@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 1 · The Variant Prop</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Lesson 1 · Design System React</p>
+  <h1>The Variant Prop</h1>
+  <p class="subtitle">A design-system component is its public interface. Today you design your first good one.</p>
+
+  <p>You already know how to make a component that <em>works</em>. A design-system
+  component has a higher bar: strangers on your team must be able to use it correctly
+  <strong>without reading its source</strong>. That makes the <strong>props API</strong> — not the
+  internal JSX — the actual product you're shipping.</p>
+
+  <p>The single most common mistake is <strong>boolean-prop soup</strong>: adding a new boolean
+  every time you want a new look. Let's see why it fails and what to do instead.</p>
+
+  <h2>The problem: booleans don't scale</h2>
+  <div class="compare">
+    <div class="bad">
+      <p class="tag">✗ Boolean soup</p>
+      <pre><code>&lt;Button primary /&gt;
+&lt;Button secondary /&gt;
+&lt;Button ghost outlined /&gt;
+
+<span class="c-com">// What does this even mean?</span>
+&lt;Button primary ghost /&gt;</code></pre>
+    </div>
+    <div class="good">
+      <p class="tag">✓ One variant prop</p>
+      <pre><code>&lt;Button variant="primary" /&gt;
+&lt;Button variant="secondary" /&gt;
+&lt;Button variant="ghost" /&gt;
+
+<span class="c-com">// Impossible states are unrepresentable</span></code></pre>
+    </div>
+  </div>
+
+  <p>With booleans, <em>n</em> looks create 2ⁿ combinations — most of them nonsense
+  (<code>primary</code> <em>and</em> <code>ghost</code>?). A single <code>variant</code> string makes the
+  choices <strong>mutually exclusive</strong> and, in TypeScript, gives you autocomplete plus a
+  compile error for typos. As the Spectrum UI guide puts it: <em>"Boolean props lock
+  you into two states forever."</em><sup><a href="#s1">1</a></sup></p>
+
+  <div class="callout">
+    <span class="label">Principle</span>
+    Prefer a <strong>closed set of named variants</strong> over booleans whenever a component has
+    more than two mutually-exclusive states. It documents intent, prevents invalid
+    combinations, and leaves room to grow (<code>variant="danger"</code> later).
+  </div>
+
+  <h2>The canonical shape</h2>
+  <p>Here is the pattern you'll reuse for almost every component. Three moves make it
+  design-system-grade:</p>
+
+  <pre><code><span class="c-com">// 1. Extend the native element → consumers get onClick, disabled, type, aria-* free</span>
+<span class="c-key">type</span> ButtonProps = React.ComponentPropsWithoutRef&lt;<span class="c-key">"button"</span>&gt; &amp; {
+  variant?: <span class="c-key">"primary"</span> | <span class="c-key">"secondary"</span> | <span class="c-key">"ghost"</span>;
+  size?: <span class="c-key">"sm"</span> | <span class="c-key">"md"</span> | <span class="c-key">"lg"</span>;
+};
+
+<span class="c-key">export function</span> Button({
+  variant = <span class="c-key">"primary"</span>,   <span class="c-com">// 2. sensible defaults → the common case needs no props</span>
+  size = <span class="c-key">"md"</span>,
+  className,
+  ...rest                <span class="c-com">// 3. spread the rest → don't re-implement the DOM</span>
+}: ButtonProps) {
+  <span class="c-key">return</span> (
+    &lt;button
+      className={`ds-btn ds-btn--${variant} ds-btn--${size} ${className ?? <span class="c-key">""</span>}`}
+      {...rest}
+    /&gt;
+  );
+}</code></pre>
+
+  <p>Why each move matters:</p>
+  <ul>
+    <li><strong>Extend the native element.</strong> <code>ComponentPropsWithoutRef&lt;"button"&gt;</code> means
+    every real button attribute already works — you never re-declare <code>onClick</code> or
+    <code>disabled</code>.<sup><a href="#s2">2</a></sup></li>
+    <li><strong>Defaults.</strong> <code>&lt;Button&gt;Save&lt;/Button&gt;</code> just works. Defaults are the
+    difference between a component people enjoy and one they configure.<sup><a href="#s3">3</a></sup></li>
+    <li><strong>Spread <code>...rest</code>.</strong> Consumers can pass anything native without you
+    predicting it. Merging <code>className</code> (not overwriting) lets them extend styling.</li>
+  </ul>
+
+  <h2>Check your understanding</h2>
+  <p>Recall, don't peek — effortful retrieval is what makes it stick.</p>
+
+  <div class="quiz" data-answer="1">
+    <p class="q">A Button needs 4 mutually-exclusive looks. Which API is best?</p>
+    <button class="quiz-opt">Four separate boolean props here</button>
+    <button class="quiz-opt">One string variant prop here</button>
+    <button class="quiz-opt">Four different button components</button>
+    <div class="quiz-feedback"
+      data-correct="Right — one closed variant set makes looks mutually exclusive and typo-safe."
+      data-wrong="A single variant prop wins: mutually exclusive, autocompleted, and easy to extend."></div>
+  </div>
+
+  <div class="quiz" data-answer="2">
+    <p class="q">Why spread <code>...rest</code> onto the underlying <code>&lt;button&gt;</code>?</p>
+    <button class="quiz-opt">It makes the component render faster</button>
+    <button class="quiz-opt">It hides props from the consumer</button>
+    <button class="quiz-opt">It forwards native props automatically</button>
+    <div class="quiz-feedback"
+      data-correct="Exactly — onClick, disabled, aria-* all work without you declaring them."
+      data-wrong="It's about reach: ...rest forwards every native attribute so you don't re-implement the DOM."></div>
+  </div>
+
+  <div class="quiz" data-answer="0">
+    <p class="q">What does <code>ComponentPropsWithoutRef&lt;"button"&gt;</code> give you?</p>
+    <button class="quiz-opt">All native button prop types</button>
+    <button class="quiz-opt">A styled button component base</button>
+    <button class="quiz-opt">Automatic dark mode support here</button>
+    <div class="quiz-feedback"
+      data-correct="Yes — it's the full, typed set of a button's native props to build on."
+      data-wrong="It's a type: the complete set of native button prop types you intersect with your own."></div>
+  </div>
+
+  <h2>Your win: build it in the repo</h2>
+  <p>Turn knowledge into a skill. In your <code>design-system-react</code> project:</p>
+  <ol>
+    <li>Create <code>src/components/Button/Button.tsx</code> with the shape above.</li>
+    <li>Add a <code>Button.css</code> with a <code>.ds-btn</code> base and one rule per
+    <code>--variant</code>/<code>--size</code> (plain CSS is fine — tokens come in a later lesson).</li>
+    <li>Render three buttons in <code>App.tsx</code>: one primary, one ghost, one
+    <code>disabled</code> — <em>passing <code>disabled</code> without adding a prop for it</em> proves your
+    <code>...rest</code> works.</li>
+  </ol>
+  <p>When it renders, you've shipped your first real design-system primitive. Tell me
+  and I'll review your API against the checklist.</p>
+
+  <div class="callout">
+    <span class="label">Primary source — read this next</span>
+    <a href="https://ui.spectrumhq.in/blog/component-api-design">Spectrum UI — “Component API Design”</a>.
+    The clearest single piece on variants vs. booleans, defaults, and exporting prop
+    types. ~10 minutes, and it reinforces everything above.
+  </div>
+
+  <div class="ask">
+    <span class="label">I'm your teacher — ask me anything.</span>
+    Stuck on the CSS? Curious why not <code>enum</code>s, or when a boolean <em>is</em> right, or how
+    this scales with <code>cva</code>? Ask in the chat. Confusion is signal, not failure.
+  </div>
+
+  <h2>Keep going</h2>
+  <p>See the compressed rules in the
+  <a href="../reference/component-api-checklist.html">Component API Checklist</a> (revisit this often).</p>
+
+  <p class="cite" id="sources"><strong>Sources</strong><br>
+    <span id="s1">1. </span><a href="https://ui.spectrumhq.in/blog/component-api-design">Spectrum UI — Component API Design</a><br>
+    <span id="s2">2. </span><a href="https://react.dev/learn/passing-props-to-a-component">react.dev — Passing Props to a Component</a><br>
+    <span id="s3">3. </span><a href="https://dev.to/selbekk/the-10-component-commandments-2a7f">Kristofer Selbekk — The 10 Component Commandments</a>
+  </p>
+
+  <nav class="lesson-nav">
+    <span>Lesson 1 of the course</span>
+    <span>Next: <em>Composition &amp; children</em> — after you've built the Button →</span>
+  </nav>
+
+  <footer>Design System React · Lesson 1 · The Variant Prop</footer>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

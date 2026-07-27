@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reference · Component API Checklist</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Reference · Design System React</p>
+  <h1>Component API Checklist</h1>
+  <p class="subtitle">The compressed essence — scan this before shipping any shared component.</p>
+
+  <h2>The props-API rules</h2>
+  <table>
+    <thead><tr><th>Rule</th><th>Do this</th><th>Not this</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Use <strong>variants</strong>, not booleans, for &gt;2 states</td>
+        <td><code>variant="primary" | "secondary" | "ghost"</code></td>
+        <td><code>isPrimary</code> + <code>isGhost</code> + <code>outlined</code></td>
+      </tr>
+      <tr>
+        <td>Give every variant/size a <strong>default</strong></td>
+        <td><code>variant = "primary", size = "md"</code></td>
+        <td>Required props for the common case</td>
+      </tr>
+      <tr>
+        <td><strong>Spread the rest</strong> onto the root element</td>
+        <td><code>&lt;button {...rest}&gt;</code></td>
+        <td>Hand-listing every native prop you support</td>
+      </tr>
+      <tr>
+        <td><strong>Forward the ref</strong> to the DOM node</td>
+        <td><code>ref</code> reaches the real <code>&lt;button&gt;</code></td>
+        <td>Ref lost inside the component</td>
+      </tr>
+      <tr>
+        <td>Default to <strong>children</strong> for content</td>
+        <td><code>&lt;Button&gt;Save&lt;/Button&gt;</code></td>
+        <td><code>label="Save"</code> for arbitrary content</td>
+      </tr>
+      <tr>
+        <td><strong>Export the prop type</strong></td>
+        <td><code>export type ButtonProps = …</code></td>
+        <td>Prop type trapped inside the file</td>
+      </tr>
+      <tr>
+        <td>Merge, don't clobber, <code>className</code></td>
+        <td><code>`ds-btn ${className ?? ""}`</code></td>
+        <td>Overwriting the consumer's class</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>The canonical shape (React 19 + TS)</h2>
+  <pre><code><span class="c-com">// Extend the native element so consumers get every real attribute for free.</span>
+<span class="c-key">type</span> ButtonProps = React.ComponentPropsWithoutRef&lt;<span class="c-key">"button"</span>&gt; &amp; {
+  variant?: <span class="c-key">"primary"</span> | <span class="c-key">"secondary"</span> | <span class="c-key">"ghost"</span>;
+  size?: <span class="c-key">"sm"</span> | <span class="c-key">"md"</span> | <span class="c-key">"lg"</span>;
+};
+
+<span class="c-key">export function</span> Button({
+  variant = <span class="c-key">"primary"</span>,
+  size = <span class="c-key">"md"</span>,
+  className,
+  ...rest              <span class="c-com">// everything native: onClick, disabled, type, aria-*</span>
+}: ButtonProps) {
+  <span class="c-key">return</span> (
+    &lt;button
+      className={`ds-btn ds-btn--${variant} ds-btn--${size} ${className ?? <span class="c-key">""</span>}`}
+      {...rest}
+    /&gt;
+  );
+}</code></pre>
+
+  <div class="callout">
+    <span class="label">The one-line test</span>
+    A design-system component is judged by its <strong>public interface</strong>,
+    not its insides. If a teammate can guess the props without reading the source,
+    the API is good.
+  </div>
+
+  <h2>Smell test before merging</h2>
+  <table>
+    <tbody>
+      <tr><td>❓</td><td>More than 2 boolean props that affect appearance? → collapse into a <code>variant</code>.</td></tr>
+      <tr><td>❓</td><td>Consumer can't pass <code>onClick</code>/<code>aria-label</code>? → you forgot <code>...rest</code>.</td></tr>
+      <tr><td>❓</td><td>Passing a <code>ref</code> does nothing? → forward it.</td></tr>
+      <tr><td>❓</td><td>Content is a <code>label</code> string? → use <code>children</code> unless it's truly a single line of text.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="cite">Sources:
+    <a href="https://ui.spectrumhq.in/blog/component-api-design">Spectrum UI — Component API Design</a> ·
+    <a href="https://dev.to/selbekk/the-10-component-commandments-2a7f">The 10 Component Commandments</a> ·
+    <a href="https://react.dev/learn/passing-props-to-a-component">react.dev — Passing Props</a>
+  </p>
+
+  <footer>Reference doc · revisit often · part of the Design System React course.</footer>
+</main>
+</body>
+</html>
