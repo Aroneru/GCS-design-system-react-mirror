@@ -1,93 +1,81 @@
-# react design system 
+# @tpl/design-kit-react
 
+Design tokens, tipografi, dan komponen **React (Tailwind v4)** untuk produk TPL —
+State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
+(`tpl/design-kit`) ke komponen React yang bisa dipublish lewat NPM.
 
+## Isi
 
-## Getting started
+- **Tokens** (`@theme`): palet warna (primary, gray, red, orange, yellow, green,
+  purple, blue-portal), semantic aliases (`brand`, `feedback-*`, `content`,
+  `surface`, `border`), skala tipografi (`display` → `caption`), spacing, radius,
+  shadow, font Lato.
+- **Komponen**: `Button`, `Badge`, `Card`, `Container`, `Icon`, `Footer`.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Install
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.com/intern-tpl-ipb/react-design-system.git
-git branch -M main
-git push -uf origin main
+```bash
+npm install @tpl/design-kit-react
 ```
 
-## Integrate with your tools
+Peer deps: `react >=18`, `react-dom >=18`, `tailwindcss ^4`.
 
-* [Set up project integrations](https://gitlab.com/intern-tpl-ipb/react-design-system/-/settings/integrations)
+## Pakai
 
-## Collaborate with your team
+```tsx
+// main.tsx — import stylesheet (token + font Lato) sekali
+import '@tpl/design-kit-react/styles.css'
+import { Button, Badge, Card } from '@tpl/design-kit-react'
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+export default function App() {
+  return (
+    <Card title="Halo" description="Kartu dari design kit" actions={
+      <Button variant="primary">Simpan</Button>
+    } />
+  )
+}
+```
 
-## Test and Deploy
+### Wajib: scan package di Tailwind consumer
 
-Use the built-in continuous integration in GitLab.
+Karena komponen memakai class utility Tailwind, project consumer perlu meng-scan
+file package ini agar class-nya ikut ter-generate. Di CSS Tailwind kamu:
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+```css
+@import 'tailwindcss';
+@import '@tpl/design-kit-react/tokens.css';   /* jika belum via styles.css */
 
-***
+@source '../node_modules/@tpl/design-kit-react/dist/**/*.js';
+```
 
-# Editing this README
+> Kalau kamu sudah `import '@tpl/design-kit-react/styles.css'`, token & font
+> sudah termuat — kamu hanya perlu baris `@source` di atas.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## Komponen & props
 
-## Suggestions for a good README
+| Komponen    | Props utama                                                          |
+| ----------- | ------------------------------------------------------------------- |
+| `Button`    | `variant`: `primary \| secondary \| danger \| ghost`                |
+| `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`          |
+| `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`     |
+| `Container` | `as` (default `div`)                                                 |
+| `Icon`      | `children` (SVG dengan `currentColor`)                              |
+| `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`               |
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## Development
 
-## Name
-Choose a self-explaining name for your project.
+```bash
+npm run dev        # situs dokumentasi (showcase) di http://localhost:5173
+npm run build      # build situs dokumentasi
+npm run build:lib  # build package -> dist/ (dipakai saat publish)
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## Publish
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+`prepublishOnly` otomatis menjalankan `build:lib`, jadi cukup:
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+```bash
+npm publish        # atau --dry-run untuk cek isi tarball
+```
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Versi mengikuti semver — lihat catatan versioning di repo Laravel (`packages/README.md`).
