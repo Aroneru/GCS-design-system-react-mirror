@@ -1,0 +1,73 @@
+/*
+ * Entry stylesheet @tpl/design-kit-react.
+ * Consumer cukup: import '@tpl/design-kit-react/styles.css'
+ *
+ * CATATAN untuk consumer memakai Tailwind v4:
+ * Supaya class utility yang dipakai komponen ikut ter-generate, scan file
+ * package ini di CSS Tailwind kamu:
+ *   @source '../node_modules/@tpl/design-kit-react/dist/**\/*.js';
+ */
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,400&display=swap');
+@import 'tailwindcss';
+@import './tokens.css';
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-gray-50 font-sans text-content antialiased;
+    }
+
+    button,
+    a {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+        @apply outline-2 outline-offset-2 outline-primary-600;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    .ds-card {
+        @apply rounded-2xl border border-border bg-surface shadow-soft;
+    }
+
+    .ds-eyebrow {
+        @apply text-caption font-bold tracking-[0.14em] text-primary-700 uppercase;
+    }
+
+    .ds-nav-link {
+        @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold text-gray-600 transition-colors hover:bg-primary-50 hover:text-primary-700;
+    }
+
+    .ds-nav-link.is-active {
+        @apply bg-primary-50 text-primary-700;
+    }
+
+    /* Scroll horizontal tipis dan bersih untuk baris type scale */
+    .ds-scroll-x {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-gray-300) transparent;
+    }
+
+    .ds-scroll-x::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .ds-scroll-x::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .ds-scroll-x::-webkit-scrollbar-thumb {
+        border-radius: 9999px;
+        background-color: var(--color-gray-300);
+    }
+}

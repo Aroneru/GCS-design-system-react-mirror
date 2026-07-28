@@ -1,75 +1,81 @@
-# React + TypeScript + Vite
+# @tpl/design-kit-react
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Design tokens, tipografi, dan komponen **React (Tailwind v4)** untuk produk TPL —
+State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
+(`tpl/design-kit`) ke komponen React yang bisa dipublish lewat NPM.
 
-Currently, two official plugins are available:
+## Isi
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Tokens** (`@theme`): palet warna (primary, gray, red, orange, yellow, green,
+  purple, blue-portal), semantic aliases (`brand`, `feedback-*`, `content`,
+  `surface`, `border`), skala tipografi (`display` → `caption`), spacing, radius,
+  shadow, font Lato.
+- **Komponen**: `Button`, `Badge`, `Card`, `Container`, `Icon`, `Footer`.
 
-## React Compiler
+## Install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install @tpl/design-kit-react
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Peer deps: `react >=18`, `react-dom >=18`, `tailwindcss ^4`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Pakai
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```tsx
+// main.tsx — import stylesheet (token + font Lato) sekali
+import '@tpl/design-kit-react/styles.css'
+import { Button, Badge, Card } from '@tpl/design-kit-react'
 
+export default function App() {
+  return (
+    <Card title="Halo" description="Kartu dari design kit" actions={
+      <Button variant="primary">Simpan</Button>
+    } />
+  )
+}
 ```
+
+### Wajib: scan package di Tailwind consumer
+
+Karena komponen memakai class utility Tailwind, project consumer perlu meng-scan
+file package ini agar class-nya ikut ter-generate. Di CSS Tailwind kamu:
+
+```css
+@import 'tailwindcss';
+@import '@tpl/design-kit-react/tokens.css';   /* jika belum via styles.css */
+
+@source '../node_modules/@tpl/design-kit-react/dist/**/*.js';
+```
+
+> Kalau kamu sudah `import '@tpl/design-kit-react/styles.css'`, token & font
+> sudah termuat — kamu hanya perlu baris `@source` di atas.
+
+## Komponen & props
+
+| Komponen    | Props utama                                                          |
+| ----------- | ------------------------------------------------------------------- |
+| `Button`    | `variant`: `primary \| secondary \| danger \| ghost`                |
+| `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`          |
+| `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`     |
+| `Container` | `as` (default `div`)                                                 |
+| `Icon`      | `children` (SVG dengan `currentColor`)                              |
+| `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`               |
+
+## Development
+
+```bash
+npm run dev        # situs dokumentasi (showcase) di http://localhost:5173
+npm run build      # build situs dokumentasi
+npm run build:lib  # build package -> dist/ (dipakai saat publish)
+```
+
+## Publish
+
+`prepublishOnly` otomatis menjalankan `build:lib`, jadi cukup:
+
+```bash
+npm publish        # atau --dry-run untuk cek isi tarball
+```
+
+Versi mengikuti semver — lihat catatan versioning di repo Laravel (`packages/README.md`).
