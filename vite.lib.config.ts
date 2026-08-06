@@ -8,16 +8,25 @@ import dts from 'vite-plugin-dts'
 export default defineConfig({
   plugins: [
     react(),
-    dts({ include: ['src/lib'], rollupTypes: true, tsconfigPath: './tsconfig.app.json' }),
+    // rollupTypes tidak dipakai: api-extractor hanya mendukung satu entry,
+    // sedangkan library ini punya subpath icons/outline & icons/solid.
+    dts({ include: ['src/lib'], entryRoot: 'src/lib', tsconfigPath: './tsconfig.app.json' }),
   ],
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/lib/index.ts'),
+      // Multi-entry: index + subpath ikon (lihat "exports" di package.json).
+      entry: {
+        index: resolve(__dirname, 'src/lib/index.ts'),
+        'icons/outline': resolve(__dirname, 'src/lib/icons/outline.ts'),
+        'icons/solid': resolve(__dirname, 'src/lib/icons/solid.ts'),
+      },
       formats: ['es'],
-      fileName: () => 'index.js',
+      fileName: (_format, entryName) => `${entryName}.js`,
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      // flowbite-react-icons ikut external supaya tidak diduplikasi ke bundle
+      // consumer — sudah terdaftar sebagai dependency package ini.
+      external: ['react', 'react-dom', 'react/jsx-runtime', /^flowbite-react-icons/],
     },
     outDir: 'dist',
     emptyOutDir: true,

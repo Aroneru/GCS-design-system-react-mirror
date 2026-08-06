@@ -16,6 +16,14 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./icons/outline": {
+      "types": "./dist/icons/outline.d.ts",
+      "import": "./dist/icons/outline.js"
+    },
+    "./icons/solid": {
+      "types": "./dist/icons/solid.d.ts",
+      "import": "./dist/icons/solid.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./tokens.css": "./dist/tokens.css"
   },

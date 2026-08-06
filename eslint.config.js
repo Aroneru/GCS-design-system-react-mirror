@@ -18,5 +18,19 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Pola `const { as: _as, ...rest } = props` dipakai untuk membuang prop
+      // tertentu sebelum sisanya di-spread ke elemen DOM — variabelnya memang
+      // sengaja tidak dipakai, jadi diabaikan lewat prefix _ dan rest sibling.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          varsIgnorePattern: '^_',
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
   },
 ])

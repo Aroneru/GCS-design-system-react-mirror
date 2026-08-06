@@ -2,7 +2,7 @@ import { Badge, Button, Card, Container, Footer } from '../../lib'
 import { FacebookIcon, InstagramIcon, XIcon } from '../socialIcons'
 
 const summaryCards = [
-  { name: 'Foundations', desc: 'Color token & typography — dasar visual dari seluruh produk.', route: '/foundations/colors' },
+  { name: 'Foundations', desc: 'Warna, tipografi, spacing, border, elevation, dan ikon — dasar visual seluruh produk.', route: '/foundations' },
   { name: 'Components', desc: 'Komponen React siap pakai dari @tpl/design-kit-react.', route: '/components' },
 ]
 
@@ -19,7 +19,7 @@ export function HomePage() {
             inklusif, dan mudah dikenali.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button as="a" href="#/foundations/colors" variant="primary">
+            <Button as="a" href="#/foundations" variant="primary">
               Lihat Foundations
             </Button>
             <Button as="a" href="#/components" variant="secondary">
@@ -72,7 +72,7 @@ export function HomePage() {
         logo="/images/komdigi-logo.svg"
         logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
         menus={[
-          { label: 'Foundations', url: '#/foundations/colors' },
+          { label: 'Foundations', url: '#/foundations' },
           { label: 'Components', url: '#/components' },
           { label: 'Card', url: '#/components/card' },
           { label: 'Footer', url: '#/components/footer' },

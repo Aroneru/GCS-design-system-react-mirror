@@ -5,13 +5,14 @@ type Section = 'home' | 'components' | 'foundations'
 const rail: { key: Section; label: string; route: string; icon: string }[] = [
   { key: 'home', label: 'Home', route: '/', icon: 'M3 10.5 12 3l9 7.5M5.5 9.5V20h13V9.5M9.5 20v-6h5v6' },
   { key: 'components', label: 'Components', route: '/components', icon: 'M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z' },
-  { key: 'foundations', label: 'Foundations', route: '/foundations/colors', icon: 'M12 3.5c3.8 3.2 6.5 6 6.5 9.5a6.5 6.5 0 1 1-13 0c0-3.5 2.7-6.3 6.5-9.5Z' },
+  { key: 'foundations', label: 'Foundations', route: '/foundations', icon: 'M12 3.5c3.8 3.2 6.5 6 6.5 9.5a6.5 6.5 0 1 1-13 0c0-3.5 2.7-6.3 6.5-9.5Z' },
 ]
 
 const sidebars: Record<string, { title: string; items: { label: string; route: string }[] }> = {
   foundations: {
     title: 'Foundations',
     items: [
+      { label: 'Overview', route: '/foundations' },
       { label: 'Colors', route: '/foundations/colors' },
       { label: 'Typography', route: '/foundations/typography' },
       { label: 'Spacing', route: '/foundations/spacing' },
