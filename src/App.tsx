@@ -10,6 +10,12 @@ import { BorderPage } from './docs/pages/foundations/BorderPage'
 import { ElevationPage } from './docs/pages/foundations/ElevationPage'
 import { IconsPage } from './docs/pages/foundations/IconsPage'
 
+import { FormOverview } from './docs/pages/form/FormOverview'
+import { InputFieldFormPage } from './docs/pages/form/InputFieldFormPage'
+import { InputFieldPage } from './docs/pages/form/input-field/InputFieldPage'
+import { FloatingLabelPage } from './docs/pages/form/input-field/FloatingLabelPage'
+import { PlaceholderPage } from './docs/pages/PlaceholderPage'
+
 import { ComponentsOverview } from './docs/pages/components/ComponentsOverview'
 import { ContainerPage } from './docs/pages/components/ContainerPage'
 import { ButtonPage } from './docs/pages/components/ButtonPage'
@@ -27,6 +33,21 @@ const routes: Record<string, () => React.ReactElement> = {
   '/foundations/border': BorderPage,
   '/foundations/elevation': ElevationPage,
   '/foundations/icons': IconsPage,
+
+  // Halaman Form selain Input Field masih placeholder — komponennya menyusul.
+  '/form': FormOverview,
+  '/form/input-field': InputFieldFormPage,
+  '/form/input-field/input': InputFieldPage,
+  '/form/input-field/floating-label': FloatingLabelPage,
+  '/form/input-field/text-area': () => (
+    <PlaceholderPage eyebrow="Form · Input Field Form" title="Text Area" />
+  ),
+  '/form/select': () => <PlaceholderPage eyebrow="Form" title="Regular Select Form" />,
+  '/form/search': () => <PlaceholderPage eyebrow="Form" title="Search Form" />,
+  '/form/upload': () => <PlaceholderPage eyebrow="Form" title="Upload Form" />,
+  '/form/radio': () => <PlaceholderPage eyebrow="Form" title="Radio Button" />,
+  '/form/toggle': () => <PlaceholderPage eyebrow="Form" title="Toggle Button" />,
+  '/form/checkbox': () => <PlaceholderPage eyebrow="Form" title="Checkbox" />,
 
   '/components': ComponentsOverview,
   '/components/container': ContainerPage,
