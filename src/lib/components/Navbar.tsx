@@ -156,6 +156,84 @@ function GuestAction({ action, variant }: { action: NavbarAction; variant: 'prim
   )
 }
 
+function NotificationControl({ notification }: { notification: NavbarNotification }) {
+  const numericCount =
+    typeof notification.unread === 'number' && Number.isFinite(notification.unread)
+      ? Math.max(0, Math.floor(notification.unread))
+      : 0
+  const hasUnreadDot = notification.unread === true
+  const hasUnreadCount = numericCount > 0
+  const visualCount = numericCount > 99 ? '99+' : String(numericCount)
+  const baseLabel = notification.label?.trim() || 'Notifikasi'
+  const accessibleLabel = hasUnreadCount
+    ? `${baseLabel}, ${numericCount} notifikasi belum dibaca`
+    : hasUnreadDot
+      ? `${baseLabel}, ada notifikasi belum dibaca`
+      : baseLabel
+  const content = (
+    <>
+      <Icon className="size-5">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"
+          />
+        </svg>
+      </Icon>
+      {hasUnreadDot && (
+        <span
+          className="absolute top-1 right-1 size-2 rounded-full bg-feedback-error"
+          aria-hidden="true"
+        />
+      )}
+      {hasUnreadCount && (
+        <span
+          className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-feedback-error px-1 text-caption leading-none font-bold text-white"
+          aria-hidden="true"
+        >
+          {visualCount}
+        </span>
+      )}
+    </>
+  )
+  const classes =
+    'relative hidden size-11 shrink-0 place-items-center rounded-full text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 lg:grid'
+
+  if (notification.href !== undefined) {
+    return (
+      <a
+        href={notification.href}
+        className={classes}
+        aria-label={accessibleLabel}
+        {...(notification.external
+          ? { target: '_blank', rel: 'noopener noreferrer' }
+          : {})}
+      >
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      className={classes}
+      aria-label={accessibleLabel}
+      onClick={notification.onClick}
+    >
+      {content}
+    </button>
+  )
+}
+
 /** Navbar utama dengan root full-width dan wrapper layout internal. */
 export function Navbar({
   brand,
@@ -185,7 +263,6 @@ export function Navbar({
   const showGuestActions = !user && Boolean(guestActions?.login || guestActions?.register)
 
   // Public contract disiapkan sekarang; rendering fitur-fitur ini ditambahkan bertahap.
-  void notification
   void mobileOpen
   void defaultMobileOpen
   void onMobileOpenChange
@@ -267,7 +344,12 @@ export function Navbar({
               )}
             </div>
           )}
-          {user && <NavbarUserMenu user={user} />}
+          {user && (
+            <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2">
+              {notification && <NotificationControl notification={notification} />}
+              <NavbarUserMenu user={user} />
+            </div>
+          )}
         </div>
       </div>
     </header>
