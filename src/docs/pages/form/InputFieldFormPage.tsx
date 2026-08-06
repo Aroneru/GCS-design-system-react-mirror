@@ -1,4 +1,4 @@
-import { FloatingLabel, InputField } from '../../../lib'
+import { FloatingLabel, InputField, TextArea } from '../../../lib'
 import { User } from '../../../lib/icons/solid'
 import { OverviewCard, OverviewPage } from '../../pageKit'
 
@@ -50,12 +50,7 @@ export function InputFieldFormPage() {
         wide
       >
         <Preview>
-          <div className="rounded-lg border border-gray-300 bg-surface px-4 py-3">
-            <p className="text-sm text-gray-500">Tulis keterangan tambahan…</p>
-            <div className="mt-8 flex justify-end">
-              <span className="text-xs text-gray-400">0/500</span>
-            </div>
-          </div>
+          <TextArea platform="mobile" placeholder="Tulis keterangan tambahan…" />
         </Preview>
       </OverviewCard>
     </OverviewPage>

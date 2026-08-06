@@ -14,6 +14,9 @@ import { FormOverview } from './docs/pages/form/FormOverview'
 import { InputFieldFormPage } from './docs/pages/form/InputFieldFormPage'
 import { InputFieldPage } from './docs/pages/form/input-field/InputFieldPage'
 import { FloatingLabelPage } from './docs/pages/form/input-field/FloatingLabelPage'
+import { TextAreaPage } from './docs/pages/form/input-field/TextAreaPage'
+import { SelectPage } from './docs/pages/form/SelectPage'
+import { RadioPage } from './docs/pages/form/RadioPage'
 import { PlaceholderPage } from './docs/pages/PlaceholderPage'
 
 import { ComponentsOverview } from './docs/pages/components/ComponentsOverview'
@@ -39,13 +42,11 @@ const routes: Record<string, () => React.ReactElement> = {
   '/form/input-field': InputFieldFormPage,
   '/form/input-field/input': InputFieldPage,
   '/form/input-field/floating-label': FloatingLabelPage,
-  '/form/input-field/text-area': () => (
-    <PlaceholderPage eyebrow="Form · Input Field Form" title="Text Area" />
-  ),
-  '/form/select': () => <PlaceholderPage eyebrow="Form" title="Regular Select Form" />,
+  '/form/input-field/text-area': TextAreaPage,
+  '/form/select': SelectPage,
   '/form/search': () => <PlaceholderPage eyebrow="Form" title="Search Form" />,
   '/form/upload': () => <PlaceholderPage eyebrow="Form" title="Upload Form" />,
-  '/form/radio': () => <PlaceholderPage eyebrow="Form" title="Radio Button" />,
+  '/form/radio': RadioPage,
   '/form/toggle': () => <PlaceholderPage eyebrow="Form" title="Toggle Button" />,
   '/form/checkbox': () => <PlaceholderPage eyebrow="Form" title="Checkbox" />,
 

@@ -24,6 +24,15 @@ export type {
   InputFieldApplication,
 } from './components/InputField'
 
+export { TextArea } from './components/TextArea'
+export type {
+  TextAreaProps,
+  TextAreaType,
+  TextAreaPlatform,
+  TextAreaApplication,
+  TextAreaToolbarAction,
+} from './components/TextArea'
+
 export { FloatingLabel } from './components/FloatingLabel'
 export type {
   FloatingLabelProps,
@@ -31,6 +40,22 @@ export type {
   FloatingLabelState,
   FloatingLabelApplication,
 } from './components/FloatingLabel'
+
+export { Select } from './components/Select'
+export type {
+  SelectProps,
+  SelectOption,
+  SelectState,
+  SelectApplication,
+} from './components/Select'
+
+export { Radio } from './components/Radio'
+export type {
+  RadioProps,
+  RadioPlatform,
+  RadioState,
+  RadioApplication,
+} from './components/Radio'
 
 // Logo brand & sosial — dipakai sebagai <Github className="size-5" />.
 export * from './brandIcons'

@@ -1,5 +1,5 @@
-import { InputField } from '../../../lib'
-import { ChevronDown, Search, Upload, User } from '../../../lib/icons/outline'
+import { InputField, Radio, Select } from '../../../lib'
+import { Search, Upload, User } from '../../../lib/icons/outline'
 import { OverviewCard, OverviewPage } from '../../pageKit'
 
 /** Pembungkus preview kartu overview — latar netral seragam. */
@@ -35,10 +35,15 @@ export function FormOverview() {
         desc="Daftar pilihan tunggal dengan tampilan yang selaras dengan Input Field."
       >
         <Preview>
-          <div className="flex h-13 items-center justify-between rounded-lg border border-gray-300 bg-gray-50 px-4">
-            <span className="text-sm text-gray-500">Pilih provinsi</span>
-            <ChevronDown className="size-4 text-gray-500" />
-          </div>
+          <Select
+            label="Provinsi"
+            info="Pilih salah satu provinsi."
+            placeholder="Pilih Apapun Itu"
+            options={[
+              { value: 'dki', label: 'DKI Jakarta' },
+              { value: 'jabar', label: 'Jawa Barat' },
+            ]}
+          />
         </Preview>
       </OverviewCard>
 
@@ -76,16 +81,8 @@ export function FormOverview() {
       >
         <Preview>
           <div className="space-y-3">
-            <span className="flex items-center gap-2.5">
-              <span className="grid size-5 place-items-center rounded-full border-2 border-primary-600">
-                <span className="size-2.5 rounded-full bg-primary-600" />
-              </span>
-              <span className="text-sm text-gray-900">Warga negara Indonesia</span>
-            </span>
-            <span className="flex items-center gap-2.5">
-              <span className="size-5 rounded-full border-2 border-gray-300" />
-              <span className="text-sm text-gray-500">Warga negara asing</span>
-            </span>
+            <Radio name="ds-overview-radio" label="Warga negara Indonesia" defaultChecked />
+            <Radio name="ds-overview-radio" label="Warga negara asing" />
           </div>
         </Preview>
       </OverviewCard>
