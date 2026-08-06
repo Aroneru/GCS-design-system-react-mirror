@@ -4,6 +4,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type MouseEventHandler,
   type ReactNode,
+  useCallback,
   useId,
   useState,
 } from 'react'
@@ -255,12 +256,22 @@ export function Navbar({
 }: NavbarProps) {
   const searchInputId = useId()
   const navigationId = useId()
+  const userMenuId = useId()
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(
     () => search?.defaultValue ?? '',
   )
   const searchValue = search?.value ?? uncontrolledSearchValue
   const showGuestActions = !user && Boolean(guestActions?.login || guestActions?.register)
+  const handleNavigationMenuChange = useCallback((itemId: string | null) => {
+    setOpenMenuId(itemId)
+    if (itemId !== null) setUserMenuOpen(false)
+  }, [])
+  const handleUserMenuChange = useCallback((open: boolean) => {
+    setUserMenuOpen(open)
+    if (open) setOpenMenuId(null)
+  }, [])
 
   // Public contract disiapkan sekarang; rendering fitur-fitur ini ditambahkan bertahap.
   void mobileOpen
@@ -331,7 +342,7 @@ export function Navbar({
             ariaLabel={ariaLabel}
             idPrefix={navigationId}
             openMenuId={openMenuId}
-            onOpenMenuChange={setOpenMenuId}
+            onOpenMenuChange={handleNavigationMenuChange}
             onNavigate={onNavigate}
           />
           {showGuestActions && guestActions && (
@@ -347,7 +358,14 @@ export function Navbar({
           {user && (
             <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2">
               {notification && <NotificationControl notification={notification} />}
-              <NavbarUserMenu user={user} />
+              <NavbarUserMenu
+                user={user}
+                activeHref={activeHref}
+                menuId={userMenuId}
+                open={userMenuOpen}
+                onOpenChange={handleUserMenuChange}
+                onNavigate={onNavigate}
+              />
             </div>
           )}
         </div>
