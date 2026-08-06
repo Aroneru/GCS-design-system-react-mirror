@@ -5,13 +5,16 @@ import {
   type MouseEventHandler,
   type ReactNode,
   useCallback,
+  useEffect,
   useId,
+  useRef,
   useState,
 } from 'react'
 import { Button } from './Button'
 import { Icon } from './Icon'
 import { cn } from '../utils/cn'
 import { NavbarNavigation } from './navbar/NavbarNavigation'
+import { NavbarMobilePanel } from './navbar/NavbarMobilePanel'
 import { NavbarUserMenu } from './navbar/NavbarUserMenu'
 
 interface NavbarItemBase {
@@ -136,13 +139,22 @@ export type NavbarProps = NavbarPropsBase &
       }
   )
 
-function GuestAction({ action, variant }: { action: NavbarAction; variant: 'primary' | 'secondary' }) {
+function GuestAction({
+  action,
+  variant,
+  onAction,
+}: {
+  action: NavbarAction
+  variant: 'primary' | 'secondary'
+  onAction?: () => void
+}) {
   if (action.href !== undefined) {
     return (
       <Button
         as="a"
         href={action.href}
         variant={variant}
+        onClick={onAction}
         {...(action.external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
       >
         {action.label}
@@ -151,13 +163,75 @@ function GuestAction({ action, variant }: { action: NavbarAction; variant: 'prim
   }
 
   return (
-    <Button variant={variant} onClick={action.onClick}>
+    <Button
+      variant={variant}
+      onClick={(event) => {
+        action.onClick(event)
+        onAction?.()
+      }}
+    >
       {action.label}
     </Button>
   )
 }
 
-function NotificationControl({ notification }: { notification: NavbarNotification }) {
+function NavbarSearchForm({
+  search,
+  inputId,
+  value,
+  className,
+  onSubmit,
+  onValueChange,
+}: {
+  search: NavbarSearchConfig
+  inputId: string
+  value: string
+  className?: string
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+  onValueChange: (value: string) => void
+}) {
+  return (
+    <form role="search" className={cn('relative', className)} onSubmit={onSubmit}>
+      <label htmlFor={inputId} className="sr-only">
+        {search.label ?? 'Cari'}
+      </label>
+      <Icon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-content-subtle">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path strokeLinecap="round" d="m16 16 4 4" />
+        </svg>
+      </Icon>
+      <input
+        id={inputId}
+        type="search"
+        name={search.name ?? 'search'}
+        value={value}
+        placeholder={search.placeholder ?? 'Cari'}
+        autoComplete={search.autoComplete ?? 'off'}
+        disabled={search.disabled}
+        className="w-full rounded-lg border border-border bg-surface py-2 pr-3 pl-9 text-sm text-content placeholder:text-content-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:opacity-50"
+        onChange={(event) => onValueChange(event.currentTarget.value)}
+      />
+    </form>
+  )
+}
+
+function NotificationControl({
+  notification,
+  className,
+  onAction,
+}: {
+  notification: NavbarNotification
+  className?: string
+  onAction?: () => void
+}) {
   const numericCount =
     typeof notification.unread === 'number' && Number.isFinite(notification.unread)
       ? Math.max(0, Math.floor(notification.unread))
@@ -205,8 +279,10 @@ function NotificationControl({ notification }: { notification: NavbarNotificatio
       )}
     </>
   )
-  const classes =
-    'relative hidden size-11 shrink-0 place-items-center rounded-full text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 lg:grid'
+  const classes = cn(
+    'relative grid size-11 shrink-0 place-items-center rounded-full text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+    className,
+  )
 
   if (notification.href !== undefined) {
     return (
@@ -214,6 +290,7 @@ function NotificationControl({ notification }: { notification: NavbarNotificatio
         href={notification.href}
         className={classes}
         aria-label={accessibleLabel}
+        onClick={onAction}
         {...(notification.external
           ? { target: '_blank', rel: 'noopener noreferrer' }
           : {})}
@@ -228,7 +305,10 @@ function NotificationControl({ notification }: { notification: NavbarNotificatio
       type="button"
       className={classes}
       aria-label={accessibleLabel}
-      onClick={notification.onClick}
+      onClick={(event) => {
+        notification.onClick(event)
+        onAction?.()
+      }}
     >
       {content}
     </button>
@@ -255,14 +335,21 @@ export function Navbar({
   ...props
 }: NavbarProps) {
   const searchInputId = useId()
+  const mobileSearchInputId = useId()
   const navigationId = useId()
   const userMenuId = useId()
+  const mobilePanelId = useId()
+  const hamburgerRef = useRef<HTMLButtonElement>(null)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [uncontrolledMobileOpen, setUncontrolledMobileOpen] = useState(defaultMobileOpen)
+  const [openMobileSubmenuId, setOpenMobileSubmenuId] = useState<string | null>(null)
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(
     () => search?.defaultValue ?? '',
   )
   const searchValue = search?.value ?? uncontrolledSearchValue
+  const isMobileControlled = mobileOpen !== undefined
+  const isMobileOpen = isMobileControlled ? mobileOpen : uncontrolledMobileOpen
   const showGuestActions = !user && Boolean(guestActions?.login || guestActions?.register)
   const handleNavigationMenuChange = useCallback((itemId: string | null) => {
     setOpenMenuId(itemId)
@@ -272,11 +359,73 @@ export function Navbar({
     setUserMenuOpen(open)
     if (open) setOpenMenuId(null)
   }, [])
+  const handleMobileOpenChange = useCallback(
+    (open: boolean) => {
+      if (open === isMobileOpen) return
 
-  // Public contract disiapkan sekarang; rendering fitur-fitur ini ditambahkan bertahap.
-  void mobileOpen
-  void defaultMobileOpen
-  void onMobileOpenChange
+      if (!isMobileControlled) setUncontrolledMobileOpen(open)
+      onMobileOpenChange?.(open)
+
+      if (open) {
+        setOpenMenuId(null)
+        setUserMenuOpen(false)
+      } else {
+        setOpenMobileSubmenuId(null)
+      }
+    },
+    [isMobileControlled, isMobileOpen, onMobileOpenChange],
+  )
+  const handleSearchSubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault()
+      const query = searchValue.trim()
+
+      if (!search || search.disabled || query.length === 0) return
+      search.onSubmit(query, event)
+    },
+    [search, searchValue],
+  )
+  const handleSearchValueChange = useCallback(
+    (value: string) => {
+      if (!search) return
+
+      if (search.value === undefined) setUncontrolledSearchValue(value)
+      search.onValueChange?.(value)
+    },
+    [search],
+  )
+
+  useEffect(() => {
+    if (!isMobileOpen) return
+
+    const closeFromEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+
+      event.preventDefault()
+      handleMobileOpenChange(false)
+      hamburgerRef.current?.focus()
+    }
+
+    document.addEventListener('keydown', closeFromEscape)
+    return () => document.removeEventListener('keydown', closeFromEscape)
+  }, [handleMobileOpenChange, isMobileOpen])
+
+  useEffect(() => {
+    const desktopQuery = window.matchMedia('(min-width: 1024px)')
+
+    const synchronizeDesktop = () => {
+      if (!desktopQuery.matches) return
+
+      if (isMobileOpen) handleMobileOpenChange(false)
+      setOpenMobileSubmenuId(null)
+      setOpenMenuId(null)
+      setUserMenuOpen(false)
+    }
+
+    synchronizeDesktop()
+    desktopQuery.addEventListener('change', synchronizeDesktop)
+    return () => desktopQuery.removeEventListener('change', synchronizeDesktop)
+  }, [handleMobileOpenChange, isMobileOpen])
 
   return (
     <header
@@ -293,48 +442,14 @@ export function Navbar({
             {brand}
           </a>
           {search && (
-            <form
-              role="search"
-              className="relative hidden w-64 shrink-0 lg:block"
-              onSubmit={(event) => {
-                event.preventDefault()
-                const query = searchValue.trim()
-
-                if (search.disabled || query.length === 0) return
-                search.onSubmit(query, event)
-              }}
-            >
-              <label htmlFor={searchInputId} className="sr-only">
-                {search.label ?? 'Cari'}
-              </label>
-              <Icon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-content-subtle">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.8}
-                >
-                  <circle cx="11" cy="11" r="7" />
-                  <path strokeLinecap="round" d="m16 16 4 4" />
-                </svg>
-              </Icon>
-              <input
-                id={searchInputId}
-                type="search"
-                name={search.name ?? 'search'}
-                value={searchValue}
-                placeholder={search.placeholder ?? 'Cari'}
-                autoComplete={search.autoComplete ?? 'off'}
-                disabled={search.disabled}
-                className="w-full rounded-lg border border-border bg-surface py-2 pr-3 pl-9 text-sm text-content placeholder:text-content-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:opacity-50"
-                onChange={(event) => {
-                  const value = event.currentTarget.value
-
-                  if (search.value === undefined) setUncontrolledSearchValue(value)
-                  search.onValueChange?.(value)
-                }}
-              />
-            </form>
+            <NavbarSearchForm
+              search={search}
+              inputId={searchInputId}
+              value={searchValue}
+              className="hidden w-64 shrink-0 lg:block"
+              onSubmit={handleSearchSubmit}
+              onValueChange={handleSearchValueChange}
+            />
           )}
           <NavbarNavigation
             items={items}
@@ -357,7 +472,9 @@ export function Navbar({
           )}
           {user && (
             <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2">
-              {notification && <NotificationControl notification={notification} />}
+              {notification && (
+                <NotificationControl notification={notification} className="hidden lg:grid" />
+              )}
               <NavbarUserMenu
                 user={user}
                 activeHref={activeHref}
@@ -368,7 +485,94 @@ export function Navbar({
               />
             </div>
           )}
+          <button
+            ref={hamburgerRef}
+            type="button"
+            className="ml-auto grid size-11 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 lg:hidden"
+            aria-label={isMobileOpen ? 'Tutup navigasi' : 'Buka navigasi'}
+            aria-expanded={isMobileOpen}
+            aria-controls={mobilePanelId}
+            onClick={() => handleMobileOpenChange(!isMobileOpen)}
+          >
+            <Icon className="size-5">
+              {isMobileOpen ? (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+                </svg>
+              ) : (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
+                </svg>
+              )}
+            </Icon>
+          </button>
         </div>
+
+        <NavbarMobilePanel
+          id={mobilePanelId}
+          open={isMobileOpen}
+          items={items}
+          activeHref={activeHref}
+          ariaLabel={ariaLabel}
+          openSubmenuId={openMobileSubmenuId}
+          onOpenSubmenuChange={setOpenMobileSubmenuId}
+          onNavigate={onNavigate}
+          onClose={() => handleMobileOpenChange(false)}
+          searchContent={
+            search ? (
+              <NavbarSearchForm
+                search={search}
+                inputId={mobileSearchInputId}
+                value={searchValue}
+                onSubmit={handleSearchSubmit}
+                onValueChange={handleSearchValueChange}
+              />
+            ) : undefined
+          }
+          guestActionsContent={
+            showGuestActions && guestActions ? (
+              <div className="flex flex-col gap-2 border-t border-border pt-4">
+                {guestActions.login && (
+                  <GuestAction
+                    action={guestActions.login}
+                    variant="secondary"
+                    onAction={() => handleMobileOpenChange(false)}
+                  />
+                )}
+                {guestActions.register && (
+                  <GuestAction
+                    action={guestActions.register}
+                    variant="primary"
+                    onAction={() => handleMobileOpenChange(false)}
+                  />
+                )}
+              </div>
+            ) : undefined
+          }
+          notificationContent={
+            user && notification ? (
+              <NotificationControl
+                notification={notification}
+                onAction={() => handleMobileOpenChange(false)}
+              />
+            ) : undefined
+          }
+          user={user}
+        />
       </div>
     </header>
   )
