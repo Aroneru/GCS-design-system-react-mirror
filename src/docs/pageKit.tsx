@@ -85,6 +85,16 @@ export function Section({ title, children }: { title: string; children: ReactNod
   )
 }
 
+/** Kartu contoh: label kecil di atas, lalu isi di dalam kotak berlatar netral. */
+export function Demo({ children, label }: { children: ReactNode; label?: string }) {
+  return (
+    <div>
+      {label && <p className="mb-2 text-sm font-black text-gray-900">{label}</p>}
+      <div className="rounded-xl border border-border bg-surface-subtle p-5">{children}</div>
+    </div>
+  )
+}
+
 /** Daftar "Prinsip penggunaan" di bagian bawah halaman Foundations. */
 export function Principles({ items }: { items: ReactNode[] }) {
   return (

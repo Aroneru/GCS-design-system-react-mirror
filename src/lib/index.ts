@@ -16,6 +16,22 @@ export type { ContainerProps } from './components/Container'
 export { Icon } from './components/Icon'
 export type { IconProps } from './components/Icon'
 
+export { InputField } from './components/InputField'
+export type {
+  InputFieldProps,
+  InputFieldPlatform,
+  InputFieldState,
+  InputFieldApplication,
+} from './components/InputField'
+
+export { FloatingLabel } from './components/FloatingLabel'
+export type {
+  FloatingLabelProps,
+  FloatingLabelPlatform,
+  FloatingLabelState,
+  FloatingLabelApplication,
+} from './components/FloatingLabel'
+
 // Logo brand & sosial — dipakai sebagai <Github className="size-5" />.
 export * from './brandIcons'
 export { brandIcons } from './brandIconRegistry'
