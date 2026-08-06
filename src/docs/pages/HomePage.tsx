@@ -69,17 +69,8 @@ export function HomePage() {
       </Container>
 
       <Footer
-        logoContent={
-          <div className="flex items-center gap-2.5">
-            <span className="grid size-9 grid-cols-2 gap-0.5 rounded-lg bg-white/95 p-2">
-              <span className="rounded-[3px] bg-primary-700" />
-              <span className="rounded-[3px] bg-primary-300" />
-              <span className="rounded-[3px] bg-primary-300" />
-              <span className="rounded-[3px] bg-primary-700" />
-            </span>
-            <span className="font-black tracking-tight text-white">Design System</span>
-          </div>
-        }
+        logo="/images/komdigi-logo.svg"
+        logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
         menus={[
           { label: 'Foundations', url: '#/foundations/colors' },
           { label: 'Components', url: '#/components' },
