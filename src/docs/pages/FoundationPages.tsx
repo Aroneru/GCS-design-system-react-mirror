@@ -1,6 +1,7 @@
 import { useState, type ComponentType, type ReactNode } from 'react'
 import * as OutlineIcons from 'flowbite-react-icons/outline'
 import * as SolidIcons from 'flowbite-react-icons/solid'
+import { brandIcons } from '../../lib/brandIconRegistry'
 import { DocHero } from '../DocHero'
 import { DocUsage } from '../DocUsage'
 
@@ -337,14 +338,8 @@ type IconCmp = ComponentType<{ className?: string }>
 const outlineEntries = Object.entries(OutlineIcons) as [string, IconCmp][]
 const solidEntries = Object.entries(SolidIcons) as [string, IconCmp][]
 
-// Logo brand/sosial — Flowbite React tidak menyertakan logo brand, jadi
-// dipertahankan sebagai SVG inline milik design kit sendiri.
-const brandIcons: [string, string][] = [
-  ['github', 'M12 2C6.5 2 2 6.6 2 12.3c0 4.5 2.9 8.4 6.8 9.7.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.4-3.4-1.4-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.3 1.1 2.9.9.1-.7.3-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.8 0-.3-.4-1.3.1-2.7 0 0 .9-.3 2.8 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .6 1.4.2 2.4.1 2.7.7.8 1 1.7 1 2.8 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 22 12.3C22 6.6 17.5 2 12 2Z'],
-  ['x', 'M17.5 3h3l-6.6 7.5L21.7 21h-5.9l-4.6-6-5.3 6H3l7-8L2.5 3h6l4.2 5.5L17.5 3Z'],
-  ['facebook', 'M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.3 0-1.7.8-1.7 1.6V12h2.8l-.4 2.9h-2.3v7A10 10 0 0 0 22 12Z'],
-  ['instagram', 'M12 4c-2.2 0-2.5 0-3.3.05-.9.04-1.4.2-1.8.35a3 3 0 0 0-1.1.7 3 3 0 0 0-.7 1.1c-.15.4-.3.9-.35 1.8C4.75 9.5 4.7 9.8 4.7 12s0 2.5.05 3.3c.04.9.2 1.4.35 1.8.15.4.4.8.7 1.1.3.3.7.55 1.1.7.4.15.9.3 1.8.35.8.05 1.1.05 3.3.05s2.5 0 3.3-.05c.9-.04 1.4-.2 1.8-.35a3 3 0 0 0 1.1-.7 3 3 0 0 0 .7-1.1c.15-.4.3-.9.35-1.8.05-.8.05-1.1.05-3.3s0-2.5-.05-3.3c-.04-.9-.2-1.4-.35-1.8a3 3 0 0 0-.7-1.1 3 3 0 0 0-1.1-.7c-.4-.15-.9-.3-1.8-.35C14.5 4 14.2 4 12 4Zm0 4.9a3.1 3.1 0 1 1 0 6.2 3.1 3.1 0 0 1 0-6.2Zm4.9-.2a.7.7 0 1 1-1.4 0 .7.7 0 0 1 1.4 0Z'],
-]
+// Logo brand/sosial — flowbite-react-icons hanya punya outline & solid, jadi
+// logo brand di-generate sebagai komponen React milik design kit sendiri.
 
 function FlowbiteGrid({ entries, q }: { entries: [string, IconCmp][]; q: string }) {
   const needle = q.toLowerCase().replace(/[\s-]/g, '')
@@ -365,12 +360,17 @@ function FlowbiteGrid({ entries, q }: { entries: [string, IconCmp][]; q: string 
 }
 
 function BrandGrid({ q }: { q: string }) {
-  const filtered = brandIcons.filter(([n]) => q === '' || n.includes(q.toLowerCase()))
+  const needle = q.toLowerCase().replace(/[\s-]/g, '')
+  const filtered = q === '' ? brandIcons : brandIcons.filter(([n]) => n.replace(/-/g, '').includes(needle))
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(44px,1fr))] gap-1">
-      {filtered.map(([name, d]) => (
-        <div key={name} title={name} className="flex aspect-square items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-primary-50 hover:text-primary-700">
-          <svg className="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={d} /></svg>
+      {filtered.map(([name, Cmp]) => (
+        <div
+          key={name}
+          title={name}
+          className="flex aspect-square items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-primary-50 hover:text-primary-700"
+        >
+          <Cmp className="size-5" />
         </div>
       ))}
     </div>
@@ -429,12 +429,18 @@ export function IconsPage() {
 
       <div className="mt-8">
         <SectionHead eyebrow="Social icons" title={`Logo brand · ${brandIcons.length}`}>
-          Logo sosial untuk footer, tautan berbagi, dan halaman login. Bungkus dengan komponen <C>Icon</C> dari design kit.
+          Logo sosial dan teknologi untuk footer, tautan berbagi, dan halaman login. Diekspor langsung dari design kit — bukan dari <C>flowbite-react-icons</C> yang hanya memuat outline &amp; solid.
         </SectionHead>
         <article className="ds-card p-5 sm:p-7">
           <BrandGrid q={q} />
         </article>
       </div>
+
+      <DocUsage code={`import { Github, Instagram, ReactLogo } from '@tpl/design-kit-react'
+
+<Github className="size-5" />
+<Instagram className="size-5 text-purple-600" />
+<ReactLogo className="size-5" />`} />
 
       <Principles items={[
         <>Konsisten dalam satu konteks — jangan mencampur outline dan solid pada kelompok aksi yang sama.</>,
