@@ -1,54 +1,49 @@
 import { DocsLayout } from './docs/DocsLayout'
 import { useHashRoute } from './docs/useHashRoute'
 import { HomePage } from './docs/pages/HomePage'
-import { ColorsPage } from './docs/pages/ColorsPage'
-import { TypographyPage } from './docs/pages/TypographyPage'
-import {
-  BadgePage,
-  ButtonPage,
-  CardPage,
-  ComponentsOverview,
-  ContainerPage,
-  FooterPage,
-} from './docs/pages/ComponentPages'
-import { BorderPage, ElevationPage, IconsPage, SpacingPage } from './docs/pages/FoundationPages'
 
-function renderPage(path: string) {
-  switch (path) {
-    case '/':
-      return <HomePage />
-    case '/foundations/colors':
-      return <ColorsPage />
-    case '/foundations/typography':
-      return <TypographyPage />
-    case '/foundations/spacing':
-      return <SpacingPage />
-    case '/foundations/border':
-      return <BorderPage />
-    case '/foundations/elevation':
-      return <ElevationPage />
-    case '/foundations/icons':
-      return <IconsPage />
-    case '/components':
-      return <ComponentsOverview />
-    case '/components/container':
-      return <ContainerPage />
-    case '/components/button':
-      return <ButtonPage />
-    case '/components/badge':
-      return <BadgePage />
-    case '/components/card':
-      return <CardPage />
-    case '/components/footer':
-      return <FooterPage />
-    default:
-      return <HomePage />
-  }
+import { FoundationsOverview } from './docs/pages/foundations/FoundationsOverview'
+import { ColorsPage } from './docs/pages/foundations/ColorsPage'
+import { TypographyPage } from './docs/pages/foundations/TypographyPage'
+import { SpacingPage } from './docs/pages/foundations/SpacingPage'
+import { BorderPage } from './docs/pages/foundations/BorderPage'
+import { ElevationPage } from './docs/pages/foundations/ElevationPage'
+import { IconsPage } from './docs/pages/foundations/IconsPage'
+
+import { ComponentsOverview } from './docs/pages/components/ComponentsOverview'
+import { ContainerPage } from './docs/pages/components/ContainerPage'
+import { ButtonPage } from './docs/pages/components/ButtonPage'
+import { BadgePage } from './docs/pages/components/BadgePage'
+import { CardPage } from './docs/pages/components/CardPage'
+import { FooterPage } from './docs/pages/components/FooterPage'
+
+const routes: Record<string, () => React.ReactElement> = {
+  '/': HomePage,
+
+  '/foundations': FoundationsOverview,
+  '/foundations/colors': ColorsPage,
+  '/foundations/typography': TypographyPage,
+  '/foundations/spacing': SpacingPage,
+  '/foundations/border': BorderPage,
+  '/foundations/elevation': ElevationPage,
+  '/foundations/icons': IconsPage,
+
+  '/components': ComponentsOverview,
+  '/components/container': ContainerPage,
+  '/components/button': ButtonPage,
+  '/components/badge': BadgePage,
+  '/components/card': CardPage,
+  '/components/footer': FooterPage,
 }
 
 function App() {
   const [path] = useHashRoute()
-  return <DocsLayout path={path}>{renderPage(path)}</DocsLayout>
+  const Page = routes[path] ?? HomePage
+  return (
+    <DocsLayout path={path}>
+      <Page />
+    </DocsLayout>
+  )
 }
 
 export default App

@@ -1,5 +1,5 @@
-import { DocHero } from '../DocHero'
-import { DocUsage } from '../DocUsage'
+import { DocHero } from '../../DocHero'
+import { DocUsage } from '../../DocUsage'
 
 const typeScale = [
   { name: 'Display', cls: 'text-display font-bold', spec: '48 / 55 · Bold', sample: 'Layanan digital untuk semua' },

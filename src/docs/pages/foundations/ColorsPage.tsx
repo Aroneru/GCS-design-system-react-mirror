@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { DocHero } from '../DocHero'
-import { DocUsage } from '../DocUsage'
+import { DocHero } from '../../DocHero'
+import { DocUsage } from '../../DocUsage'
 
 // Primitive palette — sama persis dengan foundations/colors.blade.php.
 const palettes: { key: string; name: string; colors: [number, string][] }[] = [
