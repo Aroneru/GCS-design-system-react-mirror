@@ -175,6 +175,8 @@ export function Navbar({
   ...props
 }: NavbarProps) {
   const searchInputId = useId()
+  const navigationId = useId()
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(
     () => search?.defaultValue ?? '',
   )
@@ -249,6 +251,9 @@ export function Navbar({
             items={items}
             activeHref={activeHref}
             ariaLabel={ariaLabel}
+            idPrefix={navigationId}
+            openMenuId={openMenuId}
+            onOpenMenuChange={setOpenMenuId}
             onNavigate={onNavigate}
           />
           {showGuestActions && guestActions && (
