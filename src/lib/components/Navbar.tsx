@@ -11,6 +11,7 @@ import { Button } from './Button'
 import { Icon } from './Icon'
 import { cn } from '../utils/cn'
 import { NavbarNavigation } from './navbar/NavbarNavigation'
+import { NavbarUserMenu } from './navbar/NavbarUserMenu'
 
 interface NavbarItemBase {
   id: string
@@ -266,6 +267,7 @@ export function Navbar({
               )}
             </div>
           )}
+          {user && <NavbarUserMenu user={user} />}
         </div>
       </div>
     </header>
