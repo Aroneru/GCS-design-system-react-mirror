@@ -1,4 +1,5 @@
-import { Badge, Button, Card, Container } from '../../lib'
+import { useState, type ReactNode } from 'react'
+import { Badge, Button, Card, Container, Navbar, type NavbarItem } from '../../lib'
 import { DocHero } from '../DocHero'
 import { DocUsage } from '../DocUsage'
 
@@ -9,6 +10,7 @@ const overviewItems = [
   { name: 'Button', route: '/components/button', desc: 'Aksi dengan empat varian.' },
   { name: 'Badge', route: '/components/badge', desc: 'Label status ringkas.' },
   { name: 'Card', route: '/components/card', desc: 'Kartu konten fleksibel.' },
+  { name: 'Navbar', route: '/components/navbar', desc: 'Navigasi responsif untuk guest dan pengguna terautentikasi.' },
   { name: 'Footer', route: '/components/footer', desc: 'Footer dengan menu & media sosial.' },
 ]
 
@@ -33,7 +35,7 @@ export function ComponentsOverview() {
 
 /* ---------- Layout bantu halaman komponen ---------- */
 
-function Preview({ children }: { children: React.ReactNode }) {
+function Preview({ children }: { children: ReactNode }) {
   return (
     <div className="ds-card flex flex-wrap items-center gap-4 p-8">{children}</div>
   )
@@ -48,7 +50,7 @@ function Page({
   eyebrow: string
   title: string
   description: string
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <>
@@ -161,6 +163,260 @@ export function ContainerPage() {
 {/* Render sebagai elemen lain */}
 <Container as="section">...</Container>`}
       />
+    </Page>
+  )
+}
+
+/* ---------- Navbar ---------- */
+
+const twoMenuItems: NavbarItem[] = [
+  { id: 'home', label: 'Beranda', href: '#/' },
+  { id: 'components', label: 'Komponen', href: '#/components' },
+]
+
+const fiveMenuItems: NavbarItem[] = [
+  ...twoMenuItems,
+  { id: 'colors', label: 'Warna', href: '#/foundations/colors' },
+  { id: 'typography', label: 'Tipografi', href: '#/foundations/typography' },
+  { id: 'icons', label: 'Ikon', href: '#/foundations/icons' },
+]
+
+const submenuItems: NavbarItem[] = [
+  { id: 'home', label: 'Beranda', href: '#/' },
+  {
+    id: 'foundations',
+    label: 'Foundations',
+    children: [
+      { id: 'colors', label: 'Warna', href: '#/foundations/colors' },
+      { id: 'typography', label: 'Tipografi', href: '#/foundations/typography' },
+    ],
+  },
+]
+
+const accountItems = [
+  { id: 'profile', label: 'Profil', href: '#/profile' },
+  { id: 'settings', label: 'Pengaturan', href: '#/settings' },
+]
+
+function DemoBrand() {
+  return (
+    <span className="flex items-center gap-2">
+      <span className="grid size-8 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5">
+        <span className="rounded-sm bg-white" />
+        <span className="rounded-sm bg-primary-300" />
+        <span className="rounded-sm bg-primary-300" />
+        <span className="rounded-sm bg-white" />
+      </span>
+      <span className="text-sm font-black tracking-tight text-content">KOMDIGI</span>
+    </span>
+  )
+}
+
+function NavbarShowcase({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
+  return (
+    <section className="space-y-2">
+      <div>
+        <h2 className="text-heading-4 font-black text-content">{title}</h2>
+        {note && <p className="mt-1 text-body-sm text-content-subtle">{note}</p>}
+      </div>
+      <div className="overflow-visible rounded-lg border border-border bg-gray-900 p-2">{children}</div>
+    </section>
+  )
+}
+
+export function NavbarPage() {
+  const [searchValue, setSearchValue] = useState('')
+  const [lastQuery, setLastQuery] = useState('Belum ada pencarian')
+  const [mobileGuestOpen, setMobileGuestOpen] = useState(false)
+  const [mobileUserOpen, setMobileUserOpen] = useState(false)
+
+  const brand = <DemoBrand />
+  const guestActions = {
+    login: { label: 'Masuk', href: '#/login' },
+    register: { label: 'Daftar', href: '#/register' },
+  }
+
+  return (
+    <Page
+      eyebrow="Components · Navbar"
+      title="Navbar"
+      description="Navigasi responsif dengan search, submenu satu tingkat, guest actions, notification, dan account menu."
+    >
+      <div className="space-y-10">
+        <NavbarShowcase title="Desktop Guest" note={`Controlled search · ${lastQuery}`}>
+          <Navbar
+            brand={brand}
+            brandLabel="KOMDIGI — Beranda"
+            items={fiveMenuItems}
+            activeHref="#/components"
+            search={{
+              value: searchValue,
+              onValueChange: setSearchValue,
+              onSubmit: (query) => setLastQuery(`Query terakhir: ${query}`),
+              label: 'Cari civitas atau organisasi',
+              placeholder: 'Cari Civitas, Organisasi ...',
+            }}
+            guestActions={guestActions}
+          />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Desktop Authenticated">
+          <Navbar
+            brand={brand}
+            brandLabel="KOMDIGI — Beranda"
+            items={fiveMenuItems}
+            user={{ name: 'User Komdigi', initials: 'UK', items: accountItems }}
+            notification={{ unread: true, href: '#/notifications' }}
+          />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Mobile Guest" note="Gunakan viewport di bawah 1024 px. Contoh memakai controlled mobile state.">
+          <Navbar
+            brand={brand}
+            brandLabel="KOMDIGI — Beranda"
+            items={submenuItems}
+            search={{ defaultValue: '', onSubmit: () => undefined, placeholder: 'Cari ...' }}
+            guestActions={guestActions}
+            mobileOpen={mobileGuestOpen}
+            onMobileOpenChange={setMobileGuestOpen}
+          />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Mobile Authenticated" note="Avatar, notification, dan account items tersedia pada composition mobile.">
+          <Navbar
+            brand={brand}
+            brandLabel="KOMDIGI — Beranda"
+            items={submenuItems}
+            user={{ name: 'User Mobile', initials: 'UM', items: accountItems }}
+            notification={{ unread: 8, href: '#/notifications' }}
+            mobileOpen={mobileUserOpen}
+            onMobileOpenChange={setMobileUserOpen}
+          />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="2 Menu">
+          <Navbar brand={brand} brandLabel="KOMDIGI — Beranda" items={twoMenuItems} />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="5 Menu">
+          <Navbar brand={brand} brandLabel="KOMDIGI — Beranda" items={fiveMenuItems} />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Submenu">
+          <Navbar brand={brand} brandLabel="KOMDIGI — Beranda" items={submenuItems} />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Active dan Disabled Item">
+          <Navbar
+            brand={brand}
+            brandLabel="KOMDIGI — Beranda"
+            items={[
+              { id: 'active', label: 'Aktif eksplisit', href: '#/active', active: true },
+              { id: 'disabled', label: 'Tidak tersedia', href: '#/disabled', disabled: true },
+            ]}
+            activeHref="#/disabled"
+          />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Without Search">
+          <Navbar brand={brand} brandLabel="KOMDIGI — Beranda" items={twoMenuItems} guestActions={guestActions} />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Without Guest Actions">
+          <Navbar brand={brand} brandLabel="KOMDIGI — Beranda" items={fiveMenuItems} />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Notification — Boolean Unread">
+          <Navbar
+            brand={brand}
+            brandLabel="KOMDIGI — Beranda"
+            items={twoMenuItems}
+            user={{ name: 'Boolean User', initials: 'BU' }}
+            notification={{ unread: true, onClick: () => undefined }}
+          />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Notification — Numeric Count">
+          <Navbar
+            brand={brand}
+            brandLabel="KOMDIGI — Beranda"
+            items={twoMenuItems}
+            user={{ name: 'Count User', initials: 'CU' }}
+            notification={{ unread: 125, href: '#/notifications' }}
+          />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Avatar Fallback">
+          <Navbar
+            brand={brand}
+            brandLabel="KOMDIGI — Beranda"
+            items={twoMenuItems}
+            user={{ name: 'Nama Pengguna', items: accountItems }}
+          />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Long Menu Label">
+          <Navbar
+            brand={brand}
+            brandLabel="KOMDIGI — Beranda"
+            items={[
+              { id: 'long', label: 'Menu dengan label sangat panjang untuk menguji batas layout', href: '#/long' },
+              { id: 'short', label: 'Menu ringkas', href: '#/short' },
+            ]}
+          />
+        </NavbarShowcase>
+
+        <NavbarShowcase title="Long Username">
+          <Navbar
+            brand={brand}
+            brandLabel="KOMDIGI — Beranda"
+            items={twoMenuItems}
+            user={{ name: 'Nama Pengguna Sangat Panjang untuk Pengujian Layout Navbar', items: accountItems }}
+          />
+        </NavbarShowcase>
+
+        <section className="space-y-3">
+          <h2 className="text-heading-4 font-black text-content">Props utama</h2>
+          <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-surface-subtle text-content">
+                <tr><th className="p-3">Prop</th><th className="p-3">Keterangan</th></tr>
+              </thead>
+              <tbody className="divide-y divide-border text-content-subtle">
+                <tr><td className="p-3 font-bold text-content">brand, brandLabel</td><td className="p-3">Konten brand dan accessible name.</td></tr>
+                <tr><td className="p-3 font-bold text-content">items</td><td className="p-3">Link atau submenu maksimal satu tingkat.</td></tr>
+                <tr><td className="p-3 font-bold text-content">search</td><td className="p-3">Search submit biasa, controlled atau uncontrolled.</td></tr>
+                <tr><td className="p-3 font-bold text-content">guestActions</td><td className="p-3">Action login dan register.</td></tr>
+                <tr><td className="p-3 font-bold text-content">user, notification</td><td className="p-3">Authenticated composition dan unread state.</td></tr>
+                <tr><td className="p-3 font-bold text-content">mobileOpen</td><td className="p-3">Controlled mobile panel; gunakan defaultMobileOpen untuk uncontrolled.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="ds-card space-y-3 p-5 text-sm leading-6 text-content-subtle">
+          <h2 className="text-heading-4 font-black text-content">Accessibility dan responsive</h2>
+          <p>Navbar memakai landmark header/nav/search, aria-current untuk link aktif, serta aria-expanded dan aria-controls untuk disclosure.</p>
+          <p>Desktop dimulai pada breakpoint lg. Di bawah lg, hamburger membuka panel vertikal inline yang bukan modal, tanpa backdrop, scroll lock, atau focus trap.</p>
+          <p>Avatar, Dropdown, Search Form, dan notification control saat ini masih berupa implementasi internal sementara dan bukan public API package.</p>
+        </section>
+
+        <DocUsage
+          code={`<Navbar
+  brand={<Logo />}
+  brandLabel="KOMDIGI — Beranda"
+  items={[
+    { id: 'home', label: 'Beranda', href: '/' },
+    { id: 'about', label: 'Tentang', href: '/tentang' },
+  ]}
+  search={{ onSubmit: (query) => console.log(query) }}
+  guestActions={{
+    login: { label: 'Masuk', href: '/login' },
+    register: { label: 'Daftar', href: '/register' },
+  }}
+/>`}
+        />
+      </div>
     </Page>
   )
 }

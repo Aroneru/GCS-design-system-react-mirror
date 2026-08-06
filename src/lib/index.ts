@@ -19,4 +19,16 @@ export type { IconProps } from './components/Icon'
 export { Footer } from './components/Footer'
 export type { FooterProps, FooterMenu, FooterSocial } from './components/Footer'
 
+export { Navbar } from './components/Navbar'
+export type {
+  NavbarProps,
+  NavbarItem,
+  NavbarSubItem,
+  NavbarSearchConfig,
+  NavbarAction,
+  NavbarGuestActions,
+  NavbarUser,
+  NavbarNotification,
+} from './components/Navbar'
+
 export { cn } from './utils/cn'

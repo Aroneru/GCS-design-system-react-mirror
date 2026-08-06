@@ -10,7 +10,7 @@ State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
   purple, blue-portal), semantic aliases (`brand`, `feedback-*`, `content`,
   `surface`, `border`), skala tipografi (`display` → `caption`), spacing, radius,
   shadow, font Lato.
-- **Komponen**: `Button`, `Badge`, `Card`, `Container`, `Icon`, `Footer`.
+- **Komponen**: `Button`, `Badge`, `Card`, `Container`, `Icon`, `Navbar`, `Footer`.
 
 ## Install
 
@@ -25,7 +25,7 @@ Peer deps: `react >=18`, `react-dom >=18`, `tailwindcss ^4`.
 ```tsx
 // main.tsx — import stylesheet (token + font Lato) sekali
 import '@tpl/design-kit-react/styles.css'
-import { Button, Badge, Card } from '@tpl/design-kit-react'
+import { Button, Badge, Card, Navbar } from '@tpl/design-kit-react'
 
 export default function App() {
   return (
@@ -60,7 +60,35 @@ file package ini agar class-nya ikut ter-generate. Di CSS Tailwind kamu:
 | `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`     |
 | `Container` | `as` (default `div`)                                                 |
 | `Icon`      | `children` (SVG dengan `currentColor`)                              |
+| `Navbar`    | `brand`, `brandLabel`, `items`, `search`, `guestActions`, `user`    |
 | `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`               |
+
+### Navbar
+
+```tsx
+import { Navbar } from '@tpl/design-kit-react'
+
+<Navbar
+  brand={<img src="/logo.svg" alt="" />}
+  brandLabel="KOMDIGI — Beranda"
+  items={[
+    { id: 'home', label: 'Beranda', href: '/' },
+    { id: 'components', label: 'Komponen', href: '/components' },
+  ]}
+  search={{ onSubmit: (query) => console.log(query) }}
+  guestActions={{
+    login: { label: 'Masuk', href: '/login' },
+    register: { label: 'Daftar', href: '/register' },
+  }}
+/>
+```
+
+Navbar bersifat router-agnostic dan responsive mulai breakpoint `lg`. Avatar,
+Dropdown, Search Form, dan notification control yang dipakai di dalam Navbar
+masih merupakan detail implementasi internal, bukan export publik package.
+
+Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
+bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.
 
 ## Development
 

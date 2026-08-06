@@ -10,6 +10,7 @@ import {
   ComponentsOverview,
   ContainerPage,
   FooterPage,
+  NavbarPage,
 } from './docs/pages/ComponentPages'
 import { BorderPage, ElevationPage, IconsPage, SpacingPage } from './docs/pages/FoundationPages'
 
@@ -39,6 +40,8 @@ function renderPage(path: string) {
       return <BadgePage />
     case '/components/card':
       return <CardPage />
+    case '/components/navbar':
+      return <NavbarPage />
     case '/components/footer':
       return <FooterPage />
     default:
