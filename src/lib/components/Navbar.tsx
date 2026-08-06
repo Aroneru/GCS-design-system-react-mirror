@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from 'react'
 import { cn } from '../utils/cn'
+import { NavbarNavigation } from './navbar/NavbarNavigation'
 
 interface NavbarItemBase {
   id: string
@@ -149,15 +150,10 @@ export function Navbar({
   ...props
 }: NavbarProps) {
   // Public contract disiapkan sekarang; rendering fitur-fitur ini ditambahkan bertahap.
-  void items
-  void activeHref
   void search
   void guestActions
   void user
   void notification
-  // Diterapkan pada elemen <nav> ketika navigation ditambahkan di Tahap 2.
-  void ariaLabel
-  void onNavigate
   void mobileOpen
   void defaultMobileOpen
   void onMobileOpenChange
@@ -176,6 +172,12 @@ export function Navbar({
           >
             {brand}
           </a>
+          <NavbarNavigation
+            items={items}
+            activeHref={activeHref}
+            ariaLabel={ariaLabel}
+            onNavigate={onNavigate}
+          />
         </div>
       </div>
     </header>
