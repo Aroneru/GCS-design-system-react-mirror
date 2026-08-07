@@ -148,6 +148,37 @@ function GuestAction({
   variant: 'primary' | 'secondary'
   onAction?: () => void
 }) {
+  const icon =
+    variant === 'secondary' ? (
+      <Icon className="size-4">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10 17l5-5-5-5M15 12H3" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5" />
+        </svg>
+      </Icon>
+    ) : (
+      <Icon className="size-4">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6.5l4 4L8 20H4v-4L13.5 6.5Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="m15.5 4.5 4 4" />
+        </svg>
+      </Icon>
+    )
+
   if (action.href !== undefined) {
     return (
       <Button
@@ -157,6 +188,7 @@ function GuestAction({
         onClick={onAction}
         {...(action.external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
       >
+        {icon}
         {action.label}
       </Button>
     )
@@ -170,11 +202,13 @@ function GuestAction({
         onAction?.()
       }}
     >
+      {icon}
       {action.label}
     </Button>
   )
 }
 
+// Boundary internal: ganti dengan primitive Search resmi tanpa mengubah NavbarSearchConfig.
 function NavbarSearchForm({
   search,
   inputId,
@@ -213,10 +247,10 @@ function NavbarSearchForm({
         type="search"
         name={search.name ?? 'search'}
         value={value}
-        placeholder={search.placeholder ?? 'Cari'}
+        placeholder={search.placeholder ?? 'Search Civitas, Organisasi ...'}
         autoComplete={search.autoComplete ?? 'off'}
         disabled={search.disabled}
-        className="w-full rounded-lg border border-border bg-surface py-2 pr-3 pl-9 text-sm text-content placeholder:text-content-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:bg-surface-subtle disabled:opacity-50"
+        className="box-border h-[37px] w-full rounded-lg border border-gray-300 bg-surface-subtle py-0 pr-3 pl-9 text-sm leading-[21px] font-medium text-content placeholder:text-content-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
         onChange={(event) => onValueChange(event.currentTarget.value)}
       />
     </form>
@@ -342,6 +376,7 @@ export function Navbar({
   const hamburgerRef = useRef<HTMLButtonElement>(null)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [previousUserPresent, setPreviousUserPresent] = useState(user !== undefined)
   const [uncontrolledMobileOpen, setUncontrolledMobileOpen] = useState(defaultMobileOpen)
   const [openMobileSubmenuId, setOpenMobileSubmenuId] = useState<string | null>(null)
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(
@@ -351,6 +386,12 @@ export function Navbar({
   const isMobileControlled = mobileOpen !== undefined
   const isMobileOpen = isMobileControlled ? mobileOpen : uncontrolledMobileOpen
   const showGuestActions = !user && Boolean(guestActions?.login || guestActions?.register)
+
+  if (previousUserPresent !== (user !== undefined)) {
+    setPreviousUserPresent(user !== undefined)
+    if (userMenuOpen) setUserMenuOpen(false)
+  }
+
   const handleNavigationMenuChange = useCallback((itemId: string | null) => {
     setOpenMenuId(itemId)
     if (itemId !== null) setUserMenuOpen(false)
@@ -432,8 +473,8 @@ export function Navbar({
       className={cn('w-full border-b border-border bg-surface text-content', className)}
       {...props}
     >
-      <div className="mx-auto w-full px-4 lg:px-6">
-        <div className="flex items-center py-4 lg:gap-6 lg:py-5">
+      <div className="mx-auto w-full max-w-7xl px-4 lg:px-8">
+        <div className="flex w-full min-w-0 items-center py-3 lg:gap-4 lg:py-6 2xl:gap-6">
           <a
             href={brandHref}
             className="inline-flex shrink-0 items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
@@ -446,7 +487,7 @@ export function Navbar({
               search={search}
               inputId={searchInputId}
               value={searchValue}
-              className="hidden w-64 shrink-0 lg:block"
+              className="hidden w-[348px] shrink-0 lg:block"
               onSubmit={handleSearchSubmit}
               onValueChange={handleSearchValueChange}
             />
@@ -471,7 +512,7 @@ export function Navbar({
             </div>
           )}
           {user && (
-            <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2">
+            <div className="flex min-w-0 shrink-0 items-center gap-2">
               {notification && (
                 <NotificationControl notification={notification} className="hidden lg:grid" />
               )}
@@ -494,7 +535,7 @@ export function Navbar({
             aria-controls={mobilePanelId}
             onClick={() => handleMobileOpenChange(!isMobileOpen)}
           >
-            <Icon className="size-5">
+            <Icon className="size-4">
               {isMobileOpen ? (
                 <svg
                   viewBox="0 0 24 24"
@@ -522,6 +563,19 @@ export function Navbar({
           </button>
         </div>
 
+        {search && (
+          <div className="pb-3 lg:hidden">
+            <NavbarSearchForm
+              search={search}
+              inputId={mobileSearchInputId}
+              value={searchValue}
+              className="w-full"
+              onSubmit={handleSearchSubmit}
+              onValueChange={handleSearchValueChange}
+            />
+          </div>
+        )}
+
         <NavbarMobilePanel
           id={mobilePanelId}
           open={isMobileOpen}
@@ -532,17 +586,6 @@ export function Navbar({
           onOpenSubmenuChange={setOpenMobileSubmenuId}
           onNavigate={onNavigate}
           onClose={() => handleMobileOpenChange(false)}
-          searchContent={
-            search ? (
-              <NavbarSearchForm
-                search={search}
-                inputId={mobileSearchInputId}
-                value={searchValue}
-                onSubmit={handleSearchSubmit}
-                onValueChange={handleSearchValueChange}
-              />
-            ) : undefined
-          }
           guestActionsContent={
             showGuestActions && guestActions ? (
               <div className="flex flex-col gap-2 border-t border-border pt-4">

@@ -10,6 +10,8 @@ import {
   ComponentsOverview,
   ContainerPage,
   FooterPage,
+  NavbarDesktopPreview,
+  NavbarMobilePreview,
   NavbarPage,
 } from './docs/pages/ComponentPages'
 import { BorderPage, ElevationPage, IconsPage, SpacingPage } from './docs/pages/FoundationPages'
@@ -44,6 +46,34 @@ function renderPage(path: string) {
       return <NavbarPage />
     case '/components/footer':
       return <FooterPage />
+    case '/preview/navbar/mobile-guest-collapsed':
+      return <NavbarMobilePreview variant="guest" open={false} />
+    case '/preview/navbar/mobile-guest-open':
+      return <NavbarMobilePreview variant="guest" open />
+    case '/preview/navbar/mobile-authenticated-collapsed':
+      return <NavbarMobilePreview variant="authenticated" open={false} />
+    case '/preview/navbar/mobile-authenticated-open':
+      return <NavbarMobilePreview variant="authenticated" open />
+    case '/preview/navbar/desktop-guest-5':
+      return <NavbarDesktopPreview variant="guest" menuCount={5} />
+    case '/preview/navbar/desktop-guest-4':
+      return <NavbarDesktopPreview variant="guest" menuCount={4} />
+    case '/preview/navbar/desktop-guest-3':
+      return <NavbarDesktopPreview variant="guest" menuCount={3} />
+    case '/preview/navbar/desktop-guest-2':
+      return <NavbarDesktopPreview variant="guest" menuCount={2} />
+    case '/preview/navbar/desktop-no-button-5':
+      return <NavbarDesktopPreview variant="no-button" menuCount={5} />
+    case '/preview/navbar/desktop-no-button-4':
+      return <NavbarDesktopPreview variant="no-button" menuCount={4} />
+    case '/preview/navbar/desktop-no-button-3':
+      return <NavbarDesktopPreview variant="no-button" menuCount={3} />
+    case '/preview/navbar/desktop-authenticated-5':
+      return <NavbarDesktopPreview variant="authenticated" menuCount={5} />
+    case '/preview/navbar/desktop-authenticated-4':
+      return <NavbarDesktopPreview variant="authenticated" menuCount={4} />
+    case '/preview/navbar/desktop-authenticated-3':
+      return <NavbarDesktopPreview variant="authenticated" menuCount={3} />
     default:
       return <HomePage />
   }
@@ -51,6 +81,7 @@ function renderPage(path: string) {
 
 function App() {
   const [path] = useHashRoute()
+  if (path.startsWith('/preview/navbar/')) return renderPage(path)
   return <DocsLayout path={path}>{renderPage(path)}</DocsLayout>
 }
 

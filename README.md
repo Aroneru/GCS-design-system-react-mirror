@@ -72,10 +72,16 @@ import { Navbar } from '@tpl/design-kit-react'
   brand={<img src="/logo.svg" alt="" />}
   brandLabel="KOMDIGI — Beranda"
   items={[
-    { id: 'home', label: 'Beranda', href: '/' },
-    { id: 'components', label: 'Komponen', href: '/components' },
+    {
+      id: 'menu-1',
+      label: 'Menu 1',
+      children: [{ id: 'menu-1-overview', label: 'Ringkasan', href: '/menu-1' }],
+    },
   ]}
-  search={{ onSubmit: (query) => console.log(query) }}
+  search={{
+    placeholder: 'Search Civitas, Organisasi ...',
+    onSubmit: (query) => console.log(query),
+  }}
   guestActions={{
     login: { label: 'Masuk', href: '/login' },
     register: { label: 'Daftar', href: '/register' },
@@ -83,9 +89,27 @@ import { Navbar } from '@tpl/design-kit-react'
 />
 ```
 
-Navbar bersifat router-agnostic dan responsive mulai breakpoint `lg`. Avatar,
-Dropdown, Search Form, dan notification control yang dipakai di dalam Navbar
-masih merupakan detail implementasi internal, bukan export publik package.
+Navbar bersifat router-agnostic dan responsive mulai breakpoint `lg`. Pada
+mobile, search tetap terlihat pada baris kedua ketika panel navigasi tertutup.
+Panel mobile bersifat inline dan non-modal. Avatar, Dropdown, Search Form, dan
+notification control masih merupakan detail implementasi internal.
+
+Authenticated state cukup diberikan melalui prop `user`:
+
+```tsx
+<Navbar
+  brand={<Logo />}
+  brandLabel="KOMDIGI — Beranda"
+  items={items}
+  search={{ onSubmit: (query) => console.log(query) }}
+  user={{ name: 'User Komdigi', avatarSrc: '/avatar.jpg' }}
+  notification={{ unread: true, href: '/notifications' }}
+/>
+```
+
+Type publik utama meliputi `NavbarProps`, `NavbarItem`, `NavbarSubItem`,
+`NavbarSearchConfig`, `NavbarGuestActions`, `NavbarUser`, dan
+`NavbarNotification`.
 
 Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
 bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.

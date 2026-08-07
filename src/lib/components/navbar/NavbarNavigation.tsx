@@ -44,6 +44,15 @@ export function NavbarNavigation({
   )
 
   useEffect(() => {
+    if (
+      openMenuId !== null &&
+      !navigationItems.some((item) => isSubmenuItem(item) && item.id === openMenuId)
+    ) {
+      onOpenMenuChange(null)
+    }
+  }, [navigationItems, onOpenMenuChange, openMenuId])
+
+  useEffect(() => {
     if (openMenuId === null) return
 
     const closeFromOutside = (event: PointerEvent) => {
@@ -71,18 +80,18 @@ export function NavbarNavigation({
   if (navigationItems.length === 0) return null
 
   return (
-    <nav ref={navigationRef} className="hidden min-w-0 flex-1 lg:block" aria-label={ariaLabel}>
-      <ul className="flex min-w-0 items-center justify-end gap-2">
+    <nav ref={navigationRef} className="ml-auto hidden w-fit shrink-0 lg:block" aria-label={ariaLabel}>
+      <ul className="flex w-max items-center gap-2 xl:gap-4">
         {navigationItems.map((item) => {
           if (isLinkItem(item)) {
             const active = isActive(item, activeHref)
 
             return (
-              <li key={item.id} className="min-w-0">
+              <li key={item.id}>
                 <a
                   href={item.href}
                   className={cn(
-                    'block max-w-xs truncate rounded-md px-3 py-2 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                    'block max-w-xs truncate rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
                     item.disabled
                       ? 'cursor-not-allowed text-content-subtle opacity-50'
                       : active
@@ -120,7 +129,7 @@ export function NavbarNavigation({
           const submenuId = `${idPrefix}-${encodeURIComponent(item.id)}-submenu`
 
           return (
-            <li key={item.id} className="relative min-w-0">
+            <li key={item.id} className="relative">
               <button
                 ref={(node) => {
                   if (node) triggerRefs.current.set(item.id, node)
@@ -128,7 +137,7 @@ export function NavbarNavigation({
                 }}
                 type="button"
                 className={cn(
-                  'flex max-w-xs items-center gap-1 truncate rounded-md px-3 py-2 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                  'flex max-w-xs items-center gap-1.5 truncate rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
                   item.disabled
                     ? 'cursor-not-allowed text-content-subtle opacity-50'
                     : parentActive
@@ -173,7 +182,7 @@ export function NavbarNavigation({
                       <a
                         href={child.href}
                         className={cn(
-                          'block truncate rounded-md px-3 py-2 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                          'block truncate rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
                           child.disabled
                             ? 'cursor-not-allowed text-content-subtle opacity-50'
                             : active

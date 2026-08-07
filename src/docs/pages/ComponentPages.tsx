@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Badge, Button, Card, Container, Navbar, type NavbarItem } from '../../lib'
 import { DocHero } from '../DocHero'
 import { DocUsage } from '../DocUsage'
@@ -169,29 +169,30 @@ export function ContainerPage() {
 
 /* ---------- Navbar ---------- */
 
-const twoMenuItems: NavbarItem[] = [
-  { id: 'home', label: 'Beranda', href: '#/' },
-  { id: 'components', label: 'Komponen', href: '#/components' },
-]
+function createFigmaItems(count: number): NavbarItem[] {
+  return Array.from({ length: count }, (_, index) => {
+  const menuNumber = index + 1
 
-const fiveMenuItems: NavbarItem[] = [
-  ...twoMenuItems,
-  { id: 'colors', label: 'Warna', href: '#/foundations/colors' },
-  { id: 'typography', label: 'Tipografi', href: '#/foundations/typography' },
-  { id: 'icons', label: 'Ikon', href: '#/foundations/icons' },
-]
-
-const submenuItems: NavbarItem[] = [
-  { id: 'home', label: 'Beranda', href: '#/' },
-  {
-    id: 'foundations',
-    label: 'Foundations',
+  return {
+    id: `menu-${menuNumber}`,
+    label: `Menu ${menuNumber}`,
     children: [
-      { id: 'colors', label: 'Warna', href: '#/foundations/colors' },
-      { id: 'typography', label: 'Tipografi', href: '#/foundations/typography' },
+      {
+        id: `menu-${menuNumber}-overview`,
+        label: `Ringkasan Menu ${menuNumber}`,
+        href: `#/menu-${menuNumber}`,
+      },
     ],
-  },
-]
+  }
+  })
+}
+
+const figmaMenuItems = {
+  2: createFigmaItems(2),
+  3: createFigmaItems(3),
+  4: createFigmaItems(4),
+  5: createFigmaItems(5),
+}
 
 const accountItems = [
   { id: 'profile', label: 'Profil', href: '#/profile' },
@@ -219,23 +220,186 @@ function NavbarShowcase({ title, note, children }: { title: string; note?: strin
         <h2 className="text-heading-4 font-black text-content">{title}</h2>
         {note && <p className="mt-1 text-body-sm text-content-subtle">{note}</p>}
       </div>
-      <div className="overflow-visible rounded-lg border border-border bg-gray-900 p-2">{children}</div>
+      <div className="overflow-visible rounded-lg border border-border bg-surface-subtle p-2 shadow-sm">{children}</div>
     </section>
   )
 }
 
+function NavbarDesktopShowcase({ title, src }: { title: string; src: string }) {
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+  const previewWidth = 1440
+  const previewHeight = 220
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
+
+    const updateScale = () => setScale(Math.min(1, wrapper.clientWidth / previewWidth))
+    const observer = new ResizeObserver(updateScale)
+
+    updateScale()
+    observer.observe(wrapper)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <section className="min-w-0 space-y-2">
+      <h2 className="text-heading-4 font-black text-content">{title}</h2>
+      <div
+        ref={wrapperRef}
+        className="relative w-full rounded-lg border border-border bg-surface shadow-sm"
+        style={{ height: previewHeight * scale }}
+      >
+        <iframe
+          title={`Preview ${title}`}
+          src={src}
+          className="absolute top-0 left-0 block border-0 bg-surface"
+          style={{
+            width: previewWidth,
+            height: previewHeight,
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+          }}
+        />
+      </div>
+    </section>
+  )
+}
+
+function ShowcaseGroupTitle({ children }: { children: ReactNode }) {
+  return <h2 className="border-b border-border pb-3 text-heading-3 font-black text-content">{children}</h2>
+}
+
+const demoGuestActions = {
+  login: { label: 'Masuk', onClick: () => undefined },
+  register: { label: 'Daftar', onClick: () => undefined },
+}
+
+function NavbarPreviewSurface({ children }: { children: ReactNode }) {
+  return (
+    <div
+      className="min-h-screen bg-surface"
+      onClickCapture={(event) => {
+        const target = event.target
+
+        if (target instanceof Element && target.closest('a')) {
+          event.preventDefault()
+        }
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+function NavbarMobileShowcase({
+  title,
+  src,
+  initialHeight,
+}: {
+  title: string
+  src: string
+  initialHeight: number
+}) {
+  const observerRef = useRef<ResizeObserver | null>(null)
+  const [height, setHeight] = useState(initialHeight)
+
+  useEffect(() => () => observerRef.current?.disconnect(), [])
+
+  return (
+    <NavbarShowcase
+      title={title}
+      note="Iframe memakai viewport mobile nyata; search tetap terlihat di luar panel."
+    >
+      <div className="mx-auto w-full max-w-[412px]">
+        <iframe
+          title={`Preview ${title}`}
+          src={src}
+          className="block w-full rounded-lg border-0 bg-surface"
+          style={{ height }}
+          onLoad={(event) => {
+            observerRef.current?.disconnect()
+
+            const navbar = event.currentTarget.contentDocument?.querySelector('header')
+            if (!navbar) return
+
+            const updateHeight = () => setHeight(Math.ceil(navbar.getBoundingClientRect().height))
+            observerRef.current = new ResizeObserver(updateHeight)
+            observerRef.current.observe(navbar)
+            updateHeight()
+          }}
+        />
+      </div>
+    </NavbarShowcase>
+  )
+}
+
+export function NavbarDesktopPreview({
+  variant,
+  menuCount,
+}: {
+  variant: 'guest' | 'no-button' | 'authenticated'
+  menuCount: 2 | 3 | 4 | 5
+}) {
+  const [query, setQuery] = useState('')
+  const authenticated = variant === 'authenticated'
+
+  return (
+    <NavbarPreviewSurface>
+      <Navbar
+        brand={<DemoBrand />}
+        brandLabel="KOMDIGI — Beranda"
+        items={figmaMenuItems[menuCount]}
+        search={{
+          value: query,
+          onValueChange: setQuery,
+          onSubmit: () => undefined,
+          placeholder: 'Search Civitas, Organisasi ...',
+        }}
+        guestActions={variant === 'guest' ? demoGuestActions : undefined}
+        user={authenticated ? { name: 'User Komdigi', initials: 'UK', items: accountItems } : undefined}
+        notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
+      />
+    </NavbarPreviewSurface>
+  )
+}
+
+export function NavbarMobilePreview({
+  variant,
+  open: initialOpen,
+}: {
+  variant: 'guest' | 'authenticated'
+  open: boolean
+}) {
+  const [open, setOpen] = useState(initialOpen)
+  const [query, setQuery] = useState('')
+  const authenticated = variant === 'authenticated'
+
+  return (
+    <NavbarPreviewSurface>
+      <Navbar
+        brand={<DemoBrand />}
+        brandLabel="KOMDIGI — Beranda"
+        items={figmaMenuItems[3]}
+        search={{
+          value: query,
+          onValueChange: setQuery,
+          onSubmit: () => undefined,
+          placeholder: 'Search Civitas, Organisasi ...',
+        }}
+        guestActions={authenticated ? undefined : demoGuestActions}
+        user={authenticated ? { name: 'User Komdigi', initials: 'UK', items: accountItems } : undefined}
+        notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
+        onNavigate={(_, event) => event.preventDefault()}
+        mobileOpen={open}
+        onMobileOpenChange={setOpen}
+      />
+    </NavbarPreviewSurface>
+  )
+}
+
 export function NavbarPage() {
-  const [searchValue, setSearchValue] = useState('')
-  const [lastQuery, setLastQuery] = useState('Belum ada pencarian')
-  const [mobileGuestOpen, setMobileGuestOpen] = useState(false)
-  const [mobileUserOpen, setMobileUserOpen] = useState(false)
-
-  const brand = <DemoBrand />
-  const guestActions = {
-    login: { label: 'Masuk', href: '#/login' },
-    register: { label: 'Daftar', href: '#/register' },
-  }
-
   return (
     <Page
       eyebrow="Components · Navbar"
@@ -243,137 +407,63 @@ export function NavbarPage() {
       description="Navigasi responsif dengan search, submenu satu tingkat, guest actions, notification, dan account menu."
     >
       <div className="space-y-10">
-        <NavbarShowcase title="Desktop Guest" note={`Controlled search · ${lastQuery}`}>
-          <Navbar
-            brand={brand}
-            brandLabel="KOMDIGI — Beranda"
-            items={fiveMenuItems}
-            activeHref="#/components"
-            search={{
-              value: searchValue,
-              onValueChange: setSearchValue,
-              onSubmit: (query) => setLastQuery(`Query terakhir: ${query}`),
-              label: 'Cari civitas atau organisasi',
-              placeholder: 'Cari Civitas, Organisasi ...',
-            }}
-            guestActions={guestActions}
+        <ShowcaseGroupTitle>Desktop Guest</ShowcaseGroupTitle>
+
+        <p className="text-body-sm text-content-subtle">
+          Brand pada showcase masih berupa placeholder karena aset logo KOMDIGI resmi belum tersedia di repository.
+        </p>
+
+        {([5, 4, 3, 2] as const).map((count) => (
+          <NavbarDesktopShowcase
+            key={`guest-${count}-button`}
+            title={`${count} Menu + Button`}
+            src={`#/preview/navbar/desktop-guest-${count}`}
           />
-        </NavbarShowcase>
+        ))}
 
-        <NavbarShowcase title="Desktop Authenticated">
-          <Navbar
-            brand={brand}
-            brandLabel="KOMDIGI — Beranda"
-            items={fiveMenuItems}
-            user={{ name: 'User Komdigi', initials: 'UK', items: accountItems }}
-            notification={{ unread: true, href: '#/notifications' }}
+        {([5, 4, 3] as const).map((count) => (
+          <NavbarDesktopShowcase
+            key={`guest-${count}`}
+            title={`${count} Menu tanpa Button`}
+            src={`#/preview/navbar/desktop-no-button-${count}`}
           />
-        </NavbarShowcase>
+        ))}
 
-        <NavbarShowcase title="Mobile Guest" note="Gunakan viewport di bawah 1024 px. Contoh memakai controlled mobile state.">
-          <Navbar
-            brand={brand}
-            brandLabel="KOMDIGI — Beranda"
-            items={submenuItems}
-            search={{ defaultValue: '', onSubmit: () => undefined, placeholder: 'Cari ...' }}
-            guestActions={guestActions}
-            mobileOpen={mobileGuestOpen}
-            onMobileOpenChange={setMobileGuestOpen}
+        <ShowcaseGroupTitle>Desktop Authenticated</ShowcaseGroupTitle>
+
+        {([5, 4, 3] as const).map((count) => (
+          <NavbarDesktopShowcase
+            key={`authenticated-${count}`}
+            title={`${count} Menu + User`}
+            src={`#/preview/navbar/desktop-authenticated-${count}`}
           />
-        </NavbarShowcase>
+        ))}
 
-        <NavbarShowcase title="Mobile Authenticated" note="Avatar, notification, dan account items tersedia pada composition mobile.">
-          <Navbar
-            brand={brand}
-            brandLabel="KOMDIGI — Beranda"
-            items={submenuItems}
-            user={{ name: 'User Mobile', initials: 'UM', items: accountItems }}
-            notification={{ unread: 8, href: '#/notifications' }}
-            mobileOpen={mobileUserOpen}
-            onMobileOpenChange={setMobileUserOpen}
+        <ShowcaseGroupTitle>Mobile</ShowcaseGroupTitle>
+
+        {(
+          [
+            ['Mobile Guest — Collapsed', '#/preview/navbar/mobile-guest-collapsed', 120],
+            ['Mobile Guest — Panel Open', '#/preview/navbar/mobile-guest-open', 408],
+            [
+              'Mobile Authenticated — Collapsed',
+              '#/preview/navbar/mobile-authenticated-collapsed',
+              120,
+            ],
+            [
+              'Mobile Authenticated — Panel Open',
+              '#/preview/navbar/mobile-authenticated-open',
+              444,
+            ],
+          ] satisfies Array<[string, string, number]>
+        ).map(([title, src, initialHeight]) => (
+          <NavbarMobileShowcase
+            key={src}
+            title={title}
+            src={src}
+            initialHeight={initialHeight}
           />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="2 Menu">
-          <Navbar brand={brand} brandLabel="KOMDIGI — Beranda" items={twoMenuItems} />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="5 Menu">
-          <Navbar brand={brand} brandLabel="KOMDIGI — Beranda" items={fiveMenuItems} />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="Submenu">
-          <Navbar brand={brand} brandLabel="KOMDIGI — Beranda" items={submenuItems} />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="Active dan Disabled Item">
-          <Navbar
-            brand={brand}
-            brandLabel="KOMDIGI — Beranda"
-            items={[
-              { id: 'active', label: 'Aktif eksplisit', href: '#/active', active: true },
-              { id: 'disabled', label: 'Tidak tersedia', href: '#/disabled', disabled: true },
-            ]}
-            activeHref="#/disabled"
-          />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="Without Search">
-          <Navbar brand={brand} brandLabel="KOMDIGI — Beranda" items={twoMenuItems} guestActions={guestActions} />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="Without Guest Actions">
-          <Navbar brand={brand} brandLabel="KOMDIGI — Beranda" items={fiveMenuItems} />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="Notification — Boolean Unread">
-          <Navbar
-            brand={brand}
-            brandLabel="KOMDIGI — Beranda"
-            items={twoMenuItems}
-            user={{ name: 'Boolean User', initials: 'BU' }}
-            notification={{ unread: true, onClick: () => undefined }}
-          />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="Notification — Numeric Count">
-          <Navbar
-            brand={brand}
-            brandLabel="KOMDIGI — Beranda"
-            items={twoMenuItems}
-            user={{ name: 'Count User', initials: 'CU' }}
-            notification={{ unread: 125, href: '#/notifications' }}
-          />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="Avatar Fallback">
-          <Navbar
-            brand={brand}
-            brandLabel="KOMDIGI — Beranda"
-            items={twoMenuItems}
-            user={{ name: 'Nama Pengguna', items: accountItems }}
-          />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="Long Menu Label">
-          <Navbar
-            brand={brand}
-            brandLabel="KOMDIGI — Beranda"
-            items={[
-              { id: 'long', label: 'Menu dengan label sangat panjang untuk menguji batas layout', href: '#/long' },
-              { id: 'short', label: 'Menu ringkas', href: '#/short' },
-            ]}
-          />
-        </NavbarShowcase>
-
-        <NavbarShowcase title="Long Username">
-          <Navbar
-            brand={brand}
-            brandLabel="KOMDIGI — Beranda"
-            items={twoMenuItems}
-            user={{ name: 'Nama Pengguna Sangat Panjang untuk Pengujian Layout Navbar', items: accountItems }}
-          />
-        </NavbarShowcase>
+        ))}
 
         <section className="space-y-3">
           <h2 className="text-heading-4 font-black text-content">Props utama</h2>
@@ -397,7 +487,7 @@ export function NavbarPage() {
         <section className="ds-card space-y-3 p-5 text-sm leading-6 text-content-subtle">
           <h2 className="text-heading-4 font-black text-content">Accessibility dan responsive</h2>
           <p>Navbar memakai landmark header/nav/search, aria-current untuk link aktif, serta aria-expanded dan aria-controls untuk disclosure.</p>
-          <p>Desktop dimulai pada breakpoint lg. Di bawah lg, hamburger membuka panel vertikal inline yang bukan modal, tanpa backdrop, scroll lock, atau focus trap.</p>
+          <p>Desktop dimulai pada breakpoint lg. Di bawah lg, search selalu terlihat pada baris kedua dan hamburger membuka panel vertikal inline yang bukan modal.</p>
           <p>Avatar, Dropdown, Search Form, dan notification control saat ini masih berupa implementasi internal sementara dan bukan public API package.</p>
         </section>
 
@@ -406,10 +496,9 @@ export function NavbarPage() {
   brand={<Logo />}
   brandLabel="KOMDIGI — Beranda"
   items={[
-    { id: 'home', label: 'Beranda', href: '/' },
-    { id: 'about', label: 'Tentang', href: '/tentang' },
+    { id: 'menu-1', label: 'Menu 1', children: [{ id: 'overview', label: 'Ringkasan', href: '/menu-1' }] },
   ]}
-  search={{ onSubmit: (query) => console.log(query) }}
+  search={{ placeholder: 'Search Civitas, Organisasi ...', onSubmit: (query) => console.log(query) }}
   guestActions={{
     login: { label: 'Masuk', href: '/login' },
     register: { label: 'Daftar', href: '/register' },

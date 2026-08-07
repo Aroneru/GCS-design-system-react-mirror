@@ -77,7 +77,7 @@ export function NavbarUserMenu({
   }, [hasMenu, onOpenChange, open])
 
   const avatar = (compact: boolean) => (
-    <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full bg-surface-subtle text-sm font-bold text-content">
+    <span className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-full bg-surface-subtle text-sm font-bold text-content">
       {showImage ? (
         <img
           src={user.avatarSrc}
@@ -92,7 +92,7 @@ export function NavbarUserMenu({
   )
 
   return (
-    <div ref={rootRef} className="relative ml-auto min-w-0 shrink-0">
+    <div ref={rootRef} className="relative min-w-0 shrink-0">
       <div className="lg:hidden">
         {avatar(true)}
         {!showImage && <span className="sr-only">{displayName}</span>}
@@ -152,7 +152,7 @@ export function NavbarUserMenu({
                   <a
                     href={item.href}
                     className={cn(
-                      'block truncate rounded-md px-3 py-2 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                      'block truncate rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
                       item.disabled
                         ? 'cursor-not-allowed text-content-subtle opacity-50'
                         : active

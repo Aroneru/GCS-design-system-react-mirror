@@ -16,7 +16,6 @@ interface NavbarMobilePanelProps {
   onOpenSubmenuChange: (itemId: string | null) => void
   onNavigate?: NavbarProps['onNavigate']
   onClose: () => void
-  searchContent?: ReactNode
   guestActionsContent?: ReactNode
   notificationContent?: ReactNode
   user?: NavbarUser
@@ -51,7 +50,7 @@ function MobileLink({
     <a
       href={item.href}
       className={cn(
-        'block truncate rounded-md px-3 py-2.5 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+        'block truncate rounded-md px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
         item.disabled
           ? 'cursor-not-allowed text-content-subtle opacity-50'
           : active
@@ -87,7 +86,6 @@ export function NavbarMobilePanel({
   onOpenSubmenuChange,
   onNavigate,
   onClose,
-  searchContent,
   guestActionsContent,
   notificationContent,
   user,
@@ -98,14 +96,16 @@ export function NavbarMobilePanel({
   const accountItems = user?.items?.filter((item) => typeof item.href === 'string') ?? []
 
   useEffect(() => {
-    if (!open && openSubmenuId !== null) onOpenSubmenuChange(null)
-  }, [onOpenSubmenuChange, open, openSubmenuId])
+    const submenuStillExists = navigationItems.some(
+      (item) => isSubmenuItem(item) && item.id === openSubmenuId,
+    )
+
+    if (openSubmenuId !== null && (!open || !submenuStillExists)) onOpenSubmenuChange(null)
+  }, [navigationItems, onOpenSubmenuChange, open, openSubmenuId])
 
   return (
     <div id={id} hidden={!open} className="border-t border-border bg-surface lg:hidden">
       <div className="space-y-5 px-4 py-4">
-        {searchContent}
-
         {navigationItems.length > 0 && (
           <nav aria-label={ariaLabel}>
             <ul className="space-y-1">
@@ -137,7 +137,7 @@ export function NavbarMobilePanel({
                     <button
                       type="button"
                       className={cn(
-                        'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2.5 text-left text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                        'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
                         item.disabled
                           ? 'cursor-not-allowed text-content-subtle opacity-50'
                           : parentActive
