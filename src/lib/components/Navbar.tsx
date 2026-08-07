@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { Bell } from 'flowbite-react-icons/solid'
 import { Button } from './Button'
 import { Icon } from './Icon'
 import { cn } from '../utils/cn'
@@ -269,55 +270,14 @@ function NotificationControl({
   className?: string
   onAction?: () => void
 }) {
-  const numericCount =
-    typeof notification.unread === 'number' && Number.isFinite(notification.unread)
-      ? Math.max(0, Math.floor(notification.unread))
-      : 0
-  const hasUnreadDot = notification.unread === true
-  const hasUnreadCount = numericCount > 0
-  const visualCount = numericCount > 99 ? '99+' : String(numericCount)
-  const baseLabel = notification.label?.trim() || 'Notifikasi'
-  const accessibleLabel = hasUnreadCount
-    ? `${baseLabel}, ${numericCount} notifikasi belum dibaca`
-    : hasUnreadDot
-      ? `${baseLabel}, ada notifikasi belum dibaca`
-      : baseLabel
+  const accessibleLabel = notification.label?.trim() || 'Notifikasi'
   const content = (
-    <>
-      <Icon className="size-5">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.8}
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"
-          />
-        </svg>
-      </Icon>
-      {hasUnreadDot && (
-        <span
-          className="absolute top-1 right-1 size-2 rounded-full bg-feedback-error"
-          aria-hidden="true"
-        />
-      )}
-      {hasUnreadCount && (
-        <span
-          className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-feedback-error px-1 text-caption leading-none font-bold text-white"
-          aria-hidden="true"
-        >
-          {visualCount}
-        </span>
-      )}
-    </>
+    <Icon className="size-5">
+      <Bell aria-hidden="true" focusable="false" />
+    </Icon>
   )
   const classes = cn(
-    'relative grid size-11 shrink-0 place-items-center rounded-full text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+    'inline-flex size-10 shrink-0 items-center justify-center text-content transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
     className,
   )
 
@@ -496,42 +456,47 @@ export function Navbar({
               onValueChange={handleSearchValueChange}
             />
           )}
-          {menuPosition === 'right' && <div className="hidden min-w-0 flex-1 lg:block" aria-hidden="true" />}
-          <NavbarNavigation
-            items={items}
-            activeHref={activeHref}
-            ariaLabel={ariaLabel}
-            idPrefix={navigationId}
-            openMenuId={openMenuId}
-            onOpenMenuChange={handleNavigationMenuChange}
-            onNavigate={onNavigate}
-          />
-          {menuPosition === 'left' && <div className="hidden min-w-0 flex-1 lg:block" aria-hidden="true" />}
-          {showGuestActions && guestActions && (
-            <div className="hidden shrink-0 items-center gap-2 lg:flex">
-              {guestActions.login && (
-                <GuestAction action={guestActions.login} variant="secondary" />
-              )}
-              {guestActions.register && (
-                <GuestAction action={guestActions.register} variant="primary" />
-              )}
-            </div>
-          )}
-          {user && (
-            <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2 lg:ml-0">
-              {notification && (
-                <NotificationControl notification={notification} className="hidden lg:grid" />
-              )}
-              <NavbarUserMenu
-                user={user}
-                activeHref={activeHref}
-                menuId={userMenuId}
-                open={userMenuOpen}
-                onOpenChange={handleUserMenuChange}
-                onNavigate={onNavigate}
-              />
-            </div>
-          )}
+          <div
+            className={cn(
+              'ml-auto flex min-w-0 items-center lg:gap-4 2xl:gap-6',
+              !user && menuPosition === 'left' && 'lg:flex-1 lg:justify-between',
+            )}
+          >
+            <NavbarNavigation
+              items={items}
+              activeHref={activeHref}
+              ariaLabel={ariaLabel}
+              idPrefix={navigationId}
+              openMenuId={openMenuId}
+              onOpenMenuChange={handleNavigationMenuChange}
+              onNavigate={onNavigate}
+            />
+            {showGuestActions && guestActions && (
+              <div className="hidden shrink-0 items-center gap-2 lg:flex">
+                {guestActions.login && (
+                  <GuestAction action={guestActions.login} variant="secondary" />
+                )}
+                {guestActions.register && (
+                  <GuestAction action={guestActions.register} variant="primary" />
+                )}
+              </div>
+            )}
+            {user && (
+              <div className="flex min-w-0 shrink-0 items-center gap-1">
+                {notification && (
+                  <NotificationControl notification={notification} className="hidden lg:grid" />
+                )}
+                <NavbarUserMenu
+                  user={user}
+                  activeHref={activeHref}
+                  menuId={userMenuId}
+                  open={userMenuOpen}
+                  onOpenChange={handleUserMenuChange}
+                  onNavigate={onNavigate}
+                />
+              </div>
+            )}
+          </div>
           <button
             ref={hamburgerRef}
             type="button"
