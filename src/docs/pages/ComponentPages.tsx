@@ -307,14 +307,12 @@ function NavbarPreviewSurface({ children }: { children: ReactNode }) {
 function NavbarMobileShowcase({
   title,
   src,
-  initialHeight,
 }: {
   title: string
   src: string
-  initialHeight: number
 }) {
   const observerRef = useRef<ResizeObserver | null>(null)
-  const [height, setHeight] = useState(initialHeight)
+  const [height, setHeight] = useState(122)
 
   useEffect(() => () => observerRef.current?.disconnect(), [])
 
@@ -385,12 +383,10 @@ export function NavbarDesktopPreview({
 
 export function NavbarMobilePreview({
   variant,
-  open: initialOpen,
 }: {
   variant: 'guest' | 'authenticated'
-  open: boolean
 }) {
-  const [open, setOpen] = useState(initialOpen)
+  const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const authenticated = variant === 'authenticated'
 
@@ -470,25 +466,14 @@ export function NavbarPage() {
 
         {(
           [
-            ['Mobile Guest — Collapsed', '#/preview/navbar/mobile-guest-collapsed', 120],
-            ['Mobile Guest — Panel Open', '#/preview/navbar/mobile-guest-open', 408],
-            [
-              'Mobile Authenticated — Collapsed',
-              '#/preview/navbar/mobile-authenticated-collapsed',
-              120,
-            ],
-            [
-              'Mobile Authenticated — Panel Open',
-              '#/preview/navbar/mobile-authenticated-open',
-              444,
-            ],
-          ] satisfies Array<[string, string, number]>
-        ).map(([title, src, initialHeight]) => (
+            ['Mobile Guest', '#/preview/navbar/mobile-guest'],
+            ['Mobile Authenticated', '#/preview/navbar/mobile-authenticated'],
+          ] satisfies Array<[string, string]>
+        ).map(([title, src]) => (
           <NavbarMobileShowcase
             key={src}
             title={title}
             src={src}
-            initialHeight={initialHeight}
           />
         ))}
 

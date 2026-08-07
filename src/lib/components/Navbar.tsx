@@ -518,7 +518,7 @@ export function Navbar({
             </div>
           )}
           {user && (
-            <div className="flex min-w-0 shrink-0 items-center gap-2">
+            <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2 lg:ml-0">
               {notification && (
                 <NotificationControl notification={notification} className="hidden lg:grid" />
               )}
@@ -535,7 +535,10 @@ export function Navbar({
           <button
             ref={hamburgerRef}
             type="button"
-            className="ml-auto grid size-11 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 lg:hidden"
+            className={cn(
+              'grid size-11 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 lg:hidden',
+              user ? 'ml-2' : 'ml-auto',
+            )}
             aria-label={isMobileOpen ? 'Tutup navigasi' : 'Buka navigasi'}
             aria-expanded={isMobileOpen}
             aria-controls={mobilePanelId}
@@ -570,12 +573,12 @@ export function Navbar({
         </div>
 
         {search && (
-          <div className="pb-3 lg:hidden">
+          <div className="pb-4 lg:hidden">
             <NavbarSearchForm
               search={search}
               inputId={mobileSearchInputId}
               value={searchValue}
-              className="w-full"
+              className="mx-auto w-full max-w-[348px]"
               onSubmit={handleSearchSubmit}
               onValueChange={handleSearchValueChange}
             />

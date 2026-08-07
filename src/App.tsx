@@ -46,14 +46,10 @@ function renderPage(path: string) {
       return <NavbarPage />
     case '/components/footer':
       return <FooterPage />
-    case '/preview/navbar/mobile-guest-collapsed':
-      return <NavbarMobilePreview variant="guest" open={false} />
-    case '/preview/navbar/mobile-guest-open':
-      return <NavbarMobilePreview variant="guest" open />
-    case '/preview/navbar/mobile-authenticated-collapsed':
-      return <NavbarMobilePreview variant="authenticated" open={false} />
-    case '/preview/navbar/mobile-authenticated-open':
-      return <NavbarMobilePreview variant="authenticated" open />
+    case '/preview/navbar/mobile-guest':
+      return <NavbarMobilePreview variant="guest" />
+    case '/preview/navbar/mobile-authenticated':
+      return <NavbarMobilePreview variant="authenticated" />
     case '/preview/navbar/desktop-guest-5':
       return <NavbarDesktopPreview variant="guest" menuCount={5} />
     case '/preview/navbar/desktop-guest-4':
