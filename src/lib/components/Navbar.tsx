@@ -338,9 +338,9 @@ export function Navbar({
   const userMenuId = useId()
   const mobilePanelId = useId()
   const hamburgerRef = useRef<HTMLButtonElement>(null)
+  const previousUserPresentRef = useRef(user !== undefined)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [previousUserPresent, setPreviousUserPresent] = useState(user !== undefined)
   const [uncontrolledMobileOpen, setUncontrolledMobileOpen] = useState(defaultMobileOpen)
   const [openMobileSubmenuId, setOpenMobileSubmenuId] = useState<string | null>(null)
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(
@@ -350,11 +350,6 @@ export function Navbar({
   const isMobileControlled = mobileOpen !== undefined
   const isMobileOpen = isMobileControlled ? mobileOpen : uncontrolledMobileOpen
   const showGuestActions = !user && Boolean(guestActions?.login || guestActions?.register)
-
-  if (previousUserPresent !== (user !== undefined)) {
-    setPreviousUserPresent(user !== undefined)
-    if (userMenuOpen) setUserMenuOpen(false)
-  }
 
   const handleNavigationMenuChange = useCallback((itemId: string | null) => {
     setOpenMenuId(itemId)
@@ -399,6 +394,17 @@ export function Navbar({
     },
     [search],
   )
+
+  useEffect(() => {
+    const userPresent = user !== undefined
+    const userWasRemoved = previousUserPresentRef.current && !userPresent
+
+    previousUserPresentRef.current = userPresent
+    if (!userWasRemoved) return
+
+    const closeUserMenuTimer = window.setTimeout(() => setUserMenuOpen(false), 0)
+    return () => window.clearTimeout(closeUserMenuTimer)
+  }, [user])
 
   useEffect(() => {
     if (!isMobileOpen) return

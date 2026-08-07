@@ -93,6 +93,8 @@ Navbar bersifat router-agnostic dan responsive mulai breakpoint `lg`. Pada
 mobile, search tetap terlihat pada baris kedua ketika panel navigasi tertutup.
 Panel mobile bersifat inline dan non-modal. Avatar, Dropdown, Search Form, dan
 notification control masih merupakan detail implementasi internal.
+`notification.unread` tetap tersedia untuk kompatibilitas state API, tetapi
+desain Navbar saat ini tidak menampilkannya sebagai badge atau indikator visual.
 
 Authenticated state cukup diberikan melalui prop `user`:
 
