@@ -57,6 +57,22 @@ export type {
   RadioApplication,
 } from './components/Radio'
 
+export { Toggle } from './components/Toggle'
+export type {
+  ToggleProps,
+  TogglePlatform,
+  ToggleState,
+  ToggleApplication,
+} from './components/Toggle'
+
+export { Checkbox } from './components/Checkbox'
+export type {
+  CheckboxProps,
+  CheckboxPlatform,
+  CheckboxState,
+  CheckboxApplication,
+} from './components/Checkbox'
+
 // Logo brand & sosial — dipakai sebagai <Github className="size-5" />.
 export * from './brandIcons'
 export { brandIcons } from './brandIconRegistry'

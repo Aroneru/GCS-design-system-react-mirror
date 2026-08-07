@@ -22,9 +22,20 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-NOTES.md
-MISSION.md  
-lessons
-learning-records
+# ── Catatan & materi belajar pribadi ──────────────────────────────
+# Awalan "/" mengunci pola ke root project, supaya mis. src/assets/
+# tidak ikut terabaikan kalau suatu saat dibuat.
+/MISSION.md
+/NOTES.md
+/RESOURCES.md
+/lessons/
+/learning-records/
+/reference/
+/assets/
+
+# Hasil `npm pack` saat uji coba paket secara lokal
+*.tgz
+
+# Aset kerja yang belum dipakai produk
 public/images/LOGO STASI Random bikin Horizontal.svg
 public/images/remade idfc co more revision.svg
