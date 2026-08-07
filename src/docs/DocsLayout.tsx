@@ -1,23 +1,50 @@
 import { useEffect, useState, type ReactNode } from 'react'
 
-type Section = 'home' | 'components' | 'foundations'
+type Section = 'home' | 'components' | 'form' | 'foundations' | 'example'
 
 const rail: { key: Section; label: string; route: string; icon: string }[] = [
   { key: 'home', label: 'Home', route: '/', icon: 'M3 10.5 12 3l9 7.5M5.5 9.5V20h13V9.5M9.5 20v-6h5v6' },
   { key: 'components', label: 'Components', route: '/components', icon: 'M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z' },
-  { key: 'foundations', label: 'Foundations', route: '/foundations/colors', icon: 'M12 3.5c3.8 3.2 6.5 6 6.5 9.5a6.5 6.5 0 1 1-13 0c0-3.5 2.7-6.3 6.5-9.5Z' },
+  { key: 'form', label: 'Form', route: '/form', icon: 'M4 6h16M4 12h10M4 18h13M17.5 10.5l3 3-4.5 4.5H13v-3l4.5-4.5Z' },
+  { key: 'foundations', label: 'Foundations', route: '/foundations', icon: 'M12 3.5c3.8 3.2 6.5 6 6.5 9.5a6.5 6.5 0 1 1-13 0c0-3.5 2.7-6.3 6.5-9.5Z' },
+  { key: 'example', label: 'Example', route: '/example', icon: 'M4 5.5h16v13H4v-13Zm0 4h16M7.5 13h5m-5 2.5h8' },
 ]
 
-const sidebars: Record<string, { title: string; items: { label: string; route: string }[] }> = {
+/** Entri panel samping; `children` dipakai halaman yang punya sub-halaman. */
+type NavItem = { label: string; route: string; children?: NavItem[] }
+
+const sidebars: Record<string, { title: string; items: NavItem[] }> = {
   foundations: {
     title: 'Foundations',
     items: [
+      { label: 'Overview', route: '/foundations' },
       { label: 'Colors', route: '/foundations/colors' },
       { label: 'Typography', route: '/foundations/typography' },
       { label: 'Spacing', route: '/foundations/spacing' },
       { label: 'Border', route: '/foundations/border' },
       { label: 'Elevation', route: '/foundations/elevation' },
       { label: 'Icons', route: '/foundations/icons' },
+    ],
+  },
+  form: {
+    title: 'Form',
+    items: [
+      { label: 'Overview', route: '/form' },
+      {
+        label: 'Input Field Form',
+        route: '/form/input-field',
+        children: [
+          { label: 'Input Field', route: '/form/input-field/input' },
+          { label: 'Floating Label', route: '/form/input-field/floating-label' },
+          { label: 'Text Area', route: '/form/input-field/text-area' },
+        ],
+      },
+      { label: 'Regular Select Form', route: '/form/select' },
+      { label: 'Search Form', route: '/form/search' },
+      { label: 'Upload Form', route: '/form/upload' },
+      { label: 'Radio Button', route: '/form/radio' },
+      { label: 'Toggle Button', route: '/form/toggle' },
+      { label: 'Checkbox', route: '/form/checkbox' },
     ],
   },
   components: {
@@ -37,7 +64,42 @@ const sidebars: Record<string, { title: string; items: { label: string; route: s
 function sectionOf(path: string): Section {
   if (path.startsWith('/foundations')) return 'foundations'
   if (path.startsWith('/components')) return 'components'
+  if (path.startsWith('/form')) return 'form'
+  if (path.startsWith('/example')) return 'example'
   return 'home'
+}
+
+/** Daftar tautan panel samping — sub-halaman ditarik masuk di bawah induknya. */
+function NavLinks({ items, path }: { items: NavItem[]; path: string }) {
+  return (
+    <>
+      {items.map((item) => (
+        <div key={item.route} className="mt-1">
+          <a
+            href={`#${item.route}`}
+            className={`ds-nav-link w-full ${path === item.route ? 'is-active' : ''}`}
+            aria-current={path === item.route ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+          {item.children && (
+            <div className="mt-1 ml-5 border-l border-border pl-2">
+              {item.children.map((child) => (
+                <a
+                  key={child.route}
+                  href={`#${child.route}`}
+                  className={`ds-nav-link w-full py-2 text-[13px] ${path === child.route ? 'is-active' : ''}`}
+                  aria-current={path === child.route ? 'page' : undefined}
+                >
+                  {child.label}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </>
+  )
 }
 
 function Logo({ small }: { small?: boolean }) {
@@ -103,11 +165,7 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
               {sidebar && (
                 <>
                   <p className="mt-6 mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">{sidebar.title}</p>
-                  {sidebar.items.map((item) => (
-                    <a key={item.route} href={`#${item.route}`} className={`ds-nav-link mt-1 w-full ${path === item.route ? 'is-active' : ''}`}>
-                      {item.label}
-                    </a>
-                  ))}
+                  <NavLinks items={sidebar.items} path={path} />
                 </>
               )}
             </nav>
@@ -162,17 +220,8 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
         >
           <div className="flex h-full flex-col px-5 py-7">
             <p className="px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">{sidebar.title}</p>
-            <nav className="mt-3 space-y-1" aria-label={sidebar.title}>
-              {sidebar.items.map((item) => (
-                <a
-                  key={item.route}
-                  href={`#${item.route}`}
-                  className={`ds-nav-link w-full ${path === item.route ? 'is-active' : ''}`}
-                  aria-current={path === item.route ? 'page' : undefined}
-                >
-                  {item.label}
-                </a>
-              ))}
+            <nav className="mt-2" aria-label={sidebar.title}>
+              <NavLinks items={sidebar.items} path={path} />
             </nav>
             <div className="mt-auto rounded-xl bg-gray-50 p-4">
               <p className="text-xs font-bold text-gray-900">Foundation v1.0</p>
