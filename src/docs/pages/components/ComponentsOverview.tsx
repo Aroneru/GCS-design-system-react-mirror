@@ -1,4 +1,4 @@
-import { Badge, Button } from '../../../lib'
+import { Badge, Button, Navbar } from '../../../lib'
 import { OverviewCard, OverviewPage } from '../../pageKit'
 
 export function ComponentsOverview() {
@@ -58,6 +58,29 @@ export function ComponentsOverview() {
               <div className="h-1.5 w-2/3 rounded bg-gray-200" />
             </div>
           </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/navbar"
+        name="Navbar"
+        desc="Navigasi responsif dengan search, menu, guest actions, dan account controls."
+        wide
+      >
+        <div className="overflow-hidden rounded-xl bg-surface-subtle p-2">
+          <Navbar
+            brand={<span className="text-sm font-black text-content">KOMDIGI</span>}
+            brandLabel="KOMDIGI — Beranda"
+            items={[
+              { id: 'menu-1', label: 'Menu 1', href: '#/menu-1' },
+              { id: 'menu-2', label: 'Menu 2', href: '#/menu-2' },
+            ]}
+            guestActions={{
+              login: { label: 'Masuk', onClick: () => undefined },
+              register: { label: 'Daftar', onClick: () => undefined },
+            }}
+            onNavigate={(_, event) => event.preventDefault()}
+          />
         </div>
       </OverviewCard>
 

@@ -28,6 +28,11 @@ import { ButtonPage } from './docs/pages/components/ButtonPage'
 import { BadgePage } from './docs/pages/components/BadgePage'
 import { CardPage } from './docs/pages/components/CardPage'
 import { FooterPage } from './docs/pages/components/FooterPage'
+import {
+  NavbarDesktopPreview,
+  NavbarMobilePreview,
+  NavbarPage,
+} from './docs/pages/components/NavbarPage'
 
 const routes: Record<string, () => React.ReactElement> = {
   '/': HomePage,
@@ -59,12 +64,50 @@ const routes: Record<string, () => React.ReactElement> = {
   '/components/button': ButtonPage,
   '/components/badge': BadgePage,
   '/components/card': CardPage,
+  '/components/navbar': NavbarPage,
   '/components/footer': FooterPage,
+}
+
+function renderNavbarPreview(path: string) {
+  switch (path) {
+    case '/preview/navbar/mobile-guest':
+      return <NavbarMobilePreview variant="guest" />
+    case '/preview/navbar/mobile-authenticated':
+      return <NavbarMobilePreview variant="authenticated" />
+    case '/preview/navbar/desktop-guest-5':
+      return <NavbarDesktopPreview variant="guest" menuCount={5} />
+    case '/preview/navbar/desktop-guest-4':
+      return <NavbarDesktopPreview variant="guest" menuCount={4} />
+    case '/preview/navbar/desktop-guest-3':
+      return <NavbarDesktopPreview variant="guest" menuCount={3} />
+    case '/preview/navbar/desktop-guest-2':
+      return <NavbarDesktopPreview variant="guest" menuCount={2} />
+    case '/preview/navbar/desktop-no-button-5':
+      return <NavbarDesktopPreview variant="no-button" menuCount={5} />
+    case '/preview/navbar/desktop-no-button-4':
+      return <NavbarDesktopPreview variant="no-button" menuCount={4} />
+    case '/preview/navbar/desktop-no-button-3':
+      return <NavbarDesktopPreview variant="no-button" menuCount={3} />
+    case '/preview/navbar/desktop-authenticated-5':
+      return <NavbarDesktopPreview variant="authenticated" menuCount={5} />
+    case '/preview/navbar/desktop-authenticated-4':
+      return <NavbarDesktopPreview variant="authenticated" menuCount={4} />
+    case '/preview/navbar/desktop-authenticated-3':
+      return <NavbarDesktopPreview variant="authenticated" menuCount={3} />
+    default:
+      return null
+  }
 }
 
 function App() {
   const [path] = useHashRoute()
+
+  if (path.startsWith('/preview/navbar/')) {
+    return renderNavbarPreview(path)
+  }
+
   const Page = routes[path] ?? HomePage
+
   return (
     <DocsLayout path={path}>
       <Page />

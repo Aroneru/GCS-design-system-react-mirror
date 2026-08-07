@@ -80,4 +80,17 @@ export { brandIcons } from './brandIconRegistry'
 export { Footer } from './components/Footer'
 export type { FooterProps, FooterMenu, FooterSocial } from './components/Footer'
 
+export { Navbar } from './components/Navbar'
+export type {
+  NavbarProps,
+  NavbarItem,
+  NavbarSubItem,
+  NavbarSearchConfig,
+  NavbarAction,
+  NavbarGuestActions,
+  NavbarUser,
+  NavbarNotification,
+  NavbarMenuPosition,
+} from './components/Navbar'
+
 export { cn } from './utils/cn'
