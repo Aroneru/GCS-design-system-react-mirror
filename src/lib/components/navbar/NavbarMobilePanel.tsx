@@ -17,7 +17,6 @@ interface NavbarMobilePanelProps {
   onNavigate?: NavbarProps['onNavigate']
   onClose: () => void
   guestActionsContent?: ReactNode
-  notificationContent?: ReactNode
   user?: NavbarUser
 }
 
@@ -87,7 +86,6 @@ export function NavbarMobilePanel({
   onNavigate,
   onClose,
   guestActionsContent,
-  notificationContent,
   user,
 }: NavbarMobilePanelProps) {
   const navigationItems = items.filter(
@@ -196,12 +194,9 @@ export function NavbarMobilePanel({
 
         {user && (
           <section className="space-y-3 border-t border-border pt-4" aria-label="Akun pengguna">
-            <div className="flex min-w-0 items-center justify-between gap-3">
-              <p className="truncate text-sm font-bold text-content" title={user.name}>
-                {user.name.trim() || 'Pengguna'}
-              </p>
-              {notificationContent}
-            </div>
+            <p className="truncate text-sm font-bold text-content" title={user.name}>
+              {user.name.trim() || 'Pengguna'}
+            </p>
 
             {accountItems.length > 0 && (
               <ul className="space-y-1">

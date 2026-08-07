@@ -438,7 +438,7 @@ export function Navbar({
       {...props}
     >
       <div className="mx-auto w-full max-w-7xl px-4 lg:px-8">
-        <div className="flex w-full min-w-0 items-center py-3 lg:h-[93px] lg:gap-4 lg:py-0 2xl:gap-6">
+        <div className="flex w-full min-w-0 items-center pt-4 pb-0 lg:h-[93px] lg:gap-4 lg:py-0 2xl:gap-6">
           <a
             href={brandHref}
             className="inline-flex shrink-0 items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
@@ -484,7 +484,9 @@ export function Navbar({
             {user && (
               <div className="flex min-w-0 shrink-0 items-center gap-1">
                 {notification && (
-                  <NotificationControl notification={notification} className="hidden lg:grid" />
+                  <div className="hidden lg:block">
+                    <NotificationControl notification={notification} />
+                  </div>
                 )}
                 <NavbarUserMenu
                   user={user}
@@ -538,12 +540,12 @@ export function Navbar({
         </div>
 
         {search && (
-          <div className="pb-4 lg:hidden">
+          <div className="mt-4 pb-4 lg:hidden">
             <NavbarSearchForm
               search={search}
               inputId={mobileSearchInputId}
               value={searchValue}
-              className="mx-auto w-full max-w-[348px]"
+              className="w-full max-w-[348px]"
               onSubmit={handleSearchSubmit}
               onValueChange={handleSearchValueChange}
             />
@@ -578,14 +580,6 @@ export function Navbar({
                   />
                 )}
               </div>
-            ) : undefined
-          }
-          notificationContent={
-            user && notification ? (
-              <NotificationControl
-                notification={notification}
-                onAction={() => handleMobileOpenChange(false)}
-              />
             ) : undefined
           }
           user={user}
