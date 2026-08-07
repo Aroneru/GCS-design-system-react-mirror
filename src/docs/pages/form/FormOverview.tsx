@@ -1,4 +1,4 @@
-import { InputField, Radio, Select } from '../../../lib'
+import { Checkbox, InputField, Radio, Select, Toggle } from '../../../lib'
 import { Search, Upload, User } from '../../../lib/icons/outline'
 import { OverviewCard, OverviewPage } from '../../pageKit'
 
@@ -94,18 +94,8 @@ export function FormOverview() {
       >
         <Preview>
           <div className="space-y-3">
-            <span className="flex items-center gap-3">
-              <span className="flex h-6 w-11 items-center rounded-full bg-primary-600 p-0.5">
-                <span className="ml-auto size-5 rounded-full bg-white shadow-sm" />
-              </span>
-              <span className="text-sm text-gray-900">Notifikasi aktif</span>
-            </span>
-            <span className="flex items-center gap-3">
-              <span className="flex h-6 w-11 items-center rounded-full bg-gray-300 p-0.5">
-                <span className="size-5 rounded-full bg-white shadow-sm" />
-              </span>
-              <span className="text-sm text-gray-500">Notifikasi nonaktif</span>
-            </span>
+            <Toggle label="Notifikasi aktif" defaultChecked />
+            <Toggle label="Notifikasi nonaktif" />
           </div>
         </Preview>
       </OverviewCard>
@@ -118,18 +108,8 @@ export function FormOverview() {
       >
         <Preview>
           <div className="flex flex-wrap gap-6">
-            <span className="flex items-center gap-2.5">
-              <span className="grid size-5 place-items-center rounded-sm bg-primary-600">
-                <svg className="size-3 text-white" viewBox="0 0 16 12" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M1 5.9 5.7 10.5 15 1.5" />
-                </svg>
-              </span>
-              <span className="text-sm text-gray-900">Saya menyetujui syarat</span>
-            </span>
-            <span className="flex items-center gap-2.5">
-              <span className="size-5 rounded-sm border-2 border-gray-300" />
-              <span className="text-sm text-gray-500">Kirim salinan ke email</span>
-            </span>
+            <Checkbox label="Saya menyetujui syarat" defaultChecked />
+            <Checkbox label="Kirim salinan ke email" />
           </div>
         </Preview>
       </OverviewCard>

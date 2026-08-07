@@ -1,6 +1,7 @@
 import { DocsLayout } from './docs/DocsLayout'
 import { useHashRoute } from './docs/useHashRoute'
 import { HomePage } from './docs/pages/HomePage'
+import { ExamplePage } from './docs/pages/ExamplePage'
 
 import { FoundationsOverview } from './docs/pages/foundations/FoundationsOverview'
 import { ColorsPage } from './docs/pages/foundations/ColorsPage'
@@ -17,6 +18,8 @@ import { FloatingLabelPage } from './docs/pages/form/input-field/FloatingLabelPa
 import { TextAreaPage } from './docs/pages/form/input-field/TextAreaPage'
 import { SelectPage } from './docs/pages/form/SelectPage'
 import { RadioPage } from './docs/pages/form/RadioPage'
+import { TogglePage } from './docs/pages/form/TogglePage'
+import { CheckboxPage } from './docs/pages/form/CheckboxPage'
 import { PlaceholderPage } from './docs/pages/PlaceholderPage'
 
 import { ComponentsOverview } from './docs/pages/components/ComponentsOverview'
@@ -28,6 +31,7 @@ import { FooterPage } from './docs/pages/components/FooterPage'
 
 const routes: Record<string, () => React.ReactElement> = {
   '/': HomePage,
+  '/example': ExamplePage,
 
   '/foundations': FoundationsOverview,
   '/foundations/colors': ColorsPage,
@@ -47,8 +51,8 @@ const routes: Record<string, () => React.ReactElement> = {
   '/form/search': () => <PlaceholderPage eyebrow="Form" title="Search Form" />,
   '/form/upload': () => <PlaceholderPage eyebrow="Form" title="Upload Form" />,
   '/form/radio': RadioPage,
-  '/form/toggle': () => <PlaceholderPage eyebrow="Form" title="Toggle Button" />,
-  '/form/checkbox': () => <PlaceholderPage eyebrow="Form" title="Checkbox" />,
+  '/form/toggle': TogglePage,
+  '/form/checkbox': CheckboxPage,
 
   '/components': ComponentsOverview,
   '/components/container': ContainerPage,
