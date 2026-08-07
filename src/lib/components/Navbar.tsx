@@ -109,6 +109,8 @@ export type NavbarNotification =
       onClick: MouseEventHandler<HTMLButtonElement>
     })
 
+export type NavbarMenuPosition = 'left' | 'right'
+
 interface NavbarPropsBase extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
   brand: ReactNode
   brandLabel: string
@@ -119,6 +121,7 @@ interface NavbarPropsBase extends Omit<HTMLAttributes<HTMLElement>, 'children'> 
   guestActions?: NavbarGuestActions
   user?: NavbarUser
   notification?: NavbarNotification
+  menuPosition?: NavbarMenuPosition
   ariaLabel?: string
   onNavigate?: (
     item: NavbarItem | NavbarSubItem,
@@ -360,6 +363,7 @@ export function Navbar({
   guestActions,
   user,
   notification,
+  menuPosition = 'right',
   ariaLabel = 'Navigasi utama',
   onNavigate,
   mobileOpen,
@@ -474,7 +478,7 @@ export function Navbar({
       {...props}
     >
       <div className="mx-auto w-full max-w-7xl px-4 lg:px-8">
-        <div className="flex w-full min-w-0 items-center py-3 lg:gap-4 lg:py-6 2xl:gap-6">
+        <div className="flex w-full min-w-0 items-center py-3 lg:h-[93px] lg:gap-4 lg:py-0 2xl:gap-6">
           <a
             href={brandHref}
             className="inline-flex shrink-0 items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
@@ -492,6 +496,7 @@ export function Navbar({
               onValueChange={handleSearchValueChange}
             />
           )}
+          {menuPosition === 'right' && <div className="hidden min-w-0 flex-1 lg:block" aria-hidden="true" />}
           <NavbarNavigation
             items={items}
             activeHref={activeHref}
@@ -501,6 +506,7 @@ export function Navbar({
             onOpenMenuChange={handleNavigationMenuChange}
             onNavigate={onNavigate}
           />
+          {menuPosition === 'left' && <div className="hidden min-w-0 flex-1 lg:block" aria-hidden="true" />}
           {showGuestActions && guestActions && (
             <div className="hidden shrink-0 items-center gap-2 lg:flex">
               {guestActions.login && (

@@ -29,6 +29,7 @@ export type {
   NavbarGuestActions,
   NavbarUser,
   NavbarNotification,
+  NavbarMenuPosition,
 } from './components/Navbar'
 
 export { cn } from './utils/cn'

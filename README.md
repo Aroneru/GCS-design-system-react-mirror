@@ -60,7 +60,7 @@ file package ini agar class-nya ikut ter-generate. Di CSS Tailwind kamu:
 | `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`     |
 | `Container` | `as` (default `div`)                                                 |
 | `Icon`      | `children` (SVG dengan `currentColor`)                              |
-| `Navbar`    | `brand`, `brandLabel`, `items`, `search`, `guestActions`, `user`    |
+| `Navbar`    | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`  |
 | `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`               |
 
 ### Navbar
@@ -108,8 +108,8 @@ Authenticated state cukup diberikan melalui prop `user`:
 ```
 
 Type publik utama meliputi `NavbarProps`, `NavbarItem`, `NavbarSubItem`,
-`NavbarSearchConfig`, `NavbarGuestActions`, `NavbarUser`, dan
-`NavbarNotification`.
+`NavbarSearchConfig`, `NavbarGuestActions`, `NavbarUser`, `NavbarNotification`,
+dan `NavbarMenuPosition`.
 
 Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
 bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.

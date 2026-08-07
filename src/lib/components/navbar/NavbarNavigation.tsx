@@ -80,7 +80,7 @@ export function NavbarNavigation({
   if (navigationItems.length === 0) return null
 
   return (
-    <nav ref={navigationRef} className="ml-auto hidden w-fit shrink-0 lg:block" aria-label={ariaLabel}>
+    <nav ref={navigationRef} className="hidden w-fit shrink-0 lg:block" aria-label={ariaLabel}>
       <ul className="flex w-max items-center gap-2 xl:gap-4">
         {navigationItems.map((item) => {
           if (isLinkItem(item)) {

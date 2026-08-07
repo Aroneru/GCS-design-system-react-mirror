@@ -188,7 +188,18 @@ function createFigmaItems(count: number): NavbarItem[] {
 }
 
 const figmaMenuItems = {
-  2: createFigmaItems(2),
+  2: [
+    {
+      id: 'menu-1',
+      label: 'Menu 1',
+      children: [{ id: 'menu-1-child', label: 'Submenu Menu 1', href: '#/menu-1' }],
+    },
+    {
+      id: 'menu-2',
+      label: 'Menu 2',
+      children: [{ id: 'menu-2-child', label: 'Submenu Menu 2', href: '#/menu-2' }],
+    },
+  ] satisfies NavbarItem[],
   3: createFigmaItems(3),
   4: createFigmaItems(4),
   5: createFigmaItems(5),
@@ -344,6 +355,12 @@ export function NavbarDesktopPreview({
 }) {
   const [query, setQuery] = useState('')
   const authenticated = variant === 'authenticated'
+  const menuPosition =
+    variant === 'guest' &&
+    menuCount === 2 &&
+    new URLSearchParams(window.location.search).get('navbarMenuPosition') === 'left'
+      ? 'left'
+      : 'right'
 
   return (
     <NavbarPreviewSurface>
@@ -360,6 +377,7 @@ export function NavbarDesktopPreview({
         guestActions={variant === 'guest' ? demoGuestActions : undefined}
         user={authenticated ? { name: 'User Komdigi', initials: 'UK', items: accountItems } : undefined}
         notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
+        menuPosition={menuPosition}
       />
     </NavbarPreviewSurface>
   )
@@ -413,13 +431,22 @@ export function NavbarPage() {
           Brand pada showcase masih berupa placeholder karena aset logo KOMDIGI resmi belum tersedia di repository.
         </p>
 
-        {([5, 4, 3, 2] as const).map((count) => (
+        {([5, 4, 3] as const).map((count) => (
           <NavbarDesktopShowcase
             key={`guest-${count}-button`}
             title={`${count} Menu + Button`}
             src={`#/preview/navbar/desktop-guest-${count}`}
           />
         ))}
+
+        <NavbarDesktopShowcase
+          title="2 Menu + Button — Menu Position Left"
+          src="?navbarMenuPosition=left#/preview/navbar/desktop-guest-2"
+        />
+        <NavbarDesktopShowcase
+          title="2 Menu + Button — Menu Position Right"
+          src="#/preview/navbar/desktop-guest-2"
+        />
 
         {([5, 4, 3] as const).map((count) => (
           <NavbarDesktopShowcase
@@ -476,6 +503,7 @@ export function NavbarPage() {
                 <tr><td className="p-3 font-bold text-content">brand, brandLabel</td><td className="p-3">Konten brand dan accessible name.</td></tr>
                 <tr><td className="p-3 font-bold text-content">items</td><td className="p-3">Link atau submenu maksimal satu tingkat.</td></tr>
                 <tr><td className="p-3 font-bold text-content">search</td><td className="p-3">Search submit biasa, controlled atau uncontrolled.</td></tr>
+                <tr><td className="p-3 font-bold text-content">menuPosition</td><td className="p-3"><code>'left' | 'right'</code>; default <code>'right'</code> dan hanya memengaruhi desktop.</td></tr>
                 <tr><td className="p-3 font-bold text-content">guestActions</td><td className="p-3">Action login dan register.</td></tr>
                 <tr><td className="p-3 font-bold text-content">user, notification</td><td className="p-3">Authenticated composition dan unread state.</td></tr>
                 <tr><td className="p-3 font-bold text-content">mobileOpen</td><td className="p-3">Controlled mobile panel; gunakan defaultMobileOpen untuk uncontrolled.</td></tr>
