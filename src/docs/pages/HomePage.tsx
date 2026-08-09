@@ -1,10 +1,18 @@
-import { Badge, Button, Card, Container, Footer } from '../../lib'
-import { FacebookIcon, InstagramIcon, XIcon } from '../socialIcons'
+import { Badge, Button, Card, Container, Footer } from "../../lib";
+import { FacebookIcon, InstagramIcon, XIcon } from "../socialIcons";
 
 const summaryCards = [
-  { name: 'Foundations', desc: 'Warna, tipografi, spacing, border, elevation, dan ikon — dasar visual seluruh produk.', route: '/foundations' },
-  { name: 'Components', desc: 'Komponen React siap pakai dari @tpl/design-kit-react.', route: '/components' },
-]
+  {
+    name: "Foundations",
+    desc: "Warna, tipografi, spacing, border, elevation, dan ikon — dasar visual seluruh produk.",
+    route: "/foundations",
+  },
+  {
+    name: "Components",
+    desc: "Komponen React siap pakai dari @tpl/design-kit-react.",
+    route: "/components",
+  },
+];
 
 export function HomePage() {
   return (
@@ -15,14 +23,14 @@ export function HomePage() {
             State Security Service Design System
           </h1>
           <p className="mt-5 max-w-2xl text-body-lg text-gray-600">
-            Satu sumber visual dan komponen yang konsisten untuk membangun layanan digital yang jelas,
-            inklusif, dan mudah dikenali.
+            Satu sumber visual dan komponen yang konsisten untuk membangun layanan digital yang
+            jelas, inklusif, dan mudah dikenali.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button as="a" href="#/foundations" variant="primary">
+            <Button as="a" href="#/foundations" variant="filled">
               Lihat Foundations
             </Button>
-            <Button as="a" href="#/components" variant="secondary">
+            <Button as="a" href="#/components" variant="outline">
               Jelajahi Components
             </Button>
           </div>
@@ -46,7 +54,9 @@ export function HomePage() {
         <div className="mt-12 overflow-hidden rounded-lg border border-border shadow-soft">
           <div className="flex items-center justify-between border-b border-white/10 bg-gray-900 px-5 py-3">
             <span className="text-xs font-bold text-gray-300">Mulai cepat</span>
-            <span className="text-[10px] font-bold tracking-wider text-gray-500 uppercase">React + @tpl/design-kit-react</span>
+            <span className="text-[10px] font-bold tracking-wider text-gray-500 uppercase">
+              React + @tpl/design-kit-react
+            </span>
           </div>
           <pre className="overflow-x-auto bg-gray-900 p-5 text-sm leading-7 text-gray-300">
             <code>
@@ -72,18 +82,18 @@ export function HomePage() {
         logo="/images/komdigi-logo.svg"
         logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
         menus={[
-          { label: 'Foundations', url: '#/foundations' },
-          { label: 'Components', url: '#/components' },
-          { label: 'Card', url: '#/components/card' },
-          { label: 'Footer', url: '#/components/footer' },
+          { label: "Foundations", url: "#/foundations" },
+          { label: "Components", url: "#/components" },
+          { label: "Card", url: "#/components/card" },
+          { label: "Footer", url: "#/components/footer" },
         ]}
         copyright="© 2025 Kementerian Komunikasi dan Digital"
         socials={[
-          { label: 'Instagram', url: '#', icon: InstagramIcon },
-          { label: 'X', url: '#', icon: XIcon },
-          { label: 'Facebook', url: '#', icon: FacebookIcon },
+          { label: "Instagram", url: "#", icon: InstagramIcon },
+          { label: "X", url: "#", icon: XIcon },
+          { label: "Facebook", url: "#", icon: FacebookIcon },
         ]}
       />
     </>
-  )
+  );
 }

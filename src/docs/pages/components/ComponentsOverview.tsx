@@ -1,5 +1,5 @@
-import { Badge, Button, Navbar } from '../../../lib'
-import { OverviewCard, OverviewPage } from '../../pageKit'
+import { Badge, Button, Navbar } from "../../../lib";
+import { OverviewCard, OverviewPage } from "../../pageKit";
 
 export function ComponentsOverview() {
   return (
@@ -27,8 +27,8 @@ export function ComponentsOverview() {
         desc="Aksi utama dengan empat variant: primary, secondary, danger, ghost."
       >
         <div className="flex flex-wrap items-center gap-2 rounded-xl bg-surface-subtle p-5">
-          <Button variant="primary">Primary</Button>
-          <Button variant="secondary">Secondary</Button>
+          <Button variant="filled">Primary</Button>
+          <Button variant="outline">Secondary</Button>
         </div>
       </OverviewCard>
 
@@ -51,7 +51,11 @@ export function ComponentsOverview() {
       >
         <div className="rounded-xl bg-surface-subtle p-5">
           <div className="overflow-hidden rounded-lg border border-border bg-white">
-            <img src="/images/card-sample.svg" alt="" className="aspect-video w-full object-cover" />
+            <img
+              src="/images/card-sample.svg"
+              alt=""
+              className="aspect-video w-full object-cover"
+            />
             <div className="space-y-1.5 p-3">
               <div className="h-2 w-24 rounded bg-gray-300" />
               <div className="h-1.5 w-full rounded bg-gray-200" />
@@ -72,12 +76,12 @@ export function ComponentsOverview() {
             brand={<span className="text-sm font-black text-content">KOMDIGI</span>}
             brandLabel="KOMDIGI — Beranda"
             items={[
-              { id: 'menu-1', label: 'Menu 1', href: '#/menu-1' },
-              { id: 'menu-2', label: 'Menu 2', href: '#/menu-2' },
+              { id: "menu-1", label: "Menu 1", href: "#/menu-1" },
+              { id: "menu-2", label: "Menu 2", href: "#/menu-2" },
             ]}
             guestActions={{
-              login: { label: 'Masuk', onClick: () => undefined },
-              register: { label: 'Daftar', onClick: () => undefined },
+              login: { label: "Masuk", onClick: () => undefined },
+              register: { label: "Daftar", onClick: () => undefined },
             }}
             onNavigate={(_, event) => event.preventDefault()}
           />
@@ -103,5 +107,5 @@ export function ComponentsOverview() {
         </div>
       </OverviewCard>
     </OverviewPage>
-  )
+  );
 }
