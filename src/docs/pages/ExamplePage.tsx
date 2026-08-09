@@ -110,10 +110,10 @@ export function ExamplePage() {
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
-              <Button variant="filled" as="a" href="#/form">
+              <Button variant="outline" as="a" href="#/form">
                 Panduan
               </Button>
-              <Button variant="outline">Simpan draf</Button>
+              <Button variant="filled">Simpan draf</Button>
             </div>
           </div>
         </Container>
@@ -322,7 +322,9 @@ export function ExamplePage() {
                   Kirim permohonan
                 </Button>
                 <Button variant="filled">Simpan sebagai draf</Button>
-                <Button variant="outline">Batal</Button>
+                <Button variant="outline" theme="orange" tone="dark">
+                  Batal
+                </Button>
                 {!setuju && (
                   <p className="text-body-sm text-gray-500">
                     Centang pernyataan kebenaran data untuk mengirim.
@@ -359,7 +361,7 @@ export function ExamplePage() {
               </dl>
 
               <div className="mt-5 border-t border-border pt-4">
-                <Button variant="filled" className="w-full">
+                <Button variant="filled" theme="orange" tone="dark" className="w-full">
                   Hapus draf
                 </Button>
               </div>
