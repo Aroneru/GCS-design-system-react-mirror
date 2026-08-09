@@ -1,9 +1,6 @@
 // @tpl/design-kit-react — entry point library.
 // Import token/CSS terpisah: import '@tpl/design-kit-react/styles.css'
 
-// export { Button } from './components/Button'
-// export type { ButtonProps, ButtonVariant } from './components/Button'
-
 export { Button } from "./components/Button";
 
 export type {

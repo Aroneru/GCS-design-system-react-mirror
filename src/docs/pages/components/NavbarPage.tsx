@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Navbar, type NavbarItem } from "../../../lib";
-import { Button } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { CodeBlock, ComponentPage, Section } from "../../pageKit";
 

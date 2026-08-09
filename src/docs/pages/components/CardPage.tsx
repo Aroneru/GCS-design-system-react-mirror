@@ -1,7 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Button, Card } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { MessagesIcon } from "../../rawIcons";
 import { CodeBlock, ComponentPage, ControlLabel, H, Section, Segmented } from "../../pageKit";
 
 const cardTitle = "Komdigi Card Desktop";
@@ -31,13 +30,6 @@ const cardProps: PropRow[] = [
   ["linkLabel", "string | undefined", "Selengkapnya", "Teks tautan, dipakai bersama href."],
   ["actions", "ReactNode", "—", "Slot untuk satu atau beberapa tombol."],
 ];
-
-/** Tombol contoh pada kartu — meniru `<x-dk::button>Button text <x-dk::icon name="messages" />`. */
-// const SampleButton = ({ variant }: { variant: 'primary' | 'secondary' }) => (
-//   <Button variant={variant}>
-//     Button text <MessagesIcon />
-//   </Button>
-// )
 
 const SampleButton = ({ variant }: { variant: "primary" | "secondary" }) => {
   if (variant === "primary") {

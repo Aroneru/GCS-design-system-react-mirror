@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { Messages } from "flowbite-react-icons/outline";
-import {
-  Button,
-  Radio,
-  Checkbox,
-  type ButtonTheme,
-  type ButtonTone,
-  type ButtonVariant,
-} from "../../../lib";
+import { Button, Radio, Checkbox, type ButtonTheme, type ButtonVariant } from "../../../lib";
 import { DocHero } from "../../DocHero";
 import { DocUsage } from "../../DocUsage";
 
@@ -16,7 +9,6 @@ export function ButtonPage() {
 
   const [variant, setVariant] = useState<ButtonVariant>("filled");
   const [theme, setTheme] = useState<ButtonTheme>("primary");
-  const [tone, setTone] = useState<ButtonTone>("light");
 
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
@@ -33,10 +25,6 @@ export function ButtonPage() {
 
   return (
     <div>
-      {/* =========================================================
-          HERO
-      ========================================================= */}
-
       <DocHero
         eyebrow="COMPONENTS"
         title="Button"
@@ -44,10 +32,6 @@ export function ButtonPage() {
       />
 
       <div className="mx-auto max-w-6xl space-y-16 px-6 py-12">
-        {/* =========================================================
-            VARIANTS
-        ========================================================= */}
-
         <section>
           <h2 className="mb-6 text-2xl font-bold text-gray-900">Variants</h2>
 
@@ -75,11 +59,6 @@ export function ButtonPage() {
             />
           </div>
         </section>
-
-        {/* =========================================================
-            SIZES & ICONS
-        ========================================================= */}
-
         <section>
           <h2 className="mb-6 text-2xl font-bold text-gray-900">Sizes & Icons</h2>
 
@@ -117,11 +96,6 @@ export function ButtonPage() {
             />
           </div>
         </section>
-
-        {/* =========================================================
-            ICON ONLY
-        ========================================================= */}
-
         <section>
           <h2 className="mb-6 text-2xl font-bold text-gray-900">Icon Only</h2>
 
@@ -155,11 +129,6 @@ export function ButtonPage() {
             />
           </div>
         </section>
-
-        {/* =========================================================
-            INTERACTIVE
-        ========================================================= */}
-
         <section>
           <h2 className="mb-2 text-2xl font-bold text-gray-900">Interactive</h2>
 
@@ -318,11 +287,6 @@ export function ButtonPage() {
             </div>
           </div>
         </section>
-
-        {/* =========================================================
-            AS LINK
-        ========================================================= */}
-
         <section>
           <h2 className="mb-2 text-2xl font-bold text-gray-900">Sebagai link</h2>
 
@@ -355,11 +319,6 @@ export function ButtonPage() {
             />
           </div>
         </section>
-
-        {/* =========================================================
-            PROPERTIES
-        ========================================================= */}
-
         <section>
           <h2 className="mb-6 text-2xl font-bold text-gray-900">Properties</h2>
 
