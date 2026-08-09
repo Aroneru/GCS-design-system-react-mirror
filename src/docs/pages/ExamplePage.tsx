@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from "react";
 import {
   Badge,
   Button,
@@ -13,9 +13,9 @@ import {
   TextArea,
   Toggle,
   type SelectOption,
-} from '../../lib'
-import { Envelope, Globe, User } from '../../lib/icons/outline'
-import { FacebookIcon, InstagramIcon, XIcon } from '../socialIcons'
+} from "../../lib";
+import { Envelope, Globe, User } from "../../lib/icons/outline";
+import { FacebookIcon, InstagramIcon, XIcon } from "../socialIcons";
 
 /**
  * Halaman contoh — satu formulir layanan yang memakai seluruh komponen kit
@@ -24,68 +24,70 @@ import { FacebookIcon, InstagramIcon, XIcon } from '../socialIcons'
  */
 
 const provinsi: SelectOption[] = [
-  { value: 'dki', label: 'DKI Jakarta' },
-  { value: 'jabar', label: 'Jawa Barat' },
-  { value: 'jateng', label: 'Jawa Tengah' },
-  { value: 'jatim', label: 'Jawa Timur' },
-  { value: 'bali', label: 'Bali' },
-]
+  { value: "dki", label: "DKI Jakarta" },
+  { value: "jabar", label: "Jawa Barat" },
+  { value: "jateng", label: "Jawa Tengah" },
+  { value: "jatim", label: "Jawa Timur" },
+  { value: "bali", label: "Bali" },
+];
 
 const kategori: SelectOption[] = [
-  { value: 'marketplace', label: 'Perdagangan elektronik' },
-  { value: 'fintech', label: 'Layanan keuangan digital' },
-  { value: 'media', label: 'Media & konten digital' },
-  { value: 'edu', label: 'Pendidikan & pelatihan' },
-]
+  { value: "marketplace", label: "Perdagangan elektronik" },
+  { value: "fintech", label: "Layanan keuangan digital" },
+  { value: "media", label: "Media & konten digital" },
+  { value: "edu", label: "Pendidikan & pelatihan" },
+];
 
 const berkasWajib = [
-  { value: 'akta', label: 'Akta pendirian', caption: 'PDF, maksimal 2 MB.' },
-  { value: 'npwp', label: 'NPWP badan usaha', caption: 'PDF atau JPG, maksimal 2 MB.' },
-  { value: 'domain', label: 'Bukti kepemilikan domain', caption: 'Tangkapan layar panel domain.' },
-]
+  { value: "akta", label: "Akta pendirian", caption: "PDF, maksimal 2 MB." },
+  { value: "npwp", label: "NPWP badan usaha", caption: "PDF atau JPG, maksimal 2 MB." },
+  { value: "domain", label: "Bukti kepemilikan domain", caption: "Tangkapan layar panel domain." },
+];
 
 const footerMenus = [
-  { label: 'Tentang tpl', url: '#' },
-  { label: 'Layanan', url: '#' },
-  { label: 'Pengaduan', url: '#' },
-  { label: 'Kebijakan privasi', url: '#' },
-]
+  { label: "Tentang tpl", url: "#" },
+  { label: "Layanan", url: "#" },
+  { label: "Pengaduan", url: "#" },
+  { label: "Kebijakan privasi", url: "#" },
+];
 
 const footerSocials = [
-  { label: 'Instagram', url: '#', icon: InstagramIcon },
-  { label: 'X', url: '#', icon: XIcon },
-  { label: 'Facebook', url: '#', icon: FacebookIcon },
-]
+  { label: "Instagram", url: "#", icon: InstagramIcon },
+  { label: "X", url: "#", icon: XIcon },
+  { label: "Facebook", url: "#", icon: FacebookIcon },
+];
 
 export function ExamplePage() {
-  const [jenis, setJenis] = useState('badan')
-  const [nama, setNama] = useState('')
-  const [nik, setNik] = useState('')
-  const [nikDisentuh, setNikDisentuh] = useState(false)
-  const [email, setEmail] = useState('')
-  const [telepon, setTelepon] = useState('')
-  const [wilayah, setWilayah] = useState('')
-  const [namaSistem, setNamaSistem] = useState('')
-  const [domain, setDomain] = useState('')
-  const [jenisLayanan, setJenisLayanan] = useState('')
-  const [deskripsi, setDeskripsi] = useState('')
-  const [berkas, setBerkas] = useState<string[]>(['akta'])
-  const [notifEmail, setNotifEmail] = useState(true)
-  const [notifWa, setNotifWa] = useState(false)
-  const [setuju, setSetuju] = useState(false)
-  const [terkirim, setTerkirim] = useState(false)
+  const [jenis, setJenis] = useState("badan");
+  const [nama, setNama] = useState("");
+  const [nik, setNik] = useState("");
+  const [nikDisentuh, setNikDisentuh] = useState(false);
+  const [email, setEmail] = useState("");
+  const [telepon, setTelepon] = useState("");
+  const [wilayah, setWilayah] = useState("");
+  const [namaSistem, setNamaSistem] = useState("");
+  const [domain, setDomain] = useState("");
+  const [jenisLayanan, setJenisLayanan] = useState("");
+  const [deskripsi, setDeskripsi] = useState("");
+  const [berkas, setBerkas] = useState<string[]>(["akta"]);
+  const [notifEmail, setNotifEmail] = useState(true);
+  const [notifWa, setNotifWa] = useState(false);
+  const [setuju, setSetuju] = useState(false);
+  const [terkirim, setTerkirim] = useState(false);
 
   // NIK baru dinilai setelah pengguna meninggalkan kolomnya, supaya tak memerahi
   // orang yang baru mengetik digit pertama.
-  const nikSalah = nikDisentuh && nik.length !== 16
+  const nikSalah = nikDisentuh && nik.length !== 16;
 
   const toggleBerkas = (value: string) =>
-    setBerkas((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]))
+    setBerkas((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
+    );
 
   const kirim = (event: FormEvent) => {
-    event.preventDefault()
-    setTerkirim(true)
-  }
+    event.preventDefault();
+    setTerkirim(true);
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
@@ -102,16 +104,16 @@ export function ExamplePage() {
                 Pendaftaran Penyelenggara Sistem Elektronik
               </h1>
               <p className="mt-2 text-body-sm leading-6 text-gray-500">
-                Lengkapi data pemohon dan sistem elektronik yang didaftarkan. Permohonan diverifikasi
-                paling lama 5 hari kerja setelah seluruh berkas diterima.
+                Lengkapi data pemohon dan sistem elektronik yang didaftarkan. Permohonan
+                diverifikasi paling lama 5 hari kerja setelah seluruh berkas diterima.
               </p>
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
-              <Button variant="ghost" as="a" href="#/form">
+              <Button variant="filled" as="a" href="#/form">
                 Panduan
               </Button>
-              <Button variant="secondary">Simpan draf</Button>
+              <Button variant="outline">Simpan draf</Button>
             </div>
           </div>
         </Container>
@@ -122,7 +124,10 @@ export function ExamplePage() {
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <form className="space-y-6" onSubmit={kirim}>
             {/* ── 1. Pemohon ── */}
-            <Card title="1. Data pemohon" description="Isi sesuai dokumen resmi yang masih berlaku.">
+            <Card
+              title="1. Data pemohon"
+              description="Isi sesuai dokumen resmi yang masih berlaku."
+            >
               <fieldset className="mt-1">
                 <legend className="mb-3 text-sm font-bold text-gray-900">Jenis pemohon</legend>
                 <div className="flex flex-wrap gap-8">
@@ -130,15 +135,15 @@ export function ExamplePage() {
                     name="jenis-pemohon"
                     label="Badan usaha"
                     helperText="PT, CV, yayasan, atau koperasi."
-                    checked={jenis === 'badan'}
-                    onChange={() => setJenis('badan')}
+                    checked={jenis === "badan"}
+                    onChange={() => setJenis("badan")}
                   />
                   <Radio
                     name="jenis-pemohon"
                     label="Perorangan"
                     helperText="Atas nama pribadi, bukan entitas."
-                    checked={jenis === 'perorangan'}
-                    onChange={() => setJenis('perorangan')}
+                    checked={jenis === "perorangan"}
+                    onChange={() => setJenis("perorangan")}
                   />
                 </div>
               </fieldset>
@@ -150,7 +155,7 @@ export function ExamplePage() {
                   icon={<User className="size-4" />}
                   value={nama}
                   onChange={(e) => setNama(e.target.value)}
-                  onClear={nama ? () => setNama('') : undefined}
+                  onClear={nama ? () => setNama("") : undefined}
                 />
 
                 <InputField
@@ -158,10 +163,12 @@ export function ExamplePage() {
                   placeholder="16 digit tanpa spasi"
                   inputMode="numeric"
                   maxLength={16}
-                  state={nikSalah ? 'failed' : 'default'}
-                  helperText={nikSalah ? 'NIK harus tepat 16 digit.' : 'Dipakai untuk verifikasi Dukcapil.'}
+                  state={nikSalah ? "failed" : "default"}
+                  helperText={
+                    nikSalah ? "NIK harus tepat 16 digit." : "Dipakai untuk verifikasi Dukcapil."
+                  }
                   value={nik}
-                  onChange={(e) => setNik(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => setNik(e.target.value.replace(/\D/g, ""))}
                   onBlur={() => setNikDisentuh(true)}
                 />
 
@@ -246,7 +253,9 @@ export function ExamplePage() {
             {/* ── 3. Berkas & persetujuan ── */}
             <Card title="3. Kelengkapan & persetujuan">
               <fieldset className="mt-1">
-                <legend className="mb-3 text-sm font-bold text-gray-900">Berkas yang dilampirkan</legend>
+                <legend className="mb-3 text-sm font-bold text-gray-900">
+                  Berkas yang dilampirkan
+                </legend>
                 <div className="space-y-4">
                   {berkasWajib.map((b) => (
                     <Checkbox
@@ -270,9 +279,11 @@ export function ExamplePage() {
                 <Toggle
                   label="Pembaruan via WhatsApp"
                   helperText={
-                    telepon ? 'Dikirim ke nomor yang Anda isi di atas.' : 'Isi nomor telepon dulu untuk mengaktifkan.'
+                    telepon
+                      ? "Dikirim ke nomor yang Anda isi di atas."
+                      : "Isi nomor telepon dulu untuk mengaktifkan."
                   }
-                  state={telepon ? 'default' : 'inactive'}
+                  state={telepon ? "default" : "inactive"}
                   checked={notifWa}
                   onChange={(e) => setNotifWa(e.target.checked)}
                 />
@@ -297,11 +308,11 @@ export function ExamplePage() {
                     <p className="text-sm font-bold text-gray-900">Permohonan diterima</p>
                   </div>
                   <p className="mt-1 text-body-sm text-gray-600">
-                    Nomor tiket <strong className="font-bold text-gray-900">PSE-2026-0481</strong> — pantau
-                    statusnya lewat email.
+                    Nomor tiket <strong className="font-bold text-gray-900">PSE-2026-0481</strong> —
+                    pantau statusnya lewat email.
                   </p>
                 </div>
-                <Button variant="secondary" onClick={() => setTerkirim(false)}>
+                <Button variant="filled" onClick={() => setTerkirim(false)}>
                   Ajukan permohonan lain
                 </Button>
               </div>
@@ -310,8 +321,8 @@ export function ExamplePage() {
                 <Button type="submit" disabled={!setuju}>
                   Kirim permohonan
                 </Button>
-                <Button variant="secondary">Simpan sebagai draf</Button>
-                <Button variant="ghost">Batal</Button>
+                <Button variant="filled">Simpan sebagai draf</Button>
+                <Button variant="outline">Batal</Button>
                 {!setuju && (
                   <p className="text-body-sm text-gray-500">
                     Centang pernyataan kebenaran data untuk mengirim.
@@ -328,8 +339,8 @@ export function ExamplePage() {
                 <div className="flex items-center justify-between gap-3">
                   <dt className="text-gray-500">Tahap</dt>
                   <dd>
-                    <Badge variant={terkirim ? 'success' : 'gray'}>
-                      {terkirim ? 'Menunggu verifikasi' : 'Draf'}
+                    <Badge variant={terkirim ? "success" : "gray"}>
+                      {terkirim ? "Menunggu verifikasi" : "Draf"}
                     </Badge>
                   </dd>
                 </div>
@@ -342,13 +353,13 @@ export function ExamplePage() {
                 <div className="flex items-center justify-between gap-3">
                   <dt className="text-gray-500">Pemohon</dt>
                   <dd className="font-bold text-gray-900">
-                    {jenis === 'badan' ? 'Badan usaha' : 'Perorangan'}
+                    {jenis === "badan" ? "Badan usaha" : "Perorangan"}
                   </dd>
                 </div>
               </dl>
 
               <div className="mt-5 border-t border-border pt-4">
-                <Button variant="danger" className="w-full">
+                <Button variant="filled" className="w-full">
                   Hapus draf
                 </Button>
               </div>
@@ -365,7 +376,7 @@ export function ExamplePage() {
               title="Butuh bantuan?"
               description="Layanan pengaduan siap membantu pada hari kerja, pukul 08.00–16.00 WIB."
               actions={
-                <Button variant="secondary" as="a" href="#/">
+                <Button variant="outline" as="a" href="#/">
                   Hubungi kami
                 </Button>
               }
@@ -382,5 +393,5 @@ export function ExamplePage() {
         socials={footerSocials}
       />
     </div>
-  )
+  );
 }

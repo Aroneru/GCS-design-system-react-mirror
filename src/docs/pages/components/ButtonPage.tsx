@@ -1,105 +1,35 @@
-// import { Button } from '../../../lib'
-// import { DocExample } from '../../DocExample'
-// import { PropsTable, type PropRow } from '../../PropsTable'
-// import { ComponentPage, H, Section } from '../../pageKit'
-
-// const buttonProps: PropRow[] = [
-//   ['variant', 'string', 'primary', 'primary · secondary · danger · ghost'],
-//   ['as', "'button' | 'a'", 'button', "Elemen yang dirender, mis. 'a' untuk link"],
-// ]
-
-// export function ButtonPage() {
-//   return (
-//     <ComponentPage
-//       title="Button"
-//       description="Memicu aksi utama pada sebuah halaman atau form. Empat variant untuk tingkat penekanan yang berbeda."
-//     >
-//       <Section title="Variants">
-//         <DocExample
-//           code={
-//             <>
-//               {'<Button variant="'}
-//               <H>primary</H>
-//               {'">Simpan perubahan</Button>\n'}
-//               {'<Button variant="secondary">Batal</Button>\n'}
-//               {'<Button variant="danger">Hapus</Button>\n'}
-//               {'<Button variant="ghost">Lewati</Button>'}
-//             </>
-//           }
-//         >
-//           <Button variant="primary">Simpan perubahan</Button>
-//           <Button variant="secondary">Batal</Button>
-//           <Button variant="danger">Hapus</Button>
-//           <Button variant="ghost">Lewati</Button>
-//         </DocExample>
-//       </Section>
-
-//       <Section title="States">
-//         <DocExample
-//           code={
-//             <>
-//               {'<Button variant="primary" '}
-//               <H>disabled</H>
-//               {'>Nonaktif</Button>'}
-//             </>
-//           }
-//         >
-//           <Button variant="primary">Normal</Button>
-//           <Button variant="primary" disabled>
-//             Nonaktif
-//           </Button>
-//         </DocExample>
-//       </Section>
-
-//       <Section title="Sebagai link">
-//         <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
-//           Gunakan prop <code className="text-xs font-bold text-gray-700">as="a"</code> agar dirender sebagai
-//           anchor tanpa kehilangan gaya tombol.
-//         </p>
-//         <DocExample
-//           code={
-//             <>
-//               {'<Button as="'}
-//               <H>a</H>
-//               {'" href="/foundations/colors" variant="secondary">\n'}
-//               {'    Buka Foundations\n'}
-//               {'</Button>'}
-//             </>
-//           }
-//         >
-//           <Button as="a" href="#/foundations/colors" variant="secondary">
-//             Buka Foundations
-//           </Button>
-//         </DocExample>
-//       </Section>
-
-//       <Section title="Properties">
-//         <PropsTable rows={buttonProps} minWidth="36rem" />
-//       </Section>
-//     </ComponentPage>
-//   )
-// }
-
 import { useState } from "react";
 import { Messages } from "flowbite-react-icons/outline";
-
-import { Button } from "../../../lib";
+import {
+  Button,
+  Radio,
+  Checkbox,
+  type ButtonTheme,
+  type ButtonTone,
+  type ButtonVariant,
+} from "../../../lib";
 import { DocHero } from "../../DocHero";
 import { DocUsage } from "../../DocUsage";
 
 export function ButtonPage() {
   const sizes = ["xs", "s", "base", "l", "xl"] as const;
 
-  const [variant, setVariant] = useState<"filled" | "outline">("filled");
-
-  const [theme, setTheme] = useState<
-    "primary" | "green" | "gray" | "portal" | "purple" | "orange" | "yellow"
-  >("primary");
-
-  const [tone, setTone] = useState<"light" | "dark">("light");
+  const [variant, setVariant] = useState<ButtonVariant>("filled");
+  const [theme, setTheme] = useState<ButtonTheme>("primary");
+  const [tone, setTone] = useState<ButtonTone>("light");
 
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
+
+  const themes: { value: ButtonTheme; label: string }[] = [
+    { value: "primary", label: "Primary" },
+    { value: "green", label: "Green" },
+    { value: "gray", label: "Gray" },
+    { value: "portal", label: "Blue Portal" },
+    { value: "purple", label: "Purple" },
+    { value: "orange", label: "Orange" },
+    { value: "yellow", label: "Yellow" },
+  ];
 
   return (
     <div>
@@ -128,7 +58,7 @@ export function ButtonPage() {
                 Simpan perubahan
               </Button>
 
-              <Button variant="outline" theme="primary" tone="light">
+              <Button variant="outline" theme="orange" tone="light">
                 Batal
               </Button>
             </div>
@@ -241,46 +171,89 @@ export function ButtonPage() {
             {/* Preview */}
             <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
               <h3 className="mb-6 text-lg font-semibold text-gray-900">Preview</h3>
+              <div className="space-y-6">
+                {/* Light */}
+                <div>
+                  <p className="mb-3 text-sm font-semibold text-gray-500">Light</p>
 
-              {/* Normal buttons */}
-              <div className="mb-10">
-                <p className="mb-4 text-sm font-medium text-gray-600">Button</p>
+                  <div className="flex flex-wrap gap-4">
+                    {sizes.map((size) => (
+                      <Button
+                        key={size}
+                        size={size}
+                        variant={variant}
+                        theme={theme}
+                        tone="light"
+                        leftIcon={showLeftIcon ? <Messages className="size-5" /> : undefined}
+                        rightIcon={showRightIcon ? <Messages className="size-5" /> : undefined}
+                      >
+                        Button
+                      </Button>
+                    ))}
+                  </div>
+                </div>
 
-                <div className="flex flex-wrap items-center gap-5">
-                  {sizes.map((size) => (
-                    <Button
-                      key={size}
-                      size={size}
-                      variant={variant}
-                      theme={theme}
-                      tone={tone}
-                      leftIcon={showLeftIcon ? <Messages /> : undefined}
-                      rightIcon={showRightIcon ? <Messages /> : undefined}
-                    >
-                      Button
-                    </Button>
-                  ))}
+                {/* Dark */}
+                <div>
+                  <p className="mb-3 text-sm font-semibold text-gray-500">Dark</p>
+
+                  <div className="flex flex-wrap gap-4">
+                    {sizes.map((size) => (
+                      <Button
+                        key={size}
+                        size={size}
+                        variant={variant}
+                        theme={theme}
+                        tone="dark"
+                        leftIcon={showLeftIcon ? <Messages className="size-5" /> : undefined}
+                        rightIcon={showRightIcon ? <Messages className="size-5" /> : undefined}
+                      >
+                        Button
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               </div>
-
               {/* Icon only */}
-              <div>
-                <p className="mb-4 text-sm font-medium text-gray-600">Icon Only</p>
+              <div className="mt-8 space-y-6">
+                {/* Light */}
+                <div>
+                  <p className="mb-3 text-sm font-semibold text-gray-500">Light</p>
 
-                <div className="flex flex-wrap items-center gap-5">
-                  {sizes.map((size) => (
-                    <Button
-                      key={size}
-                      size={size}
-                      variant={variant}
-                      theme={theme}
-                      tone={tone}
-                      iconOnly
-                      aria-label={`Messages ${size}`}
-                    >
-                      <Messages />
-                    </Button>
-                  ))}
+                  <div className="flex flex-wrap gap-5">
+                    {sizes.map((size) => (
+                      <Button
+                        key={size}
+                        size={size}
+                        variant={variant}
+                        theme={theme}
+                        tone="light"
+                        iconOnly
+                      >
+                        <Messages className="size-5" />
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Dark */}
+                <div>
+                  <p className="mb-3 text-sm font-semibold text-gray-500">Dark</p>
+
+                  <div className="flex flex-wrap gap-5">
+                    {sizes.map((size) => (
+                      <Button
+                        key={size}
+                        size={size}
+                        variant={variant}
+                        theme={theme}
+                        tone="dark"
+                        iconOnly
+                      >
+                        <Messages className="size-5" />
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -290,124 +263,57 @@ export function ButtonPage() {
               <h3 className="mb-6 text-lg font-semibold text-gray-900">Controls</h3>
 
               {/* Variant */}
-              <div className="mb-8">
-                <h4 className="mb-4 text-sm font-semibold text-gray-700">Variant</h4>
+              <div className="space-y-3">
+                <h4 className="font-semibold">Variant</h4>
 
-                <div className="space-y-3">
-                  <label className="flex cursor-pointer items-center gap-3">
-                    <input
-                      type="radio"
-                      name="variant"
-                      checked={variant === "filled"}
-                      onChange={() => setVariant("filled")}
-                      className="h-4 w-4"
-                    />
+                <Radio
+                  name="button-variant"
+                  label="Filled"
+                  checked={variant === "filled"}
+                  onChange={() => setVariant("filled")}
+                />
 
-                    <span className="text-sm">Filled</span>
-                  </label>
-
-                  <label className="flex cursor-pointer items-center gap-3">
-                    <input
-                      type="radio"
-                      name="variant"
-                      checked={variant === "outline"}
-                      onChange={() => setVariant("outline")}
-                      className="h-4 w-4"
-                    />
-
-                    <span className="text-sm">Outline</span>
-                  </label>
-                </div>
+                <Radio
+                  name="button-variant"
+                  label="Outline"
+                  checked={variant === "outline"}
+                  onChange={() => setVariant("outline")}
+                />
               </div>
 
               {/* Color */}
-              <div className="mb-8">
-                <h4 className="mb-4 text-sm font-semibold text-gray-700">Color</h4>
+              <div className="mt-4 space-y-3">
+                <h4 className="font-semibold">Color</h4>
 
-                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                  {[
-                    ["primary", "Primary"],
-                    ["green", "Green"],
-                    ["gray", "Gray"],
-                    ["portal", "Blue Portal"],
-                    ["purple", "Purple"],
-                    ["orange", "Orange"],
-                    ["yellow", "Yellow"],
-                  ].map(([value, label]) => (
-                    <label key={value} className="flex cursor-pointer items-center gap-2">
-                      <input
-                        type="radio"
-                        name="theme"
-                        value={value}
-                        checked={theme === value}
-                        onChange={() => setTheme(value as typeof theme)}
-                        className="h-4 w-4"
-                      />
-
-                      <span className="text-sm">{label}</span>
-                    </label>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                  {themes.map((item) => (
+                    <Radio
+                      key={item.value}
+                      name="button-theme"
+                      label={item.label}
+                      checked={theme === item.value}
+                      onChange={() => setTheme(item.value)}
+                    />
                   ))}
                 </div>
               </div>
 
-              {/* Tone */}
-              <div className="mb-8">
-                <h4 className="mb-4 text-sm font-semibold text-gray-700">Tone</h4>
-
-                <div className="space-y-3">
-                  <label className="flex cursor-pointer items-center gap-3">
-                    <input
-                      type="radio"
-                      name="tone"
-                      checked={tone === "light"}
-                      onChange={() => setTone("light")}
-                      className="h-4 w-4"
-                    />
-
-                    <span className="text-sm">Light</span>
-                  </label>
-
-                  <label className="flex cursor-pointer items-center gap-3">
-                    <input
-                      type="radio"
-                      name="tone"
-                      checked={tone === "dark"}
-                      onChange={() => setTone("dark")}
-                      className="h-4 w-4"
-                    />
-
-                    <span className="text-sm">Dark</span>
-                  </label>
-                </div>
-              </div>
-
               {/* Icons */}
-              <div>
-                <h4 className="mb-4 text-sm font-semibold text-gray-700">Icons</h4>
+              <div className="mt-4 space-y-3">
+                <h4 className="font-semibold">Variant</h4>
+                <Checkbox
+                  name="button-left-icon"
+                  label="Left Icon"
+                  checked={showLeftIcon}
+                  onChange={(e) => setShowLeftIcon(e.target.checked)}
+                />
 
-                <div className="space-y-3">
-                  <label className="flex cursor-pointer items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={showLeftIcon}
-                      onChange={(e) => setShowLeftIcon(e.target.checked)}
-                      className="h-4 w-4 rounded"
-                    />
-
-                    <span className="text-sm">Left Icon</span>
-                  </label>
-
-                  <label className="flex cursor-pointer items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={showRightIcon}
-                      onChange={(e) => setShowRightIcon(e.target.checked)}
-                      className="h-4 w-4 rounded"
-                    />
-
-                    <span className="text-sm">Right Icon</span>
-                  </label>
-                </div>
+                <Checkbox
+                  name="button-right-icon"
+                  label="Right Icon"
+                  checked={showRightIcon}
+                  onChange={(e) => setShowRightIcon(e.target.checked)}
+                />
               </div>
             </div>
           </div>
