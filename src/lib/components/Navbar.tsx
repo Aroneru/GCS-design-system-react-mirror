@@ -9,151 +9,151 @@ import {
   useId,
   useRef,
   useState,
-} from 'react'
-import { Bell } from 'flowbite-react-icons/solid'
-import { Button } from './Button'
-import { Icon } from './Icon'
-import { cn } from '../utils/cn'
-import { NavbarNavigation } from './navbar/NavbarNavigation'
-import { NavbarMobilePanel } from './navbar/NavbarMobilePanel'
-import { NavbarUserMenu } from './navbar/NavbarUserMenu'
+} from "react";
+import { Bell } from "flowbite-react-icons/solid";
+import { Button } from "./Button";
+import { Icon } from "./Icon";
+import { cn } from "../utils/cn";
+import { NavbarNavigation } from "./navbar/NavbarNavigation";
+import { NavbarMobilePanel } from "./navbar/NavbarMobilePanel";
+import { NavbarUserMenu } from "./navbar/NavbarUserMenu";
 
 interface NavbarItemBase {
-  id: string
-  label: string
-  active?: boolean
-  disabled?: boolean
+  id: string;
+  label: string;
+  active?: boolean;
+  disabled?: boolean;
 }
 
 export interface NavbarSubItem extends NavbarItemBase {
-  href: string
-  external?: boolean
+  href: string;
+  external?: boolean;
 }
 
 export type NavbarItem =
   | (NavbarItemBase & {
-      href: string
-      external?: boolean
-      children?: never
+      href: string;
+      external?: boolean;
+      children?: never;
     })
   | (NavbarItemBase & {
-      href?: never
-      external?: never
-      children: NavbarSubItem[]
-    })
+      href?: never;
+      external?: never;
+      children: NavbarSubItem[];
+    });
 
 interface NavbarSearchBase {
-  onSubmit: (query: string, event: FormEvent<HTMLFormElement>) => void
-  onValueChange?: (value: string) => void
-  label?: string
-  placeholder?: string
-  name?: string
-  disabled?: boolean
-  autoComplete?: string
+  onSubmit: (query: string, event: FormEvent<HTMLFormElement>) => void;
+  onValueChange?: (value: string) => void;
+  label?: string;
+  placeholder?: string;
+  name?: string;
+  disabled?: boolean;
+  autoComplete?: string;
 }
 
 export type NavbarSearchConfig = NavbarSearchBase &
   (
     | {
-        value: string
-        defaultValue?: never
+        value: string;
+        defaultValue?: never;
       }
     | {
-        value?: never
-        defaultValue?: string
+        value?: never;
+        defaultValue?: string;
       }
-  )
+  );
 
 interface NavbarActionBase {
-  label: string
+  label: string;
 }
 
 export type NavbarAction =
   | (NavbarActionBase & {
-      href: string
-      external?: boolean
-      onClick?: never
+      href: string;
+      external?: boolean;
+      onClick?: never;
     })
   | (NavbarActionBase & {
-      href?: never
-      external?: never
-      onClick: MouseEventHandler<HTMLButtonElement>
-    })
+      href?: never;
+      external?: never;
+      onClick: MouseEventHandler<HTMLButtonElement>;
+    });
 
 export interface NavbarGuestActions {
-  login?: NavbarAction
-  register?: NavbarAction
+  login?: NavbarAction;
+  register?: NavbarAction;
 }
 
 export interface NavbarUser {
-  name: string
-  avatarSrc?: string
-  avatarAlt?: string
-  initials?: string
-  items?: NavbarSubItem[]
+  name: string;
+  avatarSrc?: string;
+  avatarAlt?: string;
+  initials?: string;
+  items?: NavbarSubItem[];
 }
 
 interface NavbarNotificationBase {
-  unread: boolean | number
-  label?: string
+  unread: boolean | number;
+  label?: string;
 }
 
 export type NavbarNotification =
   | (NavbarNotificationBase & {
-      href: string
-      external?: boolean
-      onClick?: never
+      href: string;
+      external?: boolean;
+      onClick?: never;
     })
   | (NavbarNotificationBase & {
-      href?: never
-      external?: never
-      onClick: MouseEventHandler<HTMLButtonElement>
-    })
+      href?: never;
+      external?: never;
+      onClick: MouseEventHandler<HTMLButtonElement>;
+    });
 
-export type NavbarMenuPosition = 'left' | 'right'
+export type NavbarMenuPosition = "left" | "right";
 
-interface NavbarPropsBase extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
-  brand: ReactNode
-  brandLabel: string
-  brandHref?: string
-  items: NavbarItem[]
-  activeHref?: string
-  search?: NavbarSearchConfig
-  guestActions?: NavbarGuestActions
-  user?: NavbarUser
-  notification?: NavbarNotification
-  menuPosition?: NavbarMenuPosition
-  ariaLabel?: string
+interface NavbarPropsBase extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+  brand: ReactNode;
+  brandLabel: string;
+  brandHref?: string;
+  items: NavbarItem[];
+  activeHref?: string;
+  search?: NavbarSearchConfig;
+  guestActions?: NavbarGuestActions;
+  user?: NavbarUser;
+  notification?: NavbarNotification;
+  menuPosition?: NavbarMenuPosition;
+  ariaLabel?: string;
   onNavigate?: (
     item: NavbarItem | NavbarSubItem,
     event: ReactMouseEvent<HTMLAnchorElement>,
-  ) => void
-  onMobileOpenChange?: (open: boolean) => void
+  ) => void;
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
 export type NavbarProps = NavbarPropsBase &
   (
     | {
-        mobileOpen: boolean
-        defaultMobileOpen?: never
+        mobileOpen: boolean;
+        defaultMobileOpen?: never;
       }
     | {
-        mobileOpen?: never
-        defaultMobileOpen?: boolean
+        mobileOpen?: never;
+        defaultMobileOpen?: boolean;
       }
-  )
+  );
 
 function GuestAction({
   action,
   variant,
   onAction,
 }: {
-  action: NavbarAction
-  variant: 'primary' | 'secondary'
-  onAction?: () => void
+  action: NavbarAction;
+  variant: "primary" | "secondary";
+  onAction?: () => void;
 }) {
   const icon =
-    variant === 'secondary' ? (
+    variant === "secondary" ? (
       <Icon className="size-4">
         <svg
           viewBox="0 0 24 24"
@@ -164,7 +164,11 @@ function GuestAction({
           focusable="false"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M10 17l5-5-5-5M15 12H3" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5"
+          />
         </svg>
       </Icon>
     ) : (
@@ -177,39 +181,51 @@ function GuestAction({
           aria-hidden="true"
           focusable="false"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6.5l4 4L8 20H4v-4L13.5 6.5Z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M13.5 6.5l4 4L8 20H4v-4L13.5 6.5Z"
+          />
           <path strokeLinecap="round" strokeLinejoin="round" d="m15.5 4.5 4 4" />
         </svg>
       </Icon>
-    )
+    );
+
+  const buttonVariant = variant === "primary" ? "filled" : "outline";
 
   if (action.href !== undefined) {
     return (
       <Button
         as="a"
         href={action.href}
-        variant={variant}
+        variant={buttonVariant}
+        theme="primary"
+        tone="light"
+        size="s"
         onClick={onAction}
-        {...(action.external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
+        {...(action.external ? { target: "_blank", rel: "noreferrer noopener" } : {})}
       >
         {icon}
         {action.label}
       </Button>
-    )
+    );
   }
 
   return (
     <Button
-      variant={variant}
+      variant={buttonVariant}
+      theme="primary"
+      tone="light"
+      size="s"
       onClick={(event) => {
-        action.onClick(event)
-        onAction?.()
+        action.onClick(event);
+        onAction?.();
       }}
     >
       {icon}
       {action.label}
     </Button>
-  )
+  );
 }
 
 // Boundary internal: ganti dengan primitive Search resmi tanpa mengubah NavbarSearchConfig.
@@ -221,17 +237,17 @@ function NavbarSearchForm({
   onSubmit,
   onValueChange,
 }: {
-  search: NavbarSearchConfig
-  inputId: string
-  value: string
-  className?: string
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void
-  onValueChange: (value: string) => void
+  search: NavbarSearchConfig;
+  inputId: string;
+  value: string;
+  className?: string;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onValueChange: (value: string) => void;
 }) {
   return (
-    <form role="search" className={cn('relative', className)} onSubmit={onSubmit}>
+    <form role="search" className={cn("relative", className)} onSubmit={onSubmit}>
       <label htmlFor={inputId} className="sr-only">
-        {search.label ?? 'Cari'}
+        {search.label ?? "Cari"}
       </label>
       <Icon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-content-subtle">
         <svg
@@ -249,16 +265,16 @@ function NavbarSearchForm({
       <input
         id={inputId}
         type="search"
-        name={search.name ?? 'search'}
+        name={search.name ?? "search"}
         value={value}
-        placeholder={search.placeholder ?? 'Search Civitas, Organisasi ...'}
-        autoComplete={search.autoComplete ?? 'off'}
+        placeholder={search.placeholder ?? "Search Civitas, Organisasi ..."}
+        autoComplete={search.autoComplete ?? "off"}
         disabled={search.disabled}
         className="box-border h-[37px] w-full rounded-lg border border-gray-300 bg-surface-subtle py-0 pr-3 pl-9 text-sm leading-[21px] font-medium text-content placeholder:text-content-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:opacity-50"
         onChange={(event) => onValueChange(event.currentTarget.value)}
       />
     </form>
-  )
+  );
 }
 
 function NotificationControl({
@@ -266,20 +282,20 @@ function NotificationControl({
   className,
   onAction,
 }: {
-  notification: NavbarNotification
-  className?: string
-  onAction?: () => void
+  notification: NavbarNotification;
+  className?: string;
+  onAction?: () => void;
 }) {
-  const accessibleLabel = notification.label?.trim() || 'Notifikasi'
+  const accessibleLabel = notification.label?.trim() || "Notifikasi";
   const content = (
     <Icon className="size-5">
       <Bell aria-hidden="true" focusable="false" />
     </Icon>
-  )
+  );
   const classes = cn(
-    'inline-flex size-10 shrink-0 items-center justify-center text-content transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+    "inline-flex size-10 shrink-0 items-center justify-center text-content transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
     className,
-  )
+  );
 
   if (notification.href !== undefined) {
     return (
@@ -288,13 +304,11 @@ function NotificationControl({
         className={classes}
         aria-label={accessibleLabel}
         onClick={onAction}
-        {...(notification.external
-          ? { target: '_blank', rel: 'noopener noreferrer' }
-          : {})}
+        {...(notification.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       >
         {content}
       </a>
-    )
+    );
   }
 
   return (
@@ -303,28 +317,28 @@ function NotificationControl({
       className={classes}
       aria-label={accessibleLabel}
       onClick={(event) => {
-        notification.onClick(event)
-        onAction?.()
+        notification.onClick(event);
+        onAction?.();
       }}
     >
       {content}
     </button>
-  )
+  );
 }
 
 /** Navbar utama dengan root full-width dan wrapper layout internal. */
 export function Navbar({
   brand,
   brandLabel,
-  brandHref = '/',
+  brandHref = "/",
   items,
   activeHref,
   search,
   guestActions,
   user,
   notification,
-  menuPosition = 'right',
-  ariaLabel = 'Navigasi utama',
+  menuPosition = "right",
+  ariaLabel = "Navigasi utama",
   onNavigate,
   mobileOpen,
   defaultMobileOpen = false,
@@ -332,115 +346,115 @@ export function Navbar({
   className,
   ...props
 }: NavbarProps) {
-  const searchInputId = useId()
-  const mobileSearchInputId = useId()
-  const navigationId = useId()
-  const userMenuId = useId()
-  const mobilePanelId = useId()
-  const hamburgerRef = useRef<HTMLButtonElement>(null)
-  const previousUserPresentRef = useRef(user !== undefined)
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [uncontrolledMobileOpen, setUncontrolledMobileOpen] = useState(defaultMobileOpen)
-  const [openMobileSubmenuId, setOpenMobileSubmenuId] = useState<string | null>(null)
+  const searchInputId = useId();
+  const mobileSearchInputId = useId();
+  const navigationId = useId();
+  const userMenuId = useId();
+  const mobilePanelId = useId();
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const previousUserPresentRef = useRef(user !== undefined);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [uncontrolledMobileOpen, setUncontrolledMobileOpen] = useState(defaultMobileOpen);
+  const [openMobileSubmenuId, setOpenMobileSubmenuId] = useState<string | null>(null);
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(
-    () => search?.defaultValue ?? '',
-  )
-  const searchValue = search?.value ?? uncontrolledSearchValue
-  const isMobileControlled = mobileOpen !== undefined
-  const isMobileOpen = isMobileControlled ? mobileOpen : uncontrolledMobileOpen
-  const showGuestActions = !user && Boolean(guestActions?.login || guestActions?.register)
+    () => search?.defaultValue ?? "",
+  );
+  const searchValue = search?.value ?? uncontrolledSearchValue;
+  const isMobileControlled = mobileOpen !== undefined;
+  const isMobileOpen = isMobileControlled ? mobileOpen : uncontrolledMobileOpen;
+  const showGuestActions = !user && Boolean(guestActions?.login || guestActions?.register);
 
   const handleNavigationMenuChange = useCallback((itemId: string | null) => {
-    setOpenMenuId(itemId)
-    if (itemId !== null) setUserMenuOpen(false)
-  }, [])
+    setOpenMenuId(itemId);
+    if (itemId !== null) setUserMenuOpen(false);
+  }, []);
   const handleUserMenuChange = useCallback((open: boolean) => {
-    setUserMenuOpen(open)
-    if (open) setOpenMenuId(null)
-  }, [])
+    setUserMenuOpen(open);
+    if (open) setOpenMenuId(null);
+  }, []);
   const handleMobileOpenChange = useCallback(
     (open: boolean) => {
-      if (open === isMobileOpen) return
+      if (open === isMobileOpen) return;
 
-      if (!isMobileControlled) setUncontrolledMobileOpen(open)
-      onMobileOpenChange?.(open)
+      if (!isMobileControlled) setUncontrolledMobileOpen(open);
+      onMobileOpenChange?.(open);
 
       if (open) {
-        setOpenMenuId(null)
-        setUserMenuOpen(false)
+        setOpenMenuId(null);
+        setUserMenuOpen(false);
       } else {
-        setOpenMobileSubmenuId(null)
+        setOpenMobileSubmenuId(null);
       }
     },
     [isMobileControlled, isMobileOpen, onMobileOpenChange],
-  )
+  );
   const handleSearchSubmit = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
-      event.preventDefault()
-      const query = searchValue.trim()
+      event.preventDefault();
+      const query = searchValue.trim();
 
-      if (!search || search.disabled || query.length === 0) return
-      search.onSubmit(query, event)
+      if (!search || search.disabled || query.length === 0) return;
+      search.onSubmit(query, event);
     },
     [search, searchValue],
-  )
+  );
   const handleSearchValueChange = useCallback(
     (value: string) => {
-      if (!search) return
+      if (!search) return;
 
-      if (search.value === undefined) setUncontrolledSearchValue(value)
-      search.onValueChange?.(value)
+      if (search.value === undefined) setUncontrolledSearchValue(value);
+      search.onValueChange?.(value);
     },
     [search],
-  )
+  );
 
   useEffect(() => {
-    const userPresent = user !== undefined
-    const userWasRemoved = previousUserPresentRef.current && !userPresent
+    const userPresent = user !== undefined;
+    const userWasRemoved = previousUserPresentRef.current && !userPresent;
 
-    previousUserPresentRef.current = userPresent
-    if (!userWasRemoved) return
+    previousUserPresentRef.current = userPresent;
+    if (!userWasRemoved) return;
 
-    const closeUserMenuTimer = window.setTimeout(() => setUserMenuOpen(false), 0)
-    return () => window.clearTimeout(closeUserMenuTimer)
-  }, [user])
+    const closeUserMenuTimer = window.setTimeout(() => setUserMenuOpen(false), 0);
+    return () => window.clearTimeout(closeUserMenuTimer);
+  }, [user]);
 
   useEffect(() => {
-    if (!isMobileOpen) return
+    if (!isMobileOpen) return;
 
     const closeFromEscape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
+      if (event.key !== "Escape") return;
 
-      event.preventDefault()
-      handleMobileOpenChange(false)
-      hamburgerRef.current?.focus()
-    }
+      event.preventDefault();
+      handleMobileOpenChange(false);
+      hamburgerRef.current?.focus();
+    };
 
-    document.addEventListener('keydown', closeFromEscape)
-    return () => document.removeEventListener('keydown', closeFromEscape)
-  }, [handleMobileOpenChange, isMobileOpen])
+    document.addEventListener("keydown", closeFromEscape);
+    return () => document.removeEventListener("keydown", closeFromEscape);
+  }, [handleMobileOpenChange, isMobileOpen]);
 
   useEffect(() => {
-    const desktopQuery = window.matchMedia('(min-width: 1024px)')
+    const desktopQuery = window.matchMedia("(min-width: 1024px)");
 
     const synchronizeDesktop = () => {
-      if (!desktopQuery.matches) return
+      if (!desktopQuery.matches) return;
 
-      if (isMobileOpen) handleMobileOpenChange(false)
-      setOpenMobileSubmenuId(null)
-      setOpenMenuId(null)
-      setUserMenuOpen(false)
-    }
+      if (isMobileOpen) handleMobileOpenChange(false);
+      setOpenMobileSubmenuId(null);
+      setOpenMenuId(null);
+      setUserMenuOpen(false);
+    };
 
-    synchronizeDesktop()
-    desktopQuery.addEventListener('change', synchronizeDesktop)
-    return () => desktopQuery.removeEventListener('change', synchronizeDesktop)
-  }, [handleMobileOpenChange, isMobileOpen])
+    synchronizeDesktop();
+    desktopQuery.addEventListener("change", synchronizeDesktop);
+    return () => desktopQuery.removeEventListener("change", synchronizeDesktop);
+  }, [handleMobileOpenChange, isMobileOpen]);
 
   return (
     <header
-      className={cn('w-full border-b border-border bg-surface text-content', className)}
+      className={cn("w-full border-b border-border bg-surface text-content", className)}
       {...props}
     >
       <div className="mx-auto w-full max-w-7xl px-4 lg:px-8">
@@ -464,8 +478,8 @@ export function Navbar({
           )}
           <div
             className={cn(
-              'ml-auto flex min-w-0 items-center lg:gap-4 2xl:gap-6',
-              !user && menuPosition === 'left' && 'lg:flex-1 lg:justify-between',
+              "ml-auto flex min-w-0 items-center lg:gap-4 2xl:gap-6",
+              !user && menuPosition === "left" && "lg:flex-1 lg:justify-between",
             )}
           >
             <NavbarNavigation
@@ -509,10 +523,10 @@ export function Navbar({
             ref={hamburgerRef}
             type="button"
             className={cn(
-              'grid size-11 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 lg:hidden',
-              user ? 'ml-2' : 'ml-auto',
+              "grid size-11 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 lg:hidden",
+              user ? "ml-2" : "ml-auto",
             )}
-            aria-label={isMobileOpen ? 'Tutup navigasi' : 'Buka navigasi'}
+            aria-label={isMobileOpen ? "Tutup navigasi" : "Buka navigasi"}
             aria-expanded={isMobileOpen}
             aria-controls={mobilePanelId}
             onClick={() => handleMobileOpenChange(!isMobileOpen)}
@@ -592,5 +606,5 @@ export function Navbar({
         />
       </div>
     </header>
-  )
+  );
 }

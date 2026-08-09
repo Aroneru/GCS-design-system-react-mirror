@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Navbar, type NavbarItem } from '../../../lib'
-import { PropsTable, type PropRow } from '../../PropsTable'
-import { CodeBlock, ComponentPage, Section } from '../../pageKit'
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Navbar, type NavbarItem } from "../../../lib";
+import { Button } from "../../../lib";
+import { PropsTable, type PropRow } from "../../PropsTable";
+import { CodeBlock, ComponentPage, Section } from "../../pageKit";
 
 function createFigmaItems(count: number): NavbarItem[] {
   return Array.from({ length: count }, (_, index) => {
-    const menuNumber = index + 1
+    const menuNumber = index + 1;
 
     return {
       id: `menu-${menuNumber}`,
@@ -17,57 +18,62 @@ function createFigmaItems(count: number): NavbarItem[] {
           href: `#/menu-${menuNumber}`,
         },
       ],
-    }
-  })
+    };
+  });
 }
 
 const figmaMenuItems = {
   2: [
     {
-      id: 'menu-1',
-      label: 'Menu 1',
-      children: [{ id: 'menu-1-child', label: 'Submenu Menu 1', href: '#/menu-1' }],
+      id: "menu-1",
+      label: "Menu 1",
+      children: [{ id: "menu-1-child", label: "Submenu Menu 1", href: "#/menu-1" }],
     },
     {
-      id: 'menu-2',
-      label: 'Menu 2',
-      children: [{ id: 'menu-2-child', label: 'Submenu Menu 2', href: '#/menu-2' }],
+      id: "menu-2",
+      label: "Menu 2",
+      children: [{ id: "menu-2-child", label: "Submenu Menu 2", href: "#/menu-2" }],
     },
   ] satisfies NavbarItem[],
   3: createFigmaItems(3),
   4: createFigmaItems(4),
   5: createFigmaItems(5),
-}
+};
 
 const accountItems = [
-  { id: 'profile', label: 'Profil', href: '#/profile' },
-  { id: 'settings', label: 'Pengaturan', href: '#/settings' },
-]
+  { id: "profile", label: "Profil", href: "#/profile" },
+  { id: "settings", label: "Pengaturan", href: "#/settings" },
+];
 
 const navbarProps: PropRow[] = [
-  ['brand, brandLabel', 'ReactNode, string', '—', 'Konten brand dan accessible name.'],
-  ['items', 'NavbarItem[]', '[]', 'Link atau submenu maksimal satu tingkat.'],
-  ['search', 'NavbarSearchConfig', 'undefined', 'Search submit biasa, controlled atau uncontrolled.'],
+  ["brand, brandLabel", "ReactNode, string", "—", "Konten brand dan accessible name."],
+  ["items", "NavbarItem[]", "[]", "Link atau submenu maksimal satu tingkat."],
   [
-    'menuPosition',
+    "search",
+    "NavbarSearchConfig",
+    "undefined",
+    "Search submit biasa, controlled atau uncontrolled.",
+  ],
+  [
+    "menuPosition",
     "'left' | 'right'",
     "'right'",
-    'Posisi menu desktop; tidak memengaruhi komposisi mobile.',
+    "Posisi menu desktop; tidak memengaruhi komposisi mobile.",
   ],
-  ['guestActions', 'NavbarGuestActions', 'undefined', 'Action login dan register.'],
+  ["guestActions", "NavbarGuestActions", "undefined", "Action login dan register."],
   [
-    'user, notification',
-    'NavbarUser, NavbarNotification',
-    'undefined',
-    'Komposisi authenticated dan unread state.',
+    "user, notification",
+    "NavbarUser, NavbarNotification",
+    "undefined",
+    "Komposisi authenticated dan unread state.",
   ],
   [
-    'mobileOpen',
-    'boolean',
-    'undefined',
-    'Controlled mobile panel; gunakan defaultMobileOpen untuk uncontrolled.',
+    "mobileOpen",
+    "boolean",
+    "undefined",
+    "Controlled mobile panel; gunakan defaultMobileOpen untuk uncontrolled.",
   ],
-]
+];
 
 function DemoBrand() {
   return (
@@ -80,10 +86,18 @@ function DemoBrand() {
       </span>
       <span className="text-sm font-black tracking-tight text-content">KOMDIGI</span>
     </span>
-  )
+  );
 }
 
-function NavbarShowcase({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
+function NavbarShowcase({
+  title,
+  note,
+  children,
+}: {
+  title: string;
+  note?: string;
+  children: ReactNode;
+}) {
   return (
     <section className="space-y-2">
       <div>
@@ -94,26 +108,26 @@ function NavbarShowcase({ title, note, children }: { title: string; note?: strin
         {children}
       </div>
     </section>
-  )
+  );
 }
 
 function NavbarDesktopShowcase({ title, src }: { title: string; src: string }) {
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const [scale, setScale] = useState(1)
-  const previewWidth = 1440
-  const previewHeight = 220
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const previewWidth = 1440;
+  const previewHeight = 220;
 
   useEffect(() => {
-    const wrapper = wrapperRef.current
-    if (!wrapper) return
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
 
-    const updateScale = () => setScale(Math.min(1, wrapper.clientWidth / previewWidth))
-    const observer = new ResizeObserver(updateScale)
+    const updateScale = () => setScale(Math.min(1, wrapper.clientWidth / previewWidth));
+    const observer = new ResizeObserver(updateScale);
 
-    updateScale()
-    observer.observe(wrapper)
-    return () => observer.disconnect()
-  }, [])
+    updateScale();
+    observer.observe(wrapper);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section className="min-w-0 space-y-2">
@@ -131,44 +145,47 @@ function NavbarDesktopShowcase({ title, src }: { title: string; src: string }) {
             width: previewWidth,
             height: previewHeight,
             transform: `scale(${scale})`,
-            transformOrigin: 'top left',
+            transformOrigin: "top left",
           }}
         />
       </div>
     </section>
-  )
+  );
 }
 
 const demoGuestActions = {
-  login: { label: 'Masuk', onClick: () => undefined },
-  register: { label: 'Daftar', onClick: () => undefined },
-}
+  login: { label: "Masuk", onClick: () => undefined },
+  register: { label: "Daftar", onClick: () => undefined },
+};
 
 function NavbarPreviewSurface({ children }: { children: ReactNode }) {
   return (
     <div
       className="min-h-screen bg-surface"
       onClickCapture={(event) => {
-        const target = event.target
+        const target = event.target;
 
-        if (target instanceof Element && target.closest('a')) {
-          event.preventDefault()
+        if (target instanceof Element && target.closest("a")) {
+          event.preventDefault();
         }
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 function NavbarMobileShowcase({ title, src }: { title: string; src: string }) {
-  const observerRef = useRef<ResizeObserver | null>(null)
-  const [height, setHeight] = useState(122)
+  const observerRef = useRef<ResizeObserver | null>(null);
+  const [height, setHeight] = useState(122);
 
-  useEffect(() => () => observerRef.current?.disconnect(), [])
+  useEffect(() => () => observerRef.current?.disconnect(), []);
 
   return (
-    <NavbarShowcase title={title} note="Iframe memakai viewport mobile nyata; search tetap terlihat di luar panel.">
+    <NavbarShowcase
+      title={title}
+      note="Iframe memakai viewport mobile nyata; search tetap terlihat di luar panel."
+    >
       <div className="mx-auto w-full max-w-[412px]">
         <iframe
           title={`Preview ${title}`}
@@ -176,37 +193,37 @@ function NavbarMobileShowcase({ title, src }: { title: string; src: string }) {
           className="block w-full rounded-lg border-0 bg-surface"
           style={{ height }}
           onLoad={(event) => {
-            observerRef.current?.disconnect()
+            observerRef.current?.disconnect();
 
-            const navbar = event.currentTarget.contentDocument?.querySelector('header')
-            if (!navbar) return
+            const navbar = event.currentTarget.contentDocument?.querySelector("header");
+            if (!navbar) return;
 
-            const updateHeight = () => setHeight(Math.ceil(navbar.getBoundingClientRect().height))
-            observerRef.current = new ResizeObserver(updateHeight)
-            observerRef.current.observe(navbar)
-            updateHeight()
+            const updateHeight = () => setHeight(Math.ceil(navbar.getBoundingClientRect().height));
+            observerRef.current = new ResizeObserver(updateHeight);
+            observerRef.current.observe(navbar);
+            updateHeight();
           }}
         />
       </div>
     </NavbarShowcase>
-  )
+  );
 }
 
 export function NavbarDesktopPreview({
   variant,
   menuCount,
 }: {
-  variant: 'guest' | 'no-button' | 'authenticated'
-  menuCount: 2 | 3 | 4 | 5
+  variant: "guest" | "no-button" | "authenticated";
+  menuCount: 2 | 3 | 4 | 5;
 }) {
-  const [query, setQuery] = useState('')
-  const authenticated = variant === 'authenticated'
+  const [query, setQuery] = useState("");
+  const authenticated = variant === "authenticated";
   const menuPosition =
-    variant === 'guest' &&
+    variant === "guest" &&
     menuCount === 2 &&
-    new URLSearchParams(window.location.search).get('navbarMenuPosition') === 'left'
-      ? 'left'
-      : 'right'
+    new URLSearchParams(window.location.search).get("navbarMenuPosition") === "left"
+      ? "left"
+      : "right";
 
   return (
     <NavbarPreviewSurface>
@@ -218,21 +235,23 @@ export function NavbarDesktopPreview({
           value: query,
           onValueChange: setQuery,
           onSubmit: () => undefined,
-          placeholder: 'Search Civitas, Organisasi ...',
+          placeholder: "Search Civitas, Organisasi ...",
         }}
-        guestActions={variant === 'guest' ? demoGuestActions : undefined}
-        user={authenticated ? { name: 'User Komdigi', initials: 'UK', items: accountItems } : undefined}
+        guestActions={variant === "guest" ? demoGuestActions : undefined}
+        user={
+          authenticated ? { name: "User Komdigi", initials: "UK", items: accountItems } : undefined
+        }
         notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
         menuPosition={menuPosition}
       />
     </NavbarPreviewSurface>
-  )
+  );
 }
 
-export function NavbarMobilePreview({ variant }: { variant: 'guest' | 'authenticated' }) {
-  const [open, setOpen] = useState(false)
-  const [query, setQuery] = useState('')
-  const authenticated = variant === 'authenticated'
+export function NavbarMobilePreview({ variant }: { variant: "guest" | "authenticated" }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const authenticated = variant === "authenticated";
 
   return (
     <NavbarPreviewSurface>
@@ -244,17 +263,19 @@ export function NavbarMobilePreview({ variant }: { variant: 'guest' | 'authentic
           value: query,
           onValueChange: setQuery,
           onSubmit: () => undefined,
-          placeholder: 'Search Civitas, Organisasi ...',
+          placeholder: "Search Civitas, Organisasi ...",
         }}
         guestActions={authenticated ? undefined : demoGuestActions}
-        user={authenticated ? { name: 'User Komdigi', initials: 'UK', items: accountItems } : undefined}
+        user={
+          authenticated ? { name: "User Komdigi", initials: "UK", items: accountItems } : undefined
+        }
         notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
         onNavigate={(_, event) => event.preventDefault()}
         mobileOpen={open}
         onMobileOpenChange={setOpen}
       />
     </NavbarPreviewSurface>
-  )
+  );
 }
 
 export function NavbarPage() {
@@ -267,7 +288,8 @@ export function NavbarPage() {
       <Section title="Desktop Guest">
         <div className="space-y-8">
           <p className="text-body-sm text-content-subtle">
-            Brand pada showcase masih berupa placeholder karena aset logo KOMDIGI resmi belum tersedia di repository.
+            Brand pada showcase masih berupa placeholder karena aset logo KOMDIGI resmi belum
+            tersedia di repository.
           </p>
 
           {([5, 4, 3] as const).map((count) => (
@@ -313,8 +335,8 @@ export function NavbarPage() {
         <div className="space-y-8">
           {(
             [
-              ['Mobile Guest', '#/preview/navbar/mobile-guest'],
-              ['Mobile Authenticated', '#/preview/navbar/mobile-authenticated'],
+              ["Mobile Guest", "#/preview/navbar/mobile-guest"],
+              ["Mobile Authenticated", "#/preview/navbar/mobile-authenticated"],
             ] satisfies Array<[string, string]>
           ).map(([title, src]) => (
             <NavbarMobileShowcase key={src} title={title} src={src} />
@@ -329,16 +351,16 @@ export function NavbarPage() {
       <Section title="Accessibility dan responsive">
         <div className="ds-card space-y-3 p-5 text-sm leading-6 text-content-subtle">
           <p>
-            Navbar memakai landmark header/nav/search, aria-current untuk link aktif, serta aria-expanded dan
-            aria-controls untuk disclosure.
+            Navbar memakai landmark header/nav/search, aria-current untuk link aktif, serta
+            aria-expanded dan aria-controls untuk disclosure.
           </p>
           <p>
-            Desktop dimulai pada breakpoint lg. Di bawah lg, search selalu terlihat pada baris kedua dan hamburger
-            membuka panel vertikal inline yang bukan modal.
+            Desktop dimulai pada breakpoint lg. Di bawah lg, search selalu terlihat pada baris kedua
+            dan hamburger membuka panel vertikal inline yang bukan modal.
           </p>
           <p>
-            Avatar, Dropdown, Search Form, dan notification control saat ini masih berupa implementasi internal
-            sementara dan bukan public API package.
+            Avatar, Dropdown, Search Form, dan notification control saat ini masih berupa
+            implementasi internal sementara dan bukan public API package.
           </p>
         </div>
       </Section>
@@ -358,5 +380,5 @@ export function NavbarPage() {
 />`}</CodeBlock>
       </Section>
     </ComponentPage>
-  )
+  );
 }
