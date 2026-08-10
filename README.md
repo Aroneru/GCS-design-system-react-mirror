@@ -10,7 +10,8 @@ State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
   purple, blue-portal), semantic aliases (`brand`, `feedback-*`, `content`,
   `surface`, `border`), skala tipografi (`display` → `caption`), spacing, radius,
   shadow, font Lato.
-- **Komponen umum**: `Button`, `Badge`, `Card`, `Container`, `Icon`, `Footer`.
+- **Komponen umum**: `Button`, `Badge`, `Card`, `Container`, `Icon`, `Navbar`,
+  `Footer`.
 - **Komponen form**: `InputField`, `FloatingLabel`, `TextArea`, `Select`,
   `Radio`, `Toggle`, `Checkbox`.
 - **Ikon**: logo brand & sosial (`Github`, `Instagram`, …) dari barrel utama,
@@ -86,14 +87,15 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 
 ### Umum
 
-| Komponen    | Props utama                                                     |
-| ----------- | --------------------------------------------------------------- |
-| `Button`    | `variant`: `primary \| secondary \| danger \| ghost`, `as`      |
-| `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`      |
-| `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions` |
-| `Container` | `as` (default `div`)                                            |
-| `Icon`      | `children` (SVG dengan `currentColor`)                          |
-| `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`           |
+| Komponen    | Props utama                                                          |
+| ----------- | -------------------------------------------------------------------- |
+| `Button`    | `variant`: `primary \| secondary \| danger \| ghost`, `as`          |
+| `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`          |
+| `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`      |
+| `Container` | `as` (default `div`)                                                  |
+| `Icon`      | `children` (SVG dengan `currentColor`)                               |
+| `Navbar`    | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`   |
+| `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`                |
 
 ### Form
 
@@ -125,6 +127,61 @@ Prop yang dipakai bersama seluruh komponen form:
 > karena mengikuti file Figma apa adanya — `Checkbox` tidak meredupkan kotaknya,
 > `Radio` memakai latar gray-100, `Toggle` justru menggelapkan jalurnya ke
 > gray-300. Perlu diseragamkan di Figma lebih dulu.
+
+### Navbar
+
+```tsx
+import { Navbar } from '@tpl/design-kit-react'
+
+<Navbar
+  brand={<img src="/logo.svg" alt="" />}
+  brandLabel="KOMDIGI — Beranda"
+  items={[
+    {
+      id: 'menu-1',
+      label: 'Menu 1',
+      children: [{ id: 'menu-1-overview', label: 'Ringkasan', href: '/menu-1' }],
+    },
+  ]}
+  search={{
+    placeholder: 'Search Civitas, Organisasi ...',
+    onSubmit: (query) => console.log(query),
+  }}
+  guestActions={{
+    login: { label: 'Masuk', href: '/login' },
+    register: { label: 'Daftar', href: '/register' },
+  }}
+/>
+```
+
+Navbar bersifat router-agnostic dan responsive mulai breakpoint `lg`. Pada
+mobile, search tetap terlihat pada baris kedua di luar panel navigasi, termasuk
+ketika panel tertutup. Panel mobile bersifat inline dan non-modal.
+
+Authenticated state diberikan melalui prop `user`. Notification merupakan
+API/config Navbar yang dapat dipakai bersama authenticated state:
+
+```tsx
+<Navbar
+  brand={<Logo />}
+  brandLabel="KOMDIGI — Beranda"
+  items={items}
+  search={{ onSubmit: (query) => console.log(query) }}
+  user={{ name: 'User Komdigi', avatarSrc: '/avatar.jpg' }}
+  notification={{ unread: true, href: '/notifications' }}
+/>
+```
+
+`notification.unread` tetap tersedia untuk kompatibilitas state API, tetapi
+desain Navbar saat ini hanya menampilkan ikon notification solid tanpa badge,
+dot, atau indikator unread visual.
+
+Type publik utama meliputi `NavbarProps`, `NavbarItem`, `NavbarSubItem`,
+`NavbarSearchConfig`, `NavbarGuestActions`, `NavbarUser`, `NavbarNotification`,
+dan `NavbarMenuPosition`.
+
+Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
+bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.
 
 ## Ikon
 
