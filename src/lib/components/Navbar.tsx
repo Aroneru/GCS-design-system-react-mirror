@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import { Bell } from "flowbite-react-icons/solid";
+import { ArrowRightToBracket, Edit } from "../icons/outline";
 import { Button } from "./Button";
 import { Icon } from "./Icon";
 import { cn } from "../utils/cn";
@@ -154,40 +155,12 @@ function GuestAction({
 }) {
   const icon =
     variant === "secondary" ? (
-      <Icon className="size-4">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.8}
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10 17l5-5-5-5M15 12H3" />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5"
-          />
-        </svg>
+      <Icon className="size-[14px]">
+        <ArrowRightToBracket aria-hidden="true" focusable="false" />
       </Icon>
     ) : (
-      <Icon className="size-4">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.8}
-          aria-hidden="true"
-          focusable="false"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M13.5 6.5l4 4L8 20H4v-4L13.5 6.5Z"
-          />
-          <path strokeLinecap="round" strokeLinejoin="round" d="m15.5 4.5 4 4" />
-        </svg>
+      <Icon className="size-[14px]">
+        <Edit aria-hidden="true" focusable="false" />
       </Icon>
     );
 
@@ -201,7 +174,7 @@ function GuestAction({
         variant={buttonVariant}
         theme="primary"
         tone="light"
-        size="s"
+        size="base"
         onClick={onAction}
         {...(action.external ? { target: "_blank", rel: "noreferrer noopener" } : {})}
       >
@@ -216,7 +189,7 @@ function GuestAction({
       variant={buttonVariant}
       theme="primary"
       tone="light"
-      size="s"
+      size="base"
       onClick={(event) => {
         action.onClick(event);
         onAction?.();
