@@ -49,7 +49,15 @@ export function Footer({
 
           {menus.length > 0 && (
             <nav className="@3xl:flex @3xl:flex-1 @3xl:justify-center" aria-label="Navigasi footer">
-              <ul className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
+              {/*
+               * Satu baris memuat paling banyak 5 menu; sisanya turun ke baris
+               * berikutnya. Saat footer sempit tata letaknya tetap flex-wrap
+               * (menyesuaikan ruang), dan gridTemplateColumns diabaikan.
+               */}
+              <ul
+                className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm @3xl:grid"
+                style={{ gridTemplateColumns: `repeat(${Math.min(menus.length, 5)}, max-content)` }}
+              >
                 {menus.map((menu, i) => (
                   <li key={i}>
                     <a
@@ -63,6 +71,8 @@ export function Footer({
               </ul>
             </nav>
           )}
+
+          <div></div>
         </div>
 
         <hr className="border-white/15" />

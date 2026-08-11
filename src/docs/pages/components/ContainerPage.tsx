@@ -1,7 +1,8 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { Container } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { C, CodeBlock, ComponentPage, ControlLabel, H, Principles, SectionHead, Segmented } from '../../pageKit'
+import { C, CodeBlock, ComponentPage, H, Mark, Principles, SectionHead, Segmented } from '../../pageKit'
+import { Control, Controls } from '../../usulanKit'
 
 const containerProps: PropRow[] = [
   [
@@ -107,87 +108,6 @@ export function ContainerPage() {
       description="Pembungkus paling luar untuk isi halaman. Tugasnya satu: menjaga konten berhenti di lebar yang sama di mana pun ia dipakai — 380px saat ruangnya sempit dan 1126px saat lapang — lalu memusatkannya. Tingginya selalu mengikuti konten."
     >
       <section>
-        <SectionHead eyebrow="Playground" title="Preview">
-          Kotak biru muda adalah ruang yang tersedia; garis putus-putus adalah tempat konten berhenti. Selisih
-          keduanya itulah padding. Pilih <C>Mobile</C>/<C>Desktop</C> untuk melihat ambang bawaannya, atau{' '}
-          <C>Kustom</C> untuk mengetik lebar sendiri — contoh kode di bawah ikut menyesuaikan.
-        </SectionHead>
-
-        {/* Preview memakai <Container> yang sungguhan, bukan tiruan. */}
-        <div className="rounded-2xl border border-border bg-surface-subtle p-4 sm:p-6">
-          <div
-            ref={availRef}
-            className="mx-auto max-w-full rounded-xl bg-primary-50 ring-1 ring-primary-100 transition-[width] duration-300 ease-out"
-            style={{ width: `${width}px` }}
-          >
-            <Container className="py-6">
-              <div
-                ref={contentRef}
-                className="rounded-lg border-2 border-dashed border-primary-300 bg-surface px-4 py-8 text-center"
-              >
-                <p className="text-sm font-black text-primary-700">Container</p>
-                <p className="mt-1 text-xs text-gray-500">
-                  ruang {measured.avail}px · konten {measured.content}px · padding {measured.padding}px
-                </p>
-              </div>
-            </Container>
-          </div>
-        </div>
-
-        {/* Kontrol lebar: preset + input manual */}
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <ControlLabel>Lebar</ControlLabel>
-          <Segmented
-            label="Pilih lebar container"
-            value={view}
-            onChange={setView}
-            options={[
-              { value: 'mobile', label: 'Mobile' },
-              { value: 'desktop', label: 'Desktop' },
-              { value: 'custom', label: 'Kustom' },
-            ]}
-          />
-
-          {view === 'custom' && (
-            <div className="flex flex-wrap items-center gap-3">
-              <input
-                type="range"
-                min={MIN_WIDTH}
-                max={MAX_WIDTH}
-                step={10}
-                value={customWidth}
-                onChange={(e) => setCustomWidth(clamp(Number(e.target.value)))}
-                aria-label="Geser lebar container"
-                className="h-1.5 w-40 cursor-pointer appearance-none rounded-full bg-border accent-primary-600"
-              />
-              <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5">
-                <input
-                  type="number"
-                  min={MIN_WIDTH}
-                  max={MAX_WIDTH}
-                  value={customWidth}
-                  onChange={(e) => setCustomWidth(clamp(Number(e.target.value) || MIN_WIDTH))}
-                  aria-label="Lebar container dalam piksel"
-                  className="w-16 bg-transparent text-sm font-bold text-gray-900 outline-none"
-                />
-                <span className="text-xs font-bold text-gray-500">px</span>
-              </label>
-              <span className="text-xs text-gray-500">
-                {MIN_WIDTH}–{MAX_WIDTH}px
-              </span>
-            </div>
-          )}
-        </div>
-
-        <p className="mt-4 text-body-sm leading-6 text-gray-500">
-          Yang berganti di atas benar-benar komponen <C>Container</C>, bukan kotak tiruan — angkanya diukur langsung
-          dari elemen yang dirender. Itu mungkin karena Container memakai <em>container query</em> seperti Footer:
-          ambangnya mengikuti lebar ruang yang tersedia, bukan lebar jendela. Di halaman biasa hasilnya sama saja,
-          tapi di dalam kolom sempit atau split view, Container tetap tahu diri.
-        </p>
-      </section>
-
-      <section>
         <SectionHead eyebrow="Cara kerja" title="Tiga hal yang diatur">
           Semua perilaku di bawah sudah menempel di komponen — tidak perlu ditulis ulang setiap kali dipakai.
         </SectionHead>
@@ -251,8 +171,102 @@ export function ContainerPage() {
       </section>
 
       <section>
+        <SectionHead eyebrow="API" title="Properties">
+          Container merender elemen luar sebagai titik ukur <C>@container</C>, lalu elemen dalam yang memegang lebar
+          dan padding. <C>className</C> dan atribut HTML menempel di elemen luar.
+        </SectionHead>
+        <PropsTable rows={containerProps} minWidth="44rem" />
+      </section>
+
+      {/* Playground ditaruh setelah penjelasan: pembaca tahu dulu apa yang
+          diatur Container, baru mencobanya sendiri. */}
+      <section>
+        <SectionHead eyebrow="Playground" title="Coba sendiri">
+          Kotak biru muda adalah ruang yang tersedia; garis putus-putus adalah tempat konten berhenti. Selisih
+          keduanya itulah padding. Pilih <C>Mobile</C>/<C>Desktop</C> untuk melihat ambang bawaannya, atau{' '}
+          <C>Kustom</C> untuk mengetik lebar sendiri — contoh kode di bawah ikut menyesuaikan.
+        </SectionHead>
+
+        {/* Preview memakai <Container> yang sungguhan, bukan tiruan. */}
+        <div className="rounded-2xl border border-border bg-surface-subtle p-4 sm:p-6">
+          <div
+            ref={availRef}
+            className="mx-auto max-w-full rounded-xl bg-primary-50 ring-1 ring-primary-100 transition-[width] duration-300 ease-out"
+            style={{ width: `${width}px` }}
+          >
+            <Container className="py-6">
+              <div
+                ref={contentRef}
+                className="rounded-lg border-2 border-dashed border-primary-300 bg-surface px-4 py-8 text-center"
+              >
+                <p className="text-sm font-black text-primary-700">Container</p>
+                <p className="mt-1 text-xs text-gray-500">
+                  ruang {measured.avail}px · konten {measured.content}px · padding {measured.padding}px
+                </p>
+              </div>
+            </Container>
+          </div>
+        </div>
+
+        {/* Kontrol — susunannya mengikuti Playground halaman usulan (Controls/Control). */}
+        <Controls>
+          <Control label="Lebar">
+            <Segmented
+              label="Pilih lebar container"
+              value={view}
+              onChange={setView}
+              options={[
+                { value: 'mobile', label: 'Mobile' },
+                { value: 'desktop', label: 'Desktop' },
+                { value: 'custom', label: 'Kustom' },
+              ]}
+            />
+          </Control>
+
+          {view === 'custom' && (
+            <Control label="Lebar kustom">
+              <div className="flex flex-wrap items-center gap-3">
+                <input
+                  type="range"
+                  min={MIN_WIDTH}
+                  max={MAX_WIDTH}
+                  step={10}
+                  value={customWidth}
+                  onChange={(e) => setCustomWidth(clamp(Number(e.target.value)))}
+                  aria-label="Geser lebar container"
+                  className="h-1.5 w-40 cursor-pointer appearance-none rounded-full bg-border accent-primary-600"
+                />
+                <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5">
+                  <input
+                    type="number"
+                    min={MIN_WIDTH}
+                    max={MAX_WIDTH}
+                    value={customWidth}
+                    onChange={(e) => setCustomWidth(clamp(Number(e.target.value) || MIN_WIDTH))}
+                    aria-label="Lebar container dalam piksel"
+                    className="w-16 bg-transparent text-sm font-bold text-gray-900 outline-none"
+                  />
+                  <span className="text-xs font-bold text-gray-500">px</span>
+                </label>
+                <span className="text-xs text-gray-500">
+                  {MIN_WIDTH}–{MAX_WIDTH}px
+                </span>
+              </div>
+            </Control>
+          )}
+        </Controls>
+
+        <p className="mt-4 text-body-sm leading-6 text-gray-500">
+          Yang berganti di atas benar-benar komponen <C>Container</C>, bukan kotak tiruan — angkanya diukur langsung
+          dari elemen yang dirender. Itu mungkin karena Container memakai <em>container query</em> seperti Footer:
+          ambangnya mengikuti lebar ruang yang tersedia, bukan lebar jendela. Di halaman biasa hasilnya sama saja,
+          tapi di dalam kolom sempit atau split view, Container tetap tahu diri.
+        </p>
+      </section>
+
+      <section>
         <SectionHead eyebrow="Penggunaan" title="Contoh kode">
-          Contoh pertama mengikuti mode yang dipilih di Preview — saat ini{' '}
+          Contoh pertama mengikuti mode yang dipilih di Playground tepat di atas — saat ini{' '}
           <C>{view === 'custom' ? `Kustom ${width}px` : view === 'mobile' ? 'Mobile' : 'Desktop'}</C>. Tiga pola
           berikutnya berlaku di semua ukuran.
         </SectionHead>
@@ -280,7 +294,7 @@ export function ContainerPage() {
               {'    Padding ikut menyesuaikan sendiri karena ambangnya\n'}
               {'    diukur dari ruang yang tersedia. */}\n'}
               {'<Container className="'}
-              <H>{`max-w-[${width}px]`}</H>
+              <Mark>{`max-w-[${width}px]`}</Mark>
               {'">\n    ...\n</Container>\n\n'}
             </>
           )}
@@ -302,14 +316,6 @@ export function ContainerPage() {
           {'    <Container className="py-12">\n        ...\n    </Container>\n'}
           {'</section>'}
         </CodeBlock>
-      </section>
-
-      <section>
-        <SectionHead eyebrow="API" title="Properties">
-          Container merender elemen luar sebagai titik ukur <C>@container</C>, lalu elemen dalam yang memegang lebar
-          dan padding. <C>className</C> dan atribut HTML menempel di elemen luar.
-        </SectionHead>
-        <PropsTable rows={containerProps} minWidth="44rem" />
       </section>
 
       <Principles

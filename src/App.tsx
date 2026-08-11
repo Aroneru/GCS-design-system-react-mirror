@@ -34,10 +34,13 @@ import { PlaceholderPage } from './docs/pages/PlaceholderPage'
 
 import { ComponentsOverview } from './docs/pages/components/ComponentsOverview'
 import { ContainerPage } from './docs/pages/components/ContainerPage'
+import { ContainerUsulanPage } from './docs/pages/components/ContainerUsulanPage'
 import { ButtonPage } from './docs/pages/components/ButtonPage'
 import { BadgePage } from './docs/pages/components/BadgePage'
 import { CardPage } from './docs/pages/components/CardPage'
+import { CardUsulanPage } from './docs/pages/components/CardUsulanPage'
 import { FooterPage } from './docs/pages/components/FooterPage'
+import { FooterUsulanPage } from './docs/pages/components/FooterUsulanPage'
 import {
   NavbarDesktopPreview,
   NavbarMobilePreview,
@@ -78,11 +81,14 @@ const routes: Record<string, () => React.ReactElement> = {
 
   '/components': ComponentsOverview,
   '/components/container': ContainerPage,
+  '/components/container-usulan': ContainerUsulanPage,
   '/components/button': ButtonPage,
   '/components/badge': BadgePage,
   '/components/card': CardPage,
+  '/components/card-usulan': CardUsulanPage,
   '/components/navbar': NavbarPage,
   '/components/footer': FooterPage,
+  '/components/footer-usulan': FooterUsulanPage,
 }
 
 function renderNavbarPreview(path: string) {

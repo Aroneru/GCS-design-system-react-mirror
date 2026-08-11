@@ -16,7 +16,7 @@ const INSTALL = 'npm install @tpl/design-kit-react'
  */
 const countLeaves = (key: string) =>
   sidebars[key].items
-    .filter((i) => i.label !== 'Overview' && !i.soon)
+    .filter((i) => i.label !== 'Overview' && !i.soon && !i.alt)
     .reduce((n, i) => n + (i.children?.length ?? 1), 0)
 
 /** Logo brand sudah termasuk di dalam set solid/outline, jadi tidak dijumlah lagi. */

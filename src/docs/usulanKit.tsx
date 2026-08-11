@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type MouseEvent, type ReactNode } from 'react'
 import { CodeBlock, ControlLabel } from './pageKit'
 
 /**
@@ -15,11 +15,29 @@ export type TocEntry = { id: string; label: string }
 
 /**
  * Router aplikasi ini memakai hash (`#/form/...`), jadi `<a href="#editor">`
- * akan dibaca sebagai perpindahan halaman dan melempar kita ke Home. Karena itu
- * lompatan antar-bagian dilakukan lewat JS, bukan anchor HTML biasa.
+ * biasa akan dibaca sebagai perpindahan halaman dan melempar kita ke Home.
+ * Solusinya: tautan bagian ditulis lengkap — `#<rute>#<id>` — dan useHashRoute
+ * yang memotong penanda bagian dari rutenya lalu menggulir ke sana.
+ *
+ * Bentuknya tetap <a>, bukan <button>, supaya alamatnya bisa disalin, dibuka di
+ * tab baru, dan tetap benar setelah halaman dimuat ulang.
  */
-function scrollToSection(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+function sectionHref(id: string) {
+  const route = window.location.hash.replace(/^#/, '').split('#')[0] || '/'
+  return `#${route}#${id}`
+}
+
+/**
+ * Menekan tautan yang alamatnya sama persis dengan hash sekarang tidak memicu
+ * `hashchange`, jadi klik kedua ke bagian yang sama akan terasa mati. Di kasus
+ * itu saja gulirannya dijalankan langsung.
+ */
+function handleSectionClick(id: string) {
+  return (e: MouseEvent<HTMLAnchorElement>) => {
+    if (window.location.hash !== sectionHref(id)) return
+    e.preventDefault()
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }
 }
 
 /**
@@ -69,15 +87,15 @@ export function FlowSection({
     <section id={id} className="scroll-mt-24">
       <h2 className="group flex items-baseline gap-2 text-heading-3 font-black text-gray-900">
         {title}
-        <button
-          type="button"
-          onClick={() => scrollToSection(id)}
-          title="Ke bagian ini"
-          aria-label={`Ke bagian ${title}`}
-          className="text-primary-300 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+        <a
+          href={sectionHref(id)}
+          onClick={handleSectionClick(id)}
+          title="Tautan ke bagian ini"
+          aria-label={`Tautan ke bagian ${title}`}
+          className="rounded text-primary-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-primary-600 focus-visible:opacity-100"
         >
           #
-        </button>
+        </a>
       </h2>
       <div className="mt-3">{children}</div>
     </section>
@@ -177,19 +195,19 @@ export function UsulanPage({
               </p>
               <nav className="mt-3 border-l border-border" aria-label="Daftar isi halaman">
                 {toc.map((t) => (
-                  <button
+                  <a
                     key={t.id}
-                    type="button"
-                    onClick={() => scrollToSection(t.id)}
+                    href={sectionHref(t.id)}
+                    onClick={handleSectionClick(t.id)}
                     aria-current={active === t.id ? 'true' : undefined}
                     className={`-ml-px block w-full border-l-2 py-1.5 pl-3 text-left text-[13px] transition-colors ${
                       active === t.id
                         ? 'border-primary-600 font-bold text-primary-700'
-                        : 'border-transparent text-gray-500 hover:text-gray-800'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800'
                     }`}
                   >
                     {t.label}
-                  </button>
+                  </a>
                 ))}
               </nav>
             </div>
