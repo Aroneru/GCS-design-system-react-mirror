@@ -10,15 +10,46 @@ type PreviewDevice = "desktop" | "mobile";
 function createFigmaItems(count: number): NavbarItem[] {
   return Array.from({ length: count }, (_, index) => {
     const menuNumber = index + 1;
+    const isTrueSubmenu = count >= 2 && index === count - 1;
+
+    if (isTrueSubmenu) {
+      return {
+        id: `menu-${menuNumber}`,
+        label: `Menu ${menuNumber}`,
+        children: [
+          {
+            id: `menu-${menuNumber}-submenu-1`,
+            label: "Submenu 1",
+            href: `#/menu-${menuNumber}/submenu-1`,
+          },
+          {
+            id: `menu-${menuNumber}-submenu-2`,
+            label: "Submenu 2",
+            href: `#/menu-${menuNumber}/submenu-2`,
+          },
+        ],
+      };
+    }
 
     return {
       id: `menu-${menuNumber}`,
       label: `Menu ${menuNumber}`,
+      href: `#/menu-${menuNumber}`,
       children: [
         {
           id: `menu-${menuNumber}-overview`,
           label: `Ringkasan Menu ${menuNumber}`,
-          href: `#/menu-${menuNumber}`,
+          href: `#/menu-${menuNumber}/ringkasan`,
+        },
+        {
+          id: `menu-${menuNumber}-settings`,
+          label: `Pengaturan Menu ${menuNumber}`,
+          href: `#/menu-${menuNumber}/pengaturan`,
+        },
+        {
+          id: `menu-${menuNumber}-history`,
+          label: `Riwayat Menu ${menuNumber}`,
+          href: `#/menu-${menuNumber}/riwayat`,
         },
       ],
     };
@@ -27,22 +58,49 @@ function createFigmaItems(count: number): NavbarItem[] {
 
 const figmaMenuItems = {
   1: createFigmaItems(1),
-  2: [
-    {
-      id: "menu-1",
-      label: "Menu 1",
-      children: [{ id: "menu-1-child", label: "Submenu Menu 1", href: "#/menu-1" }],
-    },
-    {
-      id: "menu-2",
-      label: "Menu 2",
-      children: [{ id: "menu-2-child", label: "Submenu Menu 2", href: "#/menu-2" }],
-    },
-  ] satisfies NavbarItem[],
+  2: createFigmaItems(2),
   3: createFigmaItems(3),
   4: createFigmaItems(4),
   5: createFigmaItems(5),
 };
+
+function getMobilePreviewPage(items: NavbarItem[], activeHref?: string) {
+  if (!activeHref) {
+    return {
+      title: "Beranda",
+      description: "Pilih menu dari navigasi utama untuk melihat contoh halaman.",
+    };
+  }
+
+  for (const item of items) {
+    if ("href" in item && item.href === activeHref) {
+      return {
+        title: item.label,
+        description: `Anda sedang berada di halaman utama ${item.label}.`,
+      };
+    }
+
+    if (!Array.isArray(item.children)) continue;
+
+    const activeChild = item.children.find((child) => child.href === activeHref);
+    if (!activeChild) continue;
+
+    const suffix = ` ${item.label}`;
+    const childContext = activeChild.label.endsWith(suffix)
+      ? activeChild.label.slice(0, -suffix.length)
+      : activeChild.label;
+
+    return {
+      title: activeChild.label,
+      description: `Anda sedang melihat ${childContext} dari ${item.label}.`,
+    };
+  }
+
+  return {
+    title: "Beranda",
+    description: "Pilih menu dari navigasi utama untuk melihat contoh halaman.",
+  };
+}
 
 const accountItems = [
   { id: "profile", label: "Profil", href: "#/profile" },
@@ -125,16 +183,25 @@ const demoGuestActions = {
   register: { label: "Daftar", onClick: () => undefined },
 };
 
-function NavbarPreviewSurface({ children }: { children: ReactNode }) {
+function NavbarPreviewSurface({
+  children,
+  onHomeNavigate,
+}: {
+  children: ReactNode;
+  onHomeNavigate?: () => void;
+}) {
   return (
     <div
       className="min-h-screen bg-surface"
       onClickCapture={(event) => {
         const target = event.target;
+        if (!(target instanceof Element)) return;
 
-        if (target instanceof Element && target.closest("a")) {
-          event.preventDefault();
-        }
+        const link = target.closest("a");
+        if (!link) return;
+
+        event.preventDefault();
+        if (link.getAttribute("href") === "/") onHomeNavigate?.();
       }}
     >
       {children}
@@ -143,11 +210,6 @@ function NavbarPreviewSurface({ children }: { children: ReactNode }) {
 }
 
 function PlaygroundMobileFrame({ src }: { src: string }) {
-  const observerRef = useRef<ResizeObserver | null>(null);
-  const [height, setHeight] = useState(122);
-
-  useEffect(() => () => observerRef.current?.disconnect(), []);
-
   return (
     <div className="mx-auto w-full max-w-[412px] overflow-hidden rounded-lg border border-border bg-surface shadow-sm">
       <iframe
@@ -155,18 +217,7 @@ function PlaygroundMobileFrame({ src }: { src: string }) {
         title="Preview interaktif Navbar mobile"
         src={src}
         className="block w-full border-0 bg-surface"
-        style={{ height }}
-        onLoad={(event) => {
-          observerRef.current?.disconnect();
-
-          const navbar = event.currentTarget.contentDocument?.querySelector("header");
-          if (!navbar) return;
-
-          const updateHeight = () => setHeight(Math.ceil(navbar.getBoundingClientRect().height));
-          observerRef.current = new ResizeObserver(updateHeight);
-          observerRef.current.observe(navbar);
-          updateHeight();
-        }}
+        style={{ height: 640 }}
       />
     </div>
   );
@@ -187,10 +238,28 @@ function createPlaygroundCode({
 }) {
   const items = Array.from({ length: menuCount }, (_, index) => {
     const number = index + 1;
+    const isTrueSubmenu = menuCount >= 2 && index === menuCount - 1;
+
+    if (isTrueSubmenu) {
+      return `    {
+      id: 'menu-${number}',
+      label: 'Menu ${number}',
+      children: [
+        { id: 'menu-${number}-submenu-1', label: 'Submenu 1', href: '/menu-${number}/submenu-1' },
+        { id: 'menu-${number}-submenu-2', label: 'Submenu 2', href: '/menu-${number}/submenu-2' },
+      ],
+    }`;
+    }
+
     return `    {
       id: 'menu-${number}',
       label: 'Menu ${number}',
-      children: [{ id: 'menu-${number}-overview', label: 'Ringkasan', href: '/menu-${number}' }],
+      href: '/menu-${number}',
+      children: [
+        { id: 'menu-${number}-overview', label: 'Ringkasan Menu ${number}', href: '/menu-${number}/ringkasan' },
+        { id: 'menu-${number}-settings', label: 'Pengaturan Menu ${number}', href: '/menu-${number}/pengaturan' },
+        { id: 'menu-${number}-history', label: 'Riwayat Menu ${number}', href: '/menu-${number}/riwayat' },
+      ],
     }`;
   }).join(",\n");
 
@@ -464,6 +533,7 @@ export function NavbarDesktopPreview({
 export function NavbarMobilePreview({ variant }: { variant: "guest" | "authenticated" }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [navigationInstanceKey, setNavigationInstanceKey] = useState(0);
   const params = new URLSearchParams(window.location.search);
   const playground = params.get("navbarPlayground") === "true";
   const requestedMenuCount = Number(params.get("navbarMenuCount"));
@@ -471,6 +541,9 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
     playground && [1, 2, 3, 4, 5].includes(requestedMenuCount)
       ? (requestedMenuCount as 1 | 2 | 3 | 4 | 5)
       : 3;
+  const previewItems = figmaMenuItems[effectiveMenuCount];
+  const [activeHref, setActiveHref] = useState<string>();
+  const previewPage = getMobilePreviewPage(previewItems, activeHref);
   const authenticated = playground
     ? params.get("navbarState") === "authenticated"
     : variant === "authenticated";
@@ -479,11 +552,20 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
   const menuPosition = params.get("navbarMenuPosition") === "left" ? "left" : "right";
 
   return (
-    <NavbarPreviewSurface>
+    <NavbarPreviewSurface
+      onHomeNavigate={() => {
+        setActiveHref(undefined);
+        setOpen(false);
+        setNavigationInstanceKey((key) => key + 1);
+      }}
+    >
       <Navbar
+        key={navigationInstanceKey}
         brand={<DemoBrand />}
+        brandHref="/"
         brandLabel="KOMDIGI — Beranda"
-        items={figmaMenuItems[effectiveMenuCount]}
+        items={previewItems}
+        activeHref={activeHref}
         search={
           searchEnabled
             ? {
@@ -500,10 +582,21 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
         }
         notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
         menuPosition={menuPosition}
-        onNavigate={(_, event) => event.preventDefault()}
+        onNavigate={(item, event) => {
+          event.preventDefault();
+          if ("href" in item && item.href) setActiveHref(item.href);
+        }}
         mobileOpen={open}
         onMobileOpenChange={setOpen}
       />
+      <main className="min-h-[480px] bg-surface px-4 py-6">
+        <section className="max-w-prose" aria-live="polite">
+          <h1 className="text-lg font-bold text-content">{previewPage.title}</h1>
+          <p className="mt-2 text-sm leading-6 text-content-subtle">
+            {previewPage.description}
+          </p>
+        </section>
+      </main>
     </NavbarPreviewSurface>
   );
 }
@@ -516,6 +609,7 @@ const automaticAccessibility = [
   "Mencegah navigation item disabled diaktifkan.",
   "Menyembunyikan icon dekoratif dari assistive technology.",
   "Menyampaikan status hamburger dan label notification secara aksesibel.",
+  "Menyediakan trigger conditional yang aksesibel untuk navigasi sekunder mobile.",
 ];
 
 const consumerAccessibility = [
@@ -583,8 +677,10 @@ export function NavbarPage() {
           <article className="ds-card p-5">
             <h3 className="font-black text-content">Mobile</h3>
             <p className="mt-2 text-body-sm leading-6 text-content-subtle">
-              Navigation dibuka melalui hamburger, sementara search tetap terlihat di luar panel.
-              Panel tampil inline dan notification Bell tidak ditampilkan pada authenticated mobile.
+              Navigasi utama dibuka melalui sidebar dari kiri. Jika menu aktif memiliki navigasi
+              sekunder, trigger tambahan ditampilkan untuk membuka drawer dari kanan. Search tetap
+              berada di luar navigation surface dan notification Bell tidak ditampilkan pada
+              authenticated mobile.
             </p>
           </article>
         </div>

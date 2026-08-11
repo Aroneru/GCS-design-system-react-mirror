@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { Bell } from "flowbite-react-icons/solid";
-import { ArrowRightToBracket, Edit } from "../icons/outline";
+import { ArrowRightToBracket, Bars, Edit, List } from "../icons/outline";
 import { Button } from "./Button";
 import { Icon } from "./Icon";
 import { cn } from "../utils/cn";
@@ -36,6 +36,11 @@ export type NavbarItem =
       href: string;
       external?: boolean;
       children?: never;
+    })
+  | (NavbarItemBase & {
+      href: string;
+      external?: boolean;
+      children: NavbarSubItem[];
     })
   | (NavbarItemBase & {
       href?: never;
@@ -112,6 +117,36 @@ export type NavbarNotification =
     });
 
 export type NavbarMenuPosition = "left" | "right";
+
+const mobileNavigationTriggerClasses =
+  "grid size-10 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600";
+
+type NavbarSectionItem = Extract<NavbarItem, { children: NavbarSubItem[] }>;
+type NavbarContextItem = Extract<
+  NavbarItem,
+  { href: string; children: NavbarSubItem[] }
+>;
+
+function isNavbarSectionItem(item: NavbarItem): item is NavbarSectionItem {
+  return Array.isArray(item.children) && item.children.length > 0;
+}
+
+function isNavbarContextItem(item: NavbarItem): item is NavbarContextItem {
+  return typeof item.href === "string" && isNavbarSectionItem(item);
+}
+
+function findActivePrimaryItem(items: NavbarItem[], activeHref?: string) {
+  return items.find((item) => {
+    if (item.disabled) return false;
+    if (item.active) return true;
+    if (typeof item.href === "string" && item.href === activeHref) return true;
+
+    return (
+      isNavbarSectionItem(item) &&
+      item.children.some((child) => !child.disabled && child.href === activeHref)
+    );
+  });
+}
 
 interface NavbarPropsBase extends Omit<HTMLAttributes<HTMLElement>, "children"> {
   brand: ReactNode;
@@ -324,12 +359,16 @@ export function Navbar({
   const navigationId = useId();
   const userMenuId = useId();
   const mobilePanelId = useId();
+  const mobileDrawerId = useId();
   const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const mobileDrawerTriggerRef = useRef<HTMLButtonElement>(null);
+  const mobileSidebarCloseRef = useRef<HTMLButtonElement>(null);
+  const mobileDrawerCloseRef = useRef<HTMLButtonElement>(null);
   const previousUserPresentRef = useRef(user !== undefined);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [uncontrolledMobileOpen, setUncontrolledMobileOpen] = useState(defaultMobileOpen);
-  const [openMobileSubmenuId, setOpenMobileSubmenuId] = useState<string | null>(null);
+  const [openMobileDrawerItemId, setOpenMobileDrawerItemId] = useState<string | null>(null);
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(
     () => search?.defaultValue ?? "",
   );
@@ -337,6 +376,14 @@ export function Navbar({
   const isMobileControlled = mobileOpen !== undefined;
   const isMobileOpen = isMobileControlled ? mobileOpen : uncontrolledMobileOpen;
   const showGuestActions = !user && Boolean(guestActions?.login || guestActions?.register);
+  const activePrimaryItem = findActivePrimaryItem(items, activeHref);
+  const activeMobileSection =
+    activePrimaryItem && isNavbarContextItem(activePrimaryItem) ? activePrimaryItem : undefined;
+  const openMobileDrawerItem = items.find(
+    (item): item is NavbarContextItem =>
+      isNavbarContextItem(item) && item.id === openMobileDrawerItemId && !item.disabled,
+  );
+  const mobileDrawerOpen = openMobileDrawerItem !== undefined;
 
   const handleNavigationMenuChange = useCallback((itemId: string | null) => {
     setOpenMenuId(itemId);
@@ -356,12 +403,15 @@ export function Navbar({
       if (open) {
         setOpenMenuId(null);
         setUserMenuOpen(false);
-      } else {
-        setOpenMobileSubmenuId(null);
+        setOpenMobileDrawerItemId(null);
       }
     },
     [isMobileControlled, isMobileOpen, onMobileOpenChange],
   );
+  const handleMobileDrawerClose = useCallback(() => {
+    setOpenMobileDrawerItemId(null);
+    window.setTimeout(() => mobileDrawerTriggerRef.current?.focus(), 50);
+  }, []);
   const handleSearchSubmit = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -394,19 +444,35 @@ export function Navbar({
   }, [user]);
 
   useEffect(() => {
-    if (!isMobileOpen) return;
+    if (!isMobileOpen && !mobileDrawerOpen) return;
 
     const closeFromEscape = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
 
       event.preventDefault();
+      if (mobileDrawerOpen) {
+        handleMobileDrawerClose();
+        return;
+      }
+
       handleMobileOpenChange(false);
       hamburgerRef.current?.focus();
     };
 
     document.addEventListener("keydown", closeFromEscape);
     return () => document.removeEventListener("keydown", closeFromEscape);
-  }, [handleMobileOpenChange, isMobileOpen]);
+  }, [handleMobileDrawerClose, handleMobileOpenChange, isMobileOpen, mobileDrawerOpen]);
+
+  useEffect(() => {
+    if (!isMobileOpen && !mobileDrawerOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMobileOpen, mobileDrawerOpen]);
 
   useEffect(() => {
     const desktopQuery = window.matchMedia("(min-width: 1024px)");
@@ -415,7 +481,7 @@ export function Navbar({
       if (!desktopQuery.matches) return;
 
       if (isMobileOpen) handleMobileOpenChange(false);
-      setOpenMobileSubmenuId(null);
+      setOpenMobileDrawerItemId(null);
       setOpenMenuId(null);
       setUserMenuOpen(false);
     };
@@ -426,12 +492,10 @@ export function Navbar({
   }, [handleMobileOpenChange, isMobileOpen]);
 
   return (
-    <header
-      className={cn("w-full border-b border-border bg-surface text-content", className)}
-      {...props}
-    >
-      <div className="mx-auto w-full max-w-7xl px-4 lg:px-8">
-        <div className="flex w-full min-w-0 items-center pt-4 pb-0 lg:h-[93px] lg:gap-4 lg:py-0 2xl:gap-6">
+    <header className={cn("w-full text-content", className)} {...props}>
+      <div className="border-b border-border bg-surface">
+        <div className="mx-auto w-full max-w-7xl px-4 lg:px-8">
+          <div className="flex w-full min-w-0 items-center pt-4 pb-0 lg:h-[93px] lg:gap-4 lg:py-0 2xl:gap-6">
           <a
             href={brandHref}
             className="inline-flex shrink-0 items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
@@ -496,65 +560,82 @@ export function Navbar({
             ref={hamburgerRef}
             type="button"
             className={cn(
-              "grid size-11 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 lg:hidden",
+              mobileNavigationTriggerClasses,
+              "lg:hidden",
               user ? "ml-2" : "ml-auto",
             )}
-            aria-label={isMobileOpen ? "Tutup navigasi" : "Buka navigasi"}
+            aria-label={isMobileOpen ? "Tutup navigasi utama" : "Buka navigasi utama"}
             aria-expanded={isMobileOpen}
             aria-controls={mobilePanelId}
-            onClick={() => handleMobileOpenChange(!isMobileOpen)}
+            onClick={() => {
+              const nextOpen = !isMobileOpen;
+              handleMobileOpenChange(nextOpen);
+              if (nextOpen) window.setTimeout(() => mobileSidebarCloseRef.current?.focus(), 50);
+            }}
           >
             <Icon className="size-4">
-              {isMobileOpen ? (
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
-                </svg>
-              ) : (
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
-                </svg>
-              )}
+              <Bars aria-hidden="true" focusable="false" />
+            </Icon>
+          </button>
+          </div>
+
+          {search && (
+            <div className="mt-4 pb-4 lg:hidden">
+              <NavbarSearchForm
+                search={search}
+                inputId={mobileSearchInputId}
+                value={searchValue}
+                className="w-full"
+                onSubmit={handleSearchSubmit}
+                onValueChange={handleSearchValueChange}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {activeMobileSection && (
+        <div className="mx-auto flex w-full max-w-7xl justify-end px-4 py-3 lg:hidden">
+          <button
+            ref={mobileDrawerTriggerRef}
+            type="button"
+            className={mobileNavigationTriggerClasses}
+            aria-label={`${mobileDrawerOpen ? "Tutup" : "Buka"} navigasi sekunder ${activeMobileSection.label}`}
+            aria-expanded={mobileDrawerOpen}
+            aria-controls={mobileDrawerId}
+            onClick={() => {
+              if (mobileDrawerOpen) {
+                handleMobileDrawerClose();
+                return;
+              }
+
+              setOpenMobileDrawerItemId(activeMobileSection.id);
+              window.setTimeout(() => mobileDrawerCloseRef.current?.focus(), 50);
+            }}
+          >
+            <Icon className="size-5">
+              <List aria-hidden="true" focusable="false" />
             </Icon>
           </button>
         </div>
+      )}
 
-        {search && (
-          <div className="mt-4 pb-4 lg:hidden">
-            <NavbarSearchForm
-              search={search}
-              inputId={mobileSearchInputId}
-              value={searchValue}
-              className="w-full max-w-[348px]"
-              onSubmit={handleSearchSubmit}
-              onValueChange={handleSearchValueChange}
-            />
-          </div>
-        )}
-
-        <NavbarMobilePanel
-          id={mobilePanelId}
-          open={isMobileOpen}
+      <NavbarMobilePanel
+          sidebarId={mobilePanelId}
+          drawerId={mobileDrawerId}
+          sidebarOpen={isMobileOpen}
+          drawerItem={openMobileDrawerItem}
+          sidebarCloseRef={mobileSidebarCloseRef}
+          drawerCloseRef={mobileDrawerCloseRef}
           items={items}
           activeHref={activeHref}
           ariaLabel={ariaLabel}
-          openSubmenuId={openMobileSubmenuId}
-          onOpenSubmenuChange={setOpenMobileSubmenuId}
+          onDrawerClose={handleMobileDrawerClose}
           onNavigate={onNavigate}
-          onClose={() => handleMobileOpenChange(false)}
+          onSidebarClose={() => {
+            handleMobileOpenChange(false);
+            hamburgerRef.current?.focus();
+          }}
           guestActionsContent={
             showGuestActions && guestActions ? (
               <div className="flex flex-col gap-2 border-t border-border pt-4">
@@ -576,8 +657,7 @@ export function Navbar({
             ) : undefined
           }
           user={user}
-        />
-      </div>
+      />
     </header>
   );
 }

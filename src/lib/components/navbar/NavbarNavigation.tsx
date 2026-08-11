@@ -83,7 +83,7 @@ export function NavbarNavigation({
     <nav ref={navigationRef} className="hidden w-fit shrink-0 lg:block" aria-label={ariaLabel}>
       <ul className="flex w-max items-center gap-2 xl:gap-4">
         {navigationItems.map((item) => {
-          if (isLinkItem(item)) {
+          if (isLinkItem(item) && !isSubmenuItem(item)) {
             const active = isActive(item, activeHref)
 
             return (
@@ -124,7 +124,8 @@ export function NavbarNavigation({
           const childActive = item.children.some(
             (child) => !child.disabled && isActive(child, activeHref),
           )
-          const parentActive = item.active ?? childActive
+          const parentActive =
+            item.active ?? ((isLinkItem(item) && item.href === activeHref) || childActive)
           const expanded = openMenuId === item.id
           const submenuId = `${idPrefix}-${encodeURIComponent(item.id)}-submenu`
 
