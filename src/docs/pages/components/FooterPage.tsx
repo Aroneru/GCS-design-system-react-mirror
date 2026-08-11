@@ -41,6 +41,21 @@ const responsiveBehaviour: [string, string][] = [
 export function FooterPage() {
   const [view, setView] = useState<'mobile' | 'desktop'>('desktop')
   const [menuCount, setMenuCount] = useState(4)
+  const [logoMode, setLogoMode] = useState<'image' | 'text'>('image')
+  const [withSocials, setWithSocials] = useState(true)
+
+  // Turunan untuk cuplikan kode di bawah playground — satu sumber dengan preview.
+  const ind = view === 'mobile' ? '    ' : ''
+  const summary = [
+    view === 'mobile' ? 'Mobile · dibatasi 390px' : 'Desktop · lebar penuh',
+    `${menuCount} menu`,
+    logoMode === 'image' ? 'logo gambar' : 'logo teks',
+    withSocials ? 'dengan ikon sosial' : 'tanpa ikon sosial',
+  ].join(' · ')
+  const menuLines = allMenus
+    .slice(0, menuCount)
+    .map((m, i) => `${ind}        { label: '${m.label}', url: '/menu-${i + 1}' },\n`)
+    .join('')
 
   return (
     <ComponentPage
@@ -58,17 +73,22 @@ export function FooterPage() {
             }`}
           >
             <Footer
-              logo="/images/komdigi-logo.svg"
+              logo={logoMode === 'image' ? '/images/komdigi-logo.svg' : undefined}
               logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
+              logoContent={
+                logoMode === 'text' ? (
+                  <span className="text-xl font-black text-white">Komdigi</span>
+                ) : undefined
+              }
               menus={allMenus.slice(0, menuCount)}
               copyright="© 2025 Kementerian Komunikasi dan Digital"
-              socials={footerSocials}
+              socials={withSocials ? footerSocials : []}
             />
           </div>
         </div>
 
         {/* Kontrol */}
-        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-4 flex flex-wrap items-center gap-x-8 gap-y-4">
           <div className="flex items-center gap-3">
             <ControlLabel>Tampilan</ControlLabel>
             <Segmented
@@ -92,11 +112,101 @@ export function FooterPage() {
               options={[2, 3, 4, 5].map((n) => ({ value: n, label: String(n) }))}
             />
           </div>
+
+          <div className="flex items-center gap-3">
+            <ControlLabel>Logo</ControlLabel>
+            <Segmented
+              label="Pilih jenis logo"
+              value={logoMode}
+              onChange={setLogoMode}
+              options={[
+                { value: 'image', label: 'Gambar' },
+                { value: 'text', label: 'Teks' },
+              ]}
+            />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <ControlLabel>Ikon sosial</ControlLabel>
+            <Segmented
+              label="Tampilkan ikon sosial"
+              value={withSocials}
+              onChange={setWithSocials}
+              options={[
+                { value: true, label: 'Ada' },
+                { value: false, label: 'Tanpa' },
+              ]}
+            />
+          </div>
         </div>
 
         <p className="mt-3 text-body-sm text-gray-500">
           Tata letak berubah otomatis: bertumpuk saat sempit, satu baris saat lebar. Karena komponen memakai{' '}
           <em>container query</em>, preview di atas benar-benar berganti susunan, bukan sekadar mengecil.
+        </p>
+
+        <p className="mt-6 mb-3 text-body-sm text-gray-500">
+          Kode di bawah mengikuti keempat kontrol di atas — baris impor, logo, jumlah menu, ikon sosial, dan
+          pembungkusnya ikut berubah. Tombol <em>Salin</em> selalu menyalin persis yang sedang tampil.
+        </p>
+
+        <CodeBlock>
+          {"import { Footer } from '@tpl/design-kit-react'\n"}
+          {withSocials && "import { Instagram, X, Facebook } from './socialIcons'\n"}
+          {'\n'}
+          {`{/* ${summary} */}\n`}
+          {view === 'mobile' && (
+            <>
+              {'{/* Footer tidak perlu tahu ini mobile — susunannya mengikuti\n'}
+              {'    lebar pembungkusnya sendiri lewat container query. */}\n'}
+              {'<div className="'}
+              <H>max-w-[390px]</H>
+              {'">\n'}
+            </>
+          )}
+          {`${ind}<Footer\n`}
+          {logoMode === 'image' && (
+            <>
+              {`${ind}    `}
+              <H>logo</H>
+              {'="/images/komdigi-logo.svg"\n'}
+              {`${ind}    logoAlt="Komdigi"\n`}
+            </>
+          )}
+          {logoMode === 'text' && (
+            <>
+              {`${ind}    `}
+              <H>logoContent</H>
+              {'={<span className="text-xl font-black text-white">Komdigi</span>}\n'}
+            </>
+          )}
+          {`${ind}    menus={[\n`}
+          {menuLines}
+          {`${ind}    ]}\n`}
+          {`${ind}    copyright="© 2025 Kementerian Komunikasi dan Digital"\n`}
+          {withSocials && (
+            <>
+              {`${ind}    socials={[\n`}
+              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/komdigi', icon: `}
+              <H>{'<Instagram />'}</H>
+              {' },\n'}
+              {`${ind}        { label: 'X',         url: 'https://x.com/komdigi',         icon: `}
+              <H>{'<X />'}</H>
+              {' },\n'}
+              {`${ind}        { label: 'Facebook',  url: '#',                            icon: `}
+              <H>{'<Facebook />'}</H>
+              {' },\n'}
+              {`${ind}    ]}\n`}
+            </>
+          )}
+          {`${ind}/>`}
+          {view === 'mobile' && '\n</div>'}
+        </CodeBlock>
+
+        <p className="mt-3 text-body-sm text-gray-500">
+          Elemen <code className="text-xs font-bold text-gray-700">&lt;svg&gt;</code> disisipkan langsung,
+          sehingga warnanya mengikuti{' '}
+          <code className="text-xs font-bold text-gray-700">currentColor</code> dan bisa berubah saat hover.
         </p>
       </section>
 
@@ -109,37 +219,6 @@ export function FooterPage() {
             </article>
           ))}
         </div>
-      </Section>
-
-      <Section title="Penggunaan">
-        <CodeBlock>
-          {"import { Instagram, X, Facebook } from './socialIcons'\n\n"}
-          {'<Footer\n'}
-          {'    logo="/images/komdigi-logo.svg"\n'}
-          {'    logoAlt="Komdigi"\n'}
-          {'    menus={[\n'}
-          {"        { label: 'Menu 1', url: '/menu-1' },\n"}
-          {"        { label: 'Menu 2', url: '/menu-2' },\n"}
-          {'    ]}\n'}
-          {'    copyright="© 2025 Kementerian Komunikasi dan Digital"\n'}
-          {'    socials={[\n'}
-          {"        { label: 'Instagram', url: 'https://instagram.com/komdigi', icon: "}
-          <H>{'<Instagram />'}</H>
-          {' },\n'}
-          {"        { label: 'X',         url: 'https://x.com/komdigi',         icon: "}
-          <H>{'<X />'}</H>
-          {' },\n'}
-          {"        { label: 'Facebook',  url: '#',                            icon: "}
-          <H>{'<Facebook />'}</H>
-          {' },\n'}
-          {'    ]}\n'}
-          {'/>'}
-        </CodeBlock>
-        <p className="mt-3 text-body-sm text-gray-500">
-          Elemen <code className="text-xs font-bold text-gray-700">&lt;svg&gt;</code> disisipkan langsung,
-          sehingga warnanya mengikuti{' '}
-          <code className="text-xs font-bold text-gray-700">currentColor</code> dan bisa berubah saat hover.
-        </p>
       </Section>
 
       <Section title="Properties">

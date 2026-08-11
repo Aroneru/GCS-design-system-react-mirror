@@ -3,7 +3,7 @@ import * as OutlineIcons from '../../../lib/icons/outline'
 import { OverviewCard, OverviewPage } from '../../pageKit'
 
 /** Swatch kecil untuk preview palet warna. */
-const swatches = ['bg-primary-600', 'bg-blue-portal-500', 'bg-green-500', 'bg-yellow-300', 'bg-red-500', 'bg-purple-500']
+const swatches = ['bg-primary-600', 'bg-green-500', 'bg-yellow-300', 'bg-red-500', 'bg-purple-500']
 
 export function FoundationsOverview() {
   return (

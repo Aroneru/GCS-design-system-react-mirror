@@ -1,4 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { Footer, type FooterMenu } from '../lib'
+import { FacebookIcon, InstagramIcon, XIcon } from './socialIcons'
 
 type Section = 'home' | 'components' | 'form' | 'foundations' | 'example'
 
@@ -35,16 +37,23 @@ const sidebars: Record<string, { title: string; items: NavItem[] }> = {
         route: '/form/input-field',
         children: [
           { label: 'Input Field', route: '/form/input-field/input' },
+          { label: 'Input Field · Usulan', route: '/form/input-field/input-usulan' },
           { label: 'Floating Label', route: '/form/input-field/floating-label' },
+          { label: 'Floating Label · Usulan', route: '/form/input-field/floating-label-usulan' },
           { label: 'Text Area', route: '/form/input-field/text-area' },
+          { label: 'Text Area · Usulan', route: '/form/input-field/text-area-usulan' },
         ],
       },
       { label: 'Regular Select Form', route: '/form/select' },
+      { label: 'Regular Select Form · Usulan', route: '/form/select-usulan' },
       { label: 'Search Form', route: '/form/search' },
       { label: 'Upload Form', route: '/form/upload' },
       { label: 'Radio Button', route: '/form/radio' },
+      { label: 'Radio Button · Usulan', route: '/form/radio-usulan' },
       { label: 'Toggle Button', route: '/form/toggle' },
+      { label: 'Toggle Button · Usulan', route: '/form/toggle-usulan' },
       { label: 'Checkbox', route: '/form/checkbox' },
+      { label: 'Checkbox · Usulan', route: '/form/checkbox-usulan' },
     ],
   },
   components: {
@@ -60,6 +69,12 @@ const sidebars: Record<string, { title: string; items: NavItem[] }> = {
     ],
   },
 }
+
+/**
+ * Menu footer sama di seluruh halaman: kelima area utama, diturunkan dari
+ * `rail` yang sama dengan navigasi kiri supaya keduanya tak mungkin melenceng.
+ */
+const footerMenus: FooterMenu[] = rail.map((r) => ({ label: r.label, url: `#${r.route}` }))
 
 function sectionOf(path: string): Section {
   if (path.startsWith('/foundations')) return 'foundations'
@@ -242,6 +257,19 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
         }`}
       >
         <main>{children}</main>
+
+        {/* Di dalam pembungkus ber-padding, supaya footer tidak tertimpa panel samping yang fixed. */}
+        <Footer
+          logo="/images/komdigi-logo.svg"
+          logoAlt="STASI — Ministerium Fur Staatssicherheit"
+          menus={footerMenus}
+          copyright={`© ${new Date().getFullYear()} STASI - Ministerium Fur Staatssicherheit`}
+          socials={[
+            { label: 'Instagram', url: '#', icon: InstagramIcon },
+            { label: 'X', url: '#', icon: XIcon },
+            { label: 'Facebook', url: '#', icon: FacebookIcon },
+          ]}
+        />
       </div>
     </div>
   )
