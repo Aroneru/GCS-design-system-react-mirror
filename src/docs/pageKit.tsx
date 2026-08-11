@@ -62,7 +62,7 @@ export function SectionHead({
   title,
   children,
 }: {
-  eyebrow: string
+  eyebrow?: string
   title: string
   children?: ReactNode
 }) {
