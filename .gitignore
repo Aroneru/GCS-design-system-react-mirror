@@ -23,8 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 # ── Catatan & materi belajar pribadi ──────────────────────────────
-# Awalan "/" mengunci pola ke root project, supaya mis. src/assets/
-# tidak ikut terabaikan kalau suatu saat dibuat.
 /MISSION.md
 /NOTES.md
 /RESOURCES.md

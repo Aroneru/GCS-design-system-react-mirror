@@ -342,23 +342,6 @@ export function FormPermohonan() {
           </div>
         </Container>
       </section>
-
-      <Footer
-        logo="/images/komdigi-logo.svg"
-        logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
-        menus={[
-          { label: 'Foundations', url: '#/foundations' },
-          { label: 'Components', url: '#/components' },
-          { label: 'Form', url: '#/form' },
-          { label: 'Example', url: '#/example' },
-        ]}
-        copyright="© 2025 Kementerian Komunikasi dan Digital"
-        socials={[
-          { label: 'Instagram', url: '#', icon: InstagramIcon },
-          { label: 'X', url: '#', icon: XIcon },
-          { label: 'Facebook', url: '#', icon: FacebookIcon },
-        ]}
-      />
     </>
   )
 }

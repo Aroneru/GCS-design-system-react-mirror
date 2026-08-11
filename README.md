@@ -7,7 +7,7 @@ State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
 ## Isi
 
 - **Tokens** (`@theme`): palet warna (primary, gray, red, orange, yellow, green,
-  purple, blue-portal), semantic aliases (`brand`, `feedback-*`, `content`,
+  purple), semantic aliases (`brand`, `feedback-*`, `content`,
   `surface`, `border`), skala tipografi (`display` → `caption`), spacing, radius,
   shadow, font Lato.
 - **Komponen umum**: `Button`, `Badge`, `Card`, `Container`, `Icon`, `Navbar`,
@@ -117,7 +117,7 @@ Prop yang dipakai bersama seluruh komponen form:
 
 - `platform`: `default | mobile` — hanya mengubah ukuran. Pada `Select`, varian
   Mobile di Figma cuma menyempitkan wadahnya, jadi prop ini memang tidak ada.
-- `application`: `default | portal | simaya` — warna aksen per aplikasi.
+- `application`: `default | simaya` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.
 - Kondisi tercentang/menyala pada `Radio`, `Toggle`, dan `Checkbox` memakai

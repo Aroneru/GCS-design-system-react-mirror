@@ -5,7 +5,6 @@ import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } f
 
 const applications: { value: ToggleApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'portal', label: 'Portal', token: 'blue-portal-500' },
   { value: 'simaya', label: 'simaya', token: 'purple-500' },
 ]
 
@@ -14,7 +13,7 @@ const toggleProps: PropRow[] = [
   ['helperText', 'ReactNode', 'undefined', 'Caption 12px di bawah label.'],
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran sakelar: 40×20px atau 36×18px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
-  ['application', "'default' | 'portal' | 'simaya'", 'default', 'Warna jalur saat sakelar menyala.'],
+  ['application', "'default' | 'simaya'", 'default', 'Warna jalur saat sakelar menyala.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="checkbox"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
 
@@ -91,7 +90,7 @@ export function TogglePage() {
           Warna jalur saat menyala mengikuti aplikasi yang memakainya; state mati dan inactive memakai abu
           yang sama.
         </p>
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
             <Demo key={a.value} label={a.label}>
               <div className="space-y-3">
@@ -210,7 +209,7 @@ export function TogglePage() {
           {'="mobile"\n'}
           {'    '}
           <H>application</H>
-          {'="portal"\n'}
+          {'="simaya"\n'}
           {'    label="Notifikasi email"\n'}
           {'    checked={aktif}\n'}
           {'    onChange={(e) => setAktif(e.target.checked)}\n'}
