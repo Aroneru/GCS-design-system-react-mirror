@@ -87,18 +87,6 @@
     --color-purple-800: #5521b5;
     --color-purple-900: #4a1d96;
 
-    /* "Blue Portal" di Figma. */
-    --color-blue-portal-50: #e8e8fd;
-    --color-blue-portal-100: #b9baf9;
-    --color-blue-portal-200: #8a8cf4;
-    --color-blue-portal-300: #5b5ef0;
-    --color-blue-portal-400: #5b5ef0;
-    --color-blue-portal-500: #2d30ec;
-    --color-blue-portal-600: #0f11a4;
-    --color-blue-portal-700: #0b0c75;
-    --color-blue-portal-800: #060746;
-    --color-blue-portal-900: #020217;
-
     /* Semantic aliases menjaga intent komponen tetap lepas dari palet. */
     --color-brand: var(--color-primary-600);
     --color-brand-hover: var(--color-primary-700);

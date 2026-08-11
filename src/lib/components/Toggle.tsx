@@ -8,7 +8,7 @@ export type TogglePlatform = 'default' | 'mobile'
 export type ToggleState = 'default' | 'inactive'
 
 /** Warna aksen per aplikasi — dipakai jalur sakelar saat menyala. */
-export type ToggleApplication = 'default' | 'portal' | 'simaya'
+export type ToggleApplication = 'default' | 'simaya'
 
 /**
  * Ukuran jalur, bulatan, dan jarak gesernya per platform. Bulatan selalu
@@ -21,7 +21,6 @@ const platforms: Record<TogglePlatform, { track: string; knob: string; shift: st
 
 const accents: Record<ToggleApplication, string> = {
   default: 'peer-checked:bg-primary-700 peer-focus-visible:outline-primary-700',
-  portal: 'peer-checked:bg-blue-portal-500 peer-focus-visible:outline-blue-portal-500',
   simaya: 'peer-checked:bg-purple-500 peer-focus-visible:outline-purple-500',
 }
 

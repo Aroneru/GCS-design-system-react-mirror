@@ -17,7 +17,6 @@ export function ButtonPage() {
     { value: "primary", label: "Primary" },
     { value: "green", label: "Green" },
     { value: "gray", label: "Gray" },
-    { value: "portal", label: "Blue Portal" },
     { value: "purple", label: "Purple" },
     { value: "orange", label: "Orange" },
     { value: "yellow", label: "Yellow" },
@@ -361,7 +360,7 @@ export function ButtonPage() {
                   <td className="px-5 py-4 font-mono text-primary-700">theme</td>
 
                   <td className="px-5 py-4 text-gray-600">
-                    primary | green | gray | portal | purple | orange | yellow
+                    primary | green | gray | purple | orange | yellow
                   </td>
 
                   <td className="px-5 py-4 font-mono text-gray-600">primary</td>

@@ -8,7 +8,7 @@ export type InputFieldPlatform = 'default' | 'mobile'
 export type InputFieldState = 'default' | 'typing' | 'inactive' | 'failed'
 
 /** Warna aksen per aplikasi — dipakai untuk garis saat field aktif. */
-export type InputFieldApplication = 'default' | 'portal' | 'simaya'
+export type InputFieldApplication = 'default' | 'simaya'
 
 const platforms: Record<InputFieldPlatform, string> = {
   default: 'h-13',
@@ -18,7 +18,6 @@ const platforms: Record<InputFieldPlatform, string> = {
 /** Garis aksen per aplikasi: dipakai state `typing` dan saat field benar-benar difokus. */
 const accents: Record<InputFieldApplication, { border: string; focus: string }> = {
   default: { border: 'border-primary-500', focus: 'focus-within:border-primary-500' },
-  portal: { border: 'border-blue-portal-500', focus: 'focus-within:border-blue-portal-500' },
   simaya: { border: 'border-purple-500', focus: 'focus-within:border-purple-500' },
 }
 

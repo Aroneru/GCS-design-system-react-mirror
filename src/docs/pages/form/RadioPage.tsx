@@ -5,7 +5,6 @@ import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } f
 
 const applications: { value: RadioApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'portal', label: 'Portal', token: 'blue-portal-500' },
   { value: 'simaya', label: 'simaya', token: 'purple-500' },
 ]
 
@@ -19,7 +18,7 @@ const radioProps: PropRow[] = [
   ['helperText', 'ReactNode', 'undefined', 'Caption 12px di bawah label.'],
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran lingkaran: 16px atau 14px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
-  ['application', "'default' | 'portal' | 'simaya'", 'default', 'Warna cincin saat pilihan dipilih.'],
+  ['application', "'default' | 'simaya'", 'default', 'Warna cincin saat pilihan dipilih.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="radio"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
 
@@ -39,13 +38,17 @@ export function RadioPage() {
       <Section title="Radio Button">
         <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
           Lingkaran 16px berlatar gray-50 dengan garis gray-300. Saat dipilih, garisnya menebal jadi 3,5px
-          berwarna aksen — sisa ruang di tengah (9px) itulah yang tampak sebagai titik.
+          berwarna aksen — sisa ruang di tengah (9px) itulah yang tampak sebagai titik. State <H>inactive</H>
+          memakai latar gray-100 dan cincin gray-400, sekaligus mematikan kontrolnya.
         </p>
         <Demo>
-          <div className="flex flex-wrap gap-8">
+          {/* Grid, bukan flex: empat kolom sama lebar mengisi kartu sampai tepi
+              kanan — flex menumpuk semuanya di kiri dan menyisakan ruang kosong. */}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <Radio name="ds-radio-dasar" label="Belum dipilih" />
             <Radio name="ds-radio-dasar" label="Sedang dipilih" defaultChecked />
             <Radio name="ds-radio-nonaktif" state="inactive" label="Tidak aktif" />
+            <Radio name="ds-radio-nonaktif-terpilih" state="inactive" label="Tidak aktif, terpilih" defaultChecked />
           </div>
         </Demo>
       </Section>
@@ -104,7 +107,7 @@ export function RadioPage() {
         <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
           Warna cincin saat dipilih mengikuti aplikasi yang memakainya; state lain memakai abu yang sama.
         </p>
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
             <Demo key={a.value} label={a.label}>
               <div className="space-y-3">
@@ -235,7 +238,7 @@ export function RadioPage() {
           {'="mobile"\n'}
           {'    '}
           <H>application</H>
-          {'="portal"\n'}
+          {'="simaya"\n'}
           {'    label="Warga negara Indonesia"\n'}
           {'    checked={pilihan === "wni"}\n'}
           {'    onChange={() => setPilihan("wni")}\n'}

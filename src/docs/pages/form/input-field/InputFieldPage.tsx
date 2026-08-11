@@ -18,7 +18,6 @@ const states: { value: InputFieldState; label: string; desc: string }[] = [
 
 const applications: { value: InputFieldApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-500' },
-  { value: 'portal', label: 'Portal', token: 'blue-portal-500' },
   { value: 'simaya', label: 'simaya', token: 'purple-500' },
 ]
 
@@ -28,7 +27,7 @@ const inputProps: PropRow[] = [
   ['icon', 'ReactNode', 'undefined', 'Ikon di sisi kiri field.'],
   ['platform', "'default' | 'mobile'", 'default', 'Tinggi field: 52px (default) atau 40px (mobile).'],
   ['state', "'default' | 'typing' | 'inactive' | 'failed'", 'default', 'Kondisi visual field.'],
-  ['application', "'default' | 'portal' | 'simaya'", 'default', 'Warna garis aksen saat field aktif.'],
+  ['application', "'default' | 'simaya'", 'default', 'Warna garis aksen saat field aktif.'],
   ['onClear', '() => void', 'undefined', 'Bila diisi, tombol hapus (×) muncul di kanan field.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (type, value, onChange, …).'],
 ]
@@ -98,7 +97,7 @@ export function InputFieldPage() {
           Warna garis saat field aktif mengikuti aplikasi yang memakainya — memakai token warna yang sama dengan palet
           Foundations.
         </p>
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
             <Demo key={a.value} label={a.label}>
               <InputField
@@ -229,7 +228,7 @@ export function InputFieldPage() {
           {'="mobile"\n'}
           {'    '}
           <H>application</H>
-          {'="portal"\n'}
+          {'="simaya"\n'}
           {'    value={value}\n'}
           {'    onChange={(e) => setValue(e.target.value)}\n'}
           {'    '}

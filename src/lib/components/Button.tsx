@@ -5,7 +5,7 @@ export type ButtonVariant = "filled" | "outline";
 
 export type ButtonSize = "xs" | "s" | "base" | "l" | "xl";
 
-export type ButtonTheme = "primary" | "green" | "gray" | "portal" | "purple" | "orange" | "yellow";
+export type ButtonTheme = "primary" | "green" | "gray" | "purple" | "orange" | "yellow";
 
 export type ButtonTone = "light" | "dark";
 
@@ -103,20 +103,6 @@ const colorClasses: Record<ButtonTheme, Record<ButtonTone, Record<ButtonVariant,
     dark: {
       filled: "bg-gray-700 text-white hover:bg-gray-500",
       outline: "border border-gray-700 text-gray-700 hover:bg-gray-50",
-    },
-  },
-
-  portal: {
-    // Portal light menggunakan 500
-    light: {
-      filled: "bg-blue-portal-500 text-white hover:bg-blue-portal-700",
-      outline: "border border-blue-portal-500 text-blue-portal-500 hover:bg-blue-portal-50",
-    },
-
-    // Portal dark menggunakan 700
-    dark: {
-      filled: "bg-blue-portal-700 text-white hover:bg-blue-portal-500",
-      outline: "border border-blue-portal-700 text-blue-portal-700 hover:bg-blue-portal-50",
     },
   },
 
