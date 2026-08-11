@@ -1,33 +1,57 @@
 import { useState } from "react";
 import { Messages } from "flowbite-react-icons/outline";
-import { Button, Radio, Checkbox, type ButtonTheme, type ButtonVariant, cn } from "../../../lib";
-import { DocHero } from "../../DocHero";
-import { DocUsage } from "../../DocUsage";
+import { Button, type ButtonTheme, type ButtonVariant } from "../../../lib";
+import { PropsTable, type PropRow } from "../../PropsTable";
+import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } from "../../pageKit";
+
+const sizes = ["xs", "s", "base", "l", "xl"] as const;
+type ButtonSize = (typeof sizes)[number];
+
+const variantOptions: { value: ButtonVariant; label: string }[] = [
+  { value: "filled", label: "Filled" },
+  { value: "outline", label: "Outline" },
+];
+
+const sizeOptions = sizes.map((size) => ({ value: size, label: size.toUpperCase() }));
+
+const themeOptions: { value: ButtonTheme; label: string }[] = [
+  { value: "primary", label: "Primary" },
+  { value: "green", label: "Green" },
+  { value: "gray", label: "Gray" },
+  { value: "purple", label: "Purple" },
+  { value: "orange", label: "Orange" },
+  { value: "yellow", label: "Yellow" },
+];
+
+const toneOptions = [
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
+
+const buttonProps: PropRow[] = [
+  ["variant", '"filled" | "outline"', "filled", "Gaya utama tombol: solid atau outline."],
+  ["size", '"xs" | "s" | "base" | "l" | "xl"', "base", "Menentukan ukuran tombol."],
+  ["theme", "ButtonTheme", "primary", "Warna aksen tombol."],
+  ["tone", '"light" | "dark"', "light", "Menyetel kontras warna untuk variant atau theme."],
+  ["leftIcon", "ReactNode", "undefined", "Ikon di sisi kiri tombol."],
+  ["rightIcon", "ReactNode", "undefined", "Ikon di sisi kanan tombol."],
+  ["iconOnly", "boolean", "false", "Menyembunyikan label dan menampilkan ikon saja."],
+  ["as", '"button" | "a"', "button", "Menentukan elemen yang dirender. Bisa jadi anchor."],
+  ["disabled", "boolean", "false", "Menonaktifkan interaksi."],
+  ["…props", "ButtonHTMLAttributes", "—", "Seluruh atribut button atau anchor yang valid."],
+];
 
 export function ButtonPage() {
-  const sizes = ["xs", "s", "base", "l", "xl"] as const;
-  type ButtonSize = (typeof sizes)[number];
-
   const [selectedSize, setSelectedSize] = useState<ButtonSize>("base");
-  const [selectedIconSize, setSelectedIconSize] = useState<ButtonSize>("base");
-
   const [variant, setVariant] = useState<ButtonVariant>("filled");
   const [theme, setTheme] = useState<ButtonTheme>("primary");
   const [tone, setTone] = useState<"light" | "dark">("light");
-
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
-
-  const themes: { value: ButtonTheme; label: string }[] = [
-    { value: "primary", label: "Primary" },
-    { value: "green", label: "Green" },
-    { value: "gray", label: "Gray" },
-    { value: "purple", label: "Purple" },
-    { value: "orange", label: "Orange" },
-    { value: "yellow", label: "Yellow" },
-  ];
+  const [asLink, setAsLink] = useState<"button" | "a">("button");
 
   const buttonCode = `<Button
+  as="${asLink}"
   size="${selectedSize}"
   variant="${variant}"
   theme="${theme}"
@@ -41,461 +65,344 @@ export function ButtonPage() {
       ? `
   rightIcon={<Messages />}`
       : ""
+  }${
+    asLink === "a"
+      ? `
+  href="/foundations/colors"`
+      : ""
   }
 >
   Button
 </Button>`;
 
   return (
-    <div>
-      <DocHero
-        eyebrow="COMPONENTS"
-        title="Button"
-        description="Tombol untuk memicu aksi utama pada sebuah halaman atau form. Mendukung berbagai ukuran, warna, varian, dan penggunaan icon."
-      />
+    <ComponentPage
+      eyebrow="Components · Button"
+      title="Button"
+      description="Tombol untuk memicu aksi utama pada sebuah halaman atau form. Mendukung berbagai ukuran, warna, varian, dan penggunaan icon."
+    >
+      <Section title="Button & Sizes">
+        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+          Ukuran mengikuti sistem token, sementara ikon kiri dan kanan bisa ditambahkan sesuai
+          kebutuhan tindakan.
+        </p>
 
-      <div className="mx-auto max-w-6xl space-y-16 px-6 py-12">
-        <section>
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">Variants</h2>
-
-          <div className="space-y-4">
-            {/* Preview */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-              <div className="flex flex-wrap items-center gap-6">
-                <Button variant="filled" theme="primary" tone="light">
-                  Simpan perubahan
-                </Button>
-
-                <Button variant="outline" theme="orange" tone="light">
-                  Batal
-                </Button>
-              </div>
-            </div>
-
-            {/* React Code */}
-            <DocUsage
-              code={`<Button variant="filled" theme="primary" tone="light">
-  Simpan perubahan
-</Button>
-
-<Button variant="outline" theme="orange" tone="light">
-  Batal
-</Button>`}
-            />
-          </div>
-        </section>
-        <section>
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">Sizes & Icons</h2>
-
-          <div className="space-y-4">
-            {/* Preview */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-              <div className="flex flex-wrap items-start gap-6">
-                {sizes.map((size) => {
-                  const isSelected = selectedSize === size;
-
-                  return (
-                    <div key={size} className="flex flex-col items-center gap-3">
-                      <div
-                        className={cn(
-                          "rounded-xl p-1 transition-all",
-                          isSelected && "ring-2 ring-primary-300 ring-offset-2",
-                        )}
-                      >
-                        <Button
-                          size={size}
-                          variant="filled"
-                          theme="primary"
-                          tone="light"
-                          leftIcon={<Messages />}
-                          rightIcon={<Messages />}
-                          onClick={() => setSelectedSize(size)}
-                        >
-                          Button
-                        </Button>
-                      </div>
-
-                      <span
-                        className={cn(
-                          "text-xs font-semibold uppercase",
-                          isSelected ? "text-primary-700" : "text-gray-500",
-                        )}
-                      >
-                        {size}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* React Code */}
-            <DocUsage
-              code={`<Button
-  size="${selectedSize}"
-  leftIcon={}
-  rightIcon={}
->
-  Button
-</Button>`}
-            />
-          </div>
-        </section>
-        <section>
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">Icon Only</h2>
-
-          <div className="space-y-4">
-            {/* Preview */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-              <div className="flex flex-wrap items-start gap-6">
-                {sizes.map((size) => {
-                  const isSelected = selectedIconSize === size;
-
-                  return (
-                    <div key={size} className="flex flex-col items-center gap-3">
-                      <div
-                        className={cn(
-                          "rounded-full p-1 transition-all",
-                          isSelected && "ring-2 ring-primary-300 ring-offset-2",
-                        )}
-                      >
-                        <Button
-                          size={size}
-                          variant="filled"
-                          theme="primary"
-                          tone="light"
-                          iconOnly
-                          aria-label={`Button ${size}`}
-                          onClick={() => setSelectedIconSize(size)}
-                        >
-                          <Messages />
-                        </Button>
-                      </div>
-
-                      <span
-                        className={cn(
-                          "text-xs font-semibold uppercase",
-                          isSelected ? "text-primary-700" : "text-gray-500",
-                        )}
-                      >
-                        {size}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* React Code */}
-            <DocUsage
-              code={`<Button
-  size="${selectedIconSize}"
-  iconOnly
-  aria-label="Messages"
->
-  <Messages />
-</Button>`}
-            />
-          </div>
-        </section>
-        {/* Interactive */}
-        <section>
-          <h2 className="mb-2 text-2xl font-bold text-gray-900">Interactive</h2>
-          <p className="mb-6 text-gray-500">
-            Gunakan kontrol di sebelah kanan untuk melihat perubahan Button secara langsung.
-          </p>
-          <div className="grid items-stretch gap-6 lg:grid-cols-[1fr_300px]">
-            {/* LEFT */}
-            <div className="flex h-[650px] flex-col gap-4">
-              {/* Preview */}
-              <div className="h-[400px] rounded-2xl border border-gray-200 bg-white shadow-sm">
-                <div className="p-8">
-                  <h3 className="mb-8 text-lg font-semibold text-gray-900">Preview</h3>
-
-                  <div className="flex min-h-[150px] items-center justify-center">
-                    <Button
-                      size={selectedSize}
-                      variant={variant}
-                      theme={theme}
-                      tone={tone}
-                      leftIcon={showLeftIcon ? <Messages className="size-5" /> : undefined}
-                      rightIcon={showRightIcon ? <Messages className="size-5" /> : undefined}
-                    >
-                      Button
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {/* React Code */}
-              <DocUsage code={buttonCode} />
-            </div>
-
-            {/* RIGHT - Controls */}
-            <div className="h-[650px] overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="mb-6 text-lg font-semibold text-gray-900">Controls</h3>
-
-              {/* Variant */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-gray-900">Variant</h4>
-
-                <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                  <Radio
-                    name="interactive-variant"
-                    label="Filled"
-                    checked={variant === "filled"}
-                    onChange={() => setVariant("filled")}
-                  />
-
-                  <Radio
-                    name="interactive-variant"
-                    label="Outline"
-                    checked={variant === "outline"}
-                    onChange={() => setVariant("outline")}
-                  />
-                </div>
-              </div>
-
-              {/* Size */}
-              <div className="mt-6 space-y-3">
-                <h4 className="font-semibold text-gray-900">Size</h4>
-
-                <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                  {sizes.map((size) => (
-                    <Radio
-                      key={size}
-                      name="interactive-size"
-                      label={size}
-                      checked={selectedSize === size}
-                      onChange={() => setSelectedSize(size)}
-                      className="capitalize"
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Color */}
-              <div className="mt-6 space-y-3">
-                <h4 className="font-semibold text-gray-900">Color</h4>
-
-                <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                  {themes.map((item) => (
-                    <Radio
-                      key={item.value}
-                      name="interactive-theme"
-                      label={item.label}
-                      checked={theme === item.value}
-                      onChange={() => setTheme(item.value)}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Tone */}
-              <div className="mt-6 space-y-3">
-                <h4 className="font-semibold text-gray-900">Tone</h4>
-
-                <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                  <Radio
-                    name="interactive-tone"
-                    label="Light"
-                    checked={tone === "light"}
-                    onChange={() => setTone("light")}
-                  />
-
-                  <Radio
-                    name="interactive-tone"
-                    label="Dark"
-                    checked={tone === "dark"}
-                    onChange={() => setTone("dark")}
-                  />
-                </div>
-              </div>
-
-              {/* Icons */}
-              <div className="mt-6 space-y-3">
-                <h4 className="font-semibold text-gray-900">Icons</h4>
-
-                <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                  <Checkbox
-                    name="interactive-left-icon"
-                    label="Left Icon"
-                    checked={showLeftIcon}
-                    onChange={(event) => setShowLeftIcon(event.currentTarget.checked)}
-                  />
-
-                  <Checkbox
-                    name="interactive-right-icon"
-                    label="Right Icon"
-                    checked={showRightIcon}
-                    onChange={(event) => setShowRightIcon(event.currentTarget.checked)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-2 text-2xl font-bold text-gray-900">Sebagai link</h2>
-
-          <p className="mb-6 text-sm text-gray-500">
-            Gunakan prop <code>as="a"</code> agar Button dirender sebagai anchor tanpa kehilangan
-            gaya Button.
-          </p>
-
-          <div className="space-y-4">
-            {/* Preview */}
-            <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+        <div className="flex flex-wrap items-start justify-start gap-6">
+          {sizes.map((size) => (
+            <div key={size} className="flex flex-col items-center gap-3">
               <Button
-                as="a"
-                href="/foundations/colors"
+                size={size}
                 variant="filled"
                 theme="primary"
                 tone="light"
+                leftIcon={<Messages className="size-4" />}
+                rightIcon={<Messages className="size-4" />}
               >
-                Buka Foundations
+                Button
               </Button>
+
+              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                {size}
+              </span>
             </div>
+          ))}
+        </div>
+      </Section>
+      <Section title="Icon Only & Sizes">
+        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+          Untuk aksi yang ringkas seperti toolbar, menu, atau quick action, tombol bisa dirender
+          tanpa label.
+        </p>
 
-            {/* React Code */}
-            <DocUsage
-              code={`<Button
-  as="a"
-  href="/foundations/colors"
-  variant="filled"
-  theme="primary"
-  tone="light"
+        <div className="flex flex-wrap items-start justify-start gap-6">
+          {sizes.map((size) => (
+            <div key={size} className="flex flex-col items-center gap-3">
+              <Button
+                size={size}
+                variant="filled"
+                theme="primary"
+                tone="light"
+                iconOnly
+                aria-label={`Icon ${size}`}
+              >
+                <Messages className="size-4" />
+              </Button>
+
+              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                {size}
+              </span>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Variants">
+        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+          Varian <H>filled</H> digunakan untuk aksi utama, sedangkan varian <H>outline</H> lebih
+          sesuai untuk aksi tambahan.
+        </p>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Filled">
+            <Button variant="filled" theme="primary" tone="light">
+              Simpan perubahan
+            </Button>
+          </Demo>
+
+          <Demo label="Outline">
+            <Button variant="outline" theme="primary" tone="light">
+              Lihat detail
+            </Button>
+          </Demo>
+        </div>
+      </Section>
+      <Section title="Color">
+        <p className="mb-6 max-w-2xl text-body-sm text-gray-500">
+          Warna Button digunakan untuk membedakan konteks dan tingkat kepentingan suatu tindakan.
+        </p>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <Button
+              variant="filled"
+              theme="primary"
+              tone="light"
+              leftIcon={<Messages className="size-4" />}
+            >
+              Button
+            </Button>
+
+            <p className="mt-3 text-sm text-gray-600">
+              <H>Primary</H> digunakan untuk tindakan utama atau aksi yang paling penting dalam
+              suatu halaman.
+            </p>
+          </div>
+
+          <div>
+            <Button
+              variant="filled"
+              theme="green"
+              tone="light"
+              leftIcon={<Messages className="size-4" />}
+            >
+              Button
+            </Button>
+
+            <p className="mt-3 text-sm text-gray-600">
+              <H>Green</H> digunakan untuk tindakan yang menunjukkan keberhasilan, konfirmasi, atau
+              penyelesaian.
+            </p>
+          </div>
+
+          <div>
+            <Button
+              variant="filled"
+              theme="gray"
+              tone="light"
+              leftIcon={<Messages className="size-4" />}
+            >
+              Button
+            </Button>
+
+            <p className="mt-3 text-sm text-gray-600">
+              <H>Gray</H> digunakan untuk tindakan sekunder atau aksi dengan tingkat prioritas
+              rendah.
+            </p>
+          </div>
+
+          <div>
+            <Button
+              variant="filled"
+              theme="purple"
+              tone="light"
+              leftIcon={<Messages className="size-4" />}
+            >
+              Button
+            </Button>
+
+            <p className="mt-3 text-sm text-gray-600">
+              <H>Purple</H> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
+              visual berbeda.
+            </p>
+          </div>
+
+          <div>
+            <Button
+              variant="filled"
+              theme="orange"
+              tone="light"
+              leftIcon={<Messages className="size-4" />}
+            >
+              Button
+            </Button>
+
+            <p className="mt-3 text-sm text-gray-600">
+              <H>Orange</H> digunakan untuk tindakan yang membutuhkan perhatian atau bersifat
+              peringatan.
+            </p>
+          </div>
+
+          <div>
+            <Button
+              variant="filled"
+              theme="yellow"
+              tone="light"
+              leftIcon={<Messages className="size-4" />}
+            >
+              Button
+            </Button>
+
+            <p className="mt-3 text-sm text-gray-600">
+              <H>Yellow</H> digunakan untuk informasi yang perlu diperhatikan tanpa menunjukkan
+              kondisi kritis.
+            </p>
+          </div>
+        </div>
+      </Section>
+      <section>
+        <h2 className="mb-4 text-heading-3 font-black text-gray-900">Playground</h2>
+        <p className="mb-4 text-body-sm text-gray-500">
+          Playground ini membuat state tombol bisa dilihat langsung tanpa memaksa radio atau
+          checkbox. Semua status dikontrol lewat <H>Segmented</H> agar tampilan lebih rapi dan
+          konsisten seperti halaman lain.
+        </p>
+
+        <div className="rounded-2xl border border-border bg-surface-subtle p-6 sm:p-10">
+          <div className="mx-auto flex min-h-[180px] items-center justify-center">
+            <Button
+              as={asLink}
+              href={asLink === "a" ? "/foundations/colors" : undefined}
+              size={selectedSize}
+              variant={variant}
+              theme={theme}
+              tone={tone}
+              leftIcon={showLeftIcon ? <Messages className="size-4" /> : undefined}
+              rightIcon={showRightIcon ? <Messages className="size-4" /> : undefined}
+            >
+              Button
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-start gap-6">
+          <div>
+            <ControlLabel>Variant</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Pilih variant"
+                value={variant}
+                onChange={setVariant}
+                options={variantOptions}
+              />
+            </div>
+          </div>
+
+          <div>
+            <ControlLabel>Size</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Pilih ukuran"
+                value={selectedSize}
+                onChange={setSelectedSize}
+                options={sizeOptions}
+                wrap
+              />
+            </div>
+          </div>
+
+          <div>
+            <ControlLabel>Theme</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Pilih theme"
+                value={theme}
+                onChange={setTheme}
+                options={themeOptions}
+                wrap
+              />
+            </div>
+          </div>
+
+          <div>
+            <ControlLabel>Tone</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Pilih tone"
+                value={tone}
+                onChange={(value) => setTone(value as "light" | "dark")}
+                options={[
+                  { value: "light", label: "Light" },
+                  { value: "dark", label: "Dark" },
+                ]}
+              />
+            </div>
+          </div>
+
+          <div>
+            <ControlLabel>Ikon kiri</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Tampilkan ikon kiri"
+                value={showLeftIcon}
+                onChange={setShowLeftIcon}
+                options={[
+                  { value: true, label: "Ada" },
+                  { value: false, label: "Tanpa" },
+                ]}
+              />
+            </div>
+          </div>
+
+          <div>
+            <ControlLabel>Ikon kanan</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Tampilkan ikon kanan"
+                value={showRightIcon}
+                onChange={setShowRightIcon}
+                options={[
+                  { value: true, label: "Ada" },
+                  { value: false, label: "Tanpa" },
+                ]}
+              />
+            </div>
+          </div>
+
+          <div>
+            <ControlLabel>Render</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Pilih render"
+                value={asLink}
+                onChange={(value) => setAsLink(value as "button" | "a")}
+                options={[
+                  { value: "button", label: "Button" },
+                  { value: "a", label: "Link" },
+                ]}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+      <Section title="Penggunaan">
+        <CodeBlock>
+          {`import { Button } from '@tpl/design-kit-react'
+import { Messages } from '@tpl/design-kit-react/icons/solid'
+
+<Button
+  as="${asLink}"
+  variant="${variant}"
+  theme="${theme}"
+  tone="${tone}"
+  size="${selectedSize}"${showLeftIcon ? '\n  leftIcon={<Messages className="size-4" />}' : ""}${showRightIcon ? '\n  rightIcon={<Messages className="size-4" />}' : ""}
 >
-  Buka Foundations
+  Button
 </Button>`}
-            />
-          </div>
-        </section>
-        <section>
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">Properties</h2>
-
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-gray-200 bg-gray-50">
-                <tr>
-                  <th className="px-5 py-4 font-semibold">PROP</th>
-
-                  <th className="px-5 py-4 font-semibold">TYPE</th>
-
-                  <th className="px-5 py-4 font-semibold">DEFAULT</th>
-
-                  <th className="px-5 py-4 font-semibold">KETERANGAN</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-gray-200">
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">variant</td>
-
-                  <td className="px-5 py-4 text-gray-600">"filled" | "outline"</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">filled</td>
-
-                  <td className="px-5 py-4 text-gray-600">Menentukan gaya Button.</td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">size</td>
-
-                  <td className="px-5 py-4 text-gray-600">"xs" | "s" | "base" | "l" | "xl"</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">base</td>
-
-                  <td className="px-5 py-4 text-gray-600">Menentukan ukuran Button.</td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">theme</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    primary | green | gray | portal | purple | orange | yellow
-                  </td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">primary</td>
-
-                  <td className="px-5 py-4 text-gray-600">Menentukan warna Button.</td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">tone</td>
-
-                  <td className="px-5 py-4 text-gray-600">light | dark</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">light</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    Menentukan shade warna yang digunakan.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">leftIcon</td>
-
-                  <td className="px-5 py-4 text-gray-600">ReactNode</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">-</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    Icon yang ditampilkan di sebelah kiri.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">rightIcon</td>
-
-                  <td className="px-5 py-4 text-gray-600">ReactNode</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">-</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    Icon yang ditampilkan di sebelah kanan.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">iconOnly</td>
-
-                  <td className="px-5 py-4 text-gray-600">boolean</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">false</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    Mengubah Button menjadi Button berbentuk icon-only.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">as</td>
-
-                  <td className="px-5 py-4 text-gray-600">"button" | "a"</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">button</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    Menentukan elemen HTML yang digunakan.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">disabled</td>
-
-                  <td className="px-5 py-4 text-gray-600">boolean</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">false</td>
-
-                  <td className="px-5 py-4 text-gray-600">Menonaktifkan Button.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-    </div>
+        </CodeBlock>
+      </Section>
+      <Section title="Properties">
+        <PropsTable rows={buttonProps} minWidth="46rem" />
+      </Section>
+    </ComponentPage>
   );
 }
