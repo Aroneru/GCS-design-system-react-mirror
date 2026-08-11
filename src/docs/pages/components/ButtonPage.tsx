@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Messages } from "flowbite-react-icons/outline";
+import { Messages } from "flowbite-react-icons/solid";
 import { Button, type ButtonTheme, type ButtonVariant } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } from "../../pageKit";
@@ -23,9 +23,9 @@ const themeOptions: { value: ButtonTheme; label: string }[] = [
   { value: "yellow", label: "Yellow" },
 ];
 
-const iconOnlyOptions = [
-  { value: false, label: "Button" },
-  { value: true, label: "Icon Only" },
+const typeOptions = [
+  { value: "button", label: "Button" },
+  { value: "iconOnly", label: "Icon Only" },
 ];
 
 const buttonProps: PropRow[] = [
@@ -46,34 +46,34 @@ export function ButtonPage() {
   const [variant, setVariant] = useState<ButtonVariant>("filled");
   const [theme, setTheme] = useState<ButtonTheme>("primary");
   const [tone, setTone] = useState<"light" | "dark">("light");
-  const [iconOnly, setIconOnly] = useState(false);
+  const [type, setType] = useState<"button" | "iconOnly">("button");
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
   const [asLink, setAsLink] = useState<"button" | "a">("button");
 
   const buttonCode = `<Button
-  as="${asLink}"
-  size="${selectedSize}"
+  as="button"
   variant="${variant}"
   theme="${theme}"
-  tone="${tone}"${
-    showLeftIcon
+  tone="${tone}"
+  size="${selectedSize}"${
+    type === "iconOnly"
       ? `
-  leftIcon={<Messages />}`
+  iconOnly`
       : ""
   }${
-    showRightIcon
+    showLeftIcon && type !== "iconOnly"
       ? `
-  rightIcon={<Messages />}`
+  leftIcon={<Messages className="size-4" />}`
       : ""
   }${
-    asLink === "a"
+    showRightIcon && type !== "iconOnly"
       ? `
-  href="/foundations/colors"`
+  rightIcon={<Messages className="size-4" />}`
       : ""
   }
 >
-  Button
+  ${type === "iconOnly" ? "<Messages />" : "Button"}
 </Button>`;
 
   return (
@@ -266,7 +266,7 @@ export function ButtonPage() {
         <div className="rounded-2xl border border-border bg-surface-subtle p-6 sm:p-10">
           <div className="mx-auto flex min-h-[180px] items-center justify-center">
             <Button
-              iconOnly={iconOnly}
+              iconOnly={type === "iconOnly"}
               as={asLink}
               href={asLink === "a" ? "/foundations/colors" : undefined}
               size={selectedSize}
@@ -276,7 +276,7 @@ export function ButtonPage() {
               leftIcon={showLeftIcon ? <Messages className="size-4" /> : undefined}
               rightIcon={showRightIcon ? <Messages className="size-4" /> : undefined}
             >
-              {iconOnly ? <Messages className="size-4" /> : "Button"}
+              {type === "iconOnly" ? <Messages className="size-4" /> : "Button"}
             </Button>
           </div>
         </div>
@@ -284,16 +284,21 @@ export function ButtonPage() {
         <div className="mt-4 flex flex-wrap items-start gap-6">
           <div>
             <ControlLabel>Type</ControlLabel>
-
             <div className="mt-2">
               <Segmented
                 label="Pilih type"
-                value={iconOnly ? "iconOnly" : "button"}
-                onChange={(value) => setIconOnly(value === "iconOnly")}
-                options={[
-                  { value: "button", label: "Button" },
-                  { value: "iconOnly", label: "Icon Only" },
-                ]}
+                value={type}
+                onChange={(value) => {
+                  const newType = value as "button" | "iconOnly";
+
+                  setType(newType);
+
+                  if (newType === "iconOnly") {
+                    setShowLeftIcon(false);
+                    setShowRightIcon(false);
+                  }
+                }}
+                options={typeOptions}
               />
             </div>
           </div>
@@ -358,7 +363,7 @@ export function ButtonPage() {
               <Segmented
                 label="Pilih posisi icon"
                 value={
-                  iconOnly
+                  type === "iconOnly"
                     ? "none"
                     : showLeftIcon && showRightIcon
                       ? "both"
@@ -369,7 +374,7 @@ export function ButtonPage() {
                           : "none"
                 }
                 onChange={(value) => {
-                  if (iconOnly) return;
+                  if (type === "iconOnly") return;
 
                   setShowLeftIcon(value === "left" || value === "both");
                   setShowRightIcon(value === "right" || value === "both");
@@ -407,6 +412,7 @@ import { Messages } from '@tpl/design-kit-react/icons/solid'
 
 <Button
   as="${asLink}"
+  type="${type}"
   variant="${variant}"
   theme="${theme}"
   tone="${tone}"

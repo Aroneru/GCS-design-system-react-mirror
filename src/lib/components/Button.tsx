@@ -40,31 +40,31 @@ const sizeClasses: Record<
 > = {
   xs: {
     button: "h-[34px] px-4 gap-2 rounded-lg text-xs",
-    icon: "size-4",
+    icon: "size-3",
     iconOnly: "h-[34px] w-[34px] rounded-full p-0",
   },
 
   s: {
     button: "h-[38px] px-4 gap-2 rounded-lg text-sm",
-    icon: "size-4",
+    icon: "size-3",
     iconOnly: "h-[38px] w-[38px] rounded-full p-0",
   },
 
   base: {
     button: "h-[40px] px-4 gap-2 rounded-lg text-base",
-    icon: "size-5",
+    icon: "size-3.5",
     iconOnly: "h-[40px] w-[40px] rounded-full p-0",
   },
 
   l: {
     button: "h-[43px] px-5 gap-2 rounded-lg text-lg",
-    icon: "size-5",
+    icon: "size-3.5",
     iconOnly: "h-[43px] w-[43px] rounded-full p-0",
   },
 
   xl: {
     button: "h-[46px] px-6 gap-2 rounded-lg text-xl",
-    icon: "size-6",
+    icon: "size-4",
     iconOnly: "h-[46px] w-[46px] rounded-full p-0",
   },
 };
@@ -168,7 +168,6 @@ export function Button({
 
   const content = (
     <>
-      {/* Left Icon */}
       {/* Left Icon */}
       {!iconOnly && leftIcon && (
         <span className={cn("flex shrink-0 items-center justify-center", currentSize.icon)}>
