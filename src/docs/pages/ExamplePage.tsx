@@ -386,14 +386,6 @@ export function ExamplePage() {
           </aside>
         </div>
       </Container>
-
-      <Footer
-        logo="/images/komdigi-logo.svg"
-        logoAlt="tpl — Kementerian Komunikasi dan Digital"
-        menus={footerMenus}
-        copyright="© 2026 Kementerian Komunikasi dan Digital"
-        socials={footerSocials}
-      />
     </div>
   );
 }
