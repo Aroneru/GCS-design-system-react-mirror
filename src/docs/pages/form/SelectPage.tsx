@@ -10,7 +10,6 @@ import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } f
 
 const applications: { value: SelectApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-500' },
-  { value: 'portal', label: 'Portal', token: 'blue-portal-500' },
   { value: 'simaya', label: 'simaya', token: 'purple-500' },
 ]
 
@@ -29,7 +28,7 @@ const selectProps: PropRow[] = [
   ['placeholder', 'string', 'undefined', 'Teks saat belum ada pilihan, mis. "Pilih Apapun Itu".'],
   ['options', 'SelectOption[]', 'undefined', 'Daftar pilihan { value, label, disabled }. Bila kosong, children yang dipakai.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
-  ['application', "'default' | 'portal' | 'simaya'", 'default', 'Warna ikon info dan garis saat difokus.'],
+  ['application', "'default' | 'simaya'", 'default', 'Warna ikon info dan garis saat difokus.'],
   ['…props', 'SelectHTMLAttributes', '—', 'Seluruh atribut <select> standar diteruskan (value, onChange, required, name, …).'],
 ]
 
@@ -100,7 +99,7 @@ export function SelectPage() {
           Warna ikon info — dan garis kotak saat difokus — mengikuti aplikasi yang memakainya, dengan token
           warna yang sama seperti pada Input Field.
         </p>
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
             <Demo key={a.value} label={a.label}>
               <Select
@@ -226,7 +225,7 @@ export function SelectPage() {
           {'<Select\n'}
           {'    '}
           <H>application</H>
-          {'="portal"\n'}
+          {'="simaya"\n'}
           {'    value={value}\n'}
           {'    onChange={(e) => setValue(e.target.value)}\n'}
           {'    options={provinsi}\n'}

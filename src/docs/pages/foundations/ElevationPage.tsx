@@ -5,7 +5,6 @@ const shadowScale = ['shadow-sm', 'shadow', 'shadow-md', 'shadow-lg', 'shadow-xl
 
 const shadowColors: [string, string][] = [
   ['shadow-blue-600/50', 'bg-primary-600 shadow-lg shadow-primary-600/50'],
-  ['shadow-blue-portal-600/50', 'bg-blue-portal-600 shadow-lg shadow-blue-portal-600/50'],
   ['shadow-green-500/50', 'bg-green-500 shadow-lg shadow-green-500/50'],
   ['shadow-red-500/50', 'bg-red-500 shadow-lg shadow-red-500/50'],
   ['shadow-orange-500/50', 'bg-orange-500 shadow-lg shadow-orange-500/50'],

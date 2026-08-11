@@ -10,7 +10,7 @@ import { InfoCircle } from 'flowbite-react-icons/solid'
 import { cn } from '../utils/cn'
 
 /** Warna aksen per aplikasi — dipakai ikon info dan garis saat field difokus. */
-export type SelectApplication = 'default' | 'portal' | 'simaya'
+export type SelectApplication = 'default' | 'simaya'
 
 /** State mengikuti varian Figma. `inactive` sekaligus menonaktifkan kontrol. */
 export type SelectState = 'default' | 'inactive'
@@ -24,7 +24,6 @@ export interface SelectOption {
 
 const accents: Record<SelectApplication, { icon: string; focus: string }> = {
   default: { icon: 'text-primary-500', focus: 'focus-within:border-primary-500' },
-  portal: { icon: 'text-blue-portal-500', focus: 'focus-within:border-blue-portal-500' },
   simaya: { icon: 'text-purple-500', focus: 'focus-within:border-purple-500' },
 }
 

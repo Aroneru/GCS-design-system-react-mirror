@@ -10,7 +10,6 @@ import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } f
 
 const applications: { value: TextAreaApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'portal', label: 'Portal', token: 'blue-portal-500' },
   { value: 'simaya', label: 'simaya', token: 'purple-700' },
 ]
 
@@ -20,7 +19,7 @@ const textAreaProps: PropRow[] = [
   ['helperText', 'ReactNode', 'undefined', 'Caption di bawah kotak.'],
   ['type', "'default' | 'editor'", 'default', 'Kotak polos, atau kotak dengan toolbar di atasnya.'],
   ['platform', "'default' | 'mobile'", 'default', 'Tinggi kotak type default: 162px atau 120px.'],
-  ['application', "'default' | 'portal' | 'simaya'", 'default', 'Warna garis saat difokus dan tombol kirim.'],
+  ['application', "'default' | 'simaya'", 'default', 'Warna garis saat difokus dan tombol kirim.'],
   ['toolbar', 'ReactNode', 'undefined', 'Mengganti isi toolbar editor dengan elemen sendiri.'],
   ['onToolbarAction', '(action) => void', 'undefined', 'Dipanggil saat tombol toolbar bawaan ditekan.'],
   ['submitLabel', 'ReactNode', 'undefined', 'Label tombol kirim; tombol hanya muncul bila diisi.'],
@@ -87,7 +86,7 @@ export function TextAreaPage() {
           Warna tombol kirim — dan garis kotak saat difokus — mengikuti aplikasi yang memakainya, dengan token
           warna yang sama seperti pada Input Field.
         </p>
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
             <Demo key={a.value} label={a.label}>
               <TextArea
@@ -214,7 +213,7 @@ export function TextAreaPage() {
           {'="editor"\n'}
           {'    '}
           <H>application</H>
-          {'="portal"\n'}
+          {'="simaya"\n'}
           {'    label="Isi pesan"\n'}
           {'    hint={`${value.length}/500`}\n'}
           {'    value={value}\n'}

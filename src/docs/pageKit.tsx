@@ -149,6 +149,7 @@ export function Segmented<T extends string | number | boolean>({
   options,
   itemClassName = 'px-3',
   wrap,
+  disabled,
 }: {
   label: string
   value: T
@@ -156,10 +157,14 @@ export function Segmented<T extends string | number | boolean>({
   options: { value: T; label: string; icon?: string }[]
   itemClassName?: string
   wrap?: boolean
+  /** Meredupkan sekaligus mematikan seluruh pilihan; nilai terpilih tetap terlihat. */
+  disabled?: boolean
 }) {
   return (
     <div
-      className={`inline-flex rounded-lg border border-border bg-surface p-1 ${wrap ? 'flex-wrap' : ''}`}
+      className={`inline-flex rounded-lg border border-border bg-surface p-1 ${wrap ? 'flex-wrap' : ''} ${
+        disabled ? 'opacity-50' : ''
+      }`}
       role="group"
       aria-label={label}
     >
@@ -168,7 +173,8 @@ export function Segmented<T extends string | number | boolean>({
           key={String(o.value)}
           type="button"
           onClick={() => onChange(o.value)}
-          className={`inline-flex items-center gap-2 rounded-md py-1.5 text-sm font-bold transition-colors ${itemClassName} ${
+          disabled={disabled}
+          className={`inline-flex items-center gap-2 rounded-md py-1.5 text-sm font-bold transition-colors disabled:cursor-not-allowed ${itemClassName} ${
             value === o.value ? 'bg-primary-50 text-primary-700' : 'text-gray-500 hover:text-gray-800'
           }`}
           aria-pressed={value === o.value}

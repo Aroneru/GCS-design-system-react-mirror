@@ -8,7 +8,7 @@ export type CheckboxPlatform = "default" | "mobile";
 export type CheckboxState = "default" | "inactive";
 
 /** Warna aksen per aplikasi — dipakai kotak saat tercentang. */
-export type CheckboxApplication = "default" | "portal" | "simaya";
+export type CheckboxApplication = "default" | "simaya";
 
 /**
  * Ukuran kotak, jarak turun agar sejajar tengah baris label, dan ukuran teks
@@ -21,8 +21,6 @@ const platforms: Record<CheckboxPlatform, { box: string; offset: string; label: 
 
 const accents: Record<CheckboxApplication, string> = {
   default: "checked:border-primary-700 checked:bg-primary-700 focus-visible:outline-primary-700",
-  portal:
-    "checked:border-blue-portal-500 checked:bg-blue-portal-500 focus-visible:outline-blue-portal-500",
   simaya: "checked:border-purple-500 checked:bg-purple-500 focus-visible:outline-purple-500",
 };
 
