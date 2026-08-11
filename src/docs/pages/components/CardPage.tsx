@@ -64,6 +64,15 @@ export function CardPage() {
   const [hasImage, setHasImage] = useState(true);
   const [action, setAction] = useState<CardAction>("two");
 
+  // Turunan untuk cuplikan kode di bawah playground — satu sumber dengan preview.
+  const widthClass = view === "mobile" ? "max-w-[238px]" : "max-w-[384px]";
+  const withButton = action === "two" || action === "one";
+  const summary = [
+    view === "mobile" ? "Mobile 238px" : "Desktop 384px",
+    hasImage ? "dengan gambar" : "tanpa gambar",
+    actionChoices.find((a) => a.value === action)?.label.toLowerCase(),
+  ].join(" · ");
+
   return (
     <ComponentPage
       title="Card"
@@ -93,10 +102,10 @@ export function CardPage() {
         {/* Kontrol */}
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <div>
-            <ControlLabel>Lebar</ControlLabel>
+            <ControlLabel>Lebar kolom</ControlLabel>
             <div className="mt-2">
               <Segmented
-                label="Pilih lebar kartu"
+                label="Pilih lebar kolom"
                 value={view}
                 onChange={setView}
                 options={[
@@ -137,12 +146,103 @@ export function CardPage() {
           </div>
         </div>
 
+        <p className="mt-6 mb-3 text-body-sm text-gray-500">
+          Kode di bawah mengikuti pilihan di atas — ganti kontrolnya, dan baris yang berubah ikut
+          tersorot. Tombol <em>Salin</em> selalu menyalin persis yang sedang tampil.
+        </p>
+
+        <CodeBlock>
+          {"import { Card"}
+          {withButton && ", Button"}
+          {" } from '@tpl/design-kit-react'\n\n"}
+          {`{/* ${summary} */}\n`}
+          {"{/* Kartu tidak punya prop ukuran — lebarnya mengikuti kolom\n"}
+          {"    tempatnya berada. Yang berubah cuma kolomnya. */}\n"}
+          {'<div className="'}
+          <H>{widthClass}</H>
+          {'">\n'}
+          {"    <Card\n"}
+          {hasImage && (
+            <>
+              {"        "}
+              <H>image</H>
+              {'="/images/card-sample.svg"\n'}
+              {'        imageAlt="Suasana kerja tim"\n'}
+            </>
+          )}
+          {'        title="Komdigi Card Desktop"\n'}
+          {'        description="Here are the biggest enterprise technology acquisitions of 2021."\n'}
+          {action === "link" && (
+            <>
+              {"        "}
+              <H>href</H>
+              {'="/panduan"\n'}
+              {"        "}
+              <H>linkLabel</H>
+              {'="See our guideline"\n'}
+            </>
+          )}
+          {action === "two" && (
+            <>
+              {"        "}
+              <H>actions</H>
+              {"={\n"}
+              {"            <>\n"}
+              {'                <Button variant="filled" size="s">Button text</Button>\n'}
+              {'                <Button variant="filled" size="s">Button text</Button>\n'}
+              {"            </>\n"}
+              {"        }\n"}
+            </>
+          )}
+          {action === "one" && (
+            <>
+              {"        "}
+              <H>actions</H>
+              {'={<Button variant="filled" size="s">Button text</Button>}\n'}
+            </>
+          )}
+          {"    />\n"}
+          {"</div>"}
+        </CodeBlock>
+
         <p className="mt-4 text-body-sm text-gray-500">
           Ukuran judul dan jarak dalam kartu memakai <em>container query</em>, sehingga menyesuaikan
           lebar kartu itu sendiri — bukan lebar layar. Kartu yang sama otomatis tampil ringkas di
           kolom sempit.
         </p>
       </section>
+
+      <Section title="Menyesuaikan sendiri">
+        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+          Empat kartu di bawah ini ditulis dengan <em>props yang sama persis</em> — tidak ada satu pun
+          kelas ukuran, breakpoint, atau prop platform. Yang berbeda hanya lebar kolomnya, dan kartu
+          menyesuaikan diri: di bawah 320px gambarnya jadi 5:4, padding menyusut ke 16px, dan judul turun
+          ke 16px; di atasnya gambar jadi 16:9, padding 24px, judul 20px.
+        </p>
+
+        <div className="rounded-2xl border border-border bg-surface-subtle p-5 sm:p-8">
+          <div className="flex flex-wrap items-start gap-5">
+            {[240, 300, 384, 520].map((w) => (
+              <div key={w} style={{ width: `${w}px` }} className="max-w-full">
+                <p className="mb-2 text-xs font-bold text-primary-700">kolom {w}px</p>
+                <Card
+                  image="/images/card-sample.svg"
+                  imageAlt=""
+                  title={cardTitle}
+                  description={cardDesc}
+                  actions={<SampleButton variant="primary" />}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p className="mt-3 text-body-sm text-gray-500">
+          Karena itu Card sengaja tidak diberi lebar bawaan: di halaman formulir ia perlu selebar
+          kolomnya (lihat halaman <em>Example</em>), sementara di daftar ringkas ia perlu menyempit
+          mengikuti grid. Menentukan lebar adalah tugas tata letak, bukan tugas kartu.
+        </p>
+      </Section>
 
       <Section title="Varian">
         <div className="grid gap-5 sm:grid-cols-2">
@@ -188,39 +288,6 @@ export function CardPage() {
             />
           </div>
         </div>
-      </Section>
-
-      <Section title="Penggunaan">
-        <CodeBlock>
-          {"{/* Default: gambar + judul + deskripsi + tombol */}\n"}
-          {"<Card\n"}
-          {'    image="/images/artikel.jpg"\n'}
-          {'    imageAlt="Suasana kerja tim"\n'}
-          {'    title="Komdigi Card Desktop"\n'}
-          {'    description="Here are the biggest enterprise technology acquisitions of 2021."\n'}
-          {"    "}
-          <H>actions</H>
-          {"={\n"}
-          {"        <>\n"}
-          {'            <Button variant="secondary">Button text</Button>\n'}
-          {'            <Button variant="primary">Button text</Button>\n'}
-          {"        </>\n"}
-          {"    }\n"}
-          {"/>\n\n"}
-          {"{/* Tanpa gambar: cukup hilangkan image */}\n"}
-          {'<Card title="..." description="..." />\n\n'}
-          {"{/* Dengan tautan: isi href + linkLabel */}\n"}
-          {"<Card\n"}
-          {'    title="..."\n'}
-          {'    description="..."\n'}
-          {"    "}
-          <H>href</H>
-          {'="/panduan"\n'}
-          {"    "}
-          <H>linkLabel</H>
-          {'="See our guideline"\n'}
-          {"/>"}
-        </CodeBlock>
       </Section>
 
       <Section title="Properties">
