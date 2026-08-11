@@ -169,7 +169,8 @@ export function Button({
   const content = (
     <>
       {/* Left Icon */}
-      {leftIcon && (
+      {/* Left Icon */}
+      {!iconOnly && leftIcon && (
         <span className={cn("flex shrink-0 items-center justify-center", currentSize.icon)}>
           {leftIcon}
         </span>
@@ -183,7 +184,7 @@ export function Button({
       )}
 
       {/* Right Icon */}
-      {rightIcon && (
+      {!iconOnly && rightIcon && (
         <span className={cn("flex shrink-0 items-center justify-center", currentSize.icon)}>
           {rightIcon}
         </span>

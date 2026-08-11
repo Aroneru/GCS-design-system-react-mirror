@@ -23,9 +23,9 @@ const themeOptions: { value: ButtonTheme; label: string }[] = [
   { value: "yellow", label: "Yellow" },
 ];
 
-const toneOptions = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
+const iconOnlyOptions = [
+  { value: false, label: "Button" },
+  { value: true, label: "Icon Only" },
 ];
 
 const buttonProps: PropRow[] = [
@@ -46,6 +46,7 @@ export function ButtonPage() {
   const [variant, setVariant] = useState<ButtonVariant>("filled");
   const [theme, setTheme] = useState<ButtonTheme>("primary");
   const [tone, setTone] = useState<"light" | "dark">("light");
+  const [iconOnly, setIconOnly] = useState(false);
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
   const [asLink, setAsLink] = useState<"button" | "a">("button");
@@ -156,7 +157,7 @@ export function ButtonPage() {
           </Demo>
         </div>
       </Section>
-      <Section title="Color">
+      <Section title="Colors">
         <p className="mb-6 max-w-2xl text-body-sm text-gray-500">
           Warna Button digunakan untuk membedakan konteks dan tingkat kepentingan suatu tindakan.
         </p>
@@ -261,15 +262,11 @@ export function ButtonPage() {
       </Section>
       <section>
         <h2 className="mb-4 text-heading-3 font-black text-gray-900">Playground</h2>
-        <p className="mb-4 text-body-sm text-gray-500">
-          Playground ini membuat state tombol bisa dilihat langsung tanpa memaksa radio atau
-          checkbox. Semua status dikontrol lewat <H>Segmented</H> agar tampilan lebih rapi dan
-          konsisten seperti halaman lain.
-        </p>
 
         <div className="rounded-2xl border border-border bg-surface-subtle p-6 sm:p-10">
           <div className="mx-auto flex min-h-[180px] items-center justify-center">
             <Button
+              iconOnly={iconOnly}
               as={asLink}
               href={asLink === "a" ? "/foundations/colors" : undefined}
               size={selectedSize}
@@ -279,12 +276,28 @@ export function ButtonPage() {
               leftIcon={showLeftIcon ? <Messages className="size-4" /> : undefined}
               rightIcon={showRightIcon ? <Messages className="size-4" /> : undefined}
             >
-              Button
+              {iconOnly ? <Messages className="size-4" /> : "Button"}
             </Button>
           </div>
         </div>
 
         <div className="mt-4 flex flex-wrap items-start gap-6">
+          <div>
+            <ControlLabel>Type</ControlLabel>
+
+            <div className="mt-2">
+              <Segmented
+                label="Pilih type"
+                value={iconOnly ? "iconOnly" : "button"}
+                onChange={(value) => setIconOnly(value === "iconOnly")}
+                options={[
+                  { value: "button", label: "Button" },
+                  { value: "iconOnly", label: "Icon Only" },
+                ]}
+              />
+            </div>
+          </div>
+
           <div>
             <ControlLabel>Variant</ControlLabel>
             <div className="mt-2">
@@ -298,19 +311,6 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <ControlLabel>Size</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih ukuran"
-                value={selectedSize}
-                onChange={setSelectedSize}
-                options={sizeOptions}
-                wrap
-              />
-            </div>
-          </div>
-
-          <div>
             <ControlLabel>Theme</ControlLabel>
             <div className="mt-2">
               <Segmented
@@ -318,6 +318,19 @@ export function ButtonPage() {
                 value={theme}
                 onChange={setTheme}
                 options={themeOptions}
+                wrap
+              />
+            </div>
+          </div>
+
+          <div>
+            <ControlLabel>Size</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Pilih ukuran"
+                value={selectedSize}
+                onChange={setSelectedSize}
+                options={sizeOptions}
                 wrap
               />
             </div>
@@ -339,30 +352,33 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <ControlLabel>Ikon kiri</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Tampilkan ikon kiri"
-                value={showLeftIcon}
-                onChange={setShowLeftIcon}
-                options={[
-                  { value: true, label: "Ada" },
-                  { value: false, label: "Tanpa" },
-                ]}
-              />
-            </div>
-          </div>
+            <ControlLabel>Icons</ControlLabel>
 
-          <div>
-            <ControlLabel>Ikon kanan</ControlLabel>
             <div className="mt-2">
               <Segmented
-                label="Tampilkan ikon kanan"
-                value={showRightIcon}
-                onChange={setShowRightIcon}
+                label="Pilih posisi icon"
+                value={
+                  iconOnly
+                    ? "none"
+                    : showLeftIcon && showRightIcon
+                      ? "both"
+                      : showLeftIcon
+                        ? "left"
+                        : showRightIcon
+                          ? "right"
+                          : "none"
+                }
+                onChange={(value) => {
+                  if (iconOnly) return;
+
+                  setShowLeftIcon(value === "left" || value === "both");
+                  setShowRightIcon(value === "right" || value === "both");
+                }}
                 options={[
-                  { value: true, label: "Ada" },
-                  { value: false, label: "Tanpa" },
+                  { value: "none", label: "None" },
+                  { value: "left", label: "Left" },
+                  { value: "right", label: "Right" },
+                  { value: "both", label: "Both" },
                 ]}
               />
             </div>
