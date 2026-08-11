@@ -1,5 +1,6 @@
-import { Badge, Button, Card, Container, Footer } from "../../lib";
-import { FacebookIcon, InstagramIcon, XIcon } from "../socialIcons";
+// Footer tidak lagi dipasang di sini: DocsLayout sudah merendernya untuk
+// seluruh halaman, dengan logo, sosial, dan copyright yang sama.
+import { Badge, Button, Card, Container } from "../../lib";
 
 const summaryCards = [
   {
@@ -77,23 +78,6 @@ export function HomePage() {
           <Badge variant="gray">Tailwind v4</Badge>
         </div>
       </Container>
-
-      <Footer
-        logo="/images/komdigi-logo.svg"
-        logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
-        menus={[
-          { label: "Foundations", url: "#/foundations" },
-          { label: "Components", url: "#/components" },
-          { label: "Card", url: "#/components/card" },
-          { label: "Footer", url: "#/components/footer" },
-        ]}
-        copyright="© 2025 Kementerian Komunikasi dan Digital"
-        socials={[
-          { label: "Instagram", url: "#", icon: InstagramIcon },
-          { label: "X", url: "#", icon: XIcon },
-          { label: "Facebook", url: "#", icon: FacebookIcon },
-        ]}
-      />
     </>
   );
 }
