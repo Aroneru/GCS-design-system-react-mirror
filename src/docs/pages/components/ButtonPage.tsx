@@ -96,7 +96,7 @@ export function ButtonPage() {
           kebutuhan tindakan.
         </p>
 
-        <div className="flex flex-wrap items-start justify-start gap-6">
+        <div className="mb-4 flex flex-wrap items-start justify-start gap-6">
           {sizes.map((size) => (
             <div key={size} className="flex flex-col items-center gap-3">
               <Button
@@ -116,6 +116,20 @@ export function ButtonPage() {
             </div>
           ))}
         </div>
+        <CodeBlock>
+          {"<Button\n"}
+          {'as="a"\n'}
+          <H>type</H>
+          {'="button"\n'}
+          <H>size</H>
+          {'="base"\n'}
+          {'variant="filled"\n'}
+          {'theme="primary"\n'}
+          {'tone="light"\n'}
+          {'leftIcon={<Messages className="size-4" />}\n'}
+          {'rightIcon={<Messages className="size-4" />}\n'}
+          {"/>"}
+        </CodeBlock>
       </Section>
       <Section title="Icon Only & Sizes">
         <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
@@ -123,7 +137,7 @@ export function ButtonPage() {
           tanpa label.
         </p>
 
-        <div className="flex flex-wrap items-start justify-start gap-6">
+        <div className="mb-4 flex flex-wrap items-start justify-start gap-6">
           {sizes.map((size) => (
             <div key={size} className="flex flex-col items-center gap-3">
               <Button
@@ -143,6 +157,18 @@ export function ButtonPage() {
             </div>
           ))}
         </div>
+        <CodeBlock>
+          {"<Button\n"}
+          {'as="a"\n'}
+          <H>type</H>
+          {'="iconOnly"\n'}
+          <H>size</H>
+          {'="base"\n'}
+          {'variant="filled"\n'}
+          {'theme="primary"\n'}
+          {'tone="light"\n'}
+          {"/>"}
+        </CodeBlock>
       </Section>
 
       <Section title="Variants">
@@ -151,34 +177,42 @@ export function ButtonPage() {
           sesuai untuk aksi tambahan.
         </p>
 
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="mb-4 grid gap-5 sm:grid-cols-2">
           <Demo label="Filled">
             <Button variant="filled" theme="primary" tone="light">
-              Simpan perubahan
+              Simpan Perubahan
             </Button>
           </Demo>
 
           <Demo label="Outline">
             <Button variant="outline" theme="primary" tone="light">
-              Lihat detail
+              Lihat Detail
             </Button>
           </Demo>
         </div>
+        <CodeBlock>
+          {"<Button\n"}
+          {'as="a"\n'}
+          {'type="button"\n'}
+          {'size="base"\n'}
+          <H>variant</H>
+          {'="filled"\n'}
+          {'theme="primary"\n'}
+          {'tone="light"\n'}
+          {'leftIcon={<Messages className="size-4" />}\n'}
+          {'rightIcon={<Messages className="size-4" />}\n'}
+          {"/>"}
+        </CodeBlock>
       </Section>
-      <Section title="Colors">
+      <Section title="Themes">
         <p className="mb-6 max-w-2xl text-body-sm text-gray-500">
-          Warna Button digunakan untuk membedakan konteks dan tingkat kepentingan suatu tindakan.
+          Tema digunakan untuk membedakan konteks dan tingkat kepentingan suatu tindakan.
         </p>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mb-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <Button
-              variant="filled"
-              theme="primary"
-              tone="light"
-              leftIcon={<Messages className="size-4" />}
-            >
-              Button
+            <Button variant="filled" theme="primary" tone="light">
+              Primary
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
@@ -188,13 +222,8 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button
-              variant="filled"
-              theme="green"
-              tone="light"
-              leftIcon={<Messages className="size-4" />}
-            >
-              Button
+            <Button variant="filled" theme="green" tone="light">
+              Green
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
@@ -204,13 +233,8 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button
-              variant="filled"
-              theme="gray"
-              tone="light"
-              leftIcon={<Messages className="size-4" />}
-            >
-              Button
+            <Button variant="filled" theme="gray" tone="light">
+              Gray
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
@@ -220,13 +244,8 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button
-              variant="filled"
-              theme="purple"
-              tone="light"
-              leftIcon={<Messages className="size-4" />}
-            >
-              Button
+            <Button variant="filled" theme="purple" tone="light">
+              Purple
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
@@ -236,13 +255,8 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button
-              variant="filled"
-              theme="orange"
-              tone="light"
-              leftIcon={<Messages className="size-4" />}
-            >
-              Button
+            <Button variant="filled" theme="orange" tone="light">
+              Orange
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
@@ -252,13 +266,8 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button
-              variant="filled"
-              theme="yellow"
-              tone="light"
-              leftIcon={<Messages className="size-4" />}
-            >
-              Button
+            <Button variant="filled" theme="yellow" tone="light">
+              Yellow
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
@@ -267,6 +276,18 @@ export function ButtonPage() {
             </p>
           </div>
         </div>
+        <CodeBlock>
+          {"<Button\n"}
+          {'as="a"\n'}
+          {'type="button"\n'}
+          {'size="base"\n'}
+          {'variant="filled"\n'}
+          <H>theme</H>
+          {'="primary"\n'}
+          <H>tone</H>
+          {'="light"\n'}
+          {"/>"}
+        </CodeBlock>
       </Section>
       <section>
         <h2 className="mb-4 text-heading-3 font-black text-gray-900">Playground</h2>
@@ -428,142 +449,11 @@ import { Messages } from '@tpl/design-kit-react/icons/solid'
 >
   Button
 </Button>`}
-<<<<<<< HEAD
         </CodeBlock>
       </Section>
       <Section title="Properties">
         <PropsTable rows={buttonProps} minWidth="46rem" />
       </Section>
     </ComponentPage>
-=======
-            />
-          </div>
-        </section>
-        <section>
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">Properties</h2>
-
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-gray-200 bg-gray-50">
-                <tr>
-                  <th className="px-5 py-4 font-semibold">PROP</th>
-
-                  <th className="px-5 py-4 font-semibold">TYPE</th>
-
-                  <th className="px-5 py-4 font-semibold">DEFAULT</th>
-
-                  <th className="px-5 py-4 font-semibold">KETERANGAN</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-gray-200">
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">variant</td>
-
-                  <td className="px-5 py-4 text-gray-600">"filled" | "outline"</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">filled</td>
-
-                  <td className="px-5 py-4 text-gray-600">Menentukan gaya Button.</td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">size</td>
-
-                  <td className="px-5 py-4 text-gray-600">"xs" | "s" | "base" | "l" | "xl"</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">base</td>
-
-                  <td className="px-5 py-4 text-gray-600">Menentukan ukuran Button.</td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">theme</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    primary | green | gray | purple | orange | yellow
-                  </td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">primary</td>
-
-                  <td className="px-5 py-4 text-gray-600">Menentukan warna Button.</td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">tone</td>
-
-                  <td className="px-5 py-4 text-gray-600">light | dark</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">light</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    Menentukan shade warna yang digunakan.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">leftIcon</td>
-
-                  <td className="px-5 py-4 text-gray-600">ReactNode</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">-</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    Icon yang ditampilkan di sebelah kiri.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">rightIcon</td>
-
-                  <td className="px-5 py-4 text-gray-600">ReactNode</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">-</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    Icon yang ditampilkan di sebelah kanan.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">iconOnly</td>
-
-                  <td className="px-5 py-4 text-gray-600">boolean</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">false</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    Mengubah Button menjadi Button berbentuk icon-only.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">as</td>
-
-                  <td className="px-5 py-4 text-gray-600">"button" | "a"</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">button</td>
-
-                  <td className="px-5 py-4 text-gray-600">
-                    Menentukan elemen HTML yang digunakan.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="px-5 py-4 font-mono text-primary-700">disabled</td>
-
-                  <td className="px-5 py-4 text-gray-600">boolean</td>
-
-                  <td className="px-5 py-4 font-mono text-gray-600">false</td>
-
-                  <td className="px-5 py-4 text-gray-600">Menonaktifkan Button.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-    </div>
->>>>>>> 9bdb714c85c750571d310c00753715cd4d8bae94
   );
 }
