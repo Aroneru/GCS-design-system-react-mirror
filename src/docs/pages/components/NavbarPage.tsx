@@ -1,11 +1,19 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Navbar, type NavbarItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { CodeBlock, ComponentPage, ControlLabel, Section, Segmented } from "../../pageKit";
+import {
+  CodeBlock,
+  ComponentPage,
+  ControlLabel,
+  Demo,
+  Section,
+  Segmented,
+} from "../../pageKit";
 
 type PlaygroundState = "guest" | "authenticated";
 type MenuPosition = "left" | "right";
 type PreviewDevice = "desktop" | "mobile";
+type PlaygroundVariant = "front-office" | "back-office";
 
 function createFigmaItems(count: number): NavbarItem[] {
   return Array.from({ length: count }, (_, index) => {
@@ -111,12 +119,23 @@ const navbarProps: PropRow[] = [
   ["brand", "ReactNode", "—", "Konten logo atau identitas brand."],
   ["brandLabel", "string", "—", "Nama aksesibel untuk link brand."],
   ["brandHref", "string", "'/'", "Tujuan link brand."],
-  ["items", "NavbarItem[]", "[]", "Daftar menu utama yang dirender Navbar."],
+  [
+    "items",
+    "NavbarItem[]",
+    "[]",
+    "Daftar menu utama berupa link, page dengan navigasi sekunder, atau true submenu.",
+  ],
   ["activeHref", "string", "undefined", "Href halaman aktif yang akan ditandai pada navigation."],
   ["search", "NavbarSearchConfig", "undefined", "Konfigurasi fitur pencarian Navbar."],
   ["guestActions", "NavbarGuestActions", "undefined", "Aksi Masuk dan Daftar untuk pengguna guest."],
   ["user", "NavbarUser", "undefined", "Jika diberikan, Navbar menggunakan tampilan authenticated."],
   ["notification", "NavbarNotification", "undefined", "Konfigurasi notification untuk pengguna authenticated."],
+  [
+    "variant",
+    "'front-office' | 'back-office'",
+    "'front-office'",
+    "Menentukan komposisi Navbar untuk konteks Front Office atau Back Office.",
+  ],
   ["menuPosition", "'left' | 'right'", "'right'", "Posisi grup menu pada desktop."],
   ["ariaLabel", "string", "'Navigasi utama'", "Accessible label untuk navigation landmark."],
   ["onNavigate", "function", "undefined", "Callback saat link menu dipilih; dapat digunakan oleh router consumer."],
@@ -128,21 +147,33 @@ const navbarProps: PropRow[] = [
 function DemoBrand() {
   return (
     <span className="flex items-center gap-2">
-      <span className="grid size-8 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5">
+      <span className="grid size-9 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5 lg:size-[46px]">
         <span className="rounded-sm bg-white" />
         <span className="rounded-sm bg-primary-300" />
         <span className="rounded-sm bg-primary-300" />
         <span className="rounded-sm bg-white" />
       </span>
-      <span className="text-sm font-black tracking-tight text-content">KOMDIGI</span>
+      <span className="w-[70px] text-sm font-black tracking-tight text-content lg:w-[90px]">
+        KOMDIGI
+      </span>
     </span>
   );
 }
 
-function ScaledDesktopFrame({ title, src }: { title: string; src: string }) {
+function ScaledDesktopFrame({
+  title,
+  src,
+  embedded = false,
+  referenceWidth = 1440,
+}: {
+  title: string;
+  src: string;
+  embedded?: boolean;
+  referenceWidth?: 1184 | 1440;
+}) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
-  const previewWidth = 1440;
+  const previewWidth = referenceWidth;
   const previewHeight = 220;
 
   useEffect(() => {
@@ -155,12 +186,14 @@ function ScaledDesktopFrame({ title, src }: { title: string; src: string }) {
     updateScale();
     observer.observe(wrapper);
     return () => observer.disconnect();
-  }, []);
+  }, [previewWidth]);
 
   return (
     <div
       ref={wrapperRef}
-      className="relative w-full overflow-hidden rounded-lg border border-border bg-surface shadow-sm"
+      className={`relative w-full overflow-hidden bg-surface ${
+        embedded ? "" : "rounded-lg border border-border shadow-sm"
+      }`}
       style={{ height: previewHeight * scale }}
     >
       <iframe
@@ -209,9 +242,17 @@ function NavbarPreviewSurface({
   );
 }
 
-function PlaygroundMobileFrame({ src }: { src: string }) {
+function PlaygroundMobileFrame({
+  src,
+  referenceWidth = 412,
+}: {
+  src: string;
+  referenceWidth?: 412 | 456;
+}) {
   return (
-    <div className="mx-auto w-full max-w-[412px] overflow-hidden rounded-lg border border-border bg-surface shadow-sm">
+    <div
+      className={`mx-auto w-full overflow-hidden rounded-lg border border-border bg-surface shadow-sm ${referenceWidth === 456 ? "max-w-[456px]" : "max-w-[412px]"}`}
+    >
       <iframe
         key={src}
         title="Preview interaktif Navbar mobile"
@@ -224,12 +265,14 @@ function PlaygroundMobileFrame({ src }: { src: string }) {
 }
 
 function createPlaygroundCode({
+  variant,
   state,
   menuCount,
   searchEnabled,
   guestActionsEnabled,
   menuPosition,
 }: {
+  variant: PlaygroundVariant;
   state: PlaygroundState;
   menuCount: number;
   searchEnabled: boolean;
@@ -272,6 +315,8 @@ function createPlaygroundCode({
     "  ]}",
   ];
 
+  if (variant === "back-office") lines.splice(1, 0, '  variant="back-office"');
+
   if (searchEnabled) {
     lines.push(
       "  search={{",
@@ -282,9 +327,9 @@ function createPlaygroundCode({
     );
   }
 
-  lines.push(`  menuPosition="${menuPosition}"`);
+  if (variant === "front-office") lines.push(`  menuPosition="${menuPosition}"`);
 
-  if (state === "guest" && guestActionsEnabled) {
+  if (variant === "front-office" && state === "guest" && guestActionsEnabled) {
     lines.push(
       "  guestActions={{",
       "    login: { label: 'Masuk', href: '/login' },",
@@ -308,7 +353,8 @@ function createPlaygroundCode({
   return lines.join("\n");
 }
 
-function NavbarPlayground() {
+function NavbarDocumentationDemo() {
+  const [variant, setVariant] = useState<PlaygroundVariant>("front-office");
   const [previewDevice, setPreviewDevice] = useState<PreviewDevice>("desktop");
   const [state, setState] = useState<PlaygroundState>("guest");
   const [menuCount, setMenuCount] = useState(1);
@@ -318,6 +364,7 @@ function NavbarPlayground() {
 
   const params = new URLSearchParams({
     navbarPlayground: "true",
+    navbarVariant: variant,
     navbarState: state,
     navbarMenuCount: String(menuCount),
     navbarSearch: searchEnabled ? "on" : "off",
@@ -330,134 +377,169 @@ function NavbarPlayground() {
       : "/preview/navbar/mobile-guest";
   const previewSrc = `?${params.toString()}#${previewRoute}`;
   const code = createPlaygroundCode({
+    variant,
     state,
     menuCount,
     searchEnabled,
     guestActionsEnabled,
     menuPosition,
   });
-  const menuPositionDisabled = previewDevice === "mobile" || state === "authenticated";
+  const menuPositionDisabled = previewDevice === "mobile" || variant === "back-office";
   const menuPositionHelp =
-    previewDevice === "mobile"
-      ? "Hanya berlaku pada tampilan desktop."
-      : state === "authenticated"
-        ? "Menu Position hanya digunakan pada Navbar guest desktop."
-        : "Mengatur posisi grup menu pada tampilan desktop.";
+    menuPositionDisabled
+      ? "Hanya digunakan pada Front Office desktop."
+      : "Mengatur posisi grup menu pada tampilan desktop.";
+  const guestActionsDisabled = variant === "back-office";
 
   return (
-    <div className="space-y-5">
-      {previewDevice === "desktop" ? (
-        <ScaledDesktopFrame title="Preview interaktif Navbar desktop" src={previewSrc} />
-      ) : (
-        <PlaygroundMobileFrame src={previewSrc} />
-      )}
-
-      <div className="ds-card w-full p-6">
-        <h3 className="text-sm font-black text-content">Konfigurasi</h3>
-        <div data-navbar-config-grid className="mt-6 grid w-full gap-x-10 gap-y-7 md:grid-cols-2">
-          <div className="space-y-2">
-            <div className="block">
-              <ControlLabel>Preview</ControlLabel>
+    <>
+      <Section title="Playground">
+        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+          Gunakan controls untuk melihat bagaimana public props mengubah komposisi Navbar dan kode
+          implementasinya.
+        </p>
+        {previewDevice === "desktop" ? (
+          <ScaledDesktopFrame
+            title="Preview interaktif Navbar desktop"
+            src={previewSrc}
+            referenceWidth={variant === "back-office" ? 1184 : 1440}
+          />
+        ) : (
+          <PlaygroundMobileFrame
+            src={previewSrc}
+            referenceWidth={variant === "back-office" ? 456 : 412}
+          />
+        )}
+        <div
+          data-navbar-config-grid
+          className="mt-4 grid w-full gap-x-10 gap-y-6 md:grid-cols-2"
+        >
+          <div>
+            <ControlLabel>Variant</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Pilih variant Navbar"
+                value={variant}
+                onChange={setVariant}
+                options={[
+                  { value: "front-office", label: "Front Office" },
+                  { value: "back-office", label: "Back Office" },
+                ]}
+              />
             </div>
-            <Segmented
-              label="Pilih viewport preview"
-              value={previewDevice}
-              onChange={setPreviewDevice}
-              options={[
-                { value: "desktop", label: "Desktop" },
-                { value: "mobile", label: "Mobile" },
-              ]}
-            />
-            <p className="max-w-xs text-xs leading-5 text-content-subtle">
-              Preview hanya mengubah viewport dokumentasi. Navbar menangani responsive behavior
-              secara otomatis.
+            <p className="mt-2 max-w-xs text-xs leading-5 text-gray-500">
+              Pilih komposisi untuk layanan publik atau application shell internal.
             </p>
           </div>
 
-          <div className="space-y-2">
-            <div className="block">
-              <ControlLabel>State</ControlLabel>
+          <div>
+            <ControlLabel>Preview</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Pilih viewport preview"
+                value={previewDevice}
+                onChange={setPreviewDevice}
+                options={[
+                  { value: "desktop", label: "Desktop" },
+                  { value: "mobile", label: "Mobile" },
+                ]}
+              />
             </div>
-            <Segmented
-              label="Pilih state Navbar"
-              value={state}
-              onChange={setState}
-              options={[
-                { value: "guest", label: "Guest" },
-                { value: "authenticated", label: "Authenticated" },
-              ]}
-            />
-            <p className="max-w-xs text-xs leading-5 text-content-subtle">
-              Gunakan Guest untuk pengguna yang belum masuk dan Authenticated jika data user
-              tersedia.
+            <p className="mt-2 max-w-xs text-xs leading-5 text-gray-500">
+              Preview hanya mengubah viewport dokumentasi; responsive behavior ditangani Navbar.
             </p>
           </div>
 
-          <div className="space-y-2">
-            <div className="block">
-              <ControlLabel>Jumlah menu</ControlLabel>
+          <div>
+            <ControlLabel>State</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Pilih state Navbar"
+                value={state}
+                onChange={setState}
+                options={[
+                  { value: "guest", label: "Guest" },
+                  { value: "authenticated", label: "Authenticated" },
+                ]}
+              />
             </div>
-            <Segmented
-              label="Pilih jumlah menu"
-              value={menuCount}
-              onChange={setMenuCount}
-              itemClassName="w-9 justify-center"
-              wrap
-              options={[1, 2, 3, 4, 5].map((value) => ({ value, label: String(value) }))}
-            />
-            <p className="max-w-xs text-xs leading-5 text-content-subtle">
+            <p className="mt-2 max-w-xs text-xs leading-5 text-gray-500">
+              Gunakan Authenticated ketika data user tersedia.
+            </p>
+          </div>
+
+          <div>
+            <ControlLabel>Jumlah menu</ControlLabel>
+            <div className="mt-2">
+              <Segmented
+                label="Pilih jumlah menu"
+                value={menuCount}
+                onChange={setMenuCount}
+                itemClassName="w-9 justify-center"
+                wrap
+                options={[1, 2, 3, 4, 5].map((value) => ({ value, label: String(value) }))}
+              />
+            </div>
+            <p className="mt-2 max-w-xs text-xs leading-5 text-gray-500">
               Jumlah menu mengikuti jumlah item pada prop <code>items</code>.
             </p>
           </div>
 
-          <div className="space-y-2">
-            <div className="block">
-              <ControlLabel>Search</ControlLabel>
-            </div>
-            <Segmented
-              label="Tampilkan search"
-              value={searchEnabled}
-              onChange={setSearchEnabled}
-              options={[
-                { value: true, label: "On" },
-                { value: false, label: "Off" },
-              ]}
-            />
-            <p className="max-w-xs text-xs leading-5 text-content-subtle">
-              Matikan jika Navbar tidak membutuhkan fitur pencarian.
-            </p>
-          </div>
-
-          {state === "guest" && (
-            <div className="space-y-2">
-              <div className="block">
-                <ControlLabel>Guest actions</ControlLabel>
-              </div>
+          <div>
+            <ControlLabel>Search</ControlLabel>
+            <div className="mt-2">
               <Segmented
-                label="Tampilkan guest actions"
-                value={guestActionsEnabled}
-                onChange={setGuestActionsEnabled}
+                label="Tampilkan search"
+                value={searchEnabled}
+                onChange={setSearchEnabled}
                 options={[
                   { value: true, label: "On" },
                   { value: false, label: "Off" },
                 ]}
               />
-              <p className="max-w-xs text-xs leading-5 text-content-subtle">
-                Menampilkan aksi Masuk dan Daftar untuk pengguna yang belum terautentikasi.
+            </div>
+            <p className="mt-2 max-w-xs text-xs leading-5 text-gray-500">
+              Matikan jika Navbar tidak membutuhkan pencarian.
+            </p>
+          </div>
+
+          {state === "guest" && (
+            <div>
+              <ControlLabel>Guest actions</ControlLabel>
+              <fieldset
+                disabled={guestActionsDisabled}
+                className={
+                  guestActionsDisabled
+                    ? "mt-2 w-fit cursor-not-allowed opacity-50 [&_button]:cursor-not-allowed"
+                    : "mt-2 w-fit"
+                }
+              >
+                <Segmented
+                  label="Tampilkan guest actions"
+                  value={guestActionsEnabled}
+                  onChange={setGuestActionsEnabled}
+                  options={[
+                    { value: true, label: "On" },
+                    { value: false, label: "Off" },
+                  ]}
+                />
+              </fieldset>
+              <p className="mt-2 max-w-xs text-xs leading-5 text-gray-500">
+                {guestActionsDisabled
+                  ? "Hanya digunakan pada Front Office."
+                  : "Menampilkan aksi Masuk dan Daftar untuk guest."}
               </p>
             </div>
           )}
 
-          <div className="space-y-2">
-            <div className="block">
-              <ControlLabel>Menu position</ControlLabel>
-            </div>
+          <div>
+            <ControlLabel>Menu position</ControlLabel>
             <fieldset
               disabled={menuPositionDisabled}
               className={
                 menuPositionDisabled
-                  ? "w-fit cursor-not-allowed opacity-50 [&_button]:cursor-not-allowed"
-                  : "w-fit"
+                  ? "mt-2 w-fit cursor-not-allowed opacity-50 [&_button]:cursor-not-allowed"
+                  : "mt-2 w-fit"
               }
             >
               <Segmented
@@ -470,13 +552,15 @@ function NavbarPlayground() {
                 ]}
               />
             </fieldset>
-            <p className="max-w-xs text-xs leading-5 text-content-subtle">{menuPositionHelp}</p>
+            <p className="mt-2 max-w-xs text-xs leading-5 text-gray-500">{menuPositionHelp}</p>
           </div>
         </div>
-      </div>
+      </Section>
 
-      <CodeBlock>{code}</CodeBlock>
-    </div>
+      <Section title="Penggunaan">
+        <CodeBlock>{code}</CodeBlock>
+      </Section>
+    </>
   );
 }
 
@@ -502,10 +586,13 @@ export function NavbarDesktopPreview({
   const guestActionsEnabled =
     playground ? params.get("navbarGuestActions") !== "off" : variant === "guest";
   const menuPosition = params.get("navbarMenuPosition") === "left" ? "left" : "right";
+  const navbarVariant =
+    params.get("navbarVariant") === "back-office" ? "back-office" : "front-office";
 
   return (
     <NavbarPreviewSurface>
       <Navbar
+        variant={navbarVariant}
         brand={<DemoBrand />}
         brandLabel="KOMDIGI — Beranda"
         items={figmaMenuItems[effectiveMenuCount]}
@@ -550,6 +637,8 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
   const searchEnabled = !playground || params.get("navbarSearch") !== "off";
   const guestActionsEnabled = !playground || params.get("navbarGuestActions") !== "off";
   const menuPosition = params.get("navbarMenuPosition") === "left" ? "left" : "right";
+  const navbarVariant =
+    params.get("navbarVariant") === "back-office" ? "back-office" : "front-office";
 
   return (
     <NavbarPreviewSurface
@@ -560,6 +649,7 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
       }}
     >
       <Navbar
+        variant={navbarVariant}
         key={navigationInstanceKey}
         brand={<DemoBrand />}
         brandHref="/"
@@ -609,7 +699,7 @@ const automaticAccessibility = [
   "Mencegah navigation item disabled diaktifkan.",
   "Menyembunyikan icon dekoratif dari assistive technology.",
   "Menyampaikan status hamburger dan label notification secara aksesibel.",
-  "Menyediakan trigger conditional yang aksesibel untuk navigasi sekunder mobile.",
+  "Mengelola Sidebar mobile dan, khusus Back Office, trigger serta Drawer navigasi sekunder.",
 ];
 
 const consumerAccessibility = [
@@ -625,22 +715,138 @@ export function NavbarPage() {
     <ComponentPage
       eyebrow="Components · Navbar"
       title="Navbar"
-      description="Navbar digunakan sebagai navigasi utama di bagian atas aplikasi. Komponen ini mendukung menu, pencarian, aksi untuk guest, dan akun pengguna pada kondisi authenticated. Gunakan Playground untuk menyesuaikan konfigurasi dan melihat kode implementasinya."
+      description="Navbar digunakan sebagai navigasi utama di bagian atas aplikasi. Komponen ini mendukung menu, pencarian, aksi untuk guest, serta akun pengguna pada kondisi authenticated."
     >
-      <Section title="Playground">
-        <div className="space-y-4">
-          <p className="text-body-sm leading-6 text-content-subtle">
-            Gunakan controls untuk melihat bagaimana public props mengubah komposisi Navbar dan kode
-            implementasinya.
-          </p>
-          <NavbarPlayground />
+      <Section title="States">
+        <div className="grid gap-5">
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Guest</h3>
+            <p className="mt-2 mb-3 max-w-2xl text-body-sm leading-6 text-gray-500">
+              Digunakan ketika pengguna belum terautentikasi. Navbar dapat menampilkan aksi Masuk
+              dan Daftar.
+            </p>
+            <Demo>
+              <ScaledDesktopFrame
+                title="Preview statis Navbar Guest"
+                src="?#/preview/navbar/desktop-guest-3"
+                embedded
+              />
+            </Demo>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Authenticated</h3>
+            <p className="mt-2 mb-3 max-w-2xl text-body-sm leading-6 text-gray-500">
+              Digunakan ketika data pengguna tersedia. Guest actions digantikan oleh notification
+              dan user controls.
+            </p>
+            <Demo>
+              <ScaledDesktopFrame
+                title="Preview statis Navbar Authenticated"
+                src="?#/preview/navbar/desktop-authenticated-3"
+                embedded
+              />
+            </Demo>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Variants">
+        <div className="grid gap-5">
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Front Office</h3>
+            <p className="mt-2 mb-3 max-w-2xl text-body-sm leading-6 text-gray-500">
+              Digunakan untuk layanan publik. Desktop menampilkan brand, sedangkan mobile memakai
+              Hamburger di kanan untuk membuka Sidebar tanpa secondary Drawer.
+            </p>
+            <Demo>
+              <ScaledDesktopFrame
+                title="Preview statis Front Office"
+                src="?navbarVariant=front-office#/preview/navbar/desktop-guest-3"
+                embedded
+              />
+            </Demo>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Back Office</h3>
+            <p className="mt-2 mb-3 max-w-2xl text-body-sm leading-6 text-gray-500">
+              Digunakan sebagai application shell. Desktop tidak menampilkan brand; pada mobile,
+              Hamburger, brand, Search, avatar opsional, dan trigger Drawer tersusun dalam satu
+              baris.
+            </p>
+            <Demo>
+              <ScaledDesktopFrame
+                title="Preview statis Back Office"
+                src="?navbarVariant=back-office#/preview/navbar/desktop-authenticated-3"
+                embedded
+                referenceWidth={1184}
+              />
+            </Demo>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Navigation">
+        <p className="mb-4 max-w-2xl text-body-sm leading-6 text-gray-500">
+          Bentuk setiap <code>NavbarItem</code> menentukan cara item berperilaku sebagai halaman,
+          navigasi sekunder, atau submenu.
+        </p>
+        <div className="grid gap-5 md:grid-cols-3">
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Primary navigation</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">href</p>
+            <p className="mt-2 text-body-sm leading-6 text-gray-500">
+              Item dengan href mengarahkan pengguna langsung ke halaman utama.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Secondary navigation</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">href + children</p>
+            <p className="mt-2 text-body-sm leading-6 text-gray-500">
+              Item dengan href dan children memiliki halaman utama serta navigasi sekunder. Pada
+              Back Office mobile, navigasi ini dibuka melalui trigger Drawer.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Submenu</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">children</p>
+            <p className="mt-2 text-body-sm leading-6 text-gray-500">
+              Item dengan children tanpa href berfungsi sebagai submenu dan menggunakan chevron
+              untuk membuka item turunannya.
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      <NavbarDocumentationDemo />
+
+      <Section title="Responsive">
+        <div className="grid gap-6 md:grid-cols-2">
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Desktop</h3>
+            <p className="mt-2 max-w-2xl text-body-sm leading-6 text-gray-500">
+              Front Office menampilkan brand, Search, navigation, dan actions atau user controls;
+              menuPosition mengatur grup menu. Back Office menampilkan Search di kiri serta
+              navigation dan user controls di kanan tanpa brand.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Mobile</h3>
+            <p className="mt-2 max-w-2xl text-body-sm leading-6 text-gray-500">
+              Front Office memakai Hamburger kanan dan Sidebar kiri tanpa Drawer. Back Office
+              memakai satu baris dengan Hamburger kiri, brand, Search, avatar opsional, dan trigger
+              Drawer kanan ketika halaman aktif memiliki navigasi sekunder. Notification Bell tidak
+              tampil pada authenticated mobile.
+            </p>
+          </div>
         </div>
       </Section>
 
       <Section title="Accessibility">
-        <div className="grid gap-4 md:grid-cols-2">
-          <article className="ds-card p-5">
-            <h3 className="font-black text-content">Ditangani otomatis oleh Navbar</h3>
+        <div className="grid gap-6 md:grid-cols-2">
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Ditangani otomatis oleh Navbar</h3>
             <ul className="mt-3 space-y-2 text-body-sm leading-6 text-content-subtle">
               {automaticAccessibility.map((item) => (
                 <li key={item} className="flex gap-2">
@@ -649,10 +855,10 @@ export function NavbarPage() {
                 </li>
               ))}
             </ul>
-          </article>
+          </div>
 
-          <article className="ds-card p-5">
-            <h3 className="font-black text-content">Perlu diperhatikan consumer</h3>
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Perlu diperhatikan consumer</h3>
             <ul className="mt-3 space-y-2 text-body-sm leading-6 text-content-subtle">
               {consumerAccessibility.map((item) => (
                 <li key={item} className="flex gap-2">
@@ -661,32 +867,16 @@ export function NavbarPage() {
                 </li>
               ))}
             </ul>
-          </article>
-        </div>
-      </Section>
-
-      <Section title="Responsive behavior">
-        <div className="grid gap-4 md:grid-cols-2">
-          <article className="ds-card p-5">
-            <h3 className="font-black text-content">Desktop</h3>
-            <p className="mt-2 text-body-sm leading-6 text-content-subtle">
-              Navigation ditampilkan horizontal bersama guest actions atau user controls. Prop
-              menuPosition mengatur posisi grup menu pada tampilan desktop.
-            </p>
-          </article>
-          <article className="ds-card p-5">
-            <h3 className="font-black text-content">Mobile</h3>
-            <p className="mt-2 text-body-sm leading-6 text-content-subtle">
-              Navigasi utama dibuka melalui sidebar dari kiri. Jika menu aktif memiliki navigasi
-              sekunder, trigger tambahan ditampilkan untuk membuka drawer dari kanan. Search tetap
-              berada di luar navigation surface dan notification Bell tidak ditampilkan pada
-              authenticated mobile.
-            </p>
-          </article>
+          </div>
         </div>
       </Section>
 
       <Section title="Properties">
+        <p className="mb-4 max-w-2xl text-body-sm leading-6 text-gray-500">
+          Pada <code>NavbarItem</code>, <code>href</code> membuat primary navigation link,
+          kombinasi <code>href + children</code> menyediakan secondary navigation context untuk
+          Drawer Back Office, dan <code>children</code> tanpa <code>href</code> membuat true submenu.
+        </p>
         <PropsTable rows={navbarProps} />
       </Section>
     </ComponentPage>

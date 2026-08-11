@@ -12,6 +12,7 @@ type NavbarContextItem = Extract<NavbarItem, { href: string; children: NavbarSub
 interface NavbarMobilePanelProps {
   sidebarId: string
   drawerId: string
+  drawerEnabled: boolean
   sidebarOpen: boolean
   drawerItem?: NavbarContextItem
   sidebarCloseRef: RefObject<HTMLButtonElement | null>
@@ -88,6 +89,7 @@ function MobileLink({
 export function NavbarMobilePanel({
   sidebarId,
   drawerId,
+  drawerEnabled,
   sidebarOpen,
   drawerItem,
   sidebarCloseRef,
@@ -104,7 +106,7 @@ export function NavbarMobilePanel({
   const [openNestedItemId, setOpenNestedItemId] = useState<string | null>(null)
   const navigationItems = items.filter((item) => isLinkItem(item) || isSectionItem(item))
   const accountItems = user?.items?.filter((item) => typeof item.href === 'string') ?? []
-  const drawerOpen = drawerItem !== undefined
+  const drawerOpen = drawerEnabled && drawerItem !== undefined
   const surfaceOpen = sidebarOpen || drawerOpen
   const drawerHeadingId = `${drawerId}-heading`
 
@@ -269,19 +271,20 @@ export function NavbarMobilePanel({
         )}
       </aside>
 
-      <aside
-        id={drawerId}
-        data-navbar-mobile-drawer
-        className={cn(
-          'fixed inset-y-0 right-0 z-50 flex w-[88vw] max-w-[360px] flex-col overflow-y-auto border-l border-border bg-surface shadow-soft transition-[transform,visibility] duration-200 motion-reduce:transition-none',
-          drawerOpen
-            ? 'visible translate-x-0'
-            : 'invisible translate-x-full pointer-events-none',
-        )}
-        aria-labelledby={drawerItem ? drawerHeadingId : undefined}
-        aria-hidden={!drawerOpen}
-      >
-        {drawerItem && (
+      {drawerEnabled && (
+        <aside
+          id={drawerId}
+          data-navbar-mobile-drawer
+          className={cn(
+            'fixed inset-y-0 right-0 z-50 flex w-[88vw] max-w-[360px] flex-col overflow-y-auto border-l border-border bg-surface shadow-soft transition-[transform,visibility] duration-200 motion-reduce:transition-none',
+            drawerOpen
+              ? 'visible translate-x-0'
+              : 'invisible translate-x-full pointer-events-none',
+          )}
+          aria-labelledby={drawerItem ? drawerHeadingId : undefined}
+          aria-hidden={!drawerOpen}
+        >
+          {drawerItem && (
           <>
             <div className="flex min-h-16 items-center justify-between gap-3 border-b border-border px-4 py-3">
               <h2 id={drawerHeadingId} className="truncate text-base font-bold text-content">
@@ -318,8 +321,9 @@ export function NavbarMobilePanel({
               </ul>
             </nav>
           </>
-        )}
-      </aside>
+          )}
+        </aside>
+      )}
     </div>
   )
 }

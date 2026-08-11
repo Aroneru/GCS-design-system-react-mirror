@@ -5,6 +5,7 @@ import { cn } from '../../utils/cn'
 
 interface NavbarUserMenuProps {
   user: NavbarUser
+  mobileAvatarClassName?: string
   activeHref?: string
   menuId: string
   open: boolean
@@ -33,6 +34,7 @@ function isActive(item: NavbarSubItem, activeHref?: string) {
 
 export function NavbarUserMenu({
   user,
+  mobileAvatarClassName,
   activeHref,
   menuId,
   open,
@@ -77,7 +79,12 @@ export function NavbarUserMenu({
   }, [hasMenu, onOpenChange, open])
 
   const avatar = (compact: boolean) => (
-    <span className="grid size-8 shrink-0 place-items-center overflow-hidden rounded-full bg-surface-subtle text-sm font-bold text-content">
+    <span
+      className={cn(
+        'grid shrink-0 place-items-center overflow-hidden rounded-full bg-surface-subtle text-sm font-bold text-content',
+        compact ? (mobileAvatarClassName ?? 'size-8') : 'size-8',
+      )}
+    >
       {showImage ? (
         <img
           src={user.avatarSrc}

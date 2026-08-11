@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { Bell } from "flowbite-react-icons/solid";
-import { ArrowRightToBracket, Bars, Edit, List } from "../icons/outline";
+import { ArrowRightToBracket, Bars, BarsFromLeft, Edit } from "../icons/outline";
 import { Button } from "./Button";
 import { Icon } from "./Icon";
 import { cn } from "../utils/cn";
@@ -117,9 +117,12 @@ export type NavbarNotification =
     });
 
 export type NavbarMenuPosition = "left" | "right";
+export type NavbarVariant = "front-office" | "back-office";
 
-const mobileNavigationTriggerClasses =
-  "grid size-10 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600";
+const mobileNavigationTriggerBaseClasses =
+  "grid shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600";
+const mobileNavigationTriggerClasses = `${mobileNavigationTriggerBaseClasses} size-[30px]`;
+const mobileBackOfficeNavigationTriggerClasses = `${mobileNavigationTriggerBaseClasses} size-[30px]`;
 
 type NavbarSectionItem = Extract<NavbarItem, { children: NavbarSubItem[] }>;
 type NavbarContextItem = Extract<
@@ -159,6 +162,7 @@ interface NavbarPropsBase extends Omit<HTMLAttributes<HTMLElement>, "children"> 
   user?: NavbarUser;
   notification?: NavbarNotification;
   menuPosition?: NavbarMenuPosition;
+  variant?: NavbarVariant;
   ariaLabel?: string;
   onNavigate?: (
     item: NavbarItem | NavbarSubItem,
@@ -194,7 +198,7 @@ function GuestAction({
         <ArrowRightToBracket aria-hidden="true" focusable="false" />
       </Icon>
     ) : (
-      <Icon className="size-[14px]">
+      <Icon className="size-[15px]">
         <Edit aria-hidden="true" focusable="false" />
       </Icon>
     );
@@ -346,6 +350,7 @@ export function Navbar({
   user,
   notification,
   menuPosition = "right",
+  variant = "front-office",
   ariaLabel = "Navigasi utama",
   onNavigate,
   mobileOpen,
@@ -375,13 +380,20 @@ export function Navbar({
   const searchValue = search?.value ?? uncontrolledSearchValue;
   const isMobileControlled = mobileOpen !== undefined;
   const isMobileOpen = isMobileControlled ? mobileOpen : uncontrolledMobileOpen;
-  const showGuestActions = !user && Boolean(guestActions?.login || guestActions?.register);
+  const isBackOffice = variant === "back-office";
+  const showGuestActions =
+    !isBackOffice && !user && Boolean(guestActions?.login || guestActions?.register);
   const activePrimaryItem = findActivePrimaryItem(items, activeHref);
   const activeMobileSection =
-    activePrimaryItem && isNavbarContextItem(activePrimaryItem) ? activePrimaryItem : undefined;
+    isBackOffice && activePrimaryItem && isNavbarContextItem(activePrimaryItem)
+      ? activePrimaryItem
+      : undefined;
   const openMobileDrawerItem = items.find(
     (item): item is NavbarContextItem =>
-      isNavbarContextItem(item) && item.id === openMobileDrawerItemId && !item.disabled,
+      isBackOffice &&
+      isNavbarContextItem(item) &&
+      item.id === openMobileDrawerItemId &&
+      !item.disabled,
   );
   const mobileDrawerOpen = openMobileDrawerItem !== undefined;
 
@@ -444,6 +456,13 @@ export function Navbar({
   }, [user]);
 
   useEffect(() => {
+    if (isBackOffice) return;
+
+    const closeDrawerTimer = window.setTimeout(() => setOpenMobileDrawerItemId(null), 0);
+    return () => window.clearTimeout(closeDrawerTimer);
+  }, [isBackOffice]);
+
+  useEffect(() => {
     if (!isMobileOpen && !mobileDrawerOpen) return;
 
     const closeFromEscape = (event: KeyboardEvent) => {
@@ -491,32 +510,100 @@ export function Navbar({
     return () => desktopQuery.removeEventListener("change", synchronizeDesktop);
   }, [handleMobileOpenChange, isMobileOpen]);
 
+  const mobileHamburger = (
+    <button
+      ref={hamburgerRef}
+      type="button"
+      className={cn(
+        isBackOffice
+          ? mobileBackOfficeNavigationTriggerClasses
+          : mobileNavigationTriggerClasses,
+        "lg:hidden",
+      )}
+      aria-label={isMobileOpen ? "Tutup navigasi utama" : "Buka navigasi utama"}
+      aria-expanded={isMobileOpen}
+      aria-controls={mobilePanelId}
+      onClick={() => {
+        const nextOpen = !isMobileOpen;
+        handleMobileOpenChange(nextOpen);
+        if (nextOpen) window.setTimeout(() => mobileSidebarCloseRef.current?.focus(), 50);
+      }}
+    >
+      <Icon className="size-[18px]">
+        <Bars aria-hidden="true" focusable="false" />
+      </Icon>
+    </button>
+  );
+
   return (
     <header className={cn("w-full text-content", className)} {...props}>
-      <div className="border-b border-border bg-surface">
-        <div className="mx-auto w-full max-w-7xl px-4 lg:px-8">
-          <div className="flex w-full min-w-0 items-center pt-4 pb-0 lg:h-[93px] lg:gap-4 lg:py-0 2xl:gap-6">
+      <div
+        className={cn(
+          "border-b border-border bg-surface",
+          isBackOffice && "h-[78px] lg:h-auto",
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto w-full lg:px-8",
+            isBackOffice ? "max-w-7xl" : "max-w-none min-[1400px]:!px-14",
+            "px-4",
+            isBackOffice && "flex h-full items-center lg:block lg:h-auto",
+          )}
+        >
+          <div
+            className={cn(
+              "flex w-full min-w-0 items-center lg:h-[93px] lg:gap-4 lg:py-0 2xl:gap-6",
+              isBackOffice ? "h-[46px] gap-2" : "pt-4 pb-0",
+            )}
+          >
+          {isBackOffice && mobileHamburger}
           <a
             href={brandHref}
-            className="inline-flex shrink-0 items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+            className={cn(
+              "inline-flex shrink-0 items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
+              isBackOffice &&
+                "h-[46px] w-16 flex-col justify-center text-center [&>*]:flex-col [&>*]:items-center [&>*]:gap-px [&>*>span:first-child]:!size-8 [&>*>span:last-child]:!w-auto [&>*>span:last-child]:text-[10px] [&>*>span:last-child]:leading-3 [&>*>span:last-child]:whitespace-nowrap lg:hidden",
+            )}
             aria-label={brandLabel}
           >
             {brand}
           </a>
+          {isBackOffice && search && (
+            <div className="min-w-0 flex-1 lg:hidden">
+              <NavbarSearchForm
+                search={search}
+                inputId={mobileSearchInputId}
+                value={searchValue}
+                className="w-full"
+                onSubmit={handleSearchSubmit}
+                onValueChange={handleSearchValueChange}
+              />
+            </div>
+          )}
+          {isBackOffice && !search && (
+            <div className="min-w-0 flex-1 lg:hidden" aria-hidden="true" />
+          )}
           {search && (
             <NavbarSearchForm
               search={search}
               inputId={searchInputId}
               value={searchValue}
-              className="hidden w-[348px] shrink-0 lg:block"
+              className={cn(
+                "hidden shrink-0 lg:block",
+                isBackOffice
+                  ? "w-[348px]"
+                  : "lg:w-16 min-[1100px]:!w-[130px] min-[1184px]:!w-[220px] min-[1280px]:!w-[260px] min-[1400px]:!w-[348px]",
+              )}
               onSubmit={handleSearchSubmit}
               onValueChange={handleSearchValueChange}
             />
           )}
           <div
             className={cn(
-              "ml-auto flex min-w-0 items-center lg:gap-4 2xl:gap-6",
-              !user && menuPosition === "left" && "lg:flex-1 lg:justify-between",
+              "ml-auto min-w-0 items-center lg:flex lg:gap-4 2xl:gap-6",
+              user ? "flex" : "hidden",
+              !isBackOffice && menuPosition === "left" && "lg:flex-1 lg:justify-between",
             )}
           >
             <NavbarNavigation
@@ -540,13 +627,14 @@ export function Navbar({
             )}
             {user && (
               <div className="flex min-w-0 shrink-0 items-center gap-1">
-                {notification && (
+                {notification && !isBackOffice && (
                   <div className="hidden lg:block">
                     <NotificationControl notification={notification} />
                   </div>
                 )}
                 <NavbarUserMenu
                   user={user}
+                  mobileAvatarClassName="size-6"
                   activeHref={activeHref}
                   menuId={userMenuId}
                   open={userMenuOpen}
@@ -556,36 +644,44 @@ export function Navbar({
               </div>
             )}
           </div>
-          <button
-            ref={hamburgerRef}
-            type="button"
-            className={cn(
-              mobileNavigationTriggerClasses,
-              "lg:hidden",
-              user ? "ml-2" : "ml-auto",
-            )}
-            aria-label={isMobileOpen ? "Tutup navigasi utama" : "Buka navigasi utama"}
-            aria-expanded={isMobileOpen}
-            aria-controls={mobilePanelId}
-            onClick={() => {
-              const nextOpen = !isMobileOpen;
-              handleMobileOpenChange(nextOpen);
-              if (nextOpen) window.setTimeout(() => mobileSidebarCloseRef.current?.focus(), 50);
-            }}
-          >
-            <Icon className="size-4">
-              <Bars aria-hidden="true" focusable="false" />
-            </Icon>
-          </button>
+          {!isBackOffice && (
+            <div className={cn("lg:hidden", user ? "ml-2" : "ml-auto")}>{mobileHamburger}</div>
+          )}
+          {isBackOffice && activeMobileSection && (
+            <button
+              ref={mobileDrawerTriggerRef}
+              type="button"
+              className={cn(
+                mobileBackOfficeNavigationTriggerClasses,
+                "lg:hidden",
+              )}
+              aria-label={`${mobileDrawerOpen ? "Tutup" : "Buka"} navigasi sekunder ${activeMobileSection.label}`}
+              aria-expanded={mobileDrawerOpen}
+              aria-controls={mobileDrawerId}
+              onClick={() => {
+                if (mobileDrawerOpen) {
+                  handleMobileDrawerClose();
+                  return;
+                }
+
+                setOpenMobileDrawerItemId(activeMobileSection.id);
+                window.setTimeout(() => mobileDrawerCloseRef.current?.focus(), 50);
+              }}
+            >
+              <Icon className="size-[18px]">
+                <BarsFromLeft aria-hidden="true" focusable="false" />
+              </Icon>
+            </button>
+          )}
           </div>
 
-          {search && (
-            <div className="mt-4 pb-4 lg:hidden">
+          {!isBackOffice && search && (
+            <div className="mt-4 pb-[15px] lg:hidden">
               <NavbarSearchForm
                 search={search}
                 inputId={mobileSearchInputId}
                 value={searchValue}
-                className="w-full"
+                className="w-full max-w-[348px]"
                 onSubmit={handleSearchSubmit}
                 onValueChange={handleSearchValueChange}
               />
@@ -594,37 +690,12 @@ export function Navbar({
         </div>
       </div>
 
-      {activeMobileSection && (
-        <div className="mx-auto flex w-full max-w-7xl justify-end px-4 py-3 lg:hidden">
-          <button
-            ref={mobileDrawerTriggerRef}
-            type="button"
-            className={mobileNavigationTriggerClasses}
-            aria-label={`${mobileDrawerOpen ? "Tutup" : "Buka"} navigasi sekunder ${activeMobileSection.label}`}
-            aria-expanded={mobileDrawerOpen}
-            aria-controls={mobileDrawerId}
-            onClick={() => {
-              if (mobileDrawerOpen) {
-                handleMobileDrawerClose();
-                return;
-              }
-
-              setOpenMobileDrawerItemId(activeMobileSection.id);
-              window.setTimeout(() => mobileDrawerCloseRef.current?.focus(), 50);
-            }}
-          >
-            <Icon className="size-5">
-              <List aria-hidden="true" focusable="false" />
-            </Icon>
-          </button>
-        </div>
-      )}
-
       <NavbarMobilePanel
           sidebarId={mobilePanelId}
           drawerId={mobileDrawerId}
           sidebarOpen={isMobileOpen}
           drawerItem={openMobileDrawerItem}
+          drawerEnabled={isBackOffice}
           sidebarCloseRef={mobileSidebarCloseRef}
           drawerCloseRef={mobileDrawerCloseRef}
           items={items}
