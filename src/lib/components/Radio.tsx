@@ -8,7 +8,7 @@ export type RadioPlatform = 'default' | 'mobile'
 export type RadioState = 'default' | 'inactive'
 
 /** Warna aksen per aplikasi — dipakai cincin saat pilihan dipilih. */
-export type RadioApplication = 'default' | 'portal' | 'simaya'
+export type RadioApplication = 'default' | 'simaya'
 
 /**
  * Ukuran kontrol, jarak turun agar sejajar tengah baris label, dan ukuran teks
@@ -26,7 +26,6 @@ const platforms: Record<RadioPlatform, { control: string; offset: string; label:
  */
 const accents: Record<RadioApplication, string> = {
   default: 'checked:border-primary-700 focus-visible:outline-primary-700',
-  portal: 'checked:border-blue-portal-500 focus-visible:outline-blue-portal-500',
   simaya: 'checked:border-purple-500 focus-visible:outline-purple-500',
 }
 

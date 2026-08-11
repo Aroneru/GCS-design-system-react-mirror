@@ -75,6 +75,14 @@ export function ButtonPage() {
 >
   ${type === "iconOnly" ? "<Messages />" : "Button"}
 </Button>`;
+  const themes: { value: ButtonTheme; label: string }[] = [
+    { value: "primary", label: "Primary" },
+    { value: "green", label: "Green" },
+    { value: "gray", label: "Gray" },
+    { value: "purple", label: "Purple" },
+    { value: "orange", label: "Orange" },
+    { value: "yellow", label: "Yellow" },
+  ];
 
   return (
     <ComponentPage
@@ -420,11 +428,142 @@ import { Messages } from '@tpl/design-kit-react/icons/solid'
 >
   Button
 </Button>`}
+<<<<<<< HEAD
         </CodeBlock>
       </Section>
       <Section title="Properties">
         <PropsTable rows={buttonProps} minWidth="46rem" />
       </Section>
     </ComponentPage>
+=======
+            />
+          </div>
+        </section>
+        <section>
+          <h2 className="mb-6 text-2xl font-bold text-gray-900">Properties</h2>
+
+          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-gray-200 bg-gray-50">
+                <tr>
+                  <th className="px-5 py-4 font-semibold">PROP</th>
+
+                  <th className="px-5 py-4 font-semibold">TYPE</th>
+
+                  <th className="px-5 py-4 font-semibold">DEFAULT</th>
+
+                  <th className="px-5 py-4 font-semibold">KETERANGAN</th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-gray-200">
+                <tr>
+                  <td className="px-5 py-4 font-mono text-primary-700">variant</td>
+
+                  <td className="px-5 py-4 text-gray-600">"filled" | "outline"</td>
+
+                  <td className="px-5 py-4 font-mono text-gray-600">filled</td>
+
+                  <td className="px-5 py-4 text-gray-600">Menentukan gaya Button.</td>
+                </tr>
+
+                <tr>
+                  <td className="px-5 py-4 font-mono text-primary-700">size</td>
+
+                  <td className="px-5 py-4 text-gray-600">"xs" | "s" | "base" | "l" | "xl"</td>
+
+                  <td className="px-5 py-4 font-mono text-gray-600">base</td>
+
+                  <td className="px-5 py-4 text-gray-600">Menentukan ukuran Button.</td>
+                </tr>
+
+                <tr>
+                  <td className="px-5 py-4 font-mono text-primary-700">theme</td>
+
+                  <td className="px-5 py-4 text-gray-600">
+                    primary | green | gray | purple | orange | yellow
+                  </td>
+
+                  <td className="px-5 py-4 font-mono text-gray-600">primary</td>
+
+                  <td className="px-5 py-4 text-gray-600">Menentukan warna Button.</td>
+                </tr>
+
+                <tr>
+                  <td className="px-5 py-4 font-mono text-primary-700">tone</td>
+
+                  <td className="px-5 py-4 text-gray-600">light | dark</td>
+
+                  <td className="px-5 py-4 font-mono text-gray-600">light</td>
+
+                  <td className="px-5 py-4 text-gray-600">
+                    Menentukan shade warna yang digunakan.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="px-5 py-4 font-mono text-primary-700">leftIcon</td>
+
+                  <td className="px-5 py-4 text-gray-600">ReactNode</td>
+
+                  <td className="px-5 py-4 font-mono text-gray-600">-</td>
+
+                  <td className="px-5 py-4 text-gray-600">
+                    Icon yang ditampilkan di sebelah kiri.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="px-5 py-4 font-mono text-primary-700">rightIcon</td>
+
+                  <td className="px-5 py-4 text-gray-600">ReactNode</td>
+
+                  <td className="px-5 py-4 font-mono text-gray-600">-</td>
+
+                  <td className="px-5 py-4 text-gray-600">
+                    Icon yang ditampilkan di sebelah kanan.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="px-5 py-4 font-mono text-primary-700">iconOnly</td>
+
+                  <td className="px-5 py-4 text-gray-600">boolean</td>
+
+                  <td className="px-5 py-4 font-mono text-gray-600">false</td>
+
+                  <td className="px-5 py-4 text-gray-600">
+                    Mengubah Button menjadi Button berbentuk icon-only.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="px-5 py-4 font-mono text-primary-700">as</td>
+
+                  <td className="px-5 py-4 text-gray-600">"button" | "a"</td>
+
+                  <td className="px-5 py-4 font-mono text-gray-600">button</td>
+
+                  <td className="px-5 py-4 text-gray-600">
+                    Menentukan elemen HTML yang digunakan.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td className="px-5 py-4 font-mono text-primary-700">disabled</td>
+
+                  <td className="px-5 py-4 text-gray-600">boolean</td>
+
+                  <td className="px-5 py-4 font-mono text-gray-600">false</td>
+
+                  <td className="px-5 py-4 text-gray-600">Menonaktifkan Button.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+>>>>>>> 9bdb714c85c750571d310c00753715cd4d8bae94
   );
 }

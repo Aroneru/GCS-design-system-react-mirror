@@ -5,7 +5,6 @@ import { DocUsage } from '../../DocUsage'
 // Primitive palette — sama persis dengan foundations/colors.blade.php.
 const palettes: { key: string; name: string; colors: [number, string][] }[] = [
   { key: 'primary', name: 'Biru (untuk identitas utama aplikasi)', colors: [[900, '#233876'], [800, '#1E429F'], [700, '#1A56DB'], [600, '#1C64F2'], [500, '#3F83F8'], [400, '#76A9FA'], [300, '#A4CAFE'], [200, '#C3DDFD'], [100, '#E1EFFE'], [50, '#EBF5FF']] },
-  { key: 'blue-portal', name: 'Biru Portal (untuk identitas ...)', colors: [[900, '#020217'], [800, '#060746'], [700, '#0B0C75'], [600, '#0F11A4'], [500, '#2D30EC'], [400, '#5B5EF0'], [300, '#5B5EF0'], [200, '#8A8CF4'], [100, '#B9BAF9'], [50, '#E8E8FD']] },
   { key: 'gray', name: 'Abu-abu (untuk teks, border, dan permukaan)', colors: [[900, '#111827'], [800, '#1F2937'], [700, '#374151'], [600, '#4B5563'], [500, '#6B7280'], [400, '#9CA3AF'], [300, '#D1D5DB'], [200, '#E5E7EB'], [100, '#F3F4F6'], [50, '#F9FAFB']] },
   { key: 'red', name: 'Merah (untuk pertanda suatu error)', colors: [[900, '#771D1D'], [800, '#9B1C1C'], [700, '#C81E1E'], [600, '#E02424'], [500, '#F05252'], [400, '#F98080'], [300, '#F8B4B4'], [200, '#FBD5D5'], [100, '#FDE8E8'], [50, '#FDF2F2']] },
   { key: 'orange', name: 'Orange (untuk pertanda suatu peringatan)', colors: [[900, '#771D1D'], [800, '#8A2C0D'], [700, '#B43403'], [600, '#D03801'], [500, '#FF5A1F'], [400, '#FF8A4C'], [300, '#FDBA8C'], [200, '#FCD9BD'], [100, '#FEECDC'], [50, '#FFF8F1']] },
