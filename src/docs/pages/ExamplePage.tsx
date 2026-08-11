@@ -6,7 +6,6 @@ import {
   Checkbox,
   Container,
   FloatingLabel,
-  Footer,
   InputField,
   Radio,
   Select,
@@ -15,7 +14,6 @@ import {
   type SelectOption,
 } from "../../lib";
 import { Envelope, Globe, User } from "../../lib/icons/outline";
-import { FacebookIcon, InstagramIcon, XIcon } from "../socialIcons";
 
 /**
  * Halaman contoh — satu formulir layanan yang memakai seluruh komponen kit
@@ -44,18 +42,8 @@ const berkasWajib = [
   { value: "domain", label: "Bukti kepemilikan domain", caption: "Tangkapan layar panel domain." },
 ];
 
-const footerMenus = [
-  { label: "Tentang tpl", url: "#" },
-  { label: "Layanan", url: "#" },
-  { label: "Pengaduan", url: "#" },
-  { label: "Kebijakan privasi", url: "#" },
-];
-
-const footerSocials = [
-  { label: "Instagram", url: "#", icon: InstagramIcon },
-  { label: "X", url: "#", icon: XIcon },
-  { label: "Facebook", url: "#", icon: FacebookIcon },
-];
+// Footer tidak lagi dirender di sini: DocsLayout sudah memasangnya untuk
+// seluruh halaman, jadi dua footer akan bertumpuk kalau halaman ini punya sendiri.
 
 export function ExamplePage() {
   const [jenis, setJenis] = useState("badan");

@@ -183,7 +183,8 @@ export function CheckboxUsulanPage() {
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth="max-w-[420px]">
+        {/* max-w-fit: blok menyusut seukuran isinya, jadi mx-auto benar-benar memusatkannya. */}
+        <Stage maxWidth="max-w-fit">
           <div className="space-y-4">
             {berkas.map((b) => (
               <Checkbox

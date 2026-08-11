@@ -194,7 +194,13 @@ export function RadioUsulanPage() {
           langsung terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth="max-w-[420px]">
+        {/*
+          max-w-fit, bukan lebar tetap: kolom 420px membuat kelompok pilihan
+          menempel di tepi kirinya dan tampak melenceng dari tengah kartu.
+          Dengan fit-content, blok menyusut seukuran isinya lalu mx-auto
+          benar-benar memusatkannya.
+        */}
+        <Stage maxWidth="max-w-fit">
           <div className="space-y-4">
             {kewarganegaraan.map((o) => (
               <Radio
