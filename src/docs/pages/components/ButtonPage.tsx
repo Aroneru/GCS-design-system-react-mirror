@@ -2,7 +2,17 @@ import { useState } from "react";
 import { Messages } from "flowbite-react-icons/solid";
 import { Button, type ButtonTheme, type ButtonVariant } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } from "../../pageKit";
+import { Demo, H, Segmented } from "../../pageKit";
+import {
+  Control,
+  Controls,
+  FlowSection,
+  Lead,
+  SectionCode,
+  Stage,
+  UsulanPage,
+  type TocEntry,
+} from "../../usulanKit";
 
 const sizes = ["xs", "s", "base", "l", "xl"] as const;
 type ButtonSize = (typeof sizes)[number];
@@ -23,22 +33,35 @@ const themeOptions: { value: ButtonTheme; label: string }[] = [
   { value: "yellow", label: "Yellow" },
 ];
 
+const toneOptions = [
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
+
 const typeOptions = [
   { value: "button", label: "Button" },
   { value: "iconOnly", label: "Icon Only" },
 ];
 
 const buttonProps: PropRow[] = [
-  ["variant", '"filled" | "outline"', "filled", "Gaya utama tombol: solid atau outline."],
+  ["as", '"button" | "a"', "button", "Menentukan elemen yang dirender. Bisa jadi anchor."],
+  ["type", '"button" | "iconOnly"', "button", "Menentukan tipe tombol."],
   ["size", '"xs" | "s" | "base" | "l" | "xl"', "base", "Menentukan ukuran tombol."],
-  ["theme", "ButtonTheme", "primary", "Warna aksen tombol."],
+  ["variant", '"filled" | "outline"', "filled", "Gaya utama tombol: solid atau outline."],
   ["tone", '"light" | "dark"', "light", "Menyetel kontras warna untuk variant atau theme."],
   ["leftIcon", "ReactNode", "undefined", "Ikon di sisi kiri tombol."],
   ["rightIcon", "ReactNode", "undefined", "Ikon di sisi kanan tombol."],
-  ["iconOnly", "boolean", "false", "Menyembunyikan label dan menampilkan ikon saja."],
-  ["as", '"button" | "a"', "button", "Menentukan elemen yang dirender. Bisa jadi anchor."],
-  ["disabled", "boolean", "false", "Menonaktifkan interaksi."],
-  ["…props", "ButtonHTMLAttributes", "—", "Seluruh atribut button atau anchor yang valid."],
+  ["theme", "ButtonTheme", "primary", "Warna aksen tombol."],
+];
+
+const toc: TocEntry[] = [
+  { id: "button", label: "Button & Sizes" },
+  { id: "icon-only", label: "Icon Only & Sizes" },
+  { id: "variants", label: "Variants" },
+  { id: "themes", label: "Themes" },
+  { id: "playground", label: "Playground" },
+  { id: "penggunaan", label: "Penggunaan" },
+  { id: "properties", label: "Properties" },
 ];
 
 export function ButtonPage() {
@@ -52,48 +75,34 @@ export function ButtonPage() {
   const [asLink, setAsLink] = useState<"button" | "a">("button");
 
   const buttonCode = `<Button
-  as="button"
+  as="${asLink}"
   variant="${variant}"
   theme="${theme}"
   tone="${tone}"
   size="${selectedSize}"${
     type === "iconOnly"
       ? `
-  iconOnly`
+  type="iconOnly"`
       : ""
-  }${
-    showLeftIcon && type !== "iconOnly"
-      ? `
-  leftIcon={<Messages className="size-4" />}`
-      : ""
-  }${
-    showRightIcon && type !== "iconOnly"
-      ? `
-  rightIcon={<Messages className="size-4" />}`
-      : ""
+  }${showLeftIcon && type !== "iconOnly" ? '\n  leftIcon={<Messages className="size-4" />}' : ""}${
+    showRightIcon && type !== "iconOnly" ? '\n  rightIcon={<Messages className="size-4" />}' : ""
   }
 >
   ${type === "iconOnly" ? "<Messages />" : "Button"}
 </Button>`;
-  const themes: { value: ButtonTheme; label: string }[] = [
-    { value: "primary", label: "Primary" },
-    { value: "green", label: "Green" },
-    { value: "gray", label: "Gray" },
-    { value: "purple", label: "Purple" },
-    { value: "orange", label: "Orange" },
-    { value: "yellow", label: "Yellow" },
-  ];
 
   return (
-    <ComponentPage
+    <UsulanPage
       eyebrow="Components · Button"
       title="Button"
       description="Tombol untuk memicu aksi utama pada sebuah halaman atau form. Mendukung berbagai ukuran, warna, varian, dan penggunaan icon."
+      toc={toc}
     >
-      <Section title="Button & Sizes">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
-          Ukuran mengikuti sistem token, sementara ikon kiri dan kanan bisa ditambahkan sesuai
-          kebutuhan tindakan.
+      <FlowSection id="button" title="Button & Sizes">
+        <p className="mb-4 text-body-sm text-gray-500">
+          Tombol default dalam berbagai ukuran untuk membantu memilih <H>size</H> yang sesuai dengan
+          ruang layout. Tombol ditampilkan menggunakan ikon untuk memberikan gambaran untuk tombol
+          dengan ikon saat dipakai sebagai aksi utama.
         </p>
 
         <div className="mb-4 flex flex-wrap items-start justify-start gap-6">
@@ -116,25 +125,27 @@ export function ButtonPage() {
             </div>
           ))}
         </div>
-        <CodeBlock>
+        <SectionCode>
           {"<Button\n"}
-          {'as="a"\n'}
+          {"    "}
           <H>type</H>
           {'="button"\n'}
+          {"    "}
           <H>size</H>
           {'="base"\n'}
-          {'variant="filled"\n'}
-          {'theme="primary"\n'}
-          {'tone="light"\n'}
-          {'leftIcon={<Messages className="size-4" />}\n'}
-          {'rightIcon={<Messages className="size-4" />}\n'}
-          {"/>"}
-        </CodeBlock>
-      </Section>
-      <Section title="Icon Only & Sizes">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
-          Untuk aksi yang ringkas seperti toolbar, menu, atau quick action, tombol bisa dirender
-          tanpa label.
+          {'    leftIcon={<Messages className="size-3.5" />}\n'}
+          {'    rightIcon={<Messages className="size-3.5" />}\n'}
+          {"    >\n"}
+          {"    Button\n"}
+          {"</Button>"}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="icon-only" title="Icon Only & Sizes">
+        <p className="mb-4 text-body-sm text-gray-500">
+          Versi ringkas untuk aksi cepat seperti toolbar, floating action, menu, atau shortcut.
+          Tersedia dengan beberapa ukuran dan digunakan saat label tidak diperlukan atau ruang
+          layout yang sempit.
         </p>
 
         <div className="mb-4 flex flex-wrap items-start justify-start gap-6">
@@ -145,7 +156,7 @@ export function ButtonPage() {
                 variant="filled"
                 theme="primary"
                 tone="light"
-                iconOnly
+                type="iconOnly"
                 aria-label={`Icon ${size}`}
               >
                 <Messages className="size-4" />
@@ -157,24 +168,25 @@ export function ButtonPage() {
             </div>
           ))}
         </div>
-        <CodeBlock>
+        <SectionCode>
           {"<Button\n"}
-          {'as="a"\n'}
+          {"    "}
           <H>type</H>
           {'="iconOnly"\n'}
+          {"    "}
           <H>size</H>
           {'="base"\n'}
-          {'variant="filled"\n'}
-          {'theme="primary"\n'}
-          {'tone="light"\n'}
-          {"/>"}
-        </CodeBlock>
-      </Section>
+          {"    >\n"}
+          {'    <Messages className="size-4" />\n'}
+          {"</Button>"}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Variants">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
-          Varian <H>filled</H> digunakan untuk aksi utama, sedangkan varian <H>outline</H> lebih
-          sesuai untuk aksi tambahan.
+      <FlowSection id="variants" title="Variants">
+        <p className="mb-4 text-body-sm text-gray-500">
+          Variasi tombol yang itentukan oleh <H>variant</H>. Gunakan <H>filled</H> untuk aksi utama
+          yang perlu mendapat perhatian lebih, dan <H>outline</H> untuk tindakan pendukung yang
+          tetap terlihat, namun tidak terlalu dominan.
         </p>
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">
@@ -190,23 +202,22 @@ export function ButtonPage() {
             </Button>
           </Demo>
         </div>
-        <CodeBlock>
+        <SectionCode>
           {"<Button\n"}
-          {'as="a"\n'}
-          {'type="button"\n'}
-          {'size="base"\n'}
+          {'    type="button"\n'}
+          {'    size="base"\n'}
+          {"    "}
           <H>variant</H>
-          {'="filled"\n'}
-          {'theme="primary"\n'}
-          {'tone="light"\n'}
-          {'leftIcon={<Messages className="size-4" />}\n'}
-          {'rightIcon={<Messages className="size-4" />}\n'}
-          {"/>"}
-        </CodeBlock>
-      </Section>
-      <Section title="Themes">
-        <p className="mb-6 max-w-2xl text-body-sm text-gray-500">
-          Tema digunakan untuk membedakan konteks dan tingkat kepentingan suatu tindakan.
+          {'="outline"\n'}
+          {"    >\n"}
+          {"    Lihat Detail\n"}
+          {"</Button>"}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="themes" title="Themes">
+        <p className="mb-6 text-body-sm text-gray-500">
+          Tema digunakan untuk membedakan konteks dan tingkat prioritas suatu aksi.
         </p>
 
         <div className="mb-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -276,26 +287,32 @@ export function ButtonPage() {
             </p>
           </div>
         </div>
-        <CodeBlock>
+        <SectionCode>
           {"<Button\n"}
-          {'as="a"\n'}
-          {'type="button"\n'}
-          {'size="base"\n'}
-          {'variant="filled"\n'}
+          {'    type="button"\n'}
+          {'    variant="filled"\n'}
+          {"    "}
           <H>theme</H>
-          {'="primary"\n'}
+          {'="green"\n'}
+          {"    "}
           <H>tone</H>
           {'="light"\n'}
-          {"/>"}
-        </CodeBlock>
-      </Section>
-      <section>
-        <h2 className="mb-4 text-heading-3 font-black text-gray-900">Playground</h2>
+          {"    >\n"}
+          {"    Green\n"}
+          {"</Button>"}
+        </SectionCode>
+      </FlowSection>
 
-        <div className="rounded-2xl border border-border bg-surface-subtle p-6 sm:p-10">
+      <FlowSection id="playground" title="Playground">
+        <p className="mb-6 text-body-sm text-gray-500">
+          Memungkinkan Anda mencoba kombinasi prop secara langsung untuk membantu menyesuaikan
+          tombol dengan kebutuhan aplikasi Anda sebelum diimplementasikan.
+        </p>
+
+        <Stage maxWidth="max-w-[380px]">
           <div className="mx-auto flex min-h-[180px] items-center justify-center">
             <Button
-              iconOnly={type === "iconOnly"}
+              type={type === "iconOnly" ? "iconOnly" : "button"}
               as={asLink}
               href={asLink === "a" ? "/foundations/colors" : undefined}
               size={selectedSize}
@@ -308,152 +325,198 @@ export function ButtonPage() {
               {type === "iconOnly" ? <Messages className="size-4" /> : "Button"}
             </Button>
           </div>
-        </div>
+        </Stage>
 
-        <div className="mt-4 flex flex-wrap items-start gap-6">
-          <div>
-            <ControlLabel>Type</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih type"
-                value={type}
-                onChange={(value) => {
-                  const newType = value as "button" | "iconOnly";
+        <Controls>
+          <Control label="As">
+            <Segmented
+              label="Pilih render"
+              value={asLink}
+              onChange={(value) => setAsLink(value as "button" | "a")}
+              options={[
+                { value: "button", label: "Button" },
+                { value: "a", label: "Link" },
+              ]}
+            />
+          </Control>
 
-                  setType(newType);
+          <Control label="Type">
+            <Segmented
+              label="Pilih type"
+              value={type}
+              onChange={(value) => {
+                const newType = value as "button" | "iconOnly";
 
-                  if (newType === "iconOnly") {
-                    setShowLeftIcon(false);
-                    setShowRightIcon(false);
-                  }
-                }}
-                options={typeOptions}
-              />
-            </div>
-          </div>
+                setType(newType);
 
-          <div>
-            <ControlLabel>Variant</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih variant"
-                value={variant}
-                onChange={setVariant}
-                options={variantOptions}
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>Theme</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih theme"
-                value={theme}
-                onChange={setTheme}
-                options={themeOptions}
-                wrap
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>Size</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih ukuran"
-                value={selectedSize}
-                onChange={setSelectedSize}
-                options={sizeOptions}
-                wrap
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>Tone</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih tone"
-                value={tone}
-                onChange={(value) => setTone(value as "light" | "dark")}
-                options={[
-                  { value: "light", label: "Light" },
-                  { value: "dark", label: "Dark" },
-                ]}
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>Icons</ControlLabel>
-
-            <div className="mt-2">
-              <Segmented
-                label="Pilih posisi icon"
-                value={
-                  type === "iconOnly"
-                    ? "none"
-                    : showLeftIcon && showRightIcon
-                      ? "both"
-                      : showLeftIcon
-                        ? "left"
-                        : showRightIcon
-                          ? "right"
-                          : "none"
+                if (newType === "iconOnly") {
+                  setShowLeftIcon(false);
+                  setShowRightIcon(false);
                 }
-                onChange={(value) => {
-                  if (type === "iconOnly") return;
+              }}
+              options={typeOptions}
+            />
+          </Control>
 
-                  setShowLeftIcon(value === "left" || value === "both");
-                  setShowRightIcon(value === "right" || value === "both");
-                }}
-                options={[
-                  { value: "none", label: "None" },
-                  { value: "left", label: "Left" },
-                  { value: "right", label: "Right" },
-                  { value: "both", label: "Both" },
-                ]}
-              />
-            </div>
-          </div>
+          <Control label="Size">
+            <Segmented
+              label="Pilih ukuran"
+              value={selectedSize}
+              onChange={setSelectedSize}
+              options={sizeOptions}
+              wrap
+            />
+          </Control>
 
-          <div>
-            <ControlLabel>Render</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih render"
-                value={asLink}
-                onChange={(value) => setAsLink(value as "button" | "a")}
-                options={[
-                  { value: "button", label: "Button" },
-                  { value: "a", label: "Link" },
-                ]}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-      <Section title="Penggunaan">
-        <CodeBlock>
-          {`import { Button } from '@tpl/design-kit-react'
-import { Messages } from '@tpl/design-kit-react/icons/solid'
+          <Control label="Variant">
+            <Segmented
+              label="Pilih variant"
+              value={variant}
+              onChange={setVariant}
+              options={variantOptions}
+            />
+          </Control>
 
-<Button
-  as="${asLink}"
-  type="${type}"
-  variant="${variant}"
-  theme="${theme}"
-  tone="${tone}"
-  size="${selectedSize}"${showLeftIcon ? '\n  leftIcon={<Messages className="size-4" />}' : ""}${showRightIcon ? '\n  rightIcon={<Messages className="size-4" />}' : ""}
->
-  Button
-</Button>`}
-        </CodeBlock>
-      </Section>
-      <Section title="Properties">
+          <Control label="Tone">
+            <Segmented
+              label="Pilih tone"
+              value={tone}
+              onChange={(value) => setTone(value as "light" | "dark")}
+              options={[
+                { value: "light", label: "Light" },
+                { value: "dark", label: "Dark" },
+              ]}
+            />
+          </Control>
+
+          <Control label="Icons">
+            <Segmented
+              label="Pilih posisi ikon"
+              value={
+                type === "iconOnly"
+                  ? "none"
+                  : showLeftIcon && showRightIcon
+                    ? "both"
+                    : showLeftIcon
+                      ? "left"
+                      : showRightIcon
+                        ? "right"
+                        : "none"
+              }
+              onChange={(value) => {
+                if (type === "iconOnly") return;
+
+                setShowLeftIcon(value === "left" || value === "both");
+                setShowRightIcon(value === "right" || value === "both");
+              }}
+              options={[
+                { value: "none", label: "None" },
+                { value: "left", label: "Left" },
+                { value: "right", label: "Right" },
+                { value: "both", label: "Both" },
+              ]}
+            />
+          </Control>
+
+          <Control label="Theme">
+            <Segmented
+              label="Pilih theme"
+              value={theme}
+              onChange={setTheme}
+              options={themeOptions}
+              wrap
+              itemClassName="basis-1/3 justify-center"
+            />
+          </Control>
+        </Controls>
+      </FlowSection>
+
+      <FlowSection id="penggunaan" title="Penggunaan">
+        <p className="mb-6 text-body-sm text-gray-500">
+          Bagian ini menampilkan kode setelah Anda menggunakan Playground untuk kombinasi prop. Kode
+          yang tampil di sini adalah kode yang siap diimplementasikan ke aplikasi.
+        </p>
+        <SectionCode flush>
+          {"import { Button } from '@tpl/design-kit-react'\n"}
+          {"import { Messages } from '@tpl/design-kit-react/icons/solid'\n"}
+          {"\n"}
+          {"<Button\n"}
+
+          <>
+            {"    "}
+            <H>as</H>
+            {`="${asLink}"\n`}
+          </>
+
+          <>
+            {"    "}
+            <H>type</H>
+            {`="${type}"\n`}
+          </>
+
+          <>
+            {"    "}
+            <H>variant</H>
+            {`="${variant}"\n`}
+          </>
+
+          <>
+            {"    "}
+            <H>theme</H>
+            {`="${theme}"\n`}
+          </>
+
+          <>
+            {"    "}
+            <H>tone</H>
+            {`="${tone}"\n`}
+          </>
+
+          <>
+            {"    "}
+            <H>size</H>
+            {`="${selectedSize}"\n`}
+          </>
+
+          {showLeftIcon && type !== "iconOnly" && (
+            <>
+              {"    "}
+              <H>leftIcon</H>
+              {'={<Messages className="size-4" />}\n'}
+            </>
+          )}
+
+          {showRightIcon && type !== "iconOnly" && (
+            <>
+              {"    "}
+              <H>rightIcon</H>
+              {'={<Messages className="size-4" />}\n'}
+            </>
+          )}
+
+          {"    >\n"}
+
+          {type === "iconOnly" ? (
+            <>
+              {"    "}
+              {'<Messages className="size-4" />\n'}
+            </>
+          ) : (
+            "    Button\n"
+          )}
+
+          {"</Button>"}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="properties" title="Properties">
+        <p className="mb-6 text-body-sm text-gray-500">
+          Referensi semua prop yang tersedia. Digunakan untuk bisa memahami cara kerja komponen
+          tanpa harus menebak implementasinya dari kode.
+        </p>
+
         <PropsTable rows={buttonProps} minWidth="46rem" />
-      </Section>
-    </ComponentPage>
+      </FlowSection>
+    </UsulanPage>
   );
 }

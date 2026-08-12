@@ -1,6 +1,8 @@
 import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../utils/cn";
 
+export type ButtonType = "button" | "iconOnly";
+
 export type ButtonVariant = "filled" | "outline";
 
 export type ButtonSize = "xs" | "s" | "base" | "l" | "xl";
@@ -11,11 +13,11 @@ export type ButtonTone = "light" | "dark";
 
 interface CommonProps {
   children?: ReactNode;
+  type?: ButtonType;
   variant?: ButtonVariant;
   size?: ButtonSize;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
-  iconOnly?: boolean;
   className?: string;
   theme?: ButtonTheme;
   tone?: ButtonTone;
@@ -142,17 +144,19 @@ const colorClasses: Record<ButtonTheme, Record<ButtonTone, Record<ButtonVariant,
 
 export function Button({
   children,
+  type = "button",
   variant = "filled",
   size = "base",
   theme = "primary",
   tone = "light",
   leftIcon,
   rightIcon,
-  iconOnly = false,
   className,
   ...props
 }: ButtonProps) {
   const currentSize = sizeClasses[size];
+
+  const isIconOnly = type === "iconOnly";
 
   const classes = cn(
     "inline-flex items-center justify-center",
@@ -162,28 +166,28 @@ export function Button({
     "focus:ring-2 focus:ring-primary-400",
     "disabled:pointer-events-none disabled:opacity-50",
     colorClasses[theme][tone][variant],
-    iconOnly ? currentSize.iconOnly : currentSize.button,
+    isIconOnly ? currentSize.iconOnly : currentSize.button,
     className,
   );
 
   const content = (
     <>
       {/* Left Icon */}
-      {!iconOnly && leftIcon && (
+      {!isIconOnly && leftIcon && (
         <span className={cn("flex shrink-0 items-center justify-center", currentSize.icon)}>
           {leftIcon}
         </span>
       )}
 
       {/* Content / Icon Only */}
-      {iconOnly ? (
+      {isIconOnly ? (
         <span className={cn("flex items-center justify-center", currentSize.icon)}>{children}</span>
       ) : (
         children
       )}
 
       {/* Right Icon */}
-      {!iconOnly && rightIcon && (
+      {!isIconOnly && rightIcon && (
         <span className={cn("flex shrink-0 items-center justify-center", currentSize.icon)}>
           {rightIcon}
         </span>
@@ -201,10 +205,10 @@ export function Button({
     );
   }
 
-  const { as: _as, type = "button", ...buttonProps } = props as AsButton;
+  const { as: _as, type: _type, ...buttonProps } = props as AsButton;
 
   return (
-    <button type={type} className={classes} {...buttonProps}>
+    <button type="button" className={classes} {...buttonProps}>
       {content}
     </button>
   );
