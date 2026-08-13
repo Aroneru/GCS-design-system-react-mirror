@@ -1,4 +1,4 @@
-import { Badge, Button, Navbar } from "../../../lib";
+import { Alert, Badge, Button, Navbar, Toast } from "../../../lib";
 import { OverviewCard, OverviewPage } from "../../pageKit";
 
 export function ComponentsOverview() {
@@ -41,6 +41,30 @@ export function ComponentsOverview() {
           <Badge variant="success">Aktif</Badge>
           <Badge variant="warning">Menunggu</Badge>
           <Badge variant="danger">Ditolak</Badge>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/alert"
+        name="Alert"
+        desc="Pesan status di dalam alur halaman: lima variant warna, gaya soft atau outline."
+      >
+        <div className="rounded-xl bg-surface-subtle p-5">
+          <Alert variant="success" heading="Ini adalah Alert" dismissible={false}>
+            Ini merupakan Design system Stasi berupa component alert.
+          </Alert>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/toast"
+        name="Toast"
+        desc="Notifikasi sekilas yang melayang di atas konten, dengan heading dan aksi opsional."
+      >
+        <div className="rounded-xl bg-surface-subtle p-5">
+          <Toast variant="success" dismissible={false}>
+            Sukses Membuat Data!
+          </Toast>
         </div>
       </OverviewCard>
 

@@ -1,5 +1,12 @@
-import { DocUsage } from '../../DocUsage'
-import { C, FoundationPage, Principles, SectionHead } from '../../pageKit'
+import { C } from '../../pageKit'
+import {
+  FlowSection,
+  Lead,
+  PrincipleList,
+  SectionCode,
+  UsulanPage,
+  type TocEntry,
+} from '../../usulanKit'
 
 const shadowScale = ['shadow-sm', 'shadow', 'shadow-md', 'shadow-lg', 'shadow-xl', 'shadow-2xl']
 
@@ -11,27 +18,37 @@ const shadowColors: [string, string][] = [
   ['shadow-purple-500/50', 'bg-purple-500 shadow-lg shadow-purple-500/50'],
 ]
 
+const toc: TocEntry[] = [
+  { id: 'shadow', label: 'Box shadow' },
+  { id: 'warna', label: 'Bayangan berwarna' },
+  { id: 'prinsip', label: 'Prinsip penggunaan' },
+]
+
 export function ElevationPage() {
   return (
-    <FoundationPage
+    <UsulanPage
       eyebrow="Foundations · Elevation"
       title="Bayangan dan kedalaman"
       description="Elevation memberi hierarki kedalaman antarpermukaan — semakin tinggi elemen melayang, semakin lembut dan panjang bayangannya."
+      toc={toc}
     >
-      <SectionHead eyebrow="Box shadow" title="Skala bayangan">
-        Enam tingkat dari <C>shadow-sm</C> hingga <C>shadow-2xl</C>. Gunakan <C>shadow</C> sebagai default untuk elemen melayang standar.
-      </SectionHead>
-      <article className="ds-card p-5 sm:p-7">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
-          {shadowScale.map((cls) => (
-            <div key={cls} className={`${cls} flex aspect-6/7 items-center justify-center rounded-lg bg-white text-center`}>
-              <code className="text-sm font-bold text-primary-700">.{cls}</code>
-            </div>
-          ))}
-        </div>
-      </article>
+      <FlowSection id="shadow" title="Box shadow">
+        <Lead>
+          Enam tingkat dari <C>shadow-sm</C> hingga <C>shadow-2xl</C>. Gunakan <C>shadow</C> sebagai default
+          untuk elemen melayang standar.
+        </Lead>
 
-      <DocUsage code={`{/* Semakin tinggi melayang, semakin besar bayangannya */}
+        <article className="ds-card p-5 sm:p-7">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
+            {shadowScale.map((cls) => (
+              <div key={cls} className={`${cls} flex aspect-6/7 items-center justify-center rounded-lg bg-white text-center`}>
+                <code className="text-sm font-bold text-primary-700">.{cls}</code>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <SectionCode>{`{/* Semakin tinggi melayang, semakin besar bayangannya */}
 <div className="rounded-lg bg-white shadow-sm">Kartu diam</div>
 <div className="rounded-lg bg-white shadow-lg">Dropdown / popover</div>
 <div className="rounded-xl bg-white shadow-2xl">Modal</div>
@@ -39,12 +56,15 @@ export function ElevationPage() {
 {/* Transisi bayangan saat hover */}
 <div className="rounded-lg bg-white shadow transition-shadow hover:shadow-md">
   Kartu yang bisa diklik
-</div>`} />
+</div>`}</SectionCode>
+      </FlowSection>
 
-      <div className="mt-8">
-        <SectionHead eyebrow="Box shadow color" title="Bayangan berwarna">
-          Kombinasikan skala bayangan dengan warna token, mis. <C>shadow-lg shadow-primary-600/50</C>. Efektif untuk glow pada tombol CTA.
-        </SectionHead>
+      <FlowSection id="warna" title="Bayangan berwarna">
+        <Lead>
+          Kombinasikan skala bayangan dengan warna token, mis. <C>shadow-lg shadow-primary-600/50</C>.
+          Efektif untuk glow pada tombol CTA.
+        </Lead>
+
         <article className="ds-card p-5 sm:p-7">
           <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
             {shadowColors.map(([label, tile]) => (
@@ -54,20 +74,24 @@ export function ElevationPage() {
             ))}
           </div>
         </article>
-      </div>
 
-      <DocUsage code={`{/* Bayangan berwarna — khusus penekanan seperti CTA */}
+        <SectionCode>{`{/* Bayangan berwarna — khusus penekanan seperti CTA */}
 <button className="rounded-lg bg-primary-600 px-4 py-2 text-white shadow-lg shadow-primary-600/50">
   Aksi utama
 </button>
-<div className="rounded-lg bg-green-500 p-4 shadow-lg shadow-green-500/50">Berhasil</div>`} />
+<div className="rounded-lg bg-green-500 p-4 shadow-lg shadow-green-500/50">Berhasil</div>`}</SectionCode>
+      </FlowSection>
 
-      <Principles items={[
-        <>Kartu memakai <C>shadow-sm</C>/<C>shadow</C>, dropdown/popover <C>shadow-lg</C>, modal <C>shadow-xl</C> ke atas.</>,
-        <>Batasi maksimal <strong className="text-gray-900">dua tingkat elevation</strong> dalam satu tampilan agar hierarki jelas.</>,
-        <>Bayangan berwarna hanya untuk penekanan khusus (CTA, kartu promosi) — bukan konten reguler.</>,
-        <>Bayangan bukan pengganti kontras — elemen interaktif tetap butuh batas/warna yang aksesibel.</>,
-      ]} />
-    </FoundationPage>
+      <FlowSection id="prinsip" title="Prinsip penggunaan">
+        <PrincipleList
+          items={[
+            <>Kartu memakai <C>shadow-sm</C>/<C>shadow</C>, dropdown/popover <C>shadow-lg</C>, modal <C>shadow-xl</C> ke atas.</>,
+            <>Batasi maksimal <strong className="text-gray-900">dua tingkat elevation</strong> dalam satu tampilan agar hierarki jelas.</>,
+            <>Bayangan berwarna hanya untuk penekanan khusus (CTA, kartu promosi) — bukan konten reguler.</>,
+            <>Bayangan bukan pengganti kontras — elemen interaktif tetap butuh batas/warna yang aksesibel.</>,
+          ]}
+        />
+      </FlowSection>
+    </UsulanPage>
   )
 }

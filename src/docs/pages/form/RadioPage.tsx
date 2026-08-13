@@ -1,7 +1,18 @@
 import { useState } from 'react'
 import { Radio, type RadioApplication, type RadioPlatform, type RadioState } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } from '../../pageKit'
+import { Demo, H, Segmented } from '../../pageKit'
+import {
+  Control,
+  Controls,
+  FlowSection,
+  Lead,
+  SectionCode,
+  Stage,
+  UsulanPage,
+  type TocEntry,
+} from '../../usulanKit'
+import { adaTanpa } from '../../usulanOptions'
 
 const applications: { value: RadioApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
@@ -22,6 +33,16 @@ const radioProps: PropRow[] = [
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="radio"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
 
+const toc: TocEntry[] = [
+  { id: 'radio-button', label: 'Radio Button' },
+  { id: 'caption', label: 'Dengan caption' },
+  { id: 'platform', label: 'Platform' },
+  { id: 'application', label: 'Application' },
+  { id: 'playground', label: 'Playground' },
+  { id: 'penggunaan', label: 'Penggunaan' },
+  { id: 'properties', label: 'Properties' },
+]
+
 export function RadioPage() {
   const [platform, setPlatform] = useState<RadioPlatform>('default')
   const [state, setState] = useState<RadioState>('default')
@@ -30,34 +51,52 @@ export function RadioPage() {
   const [pilihan, setPilihan] = useState('wni')
 
   return (
-    <ComponentPage
+    <UsulanPage
       eyebrow="Form"
       title="Radio Button"
       description="Pilihan tunggal dari beberapa opsi yang saling meniadakan. Dibangun di atas <input type='radio'> bawaan supaya navigasi panah dan pembaca layar tetap berfungsi, dengan warna, ukuran, dan jarak dari Foundations."
+      toc={toc}
     >
-      <Section title="Radio Button">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+      <FlowSection id="radio-button" title="Radio Button">
+        <Lead>
           Lingkaran 16px berlatar gray-50 dengan garis gray-300. Saat dipilih, garisnya menebal jadi 3,5px
-          berwarna aksen — sisa ruang di tengah (9px) itulah yang tampak sebagai titik. State <H>inactive</H>
-          memakai latar gray-100 dan cincin gray-400, sekaligus mematikan kontrolnya.
-        </p>
+          berwarna aksen — sisa ruang di tengah (9px) itulah yang tampak sebagai titik. State{' '}
+          <H>inactive</H> memakai latar gray-100 dan cincin gray-400, sekaligus mematikan kontrolnya.
+        </Lead>
         <Demo>
-          {/* Grid, bukan flex: empat kolom sama lebar mengisi kartu sampai tepi
-              kanan — flex menumpuk semuanya di kiri dan menyisakan ruang kosong. */}
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <Radio name="ds-radio-dasar" label="Belum dipilih" />
             <Radio name="ds-radio-dasar" label="Sedang dipilih" defaultChecked />
             <Radio name="ds-radio-nonaktif" state="inactive" label="Tidak aktif" />
-            <Radio name="ds-radio-nonaktif-terpilih" state="inactive" label="Tidak aktif, terpilih" defaultChecked />
+            <Radio
+              name="ds-radio-nonaktif-terpilih"
+              state="inactive"
+              label="Tidak aktif, terpilih"
+              defaultChecked
+            />
           </div>
         </Demo>
-      </Section>
+        <SectionCode>
+          {"import { Radio } from '@tpl/design-kit-react'\n\n"}
+          {'{/* Sekelompok pilihan: samakan name-nya */}\n'}
+          {'<Radio '}
+          <H>name</H>
+          {'="kewarganegaraan" label="Warga negara Indonesia" defaultChecked />\n'}
+          {'<Radio '}
+          <H>name</H>
+          {'="kewarganegaraan" label="Warga negara asing" />\n\n'}
+          {'{/* Inactive — meredup sekaligus nonaktif */}\n'}
+          {'<Radio '}
+          <H>state</H>
+          {'="inactive" label="Tidak tersedia" />'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Dengan caption">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+      <FlowSection id="caption" title="Dengan caption">
+        <Lead>
           Isi <H>helperText</H> untuk menambahkan keterangan 12px di bawah label — berguna saat pilihannya
           perlu penjelasan. Lingkaran tetap sejajar dengan baris pertama label.
-        </p>
+        </Lead>
         <Demo>
           <div className="space-y-4">
             <Radio
@@ -73,17 +112,31 @@ export function RadioPage() {
             />
           </div>
         </Demo>
-      </Section>
+        <SectionCode>
+          {'<Radio\n'}
+          {'    name="kewarganegaraan"\n'}
+          {'    label="Warga negara asing"\n'}
+          {'    '}
+          <H>helperText</H>
+          {'="Wajib melampirkan paspor dan izin tinggal."\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Platform">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+      <FlowSection id="platform" title="Platform">
+        <Lead>
           Platform mobile memakai lingkaran 14px dengan label 12px; ukuran caption tetap 12px di keduanya.
-        </p>
+        </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Desktop · 16px">
             <div className="space-y-3">
               {kewarganegaraan.map((o) => (
-                <Radio key={o.value} name="ds-radio-desktop" label={o.label} defaultChecked={o.value === 'wni'} />
+                <Radio
+                  key={o.value}
+                  name="ds-radio-desktop"
+                  label={o.label}
+                  defaultChecked={o.value === 'wni'}
+                />
               ))}
             </div>
           </Demo>
@@ -101,12 +154,17 @@ export function RadioPage() {
             </div>
           </Demo>
         </div>
-      </Section>
+        <SectionCode>
+          {'<Radio '}
+          <H>platform</H>
+          {'="mobile" name="kewarganegaraan" label="Warga negara Indonesia" />'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Application">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+      <FlowSection id="application" title="Application">
+        <Lead>
           Warna cincin saat dipilih mengikuti aplikasi yang memakainya; state lain memakai abu yang sama.
-        </p>
+        </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
             <Demo key={a.value} label={a.label}>
@@ -123,13 +181,27 @@ export function RadioPage() {
             </Demo>
           ))}
         </div>
-      </Section>
+        <SectionCode>
+          {'<Radio '}
+          <H>application</H>
+          {'="simaya" name="kewarganegaraan" label="Warga negara Indonesia" />'}
+        </SectionCode>
+      </FlowSection>
 
-      <section>
-        <h2 className="mb-4 text-heading-3 font-black text-gray-900">Playground</h2>
+      <FlowSection id="playground" title="Playground">
+        <Lead>
+          Satu kelompok pilihan yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan
+          langsung terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
+        </Lead>
 
-        <div className="rounded-2xl border border-border bg-surface-subtle p-6 sm:p-10">
-          <div className="mx-auto max-w-[420px] space-y-4">
+        {/*
+          max-w-fit, bukan lebar tetap: kolom 420px membuat kelompok pilihan
+          menempel di tepi kirinya dan tampak melenceng dari tengah kartu.
+          Dengan fit-content, blok menyusut seukuran isinya lalu mx-auto
+          benar-benar memusatkannya.
+        */}
+        <Stage maxWidth="max-w-fit">
+          <div className="space-y-4">
             {kewarganegaraan.map((o) => (
               <Radio
                 key={o.value}
@@ -144,115 +216,110 @@ export function RadioPage() {
               />
             ))}
           </div>
-        </div>
+        </Stage>
 
-        <div className="mt-4 flex flex-wrap items-start gap-6">
-          <div>
-            <ControlLabel>Platform</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih platform"
-                value={platform}
-                onChange={setPlatform}
-                options={[
-                  { value: 'mobile', label: 'Mobile' },
-                  { value: 'default', label: 'Desktop' },
-                ]}
-              />
-            </div>
-          </div>
+        <Controls>
+          <Control label="Platform">
+            <Segmented
+              label="Pilih platform"
+              value={platform}
+              onChange={setPlatform}
+              options={[
+                { value: 'mobile', label: 'Mobile' },
+                { value: 'default', label: 'Desktop' },
+              ]}
+            />
+          </Control>
 
-          <div>
-            <ControlLabel>State</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih state"
-                value={state}
-                onChange={setState}
-                options={[
-                  { value: 'default', label: 'Default' },
-                  { value: 'inactive', label: 'Inactive' },
-                ]}
-              />
-            </div>
-          </div>
+          <Control label="State">
+            <Segmented
+              label="Pilih state"
+              value={state}
+              onChange={setState}
+              options={[
+                { value: 'default', label: 'Default' },
+                { value: 'inactive', label: 'Inactive' },
+              ]}
+            />
+          </Control>
 
-          <div>
-            <ControlLabel>Application</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih aplikasi"
-                value={application}
-                onChange={setApplication}
-                itemClassName="px-2.5"
-                options={applications.map((a) => ({ value: a.value, label: a.label }))}
-              />
-            </div>
-          </div>
+          <Control label="Application">
+            <Segmented
+              label="Pilih aplikasi"
+              value={application}
+              onChange={setApplication}
+              itemClassName="px-2.5"
+              options={applications.map((a) => ({ value: a.value, label: a.label }))}
+            />
+          </Control>
 
-          <div>
-            <ControlLabel>Caption</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Tampilkan caption"
-                value={withCaption}
-                onChange={setWithCaption}
-                options={[
-                  { value: true, label: 'Ada' },
-                  { value: false, label: 'Tanpa' },
-                ]}
-              />
-            </div>
-          </div>
-        </div>
+          <Control label="Caption">
+            <Segmented
+              label="Tampilkan caption"
+              value={withCaption}
+              onChange={setWithCaption}
+              options={adaTanpa}
+            />
+          </Control>
+        </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
           Satu kelompok pilihan dibentuk dengan memberi <H>name</H> yang sama pada tiap Radio — sama seperti
           formulir HTML biasa, jadi panah atas/bawah otomatis berpindah antar-opsi.
         </p>
-      </section>
+      </FlowSection>
 
-      <Section title="Penggunaan">
-        <CodeBlock>
+      <FlowSection id="penggunaan" title="Penggunaan">
+        <Lead>
+          Blok ini mengikuti kontrol di Playground — ubah kontrolnya, kodenya ikut berubah. Prop yang
+          nilainya masih bawaan sengaja tidak ditulis.
+        </Lead>
+        <SectionCode flush>
           {"import { Radio } from '@tpl/design-kit-react'\n\n"}
-          {'{/* Sekelompok pilihan: samakan name-nya */}\n'}
-          {'<Radio '}
-          <H>name</H>
-          {'="kewarganegaraan" label="Warga negara Indonesia" defaultChecked />\n'}
-          {'<Radio '}
-          <H>name</H>
-          {'="kewarganegaraan" label="Warga negara asing" />\n\n'}
-          {'{/* Dengan caption */}\n'}
           {'<Radio\n'}
           {'    name="kewarganegaraan"\n'}
-          {'    label="Warga negara asing"\n'}
-          {'    '}
-          <H>helperText</H>
-          {'="Wajib melampirkan paspor dan izin tinggal."\n'}
-          {'/>\n\n'}
-          {'{/* Terkendali + warna aplikasi + mobile */}\n'}
-          {'<Radio\n'}
-          {'    name="kewarganegaraan"\n'}
-          {'    '}
-          <H>platform</H>
-          {'="mobile"\n'}
-          {'    '}
-          <H>application</H>
-          {'="simaya"\n'}
+          {platform === 'mobile' && (
+            <>
+              {'    '}
+              <H>platform</H>
+              {'="mobile"\n'}
+            </>
+          )}
+          {state !== 'default' && (
+            <>
+              {'    '}
+              <H>state</H>
+              {'="inactive"\n'}
+            </>
+          )}
+          {application !== 'default' && (
+            <>
+              {'    '}
+              <H>application</H>
+              {`="${application}"\n`}
+            </>
+          )}
           {'    label="Warga negara Indonesia"\n'}
+          {withCaption && (
+            <>
+              {'    '}
+              <H>helperText</H>
+              {'="Keterangan singkat tentang pilihan ini."\n'}
+            </>
+          )}
           {'    checked={pilihan === "wni"}\n'}
           {'    onChange={() => setPilihan("wni")}\n'}
-          {'/>\n\n'}
-          {'{/* Inactive — meredup sekaligus nonaktif */}\n'}
-          {'<Radio '}
-          <H>state</H>
-          {'="inactive" label="Tidak tersedia" />'}
-        </CodeBlock>
-      </Section>
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Properties">
+      <FlowSection id="properties" title="Properties">
+        <Lead>
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
+          <H>&lt;input type=&quot;radio&quot;&gt;</H> standar juga diteruskan apa adanya.
+        </Lead>
         <PropsTable rows={radioProps} minWidth="48rem" />
-      </Section>
-    </ComponentPage>
+      </FlowSection>
+    </UsulanPage>
   )
 }

@@ -5,8 +5,15 @@ import { useState, type ComponentType } from 'react'
 import * as OutlineIcons from '../../../lib/icons/outline'
 import * as SolidIcons from '../../../lib/icons/solid'
 import { brandIcons } from '../../../lib/brandIconRegistry'
-import { DocUsage } from '../../DocUsage'
-import { C, FoundationPage, Principles, SectionHead } from '../../pageKit'
+import { C } from '../../pageKit'
+import {
+  FlowSection,
+  Lead,
+  PrincipleList,
+  SectionCode,
+  UsulanPage,
+  type TocEntry,
+} from '../../usulanKit'
 
 type IconCmp = ComponentType<{ className?: string }>
 
@@ -32,6 +39,14 @@ const withoutBrands = (mod: object) =>
 
 const outlineEntries = withoutBrands(OutlineIcons)
 const solidEntries = withoutBrands(SolidIcons)
+
+const toc: TocEntry[] = [
+  { id: 'solid', label: 'Ikon solid' },
+  { id: 'outline', label: 'Ikon outline' },
+  { id: 'brand', label: 'Logo brand' },
+  { id: 'impor', label: 'Jalur impor' },
+  { id: 'prinsip', label: 'Prinsip penggunaan' },
+]
 
 function FlowbiteGrid({ entries, q }: { entries: [string, IconCmp][]; q: string }) {
   const needle = q.toLowerCase().replace(/[\s-]/g, '')
@@ -71,13 +86,19 @@ function BrandGrid({ q }: { q: string }) {
 
 export function IconsPage() {
   const [q, setQ] = useState('')
+
   return (
-    <FoundationPage
+    <UsulanPage
       eyebrow="Foundations · Icons"
       title="Icons"
       description="Seluruh ikon diekspor ulang oleh design kit — solid untuk status & penekanan, outline untuk aksi & navigasi, plus logo brand untuk tautan sosial. Impor selalu lewat @tpl/design-kit-react agar sumber ikon terkendali di satu tempat. Ikon mewarisi warna teks (currentColor)."
+      toc={toc}
     >
-      <div className="mb-8">
+      {/*
+        Pencarian menyaring ketiga galeri sekaligus, jadi letaknya di atas
+        seluruh bagian dan bukan di dalam salah satunya.
+      */}
+      <div>
         <label className="sr-only" htmlFor="icon-search">Cari ikon</label>
         <div className="relative max-w-md">
           <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
@@ -94,50 +115,59 @@ export function IconsPage() {
         </div>
       </div>
 
-      <SectionHead eyebrow="Solid" title={`Ikon solid · ${solidEntries.length}`}>
-        Untuk status aktif, indikator, dan momen yang butuh bobot visual lebih. Arahkan kursor untuk melihat nama komponennya. Logo brand tidak ikut di sini — lihat bagian <C>Logo brand</C> di bawah.
-      </SectionHead>
-      <article className="ds-card p-5 sm:p-7">
-        <FlowbiteGrid entries={solidEntries} q={q} />
-      </article>
+      <FlowSection id="solid" title={`Ikon solid · ${solidEntries.length}`}>
+        <Lead>
+          Untuk status aktif, indikator, dan momen yang butuh bobot visual lebih. Arahkan kursor untuk
+          melihat nama komponennya. Logo brand tidak ikut di sini — lihat bagian <C>Logo brand</C> di bawah.
+        </Lead>
 
-      <DocUsage code={`import { Bell } from '@tpl/design-kit-react/icons/solid'
+        <article className="ds-card p-5 sm:p-7">
+          <FlowbiteGrid entries={solidEntries} q={q} />
+        </article>
 
-<Bell className="size-5 text-primary-600" />`} />
+        <SectionCode>{`import { Bell } from '@tpl/design-kit-react/icons/solid'
 
-      <div className="mt-8">
-        <SectionHead eyebrow="Outline" title={`Ikon outline · ${outlineEntries.length}`}>
-          Gaya default untuk aksi, navigasi, dan elemen antarmuka umum.
-        </SectionHead>
+<Bell className="size-5 text-primary-600" />`}</SectionCode>
+      </FlowSection>
+
+      <FlowSection id="outline" title={`Ikon outline · ${outlineEntries.length}`}>
+        <Lead>Gaya default untuk aksi, navigasi, dan elemen antarmuka umum.</Lead>
+
         <article className="ds-card p-5 sm:p-7">
           <FlowbiteGrid entries={outlineEntries} q={q} />
         </article>
-      </div>
 
-      <DocUsage code={`import { Home, Search } from '@tpl/design-kit-react/icons/outline'
+        <SectionCode>{`import { Home, Search } from '@tpl/design-kit-react/icons/outline'
 
 <Home className="size-5 text-gray-700" />
-<Search className="size-4 text-gray-500" />`} />
+<Search className="size-4 text-gray-500" />`}</SectionCode>
+      </FlowSection>
 
-      <div className="mt-8">
-        <SectionHead eyebrow="Social icons" title={`Logo brand · ${brandIcons.length}`}>
-          Logo sosial dan teknologi untuk footer, tautan berbagi, dan halaman login — satu-satunya tempat logo brand ditampilkan. Berbeda dari solid &amp; outline, logo brand ada di barrel utama <C>@tpl/design-kit-react</C> karena namanya tidak bertabrakan.
-        </SectionHead>
+      <FlowSection id="brand" title={`Logo brand · ${brandIcons.length}`}>
+        <Lead>
+          Logo sosial dan teknologi untuk footer, tautan berbagi, dan halaman login — satu-satunya tempat
+          logo brand ditampilkan. Berbeda dari solid &amp; outline, logo brand ada di barrel utama{' '}
+          <C>@tpl/design-kit-react</C> karena namanya tidak bertabrakan.
+        </Lead>
+
         <article className="ds-card p-5 sm:p-7">
           <BrandGrid q={q} />
         </article>
-      </div>
 
-      <DocUsage code={`import { Github, Instagram, ReactLogo } from '@tpl/design-kit-react'
+        <SectionCode>{`import { Github, Instagram, ReactLogo } from '@tpl/design-kit-react'
 
 <Github className="size-5" />
 <Instagram className="size-5 text-purple-600" />
-<ReactLogo className="size-5" />`} />
+<ReactLogo className="size-5" />`}</SectionCode>
+      </FlowSection>
 
-      <div className="mt-8">
-        <SectionHead eyebrow="Import path" title="Tiga jalur impor">
-          Solid dan outline dipisah ke subpath masing-masing karena banyak nama ikon yang sama persis di kedua set (mis. <C>Home</C>, <C>Bell</C>) — memisahkannya juga menjaga <em>tree-shaking</em> tetap bekerja.
-        </SectionHead>
+      <FlowSection id="impor" title="Jalur impor">
+        <Lead>
+          Solid dan outline dipisah ke subpath masing-masing karena banyak nama ikon yang sama persis di
+          kedua set (mis. <C>Home</C>, <C>Bell</C>) — memisahkannya juga menjaga <em>tree-shaking</em> tetap
+          bekerja.
+        </Lead>
+
         <article className="ds-card overflow-hidden">
           <div className="ds-scroll-x overflow-x-auto">
             <table className="w-full min-w-[34rem] text-left text-sm">
@@ -162,14 +192,18 @@ export function IconsPage() {
             </table>
           </div>
         </article>
-      </div>
+      </FlowSection>
 
-      <Principles items={[
-        <>Konsisten dalam satu konteks — jangan mencampur outline dan solid pada kelompok aksi yang sama.</>,
-        <>Selaraskan ukuran ikon dengan teks: <C>size-4</C> untuk body small, <C>size-5</C> untuk body, <C>size-6</C> untuk heading.</>,
-        <>Ikon dekoratif wajib <C>aria-hidden="true"</C>; ikon berdiri sendiri butuh label (mis. <C>sr-only</C>).</>,
-        <>Jangan mengubah warna ikon terpisah dari teks pendampingnya — keduanya memakai token warna yang sama.</>,
-      ]} />
-    </FoundationPage>
+      <FlowSection id="prinsip" title="Prinsip penggunaan">
+        <PrincipleList
+          items={[
+            <>Konsisten dalam satu konteks — jangan mencampur outline dan solid pada kelompok aksi yang sama.</>,
+            <>Selaraskan ukuran ikon dengan teks: <C>size-4</C> untuk body small, <C>size-5</C> untuk body, <C>size-6</C> untuk heading.</>,
+            <>Ikon dekoratif wajib <C>aria-hidden="true"</C>; ikon berdiri sendiri butuh label (mis. <C>sr-only</C>).</>,
+            <>Jangan mengubah warna ikon terpisah dari teks pendampingnya — keduanya memakai token warna yang sama.</>,
+          ]}
+        />
+      </FlowSection>
+    </UsulanPage>
   )
 }

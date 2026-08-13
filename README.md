@@ -10,8 +10,8 @@ State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
   purple), semantic aliases (`brand`, `feedback-*`, `content`,
   `surface`, `border`), skala tipografi (`display` → `caption`), spacing, radius,
   shadow, font Lato.
-- **Komponen umum**: `Button`, `Badge`, `Card`, `Container`, `Icon`, `Navbar`,
-  `Footer`.
+- **Komponen umum**: `Button`, `Badge`, `Alert`, `Toast`, `Card`, `Container`,
+  `Icon`, `Navbar`, `Footer`.
 - **Komponen form**: `InputField`, `FloatingLabel`, `TextArea`, `Select`,
   `Radio`, `Toggle`, `Checkbox`.
 - **Ikon**: logo brand & sosial (`Github`, `Instagram`, …) dari barrel utama,
@@ -51,7 +51,7 @@ export default function App() {
   return (
     <Card title="Halo" description="Kartu dari design kit">
       <InputField label="Nama lengkap" icon={<User className="size-4" />} />
-      <Button variant="primary">Simpan</Button>
+      <Button>Simpan</Button>
     </Card>
   )
 }
@@ -87,15 +87,21 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 
 ### Umum
 
-| Komponen    | Props utama                                                          |
-| ----------- | -------------------------------------------------------------------- |
-| `Button`    | `variant`: `primary \| secondary \| danger \| ghost`, `as`          |
-| `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`          |
-| `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`      |
-| `Container` | `as` (default `div`)                                                  |
-| `Icon`      | `children` (SVG dengan `currentColor`)                               |
-| `Navbar`    | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`   |
-| `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`                |
+| Komponen    | Props utama                                                               |
+| ----------- | ------------------------------------------------------------------------- |
+| `Button`    | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `iconOnly`, `as` |
+| `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`                |
+| `Alert`     | `variant`, `surface`: `soft \| outline`, `heading`, `icon`, `actions`     |
+| `Toast`     | `variant`, `heading`, `icon`, `dismissible`, `actions`                    |
+| `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`           |
+| `Container` | `as` (default `div`), `padded` (default `true`)                           |
+| `Icon`      | `children` (SVG dengan `currentColor`)                                    |
+| `Navbar`    | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`        |
+| `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`                     |
+
+Warna Button diatur `theme` (`primary \| green \| gray \| purple \| orange \|
+yellow`) dan `tone` (`light \| dark`), bukan lewat `variant` — `variant` hanya
+memilih terisi atau bergaris. Ukuran: `xs \| s \| base \| l \| xl`.
 
 ### Form
 
@@ -206,6 +212,11 @@ npm run lint       # eslint
 Situs dokumentasinya berisi `/foundations/*` (token), `/components/*`,
 `/form/*` (tiap komponen form beserta playground-nya), dan `/example` — satu
 halaman formulir layanan yang memakai seluruh komponen kit sekaligus.
+
+Tiap komponen form punya dua halaman: susunan sekarang, dan susunan **Usulan**
+(`*-usulan`) yang sedang dinilai — judul ber-anchor, blok kode menempel di tiap
+bagian, dan daftar isi "On this page" di kanan. Kerangkanya di `docs/usulanKit.tsx`.
+Setelah salah satu dipilih, separuh halaman beserta entri navigasinya dibuang.
 
 ## Uji coba lokal sebelum publish
 

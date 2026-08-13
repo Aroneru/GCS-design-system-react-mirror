@@ -21,21 +21,17 @@ import { RadioPage } from './docs/pages/form/RadioPage'
 import { TogglePage } from './docs/pages/form/TogglePage'
 import { CheckboxPage } from './docs/pages/form/CheckboxPage'
 
-// Halaman "usulan" — susunan dokumentasi yang diusulkan, berdampingan dengan
-// yang sekarang supaya keduanya bisa dibandingkan langsung.
-import { InputFieldUsulanPage } from './docs/pages/form/input-field/InputFieldUsulanPage'
-import { FloatingLabelUsulanPage } from './docs/pages/form/input-field/FloatingLabelUsulanPage'
+// Text Area masih punya dua versi berdampingan supaya susunan lama dan baru
+// bisa dibandingkan langsung; halaman form lainnya sudah memakai susunan baru.
 import { TextAreaUsulanPage } from './docs/pages/form/input-field/TextAreaUsulanPage'
-import { SelectUsulanPage } from './docs/pages/form/SelectUsulanPage'
-import { RadioUsulanPage } from './docs/pages/form/RadioUsulanPage'
-import { ToggleUsulanPage } from './docs/pages/form/ToggleUsulanPage'
-import { CheckboxUsulanPage } from './docs/pages/form/CheckboxUsulanPage'
 import { PlaceholderPage } from './docs/pages/PlaceholderPage'
 
 import { ComponentsOverview } from './docs/pages/components/ComponentsOverview'
 import { ContainerPage } from './docs/pages/components/ContainerPage'
 import { ButtonPage } from './docs/pages/components/ButtonPage'
 import { BadgePage } from './docs/pages/components/BadgePage'
+import { AlertPage } from './docs/pages/components/AlertPage'
+import { ToastPage } from './docs/pages/components/ToastPage'
 import { CardPage } from './docs/pages/components/CardPage'
 import { FooterPage } from './docs/pages/components/FooterPage'
 import {
@@ -60,26 +56,22 @@ const routes: Record<string, () => React.ReactElement> = {
   '/form': FormOverview,
   '/form/input-field': InputFieldFormPage,
   '/form/input-field/input': InputFieldPage,
-  '/form/input-field/input-usulan': InputFieldUsulanPage,
   '/form/input-field/floating-label': FloatingLabelPage,
-  '/form/input-field/floating-label-usulan': FloatingLabelUsulanPage,
   '/form/input-field/text-area': TextAreaPage,
   '/form/input-field/text-area-usulan': TextAreaUsulanPage,
   '/form/select': SelectPage,
-  '/form/select-usulan': SelectUsulanPage,
   '/form/search': () => <PlaceholderPage eyebrow="Form" title="Search Form" />,
   '/form/upload': () => <PlaceholderPage eyebrow="Form" title="Upload Form" />,
   '/form/radio': RadioPage,
-  '/form/radio-usulan': RadioUsulanPage,
   '/form/toggle': TogglePage,
-  '/form/toggle-usulan': ToggleUsulanPage,
   '/form/checkbox': CheckboxPage,
-  '/form/checkbox-usulan': CheckboxUsulanPage,
 
   '/components': ComponentsOverview,
   '/components/container': ContainerPage,
   '/components/button': ButtonPage,
   '/components/badge': BadgePage,
+  '/components/alert': AlertPage,
+  '/components/toast': ToastPage,
   '/components/card': CardPage,
   '/components/navbar': NavbarPage,
   '/components/footer': FooterPage,
