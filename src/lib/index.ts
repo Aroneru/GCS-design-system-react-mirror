@@ -99,6 +99,7 @@ export type {
   NavbarUser,
   NavbarNotification,
   NavbarMenuPosition,
+  NavbarVariant,
 } from "./components/Navbar";
 
 export { cn } from "./utils/cn";
