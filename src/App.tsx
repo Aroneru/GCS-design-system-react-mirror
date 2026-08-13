@@ -36,6 +36,8 @@ import { ComponentsOverview } from './docs/pages/components/ComponentsOverview'
 import { ContainerPage } from './docs/pages/components/ContainerPage'
 import { ButtonPage } from './docs/pages/components/ButtonPage'
 import { BadgePage } from './docs/pages/components/BadgePage'
+import { AlertPage } from './docs/pages/components/AlertPage'
+import { ToastPage } from './docs/pages/components/ToastPage'
 import { CardPage } from './docs/pages/components/CardPage'
 import { FooterPage } from './docs/pages/components/FooterPage'
 import {
@@ -80,6 +82,8 @@ const routes: Record<string, () => React.ReactElement> = {
   '/components/container': ContainerPage,
   '/components/button': ButtonPage,
   '/components/badge': BadgePage,
+  '/components/alert': AlertPage,
+  '/components/toast': ToastPage,
   '/components/card': CardPage,
   '/components/navbar': NavbarPage,
   '/components/footer': FooterPage,

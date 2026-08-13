@@ -98,6 +98,25 @@ export function SectionCode({ children, flush }: { children: ReactNode; flush?: 
   )
 }
 
+/**
+ * Daftar "Prinsip penggunaan" tanpa kartu pembungkus.
+ *
+ * Versi di pageKit membawa kartu + eyebrow-nya sendiri; di sini judulnya sudah
+ * dipegang <FlowSection>, jadi memakai yang itu akan menggandakan judul.
+ */
+export function PrincipleList({ items }: { items: ReactNode[] }) {
+  return (
+    <ul className="space-y-4 text-sm leading-6 text-gray-600">
+      {items.map((item, i) => (
+        <li key={i} className="flex gap-3">
+          <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-600" />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 /** Panggung Playground: kartu berlatar netral, lebarnya bisa dianimasikan. */
 export function Stage({ maxWidth, children }: { maxWidth: string; children: ReactNode }) {
   return (

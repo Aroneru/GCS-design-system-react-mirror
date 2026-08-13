@@ -10,8 +10,8 @@ State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
   purple), semantic aliases (`brand`, `feedback-*`, `content`,
   `surface`, `border`), skala tipografi (`display` → `caption`), spacing, radius,
   shadow, font Lato.
-- **Komponen umum**: `Button`, `Badge`, `Card`, `Container`, `Icon`, `Navbar`,
-  `Footer`.
+- **Komponen umum**: `Button`, `Badge`, `Alert`, `Toast`, `Card`, `Container`,
+  `Icon`, `Navbar`, `Footer`.
 - **Komponen form**: `InputField`, `FloatingLabel`, `TextArea`, `Select`,
   `Radio`, `Toggle`, `Checkbox`.
 - **Ikon**: logo brand & sosial (`Github`, `Instagram`, …) dari barrel utama,
@@ -91,6 +91,8 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | ----------- | ------------------------------------------------------------------------- |
 | `Button`    | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `iconOnly`, `as` |
 | `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`                |
+| `Alert`     | `variant`, `surface`: `soft \| outline`, `heading`, `icon`, `actions`     |
+| `Toast`     | `variant`, `heading`, `icon`, `dismissible`, `actions`                    |
 | `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`           |
 | `Container` | `as` (default `div`), `padded` (default `true`)                           |
 | `Icon`      | `children` (SVG dengan `currentColor`)                                    |
