@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Badge,
@@ -94,7 +94,12 @@ export function ExamplePage() {
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
     );
 
-  const kirim = (event: FormEvent) => {
+  // Button dari kit selalu merender <button type="button">, jadi tombol kirim
+  // tidak lagi men-submit form secara native dan dipicu lewat onClick. Handler
+  // yang sama tetap dipasang di <form> supaya submit dari keyboard ikut
+  // tertangani — karena itu parameternya cukup "apa pun yang punya
+  // preventDefault", agar MouseEvent maupun FormEvent sama-sama cocok.
+  const kirim = (event: { preventDefault: () => void }) => {
     event.preventDefault();
     setTerkirim(true);
   };
@@ -356,7 +361,7 @@ export function ExamplePage() {
               </div>
             ) : (
               <div className="flex flex-wrap items-center gap-3">
-                <Button type="submit" disabled={!setuju}>
+                <Button onClick={kirim} disabled={!setuju}>
                   Kirim permohonan
                 </Button>
                 <Button variant="filled" onClick={tampilkanToast}>

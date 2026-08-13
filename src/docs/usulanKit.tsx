@@ -2,12 +2,15 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { CodeBlock, ControlLabel } from './pageKit'
 
 /**
- * Kerangka halaman "usulan" — susunan dokumentasi yang sedang diusulkan sebagai
- * pengganti ComponentPage: judul ber-anchor, blok kode menempel di tiap bagian,
- * dan daftar isi "On this page" yang menempel di kanan.
+ * Kerangka halaman dokumentasi: judul ber-anchor, blok kode menempel di tiap
+ * bagian, dan daftar isi "On this page" yang menempel di kanan.
  *
- * Dikumpulkan di satu berkas karena tujuh halaman memakainya; kalau disalin per
- * halaman, hook scroll-spy dan perhitungan lebarnya ikut tergandakan tujuh kali.
+ * Namanya masih "usulan" karena dulu memang diusulkan sebagai pengganti
+ * ComponentPage; sekarang hampir seluruh halaman memakainya, jadi berkas ini
+ * boleh diganti nama begitu ComponentPage benar-benar tidak dipakai lagi.
+ *
+ * Dikumpulkan di satu berkas karena belasan halaman memakainya; kalau disalin
+ * per halaman, hook scroll-spy dan perhitungan lebarnya ikut tergandakan.
  */
 
 /** Satu entri daftar isi. `id` harus sama dengan `id` pada <FlowSection>. */
