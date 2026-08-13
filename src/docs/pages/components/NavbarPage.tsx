@@ -2,40 +2,81 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Navbar, type NavbarItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import {
-  CodeBlock,
-  ComponentPage,
   ControlLabel,
   Demo,
-  Section,
+  H,
   Segmented,
 } from "../../pageKit";
+import {
+  FlowSection,
+  Lead,
+  SectionCode,
+  UsulanPage,
+  type TocEntry,
+} from "../../usulanKit";
 
 type PlaygroundState = "guest" | "authenticated";
 type MenuPosition = "left" | "right";
 type PreviewDevice = "desktop" | "mobile";
 type PlaygroundVariant = "front-office" | "back-office";
 
+const navbarToc: TocEntry[] = [
+  { id: "variants", label: "Variants" },
+  { id: "states", label: "States" },
+  { id: "navigation", label: "Navigation" },
+  { id: "playground", label: "Playground" },
+  { id: "penggunaan", label: "Penggunaan" },
+  { id: "properties", label: "Properties" },
+];
+
 function createFigmaItems(count: number): NavbarItem[] {
   return Array.from({ length: count }, (_, index) => {
     const menuNumber = index + 1;
-    const isTrueSubmenu = count >= 2 && index === count - 1;
+    const submenuItems = [1, 2].map((submenuNumber) => ({
+      id: `menu-${menuNumber}-submenu-${submenuNumber}`,
+      label: `Submenu ${submenuNumber} Menu ${menuNumber}`,
+      href: `#/menu-${menuNumber}/submenu-${submenuNumber}`,
+    }));
+    const contextualItems = ["overview", "settings", "history"].map((key) => ({
+      id: `menu-${menuNumber}-${key}`,
+      label: `${key === "overview" ? "Ringkasan" : key === "settings" ? "Pengaturan" : "Riwayat"} Menu ${menuNumber}`,
+      href: `#/menu-${menuNumber}/${key === "overview" ? "ringkasan" : key === "settings" ? "pengaturan" : "riwayat"}`,
+    }));
 
-    if (isTrueSubmenu) {
+    if (menuNumber === 1) {
       return {
         id: `menu-${menuNumber}`,
         label: `Menu ${menuNumber}`,
-        children: [
-          {
-            id: `menu-${menuNumber}-submenu-1`,
-            label: "Submenu 1",
-            href: `#/menu-${menuNumber}/submenu-1`,
-          },
-          {
-            id: `menu-${menuNumber}-submenu-2`,
-            label: "Submenu 2",
-            href: `#/menu-${menuNumber}/submenu-2`,
-          },
-        ],
+        href: `#/menu-${menuNumber}`,
+        contextualItems,
+      };
+    }
+
+    if (menuNumber === 2) {
+      return {
+        id: `menu-${menuNumber}`,
+        label: `Menu ${menuNumber}`,
+        href: `#/menu-${menuNumber}`,
+        children: submenuItems,
+        contextualItems,
+      };
+    }
+
+    if (menuNumber === 3) {
+      return {
+        id: `menu-${menuNumber}`,
+        label: `Menu ${menuNumber}`,
+        href: `#/menu-${menuNumber}`,
+        children: submenuItems,
+        contextualItems: false,
+      };
+    }
+
+    if (menuNumber === 5) {
+      return {
+        id: `menu-${menuNumber}`,
+        label: `Menu ${menuNumber}`,
+        children: submenuItems,
       };
     }
 
@@ -43,23 +84,6 @@ function createFigmaItems(count: number): NavbarItem[] {
       id: `menu-${menuNumber}`,
       label: `Menu ${menuNumber}`,
       href: `#/menu-${menuNumber}`,
-      children: [
-        {
-          id: `menu-${menuNumber}-overview`,
-          label: `Ringkasan Menu ${menuNumber}`,
-          href: `#/menu-${menuNumber}/ringkasan`,
-        },
-        {
-          id: `menu-${menuNumber}-settings`,
-          label: `Pengaturan Menu ${menuNumber}`,
-          href: `#/menu-${menuNumber}/pengaturan`,
-        },
-        {
-          id: `menu-${menuNumber}-history`,
-          label: `Riwayat Menu ${menuNumber}`,
-          href: `#/menu-${menuNumber}/riwayat`,
-        },
-      ],
     };
   });
 }
@@ -88,9 +112,11 @@ function getMobilePreviewPage(items: NavbarItem[], activeHref?: string) {
       };
     }
 
-    if (!Array.isArray(item.children)) continue;
-
-    const activeChild = item.children.find((child) => child.href === activeHref);
+    const itemLinks = [
+      ...(Array.isArray(item.children) ? item.children : []),
+      ...(Array.isArray(item.contextualItems) ? item.contextualItems : []),
+    ];
+    const activeChild = itemLinks.find((child) => child.href === activeHref);
     if (!activeChild) continue;
 
     const suffix = ` ${item.label}`;
@@ -116,32 +142,69 @@ const accountItems = [
 ];
 
 const navbarProps: PropRow[] = [
-  ["brand", "ReactNode", "—", "Konten logo atau identitas brand."],
+  [
+    "brand",
+    "ReactNode",
+    "—",
+    "Konten brand Front Office dan Back Office mobile; tidak ditampilkan pada Back Office desktop.",
+  ],
   ["brandLabel", "string", "—", "Nama aksesibel untuk link brand."],
-  ["brandHref", "string", "'/'", "Tujuan link brand."],
+  ["brandHref", "string", "/", "Tujuan link brand; tetap digunakan oleh brand mobile Back Office."],
   [
     "items",
     "NavbarItem[]",
-    "[]",
-    "Daftar menu utama berupa link, page dengan navigasi sekunder, atau true submenu.",
+    "—",
+    "Daftar menu utama. children membentuk submenu; contextualItems membentuk context Drawer Back Office dan false mematikan fallback legacy.",
   ],
-  ["activeHref", "string", "undefined", "Href halaman aktif yang akan ditandai pada navigation."],
-  ["search", "NavbarSearchConfig", "undefined", "Konfigurasi fitur pencarian Navbar."],
-  ["guestActions", "NavbarGuestActions", "undefined", "Aksi Masuk dan Daftar untuk pengguna guest."],
-  ["user", "NavbarUser", "undefined", "Jika diberikan, Navbar menggunakan tampilan authenticated."],
-  ["notification", "NavbarNotification", "undefined", "Konfigurasi notification untuk pengguna authenticated."],
+  [
+    "activeHref",
+    "string",
+    "undefined",
+    "Href halaman aktif untuk aria-current dan konteks Drawer Back Office mobile.",
+  ],
+  [
+    "search",
+    "NavbarSearchConfig",
+    "undefined",
+    "Konfigurasi pencarian; Front Office memakai layout FO, sedangkan Back Office mobile mengisi ruang tersedia.",
+  ],
+  [
+    "guestActions",
+    "NavbarGuestActions",
+    "undefined",
+    "Aksi Masuk dan Daftar untuk Front Office guest; diabaikan pada Back Office.",
+  ],
+  [
+    "user",
+    "NavbarUser",
+    "undefined",
+    "Data authenticated user; detail tampilan menyesuaikan variant serta desktop atau mobile.",
+  ],
+  [
+    "notification",
+    "NavbarNotification",
+    "undefined",
+    "Konfigurasi notification Front Office authenticated pada desktop.",
+  ],
   [
     "variant",
     "'front-office' | 'back-office'",
-    "'front-office'",
+    "front-office",
     "Menentukan komposisi Navbar untuk konteks Front Office atau Back Office.",
   ],
-  ["menuPosition", "'left' | 'right'", "'right'", "Posisi grup menu pada desktop."],
-  ["ariaLabel", "string", "'Navigasi utama'", "Accessible label untuk navigation landmark."],
+  [
+    "menuPosition",
+    "'left' | 'right'",
+    "right",
+    "Posisi grup menu Front Office pada desktop; tidak berlaku pada Back Office atau mobile.",
+  ],
+  ["ariaLabel", "string", "Navigasi utama", "Accessible label untuk navigation landmark."],
   ["onNavigate", "function", "undefined", "Callback saat link menu dipilih; dapat digunakan oleh router consumer."],
   ["mobileOpen", "boolean", "undefined", "State controlled untuk panel mobile."],
   ["defaultMobileOpen", "boolean", "false", "State awal panel mobile ketika uncontrolled."],
   ["onMobileOpenChange", "function", "undefined", "Callback ketika panel mobile dibuka atau ditutup."],
+  ["className", "string", "undefined", "Class tambahan untuk root Navbar."],
+  ["…props", "HTMLAttributes<HTMLElement>", "—", "Atribut elemen header standar diteruskan ke root Navbar."],
 ];
 
 function DemoBrand() {
@@ -271,6 +334,7 @@ function createPlaygroundCode({
   searchEnabled,
   guestActionsEnabled,
   menuPosition,
+  previewDevice,
 }: {
   variant: PlaygroundVariant;
   state: PlaygroundState;
@@ -278,19 +342,54 @@ function createPlaygroundCode({
   searchEnabled: boolean;
   guestActionsEnabled: boolean;
   menuPosition: MenuPosition;
+  previewDevice: PreviewDevice;
 }) {
   const items = Array.from({ length: menuCount }, (_, index) => {
     const number = index + 1;
-    const isTrueSubmenu = menuCount >= 2 && index === menuCount - 1;
+    const submenuItems = `[
+        { id: 'menu-${number}-submenu-1', label: 'Submenu 1 Menu ${number}', href: '/menu-${number}/submenu-1' },
+        { id: 'menu-${number}-submenu-2', label: 'Submenu 2 Menu ${number}', href: '/menu-${number}/submenu-2' },
+      ]`;
+    const contextualItems = `[
+        { id: 'menu-${number}-overview', label: 'Ringkasan Menu ${number}', href: '/menu-${number}/ringkasan' },
+        { id: 'menu-${number}-settings', label: 'Pengaturan Menu ${number}', href: '/menu-${number}/pengaturan' },
+        { id: 'menu-${number}-history', label: 'Riwayat Menu ${number}', href: '/menu-${number}/riwayat' },
+      ]`;
 
-    if (isTrueSubmenu) {
+    if (number === 1) {
       return `    {
       id: 'menu-${number}',
       label: 'Menu ${number}',
-      children: [
-        { id: 'menu-${number}-submenu-1', label: 'Submenu 1', href: '/menu-${number}/submenu-1' },
-        { id: 'menu-${number}-submenu-2', label: 'Submenu 2', href: '/menu-${number}/submenu-2' },
-      ],
+      href: '/menu-${number}',
+      contextualItems: ${contextualItems},
+    }`;
+    }
+
+    if (number === 2) {
+      return `    {
+      id: 'menu-${number}',
+      label: 'Menu ${number}',
+      href: '/menu-${number}',
+      children: ${submenuItems},
+      contextualItems: ${contextualItems},
+    }`;
+    }
+
+    if (number === 3) {
+      return `    {
+      id: 'menu-${number}',
+      label: 'Menu ${number}',
+      href: '/menu-${number}',
+      children: ${submenuItems},
+      contextualItems: false,
+    }`;
+    }
+
+    if (number === 5) {
+      return `    {
+      id: 'menu-${number}',
+      label: 'Menu ${number}',
+      children: ${submenuItems},
     }`;
     }
 
@@ -298,59 +397,69 @@ function createPlaygroundCode({
       id: 'menu-${number}',
       label: 'Menu ${number}',
       href: '/menu-${number}',
-      children: [
-        { id: 'menu-${number}-overview', label: 'Ringkasan Menu ${number}', href: '/menu-${number}/ringkasan' },
-        { id: 'menu-${number}-settings', label: 'Pengaturan Menu ${number}', href: '/menu-${number}/pengaturan' },
-        { id: 'menu-${number}-history', label: 'Riwayat Menu ${number}', href: '/menu-${number}/riwayat' },
-      ],
     }`;
   }).join(",\n");
 
-  const lines = [
-    "<Navbar",
-    "  brand={<Logo />}",
-    '  brandLabel="KOMDIGI — Beranda"',
-    "  items={[",
-    items,
-    "  ]}",
-  ];
+  let segmentKey = 0;
+  const code: ReactNode[] = [];
+  const add = (text: string, highlighted = false) => {
+    const key = `code-segment-${segmentKey++}`;
+    code.push(
+      highlighted ? (
+        <H key={key}>{text}</H>
+      ) : (
+        <span key={key}>{text}</span>
+      ),
+    );
+  };
 
-  if (variant === "back-office") lines.splice(1, 0, '  variant="back-office"');
+  add("import { Navbar } from '@tpl/design-kit-react';\n\n");
+  add(`const items = [\n${items.replace(/^ {2}/gm, "")}\n];\n\n`, true);
+  add("<Navbar\n");
+
+  if (variant === "back-office") {
+    add('  variant="back-office"\n', true);
+  }
+
+  add("  brand={<Logo />}\n");
+  add('  brandLabel="KOMDIGI — Beranda"\n');
+  add("  items={items}\n");
 
   if (searchEnabled) {
-    lines.push(
-      "  search={{",
-      "    label: 'Cari layanan',",
-      "    placeholder: 'Search Civitas, Organisasi ...',",
-      "    onSubmit: (query) => console.log(query),",
-      "  }}",
+    add(
+      "  search={{\n    label: 'Cari layanan',\n    placeholder: 'Search Civitas, Organisasi ...',\n    onSubmit: (query) => console.log(query),\n  }}\n",
+      true,
     );
   }
 
-  if (variant === "front-office") lines.push(`  menuPosition="${menuPosition}"`);
+  if (
+    variant === "front-office" &&
+    previewDevice === "desktop" &&
+    menuPosition !== "right"
+  ) {
+    add(`  menuPosition="${menuPosition}"\n`, true);
+  }
 
   if (variant === "front-office" && state === "guest" && guestActionsEnabled) {
-    lines.push(
-      "  guestActions={{",
-      "    login: { label: 'Masuk', href: '/login' },",
-      "    register: { label: 'Daftar', href: '/register' },",
-      "  }}",
+    add(
+      "  guestActions={{\n    login: { label: 'Masuk', href: '/login' },\n    register: { label: 'Daftar', href: '/register' },\n  }}\n",
+      true,
     );
   }
 
   if (state === "authenticated") {
-    lines.push(
-      "  user={{",
-      "    name: 'User Komdigi',",
-      "    avatarSrc: '/avatar.jpg',",
-      "    items: [{ id: 'profile', label: 'Profil', href: '/profile' }],",
-      "  }}",
-      "  notification={{ unread: true, href: '/notifications' }}",
+    add(
+      `  user={{\n    name: 'User Komdigi',\n    avatarSrc: '/avatar.jpg',\n    items: [{ id: 'profile', label: 'Profil', href: '/profile' }],\n  }}\n${
+        variant === "front-office"
+          ? "  notification={{ unread: true, href: '/notifications' }}\n"
+          : ""
+      }`,
+      true,
     );
   }
 
-  lines.push("/>");
-  return lines.join("\n");
+  add("/>");
+  return <>{code}</>;
 }
 
 function NavbarDocumentationDemo() {
@@ -383,21 +492,24 @@ function NavbarDocumentationDemo() {
     searchEnabled,
     guestActionsEnabled,
     menuPosition,
+    previewDevice,
   });
   const menuPositionDisabled = previewDevice === "mobile" || variant === "back-office";
   const menuPositionHelp =
-    menuPositionDisabled
+    variant === "back-office"
       ? "Hanya digunakan pada Front Office desktop."
-      : "Mengatur posisi grup menu pada tampilan desktop.";
+      : previewDevice === "mobile"
+        ? "Hanya berlaku pada tampilan desktop."
+        : "Mengatur posisi grup menu pada tampilan desktop.";
   const guestActionsDisabled = variant === "back-office";
 
   return (
     <>
-      <Section title="Playground">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+      <FlowSection id="playground" title="Playground">
+        <Lead>
           Gunakan controls untuk melihat bagaimana public props mengubah komposisi Navbar dan kode
           implementasinya.
-        </p>
+        </Lead>
         {previewDevice === "desktop" ? (
           <ScaledDesktopFrame
             title="Preview interaktif Navbar desktop"
@@ -412,7 +524,7 @@ function NavbarDocumentationDemo() {
         )}
         <div
           data-navbar-config-grid
-          className="mt-4 grid w-full gap-x-10 gap-y-6 md:grid-cols-2"
+          className="mt-4 grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           <div>
             <ControlLabel>Variant</ControlLabel>
@@ -555,11 +667,16 @@ function NavbarDocumentationDemo() {
             <p className="mt-2 max-w-xs text-xs leading-5 text-gray-500">{menuPositionHelp}</p>
           </div>
         </div>
-      </Section>
+      </FlowSection>
 
-      <Section title="Penggunaan">
-        <CodeBlock>{code}</CodeBlock>
-      </Section>
+      <FlowSection id="penggunaan" title="Penggunaan">
+          <Lead>
+            Blok ini mengikuti kontrol di Playground—ubah kontrolnya, lalu preview dan kode ikut
+            berubah. Prop yang masih memakai nilai bawaan atau tidak digunakan sengaja tidak
+            ditulis.
+          </Lead>
+          <SectionCode flush>{code}</SectionCode>
+      </FlowSection>
     </>
   );
 }
@@ -691,194 +808,217 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
   );
 }
 
-const automaticAccessibility = [
-  "Menyediakan elemen semantic header, nav, dan search.",
-  "Menandai halaman aktif dengan aria-current.",
-  "Menyampaikan status menu melalui aria-expanded dan aria-controls.",
-  "Menutup menu dengan Escape dan mengembalikan focus ke trigger.",
-  "Mencegah navigation item disabled diaktifkan.",
-  "Menyembunyikan icon dekoratif dari assistive technology.",
-  "Menyampaikan status hamburger dan label notification secara aksesibel.",
-  "Mengelola Sidebar mobile dan, khusus Back Office, trigger serta Drawer navigasi sekunder.",
-];
+const variantsCode = (
+  <>
+    {"<Navbar\n"}
+    <H>{'  variant="back-office"\n'}</H>
+    {"  brand={<Logo />}\n  brandLabel=\"KOMDIGI — Beranda\"\n  items={items}\n  search={search}\n/>"}
+  </>
+);
 
-const consumerAccessibility = [
-  "Berikan brandLabel yang jelas dan bermakna.",
-  "Gunakan label menu yang deskriptif dan href yang valid.",
-  "Isi search.label jika konteks pencarian berbeda dari default.",
-  "Isi notification.label jika label default kurang spesifik.",
-  "Sediakan avatarAlt atau initials yang sesuai bila avatar digunakan.",
-];
+const statesCode = (
+  <>
+    {"// Guest: omit `user` dan gunakan `guestActions` bila diperlukan.\n<Navbar\n  brand={<Logo />}\n  brandLabel=\"KOMDIGI — Beranda\"\n  items={items}\n  search={search}\n"}
+    <H>
+      {
+        "  user={{ name: 'User Komdigi', items: accountItems }}\n  notification={{ unread: true, href: '/notifications' }}\n"
+      }
+    </H>
+    {"/>"}
+  </>
+);
+
+const navigationShapesCode = (
+  <>
+    {"const items = [\n"}
+    <H>{"  { id: 'direct', label: 'Direct', href: '/direct' },\n"}</H>
+    <H>
+      {
+        "  {\n    id: 'context',\n    label: 'Context',\n    href: '/context',\n    contextualItems: [{ id: 'summary', label: 'Ringkasan', href: '/context/ringkasan' }],\n  },\n"
+      }
+    </H>
+    {"  {\n    id: 'menu-2',\n    label: 'Menu 2',\n    href: '/menu-2',\n"}
+    <H>
+      {
+        "    children: [\n      { id: 'menu-2-submenu-1', label: 'Submenu 1 Menu 2', href: '/menu-2/submenu-1' },\n      { id: 'menu-2-submenu-2', label: 'Submenu 2 Menu 2', href: '/menu-2/submenu-2' },\n    ],\n"
+      }
+    </H>
+    <H>
+      {
+        "    contextualItems: [\n      { id: 'menu-2-overview', label: 'Ringkasan Menu 2', href: '/menu-2/ringkasan' },\n      { id: 'menu-2-settings', label: 'Pengaturan Menu 2', href: '/menu-2/pengaturan' },\n    ],\n"
+      }
+    </H>
+    {"  },\n"}
+    <H>
+      {
+        "  {\n    id: 'submenu-only',\n    label: 'Submenu tanpa context',\n    href: '/submenu',\n    children: [{ id: 'child', label: 'Child', href: '/submenu/child' }],\n    contextualItems: false,\n  },\n"
+      }
+    </H>
+    <H>{"  { id: 'group', label: 'Group', children: submenuItems },\n"}</H>
+    {"] satisfies NavbarItem[];"}
+  </>
+);
 
 export function NavbarPage() {
   return (
-    <ComponentPage
+    <UsulanPage
       eyebrow="Components · Navbar"
       title="Navbar"
       description="Navbar digunakan sebagai navigasi utama di bagian atas aplikasi. Komponen ini mendukung menu, pencarian, aksi untuk guest, serta akun pengguna pada kondisi authenticated."
+      toc={navbarToc}
     >
-      <Section title="States">
-        <div className="grid gap-5">
-          <div>
-            <h3 className="text-sm font-black text-gray-900">Guest</h3>
-            <p className="mt-2 mb-3 max-w-2xl text-body-sm leading-6 text-gray-500">
-              Digunakan ketika pengguna belum terautentikasi. Navbar dapat menampilkan aksi Masuk
-              dan Daftar.
-            </p>
-            <Demo>
-              <ScaledDesktopFrame
-                title="Preview statis Navbar Guest"
-                src="?#/preview/navbar/desktop-guest-3"
-                embedded
-              />
-            </Demo>
-          </div>
+      <FlowSection id="variants" title="Variants">
+          <Lead>
+            Pilih Front Office untuk layanan publik dan Back Office untuk application shell.
+            Front Office adalah default; tambahkan prop variant untuk memakai Back Office.
+          </Lead>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-sm font-black text-gray-900">Front Office</h3>
+              <p className="mt-2 mb-3 max-w-2xl text-body-sm leading-6 text-gray-500">
+                Menampilkan brand, pencarian, navigation, serta aksi Masuk dan Daftar. Pada mobile,
+                Hamburger kanan membuka Sidebar kiri dalam layout dua baris tanpa Drawer. Front
+                Office adalah variant default.
+              </p>
+              <Demo>
+                <ScaledDesktopFrame
+                  title="Preview statis Front Office"
+                  src="?navbarVariant=front-office#/preview/navbar/desktop-guest-3"
+                  embedded
+                />
+              </Demo>
+            </div>
 
-          <div>
-            <h3 className="text-sm font-black text-gray-900">Authenticated</h3>
-            <p className="mt-2 mb-3 max-w-2xl text-body-sm leading-6 text-gray-500">
-              Digunakan ketika data pengguna tersedia. Guest actions digantikan oleh notification
-              dan user controls.
-            </p>
-            <Demo>
-              <ScaledDesktopFrame
-                title="Preview statis Navbar Authenticated"
-                src="?#/preview/navbar/desktop-authenticated-3"
-                embedded
-              />
-            </Demo>
+            <div>
+              <h3 className="text-sm font-black text-gray-900">Back Office</h3>
+              <p className="mt-2 mb-3 max-w-2xl text-body-sm leading-6 text-gray-500">
+                Desktop menempatkan Search di kiri dan navigation di kanan tanpa brand visual atau
+                guest actions. Mobile memakai Hamburger kiri, stacked brand, Search inline, serta
+                trigger Drawer kanan hanya ketika halaman aktif memiliki navigation sekunder.
+                Escape menutup surface dan focus kembali ke trigger.
+              </p>
+              <Demo>
+                <ScaledDesktopFrame
+                  title="Preview statis Back Office"
+                  src="?navbarVariant=back-office#/preview/navbar/desktop-no-button-3"
+                  embedded
+                  referenceWidth={1184}
+                />
+              </Demo>
+            </div>
           </div>
-        </div>
-      </Section>
+          <SectionCode>{variantsCode}</SectionCode>
+      </FlowSection>
 
-      <Section title="Variants">
-        <div className="grid gap-5">
-          <div>
-            <h3 className="text-sm font-black text-gray-900">Front Office</h3>
-            <p className="mt-2 mb-3 max-w-2xl text-body-sm leading-6 text-gray-500">
-              Digunakan untuk layanan publik. Desktop menampilkan brand, sedangkan mobile memakai
-              Hamburger di kanan untuk membuka Sidebar tanpa secondary Drawer.
-            </p>
-            <Demo>
-              <ScaledDesktopFrame
-                title="Preview statis Front Office"
-                src="?navbarVariant=front-office#/preview/navbar/desktop-guest-3"
-                embedded
-              />
-            </Demo>
+      <FlowSection id="states" title="States">
+          <Lead>
+            Guest dapat menampilkan aksi Masuk dan Daftar. Ketika data user diberikan, Navbar
+            menggantinya dengan authenticated controls; Bell hanya tampil pada Front Office
+            desktop.
+          </Lead>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-sm font-black text-gray-900">Guest</h3>
+              <p className="mt-2 mb-3 text-body-sm leading-6 text-gray-500">
+                Gunakan tanpa prop user dan tambahkan guestActions untuk aksi autentikasi.
+              </p>
+              <Demo>
+                <ScaledDesktopFrame
+                  title="Preview statis Navbar Guest"
+                  src="?#/preview/navbar/desktop-guest-3"
+                  embedded
+                />
+              </Demo>
+            </div>
+            <div>
+              <h3 className="text-sm font-black text-gray-900">Authenticated</h3>
+              <p className="mt-2 mb-3 text-body-sm leading-6 text-gray-500">
+                Berikan user untuk menampilkan avatar dan user controls; mobile menyembunyikan
+                nama user dan Bell.
+              </p>
+              <Demo>
+                <ScaledDesktopFrame
+                  title="Preview statis Navbar Authenticated"
+                  src="?#/preview/navbar/desktop-authenticated-3"
+                  embedded
+                />
+              </Demo>
+            </div>
           </div>
+          <SectionCode>{statesCode}</SectionCode>
+      </FlowSection>
 
-          <div>
-            <h3 className="text-sm font-black text-gray-900">Back Office</h3>
-            <p className="mt-2 mb-3 max-w-2xl text-body-sm leading-6 text-gray-500">
-              Digunakan sebagai application shell. Desktop tidak menampilkan brand; pada mobile,
-              Hamburger, brand, Search, avatar opsional, dan trigger Drawer tersusun dalam satu
-              baris.
-            </p>
-            <Demo>
-              <ScaledDesktopFrame
-                title="Preview statis Back Office"
-                src="?navbarVariant=back-office#/preview/navbar/desktop-authenticated-3"
-                embedded
-                referenceWidth={1184}
-              />
-            </Demo>
-          </div>
-        </div>
-      </Section>
-
-      <Section title="Navigation">
-        <p className="mb-4 max-w-2xl text-body-sm leading-6 text-gray-500">
+      <FlowSection id="navigation" title="Navigation">
+        <Lead>
           Bentuk setiap <code>NavbarItem</code> menentukan cara item berperilaku sebagai halaman,
           navigasi sekunder, atau submenu.
-        </p>
-        <div className="grid gap-5 md:grid-cols-3">
+        </Lead>
+        <div className="grid gap-5 md:grid-cols-2">
           <div>
             <h3 className="text-sm font-black text-gray-900">Primary navigation</h3>
             <p className="mt-2 text-xs font-bold text-primary-700">href</p>
             <p className="mt-2 text-body-sm leading-6 text-gray-500">
-              Item dengan href mengarahkan pengguna langsung ke halaman utama.
+              Item dengan href mengarahkan pengguna langsung ke halaman utama. Link aktif ditandai
+              menggunakan <code>aria-current</code>.
             </p>
           </div>
           <div>
-            <h3 className="text-sm font-black text-gray-900">Secondary navigation</h3>
-            <p className="mt-2 text-xs font-bold text-primary-700">href + children</p>
+            <h3 className="text-sm font-black text-gray-900">Contextual navigation</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">href + contextualItems</p>
             <p className="mt-2 text-body-sm leading-6 text-gray-500">
-              Item dengan href dan children memiliki halaman utama serta navigasi sekunder. Pada
-              Back Office mobile, navigasi ini dibuka melalui trigger Drawer.
+              Parent tetap direct link. Pada Back Office mobile, contextualItems ditampilkan lewat
+              Drawer; Front Office tidak menampilkan surface tersebut.
             </p>
           </div>
           <div>
-            <h3 className="text-sm font-black text-gray-900">Submenu</h3>
-            <p className="mt-2 text-xs font-bold text-primary-700">children</p>
+            <h3 className="text-sm font-black text-gray-900">Page + submenu + context</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">
+              href + children + contextualItems
+            </p>
             <p className="mt-2 text-body-sm leading-6 text-gray-500">
-              Item dengan children tanpa href berfungsi sebagai submenu dan menggunakan chevron
-              untuk membuka item turunannya.
+              Link parent dan trigger submenu memiliki tanggung jawab terpisah. Contextual items
+              tetap menjadi sumber Drawer Back Office.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Submenu tanpa context</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">
+              href + children + contextualItems: false
+            </p>
+            <p className="mt-2 text-body-sm leading-6 text-gray-500">
+              Parent tetap dapat dinavigasi dan children tetap submenu, tetapi tidak menghasilkan
+              Drawer Back Office.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900">True submenu</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">children-only</p>
+            <p className="mt-2 text-body-sm leading-6 text-gray-500">
+              Tanpa href parent. Trigger submenu memakai aria-expanded dan aria-controls. Escape
+              menutup surface dan focus kembali ke trigger.
             </p>
           </div>
         </div>
-      </Section>
+        <p className="mt-4 text-body-sm leading-6 text-gray-500">
+          Untuk kompatibilitas, <code>href + children</code> tanpa contextualItems masih memakai
+          children sebagai context Back Office. Gunakan <code>contextualItems: false</code> bila
+          children hanya dimaksudkan sebagai submenu.
+        </p>
+          <SectionCode>{navigationShapesCode}</SectionCode>
+      </FlowSection>
 
       <NavbarDocumentationDemo />
 
-      <Section title="Responsive">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <h3 className="text-sm font-black text-gray-900">Desktop</h3>
-            <p className="mt-2 max-w-2xl text-body-sm leading-6 text-gray-500">
-              Front Office menampilkan brand, Search, navigation, dan actions atau user controls;
-              menuPosition mengatur grup menu. Back Office menampilkan Search di kiri serta
-              navigation dan user controls di kanan tanpa brand.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-sm font-black text-gray-900">Mobile</h3>
-            <p className="mt-2 max-w-2xl text-body-sm leading-6 text-gray-500">
-              Front Office memakai Hamburger kanan dan Sidebar kiri tanpa Drawer. Back Office
-              memakai satu baris dengan Hamburger kiri, brand, Search, avatar opsional, dan trigger
-              Drawer kanan ketika halaman aktif memiliki navigasi sekunder. Notification Bell tidak
-              tampil pada authenticated mobile.
-            </p>
-          </div>
-        </div>
-      </Section>
-
-      <Section title="Accessibility">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div>
-            <h3 className="text-sm font-black text-gray-900">Ditangani otomatis oleh Navbar</h3>
-            <ul className="mt-3 space-y-2 text-body-sm leading-6 text-content-subtle">
-              {automaticAccessibility.map((item) => (
-                <li key={item} className="flex gap-2">
-                  <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-600" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-black text-gray-900">Perlu diperhatikan consumer</h3>
-            <ul className="mt-3 space-y-2 text-body-sm leading-6 text-content-subtle">
-              {consumerAccessibility.map((item) => (
-                <li key={item} className="flex gap-2">
-                  <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-600" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </Section>
-
-      <Section title="Properties">
-        <p className="mb-4 max-w-2xl text-body-sm leading-6 text-gray-500">
-          Pada <code>NavbarItem</code>, <code>href</code> membuat primary navigation link,
-          kombinasi <code>href + children</code> menyediakan secondary navigation context untuk
-          Drawer Back Office, dan <code>children</code> tanpa <code>href</code> membuat true submenu.
-        </p>
-        <PropsTable rows={navbarProps} />
-      </Section>
-    </ComponentPage>
+      <FlowSection id="properties" title="Properties">
+          <Lead>
+            Pada <code>NavbarItem</code>, <code>href</code> membuat primary navigation link,
+            <code>children</code> membentuk submenu dan <code>contextualItems</code> membentuk context
+            Drawer Back Office. Nilai <code>false</code> mematikan fallback legacy dari children.
+            Consumer perlu menyediakan <code>brandLabel</code>, label menu, href, dan alternative
+            text yang bermakna.
+          </Lead>
+          <PropsTable rows={navbarProps} />
+      </FlowSection>
+    </UsulanPage>
   );
 }

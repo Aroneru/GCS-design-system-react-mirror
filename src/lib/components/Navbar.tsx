@@ -36,16 +36,19 @@ export type NavbarItem =
       href: string;
       external?: boolean;
       children?: never;
+      contextualItems?: NavbarSubItem[] | false;
     })
   | (NavbarItemBase & {
       href: string;
       external?: boolean;
       children: NavbarSubItem[];
+      contextualItems?: NavbarSubItem[] | false;
     })
   | (NavbarItemBase & {
       href?: never;
       external?: never;
       children: NavbarSubItem[];
+      contextualItems?: never;
     });
 
 interface NavbarSearchBase {
@@ -125,17 +128,24 @@ const mobileNavigationTriggerClasses = `${mobileNavigationTriggerBaseClasses} si
 const mobileBackOfficeNavigationTriggerClasses = `${mobileNavigationTriggerBaseClasses} size-[30px]`;
 
 type NavbarSectionItem = Extract<NavbarItem, { children: NavbarSubItem[] }>;
-type NavbarContextItem = Extract<
-  NavbarItem,
-  { href: string; children: NavbarSubItem[] }
->;
+type NavbarLinkItem = Extract<NavbarItem, { href: string }>;
+type ResolvedNavbarContext = {
+  item: NavbarLinkItem;
+  contextualItems: NavbarSubItem[];
+};
 
 function isNavbarSectionItem(item: NavbarItem): item is NavbarSectionItem {
   return Array.isArray(item.children) && item.children.length > 0;
 }
 
-function isNavbarContextItem(item: NavbarItem): item is NavbarContextItem {
-  return typeof item.href === "string" && isNavbarSectionItem(item);
+function getContextualItems(item: NavbarItem): NavbarSubItem[] | undefined {
+  if (typeof item.href !== "string" || item.contextualItems === false) return undefined;
+  if (Array.isArray(item.contextualItems)) {
+    return item.contextualItems.length > 0 ? item.contextualItems : undefined;
+  }
+
+  // Backward compatibility: href + children was the original BO Drawer contract.
+  return isNavbarSectionItem(item) ? item.children : undefined;
 }
 
 function findActivePrimaryItem(items: NavbarItem[], activeHref?: string) {
@@ -144,10 +154,14 @@ function findActivePrimaryItem(items: NavbarItem[], activeHref?: string) {
     if (item.active) return true;
     if (typeof item.href === "string" && item.href === activeHref) return true;
 
-    return (
+    const navigationChildActive =
       isNavbarSectionItem(item) &&
-      item.children.some((child) => !child.disabled && child.href === activeHref)
+      item.children.some((child) => !child.disabled && child.href === activeHref);
+    const contextualChildActive = getContextualItems(item)?.some(
+      (child) => !child.disabled && child.href === activeHref,
     );
+
+    return navigationChildActive || contextualChildActive;
   });
 }
 
@@ -384,18 +398,29 @@ export function Navbar({
   const showGuestActions =
     !isBackOffice && !user && Boolean(guestActions?.login || guestActions?.register);
   const activePrimaryItem = findActivePrimaryItem(items, activeHref);
+  const activeContextualItems = activePrimaryItem
+    ? getContextualItems(activePrimaryItem)
+    : undefined;
   const activeMobileSection =
-    isBackOffice && activePrimaryItem && isNavbarContextItem(activePrimaryItem)
-      ? activePrimaryItem
+    isBackOffice && activePrimaryItem && typeof activePrimaryItem.href === "string" && activeContextualItems
+      ? { item: activePrimaryItem as NavbarLinkItem, contextualItems: activeContextualItems }
       : undefined;
   const openMobileDrawerItem = items.find(
-    (item): item is NavbarContextItem =>
-      isBackOffice &&
-      isNavbarContextItem(item) &&
-      item.id === openMobileDrawerItemId &&
-      !item.disabled,
+    (item) => isBackOffice && item.id === openMobileDrawerItemId && !item.disabled,
   );
-  const mobileDrawerOpen = openMobileDrawerItem !== undefined;
+  const openMobileDrawerContext: ResolvedNavbarContext | undefined =
+    openMobileDrawerItem &&
+    activeMobileSection &&
+    openMobileDrawerItem.id === activeMobileSection.item.id &&
+    typeof openMobileDrawerItem.href === "string"
+      ? (() => {
+          const contextualItems = getContextualItems(openMobileDrawerItem);
+          return contextualItems
+            ? { item: openMobileDrawerItem as NavbarLinkItem, contextualItems }
+            : undefined;
+        })()
+      : undefined;
+  const mobileDrawerOpen = openMobileDrawerContext !== undefined;
 
   const handleNavigationMenuChange = useCallback((itemId: string | null) => {
     setOpenMenuId(itemId);
@@ -461,6 +486,18 @@ export function Navbar({
     const closeDrawerTimer = window.setTimeout(() => setOpenMobileDrawerItemId(null), 0);
     return () => window.clearTimeout(closeDrawerTimer);
   }, [isBackOffice]);
+
+  useEffect(() => {
+    if (
+      openMobileDrawerItemId === null ||
+      openMobileDrawerItemId === activeMobileSection?.item.id
+    ) {
+      return;
+    }
+
+    const resetDrawerTimer = window.setTimeout(() => setOpenMobileDrawerItemId(null), 0);
+    return () => window.clearTimeout(resetDrawerTimer);
+  }, [activeMobileSection?.item.id, openMobileDrawerItemId]);
 
   useEffect(() => {
     if (!isMobileOpen && !mobileDrawerOpen) return;
@@ -647,7 +684,7 @@ export function Navbar({
           {!isBackOffice && (
             <div className={cn("lg:hidden", user ? "ml-2" : "ml-auto")}>{mobileHamburger}</div>
           )}
-          {isBackOffice && activeMobileSection && (
+          {activeMobileSection && (
             <button
               ref={mobileDrawerTriggerRef}
               type="button"
@@ -655,7 +692,7 @@ export function Navbar({
                 mobileBackOfficeNavigationTriggerClasses,
                 "lg:hidden",
               )}
-              aria-label={`${mobileDrawerOpen ? "Tutup" : "Buka"} navigasi sekunder ${activeMobileSection.label}`}
+              aria-label={`${mobileDrawerOpen ? "Tutup" : "Buka"} navigasi sekunder ${activeMobileSection.item.label}`}
               aria-expanded={mobileDrawerOpen}
               aria-controls={mobileDrawerId}
               onClick={() => {
@@ -664,7 +701,7 @@ export function Navbar({
                   return;
                 }
 
-                setOpenMobileDrawerItemId(activeMobileSection.id);
+                setOpenMobileDrawerItemId(activeMobileSection.item.id);
                 window.setTimeout(() => mobileDrawerCloseRef.current?.focus(), 50);
               }}
             >
@@ -694,7 +731,7 @@ export function Navbar({
           sidebarId={mobilePanelId}
           drawerId={mobileDrawerId}
           sidebarOpen={isMobileOpen}
-          drawerItem={openMobileDrawerItem}
+          drawerItem={openMobileDrawerContext}
           drawerEnabled={isBackOffice}
           sidebarCloseRef={mobileSidebarCloseRef}
           drawerCloseRef={mobileDrawerCloseRef}

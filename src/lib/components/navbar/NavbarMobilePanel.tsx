@@ -7,7 +7,10 @@ import { Icon } from '../Icon'
 type NavbarLinkItem = Extract<NavbarItem, { href: string }>
 type NavbarSectionItem = Extract<NavbarItem, { children: NavbarSubItem[] }>
 type NavbarNestedItem = Extract<NavbarItem, { href?: never; children: NavbarSubItem[] }>
-type NavbarContextItem = Extract<NavbarItem, { href: string; children: NavbarSubItem[] }>
+type NavbarContextItem = {
+  item: NavbarLinkItem
+  contextualItems: NavbarSubItem[]
+}
 
 interface NavbarMobilePanelProps {
   sidebarId: string
@@ -177,6 +180,74 @@ export function NavbarMobilePanel({
             <nav aria-label={ariaLabel}>
               <ul className="space-y-1">
                 {navigationItems.map((item) => {
+                  if (isLinkItem(item) && isSectionItem(item)) {
+                    const childActive = item.children.some(
+                      (child) => !child.disabled && isActive(child, activeHref),
+                    )
+                    const contextualChildActive = Array.isArray(item.contextualItems)
+                      ? item.contextualItems.some(
+                          (child) => !child.disabled && isActive(child, activeHref),
+                        )
+                      : false
+                    const parentPageActive = isActive(item, activeHref)
+                    const descendantActive = childActive || contextualChildActive
+                    const expanded = openNestedItemId === item.id
+                    const submenuId = `${sidebarId}-${encodeURIComponent(item.id)}-submenu`
+
+                    return (
+                      <li key={item.id}>
+                        <div
+                          className={cn(
+                            'flex items-center gap-1 rounded-md',
+                            (parentPageActive || descendantActive) && 'bg-primary-50',
+                          )}
+                        >
+                          <div className="min-w-0 flex-1">
+                            <MobileLink
+                              item={item}
+                              activeHref={activeHref}
+                              onNavigate={onNavigate}
+                              onClose={onSidebarClose}
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            data-navbar-mobile-section-id={item.id}
+                            className={cn(
+                              'grid size-10 shrink-0 place-items-center rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                              item.disabled
+                                ? 'cursor-not-allowed text-content-subtle opacity-50'
+                                : descendantActive
+                                  ? 'text-brand'
+                                  : 'text-content hover:bg-surface-subtle hover:text-brand',
+                            )}
+                            disabled={item.disabled}
+                            aria-label={`${expanded ? 'Tutup' : 'Buka'} submenu ${item.label}`}
+                            aria-expanded={expanded}
+                            aria-controls={submenuId}
+                            onClick={() => setOpenNestedItemId(expanded ? null : item.id)}
+                          >
+                            <Icon className="size-4 shrink-0">
+                              <ChevronRight aria-hidden="true" focusable="false" />
+                            </Icon>
+                          </button>
+                        </div>
+                        <ul id={submenuId} hidden={!expanded} className="mt-1 space-y-1 pl-4">
+                          {item.children.map((child) => (
+                            <li key={child.id}>
+                              <MobileLink
+                                item={child}
+                                activeHref={activeHref}
+                                onNavigate={onNavigate}
+                                onClose={onSidebarClose}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    )
+                  }
+
                   if (isLinkItem(item)) {
                     return (
                       <li key={item.id}>
@@ -288,13 +359,13 @@ export function NavbarMobilePanel({
           <>
             <div className="flex min-h-16 items-center justify-between gap-3 border-b border-border px-4 py-3">
               <h2 id={drawerHeadingId} className="truncate text-base font-bold text-content">
-                {drawerItem.label}
+                {drawerItem.item.label}
               </h2>
               <button
                 ref={drawerCloseRef}
                 type="button"
                 className="grid size-10 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-                aria-label={`Tutup navigasi sekunder ${drawerItem.label}`}
+                aria-label={`Tutup navigasi sekunder ${drawerItem.item.label}`}
                 onClick={onDrawerClose}
               >
                 <Icon className="size-5">
@@ -303,9 +374,9 @@ export function NavbarMobilePanel({
               </button>
             </div>
 
-            <nav className="px-4 py-5" aria-label={`Navigasi sekunder ${drawerItem.label}`}>
+            <nav className="px-4 py-5" aria-label={`Navigasi sekunder ${drawerItem.item.label}`}>
               <ul className="space-y-1">
-                {drawerItem.children.map((child) => (
+                {drawerItem.contextualItems.map((child) => (
                   <li key={child.id}>
                     <MobileLink
                       item={child}

@@ -131,44 +131,79 @@ export function NavbarNavigation({
 
           return (
             <li key={item.id} className="relative">
-              <button
-                ref={(node) => {
-                  if (node) triggerRefs.current.set(item.id, node)
-                  else triggerRefs.current.delete(item.id)
-                }}
-                type="button"
-                className={cn(
-                  'flex max-w-xs items-center gap-1.5 truncate rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
-                  item.disabled
-                    ? 'cursor-not-allowed text-content-subtle opacity-50'
-                    : parentActive
-                      ? 'bg-primary-50 text-brand'
-                      : 'text-content hover:bg-surface-subtle hover:text-brand',
-                )}
-                disabled={item.disabled}
-                aria-expanded={expanded}
-                aria-controls={submenuId}
-                onClick={() => onOpenMenuChange(expanded ? null : item.id)}
-              >
-                <span className="truncate">{item.label}</span>
-                <Icon
-                  className={cn(
-                    'size-4 shrink-0 transition-transform motion-reduce:transition-none',
-                    expanded && 'rotate-180',
-                  )}
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.8}
-                    aria-hidden="true"
-                    focusable="false"
+              <div className={cn('flex items-center rounded-md', parentActive && 'bg-primary-50')}>
+                {isLinkItem(item) && (
+                  <a
+                    href={item.href}
+                    className={cn(
+                      'max-w-xs truncate rounded-l-md py-2 pl-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                      item.disabled
+                        ? 'cursor-not-allowed text-content-subtle opacity-50'
+                        : parentActive
+                          ? 'text-brand'
+                          : 'text-content hover:text-brand',
+                    )}
+                    aria-current={!item.disabled && item.href === activeHref ? 'page' : undefined}
+                    aria-disabled={item.disabled || undefined}
+                    tabIndex={item.disabled ? -1 : undefined}
+                    onClick={(event) => {
+                      if (item.disabled) {
+                        event.preventDefault()
+                        return
+                      }
+                      onNavigate?.(item, event)
+                    }}
+                    {...(item.external
+                      ? { target: '_blank', rel: 'noreferrer noopener' }
+                      : {})}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m7 10 5 5 5-5" />
-                  </svg>
-                </Icon>
-              </button>
+                    {item.label}
+                  </a>
+                )}
+                {!isLinkItem(item) && (
+                  <span className="max-w-xs truncate py-2 pl-3 text-sm font-medium">
+                    {item.label}
+                  </span>
+                )}
+                <button
+                  ref={(node) => {
+                    if (node) triggerRefs.current.set(item.id, node)
+                    else triggerRefs.current.delete(item.id)
+                  }}
+                  type="button"
+                  className={cn(
+                    'grid size-9 shrink-0 place-items-center rounded-r-md transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                    item.disabled
+                      ? 'cursor-not-allowed text-content-subtle opacity-50'
+                      : parentActive
+                        ? 'text-brand'
+                        : 'text-content hover:bg-surface-subtle hover:text-brand',
+                  )}
+                  disabled={item.disabled}
+                  aria-label={`${expanded ? 'Tutup' : 'Buka'} submenu ${item.label}`}
+                  aria-expanded={expanded}
+                  aria-controls={submenuId}
+                  onClick={() => onOpenMenuChange(expanded ? null : item.id)}
+                >
+                  <Icon
+                    className={cn(
+                      'size-4 shrink-0 transition-transform motion-reduce:transition-none',
+                      expanded && 'rotate-180',
+                    )}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.8}
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m7 10 5 5 5-5" />
+                    </svg>
+                  </Icon>
+                </button>
+              </div>
 
               <ul
                 id={submenuId}
