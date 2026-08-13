@@ -1,6 +1,8 @@
 import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../utils/cn";
 
+export type ButtonType = "button" | "iconOnly";
+
 export type ButtonVariant = "filled" | "outline";
 
 export type ButtonSize = "xs" | "s" | "base" | "l" | "xl";
@@ -11,11 +13,11 @@ export type ButtonTone = "light" | "dark";
 
 interface CommonProps {
   children?: ReactNode;
+  type?: ButtonType;
   variant?: ButtonVariant;
   size?: ButtonSize;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
-  iconOnly?: boolean;
   className?: string;
   theme?: ButtonTheme;
   tone?: ButtonTone;
@@ -40,31 +42,31 @@ const sizeClasses: Record<
 > = {
   xs: {
     button: "h-[34px] px-4 gap-2 rounded-lg text-xs",
-    icon: "size-4",
+    icon: "size-3",
     iconOnly: "h-[34px] w-[34px] rounded-full p-0",
   },
 
   s: {
     button: "h-[38px] px-4 gap-2 rounded-lg text-sm",
-    icon: "size-4",
+    icon: "size-3",
     iconOnly: "h-[38px] w-[38px] rounded-full p-0",
   },
 
   base: {
     button: "h-[40px] px-4 gap-2 rounded-lg text-base",
-    icon: "size-5",
+    icon: "size-3.5",
     iconOnly: "h-[40px] w-[40px] rounded-full p-0",
   },
 
   l: {
     button: "h-[43px] px-5 gap-2 rounded-lg text-lg",
-    icon: "size-5",
+    icon: "size-3.5",
     iconOnly: "h-[43px] w-[43px] rounded-full p-0",
   },
 
   xl: {
     button: "h-[46px] px-6 gap-2 rounded-lg text-xl",
-    icon: "size-6",
+    icon: "size-4",
     iconOnly: "h-[46px] w-[46px] rounded-full p-0",
   },
 };
@@ -142,17 +144,19 @@ const colorClasses: Record<ButtonTheme, Record<ButtonTone, Record<ButtonVariant,
 
 export function Button({
   children,
+  type = "button",
   variant = "filled",
   size = "base",
   theme = "primary",
   tone = "light",
   leftIcon,
   rightIcon,
-  iconOnly = false,
   className,
   ...props
 }: ButtonProps) {
   const currentSize = sizeClasses[size];
+
+  const isIconOnly = type === "iconOnly";
 
   const classes = cn(
     "inline-flex items-center justify-center",
@@ -162,28 +166,28 @@ export function Button({
     "focus:ring-2 focus:ring-primary-400",
     "disabled:pointer-events-none disabled:opacity-50",
     colorClasses[theme][tone][variant],
-    iconOnly ? currentSize.iconOnly : currentSize.button,
+    isIconOnly ? currentSize.iconOnly : currentSize.button,
     className,
   );
 
   const content = (
     <>
       {/* Left Icon */}
-      {leftIcon && (
+      {!isIconOnly && leftIcon && (
         <span className={cn("flex shrink-0 items-center justify-center", currentSize.icon)}>
           {leftIcon}
         </span>
       )}
 
       {/* Content / Icon Only */}
-      {iconOnly ? (
+      {isIconOnly ? (
         <span className={cn("flex items-center justify-center", currentSize.icon)}>{children}</span>
       ) : (
         children
       )}
 
       {/* Right Icon */}
-      {rightIcon && (
+      {!isIconOnly && rightIcon && (
         <span className={cn("flex shrink-0 items-center justify-center", currentSize.icon)}>
           {rightIcon}
         </span>
@@ -201,10 +205,10 @@ export function Button({
     );
   }
 
-  const { as: _as, type = "button", ...buttonProps } = props as AsButton;
+  const { as: _as, type: _type, ...buttonProps } = props as AsButton;
 
   return (
-    <button type={type} className={classes} {...buttonProps}>
+    <button type="button" className={classes} {...buttonProps}>
       {content}
     </button>
   );

@@ -1,21 +1,21 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import {
+  Alert,
   Badge,
   Button,
   Card,
   Checkbox,
   Container,
   FloatingLabel,
-  Footer,
   InputField,
   Radio,
   Select,
   TextArea,
+  Toast,
   Toggle,
   type SelectOption,
 } from "../../lib";
 import { Envelope, Globe, User } from "../../lib/icons/outline";
-import { FacebookIcon, InstagramIcon, XIcon } from "../socialIcons";
 
 /**
  * Halaman contoh — satu formulir layanan yang memakai seluruh komponen kit
@@ -44,18 +44,8 @@ const berkasWajib = [
   { value: "domain", label: "Bukti kepemilikan domain", caption: "Tangkapan layar panel domain." },
 ];
 
-const footerMenus = [
-  { label: "Tentang tpl", url: "#" },
-  { label: "Layanan", url: "#" },
-  { label: "Pengaduan", url: "#" },
-  { label: "Kebijakan privasi", url: "#" },
-];
-
-const footerSocials = [
-  { label: "Instagram", url: "#", icon: InstagramIcon },
-  { label: "X", url: "#", icon: XIcon },
-  { label: "Facebook", url: "#", icon: FacebookIcon },
-];
+// Footer tidak lagi dirender di sini: DocsLayout sudah memasangnya untuk
+// seluruh halaman, jadi dua footer akan bertumpuk kalau halaman ini punya sendiri.
 
 export function ExamplePage() {
   const [jenis, setJenis] = useState("badan");
@@ -75,6 +65,26 @@ export function ExamplePage() {
   const [setuju, setSetuju] = useState(false);
   const [terkirim, setTerkirim] = useState(false);
 
+  const [alertTampil, setAlertTampil] = useState(false);
+  const [toastTampil, setToastTampil] = useState(false);
+  // Dinaikkan tiap tombol Toast ditekan supaya hitungan mundurnya ikut diulang,
+  // bukan diabaikan karena toastTampil kebetulan sudah true.
+  const [toastKe, setToastKe] = useState(0);
+
+  const tampilkanToast = () => {
+    setToastTampil(true);
+    setToastKe((n) => n + 1);
+  };
+
+  // Toast menghilang sendiri; Alert tidak — Alert menempati alur halaman, jadi
+  // pengguna yang memutuskan kapan menutupnya. Enam detik, bukan empat, karena
+  // Toast ini punya tombol aksi yang perlu sempat dibaca dan diklik.
+  useEffect(() => {
+    if (!toastKe) return;
+    const timer = setTimeout(() => setToastTampil(false), 6000);
+    return () => clearTimeout(timer);
+  }, [toastKe]);
+
   // NIK baru dinilai setelah pengguna meninggalkan kolomnya, supaya tak memerahi
   // orang yang baru mengetik digit pertama.
   const nikSalah = nikDisentuh && nik.length !== 16;
@@ -84,7 +94,12 @@ export function ExamplePage() {
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
     );
 
-  const kirim = (event: FormEvent) => {
+  // Button dari kit selalu merender <button type="button">, jadi tombol kirim
+  // tidak lagi men-submit form secara native dan dipicu lewat onClick. Handler
+  // yang sama tetap dipasang di <form> supaya submit dari keyboard ikut
+  // tertangani — karena itu parameternya cukup "apa pun yang punya
+  // preventDefault", agar MouseEvent maupun FormEvent sama-sama cocok.
+  const kirim = (event: { preventDefault: () => void }) => {
     event.preventDefault();
     setTerkirim(true);
   };
@@ -109,11 +124,19 @@ export function ExamplePage() {
               </p>
             </div>
 
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <Button variant="outline" size="s" onClick={() => setAlertTampil(true)}>
+                Tampilkan Alert
+              </Button>
+              <Button variant="outline" size="s" onClick={tampilkanToast}>
+                Tampilkan Toast
+              </Button>
               <Button variant="outline" as="a" href="#/form">
                 Panduan
               </Button>
-              <Button variant="filled">Simpan draf</Button>
+              <Button variant="filled" onClick={tampilkanToast}>
+                Simpan draf
+              </Button>
             </div>
           </div>
         </Container>
@@ -123,6 +146,26 @@ export function ExamplePage() {
       <Container className="flex-1 py-8 sm:py-10">
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <form className="space-y-6" onSubmit={kirim}>
+            {/*
+              Alert dikendalikan dari luar lewat `open`, bukan dibungkus
+              `{alertTampil && …}`: dengan begitu komponennya sempat memainkan
+              animasi keluar sebelum melepas dirinya dari DOM.
+            */}
+            <Alert
+              variant="warning"
+              open={alertTampil}
+              onDismiss={() => setAlertTampil(false)}
+              heading="Draf ini akan kedaluwarsa"
+              actions={
+                <Button size="s" theme="yellow" tone="dark" onClick={() => setAlertTampil(false)}>
+                  Mengerti
+                </Button>
+              }
+            >
+              Draf yang tidak dikirim akan dihapus otomatis 30 hari setelah perubahan terakhir. Kirim
+              permohonan sebelum tenggat agar berkas yang sudah diunggah tidak hilang.
+            </Alert>
+
             {/* ── 1. Pemohon ── */}
             <Card
               title="1. Data pemohon"
@@ -318,10 +361,12 @@ export function ExamplePage() {
               </div>
             ) : (
               <div className="flex flex-wrap items-center gap-3">
-                <Button type="submit" disabled={!setuju}>
+                <Button onClick={kirim} disabled={!setuju}>
                   Kirim permohonan
                 </Button>
-                <Button variant="filled">Simpan sebagai draf</Button>
+                <Button variant="filled" onClick={tampilkanToast}>
+                  Simpan sebagai draf
+                </Button>
                 <Button variant="outline" theme="orange" tone="dark">
                   Batal
                 </Button>
@@ -386,6 +431,28 @@ export function ExamplePage() {
           </aside>
         </div>
       </Container>
+
+      {/*
+        Wadah yang memposisikan, bukan Toast-nya sendiri — supaya sudut dan
+        tumpukan diatur halaman, bukan dikunci di dalam komponen.
+      */}
+      <div className="fixed bottom-4 left-4 z-50 space-y-3">
+        <Toast
+          variant="success"
+          open={toastTampil}
+          onDismiss={() => setToastTampil(false)}
+          heading="Draf tersimpan"
+          actions={
+            // Di aplikasi sungguhan tombol ini mengembalikan draf ke versi
+            // sebelumnya; di sini cukup menutup notifikasinya.
+            <Button size="xs" variant="outline" className="w-full" onClick={() => setToastTampil(false)}>
+              Urungkan
+            </Button>
+          }
+        >
+          Perubahan terakhir Anda sudah disimpan di server.
+        </Toast>
+      </div>
     </div>
   );
 }

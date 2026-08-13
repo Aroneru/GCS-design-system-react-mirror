@@ -2,12 +2,15 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { CodeBlock, ControlLabel } from './pageKit'
 
 /**
- * Kerangka halaman "usulan" — susunan dokumentasi yang sedang diusulkan sebagai
- * pengganti ComponentPage: judul ber-anchor, blok kode menempel di tiap bagian,
- * dan daftar isi "On this page" yang menempel di kanan.
+ * Kerangka halaman dokumentasi: judul ber-anchor, blok kode menempel di tiap
+ * bagian, dan daftar isi "On this page" yang menempel di kanan.
  *
- * Dikumpulkan di satu berkas karena tujuh halaman memakainya; kalau disalin per
- * halaman, hook scroll-spy dan perhitungan lebarnya ikut tergandakan tujuh kali.
+ * Namanya masih "usulan" karena dulu memang diusulkan sebagai pengganti
+ * ComponentPage; sekarang hampir seluruh halaman memakainya, jadi berkas ini
+ * boleh diganti nama begitu ComponentPage benar-benar tidak dipakai lagi.
+ *
+ * Dikumpulkan di satu berkas karena belasan halaman memakainya; kalau disalin
+ * per halaman, hook scroll-spy dan perhitungan lebarnya ikut tergandakan.
  */
 
 /** Satu entri daftar isi. `id` harus sama dengan `id` pada <FlowSection>. */
@@ -95,6 +98,25 @@ export function SectionCode({ children, flush }: { children: ReactNode; flush?: 
     <div className={flush ? undefined : 'mt-4'}>
       <CodeBlock>{children}</CodeBlock>
     </div>
+  )
+}
+
+/**
+ * Daftar "Prinsip penggunaan" tanpa kartu pembungkus.
+ *
+ * Versi di pageKit membawa kartu + eyebrow-nya sendiri; di sini judulnya sudah
+ * dipegang <FlowSection>, jadi memakai yang itu akan menggandakan judul.
+ */
+export function PrincipleList({ items }: { items: ReactNode[] }) {
+  return (
+    <ul className="space-y-4 text-sm leading-6 text-gray-600">
+      {items.map((item, i) => (
+        <li key={i} className="flex gap-3">
+          <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-600" />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
   )
 }
 
