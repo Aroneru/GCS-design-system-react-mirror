@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
-import { Badge, Button, Card, Checkbox, Container, Footer, InputField, Toggle } from '../../lib'
+// Footer tidak diimpor: DocsLayout sudah memasangnya untuk seluruh halaman.
+import { Badge, Button, Card, Checkbox, Container, InputField, Toggle } from '../../lib'
 import * as OutlineIcons from '../../lib/icons/outline'
 import * as SolidIcons from '../../lib/icons/solid'
 import { brandIcons } from '../../lib/brandIconRegistry'
 import { sidebars } from '../navigation'
 import { DocUsage } from '../DocUsage'
 import { useCopy } from '../useCopy'
-import { FacebookIcon, InstagramIcon, XIcon } from '../socialIcons'
 
 const INSTALL = 'npm install @tpl/design-kit-react'
 

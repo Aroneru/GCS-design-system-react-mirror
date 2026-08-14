@@ -7,7 +7,18 @@ import {
   type FloatingLabelState,
 } from '../../../../lib'
 import { PropsTable, type PropRow } from '../../../PropsTable'
-import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } from '../../../pageKit'
+import { Demo, H, Segmented } from '../../../pageKit'
+import {
+  Control,
+  Controls,
+  FlowSection,
+  Lead,
+  SectionCode,
+  Stage,
+  UsulanPage,
+  type TocEntry,
+} from '../../../usulanKit'
+import { adaTanpa } from '../../../usulanOptions'
 
 const states: { value: FloatingLabelState; label: string; desc: string }[] = [
   { value: 'default', label: 'Default', desc: 'Field kosong — label duduk di dalam field sebagai placeholder.' },
@@ -32,25 +43,39 @@ const floatingProps: PropRow[] = [
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (type, value, onChange, …).'],
 ]
 
+const toc: TocEntry[] = [
+  { id: 'floating-label', label: 'Floating Label' },
+  { id: 'states', label: 'States' },
+  { id: 'application', label: 'Application' },
+  { id: 'playground', label: 'Playground' },
+  { id: 'penggunaan', label: 'Penggunaan' },
+  { id: 'properties', label: 'Properties' },
+]
+
 export function FloatingLabelPage() {
   const [platform, setPlatform] = useState<FloatingLabelPlatform>('default')
   const [state, setState] = useState<FloatingLabelState>('default')
   const [application, setApplication] = useState<FloatingLabelApplication>('default')
   const [withIcon, setWithIcon] = useState(true)
+  const [withHelper, setWithHelper] = useState(true)
+  const [withClear, setWithClear] = useState(true)
   const [value, setValue] = useState('')
 
+  const helper = state === 'error' ? 'Isian tidak dapat diproses.' : 'Sesuai yang tertera pada KTP.'
+
   return (
-    <ComponentPage
+    <UsulanPage
       eyebrow="Form · Input Field Form"
       title="Floating Label"
       description="Isian teks yang labelnya naik ke garis atas begitu field difokus atau berisi — menghemat ruang tanpa menghilangkan keterangan field."
+      toc={toc}
     >
-      <Section title="Floating Label">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
-          Saat kosong, label duduk di dalam field dan berperan sebagai placeholder. Begitu field difokus atau berisi,
-          label menyusut ke 12px dan naik menimpa garis atas. Tinggi field mengikuti platform — 58px di desktop, 50px di
-          mobile.
-        </p>
+      <FlowSection id="floating-label" title="Floating Label">
+        <Lead>
+          Saat kosong, label duduk di dalam field dan berperan sebagai placeholder. Begitu field difokus
+          atau berisi, label menyusut ke 12px dan naik menimpa garis atas. Tinggi field mengikuti platform —
+          58px di desktop, 50px di mobile.
+        </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Desktop · 58px">
             <div className="space-y-5">
@@ -83,14 +108,27 @@ export function FloatingLabelPage() {
             </div>
           </Demo>
         </div>
-      </Section>
+        <SectionCode>
+          {"import { FloatingLabel } from '@tpl/design-kit-react'\n"}
+          {"import { User } from '@tpl/design-kit-react/icons/solid'\n\n"}
+          {'{/* Label naik sendiri saat difokus atau berisi */}\n'}
+          {'<FloatingLabel\n'}
+          {'    label="Nama lengkap"\n'}
+          {'    icon={<User className="size-4" />}\n'}
+          {'/>\n\n'}
+          {'{/* Mobile — field 50px */}\n'}
+          {'<FloatingLabel '}
+          <H>platform</H>
+          {'="mobile" label="Nama lengkap" />'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="States">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
-          Tiga kondisi sesuai varian Figma. Klik salah satu field untuk melihat label naik sendiri — <H>state</H> hanya
-          perlu diisi untuk mengunci tampilan atau menandai kesalahan. State <H>error</H> memasang{' '}
-          <code className="text-xs font-bold text-gray-700">aria-invalid</code> pada input.
-        </p>
+      <FlowSection id="states" title="States">
+        <Lead>
+          Tiga kondisi visual field. Klik salah satu field untuk melihat label naik sendiri — <H>state</H>{' '}
+          hanya perlu diisi untuk mengunci tampilan atau menandai kesalahan. State <H>error</H> memasang{' '}
+          <H>aria-invalid</H> pada input.
+        </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
             <Demo key={s.value} label={s.label}>
@@ -105,13 +143,23 @@ export function FloatingLabelPage() {
             </Demo>
           ))}
         </div>
-      </Section>
+        <SectionCode>
+          {'{/* Pesan kesalahan — error sekaligus menandai aria-invalid */}\n'}
+          {'<FloatingLabel\n'}
+          {'    '}
+          <H>state</H>
+          {'="error"\n'}
+          {'    label="Nama lengkap"\n'}
+          {'    helperText="Isian tidak dapat diproses."\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Application">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
-          Garis dan label saat field aktif mengikuti aplikasi yang memakainya, dengan token warna yang sama seperti pada
-          Input Field.
-        </p>
+      <FlowSection id="application" title="Application">
+        <Lead>
+          Garis dan label saat field aktif mengikuti aplikasi yang memakainya, dengan token warna yang sama
+          seperti pada Input Field.
+        </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
             <Demo key={a.value} label={a.label}>
@@ -127,133 +175,171 @@ export function FloatingLabelPage() {
             </Demo>
           ))}
         </div>
-      </Section>
-
-      <section>
-        <h2 className="mb-4 text-heading-3 font-black text-gray-900">Playground</h2>
-
-        <div className="rounded-2xl border border-border bg-surface-subtle p-6 sm:p-10">
-          <div
-            className={`mx-auto transition-[max-width] duration-300 ease-out ${
-              platform === 'mobile' ? 'max-w-[348px]' : 'max-w-[364px]'
-            }`}
-          >
-            <FloatingLabel
-              platform={platform}
-              state={state}
-              application={application}
-              label="Placeholder Text"
-              helperText={state === 'error' ? 'Isian tidak dapat diproses.' : undefined}
-              icon={withIcon ? <User className="size-4" /> : undefined}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onClear={() => setValue('')}
-            />
-          </div>
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-start gap-6">
-          <div>
-            <ControlLabel>Platform</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih platform"
-                value={platform}
-                onChange={setPlatform}
-                options={[
-                  { value: 'mobile', label: 'Mobile' },
-                  { value: 'default', label: 'Desktop' },
-                ]}
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>State</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih state"
-                value={state}
-                onChange={setState}
-                itemClassName="px-2.5"
-                options={states.map((s) => ({ value: s.value, label: s.label }))}
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>Application</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih aplikasi"
-                value={application}
-                onChange={setApplication}
-                itemClassName="px-2.5"
-                options={applications.map((a) => ({ value: a.value, label: a.label }))}
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>Ikon kiri</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Tampilkan ikon kiri"
-                value={withIcon}
-                onChange={setWithIcon}
-                options={[
-                  { value: true, label: 'Ada' },
-                  { value: false, label: 'Tanpa' },
-                ]}
-              />
-            </div>
-          </div>
-        </div>
-
-        <p className="mt-4 text-body-sm text-gray-500">
-          Klik field di atas tanpa mengubah prop apa pun: labelnya naik saat difokus dan tetap di atas selama masih ada
-          isi. Perhatikan juga posisi label saat turun — ia menyesuaikan diri bila ada ikon kiri.
-        </p>
-      </section>
-
-      <Section title="Penggunaan">
-        <CodeBlock>
-          {"import { FloatingLabel } from '@tpl/design-kit-react'\n"}
-          {"import { User } from '@tpl/design-kit-react/icons/solid'\n\n"}
-          {'{/* Dasar — label naik sendiri saat difokus atau berisi */}\n'}
+        <SectionCode>
           {'<FloatingLabel\n'}
-          {'    label="Nama lengkap"\n'}
-          {'    icon={<User className="size-4" />}\n'}
-          {'/>\n\n'}
-          {'{/* Pesan kesalahan — error sekaligus menandai aria-invalid */}\n'}
-          {'<FloatingLabel\n'}
-          {'    '}
-          <H>state</H>
-          {'="error"\n'}
-          {'    label="Nama lengkap"\n'}
-          {'    helperText="Isian tidak dapat diproses."\n'}
-          {'/>\n\n'}
-          {'{/* Mobile + tombol hapus + warna aksen aplikasi */}\n'}
-          {'<FloatingLabel\n'}
-          {'    '}
-          <H>platform</H>
-          {'="mobile"\n'}
           {'    '}
           <H>application</H>
           {'="simaya"\n'}
+          {'    state="active"\n'}
           {'    label="Nama lengkap"\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="playground" title="Playground">
+        <Lead>
+          Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
+          terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
+        </Lead>
+
+        <Stage maxWidth={platform === 'mobile' ? 'max-w-[348px]' : 'max-w-[364px]'}>
+          <FloatingLabel
+            platform={platform}
+            state={state}
+            application={application}
+            label="Placeholder Text"
+            helperText={withHelper ? helper : undefined}
+            icon={withIcon ? <User className="size-4" /> : undefined}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onClear={withClear ? () => setValue('') : undefined}
+          />
+        </Stage>
+
+        <Controls>
+          <Control label="Platform">
+            <Segmented
+              label="Pilih platform"
+              value={platform}
+              onChange={setPlatform}
+              options={[
+                { value: 'mobile', label: 'Mobile' },
+                { value: 'default', label: 'Desktop' },
+              ]}
+            />
+          </Control>
+
+          <Control label="State">
+            <Segmented
+              label="Pilih state"
+              value={state}
+              onChange={setState}
+              itemClassName="px-2.5"
+              options={states.map((s) => ({ value: s.value, label: s.label }))}
+            />
+          </Control>
+
+          <Control label="Application">
+            <Segmented
+              label="Pilih aplikasi"
+              value={application}
+              onChange={setApplication}
+              itemClassName="px-2.5"
+              options={applications.map((a) => ({ value: a.value, label: a.label }))}
+            />
+          </Control>
+
+          <Control label="Ikon kiri">
+            <Segmented
+              label="Tampilkan ikon kiri"
+              value={withIcon}
+              onChange={setWithIcon}
+              options={adaTanpa}
+            />
+          </Control>
+
+          <Control label="Helper text">
+            <Segmented
+              label="Tampilkan helper text"
+              value={withHelper}
+              onChange={setWithHelper}
+              options={adaTanpa}
+            />
+          </Control>
+
+          <Control label="Tombol hapus">
+            <Segmented
+              label="Tampilkan tombol hapus"
+              value={withClear}
+              onChange={setWithClear}
+              options={adaTanpa}
+            />
+          </Control>
+        </Controls>
+
+        <p className="mt-4 text-body-sm text-gray-500">
+          Klik field di atas tanpa mengubah prop apa pun: labelnya naik saat difokus dan tetap di atas
+          selama masih ada isi. Perhatikan juga posisi label saat turun — ia menyesuaikan diri bila ada ikon
+          kiri.
+        </p>
+      </FlowSection>
+
+      <FlowSection id="penggunaan" title="Penggunaan">
+        <Lead>
+          Blok ini mengikuti kontrol di Playground — ubah kontrolnya, kodenya ikut berubah. Prop yang
+          nilainya masih bawaan sengaja tidak ditulis.
+        </Lead>
+        <SectionCode flush>
+          {"import { FloatingLabel } from '@tpl/design-kit-react'\n"}
+          {withIcon && "import { User } from '@tpl/design-kit-react/icons/solid'\n"}
+          {'\n'}
+          {'<FloatingLabel\n'}
+          {platform === 'mobile' && (
+            <>
+              {'    '}
+              <H>platform</H>
+              {'="mobile"\n'}
+            </>
+          )}
+          {state !== 'default' && (
+            <>
+              {'    '}
+              <H>state</H>
+              {`="${state}"\n`}
+            </>
+          )}
+          {application !== 'default' && (
+            <>
+              {'    '}
+              <H>application</H>
+              {`="${application}"\n`}
+            </>
+          )}
+          {'    label="Placeholder Text"\n'}
+          {withHelper && (
+            <>
+              {'    '}
+              <H>helperText</H>
+              {`="${helper}"\n`}
+            </>
+          )}
+          {withIcon && (
+            <>
+              {'    '}
+              <H>icon</H>
+              {'={<User className="size-4" />}\n'}
+            </>
+          )}
           {'    value={value}\n'}
           {'    onChange={(e) => setValue(e.target.value)}\n'}
-          {'    '}
-          <H>onClear</H>
-          {"={() => setValue('')}\n"}
+          {withClear && (
+            <>
+              {'    '}
+              <H>onClear</H>
+              {"={() => setValue('')}\n"}
+            </>
+          )}
           {'/>'}
-        </CodeBlock>
-      </Section>
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Properties">
+      <FlowSection id="properties" title="Properties">
+        <Lead>
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <H>&lt;input&gt;</H>{' '}
+          standar juga diteruskan apa adanya.
+        </Lead>
         <PropsTable rows={floatingProps} minWidth="48rem" />
-      </Section>
-    </ComponentPage>
+      </FlowSection>
+    </UsulanPage>
   )
 }

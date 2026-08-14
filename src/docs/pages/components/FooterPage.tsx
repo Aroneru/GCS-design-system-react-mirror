@@ -52,6 +52,12 @@ const footerProps: PropRow[] = [
     'Ikon media sosial: [{ label, url, icon }, ..]. icon berupa elemen <svg> yang mewarisi currentColor sehingga ikut berubah saat hover; label jadi aria-label; url selain "#" dibuka di tab baru dengan rel="noopener noreferrer".',
   ],
   [
+    'fluid',
+    'boolean',
+    'false',
+    'Bila true, isi footer melebar penuh mengikuti lebar footer — batas 1280px (max-w-7xl) dan pemusatannya dilepas, menyisakan padding kiri-kanan saja. Dipakai untuk footer situs yang menempel di tepi layar, seperti Flowbite.',
+  ],
+  [
     'className',
     'string',
     'undefined',
@@ -136,7 +142,8 @@ export function FooterPage() {
 
         <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500">
           Yang tidak berubah di ukuran mana pun: latar <C>bg-gray-800</C>, jarak atas-bawah 64px, lebar isi
-          dibatasi <C>max-w-7xl</C> lalu dipusatkan, dan garis pemisah tipis di atas baris hak cipta.
+          dibatasi <C>max-w-7xl</C> lalu dipusatkan, dan garis pemisah tipis di atas baris hak cipta. Prop{' '}
+          <C>fluid</C> melepas batas lebar itu sehingga isi mengisi penuh — persis footer situs ini.
         </p>
       </Section>
 

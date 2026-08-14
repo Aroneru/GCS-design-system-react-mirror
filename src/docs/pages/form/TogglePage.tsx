@@ -1,7 +1,18 @@
 import { useState } from 'react'
 import { Toggle, type ToggleApplication, type TogglePlatform, type ToggleState } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } from '../../pageKit'
+import { Demo, H, Segmented } from '../../pageKit'
+import {
+  Control,
+  Controls,
+  FlowSection,
+  Lead,
+  SectionCode,
+  Stage,
+  UsulanPage,
+  type TocEntry,
+} from '../../usulanKit'
+import { adaTanpa } from '../../usulanOptions'
 
 const applications: { value: ToggleApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
@@ -17,6 +28,16 @@ const toggleProps: PropRow[] = [
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="checkbox"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
 
+const toc: TocEntry[] = [
+  { id: 'toggle-button', label: 'Toggle Button' },
+  { id: 'caption', label: 'Dengan caption' },
+  { id: 'platform', label: 'Platform' },
+  { id: 'application', label: 'Application' },
+  { id: 'playground', label: 'Playground' },
+  { id: 'penggunaan', label: 'Penggunaan' },
+  { id: 'properties', label: 'Properties' },
+]
+
 export function TogglePage() {
   const [platform, setPlatform] = useState<TogglePlatform>('default')
   const [state, setState] = useState<ToggleState>('default')
@@ -25,30 +46,41 @@ export function TogglePage() {
   const [aktif, setAktif] = useState(true)
 
   return (
-    <ComponentPage
+    <UsulanPage
       eyebrow="Form"
       title="Toggle Button"
       description="Sakelar untuk menyalakan atau mematikan satu pengaturan, berlaku seketika tanpa tombol simpan. Dibangun di atas <input type='checkbox'> dengan role='switch' supaya keyboard dan pembaca layar tetap berfungsi."
+      toc={toc}
     >
-      <Section title="Toggle Button">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+      <FlowSection id="toggle-button" title="Toggle Button">
+        <Lead>
           Jalur 40×20px dengan bulatan putih 16px yang menyisakan 2px di tiap sisi. Saat mati jalurnya
           gray-200; saat menyala ia berganti ke warna aksen dan bulatannya bergeser 20px ke kanan.
-        </p>
+        </Lead>
         <Demo>
-          <div className="flex flex-wrap gap-8">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <Toggle label="Mati" />
             <Toggle label="Menyala" defaultChecked />
             <Toggle state="inactive" label="Tidak aktif" />
+            <Toggle state="inactive" label="Tidak aktif, menyala" defaultChecked />
           </div>
         </Demo>
-      </Section>
+        <SectionCode>
+          {"import { Toggle } from '@tpl/design-kit-react'\n\n"}
+          {'{/* Menyala sejak awal */}\n'}
+          {'<Toggle label="Notifikasi email" defaultChecked />\n\n'}
+          {'{/* Inactive — meredup sekaligus nonaktif */}\n'}
+          {'<Toggle '}
+          <H>state</H>
+          {'="inactive" label="Belum tersedia" />'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Dengan caption">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+      <FlowSection id="caption" title="Dengan caption">
+        <Lead>
           Isi <H>helperText</H> untuk menerangkan akibat dari menyalakan pengaturan — berguna karena sakelar
           berlaku langsung tanpa konfirmasi.
-        </p>
+        </Lead>
         <Demo>
           <div className="space-y-4">
             <Toggle
@@ -62,13 +94,21 @@ export function TogglePage() {
             />
           </div>
         </Demo>
-      </Section>
+        <SectionCode>
+          {'<Toggle\n'}
+          {'    label="Tampilkan data sensitif"\n'}
+          {'    '}
+          <H>helperText</H>
+          {'="NIK dan nomor telepon ditampilkan penuh pada tabel."\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Platform">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+      <FlowSection id="platform" title="Platform">
+        <Lead>
           Platform mobile memakai sakelar 36×18px dengan bulatan 14px dan label 12px; ukuran caption tetap
           12px di keduanya.
-        </p>
+        </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Desktop · 40×20px">
             <div className="space-y-3">
@@ -83,147 +123,155 @@ export function TogglePage() {
             </div>
           </Demo>
         </div>
-      </Section>
+        <SectionCode>
+          {'<Toggle '}
+          <H>platform</H>
+          {'="mobile" label="Notifikasi email" defaultChecked />'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Application">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
+      <FlowSection id="application" title="Application">
+        <Lead>
           Warna jalur saat menyala mengikuti aplikasi yang memakainya; state mati dan inactive memakai abu
           yang sama.
-        </p>
+        </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
             <Demo key={a.value} label={a.label}>
               <div className="space-y-3">
-                <Toggle
-                  application={a.value}
-                  label="Menyala"
-                  helperText={`bg-${a.token}`}
-                  defaultChecked
-                />
+                <Toggle application={a.value} label="Menyala" helperText={`bg-${a.token}`} defaultChecked />
                 <Toggle application={a.value} label="Mati" />
               </div>
             </Demo>
           ))}
         </div>
-      </Section>
+        <SectionCode>
+          {'<Toggle '}
+          <H>application</H>
+          {'="simaya" label="Notifikasi email" defaultChecked />'}
+        </SectionCode>
+      </FlowSection>
 
-      <section>
-        <h2 className="mb-4 text-heading-3 font-black text-gray-900">Playground</h2>
+      <FlowSection id="playground" title="Playground">
+        <Lead>
+          Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
+          terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
+        </Lead>
 
-        <div className="rounded-2xl border border-border bg-surface-subtle p-6 sm:p-10">
-          <div className="mx-auto max-w-[420px]">
-            <Toggle
-              platform={platform}
-              state={state}
-              application={application}
-              label="Notifikasi email"
-              helperText={withCaption ? 'Kirim ringkasan permohonan baru setiap pagi.' : undefined}
-              checked={aktif}
-              onChange={(e) => setAktif(e.target.checked)}
+        {/* max-w-fit: blok menyusut seukuran isinya, jadi mx-auto benar-benar memusatkannya. */}
+        <Stage maxWidth="max-w-fit">
+          <Toggle
+            platform={platform}
+            state={state}
+            application={application}
+            label="Notifikasi email"
+            helperText={withCaption ? 'Kirim ringkasan permohonan baru setiap pagi.' : undefined}
+            checked={aktif}
+            onChange={(e) => setAktif(e.target.checked)}
+          />
+        </Stage>
+
+        <Controls>
+          <Control label="Platform">
+            <Segmented
+              label="Pilih platform"
+              value={platform}
+              onChange={setPlatform}
+              options={[
+                { value: 'mobile', label: 'Mobile' },
+                { value: 'default', label: 'Desktop' },
+              ]}
             />
-          </div>
-        </div>
+          </Control>
 
-        <div className="mt-4 flex flex-wrap items-start gap-6">
-          <div>
-            <ControlLabel>Platform</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih platform"
-                value={platform}
-                onChange={setPlatform}
-                options={[
-                  { value: 'mobile', label: 'Mobile' },
-                  { value: 'default', label: 'Desktop' },
-                ]}
-              />
-            </div>
-          </div>
+          <Control label="State">
+            <Segmented
+              label="Pilih state"
+              value={state}
+              onChange={setState}
+              options={[
+                { value: 'default', label: 'Default' },
+                { value: 'inactive', label: 'Inactive' },
+              ]}
+            />
+          </Control>
 
-          <div>
-            <ControlLabel>State</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih state"
-                value={state}
-                onChange={setState}
-                options={[
-                  { value: 'default', label: 'Default' },
-                  { value: 'inactive', label: 'Inactive' },
-                ]}
-              />
-            </div>
-          </div>
+          <Control label="Application">
+            <Segmented
+              label="Pilih aplikasi"
+              value={application}
+              onChange={setApplication}
+              itemClassName="px-2.5"
+              options={applications.map((a) => ({ value: a.value, label: a.label }))}
+            />
+          </Control>
 
-          <div>
-            <ControlLabel>Application</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih aplikasi"
-                value={application}
-                onChange={setApplication}
-                itemClassName="px-2.5"
-                options={applications.map((a) => ({ value: a.value, label: a.label }))}
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>Caption</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Tampilkan caption"
-                value={withCaption}
-                onChange={setWithCaption}
-                options={[
-                  { value: true, label: 'Ada' },
-                  { value: false, label: 'Tanpa' },
-                ]}
-              />
-            </div>
-          </div>
-        </div>
+          <Control label="Caption">
+            <Segmented
+              label="Tampilkan caption"
+              value={withCaption}
+              onChange={setWithCaption}
+              options={adaTanpa}
+            />
+          </Control>
+        </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
-          State <em>Off</em> dan <em>Active</em> di Figma sama dengan mati/menyalanya sakelar, jadi keduanya
-          diatur lewat <H>checked</H> seperti checkbox biasa — bukan lewat prop <H>state</H>.
+          Kondisi mati dan menyala diatur lewat <H>checked</H> seperti checkbox biasa — bukan lewat prop{' '}
+          <H>state</H>, yang hanya menangani <em>inactive</em>.
         </p>
-      </section>
+      </FlowSection>
 
-      <Section title="Penggunaan">
-        <CodeBlock>
+      <FlowSection id="penggunaan" title="Penggunaan">
+        <Lead>
+          Blok ini mengikuti kontrol di Playground — ubah kontrolnya, kodenya ikut berubah. Prop yang
+          nilainya masih bawaan sengaja tidak ditulis.
+        </Lead>
+        <SectionCode flush>
           {"import { Toggle } from '@tpl/design-kit-react'\n\n"}
-          {'{/* Dasar: menyala sejak awal */}\n'}
-          {'<Toggle label="Notifikasi email" defaultChecked />\n\n'}
-          {'{/* Dengan caption */}\n'}
           {'<Toggle\n'}
-          {'    label="Tampilkan data sensitif"\n'}
-          {'    '}
-          <H>helperText</H>
-          {'="NIK dan nomor telepon ditampilkan penuh pada tabel."\n'}
-          {'/>\n\n'}
-          {'{/* Terkendali + warna aplikasi + mobile */}\n'}
-          {'<Toggle\n'}
-          {'    '}
-          <H>platform</H>
-          {'="mobile"\n'}
-          {'    '}
-          <H>application</H>
-          {'="simaya"\n'}
+          {platform === 'mobile' && (
+            <>
+              {'    '}
+              <H>platform</H>
+              {'="mobile"\n'}
+            </>
+          )}
+          {state !== 'default' && (
+            <>
+              {'    '}
+              <H>state</H>
+              {'="inactive"\n'}
+            </>
+          )}
+          {application !== 'default' && (
+            <>
+              {'    '}
+              <H>application</H>
+              {`="${application}"\n`}
+            </>
+          )}
           {'    label="Notifikasi email"\n'}
+          {withCaption && (
+            <>
+              {'    '}
+              <H>helperText</H>
+              {'="Kirim ringkasan permohonan baru setiap pagi."\n'}
+            </>
+          )}
           {'    checked={aktif}\n'}
           {'    onChange={(e) => setAktif(e.target.checked)}\n'}
-          {'/>\n\n'}
-          {'{/* Inactive — meredup sekaligus nonaktif */}\n'}
-          {'<Toggle '}
-          <H>state</H>
-          {'="inactive" label="Belum tersedia" />'}
-        </CodeBlock>
-      </Section>
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Properties">
+      <FlowSection id="properties" title="Properties">
+        <Lead>
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
+          <H>&lt;input type=&quot;checkbox&quot;&gt;</H> standar juga diteruskan apa adanya.
+        </Lead>
         <PropsTable rows={toggleProps} minWidth="48rem" />
-      </Section>
-    </ComponentPage>
+      </FlowSection>
+    </UsulanPage>
   )
 }

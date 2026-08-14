@@ -1,5 +1,12 @@
-import { DocUsage } from '../../DocUsage'
-import { C, FoundationPage, Principles, SectionHead } from '../../pageKit'
+import { C } from '../../pageKit'
+import {
+  FlowSection,
+  Lead,
+  PrincipleList,
+  SectionCode,
+  UsulanPage,
+  type TocEntry,
+} from '../../usulanKit'
 
 const spacingScale: [string, string, string, string][] = [
   ['0', '0px', '0px', 'w-0'], ['px', '1px', '1px', 'w-px'], ['0.5', '0.125rem', '2px', 'w-0.5'],
@@ -22,51 +29,62 @@ const prefixes: [string, string, string][] = [
   ['Gap', 'gap-* · gap-x-* · gap-y-*', 'Jarak antaritem di dalam flex dan grid container.'],
 ]
 
+const toc: TocEntry[] = [
+  { id: 'skala', label: 'Skala spacing' },
+  { id: 'prefix', label: 'Padding, margin, gap' },
+  { id: 'prinsip', label: 'Prinsip penggunaan' },
+]
+
 export function SpacingPage() {
   return (
-    <FoundationPage
+    <UsulanPage
       eyebrow="Foundations · Spacing"
       title="Skala spacing basis 4px"
       description="Seluruh jarak — padding, margin, dan gap — mengikuti satu skala dengan basis 4px (0.25rem). Skala yang konsisten menjaga ritme visual dan alignment di seluruh produk."
+      toc={toc}
     >
-      <SectionHead eyebrow="Scale" title="Skala spacing">
-        Setiap langkah adalah kelipatan 4px — nama token dikali 4 menghasilkan nilai pixel (mis. <C>4</C> = 16px). Berlaku untuk <C>p-*</C>, <C>m-*</C>, <C>gap-*</C>, <C>w-*</C>, dan <C>h-*</C>.
-      </SectionHead>
+      <FlowSection id="skala" title="Skala spacing">
+        <Lead>
+          Setiap langkah adalah kelipatan 4px — nama token dikali 4 menghasilkan nilai pixel (mis.{' '}
+          <C>4</C> = 16px). Berlaku untuk <C>p-*</C>, <C>m-*</C>, <C>gap-*</C>, <C>w-*</C>, dan <C>h-*</C>.
+        </Lead>
 
-      <article className="ds-card overflow-hidden">
-        <div className="ds-scroll-x overflow-x-auto">
-          <div className="min-w-[560px]">
-            <div className="grid grid-cols-[90px_110px_90px_1fr] gap-4 border-b border-border px-5 py-3.5 sm:px-7">
-              <p className="text-xs font-black text-gray-900">Name</p>
-              <p className="text-xs font-black text-gray-900">Size</p>
-              <p className="text-xs font-black text-gray-900">Pixels</p>
-              <p aria-hidden="true" />
-            </div>
-            <div className="divide-y divide-gray-100">
-              {spacingScale.map(([name, size, px, bar]) => (
-                <div key={name} className="grid grid-cols-[90px_110px_90px_1fr] items-center gap-4 px-5 py-3 sm:px-7">
-                  <code className="text-sm font-bold text-gray-900">{name}</code>
-                  <code className="text-sm text-gray-500">{size}</code>
-                  <code className="text-sm text-gray-500">{px}</code>
-                  <div><div className={`${bar} h-4 rounded-xs bg-primary-600`} /></div>
-                </div>
-              ))}
+        <article className="ds-card overflow-hidden">
+          <div className="ds-scroll-x overflow-x-auto">
+            <div className="min-w-[560px]">
+              <div className="grid grid-cols-[90px_110px_90px_1fr] gap-4 border-b border-border px-5 py-3.5 sm:px-7">
+                <p className="text-xs font-black text-gray-900">Name</p>
+                <p className="text-xs font-black text-gray-900">Size</p>
+                <p className="text-xs font-black text-gray-900">Pixels</p>
+                <p aria-hidden="true" />
+              </div>
+              <div className="divide-y divide-gray-100">
+                {spacingScale.map(([name, size, px, bar]) => (
+                  <div key={name} className="grid grid-cols-[90px_110px_90px_1fr] items-center gap-4 px-5 py-3 sm:px-7">
+                    <code className="text-sm font-bold text-gray-900">{name}</code>
+                    <code className="text-sm text-gray-500">{size}</code>
+                    <code className="text-sm text-gray-500">{px}</code>
+                    <div><div className={`${bar} h-4 rounded-xs bg-primary-600`} /></div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <DocUsage code={`{/* Padding: ruang di dalam elemen */}
+        <SectionCode>{`{/* Padding: ruang di dalam elemen */}
 <div className="p-6">Padding 24px di semua sisi</div>
 <div className="px-4 py-2">Horizontal 16px, vertikal 8px</div>
 
 {/* Skala yang sama dipakai untuk ukuran */}
-<div className="size-10">40 × 40px</div>`} />
+<div className="size-10">40 × 40px</div>`}</SectionCode>
+      </FlowSection>
 
-      <div className="mt-8">
-        <SectionHead eyebrow="Usage" title="Padding, margin, dan gap">
+      <FlowSection id="prefix" title="Padding, margin, dan gap">
+        <Lead>
           Satu skala yang sama dipakai oleh ketiga jenis jarak — cukup ganti prefix utility-nya.
-        </SectionHead>
+        </Lead>
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {prefixes.map(([label, code, desc]) => (
             <article key={label} className="ds-card p-5">
@@ -102,22 +120,26 @@ export function SpacingPage() {
             </div>
           </article>
         </div>
-      </div>
 
-      <DocUsage code={`{/* Gap — utamakan ini di flex/grid daripada margin */}
+        <SectionCode>{`{/* Gap — utamakan ini di flex/grid daripada margin */}
 <div className="flex gap-3">...</div>
 <div className="grid grid-cols-3 gap-6">...</div>
 
 {/* Margin & space-y */}
 <div className="mt-8">Margin atas 32px</div>
-<div className="space-y-4">Setiap anak berjarak 16px</div>`} />
+<div className="space-y-4">Setiap anak berjarak 16px</div>`}</SectionCode>
+      </FlowSection>
 
-      <Principles items={[
-        <>Selalu pakai langkah pada skala — hindari nilai arbitrer seperti <C>p-[13px]</C> agar ritme 4px terjaga.</>,
-        <>Langkah kecil (<strong className="text-gray-900">1–4</strong>) untuk jarak dalam komponen, sedang (<strong className="text-gray-900">5–12</strong>) antarkomponen, besar (<strong className="text-gray-900">14+</strong>) antarseksi.</>,
-        <>Pilih <C>gap-*</C> dibanding margin antaritem di flex/grid — lebih mudah dirawat dan tidak menimbulkan margin ganda.</>,
-        <>Elemen dengan fungsi setara harus memakai jarak yang sama agar hierarki konsisten.</>,
-      ]} />
-    </FoundationPage>
+      <FlowSection id="prinsip" title="Prinsip penggunaan">
+        <PrincipleList
+          items={[
+            <>Selalu pakai langkah pada skala — hindari nilai arbitrer seperti <C>p-[13px]</C> agar ritme 4px terjaga.</>,
+            <>Langkah kecil (<strong className="text-gray-900">1–4</strong>) untuk jarak dalam komponen, sedang (<strong className="text-gray-900">5–12</strong>) antarkomponen, besar (<strong className="text-gray-900">14+</strong>) antarseksi.</>,
+            <>Pilih <C>gap-*</C> dibanding margin antaritem di flex/grid — lebih mudah dirawat dan tidak menimbulkan margin ganda.</>,
+            <>Elemen dengan fungsi setara harus memakai jarak yang sama agar hierarki konsisten.</>,
+          ]}
+        />
+      </FlowSection>
+    </UsulanPage>
   )
 }

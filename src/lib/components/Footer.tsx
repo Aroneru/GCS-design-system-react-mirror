@@ -22,6 +22,11 @@ export interface FooterProps {
   menus?: FooterMenu[]
   copyright?: ReactNode
   socials?: FooterSocial[]
+  /**
+   * Isi footer melebar penuh mengikuti lebar footer — hanya menyisakan padding
+   * kiri-kanan, tanpa batas 1280px dan tanpa pemusatan (gaya Flowbite).
+   */
+  fluid?: boolean
   className?: string
 }
 
@@ -33,11 +38,17 @@ export function Footer({
   menus = [],
   copyright,
   socials = [],
+  fluid = false,
   className,
 }: FooterProps) {
   return (
     <footer className={cn('@container bg-gray-800 text-gray-300', className)}>
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-16 @3xl:px-12">
+      <div
+        className={cn(
+          'flex flex-col gap-8 px-6 py-16 @3xl:px-12',
+          fluid ? 'w-full' : 'mx-auto max-w-7xl',
+        )}
+      >
         <div className="flex flex-col gap-7 @3xl:flex-row @3xl:items-center @3xl:gap-12">
           <div className="shrink-0">
             {logo ? (

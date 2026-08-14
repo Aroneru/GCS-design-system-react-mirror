@@ -7,7 +7,18 @@ import {
   type InputFieldState,
 } from '../../../../lib'
 import { PropsTable, type PropRow } from '../../../PropsTable'
-import { CodeBlock, ComponentPage, ControlLabel, Demo, H, Section, Segmented } from '../../../pageKit'
+import { Demo, H, Segmented } from '../../../pageKit'
+import {
+  Control,
+  Controls,
+  FlowSection,
+  Lead,
+  SectionCode,
+  Stage,
+  UsulanPage,
+  type TocEntry,
+} from '../../../usulanKit'
+import { adaTanpa } from '../../../usulanOptions'
 
 const states: { value: InputFieldState; label: string; desc: string }[] = [
   { value: 'default', label: 'Default', desc: 'Belum disentuh — garis abu-abu netral.' },
@@ -32,24 +43,39 @@ const inputProps: PropRow[] = [
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (type, value, onChange, …).'],
 ]
 
+const toc: TocEntry[] = [
+  { id: 'input-field', label: 'Input Field' },
+  { id: 'states', label: 'States' },
+  { id: 'application', label: 'Application' },
+  { id: 'playground', label: 'Playground' },
+  { id: 'penggunaan', label: 'Penggunaan' },
+  { id: 'properties', label: 'Properties' },
+]
+
 export function InputFieldPage() {
   const [platform, setPlatform] = useState<InputFieldPlatform>('default')
   const [state, setState] = useState<InputFieldState>('default')
   const [application, setApplication] = useState<InputFieldApplication>('default')
   const [withIcon, setWithIcon] = useState(true)
+  const [withHelper, setWithHelper] = useState(true)
+  const [withClear, setWithClear] = useState(true)
   const [value, setValue] = useState('')
 
+  const isFailed = state === 'failed'
+  const helper = isFailed ? 'Nama lengkap wajib diisi.' : 'Sesuai yang tertera pada KTP.'
+
   return (
-    <ComponentPage
+    <UsulanPage
       eyebrow="Form · Input Field Form"
       title="Input Field"
       description="Isian teks satu baris dengan label di atas field. Tinggi, warna, dan jaraknya memakai token yang sama dengan Foundations."
+      toc={toc}
     >
-      <Section title="Input Field">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
-          Isian teks satu baris: label di atas, field dengan ikon opsional dan tombol hapus, lalu caption di bawah.
-          Tinggi field mengikuti platform — 52px di desktop, 40px di mobile.
-        </p>
+      <FlowSection id="input-field" title="Input Field">
+        <Lead>
+          Label di atas, field dengan ikon opsional dan tombol hapus, lalu caption di bawah. Tinggi field
+          mengikuti platform — 52px di desktop, 40px di mobile.
+        </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Desktop · 52px">
             <InputField
@@ -69,14 +95,27 @@ export function InputFieldPage() {
             />
           </Demo>
         </div>
-      </Section>
+        <SectionCode>
+          {"import { InputField } from '@tpl/design-kit-react'\n"}
+          {"import { User } from '@tpl/design-kit-react/icons/solid'\n\n"}
+          {'<InputField\n'}
+          {'    label="Nama lengkap"\n'}
+          {'    placeholder="Masukkan nama lengkap"\n'}
+          {'    helperText="Sesuai yang tertera pada KTP."\n'}
+          {'    icon={<User className="size-4" />}\n'}
+          {'/>\n\n'}
+          {'{/* Mobile — field 40px */}\n'}
+          {'<InputField '}
+          <H>platform</H>
+          {'="mobile" label="Nama lengkap" />'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="States">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
-          Empat kondisi sesuai varian Figma. <H>inactive</H> otomatis menonaktifkan input dan <H>failed</H> menandainya{' '}
-          <code className="text-xs font-bold text-gray-700">aria-invalid</code>, jadi tampilan dan makna aksesibilitasnya
-          selalu sejalan.
-        </p>
+      <FlowSection id="states" title="States">
+        <Lead>
+          Empat kondisi visual field. <H>inactive</H> otomatis menonaktifkan input dan <H>failed</H>{' '}
+          menandainya <H>aria-invalid</H>, jadi tampilan dan makna aksesibilitasnya selalu sejalan.
+        </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
             <Demo key={s.value} label={s.label}>
@@ -90,13 +129,23 @@ export function InputFieldPage() {
             </Demo>
           ))}
         </div>
-      </Section>
+        <SectionCode>
+          {'{/* Pesan error — failed sekaligus menandai aria-invalid */}\n'}
+          {'<InputField\n'}
+          {'    '}
+          <H>state</H>
+          {'="failed"\n'}
+          {'    label="Nama lengkap"\n'}
+          {'    helperText="Nama lengkap wajib diisi."\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Application">
-        <p className="mb-4 max-w-2xl text-body-sm text-gray-500">
-          Warna garis saat field aktif mengikuti aplikasi yang memakainya — memakai token warna yang sama dengan palet
-          Foundations.
-        </p>
+      <FlowSection id="application" title="Application">
+        <Lead>
+          Warna garis saat field aktif mengikuti aplikasi yang memakainya — memakai token warna yang sama
+          dengan palet Foundations.
+        </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
             <Demo key={a.value} label={a.label}>
@@ -111,136 +160,176 @@ export function InputFieldPage() {
             </Demo>
           ))}
         </div>
-      </Section>
-
-      <section>
-        <h2 className="mb-4 text-heading-3 font-black text-gray-900">Playground</h2>
-
-        <div className="rounded-2xl border border-border bg-surface-subtle p-6 sm:p-10">
-          <div
-            className={`mx-auto transition-[max-width] duration-300 ease-out ${
-              platform === 'mobile' ? 'max-w-[326px]' : 'max-w-[364px]'
-            }`}
-          >
-            <InputField
-              platform={platform}
-              state={state}
-              application={application}
-              label="Nama lengkap"
-              placeholder="Masukkan nama lengkap"
-              helperText={state === 'failed' ? 'Nama lengkap wajib diisi.' : 'Sesuai yang tertera pada KTP.'}
-              icon={withIcon ? <User className="size-4" /> : undefined}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onClear={() => setValue('')}
-            />
-          </div>
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-start gap-6">
-          <div>
-            <ControlLabel>Platform</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih platform"
-                value={platform}
-                onChange={setPlatform}
-                options={[
-                  { value: 'mobile', label: 'Mobile' },
-                  { value: 'default', label: 'Desktop' },
-                ]}
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>State</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih state"
-                value={state}
-                onChange={setState}
-                itemClassName="px-2.5"
-                wrap
-                options={states.map((s) => ({ value: s.value, label: s.label }))}
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>Application</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Pilih aplikasi"
-                value={application}
-                onChange={setApplication}
-                itemClassName="px-2.5"
-                options={applications.map((a) => ({ value: a.value, label: a.label }))}
-              />
-            </div>
-          </div>
-
-          <div>
-            <ControlLabel>Ikon kiri</ControlLabel>
-            <div className="mt-2">
-              <Segmented
-                label="Tampilkan ikon kiri"
-                value={withIcon}
-                onChange={setWithIcon}
-                options={[
-                  { value: true, label: 'Ada' },
-                  { value: false, label: 'Tanpa' },
-                ]}
-              />
-            </div>
-          </div>
-        </div>
-
-        <p className="mt-4 text-body-sm text-gray-500">
-          Ketik pada field di atas untuk melihat state <em>typing</em> yang sesungguhnya — garisnya berubah lewat{' '}
-          <code className="text-xs font-bold text-gray-700">focus-within</code>, tanpa perlu mengubah prop.
-        </p>
-      </section>
-
-      <Section title="Penggunaan">
-        <CodeBlock>
-          {"import { InputField } from '@tpl/design-kit-react'\n"}
-          {"import { User } from '@tpl/design-kit-react/icons/solid'\n\n"}
-          {'{/* Dasar: label + caption + ikon */}\n'}
+        <SectionCode>
           {'<InputField\n'}
-          {'    label="Nama lengkap"\n'}
-          {'    placeholder="Masukkan nama lengkap"\n'}
-          {'    helperText="Sesuai yang tertera pada KTP."\n'}
-          {'    icon={<User className="size-4" />}\n'}
-          {'/>\n\n'}
-          {'{/* Pesan error — state failed sekaligus menandai aria-invalid */}\n'}
-          {'<InputField\n'}
-          {'    '}
-          <H>state</H>
-          {'="failed"\n'}
-          {'    label="Nama lengkap"\n'}
-          {'    helperText="Nama lengkap wajib diisi."\n'}
-          {'/>\n\n'}
-          {'{/* Mobile + tombol hapus + warna aksen aplikasi */}\n'}
-          {'<InputField\n'}
-          {'    '}
-          <H>platform</H>
-          {'="mobile"\n'}
           {'    '}
           <H>application</H>
           {'="simaya"\n'}
+          {'    state="typing"\n'}
+          {'    label="Nama lengkap"\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="playground" title="Playground">
+        <Lead>
+          Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
+          terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
+        </Lead>
+
+        <Stage maxWidth={platform === 'mobile' ? 'max-w-[326px]' : 'max-w-[364px]'}>
+          <InputField
+            platform={platform}
+            state={state}
+            application={application}
+            label="Nama lengkap"
+            placeholder="Masukkan nama lengkap"
+            helperText={withHelper ? helper : undefined}
+            icon={withIcon ? <User className="size-4" /> : undefined}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onClear={withClear ? () => setValue('') : undefined}
+          />
+        </Stage>
+
+        <Controls>
+          <Control label="Platform">
+            <Segmented
+              label="Pilih platform"
+              value={platform}
+              onChange={setPlatform}
+              options={[
+                { value: 'mobile', label: 'Mobile' },
+                { value: 'default', label: 'Desktop' },
+              ]}
+            />
+          </Control>
+
+          <Control label="State">
+            <Segmented
+              label="Pilih state"
+              value={state}
+              onChange={setState}
+              itemClassName="px-2.5"
+              wrap
+              options={states.map((s) => ({ value: s.value, label: s.label }))}
+            />
+          </Control>
+
+          <Control label="Application">
+            <Segmented
+              label="Pilih aplikasi"
+              value={application}
+              onChange={setApplication}
+              itemClassName="px-2.5"
+              options={applications.map((a) => ({ value: a.value, label: a.label }))}
+            />
+          </Control>
+
+          <Control label="Ikon kiri">
+            <Segmented
+              label="Tampilkan ikon kiri"
+              value={withIcon}
+              onChange={setWithIcon}
+              options={adaTanpa}
+            />
+          </Control>
+
+          <Control label="Helper text">
+            <Segmented
+              label="Tampilkan helper text"
+              value={withHelper}
+              onChange={setWithHelper}
+              options={adaTanpa}
+            />
+          </Control>
+
+          <Control label="Tombol hapus">
+            {/* Mati saat inactive: field yang tidak bisa diisi tidak perlu tombol hapus. */}
+            <Segmented
+              label="Tampilkan tombol hapus"
+              value={withClear}
+              onChange={setWithClear}
+              disabled={state === 'inactive'}
+              options={adaTanpa}
+            />
+          </Control>
+        </Controls>
+
+        <p className="mt-4 text-body-sm text-gray-500">
+          Ketik pada field di atas untuk melihat state <em>typing</em> yang sesungguhnya — garisnya berubah
+          lewat <H>focus-within</H>, tanpa perlu mengubah prop. Pada state <em>failed</em>, helper text
+          otomatis berganti jadi pesan kesalahan.
+        </p>
+      </FlowSection>
+
+      <FlowSection id="penggunaan" title="Penggunaan">
+        <Lead>
+          Blok ini mengikuti kontrol di Playground — ubah kontrolnya, kodenya ikut berubah. Prop yang
+          nilainya masih bawaan sengaja tidak ditulis.
+        </Lead>
+        <SectionCode flush>
+          {"import { InputField } from '@tpl/design-kit-react'\n"}
+          {withIcon && "import { User } from '@tpl/design-kit-react/icons/solid'\n"}
+          {'\n'}
+          {'<InputField\n'}
+          {platform === 'mobile' && (
+            <>
+              {'    '}
+              <H>platform</H>
+              {'="mobile"\n'}
+            </>
+          )}
+          {state !== 'default' && (
+            <>
+              {'    '}
+              <H>state</H>
+              {`="${state}"\n`}
+            </>
+          )}
+          {application !== 'default' && (
+            <>
+              {'    '}
+              <H>application</H>
+              {`="${application}"\n`}
+            </>
+          )}
+          {'    label="Nama lengkap"\n'}
+          {'    placeholder="Masukkan nama lengkap"\n'}
+          {withHelper && (
+            <>
+              {'    '}
+              <H>helperText</H>
+              {`="${helper}"\n`}
+            </>
+          )}
+          {withIcon && (
+            <>
+              {'    '}
+              <H>icon</H>
+              {'={<User className="size-4" />}\n'}
+            </>
+          )}
           {'    value={value}\n'}
           {'    onChange={(e) => setValue(e.target.value)}\n'}
-          {'    '}
-          <H>onClear</H>
-          {"={() => setValue('')}\n"}
+          {withClear && state !== 'inactive' && (
+            <>
+              {'    '}
+              <H>onClear</H>
+              {"={() => setValue('')}\n"}
+            </>
+          )}
           {'/>'}
-        </CodeBlock>
-      </Section>
+        </SectionCode>
+      </FlowSection>
 
-      <Section title="Properties">
+      <FlowSection id="properties" title="Properties">
+        <Lead>
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <H>&lt;input&gt;</H>{' '}
+          standar juga diteruskan apa adanya.
+        </Lead>
         <PropsTable rows={inputProps} minWidth="46rem" />
-      </Section>
-    </ComponentPage>
+      </FlowSection>
+    </UsulanPage>
   )
 }

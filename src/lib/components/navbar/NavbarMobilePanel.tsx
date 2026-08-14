@@ -1,21 +1,31 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode, type RefObject } from 'react'
+import { ChevronRight, Close } from '../../icons/outline'
+import { cn } from '../../utils/cn'
 import type { NavbarItem, NavbarProps, NavbarSubItem, NavbarUser } from '../Navbar'
 import { Icon } from '../Icon'
-import { cn } from '../../utils/cn'
 
 type NavbarLinkItem = Extract<NavbarItem, { href: string }>
-type NavbarSubmenuItem = Extract<NavbarItem, { children: NavbarSubItem[] }>
+type NavbarSectionItem = Extract<NavbarItem, { children: NavbarSubItem[] }>
+type NavbarNestedItem = Extract<NavbarItem, { href?: never; children: NavbarSubItem[] }>
+type NavbarContextItem = {
+  item: NavbarLinkItem
+  contextualItems: NavbarSubItem[]
+}
 
 interface NavbarMobilePanelProps {
-  id: string
-  open: boolean
+  sidebarId: string
+  drawerId: string
+  drawerEnabled: boolean
+  sidebarOpen: boolean
+  drawerItem?: NavbarContextItem
+  sidebarCloseRef: RefObject<HTMLButtonElement | null>
+  drawerCloseRef: RefObject<HTMLButtonElement | null>
   items: NavbarItem[]
   activeHref?: string
   ariaLabel: string
-  openSubmenuId: string | null
-  onOpenSubmenuChange: (itemId: string | null) => void
+  onDrawerClose: () => void
   onNavigate?: NavbarProps['onNavigate']
-  onClose: () => void
+  onSidebarClose: () => void
   guestActionsContent?: ReactNode
   user?: NavbarUser
 }
@@ -24,8 +34,12 @@ function isLinkItem(item: NavbarItem): item is NavbarLinkItem {
   return typeof item.href === 'string'
 }
 
-function isSubmenuItem(item: NavbarItem): item is NavbarSubmenuItem {
-  return Array.isArray(item.children)
+function isSectionItem(item: NavbarItem): item is NavbarSectionItem {
+  return Array.isArray(item.children) && item.children.length > 0
+}
+
+function isNestedItem(item: NavbarItem): item is NavbarNestedItem {
+  return !isLinkItem(item) && isSectionItem(item)
 }
 
 function isActive(item: NavbarLinkItem | NavbarSubItem, activeHref?: string) {
@@ -76,145 +90,311 @@ function MobileLink({
 }
 
 export function NavbarMobilePanel({
-  id,
-  open,
+  sidebarId,
+  drawerId,
+  drawerEnabled,
+  sidebarOpen,
+  drawerItem,
+  sidebarCloseRef,
+  drawerCloseRef,
   items,
   activeHref,
   ariaLabel,
-  openSubmenuId,
-  onOpenSubmenuChange,
+  onDrawerClose,
   onNavigate,
-  onClose,
+  onSidebarClose,
   guestActionsContent,
   user,
 }: NavbarMobilePanelProps) {
-  const navigationItems = items.filter(
-    (item) => isLinkItem(item) || (isSubmenuItem(item) && item.children.length > 0),
-  )
+  const [openNestedItemId, setOpenNestedItemId] = useState<string | null>(null)
+  const navigationItems = items.filter((item) => isLinkItem(item) || isSectionItem(item))
   const accountItems = user?.items?.filter((item) => typeof item.href === 'string') ?? []
+  const drawerOpen = drawerEnabled && drawerItem !== undefined
+  const surfaceOpen = sidebarOpen || drawerOpen
+  const drawerHeadingId = `${drawerId}-heading`
 
   useEffect(() => {
-    const submenuStillExists = navigationItems.some(
-      (item) => isSubmenuItem(item) && item.id === openSubmenuId,
-    )
+    if (sidebarOpen) return
 
-    if (openSubmenuId !== null && (!open || !submenuStillExists)) onOpenSubmenuChange(null)
-  }, [navigationItems, onOpenSubmenuChange, open, openSubmenuId])
+    const resetTimer = window.setTimeout(() => setOpenNestedItemId(null), 0)
+    return () => window.clearTimeout(resetTimer)
+  }, [sidebarOpen])
 
   return (
-    <div id={id} hidden={!open} className="border-t border-border bg-surface lg:hidden">
-      <div className="space-y-5 px-4 py-4">
-        {navigationItems.length > 0 && (
-          <nav aria-label={ariaLabel}>
-            <ul className="space-y-1">
-              {navigationItems.map((item) => {
-                if (isLinkItem(item)) {
+    <div className="lg:hidden">
+      <div
+        className={cn(
+          'fixed inset-0 z-40 bg-gray-900/50 transition-opacity duration-200 motion-reduce:transition-none',
+          surfaceOpen ? 'visible opacity-100' : 'invisible pointer-events-none opacity-0',
+        )}
+        aria-hidden="true"
+        onClick={drawerOpen ? onDrawerClose : onSidebarClose}
+      />
+
+      <aside
+        id={sidebarId}
+        data-navbar-mobile-sidebar
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 flex w-[88vw] max-w-[360px] flex-col overflow-y-auto border-r border-border bg-surface shadow-soft transition-[transform,visibility] duration-200 motion-reduce:transition-none',
+          sidebarOpen && !drawerOpen
+            ? 'visible translate-x-0'
+            : 'invisible -translate-x-full pointer-events-none',
+        )}
+        aria-label="Navigasi utama"
+        aria-hidden={!sidebarOpen || drawerOpen}
+        onKeyDown={(event) => {
+          if (event.key !== 'Escape' || openNestedItemId === null) return
+
+          event.preventDefault()
+          event.stopPropagation()
+          const triggerId = openNestedItemId
+          const sidebar = event.currentTarget
+          setOpenNestedItemId(null)
+          window.setTimeout(() => {
+            const trigger = sidebar.querySelector<HTMLButtonElement>(
+              `[data-navbar-mobile-section-id="${CSS.escape(triggerId)}"]`,
+            )
+            trigger?.focus()
+          }, 0)
+        }}
+      >
+        {sidebarOpen && (
+          <>
+            <div className="flex min-h-16 items-center justify-between gap-3 border-b border-border px-4 py-3">
+              <h2 className="truncate text-base font-bold text-content">Navigasi</h2>
+              <button
+                ref={sidebarCloseRef}
+                type="button"
+                className="grid size-10 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                aria-label="Tutup navigasi utama"
+                onClick={onSidebarClose}
+              >
+                <Icon className="size-5">
+                  <Close aria-hidden="true" focusable="false" />
+                </Icon>
+              </button>
+            </div>
+
+            <div className="space-y-5 px-4 py-5">
+          {navigationItems.length > 0 && (
+            <nav aria-label={ariaLabel}>
+              <ul className="space-y-1">
+                {navigationItems.map((item) => {
+                  if (isLinkItem(item) && isSectionItem(item)) {
+                    const childActive = item.children.some(
+                      (child) => !child.disabled && isActive(child, activeHref),
+                    )
+                    const contextualChildActive = Array.isArray(item.contextualItems)
+                      ? item.contextualItems.some(
+                          (child) => !child.disabled && isActive(child, activeHref),
+                        )
+                      : false
+                    const parentPageActive = isActive(item, activeHref)
+                    const descendantActive = childActive || contextualChildActive
+                    const expanded = openNestedItemId === item.id
+                    const submenuId = `${sidebarId}-${encodeURIComponent(item.id)}-submenu`
+
+                    return (
+                      <li key={item.id}>
+                        <div
+                          className={cn(
+                            'flex items-center gap-1 rounded-md',
+                            (parentPageActive || descendantActive) && 'bg-primary-50',
+                          )}
+                        >
+                          <div className="min-w-0 flex-1">
+                            <MobileLink
+                              item={item}
+                              activeHref={activeHref}
+                              onNavigate={onNavigate}
+                              onClose={onSidebarClose}
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            data-navbar-mobile-section-id={item.id}
+                            className={cn(
+                              'grid size-10 shrink-0 place-items-center rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                              item.disabled
+                                ? 'cursor-not-allowed text-content-subtle opacity-50'
+                                : descendantActive
+                                  ? 'text-brand'
+                                  : 'text-content hover:bg-surface-subtle hover:text-brand',
+                            )}
+                            disabled={item.disabled}
+                            aria-label={`${expanded ? 'Tutup' : 'Buka'} submenu ${item.label}`}
+                            aria-expanded={expanded}
+                            aria-controls={submenuId}
+                            onClick={() => setOpenNestedItemId(expanded ? null : item.id)}
+                          >
+                            <Icon className="size-4 shrink-0">
+                              <ChevronRight aria-hidden="true" focusable="false" />
+                            </Icon>
+                          </button>
+                        </div>
+                        <ul id={submenuId} hidden={!expanded} className="mt-1 space-y-1 pl-4">
+                          {item.children.map((child) => (
+                            <li key={child.id}>
+                              <MobileLink
+                                item={child}
+                                activeHref={activeHref}
+                                onNavigate={onNavigate}
+                                onClose={onSidebarClose}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    )
+                  }
+
+                  if (isLinkItem(item)) {
+                    return (
+                      <li key={item.id}>
+                        <MobileLink
+                          item={item}
+                          activeHref={activeHref}
+                          onNavigate={onNavigate}
+                          onClose={onSidebarClose}
+                        />
+                      </li>
+                    )
+                  }
+
+                  if (!isNestedItem(item)) return null
+
+                  const childActive = item.children.some(
+                    (child) => !child.disabled && isActive(child, activeHref),
+                  )
+                  const parentActive = item.active ?? childActive
+                  const expanded = openNestedItemId === item.id
+                  const submenuId = `${sidebarId}-${encodeURIComponent(item.id)}-submenu`
+
                   return (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        data-navbar-mobile-section-id={item.id}
+                        className={cn(
+                          'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                          item.disabled
+                            ? 'cursor-not-allowed text-content-subtle opacity-50'
+                            : parentActive
+                              ? 'bg-primary-50 text-brand'
+                              : 'text-content hover:bg-surface-subtle hover:text-brand',
+                        )}
+                        disabled={item.disabled}
+                        aria-expanded={expanded}
+                        aria-controls={submenuId}
+                        onClick={() => setOpenNestedItemId(expanded ? null : item.id)}
+                      >
+                        <span className="truncate">{item.label}</span>
+                        <Icon className="size-4 shrink-0">
+                          <ChevronRight aria-hidden="true" focusable="false" />
+                        </Icon>
+                      </button>
+
+                      <ul id={submenuId} hidden={!expanded} className="mt-1 space-y-1 pl-4">
+                        {item.children.map((child) => (
+                          <li key={child.id}>
+                            <MobileLink
+                              item={child}
+                              activeHref={activeHref}
+                              onNavigate={onNavigate}
+                              onClose={onSidebarClose}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  )
+                })}
+              </ul>
+            </nav>
+          )}
+
+          {guestActionsContent}
+
+          {user && (
+            <section className="space-y-3 border-t border-border pt-4" aria-label="Akun pengguna">
+              <p className="truncate text-sm font-bold text-content" title={user.name}>
+                {user.name.trim() || 'Pengguna'}
+              </p>
+
+              {accountItems.length > 0 && (
+                <ul className="space-y-1">
+                  {accountItems.map((item) => (
                     <li key={item.id}>
                       <MobileLink
                         item={item}
                         activeHref={activeHref}
                         onNavigate={onNavigate}
-                        onClose={onClose}
+                        onClose={onSidebarClose}
                       />
                     </li>
-                  )
-                }
-
-                if (!isSubmenuItem(item)) return null
-
-                const expanded = openSubmenuId === item.id
-                const childActive = item.children.some(
-                  (child) => !child.disabled && isActive(child, activeHref),
-                )
-                const parentActive = item.active ?? childActive
-                const submenuId = `${id}-${encodeURIComponent(item.id)}-submenu`
-
-                return (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      className={cn(
-                        'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
-                        item.disabled
-                          ? 'cursor-not-allowed text-content-subtle opacity-50'
-                          : parentActive
-                            ? 'bg-primary-50 text-brand'
-                            : 'text-content hover:bg-surface-subtle hover:text-brand',
-                      )}
-                      disabled={item.disabled}
-                      aria-expanded={expanded}
-                      aria-controls={submenuId}
-                      onClick={() => onOpenSubmenuChange(expanded ? null : item.id)}
-                    >
-                      <span className="truncate">{item.label}</span>
-                      <Icon
-                        className={cn(
-                          'size-4 shrink-0 transition-transform motion-reduce:transition-none',
-                          expanded && 'rotate-180',
-                        )}
-                      >
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={1.8}
-                          aria-hidden="true"
-                          focusable="false"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="m7 10 5 5 5-5"
-                          />
-                        </svg>
-                      </Icon>
-                    </button>
-
-                    <ul id={submenuId} hidden={!expanded} className="mt-1 space-y-1 pl-4">
-                      {item.children.map((child) => (
-                        <li key={child.id}>
-                          <MobileLink
-                            item={child}
-                            activeHref={activeHref}
-                            onNavigate={onNavigate}
-                            onClose={onClose}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                )
-              })}
-            </ul>
-          </nav>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+            </div>
+          </>
         )}
+      </aside>
 
-        {guestActionsContent}
+      {drawerEnabled && (
+        <aside
+          id={drawerId}
+          data-navbar-mobile-drawer
+          className={cn(
+            'fixed inset-y-0 right-0 z-50 flex w-[88vw] max-w-[360px] flex-col overflow-y-auto border-l border-border bg-surface shadow-soft transition-[transform,visibility] duration-200 motion-reduce:transition-none',
+            drawerOpen
+              ? 'visible translate-x-0'
+              : 'invisible translate-x-full pointer-events-none',
+          )}
+          aria-labelledby={drawerItem ? drawerHeadingId : undefined}
+          aria-hidden={!drawerOpen}
+        >
+          {drawerItem && (
+          <>
+            <div className="flex min-h-16 items-center justify-between gap-3 border-b border-border px-4 py-3">
+              <h2 id={drawerHeadingId} className="truncate text-base font-bold text-content">
+                {drawerItem.item.label}
+              </h2>
+              <button
+                ref={drawerCloseRef}
+                type="button"
+                className="grid size-10 shrink-0 place-items-center rounded-lg text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                aria-label={`Tutup navigasi sekunder ${drawerItem.item.label}`}
+                onClick={onDrawerClose}
+              >
+                <Icon className="size-5">
+                  <Close aria-hidden="true" focusable="false" />
+                </Icon>
+              </button>
+            </div>
 
-        {user && (
-          <section className="space-y-3 border-t border-border pt-4" aria-label="Akun pengguna">
-            <p className="truncate text-sm font-bold text-content" title={user.name}>
-              {user.name.trim() || 'Pengguna'}
-            </p>
-
-            {accountItems.length > 0 && (
+            <nav className="px-4 py-5" aria-label={`Navigasi sekunder ${drawerItem.item.label}`}>
               <ul className="space-y-1">
-                {accountItems.map((item) => (
-                  <li key={item.id}>
+                {drawerItem.contextualItems.map((child) => (
+                  <li key={child.id}>
                     <MobileLink
-                      item={item}
+                      item={child}
                       activeHref={activeHref}
                       onNavigate={onNavigate}
-                      onClose={onClose}
+                      onClose={() => {
+                        onDrawerClose()
+                        if (sidebarOpen) onSidebarClose()
+                      }}
                     />
                   </li>
                 ))}
               </ul>
-            )}
-          </section>
-        )}
-      </div>
+            </nav>
+          </>
+          )}
+        </aside>
+      )}
     </div>
   )
 }
