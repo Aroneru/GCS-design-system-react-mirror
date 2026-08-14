@@ -18,7 +18,7 @@ export { Card } from "./components/Card";
 export type { CardProps } from "./components/Card";
 
 export { Container } from "./components/Container";
-export type { ContainerProps } from "./components/Container";
+export type { ContainerProps, ContainerSize } from "./components/Container";
 
 export { Icon } from "./components/Icon";
 export type { IconProps } from "./components/Icon";

@@ -1,10 +1,16 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { Container } from '../../../lib'
+import { Container, type ContainerSize } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { C, CodeBlock, ComponentPage, H, Mark, Principles, SectionHead, Segmented } from '../../pageKit'
 import { Control, Controls } from '../../usulanKit'
 
 const containerProps: PropRow[] = [
+  [
+    'size',
+    "'prose' | 'default' | 'wide' | 'full'",
+    'default',
+    'Batas lebar konten: 720px, 1126px, 1440px, atau tanpa batas. Hanya angka itu yang berubah antar varian.',
+  ],
   [
     'as',
     'ElementType',
@@ -27,6 +33,50 @@ const containerProps: PropRow[] = [
   ['…props', 'HTMLAttributes', '—', 'Seluruh atribut HTML standar diteruskan (id, aria-*, data-*, …).'],
 ]
 
+/**
+ * Empat varian lebar. `ratio` dipakai untuk menggambar bilah perbandingan —
+ * skalanya relatif terhadap varian terlebar (1440px) supaya selisih antar
+ * varian langsung terlihat tanpa perlu membaca angkanya satu per satu.
+ */
+const REFERENCE_WIDTH = 1440
+
+const containerSizes: {
+  value: ContainerSize
+  max: string
+  ratio: number
+  headline: string
+  use: string
+}[] = [
+  {
+    value: 'prose',
+    max: '720px',
+    ratio: 720 / REFERENCE_WIDTH,
+    headline: 'Teks panjang & formulir',
+    use: 'Baris berhenti di sekitar 75 karakter, jarak yang paling nyaman dibaca. Pakai untuk artikel, syarat layanan, dan formulir satu kolom.',
+  },
+  {
+    value: 'default',
+    max: '1126px',
+    ratio: 1126 / REFERENCE_WIDTH,
+    headline: 'Bawaan — halaman layanan',
+    use: 'Angka dari spec Figma. Dipakai bila tidak ada alasan khusus untuk berbeda, supaya semua halaman berhenti di garis yang sama.',
+  },
+  {
+    value: 'wide',
+    max: '1440px',
+    ratio: 1,
+    headline: 'Tabel & dasbor',
+    use: 'Ruang tambahan untuk tabel berkolom banyak atau grid empat kartu ke atas yang terasa sesak di 1126px.',
+  },
+  {
+    value: 'full',
+    max: 'tanpa batas',
+    ratio: 1,
+    headline: 'Mengisi penuh induk',
+    use: 'Tidak ada batas lebar — yang tersisa hanya padding kiri-kanan. Untuk hero berwarna, peta, atau kanvas yang memang harus melebar.',
+  },
+]
+
 /** Tiga hal yang benar-benar dikerjakan Container di balik layar. */
 const howItWorks: [string, string, string][] = [
   [
@@ -47,9 +97,9 @@ const howItWorks: [string, string, string][] = [
 ]
 
 const containerSpecs: [string, string, string][] = [
-  ['Sempit', '< 640px', 'max-w 380px · rounded-xl · padding kiri-kanan 20px'],
-  ['Sedang', '≥ 640px', 'max-w 1126px · sudut rata · padding 32px'],
-  ['Lebar', '≥ 1024px / 1280px', 'max-w 1126px · padding 48px, lalu 56px di ≥ 1280px'],
+  ['Sempit', '< 640px', 'max-w 380px · rounded-xl · padding kiri-kanan 20px (kecuali size="full")'],
+  ['Sedang', '≥ 640px', 'max-w mengikuti varian — bawaan 1126px · sudut rata · padding 32px'],
+  ['Lebar', '≥ 1024px / 1280px', 'max-w varian tetap · padding 48px, lalu 56px di ≥ 1280px'],
   ['Lebar isi', 'Semua ukuran', 'w-full sampai batas max-w — tidak pernah melebihi ruangnya'],
   ['Posisi', 'Semua ukuran', 'mx-auto — selalu terpusat di ruang yang tersedia'],
   ['Tinggi', 'Semua ukuran', 'auto — mengikuti tinggi konten, tidak pernah dipaksa'],
@@ -65,9 +115,15 @@ const presetWidth: Record<Exclude<View, 'custom'>, number> = { mobile: 380, desk
 
 export function ContainerPage() {
   const [view, setView] = useState<View>('desktop')
+  const [size, setSize] = useState<ContainerSize>('default')
   const [customWidth, setCustomWidth] = useState(900)
 
   const width = view === 'custom' ? customWidth : presetWidth[view]
+
+  /** Varian aktif + label ruang: dipakai bersama oleh narasi dan contoh kode. */
+  const activeSize = containerSizes.find((s) => s.value === size)!
+  const roomLabel =
+    view === 'custom' ? `ruang ${width}px` : view === 'mobile' ? 'ruang sempit (< 640px)' : 'ruang lapang (≥ 640px)'
 
   /** Batasi input manual agar preview tidak pernah keluar dari rentang wajar. */
   const clamp = (n: number) => Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, n))
@@ -107,6 +163,56 @@ export function ContainerPage() {
       title="Container"
       description="Pembungkus paling luar untuk isi halaman. Tugasnya satu: menjaga konten berhenti di lebar yang sama di mana pun ia dipakai — 380px saat ruangnya sempit dan 1126px saat lapang — lalu memusatkannya. Tingginya selalu mengikuti konten."
     >
+      {/* Varian ditaruh paling atas: pertanyaan pertama pemakai selalu
+          "yang mana yang saya pakai", bukan "bagaimana cara kerjanya". */}
+      <section>
+        <SectionHead eyebrow="Varian" title="Empat batas lebar">
+          Yang membedakan varian hanya satu angka: sampai mana konten boleh melar di ruang lapang. Pemusatan,
+          padding, dan perilaku di ruang sempit persis sama di keempatnya. Bilah di bawah digambar dengan skala
+          yang sama — 1440px sebagai patokan penuh.
+        </SectionHead>
+        <ul className="ds-card divide-y divide-border">
+          {containerSizes.map(({ value, max, ratio, headline, use }) => (
+            <li key={value} className="grid gap-3 p-5 sm:grid-cols-[11rem_1fr] sm:gap-6">
+              <div>
+                <p className="text-sm font-black text-gray-900">
+                  size=&quot;{value}&quot;
+                  {value === 'default' && (
+                    <span className="ml-2 align-middle text-[10px] font-bold tracking-wide text-gray-500 uppercase">
+                      bawaan
+                    </span>
+                  )}
+                </p>
+                <p className="mt-0.5 text-xs font-bold text-primary-700">{max}</p>
+                <p className="mt-0.5 text-body-sm text-gray-500">{headline}</p>
+              </div>
+              <div>
+                {/* Bilah perbandingan: dekoratif, angkanya sudah ditulis di kiri. */}
+                <div
+                  aria-hidden="true"
+                  className="h-8 w-full overflow-hidden rounded-lg bg-surface-subtle ring-1 ring-border"
+                >
+                  <div
+                    className={
+                      value === 'full'
+                        ? 'h-full rounded-lg bg-primary-100 ring-1 ring-primary-300'
+                        : 'h-full rounded-lg bg-primary-50 ring-1 ring-primary-300'
+                    }
+                    style={{ width: `${ratio * 100}%` }}
+                  />
+                </div>
+                <p className="mt-2 text-body-sm leading-6 text-gray-500">{use}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 text-body-sm leading-6 text-gray-500">
+          <C>wide</C> dan <C>full</C> menggambar bilah yang sama panjang karena patokannya 1440px — bedanya baru
+          terasa di ruang yang lebih lebar dari itu: <C>wide</C> berhenti, <C>full</C> terus mengikuti induknya.
+          Cobalah di Playground dengan lebar kustom di atas 1440px.
+        </p>
+      </section>
+
       <section>
         <SectionHead eyebrow="Cara kerja" title="Tiga hal yang diatur">
           Semua perilaku di bawah sudah menempel di komponen — tidak perlu ditulis ulang setiap kali dipakai.
@@ -138,7 +244,7 @@ export function ContainerPage() {
         </div>
       </section>
 
-      <section>
+     {/* s <section>
         <SectionHead eyebrow="Dalam konteks" title="Kepala halaman layanan">
           Pemakaian yang paling sering: satu <C>Container</C> membungkus kepala halaman, satu lagi membungkus isinya.
           Judul, deskripsi, dan tombol otomatis berhenti di garis yang sama.
@@ -168,10 +274,10 @@ export function ContainerPage() {
           Perhatikan judul di kepala halaman dan kartu di bawahnya berhenti di garis kiri yang sama, walaupun latar
           putihnya melebar penuh — itu efek dari memberi warna pada Container, bukan pada isinya.
         </p>
-      </section>
+      </section> */}
 
       <section>
-        <SectionHead eyebrow="API" title="Properties">
+        <SectionHead title="Properties">
           Container merender elemen luar sebagai titik ukur <C>@container</C>, lalu elemen dalam yang memegang lebar
           dan padding. <C>className</C> dan atribut HTML menempel di elemen luar.
         </SectionHead>
@@ -183,8 +289,9 @@ export function ContainerPage() {
       <section>
         <SectionHead eyebrow="Playground" title="Coba sendiri">
           Kotak biru muda adalah ruang yang tersedia; garis putus-putus adalah tempat konten berhenti. Selisih
-          keduanya itulah padding. Pilih <C>Mobile</C>/<C>Desktop</C> untuk melihat ambang bawaannya, atau{' '}
-          <C>Kustom</C> untuk mengetik lebar sendiri — contoh kode di bawah ikut menyesuaikan.
+          keduanya itulah padding. Ganti <strong className="text-gray-900">Varian</strong> untuk melihat batas
+          lebarnya, lalu <C>Mobile</C>/<C>Desktop</C> untuk melihat ambang bawaannya — atau <C>Kustom</C> untuk
+          mengetik lebar sendiri. Angka pada preview dan contoh kode di bawah ikut menyesuaikan.
         </SectionHead>
 
         {/* Preview memakai <Container> yang sungguhan, bukan tiruan. */}
@@ -194,12 +301,12 @@ export function ContainerPage() {
             className="mx-auto max-w-full rounded-xl bg-primary-50 ring-1 ring-primary-100 transition-[width] duration-300 ease-out"
             style={{ width: `${width}px` }}
           >
-            <Container className="py-6">
+            <Container size={size} className="py-6">
               <div
                 ref={contentRef}
                 className="rounded-lg border-2 border-dashed border-primary-300 bg-surface px-4 py-8 text-center"
               >
-                <p className="text-sm font-black text-primary-700">Container</p>
+                <p className="text-sm font-black text-primary-700">size=&quot;{size}&quot;</p>
                 <p className="mt-1 text-xs text-gray-500">
                   ruang {measured.avail}px · konten {measured.content}px · padding {measured.padding}px
                 </p>
@@ -210,6 +317,15 @@ export function ContainerPage() {
 
         {/* Kontrol — susunannya mengikuti Playground halaman usulan (Controls/Control). */}
         <Controls>
+          <Control label="Varian">
+            <Segmented
+              label="Pilih varian lebar container"
+              value={size}
+              onChange={setSize}
+              options={containerSizes.map(({ value }) => ({ value, label: value }))}
+            />
+          </Control>
+
           <Control label="Lebar">
             <Segmented
               label="Pilih lebar container"
@@ -266,38 +382,32 @@ export function ContainerPage() {
 
       <section>
         <SectionHead eyebrow="Penggunaan" title="Contoh kode">
-          Contoh pertama mengikuti mode yang dipilih di Playground tepat di atas — saat ini{' '}
-          <C>{view === 'custom' ? `Kustom ${width}px` : view === 'mobile' ? 'Mobile' : 'Desktop'}</C>. Tiga pola
-          berikutnya berlaku di semua ukuran.
+          Contoh pertama bukan contoh tetap: ia dirakit ulang setiap kali pilihan di Playground tepat di atas
+          berubah — saat ini varian <C>{size}</C> ({activeSize.max}) pada {roomLabel}, dengan angka yang diambil
+          dari hasil pengukuran preview. Tiga pola berikutnya berlaku di semua ukuran.
         </SectionHead>
         <CodeBlock>
           {"import { Container } from '@tpl/design-kit-react'\n\n"}
 
-          {/* Contoh 1 mengikuti mode aktif pada playground di atas. */}
-          {view === 'mobile' && (
+          {/* Contoh 1 dirakit dari state playground + angka hasil pengukuran,
+              jadi yang dibaca selalu kode untuk preview yang sedang terlihat. */}
+          {`{/* 1. ${activeSize.max === 'tanpa batas' ? 'Tanpa batas lebar' : `Batas ${activeSize.max}`} di ${roomLabel}.\n`}
+          {`    Terukur sekarang: ruang ${measured.avail}px · konten ${measured.content}px · padding ${measured.padding}px. */}\n`}
+          {'<Container'}
+          {size !== 'default' && (
             <>
-              {'{/* 1. Ruang sempit (< 640px) — bawaan tanpa kelas tambahan:\n'}
-              {'    max-w 380px, rounded-xl, padding 20px. */}\n'}
-              {'<Container>\n    ...\n</Container>\n\n'}
-            </>
-          )}
-          {view === 'desktop' && (
-            <>
-              {'{/* 1. Ruang lapang (≥ 640px) — bawaan tanpa kelas tambahan:\n'}
-              {'    max-w 1126px, sudut rata, padding melebar sendiri. */}\n'}
-              {'<Container>\n    ...\n</Container>\n\n'}
+              {' '}
+              <Mark>{`size="${size}"`}</Mark>
             </>
           )}
           {view === 'custom' && (
             <>
-              {'{/* 1. Batas lebih sempit — pasang max-w di elemen luar.\n'}
-              {'    Padding ikut menyesuaikan sendiri karena ambangnya\n'}
-              {'    diukur dari ruang yang tersedia. */}\n'}
-              {'<Container className="'}
+              {' className="'}
               <Mark>{`max-w-[${width}px]`}</Mark>
-              {'">\n    ...\n</Container>\n\n'}
+              {'"'}
             </>
           )}
+          {'>\n    ...\n</Container>\n\n'}
 
           {'{/* 2. Tambah jarak vertikal lewat className */}\n'}
           {'<Container className="'}
@@ -323,6 +433,14 @@ export function ContainerPage() {
           <>
             Bungkus <strong className="text-gray-900">setiap section</strong> halaman dengan Container agar semua
             kolom berhenti di garis yang sama.
+          </>,
+          <>
+            Pilih satu varian untuk satu halaman dan pakai terus. Berganti-ganti <C>size</C> antar section membuat
+            garis kiri ikut bergeser — persis yang ingin dicegah Container.
+          </>,
+          <>
+            Untuk halaman yang isinya teks panjang atau formulir, <C>size=&quot;prose&quot;</C> lebih terbaca
+            daripada bawaan: baris berhenti sebelum mata kehilangan awal baris berikutnya.
           </>,
           <>
             Jangan menumpuk Container di dalam Container — paddingnya jadi dobel dan konten menyempit tanpa
