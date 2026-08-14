@@ -92,6 +92,7 @@ export { Navbar } from "./components/Navbar";
 export type {
   NavbarProps,
   NavbarItem,
+  NavbarContextItem,
   NavbarSubItem,
   NavbarSearchConfig,
   NavbarAction,
