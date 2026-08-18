@@ -1,5 +1,5 @@
 import { type HTMLAttributes, type ReactNode } from "react";
-import { ChevronRight } from "flowbite-react-icons/outline";
+import { ChevronRight } from "../icons/outline";
 import { Home } from "flowbite-react-icons/solid";
 import { cn } from "../utils/cn";
 
