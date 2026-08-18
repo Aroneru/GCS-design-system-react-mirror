@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 /**
  * Router hash minimalis: `#/foundations/colors` -> "/foundations/colors".
  *
- * Hash boleh diakhiri penanda bagian: `#/components/footer-usulan#menus`.
+ * Hash boleh diakhiri penanda bagian: `#/components/footer#menus`.
  * Bagian setelah `#` kedua bukan rute — itu id <FlowSection> yang dituju, jadi
  * ia dipotong dari path (supaya rutenya tetap cocok) dan dipakai untuk
  * menggulir ke bagiannya. Dengan begitu daftar isi "On this page" bisa berupa

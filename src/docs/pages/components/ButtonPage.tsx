@@ -7,7 +7,6 @@ import {
   Control,
   Controls,
   FlowSection,
-  Lead,
   SectionCode,
   Stage,
   UsulanPage,
@@ -31,11 +30,6 @@ const themeOptions: { value: ButtonTheme; label: string }[] = [
   { value: "purple", label: "Purple" },
   { value: "orange", label: "Orange" },
   { value: "yellow", label: "Yellow" },
-];
-
-const toneOptions = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
 ];
 
 const typeOptions = [
@@ -73,23 +67,6 @@ export function ButtonPage() {
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
   const [asLink, setAsLink] = useState<"button" | "a">("button");
-
-  const buttonCode = `<Button
-  as="${asLink}"
-  variant="${variant}"
-  theme="${theme}"
-  tone="${tone}"
-  size="${selectedSize}"${
-    type === "iconOnly"
-      ? `
-  type="iconOnly"`
-      : ""
-  }${showLeftIcon && type !== "iconOnly" ? '\n  leftIcon={<Messages className="size-4" />}' : ""}${
-    showRightIcon && type !== "iconOnly" ? '\n  rightIcon={<Messages className="size-4" />}' : ""
-  }
->
-  ${type === "iconOnly" ? "<Messages />" : "Button"}
-</Button>`;
 
   return (
     <UsulanPage

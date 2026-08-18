@@ -1,7 +1,11 @@
 /**
- * Struktur navigasi dokumentasi — satu sumber untuk icon rail, panel samping,
- * dan angka ringkas di halaman Home. Dipisah dari DocsLayout supaya berkas
- * komponen hanya mengekspor komponen (syarat react-refresh).
+ * Struktur navigasi dokumentasi — sumber angka ringkas di halaman Home.
+ * Dipisah dari DocsLayout supaya berkas komponen hanya mengekspor komponen
+ * (syarat react-refresh).
+ *
+ * CATATAN: DocsLayout masih menyimpan salinannya sendiri dan tidak mengimpor
+ * berkas ini, jadi keduanya harus diubah bersamaan sampai salah satunya
+ * dihapus.
  */
 
 export type Section = 'home' | 'components' | 'form' | 'foundations' | 'example'
@@ -82,14 +86,14 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
     items: [
       { label: 'Overview', route: '/components' },
       { label: 'Container', route: '/components/container' },
-      { label: 'Container · Usulan', route: '/components/container-usulan', alt: true },
       { label: 'Button', route: '/components/button' },
       { label: 'Badge', route: '/components/badge' },
+      { label: 'Alert', route: '/components/alert' },
+      { label: 'Toast', route: '/components/toast' },
       { label: 'Card', route: '/components/card' },
-      { label: 'Card · Usulan', route: '/components/card-usulan', alt: true },
       { label: 'Navbar', route: '/components/navbar' },
+      { label: 'Hero', route: '/components/hero' },
       { label: 'Footer', route: '/components/footer' },
-      { label: 'Footer · Usulan', route: '/components/footer-usulan', alt: true },
     ],
   },
 }
