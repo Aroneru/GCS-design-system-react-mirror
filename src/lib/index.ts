@@ -110,4 +110,12 @@ export type {
   NavbarVariant,
 } from "./components/Navbar";
 
+export { Breadcrumb } from "./components/Breadcrumb";
+export type {
+  BreadcrumbProps,
+  BreadcrumbItem,
+  BreadcrumbSize,
+  BreadcrumbBackground,
+} from "./components/Breadcrumb";
+
 export { cn } from "./utils/cn";
