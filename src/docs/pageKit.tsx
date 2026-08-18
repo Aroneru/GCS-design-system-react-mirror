@@ -139,6 +139,16 @@ export const G = ({ children }: { children: ReactNode }) => (
   <span className="text-green-300">{children}</span>
 )
 
+/**
+ * Nama variabel/prop yang sedang dikendalikan playground.
+ *
+ * Sama seperti <H> — hanya mewarnai teks, tanpa latar — tapi dipakai khusus
+ * untuk menandai prop yang nilainya datang dari kontrol di atas blok kode.
+ */
+export const Mark = ({ children }: { children: ReactNode }) => (
+  <span className="font-bold text-primary-300">{children}</span>
+)
+
 /* ---------- Kontrol playground ---------- */
 
 /** Kelompok tombol pilihan (segmented control) — port dari kontrol Alpine. */

@@ -24,7 +24,7 @@ export { Card } from "./components/Card";
 export type { CardProps } from "./components/Card";
 
 export { Container } from "./components/Container";
-export type { ContainerProps } from "./components/Container";
+export type { ContainerProps, ContainerSize } from "./components/Container";
 
 export { Icon } from "./components/Icon";
 export type { IconProps } from "./components/Icon";
@@ -84,6 +84,14 @@ export type {
 // Logo brand & sosial — dipakai sebagai <Github className="size-5" />.
 export * from "./brandIcons";
 export { brandIcons } from "./brandIconRegistry";
+
+export { Hero } from "./components/Hero";
+export type {
+  HeroProps,
+  HeroType,
+  HeroPlatform,
+  HeroImageOrientation,
+} from "./components/Hero";
 
 export { Footer } from "./components/Footer";
 export type { FooterProps, FooterMenu, FooterSocial } from "./components/Footer";

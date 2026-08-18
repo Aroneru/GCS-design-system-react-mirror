@@ -26,6 +26,7 @@ import { CheckboxPage } from "./docs/pages/form/CheckboxPage";
 import { TextAreaUsulanPage } from "./docs/pages/form/input-field/TextAreaUsulanPage";
 import { PlaceholderPage } from "./docs/pages/PlaceholderPage";
 
+<<<<<<< HEAD
 import { ComponentsOverview } from "./docs/pages/components/ComponentsOverview";
 import { ContainerPage } from "./docs/pages/components/ContainerPage";
 import { ButtonPage } from "./docs/pages/components/ButtonPage";
@@ -34,6 +35,17 @@ import { AlertPage } from "./docs/pages/components/AlertPage";
 import { ToastPage } from "./docs/pages/components/ToastPage";
 import { CardPage } from "./docs/pages/components/CardPage";
 import { FooterPage } from "./docs/pages/components/FooterPage";
+=======
+import { ComponentsOverview } from './docs/pages/components/ComponentsOverview'
+import { ContainerPage } from './docs/pages/components/ContainerPage'
+import { ButtonPage } from './docs/pages/components/ButtonPage'
+import { BadgePage } from './docs/pages/components/BadgePage'
+import { AlertPage } from './docs/pages/components/AlertPage'
+import { ToastPage } from './docs/pages/components/ToastPage'
+import { CardPage } from './docs/pages/components/CardPage'
+import { HeroPage } from './docs/pages/components/HeroPage'
+import { FooterPage } from './docs/pages/components/FooterPage'
+>>>>>>> f949205f7c484a53b164e442b85d83bbf9fc95d7
 import {
   NavbarDesktopPreview,
   NavbarMobilePreview,

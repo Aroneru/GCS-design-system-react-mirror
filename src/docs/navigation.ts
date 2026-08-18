@@ -1,7 +1,11 @@
 /**
- * Struktur navigasi dokumentasi — satu sumber untuk icon rail, panel samping,
- * dan angka ringkas di halaman Home. Dipisah dari DocsLayout supaya berkas
- * komponen hanya mengekspor komponen (syarat react-refresh).
+ * Struktur navigasi dokumentasi — sumber angka ringkas di halaman Home.
+ * Dipisah dari DocsLayout supaya berkas komponen hanya mengekspor komponen
+ * (syarat react-refresh).
+ *
+ * CATATAN: DocsLayout masih menyimpan salinannya sendiri dan tidak mengimpor
+ * berkas ini, jadi keduanya harus diubah bersamaan sampai salah satunya
+ * dihapus.
  */
 
 export type Section = "home" | "components" | "form" | "foundations" | "example";
@@ -44,7 +48,18 @@ export const rail: { key: Section; label: string; route: string; icon: string }[
  * `soon` menandai halaman yang komponennya belum ada (masih PlaceholderPage)
  * supaya tidak ikut terhitung sebagai elemen yang tersedia.
  */
-export type NavItem = { label: string; route: string; children?: NavItem[]; soon?: boolean };
+export type NavItem = {
+  label: string;
+  route: string;
+  children?: NavItem[];
+  soon?: boolean;
+  /**
+   * Menandai halaman yang mendokumentasikan komponen yang sama dengan entri
+   * lain — misal susunan "usulan" — supaya tidak ikut terhitung dua kali pada
+   * angka ringkas di halaman Home.
+   */
+  alt?: boolean;
+};
 
 export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
   foundations: {
@@ -68,16 +83,27 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
         route: "/form/input-field",
         children: [
           { label: "Input Field", route: "/form/input-field/input" },
+          { label: "Input Field · Usulan", route: "/form/input-field/input-usulan", alt: true },
           { label: "Floating Label", route: "/form/input-field/floating-label" },
+          {
+            label: "Floating Label · Usulan",
+            route: "/form/input-field/floating-label-usulan",
+            alt: true,
+          },
           { label: "Text Area", route: "/form/input-field/text-area" },
+          { label: "Text Area · Usulan", route: "/form/input-field/text-area-usulan", alt: true },
         ],
       },
       { label: "Regular Select Form", route: "/form/select" },
+      { label: "Regular Select Form · Usulan", route: "/form/select-usulan", alt: true },
       { label: "Search Form", route: "/form/search", soon: true },
       { label: "Upload Form", route: "/form/upload", soon: true },
       { label: "Radio Button", route: "/form/radio" },
+      { label: "Radio Button · Usulan", route: "/form/radio-usulan", alt: true },
       { label: "Toggle Button", route: "/form/toggle" },
+      { label: "Toggle Button · Usulan", route: "/form/toggle-usulan", alt: true },
       { label: "Checkbox", route: "/form/checkbox" },
+      { label: "Checkbox · Usulan", route: "/form/checkbox-usulan", alt: true },
     ],
   },
   components: {
@@ -87,8 +113,11 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: "Container", route: "/components/container" },
       { label: "Button", route: "/components/button" },
       { label: "Badge", route: "/components/badge" },
+      { label: "Alert", route: "/components/alert" },
+      { label: "Toast", route: "/components/toast" },
       { label: "Card", route: "/components/card" },
       { label: "Navbar", route: "/components/navbar" },
+      { label: "Hero", route: "/components/hero" },
       { label: "Footer", route: "/components/footer" },
       { label: "Breadcrumb", route: "/components/breadcrumb" },
     ],
