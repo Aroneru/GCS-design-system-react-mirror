@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { Bell } from "flowbite-react-icons/solid";
-import { ArrowRightToBracket, Bars, BarsFromLeft, Edit } from "flowbite-react-icons/outline";
+import { ArrowRightToBracket, Bars, BarsFromLeft, Edit } from "../icons/outline";
 import { Button } from "./Button";
 import { Icon } from "./Icon";
 import { cn } from "../utils/cn";
