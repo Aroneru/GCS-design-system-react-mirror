@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Navbar, Toast } from "../../../lib";
+import { Alert, Badge, Button, Navbar, Spinner, Toast } from "../../../lib";
 import { OverviewCard, OverviewPage } from "../../pageKit";
 
 export function ComponentsOverview() {
@@ -53,6 +53,16 @@ export function ComponentsOverview() {
           <Alert variant="success" heading="Ini adalah Alert" dismissible={false}>
             Ini merupakan Design system Stasi berupa component alert.
           </Alert>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/spinner"
+        name="Spinner"
+        desc="Indikator proses berputar dalam ukuran default dan large."
+      >
+        <div className="flex items-center justify-center rounded-xl bg-surface-subtle p-5">
+          <Spinner aria-label="Memuat preview" />
         </div>
       </OverviewCard>
 

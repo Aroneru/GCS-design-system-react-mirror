@@ -57,6 +57,7 @@ const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: 'Container', route: '/components/container' },
       { label: 'Button', route: '/components/button' },
       { label: 'Badge', route: '/components/badge' },
+      { label: 'Spinner', route: '/components/spinner' },
       { label: 'Alert', route: '/components/alert' },
       { label: 'Toast', route: '/components/toast' },
       { label: 'Card', route: '/components/card' },
