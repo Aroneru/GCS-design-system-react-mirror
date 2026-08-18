@@ -260,122 +260,90 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
        * bawahnya jadi bisa melebar penuh dari tepi kiri layar.
        */}
       <div className="flex flex-1">
-      {/* ══ Icon rail — desktop ══ */}
-      <aside className="sticky top-0 z-30 hidden h-screen w-[76px] shrink-0 flex-col items-center border-r border-border bg-white py-5 lg:flex">
-        <a href="#/" aria-label="Beranda">
-          <Logo />
-        </a>
-        <nav className="mt-8 flex flex-col gap-2" aria-label="Area utama">
-          {rail.map((item) => (
-            <a
-              key={item.key}
-              href={`#${item.route}`}
-              className={`flex w-14 flex-col items-center gap-1 rounded-xl py-2 text-[10px] font-bold transition-colors ${
-                section === item.key
-                  ? "bg-primary-50 text-primary-700"
-                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-              }`}
-              aria-current={section === item.key ? "page" : undefined}
+        {/* ══ Icon rail — desktop ══ */}
+        <aside className="sticky top-0 z-30 hidden h-screen w-[76px] shrink-0 flex-col items-center border-r border-border bg-white py-5 lg:flex">
+          <a href="#/" aria-label="Beranda">
+            <Logo />
+          </a>
+          <nav className="mt-8 flex flex-col gap-2" aria-label="Area utama">
+            {rail.map((item) => (
+              <a
+                key={item.key}
+                href={`#${item.route}`}
+                className={`flex w-14 flex-col items-center gap-1 rounded-xl py-2 text-[10px] font-bold transition-colors ${
+                  section === item.key
+                    ? "bg-primary-50 text-primary-700"
+                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                }`}
+                aria-current={section === item.key ? "page" : undefined}
+              >
+                <svg
+                  className="size-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
+                </svg>
+                {item.label}
+              </a>
+            ))}
+          </nav>
+          {sidebar && (
+            <button
+              onClick={() => setSidebarOpen((v) => !v)}
+              className="mt-auto grid size-10 place-items-center rounded-xl text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              aria-expanded={sidebarOpen}
+              aria-label={sidebarOpen ? "Sembunyikan panel" : "Tampilkan panel"}
             >
               <svg
-                className="size-5"
+                className={`size-5 transition-transform duration-300 ${sidebarOpen ? "" : "rotate-180"}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 strokeWidth={1.8}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16v14H4V5Zm5.5 0v14" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 9.5 13.5 12l2.5 2.5" />
               </svg>
-              {item.label}
-            </a>
-          ))}
-        </nav>
-        {sidebar && (
-          <button
-            onClick={() => setSidebarOpen((v) => !v)}
-            className="mt-auto grid size-10 place-items-center rounded-xl text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
-            aria-expanded={sidebarOpen}
-            aria-label={sidebarOpen ? "Sembunyikan panel" : "Tampilkan panel"}
-          >
-            <svg
-              className={`size-5 transition-transform duration-300 ${sidebarOpen ? "" : "rotate-180"}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.8}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16v14H4V5Zm5.5 0v14" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16 9.5 13.5 12l2.5 2.5" />
-            </svg>
-          </button>
-        )}
-      </aside>
-
-      {/* ══ Sidebar drawer — desktop ══ */}
-      {sidebar && (
-        <aside
-<<<<<<< HEAD
-          className={`fixed inset-y-0 left-[76px] z-20 hidden w-[248px] overflow-y-auto border-r border-border bg-white transition-transform duration-300 ease-out lg:block ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-          aria-hidden={!sidebarOpen}
-        >
-          <div className="flex h-full flex-col px-5 py-7">
-            <p className="px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">
-              {sidebar.title}
-            </p>
-=======
-          className={`sticky top-0 z-20 hidden h-screen shrink-0 overflow-hidden bg-white transition-[width] duration-300 ease-out lg:block ${
-            sidebarOpen ? 'w-[248px] border-r border-border' : 'w-0'
-          }`}
-          aria-hidden={!sidebarOpen}
-        >
-          {/* Lebar dikunci di dalam supaya isinya tidak ikut mengkerut saat panel menutup. */}
-          <div className="flex h-full w-[248px] flex-col overflow-y-auto px-5 py-7">
-            <p className="px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">{sidebar.title}</p>
->>>>>>> f949205f7c484a53b164e442b85d83bbf9fc95d7
-            <nav className="mt-2" aria-label={sidebar.title}>
-              <NavLinks items={sidebar.items} path={path} />
-            </nav>
-            <div className="mt-auto rounded-xl bg-gray-50 p-4">
-              <p className="text-xs font-bold text-gray-900">Foundation v1.0</p>
-              <p className="mt-1 text-xs leading-5 text-gray-500">
-                React · Vite
-                <br />
-                Tailwind CSS v4
-              </p>
-            </div>
-          </div>
+            </button>
+          )}
         </aside>
-      )}
 
-      {/* ══ Konten ══ */}
-<<<<<<< HEAD
-      <div
-        className={`transition-[padding] duration-300 ease-out ${
-          !sidebar ? "lg:pl-[76px]" : sidebarOpen ? "lg:pl-[324px]" : "lg:pl-[76px]"
-        }`}
-      >
-        <main>{children}</main>
+        {/* ══ Sidebar drawer — desktop ══ */}
+        {sidebar && (
+          <aside
+            className={`sticky top-0 z-20 hidden h-screen shrink-0 overflow-hidden bg-white transition-[width] duration-300 ease-out lg:block ${
+              sidebarOpen ? "w-[248px] border-r border-border" : "w-0"
+            }`}
+            aria-hidden={!sidebarOpen}
+          >
+            {/* Lebar dikunci di dalam supaya isinya tidak ikut mengkerut saat panel menutup. */}
+            <div className="flex h-full w-[248px] flex-col overflow-y-auto px-5 py-7">
+              <p className="px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">
+                {sidebar.title}
+              </p>
+              <nav className="mt-2" aria-label={sidebar.title}>
+                <NavLinks items={sidebar.items} path={path} />
+              </nav>
+              <div className="mt-auto rounded-xl bg-gray-50 p-4">
+                <p className="text-xs font-bold text-gray-900">Foundation v1.0</p>
+                <p className="mt-1 text-xs leading-5 text-gray-500">
+                  React · Vite
+                  <br />
+                  Tailwind CSS v4
+                </p>
+              </div>
+            </div>
+          </aside>
+        )}
 
-        {/* Di dalam pembungkus ber-padding, supaya footer tidak tertimpa panel samping yang fixed. */}
-        <Footer
-          logo="/images/komdigi-logo.svg"
-          logoAlt="STASI — Ministerium Fur Staatssicherheit"
-          menus={footerMenus}
-          copyright={`© ${new Date().getFullYear()} STASI - Ministerium Fur Staatssicherheit`}
-          socials={[
-            { label: "Instagram", url: "#", icon: InstagramIcon },
-            { label: "X", url: "#", icon: XIcon },
-            { label: "Facebook", url: "#", icon: FacebookIcon },
-          ]}
-        />
-=======
+        {/* ══ Konten ══ */}
         {/* min-w-0: tabel & blok kode lebar menggulung sendiri, tidak melebarkan baris. */}
         <div className="min-w-0 flex-1">
           <main>{children}</main>
         </div>
->>>>>>> f949205f7c484a53b164e442b85d83bbf9fc95d7
       </div>
 
       {/* Saudara dari baris di atas — melebar penuh selebar layar, di bawah rail. */}
@@ -386,9 +354,9 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
         menus={footerMenus}
         copyright={`© ${new Date().getFullYear()} STASI - Ministerium Fur Staatssicherheit`}
         socials={[
-          { label: 'Instagram', url: '#', icon: InstagramIcon },
-          { label: 'X', url: '#', icon: XIcon },
-          { label: 'Facebook', url: '#', icon: FacebookIcon },
+          { label: "Instagram", url: "#", icon: InstagramIcon },
+          { label: "X", url: "#", icon: XIcon },
+          { label: "Facebook", url: "#", icon: FacebookIcon },
         ]}
       />
     </div>
