@@ -55,16 +55,14 @@ const sidebars: Record<string, { title: string; items: NavItem[] }> = {
     items: [
       { label: 'Overview', route: '/components' },
       { label: 'Container', route: '/components/container' },
-      { label: 'Container - Usulan', route: '/components/container-usulan' },
       { label: 'Button', route: '/components/button' },
       { label: 'Badge', route: '/components/badge' },
       { label: 'Alert', route: '/components/alert' },
       { label: 'Toast', route: '/components/toast' },
       { label: 'Card', route: '/components/card' },
-      { label: 'Card - Usulan', route: '/components/card-usulan' },
       { label: 'Navbar', route: '/components/navbar' },
+      { label: 'Hero', route: '/components/hero' },
       { label: 'Footer', route: '/components/footer' },
-      { label: 'Footer - Usulan', route: '/components/footer-usulan' },
     ],
   },
 }

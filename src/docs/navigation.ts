@@ -82,14 +82,12 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
     items: [
       { label: 'Overview', route: '/components' },
       { label: 'Container', route: '/components/container' },
-      { label: 'Container · Usulan', route: '/components/container-usulan', alt: true },
       { label: 'Button', route: '/components/button' },
       { label: 'Badge', route: '/components/badge' },
       { label: 'Card', route: '/components/card' },
-      { label: 'Card · Usulan', route: '/components/card-usulan', alt: true },
       { label: 'Navbar', route: '/components/navbar' },
+      { label: 'Hero', route: '/components/hero' },
       { label: 'Footer', route: '/components/footer' },
-      { label: 'Footer · Usulan', route: '/components/footer-usulan', alt: true },
     ],
   },
 }
