@@ -41,8 +41,6 @@ const breadcrumbProps: PropRow[] = [
     "Menentukan ukuran teks Breadcrumb. sm = 12px dan base = 14px.",
   ],
   ["background", '"bg" | "none"', "none", "Menentukan apakah Breadcrumb menggunakan background."],
-  ["className", "string", "—", "Class tambahan untuk menyesuaikan tampilan Breadcrumb."],
-  ["…props", "HTMLAttributes<HTMLElement>", "—", "Atribut HTML yang valid untuk elemen nav."],
 ];
 
 const toc: TocEntry[] = [
@@ -87,7 +85,7 @@ export function BreadcrumbPage() {
         </p>
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">
-          <Demo label="sm - 12px">
+          <Demo label="sm">
             <div>
               <Breadcrumb items={allItems.slice(0, 3)} size="sm" background="none" />
             </div>
