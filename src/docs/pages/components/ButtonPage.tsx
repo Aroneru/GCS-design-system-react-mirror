@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Messages } from "flowbite-react-icons/solid";
+import { Messages } from "../../../lib/icons/solid";
 import { Button, type ButtonTheme, type ButtonVariant } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Demo, H, Segmented } from "../../pageKit";

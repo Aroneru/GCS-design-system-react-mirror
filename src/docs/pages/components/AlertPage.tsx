@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Messages } from 'flowbite-react-icons/outline'
+import { Messages } from '../../../lib/icons/outline'
 import { Alert, type AlertSurface, type AlertVariant } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Segmented } from '../../pageKit'

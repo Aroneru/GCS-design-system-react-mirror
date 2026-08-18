@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode, type RefObject } from 'react'
-import { ChevronRight, Close } from '../../icons/outline'
+import { ChevronRight, Close } from 'flowbite-react-icons/outline'
 import { cn } from '../../utils/cn'
 import type { NavbarItem, NavbarProps, NavbarSubItem, NavbarUser } from '../Navbar'
 import { Icon } from '../Icon'
