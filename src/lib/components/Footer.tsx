@@ -22,6 +22,11 @@ export interface FooterProps {
   menus?: FooterMenu[]
   copyright?: ReactNode
   socials?: FooterSocial[]
+  /**
+   * Isi footer melebar penuh mengikuti lebar footer — hanya menyisakan padding
+   * kiri-kanan, tanpa batas 1280px dan tanpa pemusatan (gaya Flowbite).
+   */
+  fluid?: boolean
   className?: string
 }
 
@@ -33,11 +38,17 @@ export function Footer({
   menus = [],
   copyright,
   socials = [],
+  fluid = false,
   className,
 }: FooterProps) {
   return (
     <footer className={cn('@container bg-gray-800 text-gray-300', className)}>
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-16 @3xl:px-12">
+      <div
+        className={cn(
+          'flex flex-col gap-8 px-6 py-16 @3xl:px-12',
+          fluid ? 'w-full' : 'mx-auto max-w-7xl',
+        )}
+      >
         <div className="flex flex-col gap-7 @3xl:flex-row @3xl:items-center @3xl:gap-12">
           <div className="shrink-0">
             {logo ? (
@@ -49,7 +60,15 @@ export function Footer({
 
           {menus.length > 0 && (
             <nav className="@3xl:flex @3xl:flex-1 @3xl:justify-center" aria-label="Navigasi footer">
-              <ul className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
+              {/*
+               * Satu baris memuat paling banyak 5 menu; sisanya turun ke baris
+               * berikutnya. Saat footer sempit tata letaknya tetap flex-wrap
+               * (menyesuaikan ruang), dan gridTemplateColumns diabaikan.
+               */}
+              <ul
+                className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm @3xl:grid"
+                style={{ gridTemplateColumns: `repeat(${Math.min(menus.length, 5)}, max-content)` }}
+              >
                 {menus.map((menu, i) => (
                   <li key={i}>
                     <a
@@ -63,6 +82,8 @@ export function Footer({
               </ul>
             </nav>
           )}
+
+          <div></div>
         </div>
 
         <hr className="border-white/15" />

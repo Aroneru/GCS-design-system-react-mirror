@@ -55,13 +55,16 @@ const sidebars: Record<string, { title: string; items: NavItem[] }> = {
     items: [
       { label: 'Overview', route: '/components' },
       { label: 'Container', route: '/components/container' },
+      { label: 'Container - Usulan', route: '/components/container-usulan' },
       { label: 'Button', route: '/components/button' },
       { label: 'Badge', route: '/components/badge' },
       { label: 'Alert', route: '/components/alert' },
       { label: 'Toast', route: '/components/toast' },
       { label: 'Card', route: '/components/card' },
+      { label: 'Card - Usulan', route: '/components/card-usulan' },
       { label: 'Navbar', route: '/components/navbar' },
       { label: 'Footer', route: '/components/footer' },
+      { label: 'Footer - Usulan', route: '/components/footer-usulan' },
     ],
   },
 }
@@ -136,7 +139,7 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
   }, [drawer])
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-gray-50">
       {/* ══ Top bar — mobile ══ */}
       <div className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-white px-4 py-3 lg:hidden">
         <a href="#/" className="flex items-center gap-2.5" aria-label="Beranda">
@@ -184,8 +187,14 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
         </div>
       )}
 
+      {/*
+       * Baris utama: rail + panel samping + konten. Keduanya `sticky` (bukan
+       * `fixed`) supaya tingginya berhenti di ujung baris ini — footer di
+       * bawahnya jadi bisa melebar penuh dari tepi kiri layar.
+       */}
+      <div className="flex flex-1">
       {/* ══ Icon rail — desktop ══ */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[76px] flex-col items-center border-r border-border bg-white py-5 lg:flex">
+      <aside className="sticky top-0 z-30 hidden h-screen w-[76px] shrink-0 flex-col items-center border-r border-border bg-white py-5 lg:flex">
         <a href="#/" aria-label="Beranda">
           <Logo />
         </a>
@@ -224,12 +233,13 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
       {/* ══ Sidebar drawer — desktop ══ */}
       {sidebar && (
         <aside
-          className={`fixed inset-y-0 left-[76px] z-20 hidden w-[248px] overflow-y-auto border-r border-border bg-white transition-transform duration-300 ease-out lg:block ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          className={`sticky top-0 z-20 hidden h-screen shrink-0 overflow-hidden bg-white transition-[width] duration-300 ease-out lg:block ${
+            sidebarOpen ? 'w-[248px] border-r border-border' : 'w-0'
           }`}
           aria-hidden={!sidebarOpen}
         >
-          <div className="flex h-full flex-col px-5 py-7">
+          {/* Lebar dikunci di dalam supaya isinya tidak ikut mengkerut saat panel menutup. */}
+          <div className="flex h-full w-[248px] flex-col overflow-y-auto px-5 py-7">
             <p className="px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">{sidebar.title}</p>
             <nav className="mt-2" aria-label={sidebar.title}>
               <NavLinks items={sidebar.items} path={path} />
@@ -247,26 +257,25 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
       )}
 
       {/* ══ Konten ══ */}
-      <div
-        className={`transition-[padding] duration-300 ease-out ${
-          !sidebar ? 'lg:pl-[76px]' : sidebarOpen ? 'lg:pl-[324px]' : 'lg:pl-[76px]'
-        }`}
-      >
-        <main>{children}</main>
-
-        {/* Di dalam pembungkus ber-padding, supaya footer tidak tertimpa panel samping yang fixed. */}
-        <Footer
-          logo="/images/komdigi-logo.svg"
-          logoAlt="STASI — Ministerium Fur Staatssicherheit"
-          menus={footerMenus}
-          copyright={`© ${new Date().getFullYear()} STASI - Ministerium Fur Staatssicherheit`}
-          socials={[
-            { label: 'Instagram', url: '#', icon: InstagramIcon },
-            { label: 'X', url: '#', icon: XIcon },
-            { label: 'Facebook', url: '#', icon: FacebookIcon },
-          ]}
-        />
+        {/* min-w-0: tabel & blok kode lebar menggulung sendiri, tidak melebarkan baris. */}
+        <div className="min-w-0 flex-1">
+          <main>{children}</main>
+        </div>
       </div>
+
+      {/* Saudara dari baris di atas — melebar penuh selebar layar, di bawah rail. */}
+      <Footer
+        fluid
+        logo="/images/komdigi-logo.svg"
+        logoAlt="STASI — Ministerium Fur Staatssicherheit"
+        menus={footerMenus}
+        copyright={`© ${new Date().getFullYear()} STASI - Ministerium Fur Staatssicherheit`}
+        socials={[
+          { label: 'Instagram', url: '#', icon: InstagramIcon },
+          { label: 'X', url: '#', icon: XIcon },
+          { label: 'Facebook', url: '#', icon: FacebookIcon },
+        ]}
+      />
     </div>
   )
 }

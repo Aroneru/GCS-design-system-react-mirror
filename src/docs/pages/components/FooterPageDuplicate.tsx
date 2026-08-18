@@ -52,12 +52,6 @@ const footerProps: PropRow[] = [
     'Ikon media sosial: [{ label, url, icon }, ..]. icon berupa elemen <svg> yang mewarisi currentColor sehingga ikut berubah saat hover; label jadi aria-label; url selain "#" dibuka di tab baru dengan rel="noopener noreferrer".',
   ],
   [
-    'fluid',
-    'boolean',
-    'false',
-    'Bila true, isi footer melebar penuh mengikuti lebar footer — batas 1280px (max-w-7xl) dan pemusatannya dilepas, menyisakan padding kiri-kanan saja. Dipakai untuk footer situs yang menempel di tepi layar, seperti Flowbite.',
-  ],
-  [
     'className',
     'string',
     'undefined',
@@ -103,64 +97,8 @@ export function FooterPage() {
       title="Footer"
       description="Penutup halaman berisi logo, navigasi ringkas, hak cipta, dan tautan media sosial. Tata letaknya mengikuti lebar footer itu sendiri, bukan lebar layar."
     >
-      <Section title="Tampilan dasar">
-        <p className="mb-4 max-w-5xl text-body-sm leading-6 text-gray-500">
-          Satu blok utuh berlatar gray-800: baris atas berisi logo dan menu, lalu garis tipis, lalu baris
-          bawah berisi hak cipta dan ikon sosial. Semua bagiannya opsional — yang tidak diisi tidak
-          dirender, bukan disembunyikan lewat CSS.
-        </p>
-
-        <div className="rounded-2xl border border-border bg-surface-subtle p-4 sm:p-6">
-          <div className="overflow-hidden rounded-xl shadow-soft">
-            <Footer
-              logo="/images/komdigi-logo.svg"
-              logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
-              menus={allMenus.slice(0, 4)}
-              copyright="© 2025 Kementerian Komunikasi dan Digital"
-              socials={footerSocials}
-            />
-          </div>
-        </div>
-      </Section>
-
-      <Section title="Perilaku responsif">
-        <p className="mb-4 max-w-5xl text-body-sm leading-6 text-gray-500">
-          Ambang di bawah ini diukur dari <strong className="text-gray-900">lebar footer itu sendiri</strong>,
-          bukan lebar layar — elemen <C>{'<footer>'}</C> dipasangi <C>@container</C>. Jadi footer yang ditaruh
-          di kolom sempit pada layar desktop tetap tampil bertumpuk seperti di ponsel, dan sebaliknya. Cara
-          mengeceknya: ganti kontrol <em>Tampilan</em> di Playground paling bawah, atau perkecil jendela.
-        </p>
-
-        <div className="grid gap-4 sm:grid-cols-3">
-          {responsiveBehaviour.map(([title, desc]) => (
-            <article key={title} className="ds-card p-5">
-              <h3 className="text-sm font-black text-gray-900">{title}</h3>
-              <p className="mt-1.5 text-body-sm leading-6 text-gray-500">{desc}</p>
-            </article>
-          ))}
-        </div>
-
-        <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500">
-          Yang tidak berubah di ukuran mana pun: latar <C>bg-gray-800</C>, jarak atas-bawah 64px, lebar isi
-          dibatasi <C>max-w-7xl</C> lalu dipusatkan, dan garis pemisah tipis di atas baris hak cipta. Prop{' '}
-          <C>fluid</C> melepas batas lebar itu sehingga isi mengisi penuh — persis footer situs ini.
-        </p>
-      </Section>
-
-      <Section title="Properties">
-        <p className="mb-4  text-body-sm leading-6 text-gray-500">
-          Semua prop opsional — <C>{'<Footer />'}</C> tanpa prop tetap merender kerangkanya. Dua tipe
-          pendukungnya: <C>FooterMenu</C> = <C>{'{ label: string; url?: string }'}</C> dan{' '}
-          <C>FooterSocial</C> = <C>{'{ label?: string; url?: string; icon: ReactNode }'}</C>. Atribut HTML di
-          luar daftar ini tidak diteruskan ke elemen <C>{'<footer>'}</C>.
-        </p>
-        <PropsTable rows={footerProps} minWidth="48rem" />
-      </Section>
-
-      {/* Playground ditaruh paling bawah: varian dan penjelasannya dibaca dulu,
-          baru pembaca mencoba sendiri. */}
       <section>
-        <h2 className="mb-4 text-heading-3 font-black text-gray-900">Playground</h2>
+        <h2 className="mb-4 text-heading-3 font-black text-gray-900">Preview</h2>
 
         {/* Area preview */}
         <div className="rounded-2xl border border-border bg-surface-subtle p-4 sm:p-6">
@@ -303,6 +241,38 @@ export function FooterPage() {
         </p>
       </section>
 
+      <Section title="Perilaku responsif">
+        <p className="mb-4 max-w-5xl text-body-sm leading-6 text-gray-500">
+          Ambang di bawah ini diukur dari <strong className="text-gray-900">lebar footer itu sendiri</strong>,
+          bukan lebar layar — elemen <C>{'<footer>'}</C> dipasangi <C>@container</C>. Jadi footer yang ditaruh
+          di kolom sempit pada layar desktop tetap tampil bertumpuk seperti di ponsel, dan sebaliknya. Cara
+          mengeceknya: ganti kontrol <em>Tampilan</em> di Preview, atau perkecil jendela.
+        </p>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          {responsiveBehaviour.map(([title, desc]) => (
+            <article key={title} className="ds-card p-5">
+              <h3 className="text-sm font-black text-gray-900">{title}</h3>
+              <p className="mt-1.5 text-body-sm leading-6 text-gray-500">{desc}</p>
+            </article>
+          ))}
+        </div>
+
+        <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500">
+          Yang tidak berubah di ukuran mana pun: latar <C>bg-gray-800</C>, jarak atas-bawah 64px, lebar isi
+          dibatasi <C>max-w-7xl</C> lalu dipusatkan, dan garis pemisah tipis di atas baris hak cipta.
+        </p>
+      </Section>
+
+      <Section title="Properties">
+        <p className="mb-4  text-body-sm leading-6 text-gray-500">
+          Semua prop opsional — <C>{'<Footer />'}</C> tanpa prop tetap merender kerangkanya. Dua tipe
+          pendukungnya: <C>FooterMenu</C> = <C>{'{ label: string; url?: string }'}</C> dan{' '}
+          <C>FooterSocial</C> = <C>{'{ label?: string; url?: string; icon: ReactNode }'}</C>. Atribut HTML di
+          luar daftar ini tidak diteruskan ke elemen <C>{'<footer>'}</C>.
+        </p>
+        <PropsTable rows={footerProps} minWidth="48rem" />
+      </Section>
     </ComponentPage>
   )
 }
