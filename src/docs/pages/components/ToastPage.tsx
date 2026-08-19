@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Refresh } from 'flowbite-react-icons/outline'
+import { Refresh } from '../../../lib/icons/outline'
 import { Button, Toast, type ToastVariant } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Segmented } from '../../pageKit'

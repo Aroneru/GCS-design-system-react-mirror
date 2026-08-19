@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 386 530" role="img" aria-label="Contoh gambar hero">
+    <!--
+      Gambar ulang aset sampul dari Figma (ekspor PNG-nya ada di repo ini juga).
+      Bayangan sengaja TIDAK dibakar ke dalam gambar: <Hero> sudah memasang
+      rounded-xl + shadow-soft sendiri, dan bayangan ganda akan terlihat kotor.
+
+      Gradiennya userSpaceOnUse supaya elemen lain — misal lubang di kepala
+      jangka — bisa memakai gradien yang sama dan warnanya menyambung persis
+      dengan latarnya.
+    -->
+    <defs>
+        <linearGradient id="heroBg" gradientUnits="userSpaceOnUse" x1="0" y1="40" x2="386" y2="330">
+            <stop offset="0" stop-color="#7ba2fa"/>
+            <stop offset="0.45" stop-color="#4680f7"/>
+            <stop offset="1" stop-color="#1f63f2"/>
+        </linearGradient>
+
+        <pattern id="heroDotsDark" width="9.3" height="9.3" patternUnits="userSpaceOnUse">
+            <circle cx="1.1" cy="1.1" r="1.1" fill="#1e429f" opacity="0.5"/>
+        </pattern>
+
+        <pattern id="heroDotsLight" width="9.3" height="9.3" patternUnits="userSpaceOnUse">
+            <circle cx="1.1" cy="1.1" r="1.1" fill="#ffffff" opacity="0.45"/>
+        </pattern>
+    </defs>
+
+    <rect width="386" height="530" rx="12" fill="url(#heroBg)"/>
+
+    <rect x="13" y="11" width="65" height="64" fill="url(#heroDotsDark)"/>
+    <rect x="308" y="439" width="62" height="78" fill="url(#heroDotsLight)"/>
+
+    <!--
+      Jangka: kepala berlubang, dua kaki menyebar ke bawah, dan palang yang
+      melengkung ke BAWAH (menyerupai senyum) melintasi kedua kaki. Ujung palang
+      berada lebih tinggi dari telapak kakinya — itu yang membuat siluetnya
+      terbaca sebagai huruf "A".
+    -->
+    <g stroke="#ffffff" stroke-width="10.5" stroke-linecap="round" fill="none">
+        <path d="M187 150 L161 188"/>
+        <path d="M199 150 L225 188"/>
+        <path d="M158 154 Q193 189 228 155"/>
+    </g>
+    <circle cx="193" cy="133" r="15" fill="#ffffff"/>
+    <circle cx="193" cy="133" r="5.5" fill="url(#heroBg)"/>
+
+    <!--
+      textLength mengunci lebar tiap baris apa pun fontnya. Ini wajib, bukan
+      hiasan: SVG yang dipanggil lewat <img src> dirender terisolasi, jadi
+      webfont halaman TIDAK tersedia di dalamnya. Tanpa lebar yang dikunci,
+      pembaca yang tidak punya Lato akan melihat teksnya melar keluar viewBox
+      lalu terpotong.
+    -->
+    <g
+        fill="#ffffff"
+        font-family="Lato, ui-sans-serif, system-ui, sans-serif"
+        font-size="23"
+        font-weight="900"
+        text-anchor="middle"
+        lengthAdjust="spacingAndGlyphs"
+    >
+        <text x="193" y="234" textLength="196">Designing Interfaces:</text>
+        <text x="193" y="265" textLength="286">A User-Centered Approach</text>
+    </g>
+
+    <!-- Lencana kecil di bawah: bulatan + nama. Ganti teksnya sesuai pemakaian. -->
+    <g transform="translate(0 493)">
+        <circle cx="168" cy="-4" r="7" fill="#ffffff"/>
+        <circle cx="168" cy="-4" r="4.2" fill="url(#heroBg)"/>
+        <circle cx="169.5" cy="-5.5" r="1.6" fill="#ffffff"/>
+        <text
+            x="182"
+            y="0"
+            fill="#ffffff"
+            font-family="Lato, ui-sans-serif, system-ui, sans-serif"
+            font-size="11.5"
+            font-weight="700"
+        >Sstasi</text>
+    </g>
+</svg>

@@ -133,6 +133,26 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/hero"
+        name="Hero"
+        desc="Pembuka halaman: judul, sub heading, deskripsi, satu tombol, dan gambar di kiri atau kanan."
+        wide
+      >
+        <div className="rounded-xl bg-surface-subtle p-5">
+          <div className="flex items-center gap-4 rounded-lg border border-border bg-white p-4">
+            <img src="/images/hero-sample.svg" alt="" className="h-20 w-auto rounded-md" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="h-3 w-40 rounded bg-gray-300" />
+              <div className="h-1.5 w-24 rounded bg-primary-300" />
+              <div className="h-1.5 w-full rounded bg-gray-200" />
+              <div className="h-1.5 w-2/3 rounded bg-gray-200" />
+              <div className="h-4 w-24 rounded bg-primary-700" />
+            </div>
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/footer"
         name="Footer"
         desc="Penutup halaman responsif dengan logo, menu, hak cipta, dan tautan media sosial."
