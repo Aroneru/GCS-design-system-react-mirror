@@ -26,17 +26,17 @@ import { CheckboxPage } from "./docs/pages/form/CheckboxPage";
 import { TextAreaUsulanPage } from "./docs/pages/form/input-field/TextAreaUsulanPage";
 import { PlaceholderPage } from "./docs/pages/PlaceholderPage";
 
-import { ComponentsOverview } from './docs/pages/components/ComponentsOverview'
-import { ContainerPage } from './docs/pages/components/ContainerPage'
-import { ButtonPage } from './docs/pages/components/ButtonPage'
-import { BadgePage } from './docs/pages/components/BadgePage'
-import { SpinnerPage } from './docs/pages/components/SpinnerPage'
-import { PopoverPage } from './docs/pages/components/PopoverPage'
-import { AlertPage } from './docs/pages/components/AlertPage'
-import { ToastPage } from './docs/pages/components/ToastPage'
-import { CardPage } from './docs/pages/components/CardPage'
+import { ComponentsOverview } from "./docs/pages/components/ComponentsOverview";
+import { ContainerPage } from "./docs/pages/components/ContainerPage";
+import { ButtonPage } from "./docs/pages/components/ButtonPage";
+import { BadgePage } from "./docs/pages/components/BadgePage";
+import { SpinnerPage } from "./docs/pages/components/SpinnerPage";
+import { PopoverPage } from "./docs/pages/components/PopoverPage";
+import { AlertPage } from "./docs/pages/components/AlertPage";
+import { ToastPage } from "./docs/pages/components/ToastPage";
+import { CardPage } from "./docs/pages/components/CardPage";
 import { HeroPage } from "./docs/pages/components/HeroPage";
-import { FooterPage } from './docs/pages/components/FooterPage'
+import { FooterPage } from "./docs/pages/components/FooterPage";
 import {
   NavbarDesktopPreview,
   NavbarMobilePreview,
@@ -70,18 +70,19 @@ const routes: Record<string, () => React.ReactElement> = {
   "/form/toggle": TogglePage,
   "/form/checkbox": CheckboxPage,
 
-  '/components': ComponentsOverview,
-  '/components/container': ContainerPage,
-  '/components/button': ButtonPage,
-  '/components/badge': BadgePage,
-  '/components/spinner': SpinnerPage,
-  '/components/popover': PopoverPage,
-  '/components/alert': AlertPage,
-  '/components/toast': ToastPage,
-  '/components/card': CardPage,
-  '/components/navbar': NavbarPage,
-  '/components/footer': FooterPage,
-}
+  "/components": ComponentsOverview,
+  "/components/container": ContainerPage,
+  "/components/button": ButtonPage,
+  "/components/badge": BadgePage,
+  "/components/spinner": SpinnerPage,
+  "/components/popover": PopoverPage,
+  "/components/alert": AlertPage,
+  "/components/toast": ToastPage,
+  "/components/card": CardPage,
+  "/components/navbar": NavbarPage,
+  "/components/footer": FooterPage,
+  "/components/breadcrumb": BreadcrumbPage,
+};
 
 function renderNavbarPreview(path: string) {
   switch (path) {
