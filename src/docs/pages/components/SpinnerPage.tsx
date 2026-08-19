@@ -14,9 +14,9 @@ const spinnerProps: PropRow[] = [
   ],
   [
     '…props',
-    'SVGProps<SVGSVGElement>',
+    'Native SVG attributes',
     '—',
-    'Seluruh atribut <svg> standar diteruskan, termasuk className, aria-label, aria-hidden, role, dan event handler yang relevan.',
+    'Atribut SVG native yang relevan diteruskan, termasuk className, style, aria-*, data-*, id, dan event handler. Ukuran dan geometri Spinner dikontrol oleh API komponen.',
   ],
 ]
 
@@ -156,8 +156,8 @@ export function SpinnerPage() {
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;svg&gt;</H> standar juga diteruskan apa adanya.
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut SVG native
+          yang relevan tetap dapat diteruskan.
         </Lead>
         <div className="[&_td:first-child]:whitespace-nowrap [&_td:nth-child(2)]:whitespace-nowrap">
           <PropsTable rows={spinnerProps} minWidth="46rem" />

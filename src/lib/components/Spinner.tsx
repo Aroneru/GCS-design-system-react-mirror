@@ -3,7 +3,11 @@ import { cn } from '../utils/cn'
 
 export type SpinnerSize = 'default' | 'large'
 
-export interface SpinnerProps extends SVGProps<SVGSVGElement> {
+export interface SpinnerProps
+  extends Omit<
+    SVGProps<SVGSVGElement>,
+    'width' | 'height' | 'viewBox' | 'fill' | 'children' | 'dangerouslySetInnerHTML'
+  > {
   size?: SpinnerSize
 }
 
@@ -12,6 +16,7 @@ const sizes: Record<SpinnerSize, string> = {
   large: 'size-[100px]',
 }
 
+// ~25% of the circumference for r=20.
 const activeArcDasharray = '31.4 94.3'
 
 export const Spinner = forwardRef<SVGSVGElement, SpinnerProps>(function Spinner(
