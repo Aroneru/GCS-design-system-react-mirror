@@ -17,6 +17,9 @@ export type { BadgeProps, BadgeVariant } from "./components/Badge";
 export { Spinner } from "./components/Spinner";
 export type { SpinnerProps, SpinnerSize } from "./components/Spinner";
 
+export { Popover } from "./components/Popover";
+export type { PopoverProps, PopoverSide } from "./components/Popover";
+
 export { Alert } from "./components/Alert";
 export type { AlertProps, AlertVariant, AlertSurface } from "./components/Alert";
 

@@ -63,6 +63,7 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: 'Button', route: '/components/button' },
       { label: 'Badge', route: '/components/badge' },
       { label: 'Spinner', route: '/components/spinner' },
+      { label: 'Popover', route: '/components/popover' },
       { label: 'Card', route: '/components/card' },
       { label: 'Navbar', route: '/components/navbar' },
       { label: 'Footer', route: '/components/footer' },

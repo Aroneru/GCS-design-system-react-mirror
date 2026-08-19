@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Navbar, Spinner, Toast } from "../../../lib";
+import { Alert, Badge, Button, Navbar, Popover, Spinner, Toast } from "../../../lib";
 import { OverviewCard, OverviewPage } from "../../pageKit";
 
 export function ComponentsOverview() {
@@ -63,6 +63,16 @@ export function ComponentsOverview() {
       >
         <div className="flex items-center justify-center rounded-xl bg-surface-subtle p-5">
           <Spinner aria-label="Memuat preview" />
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/popover"
+        name="Popover"
+        desc="Panel informasi ringkas dengan arrow pada empat pilihan sisi."
+      >
+        <div className="flex justify-center rounded-xl bg-surface-subtle p-5">
+          <Popover title="Popover">Popover Body Text, Popover Body Text, Popover Body Text</Popover>
         </div>
       </OverviewCard>
 
