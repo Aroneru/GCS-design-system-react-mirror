@@ -14,9 +14,9 @@ const spinnerProps: PropRow[] = [
   ],
   [
     '…props',
-    'Native SVG attributes',
+    'SVGProps<SVGSVGElement>',
     '—',
-    'Atribut SVG native yang relevan diteruskan, termasuk className, style, aria-*, data-*, id, dan event handler. Ukuran dan geometri Spinner dikontrol oleh API komponen.',
+    'Atribut SVG native yang relevan diteruskan. Ukuran dan geometri internal, termasuk width, height, viewBox, dan fill, dikontrol oleh Spinner.',
   ],
 ]
 
