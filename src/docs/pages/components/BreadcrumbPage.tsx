@@ -214,7 +214,7 @@ export function BreadcrumbPage() {
           {"\n"}
           {"const items = [\n"}
 
-          {items.map((item, index) => (
+          {items.map((item) => (
             <span key={item.label}>
               {`    { label: "${item.label}"${item.href ? `, href: "${item.href}"` : ""} },\n`}
             </span>
