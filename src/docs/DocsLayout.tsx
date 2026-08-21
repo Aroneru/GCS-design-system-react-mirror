@@ -90,6 +90,7 @@ const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: "Navbar", route: "/components/navbar" },
       { label: "Footer", route: "/components/footer" },
       { label: "Breadcrumb", route: "/components/breadcrumb" },
+      { label: "Pagination", route: "/components/pagination" },
     ],
   },
 };

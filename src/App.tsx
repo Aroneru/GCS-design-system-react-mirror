@@ -43,6 +43,7 @@ import {
   NavbarPage,
 } from "./docs/pages/components/NavbarPage";
 import { BreadcrumbPage } from "./docs/pages/components/BreadcrumbPage";
+import { PaginationPage } from "./docs/pages/components/PaginationPage";
 
 const routes: Record<string, () => React.ReactElement> = {
   "/": HomePage,
@@ -82,6 +83,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/navbar": NavbarPage,
   "/components/footer": FooterPage,
   "/components/breadcrumb": BreadcrumbPage,
+  "/components/pagination": PaginationPage,
 };
 
 function renderNavbarPreview(path: string) {

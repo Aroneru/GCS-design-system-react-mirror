@@ -92,12 +92,7 @@ export * from "./brandIcons";
 export { brandIcons } from "./brandIconRegistry";
 
 export { Hero } from "./components/Hero";
-export type {
-  HeroProps,
-  HeroType,
-  HeroPlatform,
-  HeroImageOrientation,
-} from "./components/Hero";
+export type { HeroProps, HeroType, HeroPlatform, HeroImageOrientation } from "./components/Hero";
 
 export { Footer } from "./components/Footer";
 export type { FooterProps, FooterMenu, FooterSocial } from "./components/Footer";
@@ -124,5 +119,8 @@ export type {
   BreadcrumbSize,
   BreadcrumbBackground,
 } from "./components/Breadcrumb";
+
+export { Pagination } from "./components/Pagination";
+export type { PaginationProps, PaginationTheme } from "./components/Pagination";
 
 export { cn } from "./utils/cn";
