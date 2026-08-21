@@ -16,9 +16,6 @@ const sizes: Record<SpinnerSize, string> = {
   large: 'size-[100px]',
 }
 
-// ~25% of the circumference for r=20.
-const activeArcDasharray = '31.4 94.3'
-
 export const Spinner = forwardRef<SVGSVGElement, SpinnerProps>(function Spinner(
   {
     size = 'default',
@@ -51,7 +48,8 @@ export const Spinner = forwardRef<SVGSVGElement, SpinnerProps>(function Spinner(
         className="stroke-primary-600"
         strokeWidth="4"
         strokeLinecap="round"
-        strokeDasharray={activeArcDasharray}
+        pathLength="100"
+        strokeDasharray="25 75"
       />
     </svg>
   )
