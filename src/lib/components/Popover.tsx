@@ -12,10 +12,17 @@ export interface PopoverProps extends Omit<HTMLAttributes<HTMLDivElement>, 'titl
 }
 
 const arrowClasses: Record<PopoverSide, string> = {
-  top: 'top-[-6px] left-1/2 -translate-x-1/2 border-t border-l bg-gray-50',
-  right: 'top-1/2 right-[-6px] -translate-y-1/2 border-t border-r bg-surface',
-  bottom: 'bottom-[-6px] left-1/2 -translate-x-1/2 border-r border-b bg-surface',
-  left: 'top-1/2 left-[-6px] -translate-y-1/2 border-b border-l bg-surface',
+  top: 'top-[-8px] left-[calc(50%-8px)]',
+  right: 'top-[calc(50%-8px)] right-[-8px] rotate-90',
+  bottom: 'bottom-[-8px] left-[calc(50%-8px)] rotate-180',
+  left: 'top-[calc(50%-8px)] left-[-8px] -rotate-90',
+}
+
+const arrowSurfaceClasses: Record<PopoverSide, string> = {
+  top: 'bg-gray-50',
+  right: 'bg-surface',
+  bottom: 'bg-surface',
+  left: 'bg-surface',
 }
 
 /**
@@ -27,16 +34,27 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
   ref,
 ) {
   return (
-    <div ref={ref} className={cn('relative w-[255px]', className)} {...props}>
+    <div
+      ref={ref}
+      className={cn(
+        'relative w-[255px] shrink-0 [filter:drop-shadow(0_1px_2px_rgb(0_0_0/0.08))]',
+        className,
+      )}
+      {...props}
+    >
       <span
         aria-hidden="true"
-        className={cn(
-          'absolute z-30 size-3 rotate-45 border-border',
-          arrowClasses[side],
-        )}
-      />
+        className={cn('pointer-events-none absolute z-30 size-4', arrowClasses[side])}
+      >
+        <span
+          className={cn(
+            'absolute top-[3.25px] left-[3px] size-2.5 rotate-45 border-t border-l border-border',
+            arrowSurfaceClasses[side],
+          )}
+        />
+      </span>
 
-      <div className="relative z-10 overflow-hidden rounded-md bg-surface shadow-sm">
+      <div className="relative z-10 overflow-hidden rounded-md bg-surface">
         <div className="border-b border-border bg-gray-50 px-3 py-1.5 text-sm leading-[1.5] font-semibold text-gray-900">
           {title}
         </div>

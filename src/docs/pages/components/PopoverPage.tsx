@@ -54,8 +54,8 @@ export function PopoverPage() {
     >
       <FlowSection id="positions" title="Positions">
         <Lead>
-          Arrow tersedia di kanan, kiri, atas, dan bawah. Panel mempertahankan lebar 255px sementara
-          tingginya mengikuti isi.
+          Arrow tersedia di kanan, kiri, atas, dan bawah. Popover menggunakan lebar default 255px 
+          dan tinggi yang menyesuaikan isi. Dalam layout flex, Popover tidak menyusut secara otomatis.
         </Lead>
         <div className="grid gap-8 sm:grid-cols-2">
           {sides.map((item) => (
@@ -74,7 +74,7 @@ export function PopoverPage() {
       <FlowSection id="playground" title="Playground">
         <Lead>Pilih sisi untuk memindahkan arrow tanpa mengubah isi atau geometri panel.</Lead>
         <Stage maxWidth="max-w-[303px]">
-          <div className="flex min-h-32 items-center justify-center px-6 py-4">
+          <div className="flex min-h-40 items-center justify-center p-6">
             <Popover title="Popover" side={side}>
               {body}
             </Popover>
@@ -95,7 +95,10 @@ export function PopoverPage() {
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Kode mengikuti pilihan Playground. Nilai default <H>right</H> tidak ditulis.
+          Kode mengikuti pilihan Playground. Nilai default <H>right</H> tidak ditulis. Gunakan
+          <H>className</H> untuk styling tambahan pada root Popover. Untuk menyesuaikan lebar dari
+          default 255px, gunakan atribut <H>style</H> agar override tetap konsisten. Perubahan lebar
+          tidak mengubah padding internal header dan body.
         </Lead>
         <SectionCode flush>
           {"import { Popover } from '@tpl/design-kit-react'\n\n"}
@@ -113,9 +116,9 @@ export function PopoverPage() {
 
       <FlowSection id="accessibility" title="Accessibility">
         <Lead>
-          Popover ini hanya menangani visual panel dan sengaja tidak menetapkan role. Consumer dapat
-          meneruskan atribut ARIA yang sesuai konteks; trigger, fokus, dismissal, dan positioning tetap
-          menjadi tanggung jawab integrasi yang menampilkannya.
+          Popover ini hanya menangani visual panel dan tidak menetapkan role secara default. 
+          Consumer dapat meneruskan atribut ARIA sesuai konteks; trigger, pengelolaan fokus, 
+          dan dismissal menjadi tanggung jawab integrasi yang menampilkannya.
         </Lead>
       </FlowSection>
 
