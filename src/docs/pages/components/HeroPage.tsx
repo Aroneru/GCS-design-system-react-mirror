@@ -12,7 +12,8 @@ import {
   UsulanPage,
   type TocEntry,
 } from "../../usulanKit";
-import { adaTanpa } from "../../usulanOptions";
+import { adaTidakAda } from "../../usulanOptions";
+import { asset } from "../../asset";
 
 /**
  * Susunan halaman: alur naratif (tampilan dasar → variasi → ukuran → responsif)
@@ -32,8 +33,8 @@ const heroSubHeading = "Hero Design system Stasi";
 const heroDesc =
   "Design System Stasi adalah sebuah kumpulan standar desain terpadu yang digunakan untuk memastikan seluruh produk digital di lingkungan Kementerian Komunikasi dan Informatika (Stasi)";
 
-const heroImage = "/images/hero-sample.svg";
-const heroImageLandscape = "/images/hero-sample-landscape.svg";
+const heroImage = asset("/images/hero-sample.svg");
+const heroImageLandscape = asset("/images/hero-sample-landscape.svg");
 
 const heroProps: PropRow[] = [
   [
@@ -713,7 +714,7 @@ export function HeroPage() {
               label="Tampilkan sub heading"
               value={withSubHeading}
               onChange={setWithSubHeading}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -722,7 +723,7 @@ export function HeroPage() {
               label="Tampilkan tombol"
               value={withButton}
               onChange={setWithButton}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>

@@ -18,7 +18,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../../usulanKit'
-import { adaTanpa } from '../../../usulanOptions'
+import { adaTidakAda } from '../../../usulanOptions'
 
 const states: { value: FloatingLabelState; label: string; desc: string }[] = [
   { value: 'default', label: 'Default', desc: 'Field kosong — label duduk di dalam field sebagai placeholder.' },
@@ -244,7 +244,7 @@ export function FloatingLabelPage() {
               label="Tampilkan ikon kiri"
               value={withIcon}
               onChange={setWithIcon}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -253,7 +253,7 @@ export function FloatingLabelPage() {
               label="Tampilkan helper text"
               value={withHelper}
               onChange={setWithHelper}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -262,7 +262,7 @@ export function FloatingLabelPage() {
               label="Tampilkan tombol hapus"
               value={withClear}
               onChange={setWithClear}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>

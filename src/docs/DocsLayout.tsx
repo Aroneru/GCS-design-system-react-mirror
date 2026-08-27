@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Footer, type FooterMenu } from "../lib";
 import { FacebookIcon, InstagramIcon, XIcon } from "./socialIcons";
+import { asset } from "./asset";
 
 type Section = "home" | "components" | "form" | "foundations" | "example";
 
@@ -64,7 +65,6 @@ const sidebars: Record<string, { title: string; items: NavItem[] }> = {
           { label: "Input Field", route: "/form/input-field/input" },
           { label: "Floating Label", route: "/form/input-field/floating-label" },
           { label: "Text Area", route: "/form/input-field/text-area" },
-          { label: "Text Area · Usulan", route: "/form/input-field/text-area-usulan" },
         ],
       },
       { label: "Regular Select Form", route: "/form/select" },
@@ -86,6 +86,7 @@ const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: "Toast", route: "/components/toast" },
       { label: "Card", route: "/components/card" },
       { label: "Navbar", route: "/components/navbar" },
+      { label: "Hero", route: "/components/hero" },
       { label: "Footer", route: "/components/footer" },
       { label: "Breadcrumb", route: "/components/breadcrumb" },
       { label: "Pagination", route: "/components/pagination" },
@@ -351,7 +352,7 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
       {/* Saudara dari baris di atas — melebar penuh selebar layar, di bawah rail. */}
       <Footer
         fluid
-        logo="/images/komdigi-logo.svg"
+        logo={asset("/images/komdigi-logo.svg")}
         logoAlt="STASI — Ministerium Fur Staatssicherheit"
         menus={footerMenus}
         copyright={`© ${new Date().getFullYear()} STASI - Ministerium Fur Staatssicherheit`}

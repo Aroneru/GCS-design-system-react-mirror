@@ -21,9 +21,6 @@ import { RadioPage } from "./docs/pages/form/RadioPage";
 import { TogglePage } from "./docs/pages/form/TogglePage";
 import { CheckboxPage } from "./docs/pages/form/CheckboxPage";
 
-// Text Area masih punya dua versi berdampingan supaya susunan lama dan baru
-// bisa dibandingkan langsung; halaman form lainnya sudah memakai susunan baru.
-import { TextAreaUsulanPage } from "./docs/pages/form/input-field/TextAreaUsulanPage";
 import { PlaceholderPage } from "./docs/pages/PlaceholderPage";
 
 import { ComponentsOverview } from "./docs/pages/components/ComponentsOverview";
@@ -62,7 +59,6 @@ const routes: Record<string, () => React.ReactElement> = {
   "/form/input-field/input": InputFieldPage,
   "/form/input-field/floating-label": FloatingLabelPage,
   "/form/input-field/text-area": TextAreaPage,
-  "/form/input-field/text-area-usulan": TextAreaUsulanPage,
   "/form/select": SelectPage,
   "/form/search": () => <PlaceholderPage eyebrow="Form" title="Search Form" />,
   "/form/upload": () => <PlaceholderPage eyebrow="Form" title="Upload Form" />,
@@ -78,6 +74,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/toast": ToastPage,
   "/components/card": CardPage,
   "/components/navbar": NavbarPage,
+  "/components/hero": HeroPage,
   "/components/footer": FooterPage,
   "/components/breadcrumb": BreadcrumbPage,
   "/components/pagination": PaginationPage,
