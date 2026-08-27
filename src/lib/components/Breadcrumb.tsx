@@ -1,6 +1,6 @@
 import { type HTMLAttributes, type ReactNode } from "react";
 import { ChevronRight } from "../icons/outline";
-import { Home } from "flowbite-react-icons/solid";
+import { Home } from "../icons/solid";
 import { cn } from "../utils/cn";
 
 export interface BreadcrumbItem {

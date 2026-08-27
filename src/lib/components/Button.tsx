@@ -120,13 +120,15 @@ const colorClasses: Record<ButtonTheme, Record<ButtonTone, Record<ButtonVariant,
   },
 
   orange: {
+    // Orange light menggunakan 600
     light: {
-      filled: "bg-orange-700 text-white hover:bg-orange-800",
-      outline: "border border-orange-700 text-orange-700 hover:bg-orange-50",
+      filled: "bg-orange-600 text-white hover:bg-orange-700",
+      outline: "border border-orange-600 text-orange-600 hover:bg-orange-50",
     },
+    // Orange dark menggunakan 700
     dark: {
-      filled: "bg-orange-800 text-white hover:bg-orange-700",
-      outline: "border border-orange-800 text-orange-800 hover:bg-orange-50",
+      filled: "bg-orange-700 text-white hover:bg-orange-700",
+      outline: "border border-orange-700 text-orange-700 hover:bg-orange-50",
     },
   },
 

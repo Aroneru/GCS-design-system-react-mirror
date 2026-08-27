@@ -37,6 +37,7 @@ import { ToastPage } from "./docs/pages/components/ToastPage";
 import { CardPage } from "./docs/pages/components/CardPage";
 import { HeroPage } from "./docs/pages/components/HeroPage";
 import { FooterPage } from "./docs/pages/components/FooterPage";
+import { SidebarPage } from "./docs/pages/components/SidebarPage";
 import {
   NavbarDesktopPreview,
   NavbarMobilePreview,
@@ -84,6 +85,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/footer": FooterPage,
   "/components/breadcrumb": BreadcrumbPage,
   "/components/pagination": PaginationPage,
+  "/components/sidebar": SidebarPage,
 };
 
 function renderNavbarPreview(path: string) {
