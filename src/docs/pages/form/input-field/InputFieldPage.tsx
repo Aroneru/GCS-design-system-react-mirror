@@ -18,7 +18,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../../usulanKit'
-import { adaTanpa } from '../../../usulanOptions'
+import { adaTidakAda } from '../../../usulanOptions'
 
 const states: { value: InputFieldState; label: string; desc: string }[] = [
   { value: 'default', label: 'Default', desc: 'Belum disentuh — garis abu-abu netral.' },
@@ -231,7 +231,7 @@ export function InputFieldPage() {
               label="Tampilkan ikon kiri"
               value={withIcon}
               onChange={setWithIcon}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -240,7 +240,7 @@ export function InputFieldPage() {
               label="Tampilkan helper text"
               value={withHelper}
               onChange={setWithHelper}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -251,7 +251,7 @@ export function InputFieldPage() {
               value={withClear}
               onChange={setWithClear}
               disabled={state === 'inactive'}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>

@@ -12,7 +12,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../usulanKit'
-import { adaTanpa } from '../../usulanOptions'
+import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: RadioApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
@@ -258,7 +258,7 @@ export function RadioPage() {
               label="Tampilkan caption"
               value={withCaption}
               onChange={setWithCaption}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>
