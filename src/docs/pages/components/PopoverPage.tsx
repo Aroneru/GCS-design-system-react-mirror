@@ -38,7 +38,6 @@ const toc: TocEntry[] = [
   { id: 'positions', label: 'Positions' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
-  { id: 'accessibility', label: 'Accessibility' },
   { id: 'properties', label: 'Properties' },
 ]
 
@@ -112,14 +111,13 @@ export function PopoverPage() {
           )}
           {'>\n  Popover Body Text, Popover Body Text, Popover Body Text\n</Popover>'}
         </SectionCode>
-      </FlowSection>
 
-      <FlowSection id="accessibility" title="Accessibility">
-        <Lead>
-          Popover ini hanya menangani visual panel dan tidak menetapkan role secara default. 
-          Consumer dapat meneruskan atribut ARIA sesuai konteks; trigger, pengelolaan fokus, 
+        <h3 className="mt-8 text-sm font-black text-gray-900">Accessibility</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
+          Popover ini hanya menangani visual panel dan tidak menetapkan role secara default.
+          Consumer dapat meneruskan atribut ARIA sesuai konteks; trigger, pengelolaan fokus,
           dan dismissal menjadi tanggung jawab integrasi yang menampilkannya.
-        </Lead>
+        </p>
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">

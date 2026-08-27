@@ -24,7 +24,6 @@ const toc: TocEntry[] = [
   { id: 'sizes', label: 'Sizes' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
-  { id: 'accessibility', label: 'Accessibility' },
   { id: 'properties', label: 'Properties' },
 ]
 
@@ -110,10 +109,9 @@ export function SpinnerPage() {
             </>
           )}
         </CodeBlock>
-      </FlowSection>
 
-      <FlowSection id="accessibility" title="Accessibility">
-        <h3 className="text-sm font-black text-gray-900">Standalone loading</h3>
+        <h3 className="mt-8 text-sm font-black text-gray-900">Accessibility</h3>
+        <h4 className="mt-4 text-sm font-black text-gray-900">Standalone loading</h4>
         <p className="mt-1 mb-3 max-w-2xl text-body-sm text-gray-500">
           Gunakan Spinner secara standalone ketika tidak ada teks loading lain. Spinner memiliki status
           aksesibel dengan label default “Loading”. Sesuaikan <code>aria-label</code> jika proses yang
@@ -123,7 +121,7 @@ export function SpinnerPage() {
           <Spinner aria-label="Memuat daftar pengguna" />
         </DocExample>
 
-        <h3 className="mt-6 text-sm font-black text-gray-900">Spinner dengan teks</h3>
+        <h4 className="mt-6 text-sm font-black text-gray-900">Spinner dengan teks</h4>
         <p className="mt-1 mb-3 max-w-2xl text-body-sm text-gray-500">
           Jika teks di sebelah Spinner sudah menjelaskan proses loading, sembunyikan Spinner dari screen
           reader dengan <code>aria-hidden=&quot;true&quot;</code> agar informasi yang sama tidak diumumkan dua kali.
@@ -146,7 +144,7 @@ export function SpinnerPage() {
           </CodeBlock>
         </div>
 
-        <h3 className="mt-6 text-sm font-black text-gray-900">Loading region &amp; reduced motion</h3>
+        <h4 className="mt-6 text-sm font-black text-gray-900">Loading region &amp; reduced motion</h4>
         <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
           Letakkan <code>aria-busy=&quot;true&quot;</code> pada region yang sedang dimuat, bukan pada Spinner.
           Saat pengguna mengaktifkan reduced motion, animasi Spinner dihentikan tetapi indikator loading
