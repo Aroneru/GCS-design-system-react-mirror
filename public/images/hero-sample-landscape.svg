@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 435 305" role="img" aria-label="Contoh gambar hero landscape">
+    <!--
+      Pasangan lanskap dari hero-sample.svg: bahasa visualnya sama persis —
+      gradien, kisi titik gelap di kiri atas, kisi titik terang di kanan bawah,
+      dan ikon jangka yang sama.
+
+      Ikonnya ditaruh di atas judul, bukan di sebelahnya: susunan bersebelahan
+      hanya menyisakan ±230px untuk judul dua baris, dan itu terlalu sempit
+      begitu fontnya jatuh ke font sistem yang lebih lebar.
+
+      Bayangan sengaja tidak dibakar ke dalam gambar; <Hero> sudah memasang
+      rounded-xl + shadow-soft sendiri.
+    -->
+    <defs>
+        <linearGradient id="heroBgWide" gradientUnits="userSpaceOnUse" x1="0" y1="25" x2="435" y2="190">
+            <stop offset="0" stop-color="#7ba2fa"/>
+            <stop offset="0.45" stop-color="#4680f7"/>
+            <stop offset="1" stop-color="#1f63f2"/>
+        </linearGradient>
+
+        <pattern id="heroDotsDarkWide" width="9.3" height="9.3" patternUnits="userSpaceOnUse">
+            <circle cx="1.1" cy="1.1" r="1.1" fill="#1e429f" opacity="0.5"/>
+        </pattern>
+
+        <pattern id="heroDotsLightWide" width="9.3" height="9.3" patternUnits="userSpaceOnUse">
+            <circle cx="1.1" cy="1.1" r="1.1" fill="#ffffff" opacity="0.45"/>
+        </pattern>
+    </defs>
+
+    <rect width="435" height="305" rx="12" fill="url(#heroBgWide)"/>
+
+    <rect x="13" y="11" width="65" height="56" fill="url(#heroDotsDarkWide)"/>
+    <rect x="357" y="228" width="62" height="56" fill="url(#heroDotsLightWide)"/>
+
+    <!-- Jangka, sama seperti versi potret: palang melengkung ke bawah. -->
+    <g stroke="#ffffff" stroke-width="9.5" stroke-linecap="round" fill="none">
+        <path d="M212 110 L189 143"/>
+        <path d="M222 110 L245 143"/>
+        <path d="M186 114 Q217 144 248 115"/>
+    </g>
+    <circle cx="217" cy="95" r="13.5" fill="#ffffff"/>
+    <circle cx="217" cy="95" r="5" fill="url(#heroBgWide)"/>
+
+    <!-- textLength: lihat catatan yang sama di hero-sample.svg. -->
+    <g
+        fill="#ffffff"
+        font-family="Lato, ui-sans-serif, system-ui, sans-serif"
+        font-size="21"
+        font-weight="900"
+        text-anchor="middle"
+        lengthAdjust="spacingAndGlyphs"
+    >
+        <text x="217" y="187" textLength="180">Designing Interfaces:</text>
+        <text x="217" y="215" textLength="262">A User-Centered Approach</text>
+    </g>
+
+    <!-- Lencana kecil di bawah. Ganti teksnya sesuai pemakaian. -->
+    <g>
+        <circle cx="191" cy="264" r="6.5" fill="#ffffff"/>
+        <circle cx="191" cy="264" r="4" fill="url(#heroBgWide)"/>
+        <circle cx="192.4" cy="262.6" r="1.5" fill="#ffffff"/>
+        <text
+            x="205"
+            y="268"
+            fill="#ffffff"
+            font-family="Lato, ui-sans-serif, system-ui, sans-serif"
+            font-size="11"
+            font-weight="700"
+        >Stasi</text>
+    </g>
+</svg>
