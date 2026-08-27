@@ -116,4 +116,7 @@ export type {
 export { Pagination } from "./components/Pagination";
 export type { PaginationProps, PaginationTheme } from "./components/Pagination";
 
+export { Sidebar } from "./components/Sidebar";
+export type { SidebarProps } from "./components/Sidebar";
+
 export { cn } from "./utils/cn";
