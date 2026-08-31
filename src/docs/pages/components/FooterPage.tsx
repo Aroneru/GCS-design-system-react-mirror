@@ -13,7 +13,8 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../usulanKit'
-import { adaTanpa } from '../../usulanOptions'
+import { adaTidakAda } from '../../usulanOptions'
+import { asset } from "../../asset";
 
 /**
  * Susunan halaman: tampilan dasar dulu, lalu beberapa bagian properti, lalu
@@ -168,7 +169,7 @@ export function FooterPage() {
 
         <Preview>
           <Footer
-            logo="/images/komdigi-logo.svg"
+            logo={asset("/images/komdigi-logo.svg")}
             logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
             menus={allMenus.slice(0, 4)}
             copyright={copyrightText}
@@ -204,7 +205,7 @@ export function FooterPage() {
         <div className="space-y-6">
           <Preview label="logo — berkas gambar">
             <Footer
-              logo="/images/komdigi-logo.svg"
+              logo={asset("/images/komdigi-logo.svg")}
               logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
               menus={allMenus.slice(0, 4)}
               copyright={copyrightText}
@@ -243,7 +244,7 @@ export function FooterPage() {
         <div className="space-y-6">
           <Preview label="Lima menu — masih satu baris">
             <Footer
-              logo="/images/komdigi-logo.svg"
+              logo={asset("/images/komdigi-logo.svg")}
               logoAlt="Komdigi"
               menus={allMenus.slice(0, 5)}
               copyright={copyrightText}
@@ -252,7 +253,7 @@ export function FooterPage() {
 
           <Preview label="Delapan menu — tiga sisanya turun">
             <Footer
-              logo="/images/komdigi-logo.svg"
+              logo={asset("/images/komdigi-logo.svg")}
               logoAlt="Komdigi"
               menus={allMenus}
               copyright={copyrightText}
@@ -288,7 +289,7 @@ export function FooterPage() {
 
         <Preview>
           <Footer
-            logo="/images/komdigi-logo.svg"
+            logo={asset("/images/komdigi-logo.svg")}
             logoAlt="Komdigi"
             menus={allMenus.slice(0, 4)}
             copyright={
@@ -336,7 +337,7 @@ export function FooterPage() {
         <Preview label="fluid — isi menempel ke tepi footer">
           <Footer
             fluid
-            logo="/images/komdigi-logo.svg"
+            logo={asset("/images/komdigi-logo.svg")}
             logoAlt="Komdigi"
             menus={allMenus.slice(0, 4)}
             copyright={copyrightText}
@@ -386,7 +387,7 @@ export function FooterPage() {
         <Stage maxWidth={view === 'mobile' ? 'max-w-[390px]' : 'max-w-full'}>
           <div className="overflow-hidden rounded-xl shadow-soft">
             <Footer
-              logo={logoMode === 'image' ? '/images/komdigi-logo.svg' : undefined}
+              logo={logoMode === 'image' ? asset('/images/komdigi-logo.svg') : undefined}
               logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
               logoContent={logoMode === 'text' ? <TextLogo /> : undefined}
               menus={allMenus.slice(0, menuCount)}
@@ -440,7 +441,7 @@ export function FooterPage() {
               label="Tampilkan ikon sosial"
               value={withSocials}
               onChange={setWithSocials}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>

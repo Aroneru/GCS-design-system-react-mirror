@@ -4,7 +4,8 @@ import { PropsTable, type PropRow } from '../../PropsTable'
 import { FacebookIcon, InstagramIcon, XIcon } from '../../socialIcons'
 import { C, CodeBlock, ComponentPage, Mark, Section, Segmented } from '../../pageKit'
 import { Control, Controls } from '../../usulanKit'
-import { adaTanpa } from '../../usulanOptions'
+import { adaTidakAda } from '../../usulanOptions'
+import { asset } from "../../asset";
 
 const allMenus = Array.from({ length: 8 }, (_, i) => ({ label: `Menu ${i + 1}`, url: '#' }))
 
@@ -108,7 +109,7 @@ export function FooterPage() {
             }`}
           >
             <Footer
-              logo={logoMode === 'image' ? '/images/komdigi-logo.svg' : undefined}
+              logo={logoMode === 'image' ? asset('/images/komdigi-logo.svg') : undefined}
               logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
               logoContent={
                 logoMode === 'text' ? (
@@ -163,7 +164,7 @@ export function FooterPage() {
               label="Tampilkan ikon sosial"
               value={withSocials}
               onChange={setWithSocials}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>

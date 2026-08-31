@@ -22,7 +22,7 @@ const sizeOptions = [
 
 const backgroundOptions = [
   { value: "with", label: "Ada" },
-  { value: "without", label: "Tanpa" },
+  { value: "without", label: "Tidak ada" },
 ];
 
 const menuOptions = [
@@ -81,7 +81,8 @@ export function BreadcrumbPage() {
       <FlowSection id="sizes" title="Sizes">
         <p className="mb-6 text-body-sm text-gray-500">
           Breadcrumb tersedia dalam dua ukuran untuk menyesuaikan kebutuhan hierarki dan kepadatan
-          informasi pada layout.
+          informasi pada layout. Ukuran <H>base</H> adalah ukuran default. Ukuran <H>sm</H>{" "}
+          digunakan ketika Breadcrumb diimplementasikan pada mobile.
         </p>
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">

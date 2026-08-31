@@ -5,7 +5,7 @@
  * mensyaratkan berkas komponen hanya mengekspor komponen, jadi konstanta
  * seperti ini akan mematikan fast refresh bila ikut ditaruh di sana.
  */
-export const adaTanpa = [
+export const adaTidakAda = [
   { value: true, label: 'Ada' },
-  { value: false, label: 'Tanpa' },
+  { value: false, label: 'Tidak ada' },
 ]
