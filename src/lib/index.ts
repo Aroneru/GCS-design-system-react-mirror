@@ -132,7 +132,13 @@ export type {
 export { Pagination } from "./components/Pagination";
 export type { PaginationProps, PaginationTheme } from "./components/Pagination";
 
-export { Sidebar } from "./components/Sidebar";
-export type { SidebarProps } from "./components/Sidebar";
+export { Sidebar } from "./components/sidebar/Sidebar";
+export type {
+  SidebarGroup,
+  SidebarItem,
+  SidebarProps,
+  SidebarSubItem,
+  SidebarUser,
+} from "./components/sidebar/Sidebar";
 
 export { cn } from "./utils/cn";
