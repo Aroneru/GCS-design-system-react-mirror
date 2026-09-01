@@ -96,7 +96,7 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
   components: {
     title: "Components",
     items: [
-     { label: "Overview", route: "/components" },
+      { label: "Overview", route: "/components" },
       { label: "Container", route: "/components/container" },
       { label: "Button", route: "/components/button" },
       { label: "Badge", route: "/components/badge" },
