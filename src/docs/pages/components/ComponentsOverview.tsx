@@ -1,4 +1,18 @@
-import { Alert, Badge, Button, Navbar, Popover, Spinner, Toast } from "../../../lib";
+import {
+  Alert,
+  Badge,
+  Breadcrumb,
+  Button,
+  Card,
+  Footer,
+  Hero,
+  Navbar,
+  Pagination,
+  Popover,
+  Sidebar,
+  Spinner,
+  Toast,
+} from "../../../lib";
 import { NotReadyPreview, OverviewCard, OverviewPage } from "../../pageKit";
 import { asset } from "../../asset";
 
@@ -72,8 +86,10 @@ export function ComponentsOverview() {
         name="Popover"
         desc="Panel informasi ringkas dengan arrow pada empat pilihan sisi."
       >
-        <div className="flex justify-center rounded-xl bg-surface-subtle p-5">
-          <Popover title="Popover">Popover Body Text, Popover Body Text, Popover Body Text</Popover>
+        <div className="flex items-center justify-center rounded-xl bg-surface-subtle p-5">
+          <Popover title="Popover" side="bottom">
+            Popover Body Text, Popover Body Text, Popover Body Text
+          </Popover>
         </div>
       </OverviewCard>
 
@@ -104,10 +120,25 @@ export function ComponentsOverview() {
         name="Toast"
         desc="Notifikasi sekilas yang melayang di atas konten, dengan heading dan aksi opsional."
       >
-        <div className="rounded-xl bg-surface-subtle p-5">
-          <Toast variant="success" dismissible={false}>
-            Sukses Membuat Data!
-          </Toast>
+        {/*
+          Skeleton halaman di belakangnya penting: Toast bedanya dengan Alert
+          justru karena ia melayang di atas konten, bukan menempati alur. Tanpa
+          latar ini kartunya tak terbedakan dari kartu Alert.
+          mt-auto menurunkan Toast ke sudut bawah kiri, memakai sisa tinggi
+          kartu yang memang diserap preview.
+        */}
+        <div className="flex flex-col rounded-xl bg-surface-subtle p-5">
+          <div className="space-y-3 opacity-60" aria-hidden="true">
+            <div className="h-2 w-2/5 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-5/6 rounded bg-gray-200" />
+            <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-4/6 rounded bg-gray-200" />
+          </div>
+          <div className="mt-auto max-w-80 pt-8">
+            <Toast variant="success">Sukses Membuat Data!</Toast>
+          </div>
         </div>
       </OverviewCard>
 
@@ -116,19 +147,15 @@ export function ComponentsOverview() {
         name="Card"
         desc="Wadah informasi dengan gambar, judul, deskripsi, dan aksi yang semuanya opsional."
       >
+        {/* Tanpa `href`: Card merender <a> hanya bila href diisi, jadi preview
+            ini aman di dalam anchor kartu. Terverifikasi lewat renderToString. */}
         <div className="rounded-xl bg-surface-subtle p-5">
-          <div className="overflow-hidden rounded-lg border border-border bg-white">
-            <img
-              src={asset("/images/card-sample.svg")}
-              alt=""
-              className="aspect-video w-full object-cover"
-            />
-            <div className="space-y-1.5 p-3">
-              <div className="h-2 w-24 rounded bg-gray-300" />
-              <div className="h-1.5 w-full rounded bg-gray-200" />
-              <div className="h-1.5 w-2/3 rounded bg-gray-200" />
-            </div>
-          </div>
+          <Card
+            image={asset("/images/card-sample.svg")}
+            imageAlt=""
+            title="Judul Kartu"
+            description="Deskripsi singkat yang menjelaskan isi kartu dalam satu atau dua baris."
+          />
         </div>
       </OverviewCard>
 
@@ -161,17 +188,15 @@ export function ComponentsOverview() {
         desc="Pembuka halaman: judul, sub heading, deskripsi, satu tombol, dan gambar di kiri atau kanan."
         wide
       >
-        <div className="rounded-xl bg-surface-subtle p-5">
-          <div className="flex items-center gap-4 rounded-lg border border-border bg-white p-4">
-            <img src={asset("/images/hero-sample.svg")} alt="" className="h-20 w-auto rounded-md" />
-            <div className="min-w-0 flex-1 space-y-2">
-              <div className="h-3 w-40 rounded bg-gray-300" />
-              <div className="h-1.5 w-24 rounded bg-primary-300" />
-              <div className="h-1.5 w-full rounded bg-gray-200" />
-              <div className="h-1.5 w-2/3 rounded bg-gray-200" />
-              <div className="h-4 w-24 rounded bg-primary-700" />
-            </div>
-          </div>
+        <div className="overflow-hidden rounded-xl border border-border bg-white">
+          <Hero
+            heading="Judul Halaman"
+            subHeading="Sub heading"
+            description="Paragraf pembuka yang menjelaskan isi halaman secara singkat."
+            buttonLabel="Selengkapnya"
+            image={asset("/images/hero-sample.svg")}
+            imageAlt=""
+          />
         </div>
       </OverviewCard>
 
@@ -181,15 +206,74 @@ export function ComponentsOverview() {
         desc="Penutup halaman responsif dengan logo, menu, hak cipta, dan tautan media sosial."
         wide
       >
+        {/*
+          Catatan: Footer tetap merender <a href="#"> untuk tiap menu walau
+          `url` dikosongkan, jadi preview ini menaruh anchor di dalam anchor
+          kartu — sama seperti kartu Navbar. Lihat komentar di OverviewCard.
+        */}
         <div className="overflow-hidden rounded-xl">
-          <div className="flex items-center justify-between gap-4 bg-gray-800 px-5 py-4">
-            <img src={asset("/images/komdigi-logo.svg")} alt="Komdigi" className="h-7 w-auto" />
-            <div className="hidden gap-5 text-xs text-gray-300 sm:flex">
-              <span>Menu 1</span>
-              <span>Menu 2</span>
-              <span>Menu 3</span>
-              <span>Menu 4</span>
-            </div>
+          <Footer
+            logo={asset("/images/komdigi-logo.svg")}
+            logoAlt="Komdigi"
+            menus={[
+              { label: "Menu 1" },
+              { label: "Menu 2" },
+              { label: "Menu 3" },
+              { label: "Menu 4" },
+            ]}
+            copyright="© 2026 Komdigi"
+          />
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/breadcrumb"
+        name="Breadcrumb"
+        desc="Jejak lokasi halaman dengan pemisah chevron, dua ukuran teks, dan latar opsional."
+      >
+        {/* Tanpa href: Breadcrumb hanya merender <a> bila item punya href, dan
+            kartu ini sendiri sudah berupa <a>. */}
+        <div className="flex items-center rounded-xl bg-surface-subtle p-5">
+          <Breadcrumb
+            items={[{ label: "Beranda" }, { label: "Komponen" }, { label: "Breadcrumb" }]}
+          />
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/pagination"
+        name="Pagination"
+        desc="Navigasi antar halaman daftar data, dengan tema warna mengikuti aplikasi."
+      >
+        <div className="flex justify-center rounded-xl bg-surface-subtle p-5">
+          <Pagination currentPage={2} totalPages={5} onPageChange={() => undefined} />
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/sidebar"
+        name="Sidebar"
+        desc="Navigasi samping dengan grup menu, submenu, profil akun, dan mode ringkas."
+      >
+        {/*
+          Sidebar asli, tapi dipotong pembungkus bertinggi tetap: komponennya
+          memakai min-h-screen, dan cn() di library ini clsx murni tanpa
+          tailwind-merge — jadi tingginya tidak bisa ditimpa lewat className.
+          Yang tampil bagian atasnya, cukup untuk memperlihatkan menu aktif.
+
+          Sama seperti Footer, Sidebar tetap merender <a href="#"> untuk tiap
+          item walau `href` dikosongkan.
+        */}
+        <div className="rounded-xl bg-surface-subtle p-5">
+          <div className="h-56 w-70 max-w-full overflow-hidden rounded-lg border border-border">
+            <Sidebar
+              items={[
+                { label: "Beranda", active: true },
+                { label: "Layanan" },
+                { label: "Laporan" },
+                { label: "Pengaturan" },
+              ]}
+            />
           </div>
         </div>
       </OverviewCard>
