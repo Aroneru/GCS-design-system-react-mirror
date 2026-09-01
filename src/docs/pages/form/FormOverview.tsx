@@ -96,7 +96,6 @@ export function FormOverview() {
         route="/form/checkbox"
         name="Checkbox"
         desc="Pilihan ganda yang bisa dicentang secara mandiri."
-        wide
       >
         <Preview>
           <div className="flex flex-wrap gap-6">
