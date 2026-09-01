@@ -266,7 +266,7 @@ export function HeroPage() {
         </Preview>
 
         <SectionCode>
-          {"import { Hero } from '@tpl/design-kit-react'\n\n"}
+          {"import { Hero } from '@stasi/design-kit-react'\n\n"}
           {"<Hero\n"}
           {'    type="horizontal-image-left"\n'}
           {'    heading="Hero Design system Stasi"\n'}
@@ -737,7 +737,7 @@ export function HeroPage() {
           menyalin persis yang sedang tampil.
         </Lead>
         <SectionCode flush>
-          {"import { Hero } from '@tpl/design-kit-react'\n\n"}
+          {"import { Hero } from '@stasi/design-kit-react'\n\n"}
           {`{/* ${summary} */}\n`}
           {view === "mobile" && (
             <>

@@ -104,7 +104,7 @@ export function AlertPage() {
           ))}
         </div>
         <SectionCode>
-          {"import { Alert } from '@tpl/design-kit-react'\n\n"}
+          {"import { Alert } from '@stasi/design-kit-react'\n\n"}
           {'<Alert\n'}
           {'    '}
           <H>variant</H>
@@ -251,7 +251,7 @@ export function AlertPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Alert } from '@tpl/design-kit-react'\n\n"}
+          {"import { Alert } from '@stasi/design-kit-react'\n\n"}
           {'<Alert\n'}
           {variant !== 'info' && (
             <>

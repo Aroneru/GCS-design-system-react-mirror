@@ -9,7 +9,7 @@ import { DocUsage } from '../DocUsage'
 import { G, H } from '../pageKit'
 import { useCopy } from '../useCopy'
 
-const INSTALL = 'npm install @tpl/design-kit-react'
+const INSTALL = 'npm install @stasi/design-kit-react'
 
 /**
  * Angka pada halaman ini diturunkan dari sumber aslinya — daftar navigasi dan
@@ -329,7 +329,7 @@ export function HomePage() {
         <Container className="py-12 lg:py-16">
           <SectionTitle eyebrow="Komponen" title="Semuanya sungguhan, bukan gambar">
             Yang tampil di bawah ini adalah komponen yang benar-benar dirender dari{' '}
-            <code className="text-xs font-bold text-gray-700">@tpl/design-kit-react</code> — sama persis
+            <code className="text-xs font-bold text-gray-700">@stasi/design-kit-react</code> — sama persis
             dengan yang akan kamu impor. Klik untuk membuka playground-nya.
           </SectionTitle>
 
@@ -393,18 +393,18 @@ export function HomePage() {
             flush
             label="CSS"
             code={`/* Sekali saja, di stylesheet utama proyek */
-@import '@tpl/design-kit-react/styles.css';
+@import '@stasi/design-kit-react/styles.css';
 
 /* Tailwind v4 perlu memindai berkas package agar
    utility yang dipakai komponen ikut ter-generate */
-@source '../node_modules/@tpl/design-kit-react/dist/**/*.js';`}
+@source '../node_modules/@stasi/design-kit-react/dist/**/*.js';`}
           />
         </div>
 
         <div className="mt-5">
           <DocUsage
             flush
-            code={`import { Button, Badge, InputField } from '@tpl/design-kit-react'
+            code={`import { Button, Badge, InputField } from '@stasi/design-kit-react'
 
 export function FormPermohonan() {
   return (

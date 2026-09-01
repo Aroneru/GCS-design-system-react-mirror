@@ -462,7 +462,7 @@ function createPlaygroundCode({
     );
   };
 
-  add("import { Navbar } from '@tpl/design-kit-react';\n\n");
+  add("import { Navbar } from '@stasi/design-kit-react';\n\n");
   add(`const items = [\n${items.replace(/^ {2}/gm, "")}\n];\n\n`, true);
   add("<Navbar\n");
 

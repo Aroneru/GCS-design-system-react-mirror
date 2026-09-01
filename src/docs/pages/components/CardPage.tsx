@@ -181,7 +181,7 @@ export function CardPage() {
         </div>
 
         <SectionCode>
-          {"import { Card } from '@tpl/design-kit-react'\n\n"}
+          {"import { Card } from '@stasi/design-kit-react'\n\n"}
           {'<Card image="…" title="…" description="…" actions={<Button … />} />\n'}
           {'<Card             title="…" description="…" actions={<Button … />} />\n'}
           {'<Card image="…" title="…" description="…" />\n'}
@@ -310,7 +310,7 @@ export function CardPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { Card, Button } from '@tpl/design-kit-react'\n\n"}
+          {"import { Card, Button } from '@stasi/design-kit-react'\n\n"}
           {"<Card\n"}
           {"    "}
           <Mark>actions</Mark>
@@ -425,7 +425,7 @@ export function CardPage() {
         <SectionCode flush>
           {"import { Card"}
           {withButton && ", Button"}
-          {" } from '@tpl/design-kit-react'\n\n"}
+          {" } from '@stasi/design-kit-react'\n\n"}
           {`{/* ${summary} */}\n`}
           {"{/* Kartu tidak punya prop ukuran — lebarnya mengikuti kolom\n"}
           {"    tempatnya berada. Yang berubah cuma kolomnya. */}\n"}
