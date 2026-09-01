@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { DocHero } from '../../DocHero'
-import { DocUsage } from '../../DocUsage'
+import { FlowSection, Lead, SectionCode, UsulanPage, type TocEntry } from '../../usulanKit'
 
 // Primitive palette — sama persis dengan foundations/colors.blade.php.
 const palettes: { key: string; name: string; colors: [number, string][] }[] = [
@@ -34,6 +33,17 @@ const semanticUsage = `{/* Pakai token semantik di komponen, bukan primitive lan
 <div className="border border-border bg-surface text-content">Kartu</div>
 <p className="text-content-subtle">Keterangan pendukung</p>`
 
+/**
+ * `id` di sini harus sama persis dengan `id` tiap <FlowSection> di bawah, dan
+ * daftarnya wajib konstanta di level modul: `useActiveSection` memasang
+ * IntersectionObserver dengan `toc` sebagai dependensi, jadi array yang dibuat
+ * ulang tiap render akan memasang-lepas observernya tiap render juga.
+ */
+const toc: TocEntry[] = [
+  { id: 'palet', label: 'Palet primitive' },
+  { id: 'semantik', label: 'Token semantik' },
+]
+
 export function ColorsPage() {
   const [copied, setCopied] = useState<string | null>(null)
 
@@ -48,22 +58,29 @@ export function ColorsPage() {
   }
 
   return (
-    <>
-      <DocHero
-        eyebrow="Foundations · Color"
-        title="Color tokens"
-        description="Klik warna untuk menyalin nilai HEX. Skala primitive dinamai berdasarkan warna, lalu dipetakan ke semantic token agar makna terpisah dari palet."
-      >
-        <span className="mt-5 inline-block w-fit rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-bold text-primary-700">
+    <UsulanPage
+      eyebrow="Foundations · Color"
+      title="Color tokens"
+      description="Klik warna untuk menyalin nilai HEX. Skala primitive dinamai berdasarkan warna, lalu dipetakan ke semantic token agar makna terpisah dari palet."
+      toc={toc}
+    >
+      <FlowSection id="palet" title="Palet primitive">
+        <Lead>
+          Delapan skala, sepuluh langkah masing-masing. Klik satu kotak untuk menyalin nilai HEX-nya.
+        </Lead>
+
+        {/* Lencana jumlah token — dulu menempel di hero, sekarang ikut bagiannya
+            karena UsulanPage memegang sendiri kepala halamannya. */}
+        <span className="mb-6 inline-block w-fit rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-bold text-primary-700">
           8 palette · 80 tokens
         </span>
-      </DocHero>
 
-      <div className="mx-auto max-w-5xl px-5 py-9 sm:px-8 lg:px-12 lg:py-12 xl:px-14">
         <div className="space-y-9">
           {palettes.map((palette) => (
             <article key={palette.key}>
-              <h2 className="text-heading-4 font-black text-gray-900">{palette.name}</h2>
+              {/* h3, bukan h2: judul bagian sudah dipegang <FlowSection> sebagai
+                  h2, jadi nama palet adalah tingkat di bawahnya. */}
+              <h3 className="text-heading-4 font-black text-gray-900">{palette.name}</h3>
               <code className="mt-0.5 block text-sm text-gray-400">colors.{palette.key}</code>
 
               <div className="ds-scroll-x mt-4 overflow-x-auto pb-1">
@@ -102,30 +119,32 @@ export function ColorsPage() {
           ))}
         </div>
 
-        <DocUsage code={primitiveUsage} label="React" />
+        <SectionCode>{primitiveUsage}</SectionCode>
+      </FlowSection>
 
-        <div className="mt-14">
-          <p className="ds-eyebrow">Semantic layer</p>
-          <h2 className="mt-2 text-heading-3 font-black text-gray-900">Tokens berdasarkan fungsi</h2>
-          <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-            Gunakan token ini di komponen, bukan primitive-nya langsung — supaya palet bisa berubah
-            tanpa menyentuh kode komponen.
-          </p>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {semantics.map(([name, description, cls, textClass, source]) => (
-              <div key={name} className="ds-card p-4">
-                <div className={`${cls} ${textClass} grid size-11 place-items-center rounded-xl`}>
-                  <span className="size-3 rounded-full border-2 border-current" />
-                </div>
-                <h3 className="mt-4 text-sm font-black text-gray-900">{name}</h3>
-                <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
-                <code className="mt-3 block text-[11px] font-bold text-gray-400">→ colors.{source}</code>
+      <FlowSection id="semantik" title="Token semantik">
+        <Lead>
+          Gunakan token ini di komponen, bukan primitive-nya langsung — supaya palet bisa berubah
+          tanpa menyentuh kode komponen.
+        </Lead>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {semantics.map(([name, description, cls, textClass, source]) => (
+            <div key={name} className="ds-card p-4">
+              <div className={`${cls} ${textClass} grid size-11 place-items-center rounded-xl`}>
+                <span className="size-3 rounded-full border-2 border-current" />
               </div>
-            ))}
-          </div>
+              <h3 className="mt-4 text-sm font-black text-gray-900">{name}</h3>
+              <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
+              <code className="mt-3 block text-[11px] font-bold text-gray-400">
+                → colors.{source}
+              </code>
+            </div>
+          ))}
         </div>
-        <DocUsage code={semanticUsage} label="React" />
-      </div>
-    </>
+
+        <SectionCode>{semanticUsage}</SectionCode>
+      </FlowSection>
+    </UsulanPage>
   )
 }

@@ -1,8 +1,4 @@
-# Membangun situs dokumentasi dan menerbitkannya ke GitHub Pages.
-#
-# Berjalan setiap kali ada push ke main — termasuk push yang datang dari
-# mirror GitLab, karena mirror mendorong commit memakai PAT milik pengguna
-# sehingga dianggap push biasa.
+# Berjalan setiap kali ada push ke main — termasuk push yang datang dari mirror GitLab, karena mirror mendorong commit memakai PAT milik pengguna sehingga dianggap push biasa.
 name: Deploy docs ke GitHub Pages
 
 on:
@@ -15,8 +11,7 @@ permissions:
   pages: write
   id-token: write
 
-# Biarkan satu deploy berjalan sampai selesai; push berikutnya menunggu,
-# tidak saling menimpa.
+# Biarkan satu deploy berjalan sampai selesai; push berikutnya menunggu, tidak saling menimpa.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -38,8 +33,7 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
-      # `npm run build` menjalankan `tsc -b` lebih dulu, jadi error tipe
-      # menggagalkan deploy alih-alih diam-diam ikut terbit.
+      # `npm run build` menjalankan `tsc -b` lebih dulu, jadi error type menggagalkan deploy alih-alih diam-diam ikut terbit gitu.
       - name: Build situs dokumentasi
         run: npm run build
         env:
