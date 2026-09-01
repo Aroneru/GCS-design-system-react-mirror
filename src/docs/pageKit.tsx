@@ -257,7 +257,7 @@ export function OverviewCard({
  */
 export function NotReadyPreview({ name }: { name: string }) {
   return (
-    <div className="grid place-items-center rounded-xl bg-surface-subtle p-5">
+    <div className="grid place-items-center rounded-xl p-5">
       <img
         src={asset('/images/Not-Ready.svg')}
         alt={`${name} belum tersedia`}
