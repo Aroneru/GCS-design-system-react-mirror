@@ -491,13 +491,13 @@ function CodeWindow() {
           benar: kedipan terang-gelap adalah persis jenis gerak yang diminta
           untuk tidak dijalankan, jadi jendelanya tinggal gelap seperti biasa.
         */}
-        <img
+        {/* <img
           data-wowo
           src={asset('/images/wowo.png')}
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-0 size-full object-cover opacity-0 select-none"
-        />
+        /> */}
 
         <div className="relative z-10 flex items-center gap-3 bg-gray-800/70 px-4 py-3">
           <WindowDots />
