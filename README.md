@@ -1,6 +1,6 @@
-# @stasi/design-kit-react
+# @tpl/design-kit-react
 
-Design tokens, tipografi, dan komponen **React (Tailwind v4)** untuk produk Stasi —
+Design tokens, tipografi, dan komponen **React (Tailwind v4)** untuk produk TPL —
 State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
 (`tpl/design-kit`) ke komponen React yang bisa dipublish lewat NPM.
 
@@ -20,7 +20,7 @@ State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
 ## Install
 
 ```bash
-npm install @stasi/design-kit-react
+npm install @tpl/design-kit-react
 ```
 
 Peer deps: `react >=18`, `react-dom >=18`, `tailwindcss ^4`. Ketiganya disediakan
@@ -34,8 +34,8 @@ kamu:
 
 ```css
 /* src/index.css */
-@import '@stasi/design-kit-react/styles.css';
-@source '../node_modules/@stasi/design-kit-react/dist/**/*.js';
+@import '@tpl/design-kit-react/styles.css';
+@source '../node_modules/@tpl/design-kit-react/dist/**/*.js';
 ```
 
 Jangan menambahkan `@import 'tailwindcss'` lagi — `styles.css` sudah memanggilnya
@@ -44,8 +44,8 @@ berikut token `@theme`, font Lato, base layer, dan class `.ds-*`.
 ```tsx
 // main.tsx
 import './index.css'
-import { Button, Card, InputField } from '@stasi/design-kit-react'
-import { User } from '@stasi/design-kit-react/icons/outline'
+import { Button, Card, InputField } from '@tpl/design-kit-react'
+import { User } from '@tpl/design-kit-react/icons/outline'
 
 export default function App() {
   return (
@@ -75,8 +75,8 @@ Kalau project kamu sudah punya base style sendiri dan hanya butuh token:
 
 ```css
 @import 'tailwindcss';
-@import '@stasi/design-kit-react/tokens.css';
-@source '../node_modules/@stasi/design-kit-react/dist/**/*.js';
+@import '@tpl/design-kit-react/tokens.css';
+@source '../node_modules/@tpl/design-kit-react/dist/**/*.js';
 ```
 
 Token dan seluruh utility komponen tetap ter-generate, tapi kamu **kehilangan**
@@ -137,11 +137,11 @@ Prop yang dipakai bersama seluruh komponen form:
 ### Navbar
 
 ```tsx
-import { Navbar } from '@stasi/design-kit-react'
+import { Navbar } from '@tpl/design-kit-react'
 
 <Navbar
   brand={<img src="/logo.svg" alt="" />}
-  brandLabel="STASI — Beranda"
+  brandLabel="KOMDIGI — Beranda"
   items={[
     {
       id: 'menu-1',
@@ -170,10 +170,10 @@ API/config Navbar yang dapat dipakai bersama authenticated state:
 ```tsx
 <Navbar
   brand={<Logo />}
-  brandLabel="STASI — Beranda"
+  brandLabel="KOMDIGI — Beranda"
   items={items}
   search={{ onSubmit: (query) => console.log(query) }}
-  user={{ name: 'User STASI', avatarSrc: '/avatar.jpg' }}
+  user={{ name: 'User Komdigi', avatarSrc: '/avatar.jpg' }}
   notification={{ unread: true, href: '/notifications' }}
 />
 ```
@@ -192,9 +192,9 @@ bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.
 ## Ikon
 
 ```tsx
-import { Github, Instagram } from '@stasi/design-kit-react'          // logo brand & sosial
-import { User, Envelope } from '@stasi/design-kit-react/icons/outline'
-import { User as UserSolid } from '@stasi/design-kit-react/icons/solid'
+import { Github, Instagram } from '@tpl/design-kit-react'          // logo brand & sosial
+import { User, Envelope } from '@tpl/design-kit-react/icons/outline'
+import { User as UserSolid } from '@tpl/design-kit-react/icons/solid'
 ```
 
 Outline dan solid sengaja dipisah ke subpath berbeda: banyak nama ikon sama
@@ -263,10 +263,10 @@ dan memicu "invalid hook call".
 ```bash
 # di package ini
 npm run build:lib      # `npm pack` TIDAK menjalankan prepublishOnly, jadi build manual
-npm pack               # -> stasi-design-kit-react-<versi>.tgz
+npm pack               # -> tpl-design-kit-react-<versi>.tgz
 
 # di project consumer
-npm install ../react-design-system/stasi-design-kit-react-0.1.0.tgz
+npm install ../react-design-system/tpl-design-kit-react-0.1.0.tgz
 ```
 
 Dependency `clsx` dan `flowbite-react-icons` ikut terpasang otomatis. Tarball

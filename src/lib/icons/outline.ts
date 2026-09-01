@@ -1,5 +1,5 @@
 /**
- * Ikon outline — dipakai lewat subpath `@stasi/design-kit-react/icons/outline`.
+ * Ikon outline — dipakai lewat subpath `@tpl/design-kit-react/icons/outline`.
  *
  * Sengaja tidak digabung ke barrel utama: nama ikon outline dan solid banyak
  * yang sama persis (mis. Home, Bell), sehingga re-export datar keduanya dari

@@ -1,6 +1,6 @@
 import { Checkbox, InputField, Radio, Select, Toggle } from '../../../lib'
-import { User } from '../../../lib/icons/outline'
-import { NotReadyPreview, OverviewCard, OverviewPage } from '../../pageKit'
+import { Search, Upload, User } from '../../../lib/icons/outline'
+import { OverviewCard, OverviewPage } from '../../pageKit'
 
 /** Pembungkus preview kartu overview — latar netral seragam. */
 function Preview({ children }: { children: React.ReactNode }) {
@@ -51,9 +51,13 @@ export function FormOverview() {
         route="/form/search"
         name="Search Form"
         desc="Kolom pencarian dengan ikon dan tombol aksi opsional."
-        soon
       >
-        <NotReadyPreview name="Search Form" />
+        <Preview>
+          <div className="flex h-13 items-center gap-3 rounded-lg border border-gray-300 bg-gray-50 px-4">
+            <Search className="size-4 shrink-0 text-gray-500" />
+            <span className="text-sm text-gray-500">Cari layanan…</span>
+          </div>
+        </Preview>
       </OverviewCard>
 
       <OverviewCard
@@ -61,9 +65,13 @@ export function FormOverview() {
         name="Upload Form"
         desc="Area unggah berkas dengan status proses dan validasi ukuran."
         wide
-        soon
       >
-        <NotReadyPreview name="Upload Form" />
+        <Preview>
+          <div className="flex flex-col items-center gap-2 rounded-lg border-2 border-dashed border-gray-300 bg-surface px-4 py-6 text-center">
+            <Upload className="size-5 text-gray-500" />
+            <span className="text-sm text-gray-500">Seret berkas ke sini atau klik untuk memilih</span>
+          </div>
+        </Preview>
       </OverviewCard>
 
       <OverviewCard
@@ -96,6 +104,7 @@ export function FormOverview() {
         route="/form/checkbox"
         name="Checkbox"
         desc="Pilihan ganda yang bisa dicentang secara mandiri."
+        wide
       >
         <Preview>
           <div className="flex flex-wrap gap-6">

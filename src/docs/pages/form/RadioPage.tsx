@@ -77,7 +77,7 @@ export function RadioPage() {
           </div>
         </Demo>
         <SectionCode>
-          {"import { Radio } from '@stasi/design-kit-react'\n\n"}
+          {"import { Radio } from '@tpl/design-kit-react'\n\n"}
           {'{/* Sekelompok pilihan: samakan name-nya */}\n'}
           {'<Radio '}
           <H>name</H>
@@ -275,7 +275,7 @@ export function RadioPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Radio } from '@stasi/design-kit-react'\n\n"}
+          {"import { Radio } from '@tpl/design-kit-react'\n\n"}
           {'<Radio\n'}
           {'    name="kewarganegaraan"\n'}
           {platform === 'mobile' && (

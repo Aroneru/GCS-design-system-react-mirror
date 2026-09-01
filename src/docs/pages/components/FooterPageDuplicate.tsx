@@ -10,8 +10,8 @@ import { asset } from "../../asset";
 const allMenus = Array.from({ length: 8 }, (_, i) => ({ label: `Menu ${i + 1}`, url: '#' }))
 
 const footerSocials = [
-  { label: 'Instagram', url: 'https://www.instagram.com/stasi/', icon: InstagramIcon },
-  { label: 'X', url: 'https://x.com/stasi', icon: XIcon },
+  { label: 'Instagram', url: 'https://www.instagram.com/kemkomdigi/', icon: InstagramIcon },
+  { label: 'X', url: 'https://x.com/kemkomdigi', icon: XIcon },
   { label: 'Facebook', url: '', icon: FacebookIcon },
 ]
 
@@ -109,15 +109,15 @@ export function FooterPage() {
             }`}
           >
             <Footer
-              logo={logoMode === 'image' ? asset('/images/stasi-logo.svg') : undefined}
-              logoAlt="STASI — Ministerium Fur Staatssicherheit"
+              logo={logoMode === 'image' ? asset('/images/komdigi-logo.svg') : undefined}
+              logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
               logoContent={
                 logoMode === 'text' ? (
-                  <span className="text-xl font-black text-white">STASI</span>
+                  <span className="text-xl font-black text-white">Komdigi</span>
                 ) : undefined
               }
               menus={allMenus.slice(0, menuCount)}
-              copyright="© 2025 Ministerium Fur Staatssicherheit"
+              copyright="© 2025 Kementerian Komunikasi dan Digital"
               socials={withSocials ? footerSocials : []}
             />
           </div>
@@ -183,7 +183,7 @@ export function FooterPage() {
         </p>
 
         <CodeBlock>
-          {"import { Footer } from '@stasi/design-kit-react'\n"}
+          {"import { Footer } from '@tpl/design-kit-react'\n"}
           {withSocials && "import { Instagram, X, Facebook } from './socialIcons'\n"}
           {'\n'}
           {`{/* ${summary} */}\n`}
@@ -201,17 +201,17 @@ export function FooterPage() {
             <>
               {`${ind}    `}
               <Mark>logo</Mark>
-              {'="/images/stasi-logo.svg"\n'}
+              {'="/images/komdigi-logo.svg"\n'}
               {`${ind}    `}
               <Mark>logoAlt</Mark>
-              {'="STASI"\n'}
+              {'="Komdigi"\n'}
             </>
           )}
           {logoMode === 'text' && (
             <>
               {`${ind}    `}
               <Mark>logoContent</Mark>
-              {'={<span className="text-xl font-black text-white">STASI</span>}\n'}
+              {'={<span className="text-xl font-black text-white">Komdigi</span>}\n'}
             </>
           )}
           {`${ind}    `}
@@ -219,14 +219,14 @@ export function FooterPage() {
           {'={[\n'}
           {menuLines.map((line) => `${ind}        ${line}\n`).join('')}
           {`${ind}    ]}\n`}
-          {`${ind}    copyright="© 2025 Ministerium Fur Staatssicherheit"\n`}
+          {`${ind}    copyright="© 2025 Kementerian Komunikasi dan Digital"\n`}
           {withSocials && (
             <>
               {`${ind}    `}
               <Mark>socials</Mark>
               {'={[\n'}
-              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/stasi', icon: <Instagram /> },\n`}
-              {`${ind}        { label: 'X',         url: 'https://x.com/stasi',         icon: <X /> },\n`}
+              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/komdigi', icon: <Instagram /> },\n`}
+              {`${ind}        { label: 'X',         url: 'https://x.com/komdigi',         icon: <X /> },\n`}
               {`${ind}        { label: 'Facebook',  url: '#',                            icon: <Facebook /> },\n`}
               {`${ind}    ]}\n`}
             </>

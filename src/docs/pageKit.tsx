@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { asset } from './asset'
 import { DocHero } from './DocHero'
 import { DocUsage } from './DocUsage'
 
@@ -226,36 +225,20 @@ export function OverviewCard({
   name,
   desc,
   wide,
-  soon,
   children,
 }: {
   route: string
   name: string
   desc: string
   wide?: boolean
-  /**
-   * Komponennya belum jadi: kartunya tidak dirender sama sekali supaya halaman
-   * Overview hanya memuat yang sudah siap dipakai. Isinya tetap ditulis di JSX
-   * agar tinggal melepas tanda ini begitu komponennya selesai.
-   */
-  soon?: boolean
   children: ReactNode
 }) {
-  if (soon) return null
-
   return (
     <a
       href={`#${route}`}
       className={`ds-card group flex flex-col p-6 transition-shadow hover:shadow-md ${wide ? 'sm:col-span-2' : ''}`}
     >
-      {/*
-        Grid meregangkan tiap kartu setinggi baris, jadi kartu berisi sedikit
-        menyisakan ruang. flex-1 membuat preview yang menyerapnya, bukan
-        dibiarkan menganga di bawah tautan. `grid` pada pembungkus meregangkan
-        kotak preview di dalamnya, supaya yang melar latarnya — bukan ruang
-        kosong di sekelilingnya.
-      */}
-      <div className="grid flex-1">{children}</div>
+      {children}
       <h2 className="mt-4 text-heading-4 font-black text-gray-900">{name}</h2>
       <p className="mt-1.5 text-body-sm text-gray-500">{desc}</p>
       <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary-700">
@@ -263,23 +246,6 @@ export function OverviewCard({
         <ArrowRight />
       </span>
     </a>
-  )
-}
-
-/**
- * Preview untuk komponen yang belum dibuat — ilustrasi Not-Ready.svg.
- * Dipakai di kartu Overview dan di <PlaceholderPage> supaya "belum jadi"
- * terlihat sama di mana pun, bukan sketsa palsu yang menyerupai komponen asli.
- */
-export function NotReadyPreview({ name }: { name: string }) {
-  return (
-    <div className="grid place-items-center rounded-xl p-5">
-      <img
-        src={asset('/images/Not-Ready.svg')}
-        alt={`${name} belum tersedia`}
-        className="h-auto w-full max-w-xs"
-      />
-    </div>
   )
 }
 

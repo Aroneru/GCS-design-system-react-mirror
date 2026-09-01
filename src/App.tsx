@@ -2,7 +2,6 @@ import { DocsLayout } from "./docs/DocsLayout";
 import { useHashRoute } from "./docs/useHashRoute";
 import { HomePage } from "./docs/pages/HomePage";
 import { ExamplePage } from "./docs/pages/ExamplePage";
-import { ExampleAppFrame } from "./docs/pages/example/ExampleAppFrame";
 
 import { FoundationsOverview } from "./docs/pages/foundations/FoundationsOverview";
 import { ColorsPage } from "./docs/pages/foundations/ColorsPage";
@@ -28,9 +27,6 @@ import { ComponentsOverview } from "./docs/pages/components/ComponentsOverview";
 import { ContainerPage } from "./docs/pages/components/ContainerPage";
 import { ButtonPage } from "./docs/pages/components/ButtonPage";
 import { BadgePage } from "./docs/pages/components/BadgePage";
-import { SpinnerPage } from "./docs/pages/components/SpinnerPage";
-import { PopoverPage } from "./docs/pages/components/PopoverPage";
-import { ModalPage } from "./docs/pages/components/ModalPage";
 import { AlertPage } from "./docs/pages/components/AlertPage";
 import { ToastPage } from "./docs/pages/components/ToastPage";
 import { CardPage } from "./docs/pages/components/CardPage";
@@ -74,9 +70,6 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/container": ContainerPage,
   "/components/button": ButtonPage,
   "/components/badge": BadgePage,
-  "/components/spinner": SpinnerPage,
-  "/components/popover": PopoverPage,
-  "/components/modal": ModalPage,
   "/components/alert": AlertPage,
   "/components/toast": ToastPage,
   "/components/card": CardPage,
@@ -86,8 +79,6 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/breadcrumb": BreadcrumbPage,
   "/components/pagination": PaginationPage,
   "/components/sidebar": SidebarPage,
-  // Komponen Table belum ada — halamannya masih placeholder seperti Search Form.
-  "/components/table": () => <PlaceholderPage eyebrow="Components" title="Table" />,
 };
 
 function renderNavbarPreview(path: string) {
@@ -126,14 +117,6 @@ function App() {
 
   if (path.startsWith("/preview/navbar/")) {
     return renderNavbarPreview(path);
-  }
-
-  // Contoh aplikasi dirender penuh layar, di luar DocsLayout: kerangka
-  // dokumentasi di sekelilingnya justru mengaburkan yang ingin ditunjukkan.
-  // startsWith, bukan ===, karena aplikasi itu punya rute-dalam sendiri
-  // (/example/app/pengajuan, .../pemohon, dst) yang dibaca ExampleAppFrame.
-  if (path.startsWith("/example/app")) {
-    return <ExampleAppFrame path={path} />;
   }
 
   const Page = routes[path] ?? HomePage;

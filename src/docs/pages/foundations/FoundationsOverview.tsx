@@ -10,7 +10,7 @@ export function FoundationsOverview() {
     <OverviewPage
       eyebrow="Foundations · Overview"
       title="Foundations"
-      description="Token dan aturan dasar yang menjadi pijakan seluruh komponen: warna, tipografi, jarak, garis, kedalaman, dan ikon. Semuanya terbit sebagai CSS token lewat @stasi/design-kit-react/tokens.css."
+      description="Token dan aturan dasar yang menjadi pijakan seluruh komponen: warna, tipografi, jarak, garis, kedalaman, dan ikon. Semuanya terbit sebagai CSS token lewat @tpl/design-kit-react/tokens.css."
     >
       <OverviewCard
         route="/foundations/colors"

@@ -1,21 +1,15 @@
 import { useEffect, useState, type ReactNode, type RefObject } from 'react'
 import { ChevronRight, Close } from '../../icons/outline'
 import { cn } from '../../utils/cn'
-import type {
-  NavbarContextItem,
-  NavbarItem,
-  NavbarProps,
-  NavbarSubItem,
-  NavbarUser,
-} from '../Navbar'
+import type { NavbarItem, NavbarProps, NavbarSubItem, NavbarUser } from '../Navbar'
 import { Icon } from '../Icon'
 
 type NavbarLinkItem = Extract<NavbarItem, { href: string }>
 type NavbarSectionItem = Extract<NavbarItem, { children: NavbarSubItem[] }>
 type NavbarNestedItem = Extract<NavbarItem, { href?: never; children: NavbarSubItem[] }>
-type ResolvedNavbarContext = {
-  item: NavbarLinkItem | NavbarSubItem
-  contextualItems: NavbarContextItem[]
+type NavbarContextItem = {
+  item: NavbarLinkItem
+  contextualItems: NavbarSubItem[]
 }
 
 interface NavbarMobilePanelProps {
@@ -23,7 +17,7 @@ interface NavbarMobilePanelProps {
   drawerId: string
   drawerEnabled: boolean
   sidebarOpen: boolean
-  drawerItem?: ResolvedNavbarContext
+  drawerItem?: NavbarContextItem
   sidebarCloseRef: RefObject<HTMLButtonElement | null>
   drawerCloseRef: RefObject<HTMLButtonElement | null>
   items: NavbarItem[]
@@ -48,25 +42,22 @@ function isNestedItem(item: NavbarItem): item is NavbarNestedItem {
   return !isLinkItem(item) && isSectionItem(item)
 }
 
-function isActive(item: NavbarLinkItem | NavbarSubItem | NavbarContextItem, activeHref?: string) {
+function isActive(item: NavbarLinkItem | NavbarSubItem, activeHref?: string) {
   return item.active ?? item.href === activeHref
 }
 
 function MobileLink({
   item,
   activeHref,
-  contextOwnerActive = false,
   onNavigate,
   onClose,
 }: {
-  item: NavbarLinkItem | NavbarSubItem | NavbarContextItem
+  item: NavbarLinkItem | NavbarSubItem
   activeHref?: string
-  contextOwnerActive?: boolean
   onNavigate?: NavbarProps['onNavigate']
   onClose: () => void
 }) {
-  const pageActive = isActive(item, activeHref)
-  const active = pageActive || contextOwnerActive
+  const active = isActive(item, activeHref)
 
   return (
     <a
@@ -79,7 +70,7 @@ function MobileLink({
             ? 'bg-primary-50 text-brand'
             : 'text-content hover:bg-surface-subtle hover:text-brand',
       )}
-      aria-current={!item.disabled && pageActive ? 'page' : undefined}
+      aria-current={!item.disabled && active ? 'page' : undefined}
       aria-disabled={item.disabled || undefined}
       tabIndex={item.disabled ? -1 : undefined}
       onClick={(event) => {
@@ -193,18 +184,13 @@ export function NavbarMobilePanel({
                     const childActive = item.children.some(
                       (child) => !child.disabled && isActive(child, activeHref),
                     )
-                    const parentContextActive = item.contextualItems?.some(
-                      (child) => !child.disabled && isActive(child, activeHref),
-                    ) ?? false
-                    const submenuContextActive = item.children.some((child) =>
-                      child.contextualItems?.some(
-                        (contextualItem) =>
-                          !contextualItem.disabled && isActive(contextualItem, activeHref),
-                      ),
-                    )
+                    const contextualChildActive = Array.isArray(item.contextualItems)
+                      ? item.contextualItems.some(
+                          (child) => !child.disabled && isActive(child, activeHref),
+                        )
+                      : false
                     const parentPageActive = isActive(item, activeHref)
-                    const descendantActive =
-                      childActive || parentContextActive || submenuContextActive
+                    const descendantActive = childActive || contextualChildActive
                     const expanded = openNestedItemId === item.id
                     const submenuId = `${sidebarId}-${encodeURIComponent(item.id)}-submenu`
 
@@ -252,11 +238,6 @@ export function NavbarMobilePanel({
                               <MobileLink
                                 item={child}
                                 activeHref={activeHref}
-                                contextOwnerActive={child.contextualItems?.some(
-                                  (contextualItem) =>
-                                    !contextualItem.disabled &&
-                                    isActive(contextualItem, activeHref),
-                                )}
                                 onNavigate={onNavigate}
                                 onClose={onSidebarClose}
                               />
@@ -268,16 +249,11 @@ export function NavbarMobilePanel({
                   }
 
                   if (isLinkItem(item)) {
-                    const contextOwnerActive = item.contextualItems?.some(
-                      (contextualItem) =>
-                        !contextualItem.disabled && isActive(contextualItem, activeHref),
-                    )
                     return (
                       <li key={item.id}>
                         <MobileLink
                           item={item}
                           activeHref={activeHref}
-                          contextOwnerActive={contextOwnerActive}
                           onNavigate={onNavigate}
                           onClose={onSidebarClose}
                         />
