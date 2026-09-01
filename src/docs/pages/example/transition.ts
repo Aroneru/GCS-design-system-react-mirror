@@ -150,24 +150,42 @@ export const KELAS_PANEL =
   'pointer-events-none fixed inset-0 z-[100] bg-gradient-to-b from-primary-100 to-primary-300'
 
 /**
- * Penanda bahwa navigasi terakhir adalah aplikasi → dokumentasi.
+ * Dari mana halaman yang sedang dimuat didatangi.
  *
- * Dibutuhkan karena `/example` juga bisa dibuka langsung dari navigasi docs,
- * dan di kasus itu panel biru selayar penuh tidak boleh muncul sama sekali.
+ * Animasi transisi hanya boleh jalan kalau pengguna menekan tombolnya. Membuka
+ * `/example` atau `/example/app` langsung dari URL, dari navigasi docs, atau
+ * me-refresh halaman harus tampil apa adanya — tanpa layar biru penuh yang
+ * mengempis entah kenapa.
  *
- * Disetel dan dibersihkan dari handler klik, bukan dari efek: efek berjalan
- * dua kali di StrictMode, dan penanda yang dibersihkan pada pass pertama akan
- * membuat animasinya hilang di pass kedua.
+ * Nilainya hidup di level modul, jadi refresh apa pun mengembalikannya ke
+ * `'langsung'` dengan sendirinya: modulnya ikut dimuat ulang. Tidak ada
+ * sessionStorage, dan memang tidak boleh ada — penanda yang bertahan melewati
+ * reload justru akan memutar animasi pada halaman yang dibuka dari nol.
+ *
+ * Disetel dari handler klik, bukan dari efek. Pembacaannya dilakukan saat
+ * render (lewat lazy initializer `useState`) supaya keadaan awal tirai sudah
+ * benar pada cat pertama; pembersihannya menyusul di dalam efek, setelah
+ * nilainya aman tersimpan di state.
  */
-let pulang = false
+export type Asal = 'langsung' | 'docs' | 'app'
 
-export const tandaiPulang = () => {
-  pulang = true
+let asal: Asal = 'langsung'
+
+/** Dipanggil di handler klik tepat sebelum animasi keluar dimulai. */
+export const tandaiAsal = (dari: Asal) => {
+  asal = dari
 }
-export const lupakanPulang = () => {
-  pulang = false
+
+export const ambilAsal = () => asal
+
+/**
+ * Dipanggil dari efek setelah asalnya tersimpan di state komponen. Tanpa ini,
+ * meninggalkan lalu kembali ke halaman yang sama dalam satu sesi akan memutar
+ * ulang animasinya padahal tidak ada tombol yang ditekan.
+ */
+export const lupakanAsal = () => {
+  asal = 'langsung'
 }
-export const pulangDariApp = () => pulang
 
 /** Menaikkan panel dari bawah sampai menutup layar, lalu menjalankan `lalu`. */
 export function tutupKeAtas(

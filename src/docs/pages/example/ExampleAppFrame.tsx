@@ -1,9 +1,17 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { ArrowLeft } from '../../../lib/icons/outline'
 import { useHashRoute } from '../../useHashRoute'
 import { Magnetic, gsap } from '../../motion'
 import { DemoApp } from './DemoApp'
-import { KELAS_PANEL, KELAS_TIRAI, bukaTirai, tandaiPulang, tutupKeAtas } from './transition'
+import {
+  KELAS_PANEL,
+  KELAS_TIRAI,
+  ambilAsal,
+  bukaTirai,
+  lupakanAsal,
+  tandaiAsal,
+  tutupKeAtas,
+} from './transition'
 import { JUDUL_HALAMAN, type HalamanDemo } from './data'
 
 /**
@@ -27,17 +35,24 @@ export function ExampleAppFrame({ path }: { path: string }) {
   const panel = useRef<HTMLDivElement>(null)
   const isi = useRef<HTMLDivElement>(null)
 
-  // Tirai dibuka lewat useLayoutEffect, bukan useGsap: hook itu melewatkan
-  // callback-nya sama sekali saat gerak diminta dikurangi, padahal tirainya
-  // tetap wajib disingkirkan — kalau tidak, ia menutupi seluruh aplikasi.
+  // Hanya benar bila pengguna datang dengan menekan tombol di /example. Membuka
+  // /example/app langsung dari URL atau me-refresh di sini harus tampil apa
+  // adanya — tanpa gelembung biru yang mengempis entah kenapa.
+  const [masuk] = useState(() => ambilAsal() === 'docs')
+
+  // Dipakai useLayoutEffect, bukan useGsap: hook itu melewatkan callback-nya
+  // sama sekali saat gerak diminta dikurangi, padahal gelembungnya tetap wajib
+  // disingkirkan — kalau tidak, ia menutupi seluruh aplikasi.
   //
-  // Daftar dependensinya kosong, jadi ini hanya berjalan sekali saat masuk.
-  // Berpindah antar-halaman dalam demo tidak mengganti komponen ini, sehingga
-  // tirainya tidak ikut berkedip di setiap klik menu.
+  // Dependensinya tetap, jadi ini hanya berjalan sekali saat masuk. Berpindah
+  // antar-halaman dalam demo tidak mengganti komponen ini, sehingga
+  // gelembungnya tidak ikut berkedip di setiap klik menu.
   useLayoutEffect(() => {
+    if (!masuk) return
+    lupakanAsal()
     const ctx = gsap.context(() => bukaTirai(tirai.current))
     return () => ctx.revert()
-  }, [])
+  }, [masuk])
 
   return (
     <>
@@ -52,7 +67,7 @@ export function ExampleAppFrame({ path }: { path: string }) {
             onClick={() => {
               // Ditandai di handler, bukan di efek — lihat catatan pada
               // `pulangDariApp` di transition.ts.
-              tandaiPulang()
+              tandaiAsal('app')
               tutupKeAtas(panel.current, isi.current, () => navigate('/example'))
             }}
             className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-lg transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700"
@@ -64,7 +79,11 @@ export function ExampleAppFrame({ path }: { path: string }) {
       </div>
 
       {/* Gelembung: paruh kedua transisi masuk. Panel: paruh pertama transisi pulang. */}
-      <div ref={tirai} className={`${KELAS_TIRAI} scale-100`} aria-hidden="true" />
+      <div
+        ref={tirai}
+        className={`${KELAS_TIRAI} ${masuk ? 'scale-100' : 'scale-0'}`}
+        aria-hidden="true"
+      />
       <div ref={panel} className={`${KELAS_PANEL} translate-y-full`} aria-hidden="true" />
     </>
   )
