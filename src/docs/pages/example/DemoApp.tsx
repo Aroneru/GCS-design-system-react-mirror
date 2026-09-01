@@ -103,11 +103,41 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             logo={
               <img src={asset('/images/stasi-logo.svg')} alt="STASI" className="h-8 w-auto" />
             }
-            collapsedLogo={<img src={asset('/images/s.svg')} alt="STASI" className="size-8" />}
+            /*
+             * Logo ringkas memakai `stasi.svg` — mark 350×335 yang sama dengan
+             * rail situs dokumentasi. Sebelumnya `images/s.svg`, dan itu gambar
+             * 1440×810: dipaksa masuk kotak 32×32 ia gepeng, bukan mengecil.
+             */
+            collapsedLogo={<img src={asset('/stasi.svg')} alt="STASI" className="size-8" />}
             items={menu}
             user={{ name: 'Yermi Rachman', profileLabel: 'Administrator' }}
             collapsed={ringkas}
             onCollapse={() => setRingkas((v) => !v)}
+            /*
+             * Catatan status di kaki Sidebar. Ditaruh di dalam navigasinya, bukan
+             * di halaman pintu masuk, supaya ia terbaca justru saat orang sedang
+             * menatap menu yang dimaksud — termasuk yang membuka rute ini langsung
+             * lewat URL tanpa lewat halaman Example.
+             *
+             * Saat ringkas, kalimatnya diganti satu kata: 72px tidak cukup untuk
+             * teks sepanjang itu, dan memaksanya masuk cuma menghasilkan tumpukan
+             * baris satu-dua huruf. Keterangan penuhnya tetap ada di `title`.
+             */
+            footer={
+              <p
+                title="Tampilan menu di sidebar ini masih tentatif dan bisa berubah."
+                className="px-4 py-3 text-center text-[11px] leading-4 text-gray-500"
+              >
+                {ringkas ? (
+                  <span className="font-bold text-yellow-600">TBD</span>
+                ) : (
+                  <>
+                    <span className="font-bold text-yellow-600">Catatan:</span> susunan menu di
+                    sidebar ini masih tentatif dan bisa berubah.
+                  </>
+                )}
+              </p>
+            }
           />
         </div>
 

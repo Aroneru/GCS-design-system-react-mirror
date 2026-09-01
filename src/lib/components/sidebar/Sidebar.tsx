@@ -14,6 +14,7 @@ export function Sidebar({
   collapsed = false,
   showCollapseButton = false,
   onCollapse,
+  footer,
   className,
   ...props
 }: SidebarProps) {
@@ -107,6 +108,10 @@ export function Sidebar({
       )}
 
       <SidebarNavigation groups={groups} items={items} collapsed={collapsed} />
+
+      {/* `shrink-0`: navigasi di atasnya `flex-1`, jadi tanpa ini footer yang
+          ikut menyusut duluan saat menunya panjang. */}
+      {footer && <div className="shrink-0 border-t border-gray-200">{footer}</div>}
     </aside>
   );
 }
