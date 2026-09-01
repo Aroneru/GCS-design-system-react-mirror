@@ -1,7 +1,7 @@
 {
   "name": "@stasi/design-kit-react",
   "private": false,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Design tokens, tipografi, dan komponen React (Tailwind v4) untuk produk Stasi — State Security Service Design System",
   "keywords": [
     "design-system",
