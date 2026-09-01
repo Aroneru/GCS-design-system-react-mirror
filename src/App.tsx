@@ -2,6 +2,7 @@ import { DocsLayout } from "./docs/DocsLayout";
 import { useHashRoute } from "./docs/useHashRoute";
 import { HomePage } from "./docs/pages/HomePage";
 import { ExamplePage } from "./docs/pages/ExamplePage";
+import { ExampleAppFrame } from "./docs/pages/example/ExampleAppFrame";
 
 import { FoundationsOverview } from "./docs/pages/foundations/FoundationsOverview";
 import { ColorsPage } from "./docs/pages/foundations/ColorsPage";
@@ -125,6 +126,14 @@ function App() {
 
   if (path.startsWith("/preview/navbar/")) {
     return renderNavbarPreview(path);
+  }
+
+  // Contoh aplikasi dirender penuh layar, di luar DocsLayout: kerangka
+  // dokumentasi di sekelilingnya justru mengaburkan yang ingin ditunjukkan.
+  // startsWith, bukan ===, karena aplikasi itu punya rute-dalam sendiri
+  // (/example/app/pengajuan, .../pemohon, dst) yang dibaca ExampleAppFrame.
+  if (path.startsWith("/example/app")) {
+    return <ExampleAppFrame path={path} />;
   }
 
   const Page = routes[path] ?? HomePage;
