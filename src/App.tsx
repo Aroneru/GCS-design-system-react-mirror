@@ -85,6 +85,8 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/breadcrumb": BreadcrumbPage,
   "/components/pagination": PaginationPage,
   "/components/sidebar": SidebarPage,
+  // Komponen Table belum ada — halamannya masih placeholder seperti Search Form.
+  "/components/table": () => <PlaceholderPage eyebrow="Components" title="Table" />,
 };
 
 function renderNavbarPreview(path: string) {

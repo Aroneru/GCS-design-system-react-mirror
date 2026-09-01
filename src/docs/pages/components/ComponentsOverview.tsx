@@ -1,5 +1,5 @@
 import { Alert, Badge, Button, Navbar, Popover, Spinner, Toast } from "../../../lib";
-import { OverviewCard, OverviewPage } from "../../pageKit";
+import { NotReadyPreview, OverviewCard, OverviewPage } from "../../pageKit";
 import { asset } from "../../asset";
 
 export function ComponentsOverview() {
@@ -192,6 +192,16 @@ export function ComponentsOverview() {
             </div>
           </div>
         </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/table"
+        name="Table"
+        desc="Tabel data dengan header, baris berselang, dan aksi per baris."
+        wide
+        soon
+      >
+        <NotReadyPreview name="Table" />
       </OverviewCard>
     </OverviewPage>
   );
