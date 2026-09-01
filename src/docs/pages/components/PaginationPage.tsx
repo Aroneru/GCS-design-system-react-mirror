@@ -188,7 +188,7 @@ export function PaginationPage() {
         </p>
 
         <SectionCode flush>
-          {"import { Pagination } from '@stasi/design-kit-react'\n"}
+          {"import { Pagination } from '@tpl/design-kit-react'\n"}
           {"\n"}
           {"const [currentPage, setCurrentPage] = useState(1)\n"}
           {"\n"}

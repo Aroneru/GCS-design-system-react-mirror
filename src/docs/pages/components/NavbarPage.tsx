@@ -32,40 +32,15 @@ const navbarToc: TocEntry[] = [
 function createFigmaItems(count: number): NavbarItem[] {
   return Array.from({ length: count }, (_, index) => {
     const menuNumber = index + 1;
-    const contextualItems = ["overview", "settings", "history"].map((key) => ({
-      id: `menu-${menuNumber}-${key}`,
-      label: `${key === "overview" ? "Ringkasan" : key === "settings" ? "Pengaturan" : "Riwayat"} Menu ${menuNumber}`,
-      href: `#/menu-${menuNumber}/${key === "overview" ? "ringkasan" : key === "settings" ? "pengaturan" : "riwayat"}`,
-    }));
     const submenuItems = [1, 2].map((submenuNumber) => ({
       id: `menu-${menuNumber}-submenu-${submenuNumber}`,
       label: `Submenu ${submenuNumber} Menu ${menuNumber}`,
       href: `#/menu-${menuNumber}/submenu-${submenuNumber}`,
-      ...(menuNumber === 2
-        ? {
-            contextualItems: [
-              {
-                id: `menu-2-submenu-${submenuNumber}-overview`,
-                label: `Ringkasan Submenu ${submenuNumber}`,
-                href: `#/menu-2/submenu-${submenuNumber}/ringkasan`,
-              },
-              {
-                id: `menu-2-submenu-${submenuNumber}-${submenuNumber === 1 ? "settings" : "history"}`,
-                label: `${submenuNumber === 1 ? "Pengaturan" : "Riwayat"} Submenu ${submenuNumber}`,
-                href: `#/menu-2/submenu-${submenuNumber}/${submenuNumber === 1 ? "pengaturan" : "riwayat"}`,
-              },
-              ...(submenuNumber === 1
-                ? [
-                    {
-                      id: "menu-2-submenu-1-history",
-                      label: "Riwayat Submenu 1",
-                      href: "#/menu-2/submenu-1/riwayat",
-                    },
-                  ]
-                : []),
-            ],
-          }
-        : {}),
+    }));
+    const contextualItems = ["overview", "settings", "history"].map((key) => ({
+      id: `menu-${menuNumber}-${key}`,
+      label: `${key === "overview" ? "Ringkasan" : key === "settings" ? "Pengaturan" : "Riwayat"} Menu ${menuNumber}`,
+      href: `#/menu-${menuNumber}/${key === "overview" ? "ringkasan" : key === "settings" ? "pengaturan" : "riwayat"}`,
     }));
 
     if (menuNumber === 1) {
@@ -93,6 +68,7 @@ function createFigmaItems(count: number): NavbarItem[] {
         label: `Menu ${menuNumber}`,
         href: `#/menu-${menuNumber}`,
         children: submenuItems,
+        contextualItems: false,
       };
     }
 
@@ -139,9 +115,6 @@ function getMobilePreviewPage(items: NavbarItem[], activeHref?: string) {
     const itemLinks = [
       ...(Array.isArray(item.children) ? item.children : []),
       ...(Array.isArray(item.contextualItems) ? item.contextualItems : []),
-      ...(Array.isArray(item.children)
-        ? item.children.flatMap((child) => child.contextualItems ?? [])
-        : []),
     ];
     const activeChild = itemLinks.find((child) => child.href === activeHref);
     if (!activeChild) continue;
@@ -181,7 +154,7 @@ const navbarProps: PropRow[] = [
     "items",
     "NavbarItem[]",
     "—",
-    "Daftar menu utama. children membentuk submenu. NavbarItem.contextualItems menjadi context parent page dan NavbarSubItem.contextualItems menjadi context submenu page. Field yang diomit atau array kosong berarti tanpa context; Drawer hanya tampil pada Back Office mobile.",
+    "Daftar menu utama. children membentuk submenu; contextualItems membentuk context Drawer Back Office dan false mematikan fallback legacy.",
   ],
   [
     "activeHref",
@@ -244,7 +217,7 @@ function DemoBrand() {
         <span className="rounded-sm bg-white" />
       </span>
       <span className="w-[70px] text-sm font-black tracking-tight text-content lg:w-[90px]">
-        STASI
+        KOMDIGI
       </span>
     </span>
   );
@@ -361,6 +334,7 @@ function createPlaygroundCode({
   searchEnabled,
   guestActionsEnabled,
   menuPosition,
+  previewDevice,
 }: {
   variant: PlaygroundVariant;
   state: PlaygroundState;
@@ -368,33 +342,13 @@ function createPlaygroundCode({
   searchEnabled: boolean;
   guestActionsEnabled: boolean;
   menuPosition: MenuPosition;
+  previewDevice: PreviewDevice;
 }) {
   const items = Array.from({ length: menuCount }, (_, index) => {
     const number = index + 1;
     const submenuItems = `[
         { id: 'menu-${number}-submenu-1', label: 'Submenu 1 Menu ${number}', href: '/menu-${number}/submenu-1' },
         { id: 'menu-${number}-submenu-2', label: 'Submenu 2 Menu ${number}', href: '/menu-${number}/submenu-2' },
-      ]`;
-    const menuTwoSubmenuItems = `[
-        {
-          id: 'menu-2-submenu-1',
-          label: 'Submenu 1 Menu 2',
-          href: '/menu-2/submenu-1',
-          contextualItems: [
-            { id: 'menu-2-submenu-1-overview', label: 'Ringkasan Submenu 1', href: '/menu-2/submenu-1/ringkasan' },
-            { id: 'menu-2-submenu-1-settings', label: 'Pengaturan Submenu 1', href: '/menu-2/submenu-1/pengaturan' },
-            { id: 'menu-2-submenu-1-history', label: 'Riwayat Submenu 1', href: '/menu-2/submenu-1/riwayat' },
-          ],
-        },
-        {
-          id: 'menu-2-submenu-2',
-          label: 'Submenu 2 Menu 2',
-          href: '/menu-2/submenu-2',
-          contextualItems: [
-            { id: 'menu-2-submenu-2-overview', label: 'Ringkasan Submenu 2', href: '/menu-2/submenu-2/ringkasan' },
-            { id: 'menu-2-submenu-2-history', label: 'Riwayat Submenu 2', href: '/menu-2/submenu-2/riwayat' },
-          ],
-        },
       ]`;
     const contextualItems = `[
         { id: 'menu-${number}-overview', label: 'Ringkasan Menu ${number}', href: '/menu-${number}/ringkasan' },
@@ -406,10 +360,8 @@ function createPlaygroundCode({
       return `    {
       id: 'menu-${number}',
       label: 'Menu ${number}',
-      href: '/menu-${number}',${
-        variant === "back-office" ? `
-      contextualItems: ${contextualItems},` : ""
-      }
+      href: '/menu-${number}',
+      contextualItems: ${contextualItems},
     }`;
     }
 
@@ -418,10 +370,8 @@ function createPlaygroundCode({
       id: 'menu-${number}',
       label: 'Menu ${number}',
       href: '/menu-${number}',
-      children: ${variant === "back-office" ? menuTwoSubmenuItems : submenuItems},${
-        variant === "back-office" ? `
-      contextualItems: ${contextualItems},` : ""
-      }
+      children: ${submenuItems},
+      contextualItems: ${contextualItems},
     }`;
     }
 
@@ -431,6 +381,7 @@ function createPlaygroundCode({
       label: 'Menu ${number}',
       href: '/menu-${number}',
       children: ${submenuItems},
+      contextualItems: false,
     }`;
     }
 
@@ -462,7 +413,7 @@ function createPlaygroundCode({
     );
   };
 
-  add("import { Navbar } from '@stasi/design-kit-react';\n\n");
+  add("import { Navbar } from '@tpl/design-kit-react';\n\n");
   add(`const items = [\n${items.replace(/^ {2}/gm, "")}\n];\n\n`, true);
   add("<Navbar\n");
 
@@ -471,7 +422,7 @@ function createPlaygroundCode({
   }
 
   add("  brand={<Logo />}\n");
-  add('  brandLabel="STASI — Beranda"\n');
+  add('  brandLabel="KOMDIGI — Beranda"\n');
   add("  items={items}\n");
 
   if (searchEnabled) {
@@ -481,7 +432,11 @@ function createPlaygroundCode({
     );
   }
 
-  if (variant === "front-office" && menuPosition !== "right") {
+  if (
+    variant === "front-office" &&
+    previewDevice === "desktop" &&
+    menuPosition !== "right"
+  ) {
     add(`  menuPosition="${menuPosition}"\n`, true);
   }
 
@@ -494,7 +449,7 @@ function createPlaygroundCode({
 
   if (state === "authenticated") {
     add(
-      `  user={{\n    name: 'User STASI',\n    avatarSrc: '/avatar.jpg',\n    items: [{ id: 'profile', label: 'Profil', href: '/profile' }],\n  }}\n${
+      `  user={{\n    name: 'User Komdigi',\n    avatarSrc: '/avatar.jpg',\n    items: [{ id: 'profile', label: 'Profil', href: '/profile' }],\n  }}\n${
         variant === "front-office"
           ? "  notification={{ unread: true, href: '/notifications' }}\n"
           : ""
@@ -537,6 +492,7 @@ function NavbarDocumentationDemo() {
     searchEnabled,
     guestActionsEnabled,
     menuPosition,
+    previewDevice,
   });
   const menuPositionDisabled = previewDevice === "mobile" || variant === "back-office";
   const menuPositionHelp =
@@ -552,8 +508,7 @@ function NavbarDocumentationDemo() {
       <FlowSection id="playground" title="Playground">
         <Lead>
           Gunakan controls untuk melihat bagaimana public props mengubah komposisi Navbar dan kode
-          implementasinya. Preview Desktop/Mobile hanya mensimulasikan viewport dokumentasi dan
-          bukan konfigurasi public Navbar.
+          implementasinya.
         </Lead>
         {previewDevice === "desktop" ? (
           <ScaledDesktopFrame
@@ -603,8 +558,7 @@ function NavbarDocumentationDemo() {
               />
             </div>
             <p className="mt-2 max-w-xs text-xs leading-5 text-gray-500">
-              Hanya mengubah ukuran viewport preview. Tidak menghasilkan prop pada kode karena
-              Navbar menyesuaikan layout secara responsif.
+              Preview hanya mengubah viewport dokumentasi; responsive behavior ditangani Navbar.
             </p>
           </div>
 
@@ -718,10 +672,8 @@ function NavbarDocumentationDemo() {
       <FlowSection id="penggunaan" title="Penggunaan">
           <Lead>
             Blok ini mengikuti kontrol di Playground—ubah kontrolnya, lalu preview dan kode ikut
-            berubah. Generated code mengikuti variant: Front Office mengomit contextualItems
-            karena tidak menghasilkan UI, sedangkan Back Office menunjukkan context page-specific.
-            Preview Desktop/Mobile hanya mengubah viewport dan tidak mengubah public API atau kode.
-            Prop bawaan atau yang tidak digunakan sengaja tidak ditulis.
+            berubah. Prop yang masih memakai nilai bawaan atau tidak digunakan sengaja tidak
+            ditulis.
           </Lead>
           <SectionCode flush>{code}</SectionCode>
       </FlowSection>
@@ -759,7 +711,7 @@ export function NavbarDesktopPreview({
       <Navbar
         variant={navbarVariant}
         brand={<DemoBrand />}
-        brandLabel="STASI — Beranda"
+        brandLabel="KOMDIGI — Beranda"
         items={figmaMenuItems[effectiveMenuCount]}
         search={
           searchEnabled
@@ -773,7 +725,7 @@ export function NavbarDesktopPreview({
         }
         guestActions={!authenticated && guestActionsEnabled ? demoGuestActions : undefined}
         user={
-          authenticated ? { name: "User STASI", initials: "US", items: accountItems } : undefined
+          authenticated ? { name: "User Komdigi", initials: "UK", items: accountItems } : undefined
         }
         notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
         menuPosition={menuPosition}
@@ -818,7 +770,7 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
         key={navigationInstanceKey}
         brand={<DemoBrand />}
         brandHref="/"
-        brandLabel="STASI — Beranda"
+        brandLabel="KOMDIGI — Beranda"
         items={previewItems}
         activeHref={activeHref}
         search={
@@ -833,7 +785,7 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
         }
         guestActions={!authenticated && guestActionsEnabled ? demoGuestActions : undefined}
         user={
-          authenticated ? { name: "User STASI", initials: "US", items: accountItems } : undefined
+          authenticated ? { name: "User Komdigi", initials: "UK", items: accountItems } : undefined
         }
         notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
         menuPosition={menuPosition}
@@ -860,16 +812,16 @@ const variantsCode = (
   <>
     {"<Navbar\n"}
     <H>{'  variant="back-office"\n'}</H>
-    {"  brand={<Logo />}\n  brandLabel=\"STASI — Beranda\"\n  items={items}\n  search={search}\n/>"}
+    {"  brand={<Logo />}\n  brandLabel=\"KOMDIGI — Beranda\"\n  items={items}\n  search={search}\n/>"}
   </>
 );
 
 const statesCode = (
   <>
-    {"// Guest: omit `user` dan gunakan `guestActions` bila diperlukan.\n<Navbar\n  brand={<Logo />}\n  brandLabel=\"STASI — Beranda\"\n  items={items}\n  search={search}\n"}
+    {"// Guest: omit `user` dan gunakan `guestActions` bila diperlukan.\n<Navbar\n  brand={<Logo />}\n  brandLabel=\"KOMDIGI — Beranda\"\n  items={items}\n  search={search}\n"}
     <H>
       {
-        "  user={{ name: 'User STASI', items: accountItems }}\n  notification={{ unread: true, href: '/notifications' }}\n"
+        "  user={{ name: 'User Komdigi', items: accountItems }}\n  notification={{ unread: true, href: '/notifications' }}\n"
       }
     </H>
     {"/>"}
@@ -879,22 +831,16 @@ const statesCode = (
 const navigationShapesCode = (
   <>
     {"const items = [\n"}
-    {"  { id: 'direct', label: 'Direct', "}<H>{"href: '/direct'"}</H>{" },\n"}
-    {"  {\n    id: 'submenu-page',\n    label: 'Page + submenu',\n    href: '/submenu-page',\n"}
-    <H>{"    children: [{ id: 'child', label: 'Child', href: '/submenu-page/child' }],\n"}</H>
-    {"  },\n"}
-    {"  { id: 'group', label: 'Group', "}<H>{"children: submenuItems"}</H>{" },\n"}
-    {"  {\n    id: 'context',\n    label: 'Context',\n    href: '/context',\n"}
+    <H>{"  { id: 'direct', label: 'Direct', href: '/direct' },\n"}</H>
     <H>
       {
-        "    contextualItems: [{ id: 'summary', label: 'Ringkasan', href: '/context/ringkasan' }],\n"
+        "  {\n    id: 'context',\n    label: 'Context',\n    href: '/context',\n    contextualItems: [{ id: 'summary', label: 'Ringkasan', href: '/context/ringkasan' }],\n  },\n"
       }
     </H>
-    {"  },\n"}
     {"  {\n    id: 'menu-2',\n    label: 'Menu 2',\n    href: '/menu-2',\n"}
     <H>
       {
-        "    children: [\n      {\n        id: 'menu-2-submenu-1',\n        label: 'Submenu 1 Menu 2',\n        href: '/menu-2/submenu-1',\n        contextualItems: [\n          { id: 'submenu-summary', label: 'Ringkasan Submenu 1', href: '/menu-2/submenu-1/ringkasan' },\n        ],\n      },\n    ],\n"
+        "    children: [\n      { id: 'menu-2-submenu-1', label: 'Submenu 1 Menu 2', href: '/menu-2/submenu-1' },\n      { id: 'menu-2-submenu-2', label: 'Submenu 2 Menu 2', href: '/menu-2/submenu-2' },\n    ],\n"
       }
     </H>
     <H>
@@ -903,6 +849,12 @@ const navigationShapesCode = (
       }
     </H>
     {"  },\n"}
+    <H>
+      {
+        "  {\n    id: 'submenu-only',\n    label: 'Submenu tanpa context',\n    href: '/submenu',\n    children: [{ id: 'child', label: 'Child', href: '/submenu/child' }],\n    contextualItems: false,\n  },\n"
+      }
+    </H>
+    <H>{"  { id: 'group', label: 'Group', children: submenuItems },\n"}</H>
     {"] satisfies NavbarItem[];"}
   </>
 );
@@ -999,92 +951,59 @@ export function NavbarPage() {
       <FlowSection id="navigation" title="Navigation">
         <Lead>
           Bentuk setiap <code>NavbarItem</code> menentukan cara item berperilaku sebagai halaman,
-          submenu, atau contextual navigation khusus Back Office mobile.
+          navigasi sekunder, atau submenu.
         </Lead>
-        <div>
-          <h3 className="text-sm font-black text-gray-900">Primary &amp; Submenu Navigation</h3>
-          <div className="mt-4 grid gap-5 md:grid-cols-3">
-            <div>
-              <h4 className="text-sm font-black text-gray-900">Primary navigation</h4>
-              <p className="mt-2 text-xs font-bold text-primary-700">href</p>
-              <p className="mt-2 text-body-sm leading-6 text-gray-500">
-                Item dengan href mengarahkan pengguna langsung ke halaman utama. Link aktif
-                ditandai menggunakan <code>aria-current</code>.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-sm font-black text-gray-900">Page + submenu</h4>
-              <p className="mt-2 text-xs font-bold text-primary-700">href + children</p>
-              <p className="mt-2 text-body-sm leading-6 text-gray-500">
-                Parent memiliki halaman sendiri dan children membentuk submenu. Bentuk ini tidak
-                menghasilkan contextual Drawer kecuali page tersebut memiliki contextualItems
-                secara eksplisit.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-sm font-black text-gray-900">True submenu</h4>
-              <p className="mt-2 text-xs font-bold text-primary-700">children-only</p>
-              <p className="mt-2 text-body-sm leading-6 text-gray-500">
-                Parent tidak memiliki href dan hanya menjadi trigger submenu. Trigger menggunakan
-                aria-expanded dan aria-controls; Escape menutup submenu dan mengembalikan focus.
-              </p>
-            </div>
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Primary navigation</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">href</p>
+            <p className="mt-2 text-body-sm leading-6 text-gray-500">
+              Item dengan href mengarahkan pengguna langsung ke halaman utama. Link aktif ditandai
+              menggunakan <code>aria-current</code>.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Contextual navigation</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">href + contextualItems</p>
+            <p className="mt-2 text-body-sm leading-6 text-gray-500">
+              Parent tetap direct link. Pada Back Office mobile, contextualItems ditampilkan lewat
+              Drawer; Front Office tidak menampilkan surface tersebut.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Page + submenu + context</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">
+              href + children + contextualItems
+            </p>
+            <p className="mt-2 text-body-sm leading-6 text-gray-500">
+              Link parent dan trigger submenu memiliki tanggung jawab terpisah. Contextual items
+              tetap menjadi sumber Drawer Back Office.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900">Submenu tanpa context</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">
+              href + children + contextualItems: false
+            </p>
+            <p className="mt-2 text-body-sm leading-6 text-gray-500">
+              Parent tetap dapat dinavigasi dan children tetap submenu, tetapi tidak menghasilkan
+              Drawer Back Office.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-gray-900">True submenu</h3>
+            <p className="mt-2 text-xs font-bold text-primary-700">children-only</p>
+            <p className="mt-2 text-body-sm leading-6 text-gray-500">
+              Tanpa href parent. Trigger submenu memakai aria-expanded dan aria-controls. Escape
+              menutup surface dan focus kembali ke trigger.
+            </p>
           </div>
         </div>
-
-        <div className="mt-8">
-          <h3 className="text-sm font-black text-gray-900">
-            Contextual Navigation — Back Office Mobile Only
-          </h3>
-          <p className="mt-2 max-w-2xl text-body-sm leading-6 text-gray-500">
-            Semua contextualItems, baik pada parent maupun submenu, hanya ditampilkan sebagai
-            Drawer pada Back Office Mobile. Front Office Desktop, Front Office Mobile, dan Back
-            Office Desktop tidak menampilkan contextual Drawer atau UI tambahan dari data tersebut.
-          </p>
-          <div className="mt-4 grid gap-5 md:grid-cols-3">
-            <div>
-              <h4 className="text-sm font-black text-gray-900">Page context</h4>
-              <p className="mt-2 text-xs font-bold text-primary-700">href + contextualItems</p>
-              <p className="mt-2 text-body-sm leading-6 text-gray-500">
-                Parent tetap direct page. contextualItems menjadi context milik page tersebut dan
-                ditampilkan sebagai Drawer hanya pada Back Office Mobile.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-sm font-black text-gray-900">Page + submenu + context</h4>
-              <p className="mt-2 text-xs font-bold text-primary-700">
-                href + children + contextualItems
-              </p>
-              <p className="mt-2 text-body-sm leading-6 text-gray-500">
-                Parent memiliki halaman, submenu, dan context sendiri. children tetap menjadi
-                submenu; contextualItems menjadi context parent page dan tidak menghasilkan Drawer
-                pada Front Office atau Back Office Desktop.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-sm font-black text-gray-900">Submenu-specific context</h4>
-              <p className="mt-2 text-xs font-bold text-primary-700">
-                children[].contextualItems
-              </p>
-              <p className="mt-2 text-body-sm leading-6 text-gray-500">
-                Submenu dapat memiliki context sendiri. Drawer mengikuti page aktif yang paling
-                spesifik: Menu 2 memakai context Menu 2, sedangkan Submenu 1 atau Submenu 2 memakai
-                context masing-masing.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 space-y-1 text-body-sm leading-6 text-gray-500">
-          <p><code>children</code> → submenu</p>
-          <p><code>NavbarItem.contextualItems</code> → context parent page</p>
-          <p><code>NavbarSubItem.contextualItems</code> → context submenu page</p>
-          <p>Semua contextualItems → Drawer hanya pada Back Office Mobile</p>
-          <p>
-            Context tidak diwariskan otomatis. Untuk berbagi context, berikan data contextualItems
-            yang sama secara eksplisit pada setiap page.
-          </p>
-        </div>
+        <p className="mt-4 text-body-sm leading-6 text-gray-500">
+          Untuk kompatibilitas, <code>href + children</code> tanpa contextualItems masih memakai
+          children sebagai context Back Office. Gunakan <code>contextualItems: false</code> bila
+          children hanya dimaksudkan sebagai submenu.
+        </p>
           <SectionCode>{navigationShapesCode}</SectionCode>
       </FlowSection>
 
@@ -1093,11 +1012,8 @@ export function NavbarPage() {
       <FlowSection id="properties" title="Properties">
           <Lead>
             Pada <code>NavbarItem</code>, <code>href</code> membuat primary navigation link,
-            <code>children</code> membentuk submenu. <code>contextualItems</code> pada parent atau
-            subitem menjadi context page tersebut dan hanya muncul sebagai Drawer Back Office
-            mobile. Field ini tetap valid pada data Front Office atau Back Office desktop, tetapi
-            tidak menghasilkan UI tambahan. Jika diomit atau berupa array kosong, page tidak
-            memiliki context dan tidak mewarisi context parent.
+            <code>children</code> membentuk submenu dan <code>contextualItems</code> membentuk context
+            Drawer Back Office. Nilai <code>false</code> mematikan fallback legacy dari children.
             Consumer perlu menyediakan <code>brandLabel</code>, label menu, href, dan alternative
             text yang bermakna.
           </Lead>

@@ -1,11 +1,5 @@
-import {
-  FlowSection,
-  Lead,
-  PrincipleList,
-  SectionCode,
-  UsulanPage,
-  type TocEntry,
-} from '../../usulanKit'
+import { DocHero } from '../../DocHero'
+import { DocUsage } from '../../DocUsage'
 
 const typeScale = [
   { name: 'Display', cls: 'text-display font-bold', spec: '48 / 55 · Bold', sample: 'Layanan digital untuk semua' },
@@ -66,35 +60,16 @@ const usage = {
 <a href="#" className="underline">Tautan bergaris bawah</a>`,
 }
 
-/**
- * `id` di sini harus sama persis dengan `id` tiap <FlowSection> di bawah, dan
- * daftarnya wajib konstanta di level modul: `useActiveSection` memasang
- * IntersectionObserver dengan `toc` sebagai dependensi, jadi array yang dibuat
- * ulang tiap render akan memasang-lepas observernya tiap render juga.
- */
-const toc: TocEntry[] = [
-  { id: 'typeface', label: 'Typeface & skala' },
-  { id: 'skala', label: 'Skala ukuran' },
-  { id: 'weight', label: 'Font weight' },
-  { id: 'leading', label: 'Line height' },
-  { id: 'transform', label: 'Transform & decoration' },
-  { id: 'prinsip', label: 'Prinsip penggunaan' },
-]
-
 export function TypographyPage() {
   return (
-    <UsulanPage
-      eyebrow="Foundations · Typography"
-      title="Lato type system"
-      description="Lato dipilih karena terbuka, humanis, dan tetap terbaca baik pada layar kecil. Skala berikut menjaga hierarki tetap konsisten di seluruh produk."
-      toc={toc}
-    >
-      <FlowSection id="typeface" title="Typeface & skala semantik">
-        <Lead>
-          Token semantik memegang hierarki utama halaman — Display sampai Caption. Pakai ini lebih
-          dulu; skala Tailwind di bawahnya hanya untuk kebutuhan yang tidak tertampung di sini.
-        </Lead>
+    <>
+      <DocHero
+        eyebrow="Foundations · Typography"
+        title="Lato type system"
+        description="Lato dipilih karena terbuka, humanis, dan tetap terbaca baik pada layar kecil. Skala berikut menjaga hierarki tetap konsisten di seluruh produk."
+      />
 
+      <div className="mx-auto max-w-5xl px-5 py-9 sm:px-8 lg:px-12 lg:py-12 xl:px-14">
         <article className="ds-card overflow-hidden">
           <div className="grid gap-8 border-b border-border bg-primary-900 p-6 text-white sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
@@ -126,117 +101,115 @@ export function TypographyPage() {
           </div>
         </article>
 
-        <SectionCode>{usage.semantic}</SectionCode>
-      </FlowSection>
+        <DocUsage code={usage.semantic} />
 
-      <FlowSection id="skala" title="Skala ukuran Tailwind">
-        <Lead>
-          Skala <code className="text-xs font-bold text-gray-700">text-xs</code> hingga{' '}
-          <code className="text-xs font-bold text-gray-700">text-9xl</code> untuk kebutuhan di luar
-          token semantik.
-        </Lead>
-
-        <article className="ds-card divide-y divide-border overflow-hidden">
-          {tailwindScale.map(([cls, label]) => (
-            <div key={cls} className="p-5 sm:p-6">
-              <div className="flex items-baseline gap-2">
-                <code className="text-sm font-bold text-primary-700">.{cls}</code>
-                <span className="text-xs text-gray-400">{label}</span>
-              </div>
-              <div className="ds-scroll-x mt-3 overflow-x-auto">
-                <p className={`${cls} font-normal whitespace-nowrap text-gray-900`}>
-                  The quick brown fox jumps over the lazy dog.
-                </p>
-              </div>
-            </div>
-          ))}
-        </article>
-
-        <SectionCode>{usage.scale}</SectionCode>
-      </FlowSection>
-
-      <FlowSection id="weight" title="Sembilan tingkat ketebalan">
-        <Lead>
-          Dari <code className="text-xs font-bold text-gray-700">.font-thin</code> (100) hingga{' '}
-          <code className="text-xs font-bold text-gray-700">.font-black</code> (900).
-        </Lead>
-
-        <article className="ds-card divide-y divide-border overflow-hidden">
-          {fontWeights.map(([cls, value]) => (
-            <div key={cls} className="grid gap-2 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6">
-              <p className={`${cls} text-4xl text-gray-900`}>State Security Service</p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:justify-end">
-                <code className="text-sm font-bold text-primary-700">.{cls}</code>
-                <code className="text-xs text-gray-400">font-weight: {value}</code>
-              </div>
-            </div>
-          ))}
-        </article>
-
-        <SectionCode>{usage.weight}</SectionCode>
-      </FlowSection>
-
-      <FlowSection id="leading" title="Leading (jarak antarbaris)">
-        <Lead>Tiga langkah jarak antarbaris untuk kerapatan teks yang berbeda.</Lead>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {lineHeights.map(([cls, value]) => (
-            <article key={cls} className="ds-card p-5">
-              <div className="flex items-center justify-between gap-2">
-                <code className="text-sm font-bold text-primary-700">.{cls}</code>
-                <code className="text-xs text-gray-400">{value}</code>
-              </div>
-              <p className={`${cls} mt-3 text-sm text-gray-900`}>
-                Layanan digital untuk semua masyarakat Indonesia yang inklusif dan mudah diakses.
-              </p>
-            </article>
-          ))}
-        </div>
-
-        <SectionCode>{usage.leading}</SectionCode>
-      </FlowSection>
-
-      <FlowSection id="transform" title="Transform & decoration">
-        <Lead>Kapitalisasi, garis bawah, dan coret — dipakai hemat, hanya saat maknanya jelas.</Lead>
-
-        <article className="ds-card p-6">
-          <div className="space-y-5">
-            {textTransforms.map(([cls, desc]) => (
-              <div key={cls} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                <div className="flex items-center justify-between gap-3">
+        <div className="mt-8">
+          <div className="mb-5">
+            <p className="ds-eyebrow">Type scale</p>
+            <h3 className="mt-2 text-heading-3 font-black text-gray-900">Skala ukuran Tailwind</h3>
+            <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+              Skala <code className="text-xs font-bold text-gray-700">text-xs</code> hingga{' '}
+              <code className="text-xs font-bold text-gray-700">text-9xl</code> untuk kebutuhan di luar token semantik.
+            </p>
+          </div>
+          <article className="ds-card divide-y divide-border overflow-hidden">
+            {tailwindScale.map(([cls, label]) => (
+              <div key={cls} className="p-5 sm:p-6">
+                <div className="flex items-baseline gap-2">
                   <code className="text-sm font-bold text-primary-700">.{cls}</code>
-                  <code className="text-[11px] text-gray-400">{desc}</code>
+                  <span className="text-xs text-gray-400">{label}</span>
                 </div>
-                <p className={`${cls} mt-2 text-lg text-gray-900`}>
-                  The quick brown fox jumps over the lazy dog.
-                </p>
+                <div className="ds-scroll-x mt-3 overflow-x-auto">
+                  <p className={`${cls} font-normal whitespace-nowrap text-gray-900`}>The quick brown fox jumps over the lazy dog.</p>
+                </div>
               </div>
             ))}
+          </article>
+        </div>
+
+        <DocUsage code={usage.scale} />
+
+        <div className="mt-8">
+          <div className="mb-5">
+            <p className="ds-eyebrow">Font weights</p>
+            <h3 className="mt-2 text-heading-3 font-black text-gray-900">Sembilan tingkat ketebalan</h3>
+            <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+              Dari <code className="text-xs font-bold text-gray-700">.font-thin</code> (100) hingga{' '}
+              <code className="text-xs font-bold text-gray-700">.font-black</code> (900).
+            </p>
           </div>
-        </article>
+          <article className="ds-card divide-y divide-border overflow-hidden">
+            {fontWeights.map(([cls, value]) => (
+              <div key={cls} className="grid gap-2 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6">
+                <p className={`${cls} text-4xl text-gray-900`}>State Security Service</p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:justify-end">
+                  <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                  <code className="text-xs text-gray-400">font-weight: {value}</code>
+                </div>
+              </div>
+            ))}
+          </article>
+        </div>
 
-        <SectionCode>{usage.transform}</SectionCode>
-      </FlowSection>
+        <DocUsage code={usage.weight} />
 
-      <FlowSection id="prinsip" title="Prinsip penggunaan">
-        <PrincipleList
-          items={[
-            <>
-              Gunakan <strong className="text-gray-900">Bold atau Black</strong> untuk heading dan
-              angka penting.
-            </>,
-            <>
-              Pertahankan body minimal <strong className="text-gray-900">16px</strong> untuk konten
-              utama.
-            </>,
-            <>Hindari paragraf panjang dengan huruf kapital karena menurunkan keterbacaan.</>,
-            <>
-              Batasi panjang baris ideal antara{' '}
-              <strong className="text-gray-900">45–75 karakter</strong>.
-            </>,
-          ]}
-        />
-      </FlowSection>
-    </UsulanPage>
+        <div className="mt-8">
+          <div className="mb-5">
+            <p className="ds-eyebrow">Line height</p>
+            <h3 className="mt-2 text-heading-3 font-black text-gray-900">Leading (jarak antarbaris)</h3>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {lineHeights.map(([cls, value]) => (
+              <article key={cls} className="ds-card p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                  <code className="text-xs text-gray-400">{value}</code>
+                </div>
+                <p className={`${cls} mt-3 text-sm text-gray-900`}>
+                  Layanan digital untuk semua masyarakat Indonesia yang inklusif dan mudah diakses.
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <DocUsage code={usage.leading} />
+
+        <div className="mt-8 grid gap-5 lg:grid-cols-2">
+          <article className="ds-card p-6">
+            <p className="ds-eyebrow">Transform & decoration</p>
+            <div className="mt-5 space-y-5">
+              {textTransforms.map(([cls, desc]) => (
+                <div key={cls} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                  <div className="flex items-center justify-between gap-3">
+                    <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                    <code className="text-[11px] text-gray-400">{desc}</code>
+                  </div>
+                  <p className={`${cls} mt-2 text-lg text-gray-900`}>The quick brown fox jumps over the lazy dog.</p>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <article className="ds-card p-6">
+            <p className="ds-eyebrow">Prinsip penggunaan</p>
+            <ul className="mt-5 space-y-4 text-sm leading-6 text-gray-600">
+              {[
+                <>Gunakan <strong className="text-gray-900">Bold atau Black</strong> untuk heading dan angka penting.</>,
+                <>Pertahankan body minimal <strong className="text-gray-900">16px</strong> untuk konten utama.</>,
+                <>Hindari paragraf panjang dengan huruf kapital karena menurunkan keterbacaan.</>,
+                <>Batasi panjang baris ideal antara <strong className="text-gray-900">45–75 karakter</strong>.</>,
+              ].map((li, i) => (
+                <li key={i} className="flex gap-3">
+                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-600" />
+                  <span>{li}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+        <DocUsage code={usage.transform} />
+      </div>
+    </>
   )
 }

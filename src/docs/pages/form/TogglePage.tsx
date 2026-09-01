@@ -66,7 +66,7 @@ export function TogglePage() {
           </div>
         </Demo>
         <SectionCode>
-          {"import { Toggle } from '@stasi/design-kit-react'\n\n"}
+          {"import { Toggle } from '@tpl/design-kit-react'\n\n"}
           {'{/* Menyala sejak awal */}\n'}
           {'<Toggle label="Notifikasi email" defaultChecked />\n\n'}
           {'{/* Inactive — meredup sekaligus nonaktif */}\n'}
@@ -228,7 +228,7 @@ export function TogglePage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Toggle } from '@stasi/design-kit-react'\n\n"}
+          {"import { Toggle } from '@tpl/design-kit-react'\n\n"}
           {'<Toggle\n'}
           {platform === 'mobile' && (
             <>

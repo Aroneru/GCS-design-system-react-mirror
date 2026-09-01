@@ -89,7 +89,7 @@ export function SelectPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { Select } from '@stasi/design-kit-react'\n\n"}
+          {"import { Select } from '@tpl/design-kit-react'\n\n"}
           {'<Select\n'}
           {'    label="Label"\n'}
           {'    '}
@@ -258,7 +258,7 @@ export function SelectPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Select } from '@stasi/design-kit-react'\n\n"}
+          {"import { Select } from '@tpl/design-kit-react'\n\n"}
           {'<Select\n'}
           {state !== 'default' && (
             <>

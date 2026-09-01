@@ -1,7 +1,11 @@
 /**
- * Struktur navigasi dokumentasi — satu-satunya sumber untuk panel samping di
- * DocsLayout sekaligus angka ringkas di halaman Home. Dipisah dari DocsLayout
- * supaya berkas komponen hanya mengekspor komponen (syarat react-refresh).
+ * Struktur navigasi dokumentasi — sumber angka ringkas di halaman Home.
+ * Dipisah dari DocsLayout supaya berkas komponen hanya mengekspor komponen
+ * (syarat react-refresh).
+ *
+ * CATATAN: DocsLayout masih menyimpan salinannya sendiri dan tidak mengimpor
+ * berkas ini, jadi keduanya harus diubah bersamaan sampai salah satunya
+ * dihapus.
  */
 
 export type Section = "home" | "components" | "form" | "foundations" | "example";
@@ -41,10 +45,8 @@ export const rail: { key: Section; label: string; route: string; icon: string }[
 
 /**
  * Entri panel samping; `children` dipakai halaman yang punya sub-halaman.
- * `soon` menandai halaman yang komponennya belum ada (masih PlaceholderPage):
- * tidak ikut terhitung sebagai elemen yang tersedia di Home, dan tautannya
- * disembunyikan dari panel samping. Rutenya tetap hidup dan bisa dibuka lewat
- * URL, jadi entri ini sengaja dipertahankan, bukan dihapus.
+ * `soon` menandai halaman yang komponennya belum ada (masih PlaceholderPage)
+ * supaya tidak ikut terhitung sebagai elemen yang tersedia.
  */
 export type NavItem = {
   label: string;
@@ -100,9 +102,6 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: "Container", route: "/components/container" },
       { label: "Button", route: "/components/button" },
       { label: "Badge", route: "/components/badge" },
-      { label: "Spinner", route: "/components/spinner" },
-      { label: "Popover", route: "/components/popover" },
-      { label: "Modal", route: "/components/modal" },
       { label: "Alert", route: "/components/alert" },
       { label: "Toast", route: "/components/toast" },
       { label: "Card", route: "/components/card" },
@@ -112,7 +111,6 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: "Breadcrumb", route: "/components/breadcrumb" },
       { label: "Pagination", route: "/components/pagination" },
       { label: "Sidebar", route: "/components/sidebar" },
-      { label: "Table", route: "/components/table", soon: true },
     ],
   },
 };

@@ -73,7 +73,7 @@ export function Footer({
                   <li key={i}>
                     <a
                       href={menu.url ?? '#'}
-                      className="rounded text-center transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                      className="rounded transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
                     >
                       {menu.label}
                     </a>
