@@ -1,0 +1,139 @@
+/*
+ * Gaya pendukung animasi untuk SITUS DOKUMENTASI saja.
+ *
+ * Berkas ini diimpor dari `src/main.tsx`, bukan dari `src/lib/styles.css`, jadi
+ * tidak ikut terbawa ke paket yang dipublish. Semuanya CSS biasa yang membaca
+ * token dari `tokens.css` — tanpa @apply, supaya tidak perlu @reference dan
+ * tidak menambah pekerjaan pada build paket.
+ */
+
+/* ── Kisi halus di latar hero ───────────────────────────────────────────── */
+
+.ds-grid {
+    background-image:
+        linear-gradient(to right, var(--color-gray-200) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--color-gray-200) 1px, transparent 1px);
+    background-size: 56px 56px;
+    /* Kisinya hanya boleh terbaca di tengah lalu larut ke tepi; tanpa mask, ia
+       berhenti mendadak di batas elemen dan terlihat seperti tabel. */
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 20%, transparent 78%);
+    opacity: 0.55;
+}
+
+/* ── Sapuan sinar diagonal ──────────────────────────────────────────────── */
+
+.ds-beam {
+    background: linear-gradient(
+        105deg,
+        transparent 32%,
+        color-mix(in oklab, var(--color-primary-100) 55%, transparent) 46%,
+        color-mix(in oklab, #fff 70%, transparent) 52%,
+        transparent 66%
+    );
+    opacity: 0.85;
+}
+
+/* ── Kartu dengan sorotan mengikuti kursor ──────────────────────────────── */
+
+.ds-spotlight {
+    position: relative;
+    isolation: isolate;
+    --mx: 50%;
+    --my: 50%;
+}
+
+.ds-spotlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+        18rem circle at var(--mx) var(--my),
+        color-mix(in oklab, var(--color-primary-500) 12%, transparent),
+        transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.ds-spotlight:hover::before,
+.ds-spotlight:focus-visible::before,
+.ds-spotlight:focus-within::before {
+    opacity: 1;
+}
+
+/* Tepi yang ikut menyala di sisi terdekat kursor. Dibuat dengan border
+   transparan + dua background: satu di padding-box, satu di border-box, lalu
+   dipotong agar hanya menyisakan cincin. */
+.ds-spotlight::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(
+        14rem circle at var(--mx) var(--my),
+        color-mix(in oklab, var(--color-primary-500) 65%, transparent),
+        transparent 65%
+    );
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+}
+
+.ds-spotlight:hover::after,
+.ds-spotlight:focus-visible::after,
+.ds-spotlight:focus-within::after {
+    opacity: 1;
+}
+
+/* ── Lempeng yang memiringkan diri mengikuti kursor ─────────────────────── */
+
+.ds-tilt {
+    /* Perspektif hidup di pembungkus supaya titik hilangnya tetap di tengah
+       kartu saat pelatnya berputar. */
+    perspective: 1200px;
+}
+
+.ds-tilt-plate {
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+/* ── Garis kemajuan baca di puncak halaman ──────────────────────────────── */
+
+.ds-progress {
+    transform-origin: 0 50%;
+    /* Dimulai dari 0 supaya tidak berkedip lebar penuh sebelum ScrollTrigger
+       sempat menghitung posisi gulir pertama. */
+    transform: scaleX(0);
+}
+
+/* ── Hormati permintaan gerak dikurangi ─────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    /* Garis kemajuan hanya bermakna kalau bergerak. Pada mode ini ia tidak
+       pernah dianimasikan, jadi disembunyikan sekalian — dibiarkan tampil, ia
+       cuma jadi garis diam yang membingungkan di puncak halaman. */
+    .ds-progress {
+        display: none;
+    }
+}

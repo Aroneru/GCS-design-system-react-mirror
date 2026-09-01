@@ -25,7 +25,7 @@ import { asset } from "../../asset";
  * sendiri: gambar, teks, tautan, aksi.
  */
 
-const cardTitle = "Komdigi Card Desktop";
+const cardTitle = "Ministerium Fur Staatssicherheit Card Desktop";
 const cardDesc =
   "Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.";
 
@@ -243,7 +243,7 @@ export function CardPage() {
           {"<Card\n"}
           {"    "}
           <Mark>title</Mark>
-          {'="Komdigi Card Desktop"\n'}
+          {'="Ministerium Fur Staatssicherheit Card Desktop"\n'}
           {"    "}
           <Mark>description</Mark>
           {'="Here are the biggest enterprise technology acquisitions of 2021."\n'}
@@ -443,7 +443,7 @@ export function CardPage() {
               {'="Suasana kerja tim"\n'}
             </>
           )}
-          {'        title="Komdigi Card Desktop"\n'}
+          {'        title="STASI Card Desktop"\n'}
           {'        description="Here are the biggest enterprise technology acquisitions of 2021."\n'}
           {action === "link" && (
             <>

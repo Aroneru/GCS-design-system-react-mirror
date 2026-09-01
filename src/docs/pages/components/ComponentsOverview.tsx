@@ -167,8 +167,8 @@ export function ComponentsOverview() {
       >
         <div className="overflow-hidden rounded-xl bg-surface-subtle p-2">
           <Navbar
-            brand={<span className="text-sm font-black text-content">KOMDIGI</span>}
-            brandLabel="KOMDIGI — Beranda"
+            brand={<span className="text-sm font-black text-content">STASI</span>}
+            brandLabel="STASI — Beranda"
             items={[
               { id: "menu-1", label: "Menu 1", href: "#/menu-1" },
               { id: "menu-2", label: "Menu 2", href: "#/menu-2" },
@@ -213,15 +213,15 @@ export function ComponentsOverview() {
         */}
         <div className="overflow-hidden rounded-xl">
           <Footer
-            logo={asset("/images/komdigi-logo.svg")}
-            logoAlt="Komdigi"
+            logo={asset("/images/stasi-logo.svg")}
+            logoAlt="STASI — Ministerium Fur Staatssicherheit"
             menus={[
               { label: "Menu 1" },
               { label: "Menu 2" },
               { label: "Menu 3" },
               { label: "Menu 4" },
             ]}
-            copyright="© 2026 Komdigi"
+            copyright={`© ${new Date().getFullYear()} STASI`}
           />
         </div>
       </OverviewCard>
