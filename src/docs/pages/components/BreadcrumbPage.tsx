@@ -22,7 +22,7 @@ const sizeOptions = [
 
 const backgroundOptions = [
   { value: "with", label: "Ada" },
-  { value: "without", label: "Tanpa" },
+  { value: "without", label: "Tidak ada" },
 ];
 
 const menuOptions = [

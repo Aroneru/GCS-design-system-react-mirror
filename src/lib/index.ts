@@ -30,7 +30,7 @@ export type {
 } from "./components/Modal";
 
 export { Alert } from "./components/Alert";
-export type { AlertProps, AlertVariant, AlertSurface } from "./components/Alert";
+export type { AlertProps, AlertVariant } from "./components/Alert";
 
 export { Toast } from "./components/Toast";
 export type { ToastProps, ToastVariant } from "./components/Toast";

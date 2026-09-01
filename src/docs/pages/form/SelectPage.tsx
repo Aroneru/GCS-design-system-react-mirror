@@ -12,7 +12,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../usulanKit'
-import { adaTanpa } from '../../usulanOptions'
+import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: SelectApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-500' },
@@ -231,7 +231,7 @@ export function SelectPage() {
               label="Tampilkan ikon info"
               value={withInfo}
               onChange={setWithInfo}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -240,7 +240,7 @@ export function SelectPage() {
               label="Tampilkan helper text"
               value={withHelper}
               onChange={setWithHelper}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>

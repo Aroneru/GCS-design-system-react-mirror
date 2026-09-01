@@ -91,7 +91,7 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | ----------- | ------------------------------------------------------------------------- |
 | `Button`    | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `iconOnly`, `as` |
 | `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`                |
-| `Alert`     | `variant`, `surface`: `soft \| outline`, `heading`, `icon`, `actions`     |
+| `Alert`     | `variant`, `heading`, `icon`, `dismissible`, `actions`                    |
 | `Toast`     | `variant`, `heading`, `icon`, `dismissible`, `actions`                    |
 | `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`           |
 | `Container` | `as` (default `div`), `padded` (default `true`)                           |
@@ -213,10 +213,46 @@ Situs dokumentasinya berisi `/foundations/*` (token), `/components/*`,
 `/form/*` (tiap komponen form beserta playground-nya), dan `/example` — satu
 halaman formulir layanan yang memakai seluruh komponen kit sekaligus.
 
-Tiap komponen form punya dua halaman: susunan sekarang, dan susunan **Usulan**
-(`*-usulan`) yang sedang dinilai — judul ber-anchor, blok kode menempel di tiap
-bagian, dan daftar isi "On this page" di kanan. Kerangkanya di `docs/usulanKit.tsx`.
-Setelah salah satu dipilih, separuh halaman beserta entri navigasinya dibuang.
+Seluruh halaman komponen dan form memakai susunan yang sama: judul ber-anchor,
+blok kode menempel di tiap bagian, dan daftar isi "On this page" di kanan.
+Kerangkanya di `docs/usulanKit.tsx`.
+
+## Deploy dokumentasi
+
+Situs dokumentasi terbit otomatis ke GitHub Pages lewat
+`.github/workflows/deploy-docs.yml` setiap ada push ke `main`.
+
+```
+GitLab main  --push mirror-->  GitHub main  --Actions-->  GitHub Pages
+```
+
+Sumber kebenarannya tetap GitLab. Repo GitHub hanya cermin, jadi jangan commit
+langsung ke sana — mirror akan menimpanya.
+
+Penyiapan sekali jalan:
+
+1. **GitHub** — buat repo tujuan, lalu Settings -> Pages -> Build and deployment
+   -> Source: **GitHub Actions** (bukan "Deploy from a branch"). Repo publik
+   gratis; repo privat butuh GitHub Pro/Team.
+2. **GitHub** — buat Personal Access Token yang boleh menulis ke repo itu
+   (classic: scope `repo`, atau fine-grained: Contents = Read and write).
+3. **GitLab** — Settings -> Repository -> Mirroring repositories -> Add:
+   - URL: `https://<user-github>@github.com/<org>/<repo>.git`
+   - Mirror direction: **Push**
+   - Authentication method: Password -> tempel PAT dari langkah 2
+   - Centang "Only mirror protected branches" bila cukup `main` yang ikut
+
+Base path-nya otomatis: workflow mengisi `VITE_BASE` dari `base_path` milik
+Pages dan `vite.config.ts` memakainya, jadi konfigurasi yang sama jalan baik di
+`<org>.github.io/<repo>/` maupun di root domain.
+
+Karena itu **rujukan berkas `public/` harus lewat `asset()`** (`docs/asset.ts`).
+Path absolut seperti `/images/x.svg` diukur dari root domain dan akan 404 saat
+situs disajikan dari sub-path; Vite hanya menulis ulang URL di `index.html` dan
+di import modul, bukan string literal di dalam kode.
+
+Routing situs ini berbasis hash (`#/components/alert`), jadi tidak perlu
+`404.html` sebagai fallback SPA.
 
 ## Uji coba lokal sebelum publish
 

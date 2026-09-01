@@ -1,5 +1,6 @@
 import { Alert, Badge, Button, Navbar, Popover, Spinner, Toast } from "../../../lib";
 import { OverviewCard, OverviewPage } from "../../pageKit";
+import { asset } from "../../asset";
 
 export function ComponentsOverview() {
   return (
@@ -118,7 +119,7 @@ export function ComponentsOverview() {
         <div className="rounded-xl bg-surface-subtle p-5">
           <div className="overflow-hidden rounded-lg border border-border bg-white">
             <img
-              src="/images/card-sample.svg"
+              src={asset("/images/card-sample.svg")}
               alt=""
               className="aspect-video w-full object-cover"
             />
@@ -162,7 +163,7 @@ export function ComponentsOverview() {
       >
         <div className="rounded-xl bg-surface-subtle p-5">
           <div className="flex items-center gap-4 rounded-lg border border-border bg-white p-4">
-            <img src="/images/hero-sample.svg" alt="" className="h-20 w-auto rounded-md" />
+            <img src={asset("/images/hero-sample.svg")} alt="" className="h-20 w-auto rounded-md" />
             <div className="min-w-0 flex-1 space-y-2">
               <div className="h-3 w-40 rounded bg-gray-300" />
               <div className="h-1.5 w-24 rounded bg-primary-300" />
@@ -182,7 +183,7 @@ export function ComponentsOverview() {
       >
         <div className="overflow-hidden rounded-xl">
           <div className="flex items-center justify-between gap-4 bg-gray-800 px-5 py-4">
-            <img src="/images/komdigi-logo.svg" alt="Komdigi" className="h-7 w-auto" />
+            <img src={asset("/images/komdigi-logo.svg")} alt="Komdigi" className="h-7 w-auto" />
             <div className="hidden gap-5 text-xs text-gray-300 sm:flex">
               <span>Menu 1</span>
               <span>Menu 2</span>
