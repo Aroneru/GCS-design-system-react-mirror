@@ -5,9 +5,22 @@ import * as OutlineIcons from '../../lib/icons/outline'
 import * as SolidIcons from '../../lib/icons/solid'
 import { brandIcons } from '../../lib/brandIconRegistry'
 import { sidebars } from '../navigation'
+import { asset } from '../asset'
 import { DocUsage } from '../DocUsage'
 import { G, H } from '../pageKit'
 import { useCopy } from '../useCopy'
+import {
+  Aurora,
+  CountUp,
+  gsap,
+  Magnetic,
+  Reveal,
+  ScrollProgress,
+  SplitWords,
+  SpotlightCard,
+  TiltCard,
+  useGsap,
+} from '../motion'
 
 const INSTALL = 'npm install @stasi/design-kit-react'
 
@@ -23,11 +36,24 @@ const countLeaves = (key: string) =>
 /** Logo brand sudah termasuk di dalam set solid/outline, jadi tidak dijumlah lagi. */
 const iconTotal = Object.keys(OutlineIcons).length + Object.keys(SolidIcons).length
 
-const stats: [string, string, string][] = [
-  [String(countLeaves('components')), 'Komponen', 'Siap pakai dari satu package'],
-  [String(countLeaves('form')), 'Elemen form', 'Input, select, radio, toggle, checkbox'],
-  [String(countLeaves('foundations')), 'Foundations', 'Warna, tipografi, spacing, dan lainnya'],
-  [String(iconTotal), 'Ikon', `Set solid dan outline, plus ${brandIcons.length} logo brand`],
+/** Nilainya angka, bukan string, karena `CountUp` menghitung naik ke sana. */
+const stats: { value: number; label: string; desc: string }[] = [
+  { value: countLeaves('components'), label: 'Komponen', desc: 'Siap pakai dari satu package' },
+  {
+    value: countLeaves('form'),
+    label: 'Elemen form',
+    desc: 'Input, select, radio, toggle, checkbox',
+  },
+  {
+    value: countLeaves('foundations'),
+    label: 'Foundations',
+    desc: 'Warna, tipografi, spacing, dan lainnya',
+  },
+  {
+    value: iconTotal,
+    label: 'Ikon',
+    desc: `Set solid dan outline, plus ${brandIcons.length} logo brand`,
+  },
 ]
 
 /* ---------- Kenapa memakai design kit ini ---------- */
@@ -106,7 +132,31 @@ const WindowDots = () => (
   </span>
 )
 
+/**
+ * Jendela kode yang barisnya muncul berurutan dari bawah, seperti sedang
+ * diketik — lalu diam. Tiap `<span data-line>` adalah satu baris logis; itulah
+ * satuan yang di-stagger.
+ */
 function CodeWindow() {
+  const ref = useGsap<HTMLDivElement>(({ q }) => {
+    gsap.from(q('[data-line]'), {
+      opacity: 0,
+      y: 12,
+      duration: 0.5,
+      ease: 'power2.out',
+      stagger: 0.09,
+      delay: 0.45,
+    })
+
+    // Kursor berkedip baru dinyalakan setelah baris terakhir mendarat, supaya
+    // tidak terlihat berkedip di ruang kosong lebih dulu.
+    gsap.fromTo(
+      q('[data-caret]'),
+      { opacity: 0 },
+      { opacity: 1, duration: 0.45, repeat: -1, yoyo: true, delay: 1.5, ease: 'steps(1)' },
+    )
+  }, [])
+
   return (
     <div className="relative">
       {/*
@@ -120,7 +170,10 @@ function CodeWindow() {
         className="pointer-events-none absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-primary-400/50 via-purple-500/60 to-purple-700/70 blur-3xl sm:-inset-10"
       />
 
-      <div className="relative overflow-hidden rounded-2xl bg-gray-900 shadow-2xl ring-1 ring-white/10">
+      <div
+        ref={ref}
+        className="relative overflow-hidden rounded-2xl bg-gray-900 shadow-2xl ring-1 ring-white/10"
+      >
         <div className="flex items-center gap-3 bg-gray-800/70 px-4 py-3">
           <WindowDots />
           <span className="ml-1 inline-flex items-center gap-2 rounded-md bg-gray-900 px-3 py-1">
@@ -131,31 +184,57 @@ function CodeWindow() {
 
         <pre className="ds-scroll-x overflow-x-auto p-5 font-mono text-xs leading-6 text-gray-300 sm:p-6">
           <code>
-            <H>{'<h3>'}</H>
-            Tulis sekali. Pakai di mana saja.
-            <H>{'</h3>'}</H>
+            <span data-line className="inline-block">
+              <H>{'<h3>'}</H>
+              Tulis sekali. Pakai di mana saja.
+              <H>{'</h3>'}</H>
+            </span>
             {'\n'}
-            <H>{'<p '}</H>
-            <A>className</A>
-            {'='}
-            <G>{'"text-body-sm text-gray-500"'}</G>
-            <H>{'>'}</H>
-            {'\n  Token Foundations → Tailwind v4\n'}
-            <H>{'</p>'}</H>
+            <span data-line className="inline-block">
+              <H>{'<p '}</H>
+              <A>className</A>
+              {'='}
+              <G>{'"text-body-sm text-gray-500"'}</G>
+              <H>{'>'}</H>
+            </span>
+            {'\n'}
+            <span data-line className="inline-block">
+              {'  Token Foundations → Tailwind v4'}
+            </span>
+            {'\n'}
+            <span data-line className="inline-block">
+              <H>{'</p>'}</H>
+            </span>
             {'\n\n'}
-            <H>{'<Select'}</H>
-            {'\n  '}
-            <A>label</A>
-            {'='}
-            <G>{'"Pilih aplikasi"'}</G>
-            {'\n  '}
-            <A>options</A>
-            {'={['}
-            <G>{"'default'"}</G>
-            {', '}
-            <G>{"'simaya'"}</G>
-            {']}\n'}
-            <H>{'/>'}</H>
+            <span data-line className="inline-block">
+              <H>{'<Select'}</H>
+            </span>
+            {'\n'}
+            <span data-line className="inline-block">
+              {'  '}
+              <A>label</A>
+              {'='}
+              <G>{'"Pilih aplikasi"'}</G>
+            </span>
+            {'\n'}
+            <span data-line className="inline-block">
+              {'  '}
+              <A>options</A>
+              {'={['}
+              <G>{"'default'"}</G>
+              {', '}
+              <G>{"'simaya'"}</G>
+              {']}'}
+            </span>
+            {'\n'}
+            <span data-line className="inline-block">
+              <H>{'/>'}</H>
+              <span
+                data-caret
+                aria-hidden="true"
+                className="ml-1 inline-block h-[1.1em] w-[0.5em] translate-y-[0.15em] bg-primary-300"
+              />
+            </span>
           </code>
         </pre>
       </div>
@@ -165,6 +244,21 @@ function CodeWindow() {
 
 /* ---------- Bagian kecil ---------- */
 
+/**
+ * Judul section dengan kalimat pengantar yang menyala kata demi kata seiring
+ * section-nya digulir melewati layar.
+ *
+ * Efeknya di-scrub, bukan dijalankan sekali: pembaca yang menggulir pelan
+ * melihat kalimatnya terang perlahan, dan yang menggulir balik melihatnya
+ * meredup lagi — gerakannya terikat pada posisi gulir, bukan pada waktu.
+ *
+ * Kata yang belum menyala TIDAK dibuat pucat. Versi umum efek ini berangkat
+ * dari abu-abu muda seperti gray-300 (rasio ~1.6:1 di atas putih) — dan karena
+ * scrub menahan kata di keadaan itu selama section masih di layar, teksnya
+ * benar-benar dibaca orang dalam kondisi gagal kontras. Jadi kedua ujungnya
+ * dibuat lolos WCAG AA: gray-500 (4.8:1) menyala menjadi gray-800. Yang
+ * dianimasikan penekanan, bukan keterbacaan.
+ */
 function SectionTitle({
   eyebrow,
   title,
@@ -176,11 +270,45 @@ function SectionTitle({
   children?: ReactNode
   center?: boolean
 }) {
+  const ref = useGsap<HTMLDivElement>(({ scope, q }) => {
+    const words = q('[data-lit]')
+    if (words.length === 0) return
+
+    gsap.fromTo(
+      words,
+      { color: 'var(--color-gray-500)' },
+      {
+        color: 'var(--color-gray-800)',
+        ease: 'none',
+        stagger: 0.4,
+        scrollTrigger: { trigger: scope, start: 'top 82%', end: 'bottom 55%', scrub: true },
+      },
+    )
+  }, [children])
+
   return (
-    <div className={`mb-8 max-w-2xl ${center ? 'mx-auto text-center' : ''}`}>
-      <p className="ds-eyebrow">{eyebrow}</p>
-      <h2 className="mt-2 text-heading-2 font-black tracking-tight text-gray-900">{title}</h2>
-      {children && <p className="mt-3 text-body-sm leading-6 text-gray-500">{children}</p>}
+    <div ref={ref} className={`mb-8 max-w-2xl ${center ? 'mx-auto text-center' : ''}`}>
+      <Reveal stagger>
+        <p className="ds-eyebrow">{eyebrow}</p>
+        <h2 className="mt-2 text-heading-2 font-black tracking-tight text-gray-900">{title}</h2>
+      </Reveal>
+      {children && (
+        <p className="mt-3 text-body-sm leading-6 text-gray-500">
+          {/*
+            Hanya string biasa yang dipecah per kata. Kalimat pengantar yang
+            mengandung elemen (misalnya <code>) dibiarkan utuh — memecahnya akan
+            merusak markup di dalamnya, dan tanpa `data-lit` efeknya tinggal
+            dilewati begitu saja oleh setup di atas.
+          */}
+          {typeof children === 'string'
+            ? children.split(' ').map((w, i) => (
+                <span data-lit key={`${w}-${i}`}>
+                  {w}{' '}
+                </span>
+              ))
+            : children}
+        </p>
+      )}
     </div>
   )
 }
@@ -198,9 +326,10 @@ function ShowcaseTile({
   children: ReactNode
 }) {
   return (
-    <a
+    <SpotlightCard
+      as="a"
       href={`#${route}`}
-      className={`ds-card group flex flex-col gap-4 p-5 transition-shadow hover:shadow-md ${
+      className={`ds-card group flex flex-col gap-4 p-5 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg ${
         span ? 'sm:col-span-2' : ''
       }`}
     >
@@ -213,7 +342,47 @@ function ShowcaseTile({
           Lihat →
         </span>
       </div>
-    </a>
+    </SpotlightCard>
+  )
+}
+
+/* ---------- Angka ringkas ---------- */
+
+/**
+ * Baris angka yang tiap kolomnya naik berurutan lalu berhitung dari nol.
+ * Dipisah jadi komponen sendiri karena butuh scope GSAP-nya sendiri untuk
+ * meng-stagger kolom-kolomnya.
+ */
+function StatsRow() {
+  const ref = useGsap<HTMLDListElement>(({ scope, q }) => {
+    gsap.from(q('[data-stat]'), {
+      opacity: 0,
+      y: 28,
+      duration: 0.6,
+      ease: 'power3.out',
+      stagger: 0.1,
+      scrollTrigger: { trigger: scope, start: 'top 88%', once: true },
+    })
+  }, [])
+
+  return (
+    <dl ref={ref} className="grid grid-cols-2 gap-6 lg:grid-cols-4">
+      {stats.map((s) => (
+        <div key={s.label} data-stat className="group relative">
+          <dd className="text-heading-2 font-black tracking-tight text-primary-700">
+            <CountUp value={s.value} />
+          </dd>
+          <dt className="mt-1 text-sm font-black text-gray-900">{s.label}</dt>
+          <p className="mt-1 text-xs leading-5 text-gray-500">{s.desc}</p>
+          {/* Garis yang memanjang saat kolomnya disentuh — penanda hover yang
+              tidak menggeser apa pun di sekitarnya. */}
+          <span
+            aria-hidden="true"
+            className="mt-3 block h-0.5 w-8 origin-left scale-x-100 rounded-full bg-primary-200 transition-transform duration-500 group-hover:scale-x-[3]"
+          />
+        </div>
+      ))}
+    </dl>
   )
 }
 
@@ -222,89 +391,109 @@ export function HomePage() {
 
   return (
     <>
+      <ScrollProgress />
+
       {/* ══ Hero ══ */}
       <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-primary-50 via-white to-white px-5 py-16 sm:px-8 lg:px-12 lg:py-24 xl:px-14">
-        {/* Dua bulatan kabur sebagai latar — dekoratif sepenuhnya. */}
-        <div
+        <Aurora />
+
+        {/*
+          Lencana STASI sebagai cap air di tepi kanan hero. Dekoratif penuh dan
+          sengaja sangat samar — kehadirannya membangun kedalaman, bukan menuntut
+          dibaca. Hanya muncul dari lebar xl ke atas, di bawah itu ia bertabrakan
+          dengan jendela kode.
+        */}
+        <img
+          src={asset('/stasi.svg')}
+          alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -top-24 -left-24 size-96 rounded-full bg-primary-200/40 blur-3xl"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-32 -bottom-40 size-[28rem] rounded-full bg-purple-200/40 blur-3xl"
+          className="pointer-events-none absolute -top-16 -right-40 hidden w-[38rem] opacity-[0.03] xl:block"
         />
 
         <Container padded={false} className="relative">
           <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:gap-16">
             <div>
-              <div className="flex flex-wrap items-center gap-2">
+              <Reveal stagger className="flex flex-wrap items-center gap-2">
                 <Badge variant="brand">React · Vite</Badge>
                 <Badge variant="gray">Tailwind CSS v4</Badge>
                 <Badge variant="success">v0.1.0</Badge>
-              </div>
+              </Reveal>
 
-              <h1 className="mt-5 text-[clamp(2.25rem,5vw,3.5rem)] leading-[1.05] font-black tracking-tight text-gray-900">
-                Menyatukan layanan digital lewat desain dan kode
-              </h1>
-              <p className="mt-5 max-w-xl text-body-lg text-gray-600">
-                Satu sumber visual dan komponen yang konsisten untuk membangun layanan yang jelas,
-                inklusif, dan mudah dikenali. Token, komponen, dan dokumentasinya tinggal dipakai — tidak
-                perlu dirancang ulang tiap proyek.
-              </p>
+              <SplitWords
+                as="h1"
+                delay={0.15}
+                text="Menyatukan layanan digital lewat desain dan kode"
+                className="mt-5 text-[clamp(2.25rem,5vw,3.5rem)] leading-[1.05] font-black tracking-tight text-gray-900"
+              />
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Button as="a" href="#/components" variant="filled">
-                  Mulai pakai
-                </Button>
-                <Button as="a" href="#/foundations" variant="outline">
-                  Lihat Foundations
-                </Button>
-              </div>
+              <Reveal delay={0.5}>
+                <p className="mt-5 max-w-xl text-body-lg text-gray-600">
+                  Satu sumber visual dan komponen yang konsisten untuk membangun layanan yang jelas,
+                  inklusif, dan mudah dikenali. Token, komponen, dan dokumentasinya tinggal dipakai —
+                  tidak perlu dirancang ulang tiap proyek.
+                </p>
+              </Reveal>
+
+              <Reveal delay={0.65} className="mt-8 flex flex-wrap items-center gap-3">
+                <Magnetic>
+                  <Button as="a" href="#/components" variant="filled">
+                    Mulai pakai
+                  </Button>
+                </Magnetic>
+                <Magnetic strength={12}>
+                  <Button as="a" href="#/foundations" variant="outline">
+                    Lihat Foundations
+                  </Button>
+                </Magnetic>
+              </Reveal>
 
               {/* Perintah pasang dengan tombol salin */}
-              <button
-                type="button"
-                onClick={copy}
-                className="mt-4 inline-flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-2.5 font-mono text-sm text-gray-700 transition-colors hover:border-primary-300 hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-                aria-label={copied ? 'Perintah tersalin' : `Salin perintah: ${INSTALL}`}
-              >
-                <span className="text-gray-400">$</span>
-                <span>{INSTALL}</span>
-                <span className={`text-xs font-bold ${copied ? 'text-green-600' : 'text-gray-400'}`}>
-                  {copied ? 'Tersalin!' : 'Salin'}
-                </span>
-              </button>
+              <Reveal delay={0.75}>
+                <button
+                  type="button"
+                  onClick={copy}
+                  className="mt-4 inline-flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-2.5 font-mono text-sm text-gray-700 transition-colors hover:border-primary-300 hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                  aria-label={copied ? 'Perintah tersalin' : `Salin perintah: ${INSTALL}`}
+                >
+                  <span className="text-gray-400">$</span>
+                  <span>{INSTALL}</span>
+                  <span
+                    className={`text-xs font-bold ${copied ? 'text-green-600' : 'text-gray-400'}`}
+                  >
+                    {copied ? 'Tersalin!' : 'Salin'}
+                  </span>
+                </button>
+              </Reveal>
             </div>
 
-            <CodeWindow />
+            <TiltCard>
+              <CodeWindow />
+            </TiltCard>
           </div>
         </Container>
       </section>
 
       {/* ══ Angka ringkas ══ */}
       <section className="border-b border-border bg-surface">
-        <Container className="py-8">
-          <dl className="grid grid-cols-2 gap-6 lg:grid-cols-4">
-            {stats.map(([value, label, desc]) => (
-              <div key={label}>
-                <dd className="text-heading-2 font-black tracking-tight text-primary-700">{value}</dd>
-                <dt className="mt-1 text-sm font-black text-gray-900">{label}</dt>
-                <p className="mt-1 text-xs leading-5 text-gray-500">{desc}</p>
-              </div>
-            ))}
-          </dl>
+        <Container className="py-10">
+          <StatsRow />
         </Container>
       </section>
 
       {/* ══ Rancang sekali ══ */}
       <Container className="py-12 lg:py-16">
         <SectionTitle center eyebrow="Prinsip" title="Rancang sekali, pakai di mana saja">
-          Empat keputusan yang membuat design kit ini tetap konsisten saat dipakai banyak tim sekaligus.
+          Empat keputusan yang membuat design kit ini tetap konsisten saat dipakai banyak tim
+          sekaligus.
         </SectionTitle>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((f) => (
-            <article key={f.title} className="ds-card p-6">
+            <SpotlightCard
+              key={f.title}
+              as="article"
+              className="ds-card p-6 transition-transform duration-300 hover:-translate-y-1"
+            >
               <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary-50 text-primary-700">
                 <svg
                   className="size-5"
@@ -319,9 +508,9 @@ export function HomePage() {
               </span>
               <h3 className="mt-4 text-heading-4 font-black text-gray-900">{f.title}</h3>
               <p className="mt-2 text-body-sm leading-6 text-gray-500">{f.desc}</p>
-            </article>
+            </SpotlightCard>
           ))}
-        </div>
+        </Reveal>
       </Container>
 
       {/* ══ Komponen hidup ══ */}
@@ -329,11 +518,11 @@ export function HomePage() {
         <Container className="py-12 lg:py-16">
           <SectionTitle eyebrow="Komponen" title="Semuanya sungguhan, bukan gambar">
             Yang tampil di bawah ini adalah komponen yang benar-benar dirender dari{' '}
-            <code className="text-xs font-bold text-gray-700">@stasi/design-kit-react</code> — sama persis
-            dengan yang akan kamu impor. Klik untuk membuka playground-nya.
+            <code className="text-xs font-bold text-gray-700">@stasi/design-kit-react</code> — sama
+            persis dengan yang akan kamu impor. Klik untuk membuka playground-nya.
           </SectionTitle>
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <ShowcaseTile name="Button" route="/components/button">
               <Button variant="filled" size="s">
                 Simpan
@@ -375,7 +564,7 @@ export function HomePage() {
                 />
               </div>
             </ShowcaseTile>
-          </div>
+          </Reveal>
         </Container>
       </section>
 
@@ -383,28 +572,34 @@ export function HomePage() {
       <Container className="py-12 lg:py-16">
         <SectionTitle eyebrow="Mulai cepat" title="Tiga baris untuk komponen pertama">
           Pasang package-nya, sambungkan stylesheet-nya sekali di proyek, lalu impor komponen yang
-          dibutuhkan dan pakai seperti elemen React biasa. Tidak ada provider atau konfigurasi tambahan.
+          dibutuhkan dan pakai seperti elemen React biasa. Tidak ada provider atau konfigurasi
+          tambahan.
         </SectionTitle>
 
-        <DocUsage flush label="Terminal" code={INSTALL} />
+        <Reveal>
+          <DocUsage flush label="Terminal" code={INSTALL} />
+        </Reveal>
 
-        <div className="mt-5">
-          <DocUsage
-            flush
-            label="CSS"
-            code={`/* Sekali saja, di stylesheet utama proyek */
+        <Reveal>
+          <div className="mt-5">
+            <DocUsage
+              flush
+              label="CSS"
+              code={`/* Sekali saja, di stylesheet utama proyek */
 @import '@stasi/design-kit-react/styles.css';
 
 /* Tailwind v4 perlu memindai berkas package agar
    utility yang dipakai komponen ikut ter-generate */
 @source '../node_modules/@stasi/design-kit-react/dist/**/*.js';`}
-          />
-        </div>
+            />
+          </div>
+        </Reveal>
 
-        <div className="mt-5">
-          <DocUsage
-            flush
-            code={`import { Button, Badge, InputField } from '@stasi/design-kit-react'
+        <Reveal>
+          <div className="mt-5">
+            <DocUsage
+              flush
+              code={`import { Button, Badge, InputField } from '@stasi/design-kit-react'
 
 export function FormPermohonan() {
   return (
@@ -417,8 +612,9 @@ export function FormPermohonan() {
     </form>
   )
 }`}
-          />
-        </div>
+            />
+          </div>
+        </Reveal>
       </Container>
 
       {/* ══ Jelajahi ══ */}
@@ -428,12 +624,13 @@ export function FormPermohonan() {
             Empat pintu masuk, tergantung yang sedang kamu kerjakan.
           </SectionTitle>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <Reveal stagger className="grid gap-5 sm:grid-cols-2">
             {sections.map((s) => (
-              <a
+              <SpotlightCard
                 key={s.route}
+                as="a"
                 href={`#${s.route}`}
-                className="ds-card group flex flex-col p-6 transition-shadow hover:shadow-md"
+                className="ds-card group flex flex-col p-6 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="text-heading-4 font-black text-gray-900">{s.name}</h3>
@@ -442,11 +639,11 @@ export function FormPermohonan() {
                 <p className="mt-2 flex-1 text-body-sm leading-6 text-gray-500">{s.desc}</p>
                 <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary-700">
                   Buka
-                  <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
                 </span>
-              </a>
+              </SpotlightCard>
             ))}
-          </div>
+          </Reveal>
         </Container>
       </section>
     </>
