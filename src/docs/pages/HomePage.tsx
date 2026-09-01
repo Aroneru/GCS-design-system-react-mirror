@@ -488,8 +488,8 @@ function CodeWindow() {
       tl.kill()
     }
   }, [
-    // index]
-  )
+    // index
+    ])
     
   /*
    * Lampu menyala.
