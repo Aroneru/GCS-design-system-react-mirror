@@ -142,7 +142,7 @@ export function SidebarPage() {
         <div className="mb-4 flex justify-start">
           <div className="h-[720px] overflow-hidden rounded-xl border border-gray-200">
             <Sidebar
-              logo={<div className="text-sm font-black tracking-wide text-gray-900">KOMDIGI</div>}
+              logo={<div className="text-sm font-black tracking-wide text-gray-900">STASI</div>}
               user={{
                 name: "Nama User",
                 profileLabel: "Lihat Profil",
@@ -294,7 +294,7 @@ export function SidebarPage() {
               onCollapse={() =>
                 setCollapse((current) => (current === "expanded" ? "collapsed" : "expanded"))
               }
-              logo={<div className="text-sm font-black tracking-wide text-gray-900">KOMDIGI</div>}
+              logo={<div className="text-sm font-black tracking-wide text-gray-900">STASI</div>}
               user={
                 profile === "show"
                   ? {

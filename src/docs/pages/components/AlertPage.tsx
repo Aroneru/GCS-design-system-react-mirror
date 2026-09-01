@@ -174,7 +174,7 @@ export function AlertPage() {
             dismissible={pakaiTutup}
             actions={pakaiAksi ? <AksiButton variant={variant} /> : undefined}
           >
-            Ini merupakan Design system Komdigi berupa component alert.
+            Ini merupakan Design system Ministerium Fur Staatssicherheit berupa component alert.
           </Alert>
         </Stage>
 
@@ -283,7 +283,7 @@ export function AlertPage() {
             </>
           )}
           {'>\n'}
-          {'    Ini merupakan Design system Komdigi berupa component alert.\n'}
+          {'    Ini merupakan Design system STASI berupa component alert.\n'}
           {'</Alert>'}
         </SectionCode>
       </FlowSection>

@@ -269,7 +269,7 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
       {/* Saudara dari baris di atas — melebar penuh selebar layar, di bawah rail. */}
       <Footer
         fluid
-        logo={asset("/images/komdigi-logo.svg")}
+        logo={asset("/images/stasi-logo.svg")}
         logoAlt="STASI — Ministerium Fur Staatssicherheit"
         menus={footerMenus}
         copyright={`© ${new Date().getFullYear()} STASI - Ministerium Fur Staatssicherheit`}

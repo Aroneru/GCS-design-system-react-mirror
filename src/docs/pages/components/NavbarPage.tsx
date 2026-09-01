@@ -217,7 +217,7 @@ function DemoBrand() {
         <span className="rounded-sm bg-white" />
       </span>
       <span className="w-[70px] text-sm font-black tracking-tight text-content lg:w-[90px]">
-        KOMDIGI
+        STASI
       </span>
     </span>
   );
@@ -422,7 +422,7 @@ function createPlaygroundCode({
   }
 
   add("  brand={<Logo />}\n");
-  add('  brandLabel="KOMDIGI — Beranda"\n');
+  add('  brandLabel="STASI — Beranda"\n');
   add("  items={items}\n");
 
   if (searchEnabled) {
@@ -449,7 +449,7 @@ function createPlaygroundCode({
 
   if (state === "authenticated") {
     add(
-      `  user={{\n    name: 'User Komdigi',\n    avatarSrc: '/avatar.jpg',\n    items: [{ id: 'profile', label: 'Profil', href: '/profile' }],\n  }}\n${
+      `  user={{\n    name: 'User STASI',\n    avatarSrc: '/avatar.jpg',\n    items: [{ id: 'profile', label: 'Profil', href: '/profile' }],\n  }}\n${
         variant === "front-office"
           ? "  notification={{ unread: true, href: '/notifications' }}\n"
           : ""
@@ -711,7 +711,7 @@ export function NavbarDesktopPreview({
       <Navbar
         variant={navbarVariant}
         brand={<DemoBrand />}
-        brandLabel="KOMDIGI — Beranda"
+        brandLabel="STASI — Beranda"
         items={figmaMenuItems[effectiveMenuCount]}
         search={
           searchEnabled
@@ -725,7 +725,7 @@ export function NavbarDesktopPreview({
         }
         guestActions={!authenticated && guestActionsEnabled ? demoGuestActions : undefined}
         user={
-          authenticated ? { name: "User Komdigi", initials: "UK", items: accountItems } : undefined
+          authenticated ? { name: "User STASI", initials: "US", items: accountItems } : undefined
         }
         notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
         menuPosition={menuPosition}
@@ -770,7 +770,7 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
         key={navigationInstanceKey}
         brand={<DemoBrand />}
         brandHref="/"
-        brandLabel="KOMDIGI — Beranda"
+        brandLabel="STASI — Beranda"
         items={previewItems}
         activeHref={activeHref}
         search={
@@ -785,7 +785,7 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
         }
         guestActions={!authenticated && guestActionsEnabled ? demoGuestActions : undefined}
         user={
-          authenticated ? { name: "User Komdigi", initials: "UK", items: accountItems } : undefined
+          authenticated ? { name: "User STASI", initials: "US", items: accountItems } : undefined
         }
         notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
         menuPosition={menuPosition}
@@ -812,16 +812,16 @@ const variantsCode = (
   <>
     {"<Navbar\n"}
     <H>{'  variant="back-office"\n'}</H>
-    {"  brand={<Logo />}\n  brandLabel=\"KOMDIGI — Beranda\"\n  items={items}\n  search={search}\n/>"}
+    {"  brand={<Logo />}\n  brandLabel=\"STASI — Beranda\"\n  items={items}\n  search={search}\n/>"}
   </>
 );
 
 const statesCode = (
   <>
-    {"// Guest: omit `user` dan gunakan `guestActions` bila diperlukan.\n<Navbar\n  brand={<Logo />}\n  brandLabel=\"KOMDIGI — Beranda\"\n  items={items}\n  search={search}\n"}
+    {"// Guest: omit `user` dan gunakan `guestActions` bila diperlukan.\n<Navbar\n  brand={<Logo />}\n  brandLabel=\"STASI — Beranda\"\n  items={items}\n  search={search}\n"}
     <H>
       {
-        "  user={{ name: 'User Komdigi', items: accountItems }}\n  notification={{ unread: true, href: '/notifications' }}\n"
+        "  user={{ name: 'User STASI', items: accountItems }}\n  notification={{ unread: true, href: '/notifications' }}\n"
       }
     </H>
     {"/>"}

@@ -10,8 +10,8 @@ import { asset } from "../../asset";
 const allMenus = Array.from({ length: 8 }, (_, i) => ({ label: `Menu ${i + 1}`, url: '#' }))
 
 const footerSocials = [
-  { label: 'Instagram', url: 'https://www.instagram.com/kemkomdigi/', icon: InstagramIcon },
-  { label: 'X', url: 'https://x.com/kemkomdigi', icon: XIcon },
+  { label: 'Instagram', url: 'https://www.instagram.com/stasi/', icon: InstagramIcon },
+  { label: 'X', url: 'https://x.com/stasi', icon: XIcon },
   { label: 'Facebook', url: '', icon: FacebookIcon },
 ]
 
@@ -109,11 +109,11 @@ export function FooterPage() {
             }`}
           >
             <Footer
-              logo={logoMode === 'image' ? asset('/images/komdigi-logo.svg') : undefined}
-              logoAlt="Komdigi — Ministerium Fur Staatssicherheit"
+              logo={logoMode === 'image' ? asset('/images/stasi-logo.svg') : undefined}
+              logoAlt="STASI — Ministerium Fur Staatssicherheit"
               logoContent={
                 logoMode === 'text' ? (
-                  <span className="text-xl font-black text-white">Komdigi</span>
+                  <span className="text-xl font-black text-white">STASI</span>
                 ) : undefined
               }
               menus={allMenus.slice(0, menuCount)}
@@ -201,17 +201,17 @@ export function FooterPage() {
             <>
               {`${ind}    `}
               <Mark>logo</Mark>
-              {'="/images/komdigi-logo.svg"\n'}
+              {'="/images/stasi-logo.svg"\n'}
               {`${ind}    `}
               <Mark>logoAlt</Mark>
-              {'="Komdigi"\n'}
+              {'="STASI"\n'}
             </>
           )}
           {logoMode === 'text' && (
             <>
               {`${ind}    `}
               <Mark>logoContent</Mark>
-              {'={<span className="text-xl font-black text-white">Komdigi</span>}\n'}
+              {'={<span className="text-xl font-black text-white">STASI</span>}\n'}
             </>
           )}
           {`${ind}    `}
@@ -225,8 +225,8 @@ export function FooterPage() {
               {`${ind}    `}
               <Mark>socials</Mark>
               {'={[\n'}
-              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/komdigi', icon: <Instagram /> },\n`}
-              {`${ind}        { label: 'X',         url: 'https://x.com/komdigi',         icon: <X /> },\n`}
+              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/stasi', icon: <Instagram /> },\n`}
+              {`${ind}        { label: 'X',         url: 'https://x.com/stasi',         icon: <X /> },\n`}
               {`${ind}        { label: 'Facebook',  url: '#',                            icon: <Facebook /> },\n`}
               {`${ind}    ]}\n`}
             </>
