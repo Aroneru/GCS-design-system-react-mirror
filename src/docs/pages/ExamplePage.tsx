@@ -5,9 +5,10 @@ import { Aurora, Magnetic, SplitWords, gsap, useGsap } from '../motion'
 import {
   KELAS_PANEL,
   KELAS_TIRAI,
+  ambilAsal,
   bukaKeAtas,
-  lupakanPulang,
-  pulangDariApp,
+  lupakanAsal,
+  tandaiAsal,
   titikTengah,
   tutupLalu,
 } from './example/transition'
@@ -25,15 +26,18 @@ export function ExamplePage() {
   const panel = useRef<HTMLDivElement>(null)
   const konten = useRef<HTMLDivElement>(null)
 
-  // Dibaca sekali pada render pertama lewat lazy initializer, bukan di dalam
-  // efek: panelnya harus sudah dirender dalam keadaan menutup pada cat pertama,
-  // kalau tidak isi halaman sempat berkedip sebelum sapuannya jalan. Pembacaan
-  // ini murni — penandanya dibersihkan di handler klik, bukan di sini — jadi
-  // aman meski StrictMode menjalankan initializer dua kali.
-  const [pulang] = useState(pulangDariApp)
+  // Dibaca saat render lewat lazy initializer, bukan di dalam efek: keadaan
+  // awal panel harus sudah benar pada cat pertama, kalau tidak isi halaman
+  // sempat berkedip sebelum sapuannya jalan. Initializer-nya murni, jadi aman
+  // meski StrictMode menjalankannya dua kali.
+  const [pulang] = useState(() => ambilAsal() === 'app')
 
   useLayoutEffect(() => {
     if (!pulang) return
+    // Dibersihkan di sini, setelah nilainya aman tersimpan di state: tanpa ini,
+    // pergi lalu kembali ke /example dalam satu sesi akan memutar ulang
+    // sapuannya padahal tidak ada tombol yang ditekan.
+    lupakanAsal()
     const ctx = gsap.context(() => bukaKeAtas(panel.current))
     return () => ctx.revert()
   }, [pulang])
@@ -88,7 +92,7 @@ export function ExamplePage() {
               <button
                 type="button"
                 onClick={(e) => {
-                  lupakanPulang()
+                  tandaiAsal('docs')
                   tutupLalu(tirai.current, konten.current, titikTengah(e.currentTarget), () =>
                     navigate('/example/app'),
                   )
