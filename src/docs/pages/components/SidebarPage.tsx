@@ -365,7 +365,7 @@ export function SidebarPage() {
 
         <div className="mb-4 grid gap-4 lg:grid-cols-2">
           <VariantPreview
-            title="1. Menu saja"
+            title="1. Menu Only"
             description="Navigasi dasar tanpa logo dan informasi akun."
           >
             <Sidebar items={menuOnlyItems} />
@@ -386,7 +386,7 @@ export function SidebarPage() {
           </VariantPreview>
 
           <VariantPreview
-            title="4. Multi-level menu + icon"
+            title="4. Multi-level menu + icon,user info, logo web"
             description="Menu berikon dikelompokkan; separator membedakan area konten."
           >
             <SidebarVariant groups={iconGroups} />
@@ -399,44 +399,6 @@ export function SidebarPage() {
             <SidebarVariant groups={iconGroups} collapsed />
           </VariantPreview>
         </div>
-
-        {/* <SectionCode>
-          {`import { Sidebar, type SidebarGroup } from '@tpl/design-kit-react'
-import { Cart, ChartPie, Clipboard, Inbox, Layers, Lock } from 'flowbite-react-icons/solid'
-
-const groups: SidebarGroup[] = [
-  {
-    id: 'main',
-    items: [
-      { label: 'Menu 1', href: '#', icon: <ChartPie /> },
-      { label: 'Menu 2', href: '#', icon: <Clipboard /> },
-      {
-        label: 'Menu 3',
-        icon: <Cart />,
-        defaultOpen: true,
-        children: [{ label: 'Sub - Menu 1', href: '#' }, { label: 'Sub - Menu 2', href: '#' }],
-      },
-      { label: 'Menu 4', href: '#', icon: <Inbox />, badge: 1 },
-      { label: 'Menu 5', href: '#', icon: <Lock /> },
-    ],
-  },
-  {
-    id: 'secondary',
-    separator: true,
-    items: [
-      { label: 'Menu 6', href: '#', icon: <Clipboard /> },
-      { label: 'Menu 7', href: '#', icon: <Layers /> },
-    ],
-  },
-]
-
-<Sidebar
-  logo={<Logo />}
-  collapsedLogo={<LogoMark />}
-  user={{ name: 'Nama User', profileLabel: 'Lihat Profil', href: '#' }}
-  groups={groups}
-/>`}
-        </SectionCode> */}
       </FlowSection>
 
       {/* ==================== MENU ==================== */}
