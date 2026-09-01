@@ -488,7 +488,7 @@ function CodeWindow() {
       tl.kill()
     }
   }, [
-    // index
+    index
     ])
     
   /*
