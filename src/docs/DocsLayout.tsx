@@ -74,18 +74,30 @@ function Logo({ small }: { small?: boolean }) {
 }
 
 /**
- * Panel navigasi samping di desktop, lengkap dengan cara masuknya.
+ * Panel navigasi samping di desktop, lengkap dengan cara masuk DAN keluarnya.
  *
- * Panel ini baru terpasang saat pengguna membuka area yang memang punya
- * sub-navigasi, jadi berpindah dari Beranda ke Components memunculkannya dari
- * nol. Kelas lebar sendiri tidak akan pernah beranimasi di saat itu: transisi
- * CSS butuh nilai berubah, sedangkan pada pemasangan pertama lebarnya langsung
- * bernilai akhir — kolom konten di sebelahnya melompat begitu saja.
+ * Panel ini selalu terpasang — juga di Beranda dan Example yang tidak punya
+ * sub-navigasi. Itu disengaja: kalau ia dilepas begitu areanya berganti, tidak
+ * ada lagi yang tersisa untuk dianimasikan dan panel sekadar hilang, sementara
+ * kolom konten di sebelahnya melompat melebar dalam satu frame. Yang berubah
+ * saat berpindah ke area tanpa panel hanyalah `open`, sehingga lebarnya menyusut
+ * ke nol lewat transisi yang sama dengan waktu ia membuka.
  *
- * `entered` yang menutup celah itu. Frame pertama digambar dengan lebar nol,
- * lalu satu frame berikutnya menyalakan lebar penuh — dan barulah transisi CSS
- * punya perubahan untuk dianimasikan. Setelah itu ia tinggal mengikuti `open`
- * seperti biasa.
+ * `entered` mengurus pemuatan pertama. Transisi CSS butuh nilai yang BERUBAH,
+ * sedangkan pada frame pertama lebar panel langsung bernilai akhir — tanpa ini
+ * halaman yang dibuka langsung di rute ber-panel tidak akan pernah beranimasi.
+ * Frame pertama digambar dengan lebar nol, frame berikutnya menyalakan lebar
+ * penuh, dan barulah ada perubahan untuk ditransisikan.
+ *
+ * `kept` mengurus isinya. Isi panel diturunkan dari area yang sedang dibuka,
+ * dan di Beranda tidak ada area yang bisa diturunkan sama sekali — kalau isinya
+ * ikut kosong seketika, yang menyusut cuma kotak putih. Karena itu panel
+ * mengingat area terakhir yang punya sub-navigasi dan tetap menampilkannya
+ * sepanjang animasi menutup. Yang diingat cukup NAMA areanya, bukan markup-nya:
+ * dari nama itu isinya bisa dirakit ulang, dan nilainya tetap sama di setiap
+ * render sehingga tidak memicu render berputar.
+ *
+ * `filled` yang melepas isi itu dari DOM, tepat setelah transisi lebarnya usai.
  *
  * Lebar memang bukan properti yang murah untuk dianimasikan, tapi di sini ia
  * tidak terhindarkan: kolom konten di sebelahnya harus ikut bergeser. Yang bisa
@@ -93,16 +105,28 @@ function Logo({ small }: { small?: boolean }) {
  * `SlideIn` lewat transform.
  */
 function SidebarPanel({
-  open,
   section,
-  children,
+  path,
+  expanded,
 }: {
-  open: boolean;
-  section: Section;
-  children: ReactNode;
+  /** Area yang sedang dibuka, atau null kalau area itu tak punya sub-navigasi. */
+  section: Section | null;
+  path: string;
+  /** Niat pengguna lewat tombol lipat di rail. */
+  expanded: boolean;
 }) {
   // Tanpa animasi, panel langsung berada di lebar akhirnya sejak frame pertama.
   const [entered, setEntered] = useState(() => prefersReducedMotion());
+  const open = section !== null && expanded;
+  const [filled, setFilled] = useState(open);
+
+  // Area terakhir yang sempat tampil, dipakai selama panel menutup. Ditahan pula
+  // supaya `SlideIn` tidak menganggap ini area baru dan memutar ulang animasi
+  // masuknya justru ketika panel sedang pergi.
+  const [kept, setKept] = useState(section);
+  // Perbandingan string, jadi setelah satu render ulang nilainya sudah sama dan
+  // cabang ini tidak bisa berputar — pola resmi menyelaraskan state dengan prop.
+  if (section !== null && section !== kept) setKept(section);
 
   useEffect(() => {
     if (entered) return;
@@ -113,19 +137,52 @@ function SidebarPanel({
     return () => cancelAnimationFrame(id);
   }, [entered]);
 
+  // Isi harus sudah terpasang di frame yang sama dengan lebar yang membuka,
+  // jadi ini disetel saat render — bukan lewat efek, yang selalu terlambat satu
+  // frame dan menyisakan panel kosong yang melebar lebih dulu.
+  if (open && !filled) setFilled(true);
+
   const shown = entered && open;
+  const body = kept ? sidebars[kept] : null;
 
   return (
     <aside
       className={`sticky top-0 z-20 hidden h-screen shrink-0 overflow-hidden bg-white transition-[width] duration-300 ease-out lg:block ${
         shown ? "w-[248px] border-r border-border" : "w-0"
       }`}
-      aria-hidden={!open}
+      // Panel yang sedang menutup masih punya tautan yang bisa difokus dengan
+      // Tab meski tak terlihat. `inert` menutup keduanya sekaligus: hilang dari
+      // urutan fokus sekaligus dari pembaca layar.
+      inert={!open}
+      onTransitionEnd={(e) => {
+        // Transisi warna dari tautan di dalamnya ikut menggelembung ke sini.
+        if (e.target === e.currentTarget && e.propertyName === "width" && !open) {
+          setFilled(false);
+        }
+      }}
     >
       {/* Lebar dikunci di dalam supaya isinya tidak ikut mengkerut saat panel menutup. */}
-      <SlideIn keyed={section} className="flex h-full w-[248px] flex-col overflow-y-auto px-5 py-7">
-        {children}
-      </SlideIn>
+      {filled && body && kept && (
+        <SlideIn keyed={kept} className="flex h-full w-[248px] flex-col overflow-y-auto px-5 py-7">
+          <p
+            data-slide-item
+            className="px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase"
+          >
+            {body.title}
+          </p>
+          <nav className="mt-2" aria-label={body.title}>
+            <NavLinks items={body.items} path={path} />
+          </nav>
+          <div data-slide-item className="mt-auto rounded-xl bg-gray-50 p-4">
+            <p className="text-xs font-bold text-gray-900">Foundation v1.0</p>
+            <p className="mt-1 text-xs leading-5 text-gray-500">
+              React · Vite
+              <br />
+              Tailwind CSS v4
+            </p>
+          </div>
+        </SlideIn>
+      )}
     </aside>
   );
 }
@@ -275,13 +332,20 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
               </a>
             ))}
           </nav>
-          {sidebar && (
-            <button
-              onClick={() => setSidebarOpen((v) => !v)}
-              className="mt-auto grid size-10 place-items-center rounded-xl text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700"
-              aria-expanded={sidebarOpen}
-              aria-label={sidebarOpen ? "Sembunyikan panel" : "Tampilkan panel"}
-            >
+          {/*
+            Tombolnya tetap dirender di area tanpa panel, hanya dipudarkan.
+            Melepasnya dari DOM membuat ia berkedip hilang seketika, tepat saat
+            panel di sebelahnya justru sedang menutup perlahan.
+          */}
+          <button
+            onClick={() => setSidebarOpen((v) => !v)}
+            className={`mt-auto grid size-10 place-items-center rounded-xl text-gray-400 transition-[opacity,transform,color,background-color] duration-300 hover:bg-gray-100 hover:text-gray-700 ${
+              sidebar ? "opacity-100" : "pointer-events-none scale-75 opacity-0"
+            }`}
+            aria-expanded={sidebarOpen}
+            aria-label={sidebarOpen ? "Sembunyikan panel" : "Tampilkan panel"}
+            inert={!sidebar}
+          >
               <svg
                 className={`size-5 transition-transform duration-300 ${sidebarOpen ? "" : "rotate-180"}`}
                 fill="none"
@@ -291,33 +355,17 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16v14H4V5Zm5.5 0v14" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 9.5 13.5 12l2.5 2.5" />
-              </svg>
-            </button>
-          )}
+            </svg>
+          </button>
         </aside>
 
         {/* ══ Sidebar drawer — desktop ══ */}
-        {sidebar && (
-          <SidebarPanel open={sidebarOpen} section={section}>
-              <p
-              data-slide-item
-              className="px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase"
-            >
-              {sidebar.title}
-            </p>
-            <nav className="mt-2" aria-label={sidebar.title}>
-              <NavLinks items={sidebar.items} path={path} />
-            </nav>
-            <div data-slide-item className="mt-auto rounded-xl bg-gray-50 p-4">
-              <p className="text-xs font-bold text-gray-900">Foundation v1.0</p>
-              <p className="mt-1 text-xs leading-5 text-gray-500">
-                React · Vite
-                <br />
-                Tailwind CSS v4
-              </p>
-            </div>
-          </SidebarPanel>
-        )}
+        {/*
+          Selalu dirender, juga di Beranda dan Example. Di sana `sidebar` kosong,
+          jadi `open` menjadi false dan panel MENUTUP dengan animasi alih-alih
+          lenyap seketika — lihat catatan di SidebarPanel.
+        */}
+        <SidebarPanel section={sidebar ? section : null} path={path} expanded={sidebarOpen} />
 
         {/* ══ Konten ══ */}
         {/* min-w-0: tabel & blok kode lebar menggulung sendiri, tidak melebarkan baris. */}

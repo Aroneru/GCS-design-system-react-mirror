@@ -436,8 +436,40 @@ function CodeWindow() {
     }
   }, [index])
 
+  /*
+   * Lampu menyala.
+   *
+   * Jendela ini gelap sepanjang waktu, lalu sesekali "terang" — fotonya muncul
+   * seketika di opacity 75%, bertahan sebentar, lalu padam lagi. Kemunculannya
+   * memakai `set`, bukan `to`: yang diminta memang saklar, bukan fade.
+   *
+   * Timeline-nya sengaja terpisah dari timeline mengetik di atas. Yang itu
+   * dibangun ulang tiap potongan kode berganti; kalau siklus lampu ikut menumpang
+   * di sana, ia ter-reset setiap giliran dan iramanya jadi terikat pada panjang
+   * potongan — bukan pada waktunya sendiri. Dependensi kosong membuatnya dibangun
+   * sekali seumur komponen.
+   *
+   * Satu kedipan per ~6 detik (0,17Hz), jauh di bawah ambang 3Hz yang memicu
+   * masalah fotosensitif. Jangan dipercepat sampai ke wilayah itu.
+   */
+  const shell = useGsap<HTMLDivElement>(({ q }) => {
+    const wowo = q('[data-wowo]')
+
+    const tl = gsap
+      .timeline({ repeat: -1, repeatDelay: 4.5, delay: 2 })
+      .set(wowo, { opacity: 0.75 })
+      // Penahan waktu: tidak ada yang dianimasikan, timeline-nya saja yang
+      // berjalan selama lampu menyala.
+      .to({}, { duration: 1.6 })
+      .set(wowo, { opacity: 0 })
+
+    return () => {
+      tl.kill()
+    }
+  }, [])
+
   return (
-    <div className="relative">
+    <div ref={shell} className="relative">
       {/*
         Ketinggian jendela dinyatakan lewat bayangan netral berlapis, bukan
         cahaya berwarna. Tiga lapis dengan jarak dan kelembutan yang menaik
@@ -450,7 +482,24 @@ function CodeWindow() {
         ref={ref}
         className="relative overflow-hidden rounded-2xl bg-gray-900 shadow-[0_2px_4px_rgb(17_24_39/0.06),0_12px_28px_rgb(17_24_39/0.12),0_36px_64px_rgb(17_24_39/0.16)] ring-1 ring-gray-900/10"
       >
-        <div className="flex items-center gap-3 bg-gray-800/70 px-4 py-3">
+        {/*
+          Latar jendela kode. Murni dekoratif — karena itu aria-hidden dan alt
+          kosong, biar tidak ikut dibacakan pembaca layar.
+
+          Berangkat dari `opacity-0`, bukan dari nilai akhirnya. Pada mode gerak
+          dikurangi seluruh setup GSAP dilewati, dan di sana justru itulah yang
+          benar: kedipan terang-gelap adalah persis jenis gerak yang diminta
+          untuk tidak dijalankan, jadi jendelanya tinggal gelap seperti biasa.
+        */}
+        <img
+          data-wowo
+          src={asset('/images/wowo.png')}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 size-full object-cover opacity-0 select-none"
+        />
+
+        <div className="relative z-10 flex items-center gap-3 bg-gray-800/70 px-4 py-3">
           <WindowDots />
           <span className="ml-1 inline-flex items-center gap-2 rounded-md bg-gray-900 px-3 py-1">
             <span className="font-mono text-[11px] font-black text-yellow-300">TSX</span>
@@ -458,7 +507,7 @@ function CodeWindow() {
           </span>
         </div>
 
-        <pre className="ds-scroll-x overflow-x-auto p-5 font-mono text-xs leading-6 text-gray-300 sm:p-6">
+        <pre className="ds-scroll-x relative z-10 overflow-x-auto p-5 font-mono text-xs leading-6 text-gray-300 sm:p-6">
           {/* Tinggi dikunci ke potongan terpanjang supaya jendela tidak berubah
               ukuran saat potongan berganti. */}
           <code
