@@ -12,7 +12,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../usulanKit'
-import { adaTanpa } from '../../usulanOptions'
+import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: SelectApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-500' },
@@ -89,7 +89,7 @@ export function SelectPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { Select } from '@tpl/design-kit-react'\n\n"}
+          {"import { Select } from '@stasi/design-kit-react'\n\n"}
           {'<Select\n'}
           {'    label="Label"\n'}
           {'    '}
@@ -231,7 +231,7 @@ export function SelectPage() {
               label="Tampilkan ikon info"
               value={withInfo}
               onChange={setWithInfo}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -240,7 +240,7 @@ export function SelectPage() {
               label="Tampilkan helper text"
               value={withHelper}
               onChange={setWithHelper}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>
@@ -258,7 +258,7 @@ export function SelectPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Select } from '@tpl/design-kit-react'\n\n"}
+          {"import { Select } from '@stasi/design-kit-react'\n\n"}
           {'<Select\n'}
           {state !== 'default' && (
             <>

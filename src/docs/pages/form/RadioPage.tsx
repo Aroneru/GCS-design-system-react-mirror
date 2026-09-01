@@ -12,7 +12,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../usulanKit'
-import { adaTanpa } from '../../usulanOptions'
+import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: RadioApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
@@ -77,7 +77,7 @@ export function RadioPage() {
           </div>
         </Demo>
         <SectionCode>
-          {"import { Radio } from '@tpl/design-kit-react'\n\n"}
+          {"import { Radio } from '@stasi/design-kit-react'\n\n"}
           {'{/* Sekelompok pilihan: samakan name-nya */}\n'}
           {'<Radio '}
           <H>name</H>
@@ -258,7 +258,7 @@ export function RadioPage() {
               label="Tampilkan caption"
               value={withCaption}
               onChange={setWithCaption}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>
@@ -275,7 +275,7 @@ export function RadioPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Radio } from '@tpl/design-kit-react'\n\n"}
+          {"import { Radio } from '@stasi/design-kit-react'\n\n"}
           {'<Radio\n'}
           {'    name="kewarganegaraan"\n'}
           {platform === 'mobile' && (

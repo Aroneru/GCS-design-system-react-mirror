@@ -12,7 +12,8 @@ import {
   UsulanPage,
   type TocEntry,
 } from "../../usulanKit";
-import { adaTanpa } from "../../usulanOptions";
+import { adaTidakAda } from "../../usulanOptions";
+import { asset } from "../../asset";
 
 /**
  * Susunan halaman: varian dulu sebagai gambaran utuh, lalu bagian per properti,
@@ -142,7 +143,7 @@ export function CardPage() {
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Default">
             <Card
-              image="/images/card-sample.svg"
+              image={asset("/images/card-sample.svg")}
               imageAlt=""
               title={cardTitle}
               description={cardDesc}
@@ -160,7 +161,7 @@ export function CardPage() {
 
           <Demo label="Tanpa tombol">
             <Card
-              image="/images/card-sample.svg"
+              image={asset("/images/card-sample.svg")}
               imageAlt=""
               title={cardTitle}
               description={cardDesc}
@@ -169,7 +170,7 @@ export function CardPage() {
 
           <Demo label="Dengan tautan">
             <Card
-              image="/images/card-sample.svg"
+              image={asset("/images/card-sample.svg")}
               imageAlt=""
               title={cardTitle}
               description={cardDesc}
@@ -180,7 +181,7 @@ export function CardPage() {
         </div>
 
         <SectionCode>
-          {"import { Card } from '@tpl/design-kit-react'\n\n"}
+          {"import { Card } from '@stasi/design-kit-react'\n\n"}
           {'<Card image="…" title="…" description="…" actions={<Button … />} />\n'}
           {'<Card             title="…" description="…" actions={<Button … />} />\n'}
           {'<Card image="…" title="…" description="…" />\n'}
@@ -199,7 +200,7 @@ export function CardPage() {
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Dengan gambar">
             <Card
-              image="/images/card-sample.svg"
+              image={asset("/images/card-sample.svg")}
               imageAlt="Suasana kerja tim"
               title={cardTitle}
               description={cardDesc}
@@ -231,7 +232,7 @@ export function CardPage() {
         <Demo>
           <Column>
             <Card
-              image="/images/card-sample.svg"
+              image={asset("/images/card-sample.svg")}
               imageAlt=""
               title={cardTitle}
               description={cardDesc}
@@ -260,7 +261,7 @@ export function CardPage() {
         <Demo>
           <Column>
             <Card
-              image="/images/card-sample.svg"
+              image={asset("/images/card-sample.svg")}
               imageAlt=""
               title={cardTitle}
               description={cardDesc}
@@ -291,7 +292,7 @@ export function CardPage() {
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Satu tombol">
             <Card
-              image="/images/card-sample.svg"
+              image={asset("/images/card-sample.svg")}
               imageAlt=""
               title={cardTitle}
               description={cardDesc}
@@ -300,7 +301,7 @@ export function CardPage() {
           </Demo>
           <Demo label="Dua tombol">
             <Card
-              image="/images/card-sample.svg"
+              image={asset("/images/card-sample.svg")}
               imageAlt=""
               title={cardTitle}
               description={cardDesc}
@@ -309,7 +310,7 @@ export function CardPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { Card, Button } from '@tpl/design-kit-react'\n\n"}
+          {"import { Card, Button } from '@stasi/design-kit-react'\n\n"}
           {"<Card\n"}
           {"    "}
           <Mark>actions</Mark>
@@ -341,7 +342,7 @@ export function CardPage() {
                   kolom {w}px
                 </p>
                 <Card
-                  image="/images/card-sample.svg"
+                  image={asset("/images/card-sample.svg")}
                   imageAlt=""
                   title={cardTitle}
                   description={cardDesc}
@@ -370,7 +371,7 @@ export function CardPage() {
 
         <Stage maxWidth={view === "mobile" ? "max-w-[238px]" : "max-w-[384px]"}>
           <Card
-            image={hasImage ? "/images/card-sample.svg" : undefined}
+            image={hasImage ? asset("/images/card-sample.svg") : undefined}
             imageAlt="Suasana kerja tim"
             title={cardTitle}
             description={cardDesc}
@@ -398,7 +399,7 @@ export function CardPage() {
               label="Tampilkan gambar"
               value={hasImage}
               onChange={setHasImage}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -424,7 +425,7 @@ export function CardPage() {
         <SectionCode flush>
           {"import { Card"}
           {withButton && ", Button"}
-          {" } from '@tpl/design-kit-react'\n\n"}
+          {" } from '@stasi/design-kit-react'\n\n"}
           {`{/* ${summary} */}\n`}
           {"{/* Kartu tidak punya prop ukuran — lebarnya mengikuti kolom\n"}
           {"    tempatnya berada. Yang berubah cuma kolomnya. */}\n"}

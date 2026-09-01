@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Messages } from "flowbite-react-icons/solid";
+import { Messages } from "../../../lib/icons/solid";
 import { Button, type ButtonTheme, type ButtonVariant } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Demo, H, Segmented } from "../../pageKit";
@@ -414,8 +414,8 @@ export function ButtonPage() {
           yang tampil di sini adalah kode yang siap diimplementasikan ke aplikasi.
         </p>
         <SectionCode flush>
-          {"import { Button } from '@tpl/design-kit-react'\n"}
-          {"import { Messages } from '@tpl/design-kit-react/icons/solid'\n"}
+          {"import { Button } from '@stasi/design-kit-react'\n"}
+          {"import { Messages } from '@stasi/design-kit-react/icons/solid'\n"}
           {"\n"}
           {"<Button\n"}
 

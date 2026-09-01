@@ -17,7 +17,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../usulanKit'
-import { adaTanpa } from '../../usulanOptions'
+import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: CheckboxApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
@@ -80,7 +80,7 @@ export function CheckboxPage() {
           </div>
         </Demo>
         <SectionCode>
-          {"import { Checkbox } from '@tpl/design-kit-react'\n\n"}
+          {"import { Checkbox } from '@stasi/design-kit-react'\n\n"}
           {'<Checkbox label="Saya menyetujui syarat" defaultChecked />\n\n'}
           {'{/* Inactive — teks meredup sekaligus nonaktif */}\n'}
           {'<Checkbox '}
@@ -241,7 +241,7 @@ export function CheckboxPage() {
               label="Tampilkan caption"
               value={withCaption}
               onChange={setWithCaption}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>
@@ -258,7 +258,7 @@ export function CheckboxPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Checkbox } from '@tpl/design-kit-react'\n\n"}
+          {"import { Checkbox } from '@stasi/design-kit-react'\n\n"}
           {'<Checkbox\n'}
           {platform === 'mobile' && (
             <>

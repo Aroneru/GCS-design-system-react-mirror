@@ -18,7 +18,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../../usulanKit'
-import { adaTanpa } from '../../../usulanOptions'
+import { adaTidakAda } from '../../../usulanOptions'
 
 const states: { value: FloatingLabelState; label: string; desc: string }[] = [
   { value: 'default', label: 'Default', desc: 'Field kosong — label duduk di dalam field sebagai placeholder.' },
@@ -109,8 +109,8 @@ export function FloatingLabelPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { FloatingLabel } from '@tpl/design-kit-react'\n"}
-          {"import { User } from '@tpl/design-kit-react/icons/solid'\n\n"}
+          {"import { FloatingLabel } from '@stasi/design-kit-react'\n"}
+          {"import { User } from '@stasi/design-kit-react/icons/solid'\n\n"}
           {'{/* Label naik sendiri saat difokus atau berisi */}\n'}
           {'<FloatingLabel\n'}
           {'    label="Nama lengkap"\n'}
@@ -244,7 +244,7 @@ export function FloatingLabelPage() {
               label="Tampilkan ikon kiri"
               value={withIcon}
               onChange={setWithIcon}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -253,7 +253,7 @@ export function FloatingLabelPage() {
               label="Tampilkan helper text"
               value={withHelper}
               onChange={setWithHelper}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -262,7 +262,7 @@ export function FloatingLabelPage() {
               label="Tampilkan tombol hapus"
               value={withClear}
               onChange={setWithClear}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>
@@ -280,8 +280,8 @@ export function FloatingLabelPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { FloatingLabel } from '@tpl/design-kit-react'\n"}
-          {withIcon && "import { User } from '@tpl/design-kit-react/icons/solid'\n"}
+          {"import { FloatingLabel } from '@stasi/design-kit-react'\n"}
+          {withIcon && "import { User } from '@stasi/design-kit-react/icons/solid'\n"}
           {'\n'}
           {'<FloatingLabel\n'}
           {platform === 'mobile' && (

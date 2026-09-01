@@ -362,7 +362,7 @@ export function ContainerPage() {
           </Container>
         </Ruang>
         <SectionCode>
-          {"import { Container } from '@tpl/design-kit-react'\n\n"}
+          {"import { Container } from '@stasi/design-kit-react'\n\n"}
           {"<Container>\n"}
           {"    <h1>Pendaftaran Penyelenggara Sistem Elektronik</h1>\n"}
           {"    <p>Lengkapi data pemohon dan sistem elektronik yang didaftarkan.</p>\n"}
@@ -567,7 +567,7 @@ export function ContainerPage() {
           ukuran.
         </Lead>
         <SectionCode flush>
-          {"import { Container } from '@tpl/design-kit-react'\n\n"}
+          {"import { Container } from '@stasi/design-kit-react'\n\n"}
 
           {/* Contoh 1 dirakit dari state playground + angka hasil pengukuran,
               jadi yang dibaca selalu kode untuk preview yang sedang terlihat. */}

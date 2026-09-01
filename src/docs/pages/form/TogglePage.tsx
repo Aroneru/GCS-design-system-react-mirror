@@ -12,7 +12,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../usulanKit'
-import { adaTanpa } from '../../usulanOptions'
+import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: ToggleApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
@@ -66,7 +66,7 @@ export function TogglePage() {
           </div>
         </Demo>
         <SectionCode>
-          {"import { Toggle } from '@tpl/design-kit-react'\n\n"}
+          {"import { Toggle } from '@stasi/design-kit-react'\n\n"}
           {'{/* Menyala sejak awal */}\n'}
           {'<Toggle label="Notifikasi email" defaultChecked />\n\n'}
           {'{/* Inactive — meredup sekaligus nonaktif */}\n'}
@@ -211,7 +211,7 @@ export function TogglePage() {
               label="Tampilkan caption"
               value={withCaption}
               onChange={setWithCaption}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>
@@ -228,7 +228,7 @@ export function TogglePage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Toggle } from '@tpl/design-kit-react'\n\n"}
+          {"import { Toggle } from '@stasi/design-kit-react'\n\n"}
           {'<Toggle\n'}
           {platform === 'mobile' && (
             <>

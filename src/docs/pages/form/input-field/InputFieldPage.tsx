@@ -18,7 +18,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../../usulanKit'
-import { adaTanpa } from '../../../usulanOptions'
+import { adaTidakAda } from '../../../usulanOptions'
 
 const states: { value: InputFieldState; label: string; desc: string }[] = [
   { value: 'default', label: 'Default', desc: 'Belum disentuh — garis abu-abu netral.' },
@@ -96,8 +96,8 @@ export function InputFieldPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { InputField } from '@tpl/design-kit-react'\n"}
-          {"import { User } from '@tpl/design-kit-react/icons/solid'\n\n"}
+          {"import { InputField } from '@stasi/design-kit-react'\n"}
+          {"import { User } from '@stasi/design-kit-react/icons/solid'\n\n"}
           {'<InputField\n'}
           {'    label="Nama lengkap"\n'}
           {'    placeholder="Masukkan nama lengkap"\n'}
@@ -231,7 +231,7 @@ export function InputFieldPage() {
               label="Tampilkan ikon kiri"
               value={withIcon}
               onChange={setWithIcon}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -240,7 +240,7 @@ export function InputFieldPage() {
               label="Tampilkan helper text"
               value={withHelper}
               onChange={setWithHelper}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -251,7 +251,7 @@ export function InputFieldPage() {
               value={withClear}
               onChange={setWithClear}
               disabled={state === 'inactive'}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>
@@ -269,8 +269,8 @@ export function InputFieldPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { InputField } from '@tpl/design-kit-react'\n"}
-          {withIcon && "import { User } from '@tpl/design-kit-react/icons/solid'\n"}
+          {"import { InputField } from '@stasi/design-kit-react'\n"}
+          {withIcon && "import { User } from '@stasi/design-kit-react/icons/solid'\n"}
           {'\n'}
           {'<InputField\n'}
           {platform === 'mobile' && (

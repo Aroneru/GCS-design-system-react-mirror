@@ -22,7 +22,7 @@ const sizeOptions = [
 
 const backgroundOptions = [
   { value: "with", label: "Ada" },
-  { value: "without", label: "Tanpa" },
+  { value: "without", label: "Tidak ada" },
 ];
 
 const menuOptions = [
@@ -211,7 +211,7 @@ export function BreadcrumbPage() {
         </p>
 
         <SectionCode flush>
-          {"import { Breadcrumb } from '@tpl/design-kit-react'\n"}
+          {"import { Breadcrumb } from '@stasi/design-kit-react'\n"}
           {"\n"}
           {"const items = [\n"}
 

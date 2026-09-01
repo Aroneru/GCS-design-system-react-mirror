@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Messages } from 'flowbite-react-icons/outline'
-import { Alert, type AlertSurface, type AlertVariant } from '../../../lib'
+import { Messages } from '../../../lib/icons/outline'
+import { Alert, type AlertVariant } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Segmented } from '../../pageKit'
 import {
@@ -13,7 +13,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../usulanKit'
-import { adaTanpa } from '../../usulanOptions'
+import { adaTidakAda } from '../../usulanOptions'
 
 /**
  * Warna tombol aksi mengikuti "ink" dari variant Alert yang sama — ditulis di
@@ -51,7 +51,6 @@ function AksiButton({ variant }: { variant: AlertVariant }) {
 
 const alertProps: PropRow[] = [
   ['variant', "'success' | 'danger' | 'warning' | 'info' | 'purple'", 'info', 'Warna semantik pesan.'],
-  ['surface', "'soft' | 'outline'", 'soft', 'soft: latar bertinta. outline: latar putih + garis warna variant.'],
   ['heading', 'ReactNode', 'undefined', 'Judul singkat di baris pertama.'],
   ['icon', 'ReactNode | false', 'undefined', 'Ikon kiri kustom. false menyembunyikannya, kosong memakai bawaan variant.'],
   ['dismissible', 'boolean', 'true', 'Menampilkan tombol tutup (×) di kanan atas.'],
@@ -64,7 +63,6 @@ const alertProps: PropRow[] = [
 
 const toc: TocEntry[] = [
   { id: 'alert', label: 'Alert' },
-  { id: 'surface', label: 'Surface' },
   { id: 'opsional', label: 'Elemen opsional' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
@@ -73,7 +71,6 @@ const toc: TocEntry[] = [
 
 export function AlertPage() {
   const [variant, setVariant] = useState<AlertVariant>('success')
-  const [surface, setSurface] = useState<AlertSurface>('soft')
   const [lebar, setLebar] = useState<'mobile' | 'desktop'>('desktop')
   const [pakaiIkon, setPakaiIkon] = useState(true)
   const [pakaiTutup, setPakaiTutup] = useState(true)
@@ -86,7 +83,7 @@ export function AlertPage() {
     <UsulanPage
       eyebrow="Components"
       title="Alert"
-      description="Menyampaikan pesan status — sukses, error, peringatan, atau informasi — tepat di dalam alur halaman. Lima variant warna, dua gaya permukaan, dan elemen yang sepenuhnya opsional."
+      description="Menyampaikan pesan status — sukses, error, peringatan, atau informasi — tepat di dalam alur halaman. Lima variant warna dengan elemen yang sepenuhnya opsional."
       toc={toc}
     >
       <FlowSection id="alert" title="Alert">
@@ -107,7 +104,7 @@ export function AlertPage() {
           ))}
         </div>
         <SectionCode>
-          {"import { Alert } from '@tpl/design-kit-react'\n\n"}
+          {"import { Alert } from '@stasi/design-kit-react'\n\n"}
           {'<Alert\n'}
           {'    '}
           <H>variant</H>
@@ -117,38 +114,6 @@ export function AlertPage() {
           {'>\n'}
           {'    Ini merupakan Design system Stasi berupa component alert.\n'}
           {'</Alert>'}
-        </SectionCode>
-      </FlowSection>
-
-      <FlowSection id="surface" title="Surface">
-        <Lead>
-          Gaya <H>soft</H> (bawaan) memakai latar bertinta untuk penekanan lebih kuat. Gaya <H>outline</H>{' '}
-          memakai latar putih dengan garis tipis — cocok untuk halaman yang sudah padat warna.
-        </Lead>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Demo label="soft">
-            <Alert variant="info" heading="Ini adalah Alert" actions={<AksiButton variant="info" />}>
-              {isiAlert}
-            </Alert>
-          </Demo>
-          <Demo label="outline">
-            <Alert
-              variant="info"
-              surface="outline"
-              heading="Ini adalah Alert"
-              actions={<AksiButton variant="info" />}
-            >
-              {isiAlert}
-            </Alert>
-          </Demo>
-        </div>
-        <SectionCode>
-          {'{/* soft (bawaan): latar bertinta, tanpa garis */}\n'}
-          {'<Alert variant="info" heading="Ini adalah Alert">…</Alert>\n\n'}
-          {'{/* outline: latar putih, garis warna variant, shadow-soft */}\n'}
-          {'<Alert variant="info" '}
-          <H>surface</H>
-          {'="outline" heading="Ini adalah Alert">…</Alert>'}
         </SectionCode>
       </FlowSection>
 
@@ -204,7 +169,6 @@ export function AlertPage() {
           <Alert
             key={tayangan}
             variant={variant}
-            surface={surface}
             heading="Ini adalah Alert"
             icon={pakaiIkon ? undefined : false}
             dismissible={pakaiTutup}
@@ -226,18 +190,6 @@ export function AlertPage() {
             />
           </Control>
 
-          <Control label="Surface">
-            <Segmented
-              label="Pilih surface"
-              value={surface}
-              onChange={setSurface}
-              options={[
-                { value: 'soft', label: 'Soft' },
-                { value: 'outline', label: 'Outline' },
-              ]}
-            />
-          </Control>
-
           <Control label="Lebar">
             <Segmented
               label="Pilih lebar alert"
@@ -255,7 +207,7 @@ export function AlertPage() {
               label="Tampilkan icon kiri"
               value={pakaiIkon}
               onChange={setPakaiIkon}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -264,7 +216,7 @@ export function AlertPage() {
               label="Tampilkan tombol tutup"
               value={pakaiTutup}
               onChange={setPakaiTutup}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
 
@@ -273,7 +225,7 @@ export function AlertPage() {
               label="Tampilkan tombol aksi"
               value={pakaiAksi}
               onChange={setPakaiAksi}
-              options={adaTanpa}
+              options={adaTidakAda}
             />
           </Control>
         </Controls>
@@ -299,20 +251,13 @@ export function AlertPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Alert } from '@tpl/design-kit-react'\n\n"}
+          {"import { Alert } from '@stasi/design-kit-react'\n\n"}
           {'<Alert\n'}
           {variant !== 'info' && (
             <>
               {'    '}
               <H>variant</H>
               {`="${variant}"\n`}
-            </>
-          )}
-          {surface !== 'soft' && (
-            <>
-              {'    '}
-              <H>surface</H>
-              {'="outline"\n'}
             </>
           )}
           {'    heading="Ini adalah Alert"\n'}

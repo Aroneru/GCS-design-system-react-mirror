@@ -1,7 +1,7 @@
 import { useState, type ComponentType } from 'react'
 // Diimpor lewat modul milik library sendiri (bukan langsung dari
 // flowbite-react-icons) supaya dokumentasi memakai jalur yang sama dengan
-// yang dianjurkan ke consumer: @tpl/design-kit-react/icons/*.
+// yang dianjurkan ke consumer: @stasi/design-kit-react/icons/*.
 import * as OutlineIcons from '../../../lib/icons/outline'
 import * as SolidIcons from '../../../lib/icons/solid'
 import { brandIcons } from '../../../lib/brandIconRegistry'
@@ -91,7 +91,7 @@ export function IconsPage() {
     <UsulanPage
       eyebrow="Foundations · Icons"
       title="Icons"
-      description="Seluruh ikon diekspor ulang oleh design kit — solid untuk status & penekanan, outline untuk aksi & navigasi, plus logo brand untuk tautan sosial. Impor selalu lewat @tpl/design-kit-react agar sumber ikon terkendali di satu tempat. Ikon mewarisi warna teks (currentColor)."
+      description="Seluruh ikon diekspor ulang oleh design kit — solid untuk status & penekanan, outline untuk aksi & navigasi, plus logo brand untuk tautan sosial. Impor selalu lewat @stasi/design-kit-react agar sumber ikon terkendali di satu tempat. Ikon mewarisi warna teks (currentColor)."
       toc={toc}
     >
       {/*
@@ -125,7 +125,7 @@ export function IconsPage() {
           <FlowbiteGrid entries={solidEntries} q={q} />
         </article>
 
-        <SectionCode>{`import { Bell } from '@tpl/design-kit-react/icons/solid'
+        <SectionCode>{`import { Bell } from '@stasi/design-kit-react/icons/solid'
 
 <Bell className="size-5 text-primary-600" />`}</SectionCode>
       </FlowSection>
@@ -137,7 +137,7 @@ export function IconsPage() {
           <FlowbiteGrid entries={outlineEntries} q={q} />
         </article>
 
-        <SectionCode>{`import { Home, Search } from '@tpl/design-kit-react/icons/outline'
+        <SectionCode>{`import { Home, Search } from '@stasi/design-kit-react/icons/outline'
 
 <Home className="size-5 text-gray-700" />
 <Search className="size-4 text-gray-500" />`}</SectionCode>
@@ -147,14 +147,14 @@ export function IconsPage() {
         <Lead>
           Logo sosial dan teknologi untuk footer, tautan berbagi, dan halaman login — satu-satunya tempat
           logo brand ditampilkan. Berbeda dari solid &amp; outline, logo brand ada di barrel utama{' '}
-          <C>@tpl/design-kit-react</C> karena namanya tidak bertabrakan.
+          <C>@stasi/design-kit-react</C> karena namanya tidak bertabrakan.
         </Lead>
 
         <article className="ds-card p-5 sm:p-7">
           <BrandGrid q={q} />
         </article>
 
-        <SectionCode>{`import { Github, Instagram, ReactLogo } from '@tpl/design-kit-react'
+        <SectionCode>{`import { Github, Instagram, ReactLogo } from '@stasi/design-kit-react'
 
 <Github className="size-5" />
 <Instagram className="size-5 text-purple-600" />
@@ -179,9 +179,9 @@ export function IconsPage() {
               </thead>
               <tbody className="divide-y divide-border">
                 {[
-                  ['Solid', '@tpl/design-kit-react/icons/solid'],
-                  ['Outline', '@tpl/design-kit-react/icons/outline'],
-                  ['Logo brand', '@tpl/design-kit-react'],
+                  ['Solid', '@stasi/design-kit-react/icons/solid'],
+                  ['Outline', '@stasi/design-kit-react/icons/outline'],
+                  ['Logo brand', '@stasi/design-kit-react'],
                 ].map(([set, path]) => (
                   <tr key={set}>
                     <td className="px-5 py-3 font-bold text-gray-900">{set}</td>

@@ -13,9 +13,6 @@ import { Icon } from './Icon'
 /** Lima warna semantik, sama maknanya dengan Badge dan token warna lain. */
 export type AlertVariant = 'success' | 'danger' | 'warning' | 'info' | 'purple'
 
-/** `soft` memakai latar bertinta; `outline` memakai latar putih + garis. */
-export type AlertSurface = 'soft' | 'outline'
-
 /**
  * Tiap variant punya satu warna "ink" yang dipakai konsisten untuk ikon,
  * heading, dan tombol tutup — hanya body text yang sedikit lebih muda,
@@ -23,39 +20,34 @@ export type AlertSurface = 'soft' | 'outline'
  */
 const variants: Record<
   AlertVariant,
-  { bg: string; border: string; ink: string; body: string; icon: ComponentType<{ className?: string }> }
+  { bg: string; ink: string; body: string; icon: ComponentType<{ className?: string }> }
 > = {
   success: {
     bg: 'bg-green-50',
-    border: 'border-green-300',
     ink: 'text-green-800',
     body: 'text-green-700',
     icon: CheckCircle,
   },
   danger: {
     bg: 'bg-red-50',
-    border: 'border-red-300',
     ink: 'text-red-800',
     body: 'text-red-700',
     icon: CloseCircle,
   },
   warning: {
     bg: 'bg-yellow-50',
-    border: 'border-yellow-300',
     ink: 'text-yellow-800',
     body: 'text-yellow-700',
     icon: ExclamationCircle,
   },
   info: {
     bg: 'bg-primary-50',
-    border: 'border-primary-300',
     ink: 'text-primary-800',
     body: 'text-primary-700',
     icon: InfoCircle,
   },
   purple: {
     bg: 'bg-purple-50',
-    border: 'border-purple-300',
     ink: 'text-purple-800',
     body: 'text-purple-700',
     icon: InfoCircle,
@@ -64,7 +56,6 @@ const variants: Record<
 
 export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
   variant?: AlertVariant
-  surface?: AlertSurface
   /** Judul singkat di baris pertama. */
   heading?: ReactNode
   /** Ikon kiri kustom. `false` menyembunyikannya, kosong memakai bawaan variant. */
@@ -89,7 +80,6 @@ export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
 export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   {
     variant = 'info',
-    surface = 'soft',
     heading,
     icon,
     dismissible = true,
@@ -121,7 +111,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
       className={cn(
         'rounded-lg p-4 transition-opacity duration-200 sm:p-5',
         visible ? 'opacity-100' : 'opacity-0',
-        surface === 'outline' ? cn('border bg-surface shadow-soft', v.border) : v.bg,
+        v.bg,
         className,
       )}
       {...props}
