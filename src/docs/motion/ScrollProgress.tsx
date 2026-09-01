@@ -29,7 +29,10 @@ export function ScrollProgress() {
     >
       <div
         ref={ref}
-        className="ds-progress h-full bg-gradient-to-r from-primary-500 via-primary-600 to-purple-500"
+        // Warna rata, bukan gradien: garisnya cuma 3px, jadi gradien apa pun
+        // tidak akan terbaca sebagai gradien — yang tersisa hanya rona yang
+        // berubah-ubah tanpa alasan.
+        className="ds-progress h-full bg-primary-600"
       />
     </div>
   )
