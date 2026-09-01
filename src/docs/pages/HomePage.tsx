@@ -153,6 +153,35 @@ export function FormPermohonan() {
 /* ---------- Jendela kode di hero ---------- */
 
 /**
+ * Saklar easter egg — foto latar jendela kode beserta tombol suaranya.
+ *
+ * MATI DI PRODUKSI, dan itu keputusan sadar: isinya memakai potret dan potongan
+ * suara tokoh publik, yang tidak layak ikut terbit di situs dokumentasi resmi.
+ * Ini lelucon untuk yang mengerjakan, bukan untuk yang memakai.
+ *
+ * Dikendalikan `VITE_EASTER_EGG` di berkas .env, dan sengaja berupa OPT-IN:
+ * hanya teks `'true'` yang menyalakan, apa pun selain itu — termasuk variabelnya
+ * yang tidak diisi sama sekali — berarti mati. Default aman tidak boleh
+ * bergantung pada seseorang yang ingat mematikannya sebelum deploy.
+ *
+ * Perbandingannya dengan STRING, bukan dengan nilai kebenaran. Variabel Vite
+ * selalu bertipe string, jadi `if (import.meta.env.VITE_EASTER_EGG)` akan
+ * bernilai benar bahkan saat isinya `'false'` — string tak kosong selalu truthy.
+ *
+ * Vite mengganti pembacaannya dengan literal saat build, jadi seluruh cabang di
+ * bawahnya ikut dibuang bundler — bukan sekadar disembunyikan lewat CSS,
+ * melainkan benar-benar tidak ada di berkas yang terbit.
+ *
+ * CATATAN — yang dimatikan hanya kodenya. Berkas asetnya tinggal di `public/`,
+ * dan Vite menyalin seluruh isi folder itu ke `dist/` tanpa peduli ada yang
+ * merujuknya atau tidak. Jadi foto dan klip suaranya tetap ikut terbit dan tetap
+ * bisa dibuka siapa pun yang tahu URL-nya; yang hilang cuma tautannya dari
+ * halaman. Kalau suatu saat itu tidak lagi bisa diterima, berkasnya yang harus
+ * keluar dari `public/` — bukan cuma tombolnya yang disembunyikan.
+ */
+const EASTER_EGG = import.meta.env.VITE_EASTER_EGG === 'true'
+
+/**
  * Easter egg: klip suara di balik tombol pengeras suara di title bar jendela.
  *
  * Diputar bergantian, bukan acak. Acak berarti klip yang sama bisa keluar dua
@@ -488,7 +517,7 @@ function CodeWindow() {
       tl.kill()
     }
   }, [
-    index
+    // index
     ])
     
   /*
@@ -514,6 +543,11 @@ function CodeWindow() {
    * masalah fotosensitif. Jangan dipercepat sampai ke wilayah itu.
    */
   const shell = useGsap<HTMLDivElement>(({ q }) => {
+    // Di produksi fotonya tidak dirender sama sekali, jadi tidak ada yang perlu
+    // dikedipkan. Keluar lebih awal supaya tidak ada timeline tak terhingga yang
+    // berjalan terus tanpa satu pun target.
+    if (!EASTER_EGG) return
+
     const wowo = q('[data-wowo]')
 
     // Semuanya `set`, tidak satu pun `to`. Kedipan lampu rusak tidak punya
@@ -644,13 +678,15 @@ function CodeWindow() {
           benar: kedipan terang-gelap adalah persis jenis gerak yang diminta
           untuk tidak dijalankan, jadi jendelanya tinggal gelap seperti biasa.
         */}
-        {/* <img
-          data-wowo
-          src={asset('/images/87dabbda5bfc01063ce53720723e862b59576b383d1895913e03148d029525d264ebd1461d74ae3e29a50f303ef8a910.png')}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 size-full object-cover opacity-0 select-none"
-        /> */}
+        {EASTER_EGG && (
+          <img
+            data-wowo
+            src={asset('/images/87dabbda5bfc01063ce53720723e862b59576b383d1895913e03148d029525d264ebd1461d74ae3e29a50f303ef8a910.png')}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-0 size-full object-cover opacity-0 select-none"
+          />
+        )}
 
         <div className="relative z-10 flex items-center gap-3 bg-gray-800/70 px-4 py-3">
           <WindowDots />
@@ -666,35 +702,46 @@ function CodeWindow() {
             Tetap sebuah <button> sungguhan: bisa dicapai dengan Tab, punya nama
             yang dibacakan, dan cincin fokusnya membuatnya muncul sepenuhnya.
           */}
-          <button
-            type="button"
-            onClick={toggleEgg}
-            aria-pressed={playing}
-            aria-label={playing ? 'Hentikan suara' : `Putar suara: ${EGG_CLIPS[clip].label}`}
-            title={playing ? 'Hentikan' : EGG_CLIPS[clip].label}
-            className={`ml-auto grid size-7 shrink-0 place-items-center rounded-md text-gray-400 transition-[opacity,color,background-color] duration-300 group-hover/window:opacity-100 hover:bg-gray-700/60 hover:text-yellow-300 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none ${
-              playing ? 'text-yellow-300 opacity-100' : 'opacity-15'
-            }`}
-          >
-            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 9H4v6h2.5L11 19V5Z" />
-              {playing ? (
-                <>
-                  <path strokeLinecap="round" d="M14.5 9.5c1.2 1.4 1.2 3.6 0 5" />
-                  <path strokeLinecap="round" d="M17.5 7c2.4 2.6 2.4 7.4 0 10" />
-                </>
-              ) : (
-                <path strokeLinecap="round" d="M14.5 9.5c1.2 1.4 1.2 3.6 0 5" />
-              )}
-            </svg>
-          </button>
+          {EASTER_EGG && (
+            <>
+              <button
+                type="button"
+                onClick={toggleEgg}
+                aria-pressed={playing}
+                aria-label={playing ? 'Hentikan suara' : `Putar suara: ${EGG_CLIPS[clip].label}`}
+                title={playing ? 'Hentikan' : EGG_CLIPS[clip].label}
+                className={`ml-auto grid size-7 shrink-0 place-items-center rounded-md text-gray-400 transition-[opacity,color,background-color] duration-300 group-hover/window:opacity-100 hover:bg-gray-700/60 hover:text-yellow-300 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none ${
+                  playing ? 'text-yellow-300 opacity-100' : 'opacity-15'
+                }`}
+              >
+                <svg
+                  className="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 9H4v6h2.5L11 19V5Z" />
+                  {playing ? (
+                    <>
+                      <path strokeLinecap="round" d="M14.5 9.5c1.2 1.4 1.2 3.6 0 5" />
+                      <path strokeLinecap="round" d="M17.5 7c2.4 2.6 2.4 7.4 0 10" />
+                    </>
+                  ) : (
+                    <path strokeLinecap="round" d="M14.5 9.5c1.2 1.4 1.2 3.6 0 5" />
+                  )}
+                </svg>
+              </button>
 
-          {/*
-            `preload="none"`: berkasnya tidak pernah diunduh sampai ada yang
-            benar-benar menekan tombolnya. Easter egg tidak layak menambah beban
-            unduhan halaman beranda bagi orang yang tak pernah menemukannya.
-          */}
-          <audio ref={audio} preload="none" onEnded={stopEgg} />
+              {/*
+                `preload="none"`: berkasnya tidak pernah diunduh sampai ada yang
+                benar-benar menekan tombolnya. Easter egg tidak layak menambah
+                beban unduhan beranda bagi orang yang tak pernah menemukannya.
+              */}
+              <audio ref={audio} preload="none" onEnded={stopEgg} />
+            </>
+          )}
         </div>
 
         <pre className="ds-scroll-x relative z-10 overflow-x-auto p-5 font-mono text-xs leading-6 text-gray-300 sm:p-6">
