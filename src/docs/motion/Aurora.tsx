@@ -57,19 +57,26 @@ export function Aurora() {
       {/* DEPTH 0 — kisi latar, paling jauh dan paling diam */}
       <div data-depth="0" className="ds-grid absolute inset-[-20%]" />
 
-      {/* DEPTH 1 — gumpalan cahaya atmosferik */}
+      {/*
+        DEPTH 1 — gumpalan cahaya atmosferik.
+
+        Satu rona saja, diambil dari tangga primary. Mencampur biru dengan ungu
+        menghasilkan pelangi latar yang tidak dimiliki merek ini dan menarik
+        perhatian ke tempat yang tidak ada isinya; menahannya di satu keluarga
+        warna membuat latar terbaca sebagai cahaya, bukan sebagai hiasan.
+      */}
       <div data-depth="1" className="absolute inset-[-30%]">
         <div
           data-blob
-          className="absolute top-[6%] left-[2%] size-[34rem] rounded-full bg-primary-300/45 blur-[110px]"
+          className="absolute top-[6%] left-[2%] size-[34rem] rounded-full bg-primary-200/40 blur-[110px]"
         />
         <div
           data-blob
-          className="absolute right-[4%] bottom-[2%] size-[30rem] rounded-full bg-purple-300/45 blur-[120px]"
+          className="absolute right-[4%] bottom-[2%] size-[30rem] rounded-full bg-primary-100/50 blur-[120px]"
         />
         <div
           data-blob
-          className="absolute top-[38%] left-[46%] size-[22rem] rounded-full bg-primary-200/50 blur-[90px]"
+          className="absolute top-[38%] left-[46%] size-[22rem] rounded-full bg-primary-50/60 blur-[90px]"
         />
       </div>
 

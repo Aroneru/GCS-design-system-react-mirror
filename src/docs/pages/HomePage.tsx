@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 // Footer tidak diimpor: DocsLayout sudah memasangnya untuk seluruh halaman.
 import { Badge, Button, Card, Checkbox, Container, InputField, Toggle } from '../../lib'
 import * as OutlineIcons from '../../lib/icons/outline'
@@ -7,7 +7,6 @@ import { brandIcons } from '../../lib/brandIconRegistry'
 import { sidebars } from '../navigation'
 import { asset } from '../asset'
 import { DocUsage } from '../DocUsage'
-import { G, H } from '../pageKit'
 import { useCopy } from '../useCopy'
 import {
   Aurora,
@@ -76,11 +75,11 @@ const features: Feature[] = [
     title: 'Aksesibilitas bawaan',
     desc: 'Dibangun di atas elemen HTML asli, lengkap dengan label, aria-invalid, dan fokus yang terlihat — tanpa perlu ditambahkan ulang di setiap halaman.',
   },
-  {
-    icon: 'M4 7h16M4 12h16M4 17h10',
-    title: 'Sejalan dengan Figma',
-    desc: 'Setiap halaman menyebut angka aslinya — 52px, 380px, 1126px — sehingga desainer dan developer membaca spesifikasi yang sama.',
-  },
+  // {
+  //   icon: 'M4 7h16M4 12h16M4 17h10',
+  //   title: 'Sejalan dengan Figma',
+  //   desc: 'Setiap halaman menyebut angka aslinya — 52px, 380px, 1126px — sehingga desainer dan developer membaca spesifikasi yang sama.',
+  // },
 ]
 
 /* ---------- Bagian yang bisa dijelajahi ---------- */
@@ -112,16 +111,46 @@ const sections: { route: string; name: string; desc: string; badge: string }[] =
   },
 ]
 
-/* ---------- Jendela kode di hero ---------- */
+/* ---------- Tiga langkah pemasangan ---------- */
 
-/**
- * Warna nama prop di dalam jendela kode. H (biru) dan G (hijau) diambil dari
- * pageKit; yang kurang hanya satu warna lagi untuk memisahkan nama prop dari
- * nilainya.
- */
-const A = ({ children }: { children: ReactNode }) => (
-  <span className="text-purple-300">{children}</span>
-)
+const steps: { title: string; desc: string; label?: string; code: string }[] = [
+  {
+    title: 'Pasang package-nya',
+    desc: 'Satu dependensi. React dan Tailwind v4 sudah ada di proyekmu sebagai peer.',
+    label: 'Terminal',
+    code: INSTALL,
+  },
+  {
+    title: 'Sambungkan stylesheet-nya',
+    desc: 'Sekali saja di stylesheet utama. Baris @source yang membuat Tailwind ikut memindai berkas package.',
+    label: 'CSS',
+    code: `/* Sekali saja, di stylesheet utama proyek */
+@import '@stasi/design-kit-react/styles.css';
+
+/* Tailwind v4 perlu memindai berkas package agar
+   utility yang dipakai komponen ikut ter-generate */
+@source '../node_modules/@stasi/design-kit-react/dist/**/*.js';`,
+  },
+  {
+    title: 'Impor komponennya',
+    desc: 'Tidak ada provider yang perlu dibungkus dan tidak ada konfigurasi tambahan.',
+    code: `import { Button, Badge, InputField } from '@stasi/design-kit-react'
+
+export function FormPermohonan() {
+  return (
+    <form className="space-y-4">
+      <InputField label="Nama lengkap" placeholder="Masukkan nama lengkap" />
+      <div className="flex items-center gap-3">
+        <Button variant="filled">Simpan</Button>
+        <Badge variant="success">Draf tersimpan</Badge>
+      </div>
+    </form>
+  )
+}`,
+  },
+]
+
+/* ---------- Jendela kode di hero ---------- */
 
 /** Titik-titik ala jendela macOS. */
 const WindowDots = () => (
@@ -133,108 +162,381 @@ const WindowDots = () => (
 )
 
 /**
- * Jendela kode yang barisnya muncul berurutan dari bawah, seperti sedang
- * diketik — lalu diam. Tiap `<span data-line>` adalah satu baris logis; itulah
- * satuan yang di-stagger.
+ * Potongan kode di jendela hero, dinyatakan sebagai data alih-alih markup.
+ *
+ * Bentuk ini yang membuat efek mengetik mungkin: animasinya perlu tahu ada
+ * berapa karakter di tiap baris agar bisa mengungkap — dan menarik kembali —
+ * teksnya per karakter. Kalau potongan ini ditulis sebagai JSX bersarang,
+ * jumlah itu hanya bisa didapat dengan membaca DOM, dan menghapus karakter
+ * berarti membongkar node.
+ *
+ * `cls` kosong berarti warna teks bawaan jendela.
+ */
+type Token = { t: string; cls?: string }
+
+const KEY = 'text-primary-300'
+const STR = 'text-green-300'
+const PROP = 'text-purple-300'
+
+type Snippet = { file: string; lines: Token[][] }
+
+/**
+ * Kalimat pembuka yang tetap di setiap potongan.
+ *
+ * Bagian inilah yang menyampaikan janji halamannya — tulis sekali, pakai di mana
+ * saja, token Foundations langsung jadi utility Tailwind. Yang berganti-ganti di
+ * bawahnya hanya komponen contohnya; pembukanya justru harus tinggal supaya tiap
+ * giliran tetap punya konteks, bukan sekadar potongan JSX lepas.
+ */
+const PREAMBLE: Token[][] = [
+  [
+    { t: '<h3>', cls: KEY },
+    { t: 'Tulis sekali. Pakai di mana saja.' },
+    { t: '</h3>', cls: KEY },
+  ],
+  [
+    { t: '<p ', cls: KEY },
+    { t: 'className', cls: PROP },
+    { t: '=' },
+    { t: '"text-body-sm text-gray-500"', cls: STR },
+    { t: '>', cls: KEY },
+  ],
+  [{ t: '  Token Foundations → Tailwind v4' }],
+  [{ t: '</p>', cls: KEY }],
+  [],
+]
+
+/**
+ * Lima potongan yang diputar bergantian di jendela hero.
+ *
+ * Urutannya selang-seling antara komponen tampilan dan elemen form — Select,
+ * Button, InputField, Card, Checkbox — supaya yang lewat di layar terbaca
+ * sebagai satu design kit yang lengkap, bukan sebagai satu komponen yang
+ * ditulis lima cara.
+ *
+ * Nama berkasnya ikut berganti tiap giliran. Pergantiannya jatuh persis saat
+ * jendela sedang kosong, jadi terbaca seperti membuka berkas berikutnya.
+ *
+ * Tiap `lines` di sini hanya bagian komponennya; pembukanya disambungkan di
+ * bawah supaya tidak perlu ditulis ulang lima kali.
+ */
+const SNIPPETS: Snippet[] = [
+  {
+    file: 'pilih-aplikasi.tsx',
+    lines: [
+      [{ t: '<Select', cls: KEY }],
+      [{ t: '  ' }, { t: 'label', cls: PROP }, { t: '=' }, { t: '"Pilih aplikasi"', cls: STR }],
+      [
+        { t: '  ' },
+        { t: 'options', cls: PROP },
+        { t: '={[' },
+        { t: "'default'", cls: STR },
+        { t: ', ' },
+        { t: "'simaya'", cls: STR },
+        { t: ']}' },
+      ],
+      [{ t: '/>', cls: KEY }],
+    ],
+  },
+  {
+    file: 'aksi-permohonan.tsx',
+    lines: [
+      [
+        { t: '<Button ', cls: KEY },
+        { t: 'variant', cls: PROP },
+        { t: '=' },
+        { t: '"filled"', cls: STR },
+        { t: '>', cls: KEY },
+        { t: 'Simpan' },
+        { t: '</Button>', cls: KEY },
+      ],
+      [
+        { t: '<Badge ', cls: KEY },
+        { t: 'variant', cls: PROP },
+        { t: '=' },
+        { t: '"success"', cls: STR },
+        { t: '>', cls: KEY },
+        { t: 'Tersimpan' },
+        { t: '</Badge>', cls: KEY },
+      ],
+    ],
+  },
+  {
+    file: 'data-pemohon.tsx',
+    lines: [
+      [{ t: '<InputField', cls: KEY }],
+      [{ t: '  ' }, { t: 'label', cls: PROP }, { t: '=' }, { t: '"Nama lengkap"', cls: STR }],
+      [
+        { t: '  ' },
+        { t: 'placeholder', cls: PROP },
+        { t: '=' },
+        { t: '"Masukkan nama lengkap"', cls: STR },
+      ],
+      [{ t: '/>', cls: KEY }],
+    ],
+  },
+  {
+    file: 'ringkasan-layanan.tsx',
+    lines: [
+      [{ t: '<Card', cls: KEY }],
+      [{ t: '  ' }, { t: 'title', cls: PROP }, { t: '=' }, { t: '"Kartu ringkas"', cls: STR }],
+      [
+        { t: '  ' },
+        { t: 'description', cls: PROP },
+        { t: '=' },
+        { t: '"Judul dan deskripsi opsional."', cls: STR },
+      ],
+      [{ t: '/>', cls: KEY }],
+    ],
+  },
+  {
+    file: 'preferensi-notifikasi.tsx',
+    lines: [
+      [{ t: '<Checkbox', cls: KEY }],
+      [
+        { t: '  ' },
+        { t: 'label', cls: PROP },
+        { t: '=' },
+        { t: '"Kirim salinan ke email"', cls: STR },
+      ],
+      [{ t: '  ' }, { t: 'defaultChecked', cls: PROP }],
+      [{ t: '/>', cls: KEY }],
+      [
+        { t: '<Toggle ', cls: KEY },
+        { t: 'label', cls: PROP },
+        { t: '=' },
+        { t: '"Notifikasi"', cls: STR },
+        { t: ' />', cls: KEY },
+      ],
+    ],
+  },
+].map((s) => ({ ...s, lines: [...PREAMBLE, ...s.lines] }))
+
+/**
+ * Panjang tiap baris dalam karakter, posisi awal baris itu di seluruh potongan,
+ * dan totalnya — dihitung sekali di muka untuk tiap potongan, karena animasinya
+ * membacanya puluhan kali per detik.
+ */
+const METRICS = SNIPPETS.map(({ lines }) => {
+  const len = lines.map((line) => line.reduce((n, tok) => n + tok.t.length, 0))
+  const start = len.reduce<number[]>(
+    (acc, _l, i) => [...acc, (acc[i - 1] ?? 0) + (len[i - 1] ?? 0)],
+    [],
+  )
+  return { len, start, total: len.reduce((a, b) => a + b, 0) }
+})
+
+/**
+ * Jumlah baris potongan terpanjang. Tinggi area kode dikunci ke angka ini,
+ * kalau tidak jendelanya akan mengerut dan memuai tiap kali potongan berganti —
+ * dan seluruh hero ikut bergeser bersamanya.
+ */
+const MAX_LINES = Math.max(...SNIPPETS.map((s) => s.lines.length))
+
+/** Tinggi satu baris, dipakai bersama oleh kelas `leading-6` dan posisi kursor. */
+const LINE_HEIGHT_REM = 1.5
+
+/** Karakter per detik saat mengetik. Durasi diturunkan dari sini supaya potongan
+ *  yang lebih panjang tidak terasa lebih cepat diketik. */
+const TYPE_SPEED = 26
+
+/**
+ * Jendela kode yang mengetik sendiri isinya, menghapusnya, lalu berpindah ke
+ * potongan berikutnya — terus berputar.
+ *
+ * Yang dianimasikan bukan isi DOM melainkan LEBAR tiap baris, dalam satuan `ch`.
+ * Karena fontnya monospace, satu `ch` persis selebar satu karakter, jadi lebar
+ * `n * 1ch` memotong baris tepat setelah karakter ke-n. Artinya seluruh teks
+ * potongan yang aktif sudah ada di DOM sejak awal — tidak ada node yang dibuat
+ * atau dibuang per karakter — dan menghapus hanya berarti menyusutkan lebar
+ * kembali.
+ *
+ * Konsekuensinya, yang terbaca pembaca layar selalu potongan kode yang lengkap,
+ * bukan teks separuh jadi yang berubah-ubah.
+ *
+ * Perputarannya digerakkan oleh `index`: timeline satu giliran diakhiri dengan
+ * menaikkan index, yang membuat `useGsap` membangun timeline berikutnya untuk
+ * potongan berikutnya. Karena itu tidak ada timeline tak terhingga yang harus
+ * dijaga tetap sinkron dengan React — tiap giliran adalah timeline pendek yang
+ * berdiri sendiri.
+ *
+ * Tanpa animasi (mode gerak dikurangi) tidak ada lebar yang pernah ditulis, jadi
+ * tiap baris memakai lebarnya sendiri dan potongan pertama tampil utuh.
  */
 function CodeWindow() {
-  const ref = useGsap<HTMLDivElement>(({ q }) => {
-    gsap.from(q('[data-line]'), {
-      opacity: 0,
-      y: 12,
-      duration: 0.5,
-      ease: 'power2.out',
-      stagger: 0.09,
-      delay: 0.45,
-    })
+  const [index, setIndex] = useState(0)
+  const snippet = SNIPPETS[index]
+  const metrics = METRICS[index]
 
-    // Kursor berkedip baru dinyalakan setelah baris terakhir mendarat, supaya
-    // tidak terlihat berkedip di ruang kosong lebih dulu.
+  // Hanya giliran pertama yang menunggu; sesudahnya potongan berikutnya langsung
+  // menyusul supaya jeda antarpotongan tidak terasa seperti animasi tersendat.
+  const firstRun = useRef(true)
+
+  const ref = useGsap<HTMLDivElement>(({ q }) => {
+    const lineEls = q('[data-line]')
+    const caret = q('[data-caret]')[0]
+    const counter = { n: 0 }
+
+    const draw = () => {
+      const n = counter.n
+      let caretLine = 0
+      let caretCol = 0
+
+      lineEls.forEach((line, i) => {
+        const visible = Math.min(Math.max(n - metrics.start[i], 0), metrics.len[i])
+        line.style.width = `${visible}ch`
+
+        // Kursor duduk di baris terakhir yang sudah tersentuh. Baris kosong ikut
+        // tersentuh pada offset yang sama dengan baris sesudahnya, jadi baris
+        // berikutnya menimpanya dan kursor tidak pernah tertinggal di ruang kosong.
+        if (n >= metrics.start[i]) {
+          caretLine = i
+          caretCol = visible
+        }
+      })
+
+      caret.style.transform = `translate(${caretCol}ch, ${caretLine * LINE_HEIGHT_REM}rem)`
+    }
+
+    // Digambar sekali sebelum timeline mulai. Tanpa ini, selama `delay` di bawah
+    // belum ada satu pun lebar yang tertulis, jadi tiap baris memakai lebar
+    // aslinya — kode utuh berkedip muncul lebih dulu, lalu hilang begitu frame
+    // pertama animasi menimpanya.
+    draw()
+
+    const tl = gsap
+      .timeline({ delay: firstRun.current ? 0.5 : 0.25 })
+      .to(counter, {
+        n: metrics.total,
+        duration: metrics.total / TYPE_SPEED,
+        ease: 'none',
+        onUpdate: draw,
+      })
+      .to(counter, { duration: 1.8 })
+      // Menghapus selalu lebih cepat daripada mengetik, dan makin cepat di
+      // akhir — itu yang membuatnya terbaca sebagai backspace ditahan, bukan
+      // sebagai animasi yang diputar mundur.
+      .to(counter, { n: 0, duration: 0.7, ease: 'power2.in', onUpdate: draw })
+      .call(() => {
+        firstRun.current = false
+        setIndex((i) => (i + 1) % SNIPPETS.length)
+      })
+
+    // `fromTo`, bukan `to`: kursor berangkat dari `opacity-0` di markup supaya
+    // pada mode gerak dikurangi — ketika seluruh setup ini dilewati — ia tidak
+    // tertinggal diam di pojok kiri atas menutupi karakter pertama.
     gsap.fromTo(
-      q('[data-caret]'),
-      { opacity: 0 },
-      { opacity: 1, duration: 0.45, repeat: -1, yoyo: true, delay: 1.5, ease: 'steps(1)' },
+      caret,
+      { opacity: 1 },
+      { opacity: 0, duration: 0.5, repeat: -1, yoyo: true, ease: 'steps(1)' },
     )
+
+    return () => {
+      tl.kill()
+    }
+  }, [index])
+
+  /*
+   * Lampu menyala.
+   *
+   * Jendela ini gelap sepanjang waktu, lalu sesekali "terang" — fotonya muncul
+   * seketika di opacity 75%, bertahan sebentar, lalu padam lagi. Kemunculannya
+   * memakai `set`, bukan `to`: yang diminta memang saklar, bukan fade.
+   *
+   * Timeline-nya sengaja terpisah dari timeline mengetik di atas. Yang itu
+   * dibangun ulang tiap potongan kode berganti; kalau siklus lampu ikut menumpang
+   * di sana, ia ter-reset setiap giliran dan iramanya jadi terikat pada panjang
+   * potongan — bukan pada waktunya sendiri. Dependensi kosong membuatnya dibangun
+   * sekali seumur komponen.
+   *
+   * Satu kedipan per ~6 detik (0,17Hz), jauh di bawah ambang 3Hz yang memicu
+   * masalah fotosensitif. Jangan dipercepat sampai ke wilayah itu.
+   */
+  const shell = useGsap<HTMLDivElement>(({ q }) => {
+    const wowo = q('[data-wowo]')
+
+    const tl = gsap
+      .timeline({ repeat: -1, repeatDelay: 4.5, delay: 2 })
+      .set(wowo, { opacity: 0.75 })
+      // Penahan waktu: tidak ada yang dianimasikan, timeline-nya saja yang
+      // berjalan selama lampu menyala.
+      .to({}, { duration: 1.6 })
+      .set(wowo, { opacity: 0 })
+
+    return () => {
+      tl.kill()
+    }
   }, [])
 
   return (
-    <div className="relative">
+    <div ref={shell} className="relative">
       {/*
-        Cahaya ungu di belakang jendela. Ditaruh sebelum jendelanya di DOM,
-        bukan dengan z-index negatif: keduanya sama-sama diposisikan, jadi
-        urutan DOM yang menentukan mana yang di bawah — sedangkan z negatif
-        justru akan menenggelamkannya di balik latar section.
+        Ketinggian jendela dinyatakan lewat bayangan netral berlapis, bukan
+        cahaya berwarna. Tiga lapis dengan jarak dan kelembutan yang menaik
+        meniru cara benda nyata menahan bayangan: satu garis rapat di bawah
+        tepinya, satu sedang, satu luas dan samar. Warnanya diambil dari keluarga
+        yang sama dengan --shadow-soft di tokens.css (gray-900), jadi ia sekadar
+        gelap — bukan aksen tersendiri yang ikut bersaing dengan isi halaman.
       */}
       <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-primary-400/50 via-purple-500/60 to-purple-700/70 blur-3xl sm:-inset-10"
-      />
-
-      <div
         ref={ref}
-        className="relative overflow-hidden rounded-2xl bg-gray-900 shadow-2xl ring-1 ring-white/10"
+        className="relative overflow-hidden rounded-2xl bg-gray-900 shadow-[0_2px_4px_rgb(17_24_39/0.06),0_12px_28px_rgb(17_24_39/0.12),0_36px_64px_rgb(17_24_39/0.16)] ring-1 ring-gray-900/10"
       >
-        <div className="flex items-center gap-3 bg-gray-800/70 px-4 py-3">
+        {/*
+          Latar jendela kode. Murni dekoratif — karena itu aria-hidden dan alt
+          kosong, biar tidak ikut dibacakan pembaca layar.
+
+          Berangkat dari `opacity-0`, bukan dari nilai akhirnya. Pada mode gerak
+          dikurangi seluruh setup GSAP dilewati, dan di sana justru itulah yang
+          benar: kedipan terang-gelap adalah persis jenis gerak yang diminta
+          untuk tidak dijalankan, jadi jendelanya tinggal gelap seperti biasa.
+        */}
+        <img
+          data-wowo
+          src={asset('/images/wowo.png')}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 size-full object-cover opacity-0 select-none"
+        />
+
+        <div className="relative z-10 flex items-center gap-3 bg-gray-800/70 px-4 py-3">
           <WindowDots />
           <span className="ml-1 inline-flex items-center gap-2 rounded-md bg-gray-900 px-3 py-1">
             <span className="font-mono text-[11px] font-black text-yellow-300">TSX</span>
-            <span className="text-xs font-bold text-gray-200">beranda.tsx</span>
+            <span className="text-xs font-bold text-gray-200">{snippet.file}</span>
           </span>
         </div>
 
-        <pre className="ds-scroll-x overflow-x-auto p-5 font-mono text-xs leading-6 text-gray-300 sm:p-6">
-          <code>
-            <span data-line className="inline-block">
-              <H>{'<h3>'}</H>
-              Tulis sekali. Pakai di mana saja.
-              <H>{'</h3>'}</H>
-            </span>
-            {'\n'}
-            <span data-line className="inline-block">
-              <H>{'<p '}</H>
-              <A>className</A>
-              {'='}
-              <G>{'"text-body-sm text-gray-500"'}</G>
-              <H>{'>'}</H>
-            </span>
-            {'\n'}
-            <span data-line className="inline-block">
-              {'  Token Foundations → Tailwind v4'}
-            </span>
-            {'\n'}
-            <span data-line className="inline-block">
-              <H>{'</p>'}</H>
-            </span>
-            {'\n\n'}
-            <span data-line className="inline-block">
-              <H>{'<Select'}</H>
-            </span>
-            {'\n'}
-            <span data-line className="inline-block">
-              {'  '}
-              <A>label</A>
-              {'='}
-              <G>{'"Pilih aplikasi"'}</G>
-            </span>
-            {'\n'}
-            <span data-line className="inline-block">
-              {'  '}
-              <A>options</A>
-              {'={['}
-              <G>{"'default'"}</G>
-              {', '}
-              <G>{"'simaya'"}</G>
-              {']}'}
-            </span>
-            {'\n'}
-            <span data-line className="inline-block">
-              <H>{'/>'}</H>
-              <span
-                data-caret
-                aria-hidden="true"
-                className="ml-1 inline-block h-[1.1em] w-[0.5em] translate-y-[0.15em] bg-primary-300"
-              />
-            </span>
+        <pre className="ds-scroll-x relative z-10 overflow-x-auto p-5 font-mono text-xs leading-6 text-gray-300 sm:p-6">
+          {/* Tinggi dikunci ke potongan terpanjang supaya jendela tidak berubah
+              ukuran saat potongan berganti. */}
+          <code
+            className="relative block"
+            style={{ height: `${MAX_LINES * LINE_HEIGHT_REM}rem` }}
+          >
+            {snippet.lines.map((line, i) => (
+              // Tinggi baris dikunci di pembungkus luar supaya baris kosong dan
+              // baris yang lebarnya sedang nol tetap menahan ruangnya.
+              <span key={i} className="block h-6">
+                <span data-line className="inline-block overflow-hidden align-top whitespace-pre">
+                  {line.map((tok, j) => (
+                    <span key={j} className={tok.cls}>
+                      {tok.t}
+                    </span>
+                  ))}
+                </span>
+              </span>
+            ))}
+
+            {/*
+              Kursor dipisah dari alur teks dan digeser dengan transform: satu
+              elemen yang berpindah, bukan satu per baris yang saling dinyalakan.
+            */}
+            <span
+              data-caret
+              aria-hidden="true"
+              className="absolute top-[0.2em] left-0 inline-block h-[1.05em] w-[0.5ch] bg-primary-300 opacity-0"
+            />
           </code>
         </pre>
       </div>
@@ -313,25 +615,30 @@ function SectionTitle({
   )
 }
 
-/** Kotak demo kecil: satu komponen hidup + tautan ke halaman detailnya. */
+/**
+ * Kotak demo kecil: satu komponen hidup + tautan ke halaman detailnya.
+ *
+ * `span` menerima kelas rentang kolom, bukan boolean. Kelima kotak ini mengisi
+ * kisi enam kolom dengan lebar yang berbeda-beda — komponen yang butuh ruang
+ * lebih (Input Field, Card) mendapat setengah baris — jadi "lebar" di sini
+ * bukan satu keadaan menyala/mati.
+ */
 function ShowcaseTile({
   name,
   route,
-  span,
+  span = '',
   children,
 }: {
   name: string
   route: string
-  span?: boolean
+  span?: string
   children: ReactNode
 }) {
   return (
     <SpotlightCard
       as="a"
       href={`#${route}`}
-      className={`ds-card group flex flex-col gap-4 p-5 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg ${
-        span ? 'sm:col-span-2' : ''
-      }`}
+      className={`ds-card group flex flex-col gap-4 p-5 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg ${span}`}
     >
       <div className="flex min-h-[92px] flex-wrap items-center gap-3 rounded-xl bg-surface-subtle p-4">
         {children}
@@ -366,9 +673,19 @@ function StatsRow() {
   }, [])
 
   return (
-    <dl ref={ref} className="grid grid-cols-2 gap-6 lg:grid-cols-4">
+    // Pembatas vertikal hanya muncul saat keempatnya benar-benar sebaris.
+    // Di bawah lg mereka terbungkus jadi dua baris, dan garis vertikal di situ
+    // akan menunjuk hubungan antarkolom yang sudah tidak ada lagi.
+    <dl
+      ref={ref}
+      className="grid grid-cols-2 gap-x-6 gap-y-8 lg:grid-cols-4 lg:gap-y-0 lg:divide-x lg:divide-border"
+    >
       {stats.map((s) => (
-        <div key={s.label} data-stat className="group relative">
+        <div
+          key={s.label}
+          data-stat
+          className="group relative lg:px-8 lg:first:pl-0 lg:last:pr-0"
+        >
           <dd className="text-heading-2 font-black tracking-tight text-primary-700">
             <CountUp value={s.value} />
           </dd>
@@ -398,26 +715,26 @@ export function HomePage() {
         <Aurora />
 
         {/*
-          Lencana STASI sebagai cap air di tepi kanan hero. Dekoratif penuh dan
+          Lencana STASI sebagai cap air di ujung kanan hero. Dekoratif penuh dan
           sengaja sangat samar — kehadirannya membangun kedalaman, bukan menuntut
-          dibaca. Hanya muncul dari lebar xl ke atas, di bawah itu ia bertabrakan
+          dibaca. Hanya muncul dari lebar xl ke atas; di bawah itu ia bertabrakan
           dengan jendela kode.
         */}
         <img
           src={asset('/stasi.svg')}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -top-16 -right-40 hidden w-[38rem] opacity-[0.03] xl:block"
+          className="pointer-events-none absolute -top-16 -right-40 hidden w-[38rem] opacity-[0.035] xl:block"
         />
 
         <Container padded={false} className="relative">
           <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:gap-16">
             <div>
-              <Reveal stagger className="flex flex-wrap items-center gap-2">
+              {/* <Reveal stagger className="flex flex-wrap items-center gap-2">
                 <Badge variant="brand">React · Vite</Badge>
                 <Badge variant="gray">Tailwind CSS v4</Badge>
                 <Badge variant="success">v0.1.0</Badge>
-              </Reveal>
+              </Reveal> */}
 
               <SplitWords
                 as="h1"
@@ -480,37 +797,64 @@ export function HomePage() {
         </Container>
       </section>
 
-      {/* ══ Rancang sekali ══ */}
-      <Container className="py-12 lg:py-16">
-        <SectionTitle center eyebrow="Prinsip" title="Rancang sekali, pakai di mana saja">
-          Empat keputusan yang membuat design kit ini tetap konsisten saat dipakai banyak tim
-          sekaligus.
-        </SectionTitle>
+      {/*
+        ══ Rancang sekali ══
 
-        <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((f) => (
-            <SpotlightCard
-              key={f.title}
-              as="article"
-              className="ds-card p-6 transition-transform duration-300 hover:-translate-y-1"
-            >
-              <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary-50 text-primary-700">
-                <svg
-                  className="size-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d={f.icon} />
-                </svg>
-              </span>
-              <h3 className="mt-4 text-heading-4 font-black text-gray-900">{f.title}</h3>
-              <p className="mt-2 text-body-sm leading-6 text-gray-500">{f.desc}</p>
-            </SpotlightCard>
-          ))}
-        </Reveal>
+        Empat kartu seukuran berjajar membuat keempat prinsip terbaca sama
+        penting dan sama sepintas — mata menyapunya tanpa berhenti. Di sini
+        judulnya dipindah ke kolom kiri yang menempel selama digulir, dan
+        prinsipnya turun menjadi daftar bernomor: satu kolom baca, urutan yang
+        jelas, dan ruang yang cukup untuk paragraf penjelasnya benar-benar
+        dibaca.
+      */}
+      <Container className="py-14 lg:py-20">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-16">
+          {/* `self-start` wajib: tanpa itu kolom ini meregang setinggi baris
+              grid, dan elemen setinggi kontainernya tidak pernah bisa lengket. */}
+          <div className="lg:sticky lg:top-12 lg:self-start">
+            <SectionTitle eyebrow="Prinsip" title="Rancang sekali, pakai di mana saja">
+              Empat keputusan yang membuat design kit ini tetap konsisten saat dipakai banyak tim
+              sekaligus.
+            </SectionTitle>
+          </div>
+
+          <Reveal stagger as="ol" className="border-t border-border">
+            {features.map((f, i) => (
+              <li
+                key={f.title}
+                className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 border-b border-border py-7"
+              >
+                <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary-50 text-primary-700">
+                  <svg
+                    className="size-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d={f.icon} />
+                  </svg>
+                </span>
+
+                <div>
+                  <div className="flex items-baseline gap-3">
+                    {/* Nomor urut murni penanda visual — urutannya sudah dibawa
+                        oleh <ol>, jadi menyuarakannya lagi hanya mengulang. */}
+                    <span
+                      aria-hidden="true"
+                      className="font-mono text-xs font-black text-primary-400"
+                    >
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <h3 className="text-heading-4 font-black text-gray-900">{f.title}</h3>
+                  </div>
+                  <p className="mt-2 max-w-2xl text-body-sm leading-6 text-gray-500">{f.desc}</p>
+                </div>
+              </li>
+            ))}
+          </Reveal>
+        </div>
       </Container>
 
       {/* ══ Komponen hidup ══ */}
@@ -522,8 +866,15 @@ export function HomePage() {
             persis dengan yang akan kamu impor. Klik untuk membuka playground-nya.
           </SectionTitle>
 
-          <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <ShowcaseTile name="Button" route="/components/button">
+          {/*
+            Enam kolom, bukan tiga. Dengan tiga kolom, lima kotak menyisakan satu
+            sel menganga di ujung baris kedua — lubang yang terbaca sebagai
+            kesalahan tata letak, bukan sebagai ruang. Pembagian 2+2+2 lalu 3+3
+            mengisi dua baris itu tepat, sekaligus memberi Input Field dan Card
+            lebar yang memang mereka butuhkan.
+          */}
+          <Reveal stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
+            <ShowcaseTile name="Button" route="/components/button" span="lg:col-span-2">
               <Button variant="filled" size="s">
                 Simpan
               </Button>
@@ -532,21 +883,25 @@ export function HomePage() {
               </Button>
             </ShowcaseTile>
 
-            <ShowcaseTile name="Badge" route="/components/badge">
+            <ShowcaseTile name="Badge" route="/components/badge" span="lg:col-span-2">
               <Badge variant="success">Aktif</Badge>
               <Badge variant="warning">Menunggu</Badge>
               <Badge variant="danger">Ditolak</Badge>
               <Badge variant="gray">Draf</Badge>
             </ShowcaseTile>
 
-            <ShowcaseTile name="Checkbox & Toggle" route="/form/checkbox">
+            <ShowcaseTile name="Checkbox & Toggle" route="/form/checkbox" span="lg:col-span-2">
               <div className="space-y-3">
                 <Checkbox label="Kirim salinan ke email" defaultChecked />
                 <Toggle label="Notifikasi permohonan" defaultChecked />
               </div>
             </ShowcaseTile>
 
-            <ShowcaseTile name="Input Field" route="/form/input-field/input" span>
+            <ShowcaseTile
+              name="Input Field"
+              route="/form/input-field/input"
+              span="sm:col-span-2 lg:col-span-3"
+            >
               <div className="w-full max-w-sm">
                 <InputField
                   label="Nama lengkap"
@@ -556,7 +911,7 @@ export function HomePage() {
               </div>
             </ShowcaseTile>
 
-            <ShowcaseTile name="Card" route="/components/card">
+            <ShowcaseTile name="Card" route="/components/card" span="sm:col-span-2 lg:col-span-3">
               <div className="w-full">
                 <Card
                   title="Kartu ringkas"
@@ -568,53 +923,40 @@ export function HomePage() {
         </Container>
       </section>
 
-      {/* ══ Mulai cepat ══ */}
-      <Container className="py-12 lg:py-16">
+      {/*
+        ══ Mulai cepat ══
+
+        Sebelumnya tiga blok kode ditumpuk tanpa penanda apa pun, sehingga
+        urutannya harus disimpulkan sendiri dari isinya. Sekarang ketiganya
+        menjadi langkah bernomor pada satu garis vertikal: nomornya menyatakan
+        urutan, judulnya menyatakan tujuan tiap langkah, dan garisnya menyatakan
+        bahwa ketiganya satu rangkaian yang dikerjakan sekali di awal.
+      */}
+      <Container className="py-14 lg:py-20">
         <SectionTitle eyebrow="Mulai cepat" title="Tiga baris untuk komponen pertama">
           Pasang package-nya, sambungkan stylesheet-nya sekali di proyek, lalu impor komponen yang
           dibutuhkan dan pakai seperti elemen React biasa. Tidak ada provider atau konfigurasi
           tambahan.
         </SectionTitle>
 
-        <Reveal>
-          <DocUsage flush label="Terminal" code={INSTALL} />
-        </Reveal>
+        <ol className="relative ml-4 border-l border-border pl-8 sm:ml-5 sm:pl-10">
+          {steps.map((step, i) => (
+            <Reveal as="li" key={step.title} className="relative pb-10 last:pb-0">
+              {/* Bulatan nomor duduk tepat di atas garis: setengah lebarnya
+                  ditarik ke kiri dari tepi konten, ditambah 1px tebal garisnya. */}
+              <span
+                aria-hidden="true"
+                className="absolute top-0 -left-[calc(2rem+1rem+0.5px)] inline-flex size-8 items-center justify-center rounded-full border border-border bg-surface font-mono text-xs font-black text-primary-700 sm:-left-[calc(2.5rem+1rem+0.5px)]"
+              >
+                {i + 1}
+              </span>
 
-        <Reveal>
-          <div className="mt-5">
-            <DocUsage
-              flush
-              label="CSS"
-              code={`/* Sekali saja, di stylesheet utama proyek */
-@import '@stasi/design-kit-react/styles.css';
-
-/* Tailwind v4 perlu memindai berkas package agar
-   utility yang dipakai komponen ikut ter-generate */
-@source '../node_modules/@stasi/design-kit-react/dist/**/*.js';`}
-            />
-          </div>
-        </Reveal>
-
-        <Reveal>
-          <div className="mt-5">
-            <DocUsage
-              flush
-              code={`import { Button, Badge, InputField } from '@stasi/design-kit-react'
-
-export function FormPermohonan() {
-  return (
-    <form className="space-y-4">
-      <InputField label="Nama lengkap" placeholder="Masukkan nama lengkap" />
-      <div className="flex items-center gap-3">
-        <Button variant="filled">Simpan</Button>
-        <Badge variant="success">Draf tersimpan</Badge>
-      </div>
-    </form>
-  )
-}`}
-            />
-          </div>
-        </Reveal>
+              <h3 className="text-heading-4 font-black text-gray-900">{step.title}</h3>
+              <p className="mt-1 mb-4 text-body-sm leading-6 text-gray-500">{step.desc}</p>
+              <DocUsage flush label={step.label} code={step.code} />
+            </Reveal>
+          ))}
+        </ol>
       </Container>
 
       {/* ══ Jelajahi ══ */}
