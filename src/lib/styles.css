@@ -1,11 +1,11 @@
 /*
- * Entry stylesheet @tpl/design-kit-react.
- * Consumer cukup: import '@tpl/design-kit-react/styles.css'
+ * Entry stylesheet @stasi/design-kit-react.
+ * Consumer cukup: import '@stasi/design-kit-react/styles.css'
  *
  * CATATAN untuk consumer memakai Tailwind v4:
  * Supaya class utility yang dipakai komponen ikut ter-generate, scan file
  * package ini di CSS Tailwind kamu:
- *   @source '../node_modules/@tpl/design-kit-react/dist/**\/*.js';
+ *   @source '../node_modules/@stasi/design-kit-react/dist/**\/*.js';
  */
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,400&display=swap');
 @import 'tailwindcss';
