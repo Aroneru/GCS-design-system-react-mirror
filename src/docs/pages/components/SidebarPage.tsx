@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { ChartPie, Clipboard, Inbox, Layers, Lock } from "flowbite-react-icons/solid";
-import { Sidebar } from "../../../lib";
+import { type ReactNode, useState } from "react";
+import { ChartPie, Clipboard, Inbox, Layers, Lock, Cart } from "flowbite-react-icons/solid";
+import { Sidebar, type SidebarGroup, type SidebarItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { H, Segmented } from "../../pageKit";
 import {
@@ -14,39 +14,71 @@ import {
 } from "../../usulanKit";
 
 type CollapseOption = "expanded" | "collapsed";
-type ProfileOption = "show" | "hide";
 type BadgeOption = "show" | "hide";
+type MenuIconOption = "show" | "hide";
+type SeparatorOption = "show" | "hide";
+type VisibilityOption = "show" | "hide";
 
 const collapseOptions = [
   { value: "expanded", label: "Expanded" },
   { value: "collapsed", label: "Collapsed" },
 ];
 
-const profileOptions = [
-  { value: "show", label: "Tampil" },
-  { value: "hide", label: "Sembunyi" },
+const badgeOptions = [
+  { value: "show", label: "Ada" },
+  { value: "hide", label: "Tidak Ada" },
 ];
 
-const badgeOptions = [
-  { value: "show", label: "Tampil" },
-  { value: "hide", label: "Sembunyi" },
+const menuIconOptions = [
+  { value: "show", label: "Ada" },
+  { value: "hide", label: "Tidak Ada" },
+];
+
+const visibilityOptions = [
+  { value: "show", label: "Ada" },
+  { value: "hide", label: "Tidak Ada" },
+];
+
+const separatorOptions = [
+  { value: "show", label: "Ada" },
+  { value: "hide", label: "Tidak Ada" },
 ];
 
 const sidebarProps: PropRow[] = [
   ["items", "SidebarItem[]", "—", "Daftar menu yang ditampilkan pada Sidebar."],
+  ["groups", "SidebarGroup[]", "undefined", "Daftar grup menu; mendukung content separator."],
   ["logo", "ReactNode", "undefined", "Logo atau identitas aplikasi pada bagian atas Sidebar."],
+  ["collapsedLogo", "ReactNode", "undefined", "Logo/mark ringkas untuk Sidebar collapsed."],
   ["user", "SidebarUser", "undefined", "Informasi pengguna yang ditampilkan pada profile section."],
-  ["collapsed", "boolean", "false", "Menentukan apakah Sidebar dalam kondisi collapsed."],
-  ["onCollapse", "() => void", "undefined", "Callback ketika tombol collapse Sidebar ditekan."],
-  ["className", "string", "—", "Class tambahan untuk menyesuaikan tampilan Sidebar."],
-  ["…props", "HTMLAttributes<HTMLElement>", "—", "Atribut HTML yang valid untuk elemen aside."],
+  [
+    "collapsed",
+    "boolean",
+    "false",
+    "State controlled untuk membuka atau menutup Sidebar; gunakan bersama onCollapse.",
+  ],
+  [
+    "showCollapseButton",
+    "boolean",
+    "false",
+    "Menampilkan tombol collapse tanpa mengaktifkan interaksi.",
+  ],
+  ["onCollapse", "() => void", "undefined", "Handler untuk memperbarui state collapsed."],
+  ["label", "string", "—", "Teks menu yang ditampilkan."],
+  ["href", "string", "undefined", "Tujuan tautan menu."],
+  ["icon", "ReactNode", "undefined", "Icon opsional di sebelah label menu."],
+  ["badge", "ReactNode", "undefined", "Konten badge pada sisi kanan menu."],
+  ["active", "boolean", "false", "State aktif per-item; dikendalikan consumer."],
+  ["disabled", "boolean", "false", "State disabled per-item; menonaktifkan interaksi menu."],
+  ["children", "SidebarSubItem[]", "undefined", "Daftar submenu pada menu."],
+  ["defaultOpen", "boolean", "false", "Initial state submenu saat pertama dirender."],
+  ["submenuToggleDisabled", "boolean", "false", "State disabled khusus tombol buka/tutup submenu."],
 ];
 
 const toc: TocEntry[] = [
-  { id: "sidebar", label: "Sidebar" },
+  { id: "variants", label: "Variants" },
   { id: "menu", label: "Menu" },
-  { id: "submenu", label: "Sub Menu" },
   { id: "badge", label: "Badge" },
+  { id: "separator", label: "Content Separator" },
   { id: "playground", label: "Playground" },
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
@@ -60,14 +92,12 @@ const baseItems = [
   },
   {
     label: "Menu 2",
+    href: "#",
     icon: <Clipboard className="size-4" />,
-    children: [
-      { label: "Sub - Menu 1", href: "#" },
-      { label: "Sub - Menu 2", href: "#" },
-    ],
   },
   {
     label: "Menu 3",
+    icon: <Cart className="size-4" />,
     defaultOpen: true,
     children: [
       { label: "Sub - Menu 1", href: "#" },
@@ -83,11 +113,8 @@ const baseItems = [
   },
   {
     label: "Menu 5",
+    href: "#",
     icon: <Lock className="size-4" />,
-    children: [
-      { label: "Sub - Menu 1", href: "#" },
-      { label: "Sub - Menu 2", href: "#" },
-    ],
   },
   {
     label: "Menu 6",
@@ -106,23 +133,211 @@ const baseItems = [
   },
 ];
 
+const menuOnlyItems = Array.from({ length: 14 }, (_, index) => ({
+  label: `Menu ${index + 1}`,
+  href: "#",
+  active: index === 2,
+}));
+
+const standardItems = menuOnlyItems.filter((item) => item.label !== "Menu 5");
+
+const nestedItems = [
+  { label: "Menu 1", href: "#" },
+  { label: "Menu 2", href: "#" },
+  {
+    label: "Menu 3",
+    active: true,
+    defaultOpen: true,
+    children: [
+      { label: "Sub - Menu 1", href: "#" },
+      { label: "Sub - Menu 2", href: "#" },
+      { label: "Sub - Menu 3", href: "#" },
+    ],
+  },
+  { label: "Menu 4", href: "#", badge: 1 },
+  { label: "Menu 5", href: "#" },
+  { label: "Menu 6", href: "#" },
+  { label: "Menu 7", href: "#" },
+  { label: "Menu 8", href: "#" },
+];
+
+const iconGroups = [
+  { id: "main", items: baseItems.slice(0, 5) },
+  { id: "secondary", separator: true, items: baseItems.slice(5) },
+];
+
+const separatorGroups: SidebarGroup[] = [
+  {
+    id: "primary",
+    items: [
+      { label: "Menu 4", href: "#", icon: <Inbox className="size-4" />, badge: 1 },
+      { label: "Menu 5", icon: <Lock className="size-4" /> },
+    ],
+  },
+  {
+    id: "secondary",
+    separator: true,
+    items: [
+      { label: "Menu 6", href: "#", icon: <Clipboard className="size-4" /> },
+      { label: "Menu 7", href: "#", icon: <Layers className="size-4" /> },
+      { label: "Menu 8", href: "#", icon: <ChartPie className="size-4" /> },
+    ],
+  },
+];
+
+function SidebarBrand({ collapsed = false }: { collapsed?: boolean }) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className="grid size-9 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5">
+        <span className="rounded-sm bg-white" />
+        <span className="rounded-sm bg-primary-300" />
+        <span className="rounded-sm bg-primary-300" />
+        <span className="rounded-sm bg-white" />
+      </span>
+      {!collapsed && <span className="text-sm font-black tracking-tight text-content">STASI</span>}
+    </span>
+  );
+}
+
+function highlightCode(code: string, tokens: string[]): ReactNode {
+  if (tokens.length === 0) return code;
+
+  const pattern = new RegExp(
+    `(${tokens
+      .sort((left, right) => right.length - left.length)
+      .map((token) => token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|")})`,
+    "g",
+  );
+
+  return code
+    .split(pattern)
+    .map((part, index) => (tokens.includes(part) ? <H key={`${part}-${index}`}>{part}</H> : part));
+}
+
+function VariantPreview({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <article className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="border-b border-gray-200 px-4 py-3">
+        <h3 className="text-sm font-bold text-gray-900">{title}</h3>
+        <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
+      </div>
+      <div className="h-[440px] overflow-y-auto overscroll-contain bg-gray-50">{children}</div>
+    </article>
+  );
+}
+
+function SidebarVariant({
+  items,
+  groups,
+  collapsed = false,
+}: {
+  items?: SidebarItem[];
+  groups?: SidebarGroup[];
+  collapsed?: boolean;
+}) {
+  return (
+    <Sidebar
+      collapsed={collapsed}
+      showCollapseButton
+      logo={<SidebarBrand />}
+      collapsedLogo={<SidebarBrand collapsed />}
+      user={{ name: "Nama User", profileLabel: "Lihat Profil", href: "#" }}
+      items={items}
+      groups={groups}
+    />
+  );
+}
+
 export function SidebarPage() {
   const [collapse, setCollapse] = useState<CollapseOption>("expanded");
-  const [profile, setProfile] = useState<ProfileOption>("show");
   const [badge, setBadge] = useState<BadgeOption>("show");
+  const [menuIcon, setMenuIcon] = useState<MenuIconOption>("show");
+  const [separator, setSeparator] = useState<SeparatorOption>("show");
+  const [userInfo, setUserInfo] = useState<VisibilityOption>("show");
+  const [logoWeb, setLogoWeb] = useState<VisibilityOption>("show");
 
   const collapsed = collapse === "collapsed";
 
-  const playgroundItems = baseItems.map((item) => {
-    if (item.label === "Menu 4") {
-      return {
-        ...item,
-        badge: badge === "show" ? 1 : undefined,
-      };
-    }
+  const playgroundItems = baseItems.map((item) => ({
+    ...item,
+    icon: menuIcon === "show" ? item.icon : undefined,
+    ...(item.label === "Menu 4" ? { badge: badge === "show" ? 1 : undefined } : {}),
+  }));
 
-    return item;
-  });
+  const playgroundGroups: SidebarGroup[] | undefined =
+    separator === "show"
+      ? [
+          { id: "main", items: playgroundItems.slice(0, 5) },
+          { id: "secondary", separator: true, items: playgroundItems.slice(5) },
+        ]
+      : undefined;
+
+  const iconProperty = (icon: string) =>
+    menuIcon === "show" ? `, icon: <${icon} className="size-4" />` : "";
+  const usageItems = `const items = [
+  { label: "Menu 1", href: "#"${iconProperty("ChartPie")} },
+  { label: "Menu 2", href: "#"${iconProperty("Clipboard")} },
+  {
+    label: "Menu 3"${iconProperty("Cart")},
+    defaultOpen: true,
+    children: [
+      { label: "Sub - Menu 1", href: "#" },
+      { label: "Sub - Menu 2", href: "#" },
+      { label: "Sub - Menu 3", href: "#" },
+    ],
+  },
+  { label: "Menu 4", href: "#"${iconProperty("Inbox")}${badge === "show" ? ", badge: 1" : ""} },
+  { label: "Menu 5", href: "#"${iconProperty("Lock")} },
+  { label: "Menu 6", href: "#"${iconProperty("Clipboard")} },
+  { label: "Menu 7", href: "#"${iconProperty("Layers")} },
+  { label: "Menu 8", href: "#"${iconProperty("ChartPie")} },
+]`;
+  const usageCode = [
+    "import { Sidebar } from '@tpl/design-kit-react'",
+    ...(menuIcon === "show"
+      ? [
+          "import { Cart, ChartPie, Clipboard, Inbox, Layers, Lock } from 'flowbite-react-icons/solid'",
+        ]
+      : []),
+    "",
+    usageItems,
+    ...(separator === "show"
+      ? [
+          "",
+          "const groups = [",
+          "  { id: 'main', items: items.slice(0, 5) },",
+          "  { id: 'secondary', separator: true, items: items.slice(5) },",
+          "]",
+        ]
+      : []),
+    "",
+    "<Sidebar",
+    ...(logoWeb === "show" ? ["  logo={<Logo />}", "  collapsedLogo={<LogoMark />}"] : []),
+    ...(userInfo === "show"
+      ? ["  user={{ name: 'Nama User', profileLabel: 'Lihat Profil', href: '#' }}"]
+      : []),
+    `  ${separator === "show" ? "groups={groups}" : "items={items}"}`,
+    `  collapsed={${collapsed}}`,
+    ...(logoWeb === "show" ? ["  onCollapse={() => setCollapsed((current) => !current)}"] : []),
+    "/>",
+  ].join("\n");
+  const usageHighlights = [
+    "collapsed",
+    ...(menuIcon === "show" ? ["icon"] : []),
+    ...(badge === "show" ? ["badge"] : []),
+    ...(userInfo === "show" ? ["user"] : []),
+    ...(logoWeb === "show" ? ["collapsedLogo", "logo", "onCollapse"] : []),
+    ...(separator === "show" ? ["separator: true", "groups"] : []),
+  ];
 
   return (
     <UsulanPage
@@ -131,42 +346,88 @@ export function SidebarPage() {
       description="Navigasi vertikal yang digunakan untuk menampilkan struktur menu utama aplikasi, profile pengguna, submenu, dan informasi tambahan."
       toc={toc}
     >
-      {/* ==================== SIDEBAR ==================== */}
+      {/* ==================== VARIANTS ==================== */}
 
-      <FlowSection id="sidebar" title="Sidebar">
+      <FlowSection id="variants" title="Variants">
         <p className="mb-6 text-body-sm text-gray-500">
-          Sidebar digunakan sebagai navigasi utama pada aplikasi dengan menampilkan identitas
-          aplikasi, informasi pengguna, dan daftar menu dalam struktur vertikal.
+          Sidebar tersedia dalam lima konfigurasi, dari navigasi sederhana sampai menu berikon yang
+          dikelompokkan dengan content separator.
         </p>
 
-        <div className="mb-4 flex justify-start">
-          <div className="h-[720px] overflow-hidden rounded-xl border border-gray-200">
-            <Sidebar
-              logo={<div className="text-sm font-black tracking-wide text-gray-900">KOMDIGI</div>}
-              user={{
-                name: "Nama User",
-                profileLabel: "Lihat Profil",
-                avatar: "/images/avatar-sample.png",
-                href: "#",
-              }}
-              items={baseItems}
-            />
-          </div>
+        <div className="mb-4 grid gap-4 lg:grid-cols-2">
+          <VariantPreview
+            title="1. Menu saja"
+            description="Navigasi dasar tanpa logo dan informasi akun."
+          >
+            <Sidebar items={menuOnlyItems} />
+          </VariantPreview>
+
+          <VariantPreview
+            title="2. Menu, user info, logo web"
+            description="Navigasi dasar dengan identitas aplikasi dan area akun."
+          >
+            <SidebarVariant items={standardItems} />
+          </VariantPreview>
+
+          <VariantPreview
+            title="3. Multi-level menu, user info, logo web"
+            description="Menu anak dipakai untuk mengelompokkan navigasi yang berkaitan."
+          >
+            <SidebarVariant items={nestedItems} />
+          </VariantPreview>
+
+          <VariantPreview
+            title="4. Multi-level menu + icon"
+            description="Menu berikon dikelompokkan; separator membedakan area konten."
+          >
+            <SidebarVariant groups={iconGroups} />
+          </VariantPreview>
+
+          <VariantPreview
+            title="5. Collapsed"
+            description="Konfigurasi varian 4 dalam kondisi tertutup: icon, user, dan logo mark tetap terlihat."
+          >
+            <SidebarVariant groups={iconGroups} collapsed />
+          </VariantPreview>
         </div>
 
-        <SectionCode>
-          {"<Sidebar\n"}
-          {"    "}
-          <H>logo</H>
-          {"={logo}\n"}
-          {"    "}
-          <H>user</H>
-          {"={user}\n"}
-          {"    "}
-          <H>items</H>
-          {"={items}\n"}
-          {"/>"}
-        </SectionCode>
+        {/* <SectionCode>
+          {`import { Sidebar, type SidebarGroup } from '@tpl/design-kit-react'
+import { Cart, ChartPie, Clipboard, Inbox, Layers, Lock } from 'flowbite-react-icons/solid'
+
+const groups: SidebarGroup[] = [
+  {
+    id: 'main',
+    items: [
+      { label: 'Menu 1', href: '#', icon: <ChartPie /> },
+      { label: 'Menu 2', href: '#', icon: <Clipboard /> },
+      {
+        label: 'Menu 3',
+        icon: <Cart />,
+        defaultOpen: true,
+        children: [{ label: 'Sub - Menu 1', href: '#' }, { label: 'Sub - Menu 2', href: '#' }],
+      },
+      { label: 'Menu 4', href: '#', icon: <Inbox />, badge: 1 },
+      { label: 'Menu 5', href: '#', icon: <Lock /> },
+    ],
+  },
+  {
+    id: 'secondary',
+    separator: true,
+    items: [
+      { label: 'Menu 6', href: '#', icon: <Clipboard /> },
+      { label: 'Menu 7', href: '#', icon: <Layers /> },
+    ],
+  },
+]
+
+<Sidebar
+  logo={<Logo />}
+  collapsedLogo={<LogoMark />}
+  user={{ name: 'Nama User', profileLabel: 'Lihat Profil', href: '#' }}
+  groups={groups}
+/>`}
+        </SectionCode> */}
       </FlowSection>
 
       {/* ==================== MENU ==================== */}
@@ -177,76 +438,90 @@ export function SidebarPage() {
           label, tautan, dan state interaksi.
         </p>
 
-        <div className="mb-4 max-w-[280px] rounded-xl border border-gray-200 bg-white p-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-              <ChartPie className="size-4" />
-              <span>Menu 1</span>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="min-w-0">
+            <h3 className="mb-3 text-sm font-bold text-gray-900">Menu</h3>
+            <div className="mb-4 max-w-[280px] rounded-xl border border-gray-200 bg-white p-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
+                  <ChartPie className="size-4" />
+                  <span>Menu 1</span>
+                </div>
+
+                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
+                  <Clipboard className="size-4" />
+                  <span>Menu 2</span>
+                </div>
+
+                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
+                  <Inbox className="size-4" />
+                  <span>Menu 3</span>
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-              <Clipboard className="size-4" />
-              <span>Menu 2</span>
+            <SectionCode>
+              {"const items = [\n"}
+              {"  { "}
+              <H>label</H>
+              {': "Menu 1", '}
+              {"icon: <ChartPie />, "}
+              {'href: "#" },\n'}
+              {"  { "}
+              <H>label</H>
+              {': "Menu 2", '}
+              {"icon: <Clipboard />, "}
+              {'href: "#" },\n'}
+              {"  { "}
+              <H>label</H>
+              {': "Menu 3", '}
+              {"icon: <Inbox />, "}
+              {'href: "#" },\n'}
+              {"]"}
+            </SectionCode>
+          </div>
+
+          <div className="min-w-0">
+            <h3 className="mb-3 text-sm font-bold text-gray-900">Sub Menu</h3>
+            <div className="mb-4 max-w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white">
+              <Sidebar
+                className="!min-h-0"
+                items={[
+                  {
+                    label: "Menu 3",
+                    icon: <Cart className="size-4" />,
+                    active: true,
+                    defaultOpen: true,
+                    submenuToggleDisabled: true,
+                    children: [
+                      { label: "Sub - Menu 1", href: "#" },
+                      { label: "Sub - Menu 2", href: "#" },
+                    ],
+                  },
+                ]}
+              />
             </div>
 
-            <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-              <Inbox className="size-4" />
-              <span>Menu 4</span>
-            </div>
+            <SectionCode>
+              {"{\n"}
+              {"  "}
+              {'label: "Menu 3",\n'}
+              {"  "}
+              {"icon: <Cart />,\n"}
+              {"  "}
+              <H>children</H>
+              {": [\n"}
+              {"    { "}
+              {'label: "Sub - Menu 1", '}
+              {'href: "#" },\n'}
+              {"    { "}
+              {'label: "Sub - Menu 2", '}
+              {'href: "#" },\n'}
+              {"  ],\n"}
+              {"}"}
+            </SectionCode>
           </div>
         </div>
-
-        <SectionCode>
-          {"const items = [\n"}
-          {"    {\n"}
-          {'        label: "Menu 1",\n'}
-          {'        href: "#",\n'}
-          {"        "}
-          <H>icon</H>
-          {"={<ChartPie />},\n"}
-          {"    },\n"}
-          {"]"}
-        </SectionCode>
-      </FlowSection>
-
-      {/* ==================== SUB MENU ==================== */}
-
-      <FlowSection id="submenu" title="Sub Menu">
-        <p className="mb-6 text-body-sm text-gray-500">
-          Submenu digunakan untuk mengelompokkan navigasi yang masih berada dalam satu kategori menu
-          utama.
-        </p>
-
-        <div className="mb-4 max-w-[280px] rounded-xl border border-gray-200 bg-white p-4">
-          <div className="rounded-lg bg-gray-100 px-3 py-2.5">
-            <div className="flex items-center gap-3 text-sm font-medium text-gray-700">
-              <span className="flex-1">Menu 3</span>
-            </div>
-
-            <div className="mt-2 space-y-1">
-              <div className="py-2 pl-7 text-sm text-gray-600">Sub - Menu 1</div>
-
-              <div className="py-2 pl-7 text-sm text-gray-600">Sub - Menu 2</div>
-
-              <div className="py-2 pl-7 text-sm text-gray-600">Sub - Menu 3</div>
-            </div>
-          </div>
-        </div>
-
-        <SectionCode>
-          {"const items = [\n"}
-          {"    {\n"}
-          {'        label: "Menu 3",\n'}
-          {"        "}
-          <H>children</H>
-          {"={[\n"}
-          {'            { label: "Sub - Menu 1", href: "#" },\n'}
-          {'            { label: "Sub - Menu 2", href: "#" },\n'}
-          {'            { label: "Sub - Menu 3", href: "#" },\n'}
-          {"        ]}\n"}
-          {"    },\n"}
-          {"]"}
-        </SectionCode>
       </FlowSection>
 
       {/* ==================== BADGE ==================== */}
@@ -271,11 +546,47 @@ export function SidebarPage() {
 
         <SectionCode>
           {"const item = {\n"}
-          {'    label: "Menu 4",\n'}
-          {"    "}
+          {"  "}
+          {'label: "Menu 4",\n'}
+          {"  "}
+          {"icon: <Inbox />,\n"}
+          {"  "}
           <H>badge</H>
-          {"={1},\n"}
+          {": 1,\n"}
           {"}"}
+        </SectionCode>
+      </FlowSection>
+
+      {/* ==================== SEPARATOR ==================== */}
+
+      <FlowSection id="separator" title="Content Separator">
+        <p className="mb-6 text-body-sm text-gray-500">
+          Separator memisahkan kelompok menu yang berbeda. Tambahkan{" "}
+          <H>
+            <code>separator: true </code>
+          </H>
+          pada group yang ingin diberi garis pemisah di bagian atas.
+        </p>
+
+        <div className="mb-4 max-w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white">
+          <Sidebar className="!min-h-0" groups={separatorGroups} />
+        </div>
+
+        <SectionCode>
+          {"const groups = [\n"}
+          {"  {\n    id: 'primary',\n    items: [\n"}
+          {"      { label: 'Menu 4', href: '#', icon: <Inbox />, badge: 1 },\n"}
+          {"      { label: 'Menu 5', href: '#', icon: <Lock /> },\n"}
+          {"    ],\n  },\n"}
+          {"  {\n    id: 'secondary',\n    "}
+          <H>separator</H>
+          {": true,\n"}
+          {"    items: [\n"}
+          {"      { label: 'Menu 6', href: '#', icon: <Clipboard /> },\n"}
+          {"      { label: 'Menu 7', href: '#', icon: <Layers /> },\n"}
+          {"      { label: 'Menu 8', href: '#', icon: <ChartPie /> },\n"}
+          {"    ],\n  },\n]\n\n"}
+          {"<Sidebar groups={groups} />"}
         </SectionCode>
       </FlowSection>
 
@@ -284,28 +595,29 @@ export function SidebarPage() {
       <FlowSection id="playground" title="Playground">
         <p className="mb-6 text-body-sm text-gray-500">
           Coba konfigurasi Sidebar melalui kontrol di bawah ini untuk melihat perubahan mode
-          collapse, profile pengguna, dan badge.
+          collapse, badge, dan separator.
         </p>
 
         <Stage maxWidth="max-w-[520px]">
           <div className="flex min-h-[760px] justify-center">
             <Sidebar
+              key={separator}
               collapsed={collapsed}
-              onCollapse={() =>
-                setCollapse((current) => (current === "expanded" ? "collapsed" : "expanded"))
-              }
-              logo={<div className="text-sm font-black tracking-wide text-gray-900">KOMDIGI</div>}
-              user={
-                profile === "show"
-                  ? {
-                      name: "Nama User",
-                      profileLabel: "Lihat Profil",
-                      avatar: "/images/avatar-sample.png",
-                      href: "#",
-                    }
+              onCollapse={
+                logoWeb === "show"
+                  ? () =>
+                      setCollapse((current) => (current === "expanded" ? "collapsed" : "expanded"))
                   : undefined
               }
-              items={playgroundItems}
+              logo={logoWeb === "show" ? <SidebarBrand /> : undefined}
+              collapsedLogo={logoWeb === "show" ? <SidebarBrand collapsed /> : undefined}
+              user={
+                userInfo === "show"
+                  ? { name: "Nama User", profileLabel: "Lihat Profil", href: "#" }
+                  : undefined
+              }
+              groups={playgroundGroups}
+              items={playgroundGroups ? undefined : playgroundItems}
             />
           </div>
         </Stage>
@@ -320,21 +632,48 @@ export function SidebarPage() {
             />
           </Control>
 
-          <Control label="Profile">
-            <Segmented
-              label="Tampilkan profile"
-              value={profile}
-              onChange={(value) => setProfile(value as ProfileOption)}
-              options={profileOptions}
-            />
-          </Control>
-
           <Control label="Badge">
             <Segmented
               label="Tampilkan badge"
               value={badge}
               onChange={(value) => setBadge(value as BadgeOption)}
               options={badgeOptions}
+            />
+          </Control>
+
+          <Control label="Icon menu">
+            <Segmented
+              label="Tampilkan icon menu"
+              value={menuIcon}
+              onChange={(value) => setMenuIcon(value as MenuIconOption)}
+              options={menuIconOptions}
+            />
+          </Control>
+
+          <Control label="User info">
+            <Segmented
+              label="Tampilkan informasi user"
+              value={userInfo}
+              onChange={(value) => setUserInfo(value as VisibilityOption)}
+              options={visibilityOptions}
+            />
+          </Control>
+
+          <Control label="Logo web">
+            <Segmented
+              label="Tampilkan logo web"
+              value={logoWeb}
+              onChange={(value) => setLogoWeb(value as VisibilityOption)}
+              options={visibilityOptions}
+            />
+          </Control>
+
+          <Control label="Content separator">
+            <Segmented
+              label="Tampilkan content separator"
+              value={separator}
+              onChange={(value) => setSeparator(value as SeparatorOption)}
+              options={separatorOptions}
             />
           </Control>
         </Controls>
@@ -348,72 +687,15 @@ export function SidebarPage() {
           Playground.
         </p>
 
-        <SectionCode flush>
-          {"import { Sidebar } from '@tpl/design-kit-react'\n"}
-          {"\n"}
-          {"const items = [\n"}
-          {"    {\n"}
-          {'        label: "Menu 1",\n'}
-          {'        href: "#",\n'}
-          {"    },\n"}
-          {"    {\n"}
-          {'        label: "Menu 3",\n'}
-          {"        children: [\n"}
-          {'            { label: "Sub - Menu 1", href: "#" },\n'}
-          {'            { label: "Sub - Menu 2", href: "#" },\n'}
-          {"        ],\n"}
-          {"    },\n"}
-
-          {badge === "show" && (
-            <>
-              {"    {\n"}
-              {'        label: "Menu 4",\n'}
-              {"        "}
-              <H>badge</H>
-              {"={1},\n"}
-              {"    },\n"}
-            </>
-          )}
-
-          {"]\n"}
-          {"\n"}
-          {"<Sidebar\n"}
-
-          <>
-            {"    "}
-            <H>items</H>
-            {"={items}\n"}
-          </>
-
-          {profile === "show" && (
-            <>
-              {"    "}
-              <H>user</H>
-              {"={user}\n"}
-            </>
-          )}
-
-          <>
-            {"    "}
-            <H>collapsed</H>
-            {`={${collapsed ? "true" : "false"}}\n`}
-          </>
-
-          <>
-            {"    "}
-            <H>onCollapse</H>
-            {"={() => setCollapsed((prev) => !prev)}\n"}
-          </>
-
-          {"/>"}
-        </SectionCode>
+        <SectionCode flush>{highlightCode(usageCode, usageHighlights)}</SectionCode>
       </FlowSection>
 
       {/* ==================== PROPERTIES ==================== */}
 
       <FlowSection id="properties" title="Properties">
         <p className="mb-6 text-body-sm text-gray-500">
-          Referensi semua prop yang tersedia pada komponen Sidebar.
+          Referensi seluruh prop Sidebar, termasuk state container serta state per-item
+          menu/submenu.
         </p>
 
         <PropsTable rows={sidebarProps} minWidth="46rem" />
