@@ -141,7 +141,7 @@ import { Navbar } from '@stasi/design-kit-react'
 
 <Navbar
   brand={<img src="/logo.svg" alt="" />}
-  brandLabel="KOMDIGI — Beranda"
+  brandLabel="STASI — Beranda"
   items={[
     {
       id: 'menu-1',
@@ -170,10 +170,10 @@ API/config Navbar yang dapat dipakai bersama authenticated state:
 ```tsx
 <Navbar
   brand={<Logo />}
-  brandLabel="KOMDIGI — Beranda"
+  brandLabel="STASI — Beranda"
   items={items}
   search={{ onSubmit: (query) => console.log(query) }}
-  user={{ name: 'User Komdigi', avatarSrc: '/avatar.jpg' }}
+  user={{ name: 'User STASI', avatarSrc: '/avatar.jpg' }}
   notification={{ unread: true, href: '/notifications' }}
 />
 ```

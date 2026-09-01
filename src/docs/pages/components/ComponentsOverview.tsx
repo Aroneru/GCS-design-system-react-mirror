@@ -140,8 +140,8 @@ export function ComponentsOverview() {
       >
         <div className="overflow-hidden rounded-xl bg-surface-subtle p-2">
           <Navbar
-            brand={<span className="text-sm font-black text-content">KOMDIGI</span>}
-            brandLabel="KOMDIGI — Beranda"
+            brand={<span className="text-sm font-black text-content">STASI</span>}
+            brandLabel="STASI — Beranda"
             items={[
               { id: "menu-1", label: "Menu 1", href: "#/menu-1" },
               { id: "menu-2", label: "Menu 2", href: "#/menu-2" },
@@ -183,7 +183,7 @@ export function ComponentsOverview() {
       >
         <div className="overflow-hidden rounded-xl">
           <div className="flex items-center justify-between gap-4 bg-gray-800 px-5 py-4">
-            <img src={asset("/images/komdigi-logo.svg")} alt="Komdigi" className="h-7 w-auto" />
+            <img src={asset("/images/stasi-logo.svg")} alt="STASI" className="h-7 w-auto" />
             <div className="hidden gap-5 text-xs text-gray-300 sm:flex">
               <span>Menu 1</span>
               <span>Menu 2</span>
