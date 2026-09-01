@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Container, type ContainerSize } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { C, H, Mark, Principles, Segmented } from "../../pageKit";
+import { C, H, Mark, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -315,7 +315,7 @@ export function ContainerPage() {
           <C>wide</C> dan <C>full</C> menggambar bilah yang sama panjang karena
           patokannya 1440px — bedanya baru terasa di ruang yang lebih lebar dari
           itu: <C>wide</C> berhenti, <C>full</C> terus mengikuti induknya.
-          Cobalah di Playground dengan lebar kustom di atas 1440px.
+          Cobalah di Playground dengan lebar Custom di atas 1440px.
         </p>
         <SectionCode>
           {'{/* Bawaan — size="default" tidak perlu ditulis */}\n'}
@@ -362,7 +362,7 @@ export function ContainerPage() {
           </Container>
         </Ruang>
         <SectionCode>
-          {"import { Container } from '@tpl/design-kit-react'\n\n"}
+          {"import { Container } from '@stasi/design-kit-react'\n\n"}
           {"<Container>\n"}
           {"    <h1>Pendaftaran Penyelenggara Sistem Elektronik</h1>\n"}
           {"    <p>Lengkapi data pemohon dan sistem elektronik yang didaftarkan.</p>\n"}
@@ -468,7 +468,7 @@ export function ContainerPage() {
           tempat konten berhenti. Selisih keduanya itulah padding. Ganti{" "}
           <strong className="text-gray-900">Varian</strong> untuk melihat batas
           lebarnya, lalu <C>Mobile</C>/<C>Desktop</C> untuk melihat ambang
-          bawaannya — atau <C>Kustom</C> untuk mengetik lebar sendiri. Yang
+          bawaannya — atau <C>Custom</C> untuk mengetik lebar sendiri. Yang
           berganti di atas benar-benar komponen <C>Container</C>, bukan kotak
           tiruan: angkanya diukur langsung dari elemen yang dirender.
         </Lead>
@@ -517,13 +517,13 @@ export function ContainerPage() {
               options={[
                 { value: "mobile", label: "Mobile" },
                 { value: "desktop", label: "Desktop" },
-                { value: "custom", label: "Kustom" },
+                { value: "custom", label: "Custom" },
               ]}
             />
           </Control>
 
           {view === "custom" && (
-            <Control label="Lebar kustom">
+            <Control label="Lebar Custom">
               <div className="flex flex-wrap items-center gap-3">
                 <input
                   type="range"
@@ -567,7 +567,7 @@ export function ContainerPage() {
           ukuran.
         </Lead>
         <SectionCode flush>
-          {"import { Container } from '@tpl/design-kit-react'\n\n"}
+          {"import { Container } from '@stasi/design-kit-react'\n\n"}
 
           {/* Contoh 1 dirakit dari state playground + angka hasil pengukuran,
               jadi yang dibaca selalu kode untuk preview yang sedang terlihat. */}
@@ -617,7 +617,7 @@ export function ContainerPage() {
         <PropsTable rows={containerProps} minWidth="44rem" />
       </FlowSection>
 
-      <Principles
+      {/* <Principles
         items={[
           <>
             Bungkus <strong className="text-gray-900">setiap section</strong>{" "}
@@ -652,7 +652,7 @@ export function ContainerPage() {
             karena padding hidup di elemen dalam.
           </>,
         ]}
-      />
+      /> */}
     </UsulanPage>
   );
 }

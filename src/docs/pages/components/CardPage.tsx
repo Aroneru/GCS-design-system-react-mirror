@@ -25,7 +25,7 @@ import { asset } from "../../asset";
  * sendiri: gambar, teks, tautan, aksi.
  */
 
-const cardTitle = "Komdigi Card Desktop";
+const cardTitle = "Ministerium Fur Staatssicherheit Card Desktop";
 const cardDesc =
   "Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.";
 
@@ -181,7 +181,7 @@ export function CardPage() {
         </div>
 
         <SectionCode>
-          {"import { Card } from '@tpl/design-kit-react'\n\n"}
+          {"import { Card } from '@stasi/design-kit-react'\n\n"}
           {'<Card image="…" title="…" description="…" actions={<Button … />} />\n'}
           {'<Card             title="…" description="…" actions={<Button … />} />\n'}
           {'<Card image="…" title="…" description="…" />\n'}
@@ -243,7 +243,7 @@ export function CardPage() {
           {"<Card\n"}
           {"    "}
           <Mark>title</Mark>
-          {'="Komdigi Card Desktop"\n'}
+          {'="Ministerium Fur Staatssicherheit Card Desktop"\n'}
           {"    "}
           <Mark>description</Mark>
           {'="Here are the biggest enterprise technology acquisitions of 2021."\n'}
@@ -310,7 +310,7 @@ export function CardPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { Card, Button } from '@tpl/design-kit-react'\n\n"}
+          {"import { Card, Button } from '@stasi/design-kit-react'\n\n"}
           {"<Card\n"}
           {"    "}
           <Mark>actions</Mark>
@@ -425,7 +425,7 @@ export function CardPage() {
         <SectionCode flush>
           {"import { Card"}
           {withButton && ", Button"}
-          {" } from '@tpl/design-kit-react'\n\n"}
+          {" } from '@stasi/design-kit-react'\n\n"}
           {`{/* ${summary} */}\n`}
           {"{/* Kartu tidak punya prop ukuran — lebarnya mengikuti kolom\n"}
           {"    tempatnya berada. Yang berubah cuma kolomnya. */}\n"}
@@ -443,7 +443,7 @@ export function CardPage() {
               {'="Suasana kerja tim"\n'}
             </>
           )}
-          {'        title="Komdigi Card Desktop"\n'}
+          {'        title="STASI Card Desktop"\n'}
           {'        description="Here are the biggest enterprise technology acquisitions of 2021."\n'}
           {action === "link" && (
             <>

@@ -96,8 +96,8 @@ export function InputFieldPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { InputField } from '@tpl/design-kit-react'\n"}
-          {"import { User } from '@tpl/design-kit-react/icons/solid'\n\n"}
+          {"import { InputField } from '@stasi/design-kit-react'\n"}
+          {"import { User } from '@stasi/design-kit-react/icons/solid'\n\n"}
           {'<InputField\n'}
           {'    label="Nama lengkap"\n'}
           {'    placeholder="Masukkan nama lengkap"\n'}
@@ -269,8 +269,8 @@ export function InputFieldPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { InputField } from '@tpl/design-kit-react'\n"}
-          {withIcon && "import { User } from '@tpl/design-kit-react/icons/solid'\n"}
+          {"import { InputField } from '@stasi/design-kit-react'\n"}
+          {withIcon && "import { User } from '@stasi/design-kit-react/icons/solid'\n"}
           {'\n'}
           {'<InputField\n'}
           {platform === 'mobile' && (

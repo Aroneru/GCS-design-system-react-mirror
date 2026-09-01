@@ -1,5 +1,5 @@
 /**
- * Ikon solid — dipakai lewat subpath `@tpl/design-kit-react/icons/solid`.
+ * Ikon solid — dipakai lewat subpath `@stasi/design-kit-react/icons/solid`.
  * Lihat catatan di ./outline.ts soal alasan pemisahan subpath.
  *
  * JANGAN dipakai dari dalam src/lib. Berkas ini adalah entry point

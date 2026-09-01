@@ -84,7 +84,12 @@ export function NavbarNavigation({
       <ul className="flex w-max items-center gap-2 xl:gap-4">
         {navigationItems.map((item) => {
           if (isLinkItem(item) && !isSubmenuItem(item)) {
-            const active = isActive(item, activeHref)
+            const pageActive = isActive(item, activeHref)
+            const contextualPageActive = item.contextualItems?.some(
+              (contextualItem) =>
+                !contextualItem.disabled && isActive(contextualItem, activeHref),
+            ) ?? false
+            const active = pageActive || contextualPageActive
 
             return (
               <li key={item.id}>
@@ -98,7 +103,7 @@ export function NavbarNavigation({
                         ? 'bg-primary-50 text-brand'
                         : 'text-content hover:bg-surface-subtle hover:text-brand',
                   )}
-                  aria-current={!item.disabled && active ? 'page' : undefined}
+                  aria-current={!item.disabled && pageActive ? 'page' : undefined}
                   aria-disabled={item.disabled || undefined}
                   tabIndex={item.disabled ? -1 : undefined}
                   onClick={(event) => {
@@ -122,10 +127,23 @@ export function NavbarNavigation({
           if (!isSubmenuItem(item)) return null
 
           const childActive = item.children.some(
-            (child) => !child.disabled && isActive(child, activeHref),
+            (child) =>
+              !child.disabled &&
+              (isActive(child, activeHref) ||
+                child.contextualItems?.some(
+                  (contextualItem) =>
+                    !contextualItem.disabled && isActive(contextualItem, activeHref),
+                )),
           )
+          const contextualPageActive = item.contextualItems?.some(
+            (contextualItem) =>
+              !contextualItem.disabled && isActive(contextualItem, activeHref),
+          ) ?? false
           const parentActive =
-            item.active ?? ((isLinkItem(item) && item.href === activeHref) || childActive)
+            item.active ??
+            ((isLinkItem(item) && item.href === activeHref) ||
+              contextualPageActive ||
+              childActive)
           const expanded = openMenuId === item.id
           const submenuId = `${idPrefix}-${encodeURIComponent(item.id)}-submenu`
 

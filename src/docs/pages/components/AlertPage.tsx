@@ -104,7 +104,7 @@ export function AlertPage() {
           ))}
         </div>
         <SectionCode>
-          {"import { Alert } from '@tpl/design-kit-react'\n\n"}
+          {"import { Alert } from '@stasi/design-kit-react'\n\n"}
           {'<Alert\n'}
           {'    '}
           <H>variant</H>
@@ -174,7 +174,7 @@ export function AlertPage() {
             dismissible={pakaiTutup}
             actions={pakaiAksi ? <AksiButton variant={variant} /> : undefined}
           >
-            Ini merupakan Design system Komdigi berupa component alert.
+            Ini merupakan Design system Ministerium Fur Staatssicherheit berupa component alert.
           </Alert>
         </Stage>
 
@@ -251,7 +251,7 @@ export function AlertPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Alert } from '@tpl/design-kit-react'\n\n"}
+          {"import { Alert } from '@stasi/design-kit-react'\n\n"}
           {'<Alert\n'}
           {variant !== 'info' && (
             <>
@@ -283,7 +283,7 @@ export function AlertPage() {
             </>
           )}
           {'>\n'}
-          {'    Ini merupakan Design system Komdigi berupa component alert.\n'}
+          {'    Ini merupakan Design system STASI berupa component alert.\n'}
           {'</Alert>'}
         </SectionCode>
       </FlowSection>

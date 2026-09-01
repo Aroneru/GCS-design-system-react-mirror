@@ -1,10 +1,24 @@
 {
-  "name": "@tpl/design-kit-react",
+  "name": "@stasi/design-kit-react",
   "private": false,
-  "version": "0.1.0",
-  "description": "Design tokens, tipografi, dan komponen React (Tailwind v4) untuk produk TPL — State Security Service Design System",
-  "type": "module",
+  "version": "0.2.0",
+  "description": "Design tokens, tipografi, dan komponen React (Tailwind v4) untuk produk Stasi — State Security Service Design System",
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "react",
+    "react-components",
+    "tailwind",
+    "tailwindcss",
+    "stasi"
+  ],
+  "homepage": "https://aroneru.github.io/GCS-design-system-react-mirror/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aroneru/GCS-design-system-react-mirror.git"
+  },
   "license": "MIT",
+  "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -58,6 +72,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "gsap": "^3.15.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.3",
