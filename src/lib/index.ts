@@ -14,6 +14,21 @@ export type {
 export { Badge } from "./components/Badge";
 export type { BadgeProps, BadgeVariant } from "./components/Badge";
 
+export { Spinner } from "./components/Spinner";
+export type { SpinnerProps, SpinnerSize } from "./components/Spinner";
+
+export { Popover } from "./components/Popover";
+export type { PopoverProps, PopoverSide } from "./components/Popover";
+
+export { Modal, ModalHeader, ModalBody, ModalFooter } from "./components/Modal";
+export type {
+  ModalProps,
+  ModalSize,
+  ModalHeaderProps,
+  ModalBodyProps,
+  ModalFooterProps,
+} from "./components/Modal";
+
 export { Alert } from "./components/Alert";
 export type { AlertProps, AlertVariant } from "./components/Alert";
 
@@ -95,6 +110,7 @@ export { Navbar } from "./components/Navbar";
 export type {
   NavbarProps,
   NavbarItem,
+  NavbarContextItem,
   NavbarSubItem,
   NavbarSearchConfig,
   NavbarAction,

@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Navbar, Toast } from "../../../lib";
+import { Alert, Badge, Button, Navbar, Popover, Spinner, Toast } from "../../../lib";
 import { NotReadyPreview, OverviewCard, OverviewPage } from "../../pageKit";
 import { asset } from "../../asset";
 
@@ -54,6 +54,48 @@ export function ComponentsOverview() {
           <Alert variant="success" heading="Ini adalah Alert" dismissible={false}>
             Ini merupakan Design system Stasi berupa component alert.
           </Alert>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/spinner"
+        name="Spinner"
+        desc="Indikator proses berputar dalam ukuran default dan large."
+      >
+        <div className="flex items-center justify-center rounded-xl bg-surface-subtle p-5">
+          <Spinner aria-label="Memuat preview" />
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/popover"
+        name="Popover"
+        desc="Panel informasi ringkas dengan arrow pada empat pilihan sisi."
+      >
+        <div className="flex justify-center rounded-xl bg-surface-subtle p-5">
+          <Popover title="Popover">Popover Body Text, Popover Body Text, Popover Body Text</Popover>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/modal"
+        name="Modal"
+        desc="Dialog terkontrol untuk informasi atau tindakan yang harus diselesaikan sebelum kembali ke halaman utama."
+      >
+        <div className="rounded-xl bg-gray-900/40 p-5">
+          <div className="mx-auto max-w-[240px] overflow-hidden rounded-lg border border-border bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div className="h-2.5 w-24 rounded bg-gray-300" />
+              <div className="size-3 rounded bg-gray-200" />
+            </div>
+            <div className="space-y-2 px-4 py-5">
+              <div className="h-1.5 w-full rounded bg-gray-200" />
+              <div className="h-1.5 w-2/3 rounded bg-gray-200" />
+            </div>
+            <div className="border-t border-border px-4 py-3">
+              <div className="h-6 w-20 rounded-lg bg-primary-700" />
+            </div>
+          </div>
         </div>
       </OverviewCard>
 

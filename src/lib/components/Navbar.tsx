@@ -26,9 +26,13 @@ interface NavbarItemBase {
   disabled?: boolean;
 }
 
-export interface NavbarSubItem extends NavbarItemBase {
+export interface NavbarContextItem extends NavbarItemBase {
   href: string;
   external?: boolean;
+}
+
+export interface NavbarSubItem extends NavbarContextItem {
+  contextualItems?: NavbarContextItem[];
 }
 
 export type NavbarItem =
@@ -36,13 +40,13 @@ export type NavbarItem =
       href: string;
       external?: boolean;
       children?: never;
-      contextualItems?: NavbarSubItem[] | false;
+      contextualItems?: NavbarContextItem[];
     })
   | (NavbarItemBase & {
       href: string;
       external?: boolean;
       children: NavbarSubItem[];
-      contextualItems?: NavbarSubItem[] | false;
+      contextualItems?: NavbarContextItem[];
     })
   | (NavbarItemBase & {
       href?: never;
@@ -129,40 +133,80 @@ const mobileBackOfficeNavigationTriggerClasses = `${mobileNavigationTriggerBaseC
 
 type NavbarSectionItem = Extract<NavbarItem, { children: NavbarSubItem[] }>;
 type NavbarLinkItem = Extract<NavbarItem, { href: string }>;
+type NavbarContextOwner = NavbarLinkItem | NavbarSubItem;
 type ResolvedNavbarContext = {
-  item: NavbarLinkItem;
-  contextualItems: NavbarSubItem[];
+  ownerKey: string;
+  item: NavbarContextOwner;
+  contextualItems: NavbarContextItem[];
 };
 
 function isNavbarSectionItem(item: NavbarItem): item is NavbarSectionItem {
   return Array.isArray(item.children) && item.children.length > 0;
 }
 
-function getContextualItems(item: NavbarItem): NavbarSubItem[] | undefined {
-  if (typeof item.href !== "string" || item.contextualItems === false) return undefined;
-  if (Array.isArray(item.contextualItems)) {
-    return item.contextualItems.length > 0 ? item.contextualItems : undefined;
-  }
-
-  // Backward compatibility: href + children was the original BO Drawer contract.
-  return isNavbarSectionItem(item) ? item.children : undefined;
+function getOwnContextualItems(
+  item: NavbarContextOwner,
+): NavbarContextItem[] | undefined {
+  return Array.isArray(item.contextualItems) && item.contextualItems.length > 0
+    ? item.contextualItems
+    : undefined;
 }
 
-function findActivePrimaryItem(items: NavbarItem[], activeHref?: string) {
-  return items.find((item) => {
-    if (item.disabled) return false;
-    if (item.active) return true;
-    if (typeof item.href === "string" && item.href === activeHref) return true;
+function findActiveNavbarPage(
+  items: NavbarItem[],
+  activeHref?: string,
+): { ownerKey: string; item: NavbarContextOwner } | undefined {
+  const enabledItems = items.filter((item) => !item.disabled);
 
-    const navigationChildActive =
-      isNavbarSectionItem(item) &&
-      item.children.some((child) => !child.disabled && child.href === activeHref);
-    const contextualChildActive = getContextualItems(item)?.some(
+  const activePrimary = enabledItems.find(
+    (item): item is NavbarLinkItem =>
+      typeof item.href === "string" && item.href === activeHref,
+  );
+  if (activePrimary) {
+    return { ownerKey: `primary:${activePrimary.id}`, item: activePrimary };
+  }
+
+  for (const parent of enabledItems) {
+    if (!isNavbarSectionItem(parent)) continue;
+    const activeSubmenu = parent.children.find(
       (child) => !child.disabled && child.href === activeHref,
     );
+    if (activeSubmenu) {
+      return {
+        ownerKey: `submenu:${parent.id}:${activeSubmenu.id}`,
+        item: activeSubmenu,
+      };
+    }
+  }
 
-    return navigationChildActive || contextualChildActive;
-  });
+  for (const parent of enabledItems) {
+    if (typeof parent.href !== "string") continue;
+    const contextualItems = getOwnContextualItems(parent);
+    if (contextualItems?.some((item) => !item.disabled && item.href === activeHref)) {
+      return { ownerKey: `primary:${parent.id}`, item: parent };
+    }
+  }
+
+  for (const parent of enabledItems) {
+    if (!isNavbarSectionItem(parent)) continue;
+    for (const child of parent.children) {
+      if (child.disabled) continue;
+      const contextualItems = getOwnContextualItems(child);
+      if (contextualItems?.some((item) => !item.disabled && item.href === activeHref)) {
+        return {
+          ownerKey: `submenu:${parent.id}:${child.id}`,
+          item: child,
+        };
+      }
+    }
+  }
+
+  const explicitlyActive = enabledItems.find(
+    (item): item is NavbarLinkItem => typeof item.href === "string" && item.active === true,
+  );
+  return explicitlyActive
+    ? { ownerKey: `primary:${explicitlyActive.id}`, item: explicitlyActive }
+    : undefined;
 }
 
 interface NavbarPropsBase extends Omit<HTMLAttributes<HTMLElement>, "children"> {
@@ -179,7 +223,7 @@ interface NavbarPropsBase extends Omit<HTMLAttributes<HTMLElement>, "children"> 
   variant?: NavbarVariant;
   ariaLabel?: string;
   onNavigate?: (
-    item: NavbarItem | NavbarSubItem,
+    item: NavbarItem | NavbarSubItem | NavbarContextItem,
     event: ReactMouseEvent<HTMLAnchorElement>,
   ) => void;
   onMobileOpenChange?: (open: boolean) => void;
@@ -387,7 +431,7 @@ export function Navbar({
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [uncontrolledMobileOpen, setUncontrolledMobileOpen] = useState(defaultMobileOpen);
-  const [openMobileDrawerItemId, setOpenMobileDrawerItemId] = useState<string | null>(null);
+  const [openMobileDrawerOwnerKey, setOpenMobileDrawerOwnerKey] = useState<string | null>(null);
   const [uncontrolledSearchValue, setUncontrolledSearchValue] = useState(
     () => search?.defaultValue ?? "",
   );
@@ -397,28 +441,21 @@ export function Navbar({
   const isBackOffice = variant === "back-office";
   const showGuestActions =
     !isBackOffice && !user && Boolean(guestActions?.login || guestActions?.register);
-  const activePrimaryItem = findActivePrimaryItem(items, activeHref);
-  const activeContextualItems = activePrimaryItem
-    ? getContextualItems(activePrimaryItem)
+  const activeNavbarPage = findActiveNavbarPage(items, activeHref);
+  const activeContextualItems = activeNavbarPage
+    ? getOwnContextualItems(activeNavbarPage.item)
     : undefined;
-  const activeMobileSection =
-    isBackOffice && activePrimaryItem && typeof activePrimaryItem.href === "string" && activeContextualItems
-      ? { item: activePrimaryItem as NavbarLinkItem, contextualItems: activeContextualItems }
+  const activeMobileSection: ResolvedNavbarContext | undefined =
+    isBackOffice && activeNavbarPage && activeContextualItems
+      ? {
+          ownerKey: activeNavbarPage.ownerKey,
+          item: activeNavbarPage.item,
+          contextualItems: activeContextualItems,
+        }
       : undefined;
-  const openMobileDrawerItem = items.find(
-    (item) => isBackOffice && item.id === openMobileDrawerItemId && !item.disabled,
-  );
   const openMobileDrawerContext: ResolvedNavbarContext | undefined =
-    openMobileDrawerItem &&
-    activeMobileSection &&
-    openMobileDrawerItem.id === activeMobileSection.item.id &&
-    typeof openMobileDrawerItem.href === "string"
-      ? (() => {
-          const contextualItems = getContextualItems(openMobileDrawerItem);
-          return contextualItems
-            ? { item: openMobileDrawerItem as NavbarLinkItem, contextualItems }
-            : undefined;
-        })()
+    activeMobileSection?.ownerKey === openMobileDrawerOwnerKey
+      ? activeMobileSection
       : undefined;
   const mobileDrawerOpen = openMobileDrawerContext !== undefined;
 
@@ -440,13 +477,13 @@ export function Navbar({
       if (open) {
         setOpenMenuId(null);
         setUserMenuOpen(false);
-        setOpenMobileDrawerItemId(null);
+        setOpenMobileDrawerOwnerKey(null);
       }
     },
     [isMobileControlled, isMobileOpen, onMobileOpenChange],
   );
   const handleMobileDrawerClose = useCallback(() => {
-    setOpenMobileDrawerItemId(null);
+    setOpenMobileDrawerOwnerKey(null);
     window.setTimeout(() => mobileDrawerTriggerRef.current?.focus(), 50);
   }, []);
   const handleSearchSubmit = useCallback(
@@ -483,21 +520,21 @@ export function Navbar({
   useEffect(() => {
     if (isBackOffice) return;
 
-    const closeDrawerTimer = window.setTimeout(() => setOpenMobileDrawerItemId(null), 0);
+    const closeDrawerTimer = window.setTimeout(() => setOpenMobileDrawerOwnerKey(null), 0);
     return () => window.clearTimeout(closeDrawerTimer);
   }, [isBackOffice]);
 
   useEffect(() => {
     if (
-      openMobileDrawerItemId === null ||
-      openMobileDrawerItemId === activeMobileSection?.item.id
+      openMobileDrawerOwnerKey === null ||
+      openMobileDrawerOwnerKey === activeMobileSection?.ownerKey
     ) {
       return;
     }
 
-    const resetDrawerTimer = window.setTimeout(() => setOpenMobileDrawerItemId(null), 0);
+    const resetDrawerTimer = window.setTimeout(() => setOpenMobileDrawerOwnerKey(null), 0);
     return () => window.clearTimeout(resetDrawerTimer);
-  }, [activeMobileSection?.item.id, openMobileDrawerItemId]);
+  }, [activeMobileSection?.ownerKey, openMobileDrawerOwnerKey]);
 
   useEffect(() => {
     if (!isMobileOpen && !mobileDrawerOpen) return;
@@ -537,7 +574,7 @@ export function Navbar({
       if (!desktopQuery.matches) return;
 
       if (isMobileOpen) handleMobileOpenChange(false);
-      setOpenMobileDrawerItemId(null);
+      setOpenMobileDrawerOwnerKey(null);
       setOpenMenuId(null);
       setUserMenuOpen(false);
     };
@@ -701,7 +738,7 @@ export function Navbar({
                   return;
                 }
 
-                setOpenMobileDrawerItemId(activeMobileSection.item.id);
+                setOpenMobileDrawerOwnerKey(activeMobileSection.ownerKey);
                 window.setTimeout(() => mobileDrawerCloseRef.current?.focus(), 50);
               }}
             >
