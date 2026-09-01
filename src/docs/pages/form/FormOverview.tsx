@@ -51,6 +51,7 @@ export function FormOverview() {
         route="/form/search"
         name="Search Form"
         desc="Kolom pencarian dengan ikon dan tombol aksi opsional."
+        soon
       >
         <NotReadyPreview name="Search Form" />
       </OverviewCard>
@@ -60,6 +61,7 @@ export function FormOverview() {
         name="Upload Form"
         desc="Area unggah berkas dengan status proses dan validasi ukuran."
         wide
+        soon
       >
         <NotReadyPreview name="Upload Form" />
       </OverviewCard>

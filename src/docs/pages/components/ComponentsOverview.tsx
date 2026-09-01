@@ -157,6 +157,7 @@ export function ComponentsOverview() {
         name="Table"
         desc="Tabel data dengan header, baris berselang, dan aksi per baris."
         wide
+        soon
       >
         <NotReadyPreview name="Table" />
       </OverviewCard>

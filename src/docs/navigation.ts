@@ -1,11 +1,7 @@
 /**
- * Struktur navigasi dokumentasi — sumber angka ringkas di halaman Home.
- * Dipisah dari DocsLayout supaya berkas komponen hanya mengekspor komponen
- * (syarat react-refresh).
- *
- * CATATAN: DocsLayout masih menyimpan salinannya sendiri dan tidak mengimpor
- * berkas ini, jadi keduanya harus diubah bersamaan sampai salah satunya
- * dihapus.
+ * Struktur navigasi dokumentasi — satu-satunya sumber untuk panel samping di
+ * DocsLayout sekaligus angka ringkas di halaman Home. Dipisah dari DocsLayout
+ * supaya berkas komponen hanya mengekspor komponen (syarat react-refresh).
  */
 
 export type Section = "home" | "components" | "form" | "foundations" | "example";
@@ -45,8 +41,10 @@ export const rail: { key: Section; label: string; route: string; icon: string }[
 
 /**
  * Entri panel samping; `children` dipakai halaman yang punya sub-halaman.
- * `soon` menandai halaman yang komponennya belum ada (masih PlaceholderPage)
- * supaya tidak ikut terhitung sebagai elemen yang tersedia.
+ * `soon` menandai halaman yang komponennya belum ada (masih PlaceholderPage):
+ * tidak ikut terhitung sebagai elemen yang tersedia di Home, dan tautannya
+ * disembunyikan dari panel samping. Rutenya tetap hidup dan bisa dibuka lewat
+ * URL, jadi entri ini sengaja dipertahankan, bukan dihapus.
  */
 export type NavItem = {
   label: string;

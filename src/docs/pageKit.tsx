@@ -226,14 +226,23 @@ export function OverviewCard({
   name,
   desc,
   wide,
+  soon,
   children,
 }: {
   route: string
   name: string
   desc: string
   wide?: boolean
+  /**
+   * Komponennya belum jadi: kartunya tidak dirender sama sekali supaya halaman
+   * Overview hanya memuat yang sudah siap dipakai. Isinya tetap ditulis di JSX
+   * agar tinggal melepas tanda ini begitu komponennya selesai.
+   */
+  soon?: boolean
   children: ReactNode
 }) {
+  if (soon) return null
+
   return (
     <a
       href={`#${route}`}
