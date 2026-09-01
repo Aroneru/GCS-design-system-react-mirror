@@ -80,7 +80,7 @@ export function CheckboxPage() {
           </div>
         </Demo>
         <SectionCode>
-          {"import { Checkbox } from '@tpl/design-kit-react'\n\n"}
+          {"import { Checkbox } from '@stasi/design-kit-react'\n\n"}
           {'<Checkbox label="Saya menyetujui syarat" defaultChecked />\n\n'}
           {'{/* Inactive — teks meredup sekaligus nonaktif */}\n'}
           {'<Checkbox '}
@@ -258,7 +258,7 @@ export function CheckboxPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Checkbox } from '@tpl/design-kit-react'\n\n"}
+          {"import { Checkbox } from '@stasi/design-kit-react'\n\n"}
           {'<Checkbox\n'}
           {platform === 'mobile' && (
             <>

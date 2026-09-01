@@ -183,7 +183,7 @@ export function FooterPage() {
         </p>
 
         <CodeBlock>
-          {"import { Footer } from '@tpl/design-kit-react'\n"}
+          {"import { Footer } from '@stasi/design-kit-react'\n"}
           {withSocials && "import { Instagram, X, Facebook } from './socialIcons'\n"}
           {'\n'}
           {`{/* ${summary} */}\n`}

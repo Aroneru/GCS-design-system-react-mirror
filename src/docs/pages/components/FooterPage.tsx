@@ -178,7 +178,7 @@ export function FooterPage() {
         </Preview>
 
         <SectionCode>
-          {"import { Footer } from '@tpl/design-kit-react'\n\n"}
+          {"import { Footer } from '@stasi/design-kit-react'\n\n"}
           {'<Footer\n'}
           {'    logo="/images/komdigi-logo.svg"\n'}
           {'    logoAlt="Komdigi — Kementerian Komunikasi dan Digital"\n'}
@@ -454,7 +454,7 @@ export function FooterPage() {
           biru, dan tombol <em>Salin</em> selalu menyalin persis yang sedang tampil.
         </Lead>
         <SectionCode flush>
-          {"import { Footer } from '@tpl/design-kit-react'\n"}
+          {"import { Footer } from '@stasi/design-kit-react'\n"}
           {withSocials && "import { Instagram, X, Facebook } from './socialIcons'\n"}
           {'\n'}
           {`{/* ${summary} */}\n`}

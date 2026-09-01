@@ -99,7 +99,7 @@ export function TextAreaPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { TextArea } from '@tpl/design-kit-react'\n\n"}
+          {"import { TextArea } from '@stasi/design-kit-react'\n\n"}
           {'<TextArea\n'}
           {'    label="Keterangan"\n'}
           {'    placeholder="Tulis keterangan tambahan…"\n'}
@@ -283,7 +283,7 @@ export function TextAreaPage() {
           yang terlihat.
         */}
         <SectionCode flush>
-          {"import { TextArea } from '@tpl/design-kit-react'\n\n"}
+          {"import { TextArea } from '@stasi/design-kit-react'\n\n"}
           {'<TextArea\n'}
           {isEditor && (
             <>
