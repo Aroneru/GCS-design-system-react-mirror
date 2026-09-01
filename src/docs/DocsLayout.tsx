@@ -91,6 +91,7 @@ const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: "Breadcrumb", route: "/components/breadcrumb" },
       { label: "Pagination", route: "/components/pagination" },
       { label: "Sidebar", route: "/components/sidebar" },
+      { label: "Table", route: "/components/table" },
     ],
   },
 };

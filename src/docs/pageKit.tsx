@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { asset } from './asset'
 import { DocHero } from './DocHero'
 import { DocUsage } from './DocUsage'
 
@@ -246,6 +247,23 @@ export function OverviewCard({
         <ArrowRight />
       </span>
     </a>
+  )
+}
+
+/**
+ * Preview untuk komponen yang belum dibuat — ilustrasi Not-Ready.svg.
+ * Dipakai di kartu Overview dan di <PlaceholderPage> supaya "belum jadi"
+ * terlihat sama di mana pun, bukan sketsa palsu yang menyerupai komponen asli.
+ */
+export function NotReadyPreview({ name }: { name: string }) {
+  return (
+    <div className="grid place-items-center rounded-xl bg-surface-subtle p-5">
+      <img
+        src={asset('/images/Not-Ready.svg')}
+        alt={`${name} belum tersedia`}
+        className="h-auto w-full max-w-xs"
+      />
+    </div>
   )
 }
 
