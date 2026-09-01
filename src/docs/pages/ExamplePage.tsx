@@ -1,8 +1,16 @@
-import { useRef } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { ArrowRight } from '../../lib/icons/outline'
 import { useHashRoute } from '../useHashRoute'
 import { Aurora, Magnetic, SplitWords, gsap, useGsap } from '../motion'
-import { KELAS_TIRAI, titikTengah, tutupLalu } from './example/transition'
+import {
+  KELAS_PANEL,
+  KELAS_TIRAI,
+  bukaKeAtas,
+  lupakanPulang,
+  pulangDariApp,
+  titikTengah,
+  tutupLalu,
+} from './example/transition'
 
 /**
  * Pintu masuk ke contoh aplikasi.
@@ -14,7 +22,21 @@ import { KELAS_TIRAI, titikTengah, tutupLalu } from './example/transition'
 export function ExamplePage() {
   const [, navigate] = useHashRoute()
   const tirai = useRef<HTMLDivElement>(null)
+  const panel = useRef<HTMLDivElement>(null)
   const konten = useRef<HTMLDivElement>(null)
+
+  // Dibaca sekali pada render pertama lewat lazy initializer, bukan di dalam
+  // efek: panelnya harus sudah dirender dalam keadaan menutup pada cat pertama,
+  // kalau tidak isi halaman sempat berkedip sebelum sapuannya jalan. Pembacaan
+  // ini murni — penandanya dibersihkan di handler klik, bukan di sini — jadi
+  // aman meski StrictMode menjalankan initializer dua kali.
+  const [pulang] = useState(pulangDariApp)
+
+  useLayoutEffect(() => {
+    if (!pulang) return
+    const ctx = gsap.context(() => bukaKeAtas(panel.current))
+    return () => ctx.revert()
+  }, [pulang])
 
   const scope = useGsap<HTMLDivElement>(({ q }) => {
     gsap.from(q('[data-intro]'), {
@@ -65,11 +87,12 @@ export function ExamplePage() {
             <Magnetic strength={22}>
               <button
                 type="button"
-                onClick={(e) =>
+                onClick={(e) => {
+                  lupakanPulang()
                   tutupLalu(tirai.current, konten.current, titikTengah(e.currentTarget), () =>
                     navigate('/example/app'),
                   )
-                }
+                }}
                 className="group inline-flex items-center gap-3 rounded-full bg-primary-700 px-8 py-4 text-base font-black text-white shadow-lg transition-colors hover:bg-primary-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700"
               >
                 Buka contoh aplikasi
@@ -80,7 +103,13 @@ export function ExamplePage() {
         </div>
       </div>
 
+      {/* Gelembung: paruh pertama transisi masuk. Panel: paruh kedua transisi pulang. */}
       <div ref={tirai} className={`${KELAS_TIRAI} scale-0`} aria-hidden="true" />
+      <div
+        ref={panel}
+        className={`${KELAS_PANEL} ${pulang ? 'translate-y-0' : 'translate-y-full'}`}
+        aria-hidden="true"
+      />
     </>
   )
 }

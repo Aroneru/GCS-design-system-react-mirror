@@ -3,7 +3,7 @@ import { ArrowLeft } from '../../../lib/icons/outline'
 import { useHashRoute } from '../../useHashRoute'
 import { Magnetic, gsap } from '../../motion'
 import { DemoApp } from './DemoApp'
-import { KELAS_TIRAI, bukaTirai, titikTengah, tutupLalu } from './transition'
+import { KELAS_PANEL, KELAS_TIRAI, bukaTirai, tandaiPulang, tutupKeAtas } from './transition'
 import { JUDUL_HALAMAN, type HalamanDemo } from './data'
 
 /**
@@ -24,6 +24,8 @@ function halamanDari(path: string): HalamanDemo {
 export function ExampleAppFrame({ path }: { path: string }) {
   const [, navigate] = useHashRoute()
   const tirai = useRef<HTMLDivElement>(null)
+  const panel = useRef<HTMLDivElement>(null)
+  const isi = useRef<HTMLDivElement>(null)
 
   // Tirai dibuka lewat useLayoutEffect, bukan useGsap: hook itu melewatkan
   // callback-nya sama sekali saat gerak diminta dikurangi, padahal tirainya
@@ -39,17 +41,20 @@ export function ExampleAppFrame({ path }: { path: string }) {
 
   return (
     <>
-      <DemoApp halaman={halamanDari(path)} />
+      <div ref={isi}>
+        <DemoApp halaman={halamanDari(path)} />
+      </div>
 
       <div className="fixed right-4 bottom-4 z-50">
         <Magnetic>
           <button
             type="button"
-            onClick={(e) =>
-              tutupLalu(tirai.current, null, titikTengah(e.currentTarget), () =>
-                navigate('/example'),
-              )
-            }
+            onClick={() => {
+              // Ditandai di handler, bukan di efek — lihat catatan pada
+              // `pulangDariApp` di transition.ts.
+              tandaiPulang()
+              tutupKeAtas(panel.current, isi.current, () => navigate('/example'))
+            }}
             className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-lg transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700"
           >
             <ArrowLeft className="size-4" />
@@ -58,7 +63,9 @@ export function ExampleAppFrame({ path }: { path: string }) {
         </Magnetic>
       </div>
 
+      {/* Gelembung: paruh kedua transisi masuk. Panel: paruh pertama transisi pulang. */}
       <div ref={tirai} className={`${KELAS_TIRAI} scale-100`} aria-hidden="true" />
+      <div ref={panel} className={`${KELAS_PANEL} translate-y-full`} aria-hidden="true" />
     </>
   )
 }
