@@ -63,15 +63,24 @@ const sidebarProps: PropRow[] = [
     "Menampilkan tombol collapse tanpa mengaktifkan interaksi.",
   ],
   ["onCollapse", "() => void", "undefined", "Handler untuk memperbarui state collapsed."],
+];
+
+const sidebarItemProps: PropRow[] = [
   ["label", "string", "—", "Teks menu yang ditampilkan."],
   ["href", "string", "undefined", "Tujuan tautan menu."],
   ["icon", "ReactNode", "undefined", "Icon opsional di sebelah label menu."],
   ["badge", "ReactNode", "undefined", "Konten badge pada sisi kanan menu."],
-  ["active", "boolean", "false", "State aktif per-item; dikendalikan consumer."],
-  ["disabled", "boolean", "false", "State disabled per-item; menonaktifkan interaksi menu."],
+  ["active", "boolean", "false", "Mengaktifkan tampilan state aktif."],
+  ["disabled", "boolean", "false", "Menonaktifkan interaksi pada menu."],
   ["children", "SidebarSubItem[]", "undefined", "Daftar submenu pada menu."],
-  ["defaultOpen", "boolean", "false", "Initial state submenu saat pertama dirender."],
-  ["submenuToggleDisabled", "boolean", "false", "State disabled khusus tombol buka/tutup submenu."],
+  ["defaultOpen", "boolean", "false", "Membuka submenu saat pertama dirender."],
+  [
+    "submenuToggleDisabled",
+    "boolean",
+    "false",
+    "Menonaktifkan tombol buka/tutup submenu tanpa menonaktifkan menu.",
+  ],
+  ["onCollapse", "() => void", "undefined", "Callback ketika tombol collapse Sidebar ditekan."],
 ];
 
 const toc: TocEntry[] = [
@@ -699,6 +708,9 @@ const groups: SidebarGroup[] = [
         </p>
 
         <PropsTable rows={sidebarProps} minWidth="46rem" />
+
+        <h3 className="mt-8 mb-3 text-sm font-bold text-gray-900">SidebarItem</h3>
+        <PropsTable rows={sidebarItemProps} minWidth="46rem" />
       </FlowSection>
     </UsulanPage>
   );
