@@ -3,6 +3,7 @@ import { Footer, type FooterMenu } from "../lib";
 import { FacebookIcon, InstagramIcon, XIcon } from "./socialIcons";
 import { asset } from "./asset";
 import { rail, sidebars, type NavItem, type Section } from "./navigation";
+import { Drawer, prefersReducedMotion, SlideIn } from "./motion";
 
 /**
  * Menu footer sama di seluruh halaman: kelima area utama, diturunkan dari
@@ -31,7 +32,7 @@ function NavLinks({ items, path }: { items: NavItem[]; path: string }) {
       {items
         .filter((item) => !item.soon)
         .map((item) => (
-          <div key={item.route} className="mt-1">
+          <div key={item.route} data-slide-item className="mt-1">
             <a
               href={`#${item.route}`}
               className={`ds-nav-link w-full ${path === item.route ? "is-active" : ""}`}
@@ -72,6 +73,63 @@ function Logo({ small }: { small?: boolean }) {
   );
 }
 
+/**
+ * Panel navigasi samping di desktop, lengkap dengan cara masuknya.
+ *
+ * Panel ini baru terpasang saat pengguna membuka area yang memang punya
+ * sub-navigasi, jadi berpindah dari Beranda ke Components memunculkannya dari
+ * nol. Kelas lebar sendiri tidak akan pernah beranimasi di saat itu: transisi
+ * CSS butuh nilai berubah, sedangkan pada pemasangan pertama lebarnya langsung
+ * bernilai akhir — kolom konten di sebelahnya melompat begitu saja.
+ *
+ * `entered` yang menutup celah itu. Frame pertama digambar dengan lebar nol,
+ * lalu satu frame berikutnya menyalakan lebar penuh — dan barulah transisi CSS
+ * punya perubahan untuk dianimasikan. Setelah itu ia tinggal mengikuti `open`
+ * seperti biasa.
+ *
+ * Lebar memang bukan properti yang murah untuk dianimasikan, tapi di sini ia
+ * tidak terhindarkan: kolom konten di sebelahnya harus ikut bergeser. Yang bisa
+ * dihindari adalah menganimasikan isinya dengan cara yang sama — itu ditangani
+ * `SlideIn` lewat transform.
+ */
+function SidebarPanel({
+  open,
+  section,
+  children,
+}: {
+  open: boolean;
+  section: Section;
+  children: ReactNode;
+}) {
+  // Tanpa animasi, panel langsung berada di lebar akhirnya sejak frame pertama.
+  const [entered, setEntered] = useState(() => prefersReducedMotion());
+
+  useEffect(() => {
+    if (entered) return;
+    // rAF, bukan setState langsung: perubahan lebar harus jatuh di frame
+    // SETELAH frame yang menggambar lebar nol, kalau tidak React menggabungkan
+    // keduanya dan tidak ada nilai yang pernah berubah untuk ditransisikan.
+    const id = requestAnimationFrame(() => setEntered(true));
+    return () => cancelAnimationFrame(id);
+  }, [entered]);
+
+  const shown = entered && open;
+
+  return (
+    <aside
+      className={`sticky top-0 z-20 hidden h-screen shrink-0 overflow-hidden bg-white transition-[width] duration-300 ease-out lg:block ${
+        shown ? "w-[248px] border-r border-border" : "w-0"
+      }`}
+      aria-hidden={!open}
+    >
+      {/* Lebar dikunci di dalam supaya isinya tidak ikut mengkerut saat panel menutup. */}
+      <SlideIn keyed={section} className="flex h-full w-[248px] flex-col overflow-y-auto px-5 py-7">
+        {children}
+      </SlideIn>
+    </aside>
+  );
+}
+
 export function DocsLayout({ path, children }: { path: string; children: ReactNode }) {
   const section = sectionOf(path);
   const sidebar = sidebars[section] ?? null;
@@ -109,70 +167,77 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
       </div>
 
       {/* ══ Drawer — mobile ══ */}
-      {drawer && (
+      {/*
+        `Drawer` menahan dirinya tetap di DOM sampai animasi keluarnya selesai,
+        jadi `drawer` di sini murni niat buka/tutup — bukan penanda apakah panel
+        masih terpasang.
+      */}
+      <Drawer open={drawer} onClose={() => setDrawer(false)} label="Navigasi">
         <div
-          className="fixed inset-0 z-50 lg:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Navigasi"
+          data-drawer-item
+          className="flex items-center justify-between border-b border-border px-5 py-4"
         >
-          <div className="absolute inset-0 bg-gray-900/50" onClick={() => setDrawer(false)} />
-          <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-border px-5 py-4">
-              <span className="text-sm font-black tracking-tight text-gray-900">Navigasi</span>
-              <button
-                onClick={() => setDrawer(false)}
-                className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
-                aria-label="Tutup navigasi"
-              >
-                <svg
-                  className="size-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
-                </svg>
-              </button>
-            </div>
-            <nav
-              className="px-4 py-5"
-              onClick={(e) => (e.target as HTMLElement).closest("a") && setDrawer(false)}
+          <span className="text-sm font-black tracking-tight text-gray-900">Navigasi</span>
+          <button
+            onClick={() => setDrawer(false)}
+            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+            aria-label="Tutup navigasi"
+          >
+            <svg
+              className="size-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
             >
-              <p className="mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">
-                Area
-              </p>
-              {rail.map((item) => (
-                <a
-                  key={item.key}
-                  href={`#${item.route}`}
-                  className={`ds-nav-link mt-1 w-full ${section === item.key ? "is-active" : ""}`}
-                >
-                  <svg
-                    className="size-4.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.8}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-                  </svg>
-                  {item.label}
-                </a>
-              ))}
-              {sidebar && (
-                <>
-                  <p className="mt-6 mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">
-                    {sidebar.title}
-                  </p>
-                  <NavLinks items={sidebar.items} path={path} />
-                </>
-              )}
-            </nav>
-          </aside>
+              <path strokeLinecap="round" d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
         </div>
-      )}
+        <nav
+          className="px-4 py-5"
+          onClick={(e) => (e.target as HTMLElement).closest("a") && setDrawer(false)}
+        >
+          <p
+            data-drawer-item
+            className="mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase"
+          >
+            Area
+          </p>
+          {rail.map((item) => (
+            <a
+              key={item.key}
+              data-drawer-item
+              href={`#${item.route}`}
+              className={`ds-nav-link mt-1 w-full ${section === item.key ? "is-active" : ""}`}
+            >
+              <svg
+                className="size-4.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.8}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
+              </svg>
+              {item.label}
+            </a>
+          ))}
+          {sidebar && (
+            <>
+              <p
+                data-drawer-item
+                className="mt-6 mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase"
+              >
+                {sidebar.title}
+              </p>
+              <div data-drawer-item>
+                <NavLinks items={sidebar.items} path={path} />
+              </div>
+            </>
+          )}
+        </nav>
+      </Drawer>
 
       {/*
        * Baris utama: rail + panel samping + konten. Keduanya `sticky` (bukan
@@ -233,30 +298,25 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
 
         {/* ══ Sidebar drawer — desktop ══ */}
         {sidebar && (
-          <aside
-            className={`sticky top-0 z-20 hidden h-screen shrink-0 overflow-hidden bg-white transition-[width] duration-300 ease-out lg:block ${
-              sidebarOpen ? "w-[248px] border-r border-border" : "w-0"
-            }`}
-            aria-hidden={!sidebarOpen}
-          >
-            {/* Lebar dikunci di dalam supaya isinya tidak ikut mengkerut saat panel menutup. */}
-            <div className="flex h-full w-[248px] flex-col overflow-y-auto px-5 py-7">
-              <p className="px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">
-                {sidebar.title}
+          <SidebarPanel open={sidebarOpen} section={section}>
+              <p
+              data-slide-item
+              className="px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase"
+            >
+              {sidebar.title}
+            </p>
+            <nav className="mt-2" aria-label={sidebar.title}>
+              <NavLinks items={sidebar.items} path={path} />
+            </nav>
+            <div data-slide-item className="mt-auto rounded-xl bg-gray-50 p-4">
+              <p className="text-xs font-bold text-gray-900">Foundation v1.0</p>
+              <p className="mt-1 text-xs leading-5 text-gray-500">
+                React · Vite
+                <br />
+                Tailwind CSS v4
               </p>
-              <nav className="mt-2" aria-label={sidebar.title}>
-                <NavLinks items={sidebar.items} path={path} />
-              </nav>
-              <div className="mt-auto rounded-xl bg-gray-50 p-4">
-                <p className="text-xs font-bold text-gray-900">Foundation v1.0</p>
-                <p className="mt-1 text-xs leading-5 text-gray-500">
-                  React · Vite
-                  <br />
-                  Tailwind CSS v4
-                </p>
-              </div>
             </div>
-          </aside>
+          </SidebarPanel>
         )}
 
         {/* ══ Konten ══ */}

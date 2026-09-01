@@ -8,9 +8,11 @@
  */
 export { Aurora } from './Aurora'
 export { CountUp } from './CountUp'
+export { Drawer } from './Drawer'
 export { Magnetic } from './Magnetic'
 export { Reveal, SplitWords } from './Reveal'
 export { ScrollProgress } from './ScrollProgress'
+export { SlideIn } from './SlideIn'
 export { SpotlightCard } from './SpotlightCard'
 export { TiltCard } from './TiltCard'
 export { useGsap } from './useGsap'
