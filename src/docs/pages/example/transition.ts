@@ -131,3 +131,79 @@ export function titikTengah(el: HTMLElement | null): Titik | null {
   const r = el.getBoundingClientRect()
   return { x: r.left + r.width / 2, y: r.top + r.height / 2 }
 }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Arah pulang: sapuan panel ke atas
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Panel persegi untuk transisi kembali ke dokumentasi.
+ *
+ * Arah pulang sengaja tidak memakai gelembung. Bukan demi variasi: gerakan
+ * yang sama persis di kedua arah membuat "masuk" dan "keluar" terasa identik,
+ * padahal maknanya berlawanan. Panel yang menyapu ke atas — masuk dari bawah
+ * saat meninggalkan aplikasi, lalu lanjut keluar lewat atas saat dokumentasi
+ * muncul — memberi satu arah gerak yang konsisten, sehingga perpindahannya
+ * terbaca sebagai satu gerakan menaik, bukan dua kejadian terpisah.
+ */
+export const KELAS_PANEL =
+  'pointer-events-none fixed inset-0 z-[100] bg-gradient-to-b from-primary-100 to-primary-300'
+
+/**
+ * Penanda bahwa navigasi terakhir adalah aplikasi → dokumentasi.
+ *
+ * Dibutuhkan karena `/example` juga bisa dibuka langsung dari navigasi docs,
+ * dan di kasus itu panel biru selayar penuh tidak boleh muncul sama sekali.
+ *
+ * Disetel dan dibersihkan dari handler klik, bukan dari efek: efek berjalan
+ * dua kali di StrictMode, dan penanda yang dibersihkan pada pass pertama akan
+ * membuat animasinya hilang di pass kedua.
+ */
+let pulang = false
+
+export const tandaiPulang = () => {
+  pulang = true
+}
+export const lupakanPulang = () => {
+  pulang = false
+}
+export const pulangDariApp = () => pulang
+
+/** Menaikkan panel dari bawah sampai menutup layar, lalu menjalankan `lalu`. */
+export function tutupKeAtas(
+  panel: HTMLElement | null,
+  konten: HTMLElement | null,
+  lalu: () => void,
+) {
+  if (!panel || prefersReducedMotion()) {
+    lalu()
+    return
+  }
+
+  const tl = gsap.timeline({ onComplete: lalu })
+
+  // Konten ikut terangkat sedikit, jadi terasa didorong panel — bukan sekadar
+  // tertutup olehnya.
+  if (konten) {
+    tl.to(konten, { opacity: 0, y: -28, duration: 0.5, ease: 'sine.in' }, 0)
+  }
+
+  tl.fromTo(panel, { yPercent: 100 }, { yPercent: 0, duration: 0.7, ease: EASE }, 0.08)
+}
+
+/**
+ * Melanjutkan sapuan: panel keluar lewat atas, menyingkap dokumentasi.
+ *
+ * Panelnya dirender sudah menutup (lihat `pulangDariApp`), jadi tidak ada kedip
+ * konten sebelum efek berjalan.
+ */
+export function bukaKeAtas(panel: HTMLElement | null) {
+  if (!panel) return
+
+  if (prefersReducedMotion()) {
+    gsap.set(panel, { yPercent: -100 })
+    return
+  }
+
+  gsap.to(panel, { yPercent: -100, duration: 0.8, ease: EASE, delay: 0.05 })
+}
