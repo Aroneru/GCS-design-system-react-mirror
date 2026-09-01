@@ -7,7 +7,7 @@ export function ComponentsOverview() {
     <OverviewPage
       eyebrow="Components · Overview"
       title="Components"
-      description="Komponen React siap pakai dari package @tpl/design-kit-react. Dipakai lewat import { Nama } from '@tpl/design-kit-react' setelah package terpasang."
+      description="Komponen React siap pakai dari package @stasi/design-kit-react. Dipakai lewat import { Nama } from '@stasi/design-kit-react' setelah package terpasang."
     >
       <OverviewCard
         route="/components/container"

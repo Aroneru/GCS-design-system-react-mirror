@@ -102,7 +102,7 @@ export function ToastPage() {
           </div>
         </Demo>
         <SectionCode>
-          {"import { Toast } from '@tpl/design-kit-react'\n\n"}
+          {"import { Toast } from '@stasi/design-kit-react'\n\n"}
           {'<Toast '}
           <H>variant</H>
           {'="success">Sukses Membuat Data!</Toast>'}
@@ -126,8 +126,8 @@ export function ToastPage() {
           </Toast>
         </Demo>
         <SectionCode>
-          {"import { Button, Toast } from '@tpl/design-kit-react'\n"}
-          {"import { Refresh } from '@tpl/design-kit-react/icons/outline'\n\n"}
+          {"import { Button, Toast } from '@stasi/design-kit-react'\n"}
+          {"import { Refresh } from '@stasi/design-kit-react/icons/outline'\n\n"}
           {'<Toast\n'}
           {'    variant="info"\n'}
           {'    '}
@@ -305,8 +305,8 @@ export function ToastPage() {
           <H>fixed</H> ikut ditulis karena posisinya memang ditentukan di sana, bukan di dalam Toast.
         </Lead>
         <SectionCode flush>
-          {"import { Toast } from '@tpl/design-kit-react'\n"}
-          {pakaiAksi && "import { Refresh } from '@tpl/design-kit-react/icons/outline'\n"}
+          {"import { Toast } from '@stasi/design-kit-react'\n"}
+          {pakaiAksi && "import { Refresh } from '@stasi/design-kit-react/icons/outline'\n"}
           {'\n'}
           {'<div className="fixed '}
           <H>{`${sudutTerpilih.vertical} ${sudutTerpilih.horizontal}`}</H>
