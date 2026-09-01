@@ -487,9 +487,7 @@ function CodeWindow() {
     return () => {
       tl.kill()
     }
-  }, [
-    // indexhey-
-  ])
+  }, [index])
     
   /*
    * Lampu menyala.
@@ -644,13 +642,13 @@ function CodeWindow() {
           benar: kedipan terang-gelap adalah persis jenis gerak yang diminta
           untuk tidak dijalankan, jadi jendelanya tinggal gelap seperti biasa.
         */}
-        {/* <img
+        <img
           data-wowo
           src={asset('/images/87dabbda5bfc01063ce53720723e862b59576b383d1895913e03148d029525d264ebd1461d74ae3e29a50f303ef8a910.png')}
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-0 size-full object-cover opacity-0 select-none"
-        /> */}
+        />
 
         <div className="relative z-10 flex items-center gap-3 bg-gray-800/70 px-4 py-3">
           <WindowDots />
