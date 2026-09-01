@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Navbar, type NavbarItem } from "../../../lib";
+import { Cart, ChartPie, Clipboard, Layers } from "flowbite-react-icons/solid";
+import { Navbar, Sidebar, type NavbarItem, type SidebarItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import {
   ControlLabel,
@@ -161,6 +162,32 @@ function getMobilePreviewPage(items: NavbarItem[], activeHref?: string) {
     title: "Beranda",
     description: "Pilih menu dari navigasi utama untuk melihat contoh halaman.",
   };
+}
+
+const sidebarMenuIcons = [
+  <ChartPie key="chart" className="size-5" />,
+  <Clipboard key="clipboard" className="size-5" />,
+  <Cart key="cart" className="size-5" />,
+  <Layers key="layers" className="size-5" />,
+];
+
+function toSidebarItems(items: NavbarItem[], activeHref?: string): SidebarItem[] {
+  return items.map((item, index) => ({
+    id: item.id,
+    label: item.label,
+    href: "href" in item ? item.href : undefined,
+    icon: sidebarMenuIcons[index],
+    active: ("href" in item && item.href === activeHref) || item.active,
+    disabled: item.disabled,
+    defaultOpen: item.children?.some((child) => child.href === activeHref),
+    children: item.children?.map((child) => ({
+      id: child.id,
+      label: child.label,
+      href: child.href,
+      active: child.href === activeHref,
+      disabled: child.disabled,
+    })),
+  }));
 }
 
 const accountItems = [
@@ -792,10 +819,11 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
   const effectiveMenuCount =
     playground && [1, 2, 3, 4, 5].includes(requestedMenuCount)
       ? (requestedMenuCount as 1 | 2 | 3 | 4 | 5)
-      : 3;
+      : 4;
   const previewItems = figmaMenuItems[effectiveMenuCount];
   const [activeHref, setActiveHref] = useState<string>();
   const previewPage = getMobilePreviewPage(previewItems, activeHref);
+  const sidebarItems = toSidebarItems(figmaMenuItems[4], activeHref);
   const authenticated = playground
     ? params.get("navbarState") === "authenticated"
     : variant === "authenticated";
@@ -816,6 +844,7 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
       <Navbar
         variant={navbarVariant}
         key={navigationInstanceKey}
+        className="[&_[data-navbar-mobile-sidebar]]:hidden [&_[data-navbar-mobile-drawer]]:hidden"
         brand={<DemoBrand />}
         brandHref="/"
         brandLabel="STASI — Beranda"
@@ -844,6 +873,32 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
         mobileOpen={open}
         onMobileOpenChange={setOpen}
       />
+      {open && (
+        <div className="fixed inset-0 z-[60] lg:hidden">
+          <button
+            type="button"
+            className="absolute inset-0 bg-gray-900/50"
+            aria-label="Tutup sidebar"
+            onClick={() => setOpen(false)}
+          />
+          <Sidebar
+            className="relative z-10 h-full !min-h-0 w-[88vw] max-w-[320px] shadow-soft"
+            aria-label="Navigasi utama"
+            logo={<DemoBrand />}
+            items={sidebarItems}
+            onCollapse={() => setOpen(false)}
+            onClick={(event) => {
+              const link = (event.target as HTMLElement).closest<HTMLAnchorElement>("a");
+              const href = link?.getAttribute("href");
+              if (!href) return;
+
+              event.preventDefault();
+              setActiveHref(href);
+              setOpen(false);
+            }}
+          />
+        </div>
+      )}
       <main className="min-h-[480px] bg-surface px-4 py-6">
         <section className="max-w-prose" aria-live="polite">
           <h1 className="text-lg font-bold text-content">{previewPage.title}</h1>
