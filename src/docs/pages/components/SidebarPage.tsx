@@ -50,6 +50,7 @@ const sidebarProps: PropRow[] = [
   ["logo", "ReactNode", "undefined", "Logo atau identitas aplikasi pada bagian atas Sidebar."],
   ["collapsedLogo", "ReactNode", "undefined", "Logo/mark ringkas untuk Sidebar collapsed."],
   ["user", "SidebarUser", "undefined", "Informasi pengguna yang ditampilkan pada profile section."],
+  ["sticky", "boolean", "false", "Menempelkan Sidebar di atas viewport dan membatasi tingginya setinggi viewport."],
   [
     "collapsed",
     "boolean",
@@ -342,6 +343,7 @@ export function SidebarPage() {
       ? ["  user={{ name: 'Nama User', profileLabel: 'Lihat Profil', href: '#' }}"]
       : []),
     `  ${separator === "show" ? "groups={groups}" : "items={items}"}`,
+    "  sticky",
     `  collapsed={${collapsed}}`,
     ...(collapseButton === "show"
       ? ["  onCollapse={() => setCollapsed((current) => !current)}"]
@@ -350,6 +352,7 @@ export function SidebarPage() {
   ].join("\n");
   const usageHighlights = [
     "collapsed",
+    "sticky",
     ...(menuIcon === "show" ? ["icon"] : []),
     ...(badge === "show" ? ["badge"] : []),
     ...(userInfo === "show" ? ["user"] : []),

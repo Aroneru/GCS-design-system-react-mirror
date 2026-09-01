@@ -11,6 +11,7 @@ export function Sidebar({
   logo,
   collapsedLogo,
   user,
+  sticky = false,
   collapsed = false,
   showCollapseButton = false,
   onCollapse,
@@ -26,6 +27,7 @@ export function Sidebar({
       className={cn(
         "flex min-h-screen flex-col border-r border-gray-200 bg-white",
         "transition-all duration-200",
+        sticky && "sticky top-0 h-screen self-start",
         collapsed ? "w-[72px]" : "w-[280px]",
         className,
       )}
@@ -42,7 +44,7 @@ export function Sidebar({
             <div
               className={cn(
                 "flex min-w-0 items-center",
-                collapsed && "order-2 max-w-full justify-center",
+                collapsed && "order-2 w-full max-w-full justify-end",
               )}
             >
               {visibleLogo}

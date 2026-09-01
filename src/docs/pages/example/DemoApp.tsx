@@ -101,11 +101,16 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
         <div className="hidden lg:block">
           <Sidebar
             logo={
-              <img src={asset('/images/stasi-logo.svg')} alt="STASI" className="h-8 w-auto" />
+              <img
+                src={asset('/images/stasi-logo.svg')}
+                alt="STASI"
+                className="mx-auto h-8 max-w-full w-auto"
+              />
             }
-            collapsedLogo={<img src={asset('/images/s.svg')} alt="STASI" className="size-8" />}
+            collapsedLogo={<img src={asset('/stasi.svg')} alt="STASI" className="size-8 object-contain" />}
             items={menu}
             user={{ name: 'Yermi Rachman', profileLabel: 'Administrator' }}
+            sticky
             collapsed={ringkas}
             onCollapse={() => setRingkas((v) => !v)}
           />
