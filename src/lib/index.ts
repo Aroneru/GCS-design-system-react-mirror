@@ -20,6 +20,15 @@ export type { SpinnerProps, SpinnerSize } from "./components/Spinner";
 export { Popover } from "./components/Popover";
 export type { PopoverProps, PopoverSide } from "./components/Popover";
 
+export { Modal, ModalHeader, ModalBody, ModalFooter } from "./components/Modal";
+export type {
+  ModalProps,
+  ModalSize,
+  ModalHeaderProps,
+  ModalBodyProps,
+  ModalFooterProps,
+} from "./components/Modal";
+
 export { Alert } from "./components/Alert";
 export type { AlertProps, AlertVariant, AlertSurface } from "./components/Alert";
 

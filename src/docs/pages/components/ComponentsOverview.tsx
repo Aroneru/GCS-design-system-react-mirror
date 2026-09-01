@@ -77,6 +77,28 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/modal"
+        name="Modal"
+        desc="Dialog terkontrol untuk informasi atau tindakan yang harus diselesaikan sebelum kembali ke halaman utama."
+      >
+        <div className="rounded-xl bg-gray-900/40 p-5">
+          <div className="mx-auto max-w-[240px] overflow-hidden rounded-lg border border-border bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div className="h-2.5 w-24 rounded bg-gray-300" />
+              <div className="size-3 rounded bg-gray-200" />
+            </div>
+            <div className="space-y-2 px-4 py-5">
+              <div className="h-1.5 w-full rounded bg-gray-200" />
+              <div className="h-1.5 w-2/3 rounded bg-gray-200" />
+            </div>
+            <div className="border-t border-border px-4 py-3">
+              <div className="h-6 w-20 rounded-lg bg-primary-700" />
+            </div>
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/toast"
         name="Toast"
         desc="Notifikasi sekilas yang melayang di atas konten, dengan heading dan aksi opsional."
