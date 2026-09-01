@@ -63,14 +63,12 @@ function NavLinks({ items, path }: { items: NavItem[]; path: string }) {
 
 function Logo({ small }: { small?: boolean }) {
   return (
-    <span
-      className={`grid ${small ? "size-8 p-1.5" : "size-9 p-2"} grid-cols-2 gap-0.5 rounded-lg bg-primary-700 shadow-sm`}
-    >
-      <span className="rounded-[3px] bg-white" />
-      <span className="rounded-[3px] bg-primary-300" />
-      <span className="rounded-[3px] bg-primary-300" />
-      <span className="rounded-[3px] bg-white" />
-    </span>
+    <img
+      src={asset("/stasi.svg")}
+      alt=""
+      aria-hidden="true"
+      className={`${small ? "size-8" : "size-9"} shrink-0 object-contain`}
+    />
   );
 }
 

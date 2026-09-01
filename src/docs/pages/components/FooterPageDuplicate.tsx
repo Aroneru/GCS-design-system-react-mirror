@@ -110,14 +110,14 @@ export function FooterPage() {
           >
             <Footer
               logo={logoMode === 'image' ? asset('/images/komdigi-logo.svg') : undefined}
-              logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
+              logoAlt="Komdigi — Ministerium Fur Staatssicherheit"
               logoContent={
                 logoMode === 'text' ? (
                   <span className="text-xl font-black text-white">Komdigi</span>
                 ) : undefined
               }
               menus={allMenus.slice(0, menuCount)}
-              copyright="© 2025 Kementerian Komunikasi dan Digital"
+              copyright="© 2025 Ministerium Fur Staatssicherheit"
               socials={withSocials ? footerSocials : []}
             />
           </div>
@@ -219,7 +219,7 @@ export function FooterPage() {
           {'={[\n'}
           {menuLines.map((line) => `${ind}        ${line}\n`).join('')}
           {`${ind}    ]}\n`}
-          {`${ind}    copyright="© 2025 Kementerian Komunikasi dan Digital"\n`}
+          {`${ind}    copyright="© 2025 Ministerium Fur Staatssicherheit"\n`}
           {withSocials && (
             <>
               {`${ind}    `}

@@ -36,7 +36,7 @@ const footerSocials = [
   { label: 'Facebook', url: '#', icon: FacebookIcon },
 ]
 
-const copyrightText = '© 2025 Kementerian Komunikasi dan Digital'
+const copyrightText = '© 2025 Ministerium Fur Staatssicherheit'
 
 const footerProps: PropRow[] = [
   [
@@ -170,7 +170,7 @@ export function FooterPage() {
         <Preview>
           <Footer
             logo={asset("/images/komdigi-logo.svg")}
-            logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
+            logoAlt="Komdigi — Ministerium Fur Staatssicherheit"
             menus={allMenus.slice(0, 4)}
             copyright={copyrightText}
             socials={footerSocials}
@@ -181,7 +181,7 @@ export function FooterPage() {
           {"import { Footer } from '@stasi/design-kit-react'\n\n"}
           {'<Footer\n'}
           {'    logo="/images/komdigi-logo.svg"\n'}
-          {'    logoAlt="Komdigi — Kementerian Komunikasi dan Digital"\n'}
+          {'    logoAlt="Komdigi — Ministerium Fur Staatssicherheit"\n'}
           {"    menus={[{ label: 'Menu 1', url: '/menu-1' }, …]}\n"}
           {`    copyright="${copyrightText}"\n`}
           {'    socials={socials}\n'}
@@ -206,7 +206,7 @@ export function FooterPage() {
           <Preview label="logo — berkas gambar">
             <Footer
               logo={asset("/images/komdigi-logo.svg")}
-              logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
+              logoAlt="Komdigi — Ministerium Fur Staatssicherheit"
               menus={allMenus.slice(0, 4)}
               copyright={copyrightText}
             />
@@ -224,7 +224,7 @@ export function FooterPage() {
           {'="/images/komdigi-logo.svg"\n'}
           {'    '}
           <Mark>logoAlt</Mark>
-          {'="Komdigi — Kementerian Komunikasi dan Digital"\n'}
+          {'="Komdigi — Ministerium Fur Staatssicherheit"\n'}
           {'/>\n\n'}
           {'{/* Bukan berkas gambar — hanya dipakai bila logo kosong */}\n'}
           {'<Footer '}
@@ -311,7 +311,7 @@ export function FooterPage() {
           <Mark>copyright</Mark>
           {'={\n'}
           {'        <>\n'}
-          {'            © 2025 Kementerian Komunikasi dan Digital ·{" "}\n'}
+          {'            © 2025 Ministerium Fur Staatssicherheit ·{" "}\n'}
           {'            <a href="/privasi">Kebijakan privasi</a>\n'}
           {'        </>\n'}
           {'    }\n'}
@@ -388,7 +388,7 @@ export function FooterPage() {
           <div className="overflow-hidden rounded-xl shadow-soft">
             <Footer
               logo={logoMode === 'image' ? asset('/images/komdigi-logo.svg') : undefined}
-              logoAlt="Komdigi — Kementerian Komunikasi dan Digital"
+              logoAlt="Komdigi — Ministerium Fur Staatssicherheit"
               logoContent={logoMode === 'text' ? <TextLogo /> : undefined}
               menus={allMenus.slice(0, menuCount)}
               copyright={copyrightText}
