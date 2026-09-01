@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 // Footer tidak diimpor: DocsLayout sudah memasangnya untuk seluruh halaman.
 import { Badge, Button, Card, Checkbox, Container, InputField, Toggle } from '../../lib'
 import * as OutlineIcons from '../../lib/icons/outline'
@@ -151,6 +151,52 @@ export function FormPermohonan() {
 ]
 
 /* ---------- Jendela kode di hero ---------- */
+
+/**
+ * Easter egg: klip suara di balik tombol pengeras suara di title bar jendela.
+ *
+ * Diputar bergantian, bukan acak. Acak berarti klip yang sama bisa keluar dua
+ * kali berturut-turut — dan lelucon yang diulang persis terdengar seperti tombol
+ * yang rusak, bukan seperti giliran berikutnya.
+ */
+const EGG_CLIPS = [
+  { src: '/icons/5d31a94b3f09a18ca28485339e47d67492b8f26443db53f0bdd352655438cba4b2d45e4920d2578f5c538ff0c44b63a417646e1e1db10e50cc2068a34374cb3d.mp3', label: 'Hey, antek-antek asing' },
+  { src: '/icons/fd6c085a954ccdeae8b4afe94b06a34b1de98c7ba942c778121a4fd88f0e20b1ff06bc594f81defe832a6a8a14067fdb.mp3', label: 'Hidup Jokowi' },
+]
+
+/**
+ * Pola kedip lampu rusak untuk latar jendela kode.
+ *
+ * Ditulis sebagai data, bukan diacak saat berjalan. Angka acak membuat tiap
+ * putaran berbeda — kedengarannya bagus, tapi hasilnya justru kehilangan bentuk:
+ * yang bikin sebuah kedipan terasa "rusak" adalah iramanya yang timpang tapi
+ * DIKENALI, bukan sekadar tak beraturan. Pola tetap juga berarti apa yang dilihat
+ * saat menyetel angkanya sama persis dengan yang dilihat pengguna.
+ *
+ * `on` selalu jauh lebih pendek dari `off` — total menyala kurang dari sepertiga
+ * putaran, dan sebagian besar hanya sekelebat. Gelap adalah keadaan normalnya;
+ * fotonya cuma tertangkap sesekali.
+ *
+ * `clip` memotong gambar jadi pita horizontal, meniru baris pindai yang putus —
+ * itu yang membedakan ini dari sekadar lampu berkedip. Dipakai hemat: dua-tiga
+ * kali per putaran sudah cukup, lebih dari itu terbaca sebagai animasi rusak,
+ * bukan gambar yang rusak.
+ */
+const FLICKER: { on: number; off: number; opacity: number; x?: number; clip?: string }[] = [
+  { on: 0.05, off: 0.13, opacity: 0.55 },
+  { on: 0.04, off: 0.05, opacity: 0.8, x: -3 },
+  { on: 0.03, off: 0.42, opacity: 0.35 },
+  { on: 0.07, off: 0.06, opacity: 0.7, clip: 'inset(28% 0 44% 0)' },
+  { on: 0.04, off: 0.09, opacity: 0.85, x: 4 },
+  { on: 0.02, off: 0.7, opacity: 0.5 },
+  // Satu tarikan panjang di tengah — matanya sempat bertemu, lalu putus lagi.
+  { on: 0.85, off: 0.16, opacity: 0.75 },
+  { on: 0.05, off: 0.07, opacity: 0.6, x: -5, clip: 'inset(9% 0 61% 0)' },
+  { on: 0.03, off: 0.05, opacity: 0.9 },
+  { on: 0.12, off: 0.9, opacity: 0.45, clip: 'inset(52% 0 12% 0)' },
+  { on: 0.03, off: 0.06, opacity: 0.8, x: 3 },
+  { on: 0.06, off: 1.4, opacity: 0.4 },
+]
 
 /** Titik-titik ala jendela macOS. */
 const WindowDots = () => (
@@ -372,6 +418,13 @@ function CodeWindow() {
   // menyusul supaya jeda antarpotongan tidak terasa seperti animasi tersendat.
   const firstRun = useRef(true)
 
+  const audio = useRef<HTMLAudioElement>(null)
+  const [clip, setClip] = useState(0)
+  const [playing, setPlaying] = useState(false)
+  // Timeline "lampu menyala" di bawah, disimpan supaya tombol suara bisa
+  // mengambil alih fotonya selagi klip berbunyi.
+  const light = useRef<gsap.core.Timeline | null>(null)
+
   const ref = useGsap<HTMLDivElement>(({ q }) => {
     const lineEls = q('[data-line]')
     const caret = q('[data-caret]')[0]
@@ -434,14 +487,22 @@ function CodeWindow() {
     return () => {
       tl.kill()
     }
-  }, [index])
-
+  }, [
+    // indexhey-
+  ])
+    
   /*
    * Lampu menyala.
    *
-   * Jendela ini gelap sepanjang waktu, lalu sesekali "terang" — fotonya muncul
-   * seketika di opacity 75%, bertahan sebentar, lalu padam lagi. Kemunculannya
-   * memakai `set`, bukan `to`: yang diminta memang saklar, bukan fade.
+   * Jendela ini gelap sepanjang waktu, lalu sesekali "terang" — fotonya naik ke
+   * opacity 75%, bertahan sebentar, lalu pudar lagi sampai habis.
+   *
+   * Naik dan turunnya tidak simetris, dan itu disengaja. Menyala pakai
+   * `power2.out` (cepat di awal lalu melambat) supaya kemunculannya masih terasa
+   * seperti lampu disentak, sementara padamnya pakai `power2.in` yang berangkat
+   * pelan — jadi ia terbaca meredup, bukan dipotong. Fade dengan durasi dan easing
+   * yang sama persis di kedua arah selalu terasa seperti animasi yang diputar
+   * mundur.
    *
    * Timeline-nya sengaja terpisah dari timeline mengetik di atas. Yang itu
    * dibangun ulang tiap potongan kode berganti; kalau siklus lampu ikut menumpang
@@ -455,18 +516,110 @@ function CodeWindow() {
   const shell = useGsap<HTMLDivElement>(({ q }) => {
     const wowo = q('[data-wowo]')
 
-    const tl = gsap
-      .timeline({ repeat: -1, repeatDelay: 4.5, delay: 2 })
-      .set(wowo, { opacity: 0.75 })
-      // Penahan waktu: tidak ada yang dianimasikan, timeline-nya saja yang
-      // berjalan selama lampu menyala.
-      .to({}, { duration: 1.6 })
-      .set(wowo, { opacity: 0 })
+    // Semuanya `set`, tidak satu pun `to`. Kedipan lampu rusak tidak punya
+    // easing — ia menyambung atau tidak sama sekali; begitu ada interpolasi,
+    // yang terbaca langsung berubah jadi denyut lembut. Penahan waktunya tween
+    // kosong: yang berjalan cuma waktunya, tidak ada properti yang ditulis.
+    const tl = gsap.timeline({ repeat: -1, repeatDelay: 5.5, delay: 1.5 })
+
+    FLICKER.forEach((beat) => {
+      tl.set(wowo, {
+        opacity: beat.opacity,
+        x: beat.x ?? 0,
+        clipPath: beat.clip ?? 'inset(0%)',
+      })
+        .to({}, { duration: beat.on })
+        // Padam berarti benar-benar bersih: geseran dan potongan ikut dinolkan,
+        // kalau tidak sisa transform-nya menempel ke kedipan berikutnya dan
+        // gambarnya terlihat merayap ke satu arah sepanjang putaran.
+        .set(wowo, { opacity: 0, x: 0, clipPath: 'inset(0%)' })
+        .to({}, { duration: beat.off })
+    })
+
+    light.current = tl
 
     return () => {
       tl.kill()
+      light.current = null
     }
   }, [])
+
+  /*
+   * Tombol easter egg.
+   *
+   * Selagi klip berbunyi, siklus lampu dihentikan dan fotonya ditahan menyala.
+   * Kalau tidak, timeline yang berjalan sendiri itu akan memudarkan wowo di
+   * tengah kalimatnya — dua animasi menulis `opacity` pada elemen yang sama, dan
+   * yang menang hanya yang kebetulan menulis paling akhir.
+   *
+   * `light.current` bisa null pada mode gerak dikurangi: di sana `useGsap`
+   * melewati setup-nya sama sekali. Suaranya tetap boleh diputar — yang diminta
+   * untuk dikurangi adalah gerak, bukan bunyi.
+   */
+  const wowoEl = () => shell.current?.querySelector('[data-wowo]') ?? null
+
+  // Klip harus berhenti kalau halamannya ditinggalkan di tengah bunyi. Melepas
+  // elemen <audio> dari DOM tidak dijamin menghentikan pemutarannya, dan suara
+  // yang terus berbunyi dari halaman yang sudah tidak terlihat hanya membuat
+  // orang mencari-cari tab mana yang bersuara.
+  useEffect(() => {
+    const el = audio.current
+    return () => el?.pause()
+  }, [])
+
+  const stopEgg = () => {
+    const el = audio.current
+    if (el) {
+      el.pause()
+      el.currentTime = 0
+    }
+    setPlaying(false)
+
+    const wowo = wowoEl()
+    if (wowo) gsap.to(wowo, { opacity: 0, duration: 0.6, ease: 'power2.in' })
+    // Diputar ulang dari nol, bukan dilanjutkan: melanjutkan berarti lampu
+    // menyala lagi sepersekian detik setelah klipnya habis.
+    light.current?.restart(true)
+  }
+
+  const toggleEgg = async () => {
+    const el = audio.current
+    if (!el) return
+
+    if (playing) {
+      stopEgg()
+      return
+    }
+
+    el.src = asset(EGG_CLIPS[clip].src)
+    el.volume = 0.8
+    light.current?.pause()
+
+    // `x` dan `clipPath` ikut dinolkan: timeline kedip bisa dijeda tepat di
+    // tengah beat yang sedang menggeser atau memotong gambar, dan sisanya akan
+    // menempel selama klip berbunyi.
+    const wowo = wowoEl()
+    if (wowo) {
+      gsap.to(wowo, {
+        opacity: 0.75,
+        x: 0,
+        clipPath: 'inset(0%)',
+        duration: 0.35,
+        ease: 'power2.out',
+      })
+    }
+
+    try {
+      // Dipanggil dari klik, jadi kebijakan autoplay browser tidak menghalangi.
+      // Tetap dijaga: berkasnya bisa saja gagal dimuat, dan promise yang ditolak
+      // tanpa penangan muncul sebagai error tak tertangani di konsol.
+      await el.play()
+      setPlaying(true)
+      setClip((i) => (i + 1) % EGG_CLIPS.length)
+    } catch {
+      stopEgg()
+    }
+  }
 
   return (
     <div ref={shell} className="relative">
@@ -480,7 +633,7 @@ function CodeWindow() {
       */}
       <div
         ref={ref}
-        className="relative overflow-hidden rounded-2xl bg-gray-900 shadow-[0_2px_4px_rgb(17_24_39/0.06),0_12px_28px_rgb(17_24_39/0.12),0_36px_64px_rgb(17_24_39/0.16)] ring-1 ring-gray-900/10"
+        className="group/window relative overflow-hidden rounded-2xl bg-gray-900 shadow-[0_2px_4px_rgb(17_24_39/0.06),0_12px_28px_rgb(17_24_39/0.12),0_36px_64px_rgb(17_24_39/0.16)] ring-1 ring-gray-900/10"
       >
         {/*
           Latar jendela kode. Murni dekoratif — karena itu aria-hidden dan alt
@@ -493,7 +646,7 @@ function CodeWindow() {
         */}
         {/* <img
           data-wowo
-          src={asset('/images/wowo.png')}
+          src={asset('/images/87dabbda5bfc01063ce53720723e862b59576b383d1895913e03148d029525d264ebd1461d74ae3e29a50f303ef8a910.png')}
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-0 size-full object-cover opacity-0 select-none"
@@ -505,6 +658,43 @@ function CodeWindow() {
             <span className="font-mono text-[11px] font-black text-yellow-300">TSX</span>
             <span className="text-xs font-bold text-gray-200">{snippet.file}</span>
           </span>
+
+          {/*
+            Easter egg. Sengaja nyaris tak terlihat sampai jendelanya disentuh
+            kursor — kalau ia menuntut perhatian seperti kontrol lain, ia berhenti
+            jadi kejutan dan mulai terbaca sebagai fitur yang perlu dijelaskan.
+            Tetap sebuah <button> sungguhan: bisa dicapai dengan Tab, punya nama
+            yang dibacakan, dan cincin fokusnya membuatnya muncul sepenuhnya.
+          */}
+          <button
+            type="button"
+            onClick={toggleEgg}
+            aria-pressed={playing}
+            aria-label={playing ? 'Hentikan suara' : `Putar suara: ${EGG_CLIPS[clip].label}`}
+            title={playing ? 'Hentikan' : EGG_CLIPS[clip].label}
+            className={`ml-auto grid size-7 shrink-0 place-items-center rounded-md text-gray-400 transition-[opacity,color,background-color] duration-300 group-hover/window:opacity-100 hover:bg-gray-700/60 hover:text-yellow-300 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none ${
+              playing ? 'text-yellow-300 opacity-100' : 'opacity-15'
+            }`}
+          >
+            <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5 6.5 9H4v6h2.5L11 19V5Z" />
+              {playing ? (
+                <>
+                  <path strokeLinecap="round" d="M14.5 9.5c1.2 1.4 1.2 3.6 0 5" />
+                  <path strokeLinecap="round" d="M17.5 7c2.4 2.6 2.4 7.4 0 10" />
+                </>
+              ) : (
+                <path strokeLinecap="round" d="M14.5 9.5c1.2 1.4 1.2 3.6 0 5" />
+              )}
+            </svg>
+          </button>
+
+          {/*
+            `preload="none"`: berkasnya tidak pernah diunduh sampai ada yang
+            benar-benar menekan tombolnya. Easter egg tidak layak menambah beban
+            unduhan halaman beranda bagi orang yang tak pernah menemukannya.
+          */}
+          <audio ref={audio} preload="none" onEnded={stopEgg} />
         </div>
 
         <pre className="ds-scroll-x relative z-10 overflow-x-auto p-5 font-mono text-xs leading-6 text-gray-300 sm:p-6">
