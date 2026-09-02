@@ -132,7 +132,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
                   <span className="font-bold text-yellow-600">TBD</span>
                 ) : (
                   <>
-                    <span className="font-bold text-yellow-600">Catatan:</span> susunan menu di
+                    <span className="font-bold text-yellow-600">Catatan:</span> Tampilan menu di
                     sidebar ini masih tentatif dan bisa berubah.
                   </>
                 )}
