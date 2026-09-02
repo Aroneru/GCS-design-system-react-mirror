@@ -50,7 +50,12 @@ const sidebarProps: PropRow[] = [
   ["logo", "ReactNode", "undefined", "Logo atau identitas aplikasi pada bagian atas Sidebar."],
   ["collapsedLogo", "ReactNode", "undefined", "Logo/mark ringkas untuk Sidebar collapsed."],
   ["user", "SidebarUser", "undefined", "Informasi pengguna yang ditampilkan pada profile section."],
-  ["sticky", "boolean", "false", "Menempelkan Sidebar di atas viewport dan membatasi tingginya setinggi viewport."],
+  [
+    "sticky",
+    "boolean",
+    "false",
+    "Menempelkan Sidebar di atas viewport dan membatasi tingginya setinggi viewport.",
+  ],
   [
     "collapsed",
     "boolean",
@@ -68,6 +73,13 @@ const sidebarProps: PropRow[] = [
     "() => void",
     "undefined",
     "Menampilkan tombol collapse aktif dan memperbarui state collapsed; independen dari prop logo.",
+  ],
+  ["onCollapse", "() => void", "undefined", "Handler untuk memperbarui state collapsed."],
+  [
+    "footer",
+    "ReactNode",
+    "undefined",
+    "Area di kaki Sidebar, di bawah daftar menu — versi aplikasi, tautan bantuan, atau catatan status.",
   ],
 ];
 

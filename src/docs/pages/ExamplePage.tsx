@@ -104,6 +104,7 @@ export function ExamplePage() {
               </button>
             </Magnetic>
           </div>
+
         </div>
       </div>
 

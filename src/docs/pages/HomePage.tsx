@@ -516,10 +516,16 @@ function CodeWindow() {
     return () => {
       tl.kill()
     }
-  }, [
-    // index
-    ])
-    
+    // `index` WAJIB ada di sini — inilah yang membuat perputarannya hidup.
+    //
+    // Timeline di atas hanya mengurus SATU potongan, lalu menutup dirinya dengan
+    // menaikkan `index`. Yang memutar potongan berikutnya adalah dependensi ini:
+    // `index` berubah → `useGsap` membangun ulang timeline untuk potongan baru.
+    // Dikosongkan, setup ini cuma berjalan sekali seumur komponen — dan karena
+    // giliran pertama diakhiri dengan menghapus teksnya sampai lebar nol,
+    // jendelanya bukan berhenti di potongan pertama melainkan tinggal kosong.
+  }, [index])
+
   /*
    * Lampu menyala.
    *
