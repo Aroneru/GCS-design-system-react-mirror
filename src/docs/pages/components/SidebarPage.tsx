@@ -63,6 +63,12 @@ const sidebarProps: PropRow[] = [
     "Menampilkan tombol collapse tanpa mengaktifkan interaksi.",
   ],
   ["onCollapse", "() => void", "undefined", "Handler untuk memperbarui state collapsed."],
+  [
+    "footer",
+    "ReactNode",
+    "undefined",
+    "Area di kaki Sidebar, di bawah daftar menu — versi aplikasi, tautan bantuan, atau catatan status.",
+  ],
 ];
 
 const sidebarItemProps: PropRow[] = [

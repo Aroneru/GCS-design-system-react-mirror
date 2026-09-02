@@ -1,5 +1,4 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { Alert } from '../../lib'
 import { ArrowRight } from '../../lib/icons/outline'
 import { useHashRoute } from '../useHashRoute'
 import { Aurora, Magnetic, SplitWords, gsap, useGsap } from '../motion'
@@ -106,32 +105,6 @@ export function ExamplePage() {
             </Magnetic>
           </div>
 
-          {/*
-            Catatan status, ditempatkan SESUDAH tombol dengan sengaja. Ini bukan
-            peringatan yang harus dibaca sebelum masuk — cuma keterangan bahwa
-            ada bagian yang masih berjalan — jadi ia tidak boleh menghalangi
-            ajakan utamanya.
-
-            Memakai <Alert> dari kit-nya sendiri, bukan kotak buatan tangan:
-            halaman ini memang memperagakan komponen kit, dan akan aneh kalau
-            catatan di depan pintunya justru ditulis dengan gaya lepas.
-
-            `dismissible={false}` — catatan ini keterangan keadaan, bukan pesan
-            yang selesai setelah dibaca. Kalau bisa ditutup, orang yang membukanya
-            lewat tautan langsung tidak akan pernah melihatnya lagi padahal
-            keadaannya belum berubah.
-          */}
-          <Alert
-            data-intro
-            variant="warning"
-            heading="Sidebar masih tentatif"
-            dismissible={false}
-            className="mx-auto mt-10 max-w-xl text-left"
-          >
-            Navigasi samping di contoh aplikasi ini belum final — susunan menu dan
-            pengelompokannya masih bisa berubah. Bagian lain sudah memakai komponen kit
-            sebagaimana mestinya; yang di sana masih penempatan sementara.
-          </Alert>
         </div>
       </div>
 
