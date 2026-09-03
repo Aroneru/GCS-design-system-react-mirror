@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Breadcrumb, Container, Hero, Navbar, Sidebar } from '../../../lib'
+import { useState } from "react";
+import { Breadcrumb, Container, Hero, Navbar, Sidebar } from "../../../lib";
 import {
   ChartMixed,
   Cog,
@@ -9,17 +9,17 @@ import {
   Home,
   Palette,
   UsersGroup,
-} from '../../../lib/icons/outline'
-import { asset } from '../../asset'
-import { DemoFooter } from './DemoFooter'
-import { JUDUL_HALAMAN, type HalamanDemo } from './data'
-import { Dasbor } from './pages/Dasbor'
-import { Layanan } from './pages/Layanan'
-import { Modifikasi } from './pages/Modifikasi'
-import { Pemohon } from './pages/Pemohon'
-import { Pengajuan } from './pages/Pengajuan'
-import { Pengaturan } from './pages/Pengaturan'
-import { Simaya } from './pages/Simaya'
+} from "../../../lib/icons/outline";
+import { asset } from "../../asset";
+import { DemoFooter } from "./DemoFooter";
+import { JUDUL_HALAMAN, type HalamanDemo } from "./data";
+import { Dasbor } from "./pages/Dasbor";
+import { Layanan } from "./pages/Layanan";
+import { Modifikasi } from "./pages/Modifikasi";
+import { Pemohon } from "./pages/Pemohon";
+import { Pengajuan } from "./pages/Pengajuan";
+import { Pengaturan } from "./pages/Pengaturan";
+import { Simaya } from "./pages/Simaya";
 
 /**
  * Kerangka aplikasi demo.
@@ -37,49 +37,50 @@ import { Simaya } from './pages/Simaya'
  */
 
 const RUTE: { halaman: HalamanDemo; ikon: React.ReactNode; badge?: string }[] = [
-  { halaman: 'dasbor', ikon: <ChartMixed className="size-5" /> },
-  { halaman: 'pengajuan', ikon: <FileLines className="size-5" />, badge: '10' },
-  { halaman: 'pemohon', ikon: <UsersGroup className="size-5" /> },
-  { halaman: 'layanan', ikon: <GridPlus className="size-5" /> },
-  { halaman: 'simaya', ikon: <Envelope className="size-5" /> },
-  { halaman: 'modifikasi', ikon: <Palette className="size-5" /> },
-  { halaman: 'pengaturan', ikon: <Cog className="size-5" /> },
-]
+  { halaman: "dasbor", ikon: <ChartMixed className="size-5" /> },
+  { halaman: "pengajuan", ikon: <FileLines className="size-5" />, badge: "10" },
+  { halaman: "pemohon", ikon: <UsersGroup className="size-5" /> },
+  { halaman: "layanan", ikon: <GridPlus className="size-5" /> },
+  { halaman: "simaya", ikon: <Envelope className="size-5" /> },
+  { halaman: "modifikasi", ikon: <Palette className="size-5" /> },
+  { halaman: "pengaturan", ikon: <Cog className="size-5" /> },
+];
 
 /** Sub-rute nyata, bukan state palsu — jadi Sidebar dan Navbar bekerja sebagai tautan. */
-const href = (h: HalamanDemo) => (h === 'dasbor' ? '#/example/app' : `#/example/app/${h}`)
+const href = (h: HalamanDemo) => (h === "dasbor" ? "#/example/app" : `#/example/app/${h}`);
 
 const DESKRIPSI: Record<HalamanDemo, string> = {
-  dasbor: 'Ringkasan pengajuan, capaian bulan ini, dan aktivitas terbaru.',
-  pengajuan: 'Seluruh pengajuan yang masuk, lengkap dengan saringan dan pencarian.',
-  pemohon: 'Daftar akun pemohon terdaftar beserta status keaktifannya.',
-  layanan: 'Layanan yang dibuka untuk umum, beserta estimasi dan biayanya.',
-  simaya: 'Persuratan internal dengan aksen Simaya — prop application pada tujuh komponen form.',
-  modifikasi: 'Tiga tingkat penyesuaian komponen: varian bawaan, slot, lalu className.',
-  pengaturan: 'Data profil dan preferensi pemberitahuan akun Anda.',
-}
+  dasbor: "Ringkasan pengajuan, capaian bulan ini, dan aktivitas terbaru.",
+  pengajuan: "Seluruh pengajuan yang masuk, lengkap dengan saringan dan pencarian.",
+  pemohon: "Daftar akun pemohon terdaftar beserta status keaktifannya.",
+  layanan: "Layanan yang dibuka untuk umum, beserta estimasi dan biayanya.",
+  simaya: "Persuratan internal dengan aksen Simaya — prop application pada tujuh komponen form.",
+  modifikasi: "Tiga tingkat penyesuaian komponen: varian bawaan, slot, lalu className.",
+  pengaturan: "Data profil dan preferensi pemberitahuan akun Anda.",
+};
 
 function Isi({ halaman }: { halaman: HalamanDemo }) {
   switch (halaman) {
-    case 'pengajuan':
-      return <Pengajuan />
-    case 'pemohon':
-      return <Pemohon />
-    case 'layanan':
-      return <Layanan />
-    case 'simaya':
-      return <Simaya />
-    case 'modifikasi':
-      return <Modifikasi />
-    case 'pengaturan':
-      return <Pengaturan />
+    case "pengajuan":
+      return <Pengajuan />;
+    case "pemohon":
+      return <Pemohon />;
+    case "layanan":
+      return <Layanan />;
+    case "simaya":
+      return <Simaya />;
+    case "modifikasi":
+      return <Modifikasi />;
+    case "pengaturan":
+      return <Pengaturan />;
     default:
-      return <Dasbor />
+      return <Dasbor />;
   }
 }
 
 export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
-  const [ringkas, setRingkas] = useState(false)
+  const [ringkas, setRingkas] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const menu = RUTE.map(({ halaman: h, ikon, badge }) => ({
     id: h,
@@ -88,7 +89,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
     icon: ikon,
     badge,
     active: h === halaman,
-  }))
+  }));
 
   return (
     // Kolom, bukan baris: Sidebar dan konten berdampingan di dalam satu baris,
@@ -101,16 +102,21 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
         <div className="hidden lg:block">
           <Sidebar
             logo={
-              <img src={asset('/images/stasi-logo.svg')} alt="STASI" className="h-8 w-auto" />
+              <img
+                src={asset("/images/stasi-logo.svg")}
+                alt="STASI"
+                className="mx-auto h-8 max-w-full w-auto"
+              />
             }
             /*
              * Logo ringkas memakai `stasi.svg` — mark 350×335 yang sama dengan
              * rail situs dokumentasi. Sebelumnya `images/s.svg`, dan itu gambar
              * 1440×810: dipaksa masuk kotak 32×32 ia gepeng, bukan mengecil.
              */
-            collapsedLogo={<img src={asset('/stasi.svg')} alt="STASI" className="size-8" />}
+            collapsedLogo={<img src={asset("/stasi.svg")} alt="STASI" className="size-8" />}
             items={menu}
-            user={{ name: 'Yermi Rachman', profileLabel: 'Administrator' }}
+            user={{ name: "Yermi Rachman", profileLabel: "Administrator" }}
+            sticky
             collapsed={ringkas}
             onCollapse={() => setRingkas((v) => !v)}
             /*
@@ -123,26 +129,12 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
              * teks sepanjang itu, dan memaksanya masuk cuma menghasilkan tumpukan
              * baris satu-dua huruf. Keterangan penuhnya tetap ada di `title`.
              */
-            footer={
-              <p
-                title="Tampilan menu di sidebar ini masih tentatif dan bisa berubah."
-                className="px-4 py-3 text-center text-[11px] leading-4 text-gray-500"
-              >
-                {ringkas ? (
-                  <span className="font-bold text-yellow-600">TBD</span>
-                ) : (
-                  <>
-                    <span className="font-bold text-yellow-600">Catatan:</span> Tampilan menu di
-                    sidebar ini masih tentatif dan bisa berubah.
-                  </>
-                )}
-              </p>
-            }
           />
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Navbar
+            className="[&>div:last-child]:hidden"
             brand={<span className="text-sm font-black text-content">STASI</span>}
             brandLabel="STASI — Dasbor"
             items={RUTE.map(({ halaman: h }) => ({
@@ -151,10 +143,39 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
               href: href(h),
               active: h === halaman,
             }))}
-            search={{ onSubmit: () => undefined, placeholder: 'Cari pengajuan, pemohon ...' }}
-            user={{ name: 'Yermi Rachman', initials: 'YR' }}
+            search={{ onSubmit: () => undefined, placeholder: "Cari pengajuan, pemohon ..." }}
+            user={{ name: "Yermi Rachman", initials: "YR" }}
             notification={{ unread: 3, onClick: () => undefined }}
+            mobileOpen={mobileSidebarOpen}
+            onMobileOpenChange={setMobileSidebarOpen}
           />
+
+          {mobileSidebarOpen && (
+            <div className="fixed inset-0 z-[60] lg:hidden">
+              <button
+                type="button"
+                className="absolute inset-0 bg-gray-900/50"
+                aria-label="Tutup navigasi utama"
+                onClick={() => setMobileSidebarOpen(false)}
+              />
+              <Sidebar
+                className="relative z-10 h-full !min-h-0 w-[88vw] max-w-[320px] shadow-soft"
+                logo={
+                  <img
+                    src={asset("/images/stasi-logo.svg")}
+                    alt="STASI"
+                    className="h-8 max-w-full w-auto"
+                  />
+                }
+                items={menu}
+                user={{ name: "Yermi Rachman", profileLabel: "Administrator" }}
+                onCollapse={() => setMobileSidebarOpen(false)}
+                onClick={(event) => {
+                  if ((event.target as HTMLElement).closest("a")) setMobileSidebarOpen(false);
+                }}
+              />
+            </div>
+          )}
 
           <main className="flex-1">
             <div className="border-b border-border bg-white">
@@ -162,7 +183,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
                 <div className="py-6">
                   <Breadcrumb
                     items={[
-                      { label: 'Beranda', href: href('dasbor'), icon: <Home className="size-4" /> },
+                      { label: "Beranda", href: href("dasbor"), icon: <Home className="size-4" /> },
                       { label: JUDUL_HALAMAN[halaman] },
                     ]}
                   />
@@ -171,14 +192,14 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
 
               {/* Hero hanya di Dasbor: di halaman kerja ia hanya akan mendorong
                   isi yang penting ke bawah lipatan. */}
-              {halaman === 'dasbor' ? (
+              {halaman === "dasbor" ? (
                 <Hero
                   heading="Portal Layanan Terpadu"
                   subHeading="Satu pintu untuk seluruh layanan"
                   description="Ajukan, pantau, dan selesaikan permohonan tanpa perlu datang ke kantor. Seluruh antarmuka di halaman ini dirakit dari komponen @stasi/design-kit-react."
                   buttonLabel="Lihat pengajuan"
-                  buttonHref={href('pengajuan')}
-                  image={asset('/images/hero-sample.svg')}
+                  buttonHref={href("pengajuan")}
+                  image={asset("/images/hero-sample.svg")}
                   imageAlt=""
                 />
               ) : (
@@ -187,7 +208,9 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
                     <h1 className="text-heading-2 font-black text-gray-900">
                       {JUDUL_HALAMAN[halaman]}
                     </h1>
-                    <p className="mt-2 max-w-2xl text-body-sm text-gray-500">{DESKRIPSI[halaman]}</p>
+                    <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+                      {DESKRIPSI[halaman]}
+                    </p>
                   </div>
                 </Container>
               )}
@@ -204,5 +227,5 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
 
       <DemoFooter />
     </div>
-  )
+  );
 }
