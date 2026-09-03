@@ -129,21 +129,6 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
              * teks sepanjang itu, dan memaksanya masuk cuma menghasilkan tumpukan
              * baris satu-dua huruf. Keterangan penuhnya tetap ada di `title`.
              */
-            footer={
-              <p
-                title="Tampilan menu di sidebar ini masih tentatif dan bisa berubah."
-                className="px-4 py-3 text-center text-[11px] leading-4 text-gray-500"
-              >
-                {ringkas ? (
-                  <span className="font-bold text-yellow-600">TBD</span>
-                ) : (
-                  <>
-                    <span className="font-bold text-yellow-600">Catatan:</span> Tampilan menu di
-                    sidebar ini masih tentatif dan bisa berubah.
-                  </>
-                )}
-              </p>
-            }
           />
         </div>
 
