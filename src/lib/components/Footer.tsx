@@ -41,6 +41,12 @@ export function Footer({
   fluid = false,
   className,
 }: FooterProps) {
+  const MENUS_PER_ROW = 5
+  const menuRows: FooterMenu[][] = []
+  for (let i = 0; i < menus.length; i += MENUS_PER_ROW) {
+    menuRows.push(menus.slice(i, i + MENUS_PER_ROW))
+  }
+
   return (
     <footer className={cn('@container bg-gray-800 text-gray-300', className)}>
       <div
@@ -59,27 +65,31 @@ export function Footer({
           </div>
 
           {menus.length > 0 && (
-            <nav className="@3xl:flex @3xl:flex-1 @3xl:justify-center" aria-label="Navigasi footer">
+            <nav className="@3xl:flex-1" aria-label="Navigasi footer">
               {/*
                * Satu baris memuat paling banyak 5 menu; sisanya turun ke baris
-               * berikutnya. Saat footer sempit tata letaknya tetap flex-wrap
-               * (menyesuaikan ruang), dan gridTemplateColumns diabaikan.
+               * berikutnya. Tiap baris — termasuk baris sisa yang isinya lebih
+               * sedikit — dipusatkan terhadap lebar nav.
                */}
-              <ul
-                className="flex flex-wrap items-center gap-x-8 gap-y-3 text-sm @3xl:grid"
-                style={{ gridTemplateColumns: `repeat(${Math.min(menus.length, 5)}, max-content)` }}
-              >
-                {menus.map((menu, i) => (
-                  <li key={i}>
-                    <a
-                      href={menu.url ?? '#'}
-                      className="rounded text-center transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                    >
-                      {menu.label}
-                    </a>
-                  </li>
+              <div className="flex flex-col gap-y-3">
+                {menuRows.map((row, rowIndex) => (
+                  <ul
+                    key={rowIndex}
+                    className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm"
+                  >
+                    {row.map((menu, i) => (
+                      <li key={i}>
+                        <a
+                          href={menu.url ?? '#'}
+                          className="rounded text-center transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                        >
+                          {menu.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 ))}
-              </ul>
+              </div>
             </nav>
           )}
 
