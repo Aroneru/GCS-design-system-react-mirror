@@ -71,7 +71,7 @@ export function Pengajuan() {
             sengaja dibiarkan utuh: begitu Search Form jadi dan pembungkus
             ini dilepas, pencariannya langsung hidup kembali.
           */}
-          <BelumAda ringkas>
+          <BelumAda ringkas adaLabel>
             <InputField
               label="Cari"
               placeholder="Nomor atau nama pemohon…"

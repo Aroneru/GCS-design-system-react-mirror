@@ -17,9 +17,16 @@ export function BelumAda({
   children,
   /** Untuk area sekecil satu field: label lebih kecil agar tidak melebihi isinya. */
   ringkas = false,
+  /**
+   * Isinya diawali label di atas field (mis. InputField ber-`label`). Penanda
+   * dipusatkan ke fieldnya saja, bukan ke label + field, supaya tidak tampak
+   * melayang di atas kotak isian.
+   */
+  adaLabel = false,
 }: {
   children: ReactNode
   ringkas?: boolean
+  adaLabel?: boolean
 }) {
   return (
     <div className="relative">
@@ -28,11 +35,14 @@ export function BelumAda({
       {/*
         z-20: di Pengajuan ada lapisan spinner ber-z-10 di dalam pembungkus yang
         sama, dan penanda ini harus tetap terbaca saat tabelnya sedang memuat.
+
+        top-7 menyamai tinggi label InputField (text-sm + mb-2 = 1.75rem), jadi
+        area pemusatan mulai tepat di bibir atas field.
       */}
       <div
-        className={`pointer-events-none absolute inset-0 z-20 grid place-items-center ${
-          ringkas ? 'p-1' : 'p-4'
-        }`}
+        className={`pointer-events-none absolute inset-x-0 bottom-0 z-20 grid place-items-center ${
+          adaLabel ? 'top-7' : 'top-0'
+        } ${ringkas ? 'p-1' : 'p-4'}`}
       >
         <p
           className={`rounded-lg border border-border bg-white/95 text-center font-black text-gray-900 shadow-soft ${

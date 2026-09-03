@@ -49,7 +49,12 @@ export function Reveal({
       // menempel memaksa browser menahan layer komposit untuk elemen yang sudah
       // diam.
       willChange: 'transform, opacity',
-      clearProps: 'willChange',
+      // `transform` ikut dibersihkan, bukan hanya `willChange`. GSAP menulis
+      // transform sebagai inline style, dan inline style mengalahkan kelas —
+      // sisa `translate(0px, 0px)` yang menempel akan mematikan efek hover
+      // berbasis kelas (mis. `hover:-translate-y-1`) pada elemen yang sama, dan
+      // menahan pembulatan sub-piksel dari akhir tween.
+      clearProps: 'willChange,transform',
     })
   }, [stagger, y, delay, Children.count(children)])
 
