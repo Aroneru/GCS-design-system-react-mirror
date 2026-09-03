@@ -80,6 +80,7 @@ function Isi({ halaman }: { halaman: HalamanDemo }) {
 
 export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
   const [ringkas, setRingkas] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const menu = RUTE.map(({ halaman: h, ikon, badge }) => ({
     id: h,
@@ -148,6 +149,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Navbar
+            className="[&>div:last-child]:hidden"
             brand={<span className="text-sm font-black text-content">STASI</span>}
             brandLabel="STASI — Dasbor"
             items={RUTE.map(({ halaman: h }) => ({
@@ -159,7 +161,36 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             search={{ onSubmit: () => undefined, placeholder: "Cari pengajuan, pemohon ..." }}
             user={{ name: "Yermi Rachman", initials: "YR" }}
             notification={{ unread: 3, onClick: () => undefined }}
+            mobileOpen={mobileSidebarOpen}
+            onMobileOpenChange={setMobileSidebarOpen}
           />
+
+          {mobileSidebarOpen && (
+            <div className="fixed inset-0 z-[60] lg:hidden">
+              <button
+                type="button"
+                className="absolute inset-0 bg-gray-900/50"
+                aria-label="Tutup navigasi utama"
+                onClick={() => setMobileSidebarOpen(false)}
+              />
+              <Sidebar
+                className="relative z-10 h-full !min-h-0 w-[88vw] max-w-[320px] shadow-soft"
+                logo={
+                  <img
+                    src={asset("/images/stasi-logo.svg")}
+                    alt="STASI"
+                    className="h-8 max-w-full w-auto"
+                  />
+                }
+                items={menu}
+                user={{ name: "Yermi Rachman", profileLabel: "Administrator" }}
+                onCollapse={() => setMobileSidebarOpen(false)}
+                onClick={(event) => {
+                  if ((event.target as HTMLElement).closest("a")) setMobileSidebarOpen(false);
+                }}
+              />
+            </div>
+          )}
 
           <main className="flex-1">
             <div className="border-b border-border bg-white">
