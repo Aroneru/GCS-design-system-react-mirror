@@ -1,5 +1,5 @@
-import { Checkbox, InputField, Radio, Select, Toggle } from '../../../lib'
-import { User } from '../../../lib/icons/outline'
+import { Checkbox, FloatingLabel, InputField, Radio, Select, TextArea, Toggle } from '../../../lib'
+import { Envelope, User } from '../../../lib/icons/outline'
 import { NotReadyPreview, OverviewCard, OverviewPage } from '../../pageKit'
 
 /** Pembungkus preview kartu overview — latar netral seragam. */
@@ -21,11 +21,37 @@ export function FormOverview() {
         wide
       >
         <Preview>
-          <InputField
-            label="Nama lengkap"
-            placeholder="Masukkan nama lengkap"
-            icon={<User className="size-4" />}
-          />
+          {/*
+            Satu latar, dua kolom: Input Field dan Floating Label ditumpuk di
+            kiri, Text Area mengisi kolom kanan sepenuhnya. `justify-between`
+            mendorong kedua field kiri ke tepi atas dan bawah supaya tingginya
+            berakhir sejajar dengan Text Area di sebelahnya, bukan menggantung
+            di tengah.
+
+            Floating Label diberi `defaultValue` dengan sengaja — dalam keadaan
+            kosong ia tak terbedakan dari Input Field di atasnya, dan justru
+            labelnya-yang-naik itulah yang membedakan keduanya.
+          */}
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="flex flex-col justify-between gap-5">
+              <InputField
+                label="Nama lengkap"
+                placeholder="Masukkan nama lengkap"
+                helperText="Sesuai yang tertera pada KTP."
+                icon={<User className="size-4" />}
+              />
+              <FloatingLabel
+                label="Alamat surel"
+                type="email"
+                defaultValue="yermi@contoh.id"
+                icon={<Envelope className="size-4" />}
+              />
+            </div>
+            <TextArea
+              label="Keterangan"
+              placeholder="Tulis keterangan tambahan di sini…"
+            />
+          </div>
         </Preview>
       </OverviewCard>
 
