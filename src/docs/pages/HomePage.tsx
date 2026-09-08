@@ -878,21 +878,33 @@ function ShowcaseTile({
   children: ReactNode
 }) {
   return (
-    <SpotlightCard
-      as="a"
-      href={`#${route}`}
-      className={`ds-card group flex flex-col gap-4 p-5 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg ${span}`}
-    >
-      <div className="flex min-h-[92px] flex-wrap items-center gap-3 rounded-xl bg-surface-subtle p-4">
-        {children}
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-black text-gray-900">{name}</span>
-        <span className="text-xs font-bold text-primary-700 transition-transform group-hover:translate-x-0.5">
-          Lihat →
-        </span>
-      </div>
-    </SpotlightCard>
+    /*
+      Dua elemen, bukan satu. Animasi masuk dari <Reveal stagger> menulis
+      `transform` sebagai inline style pada tiap anak langsung; kalau kartunya
+      sendiri yang jadi anak itu, transform tersebut bertabrakan dengan
+      `transition-[transform]` + `hover:-translate-y-1` di kartu yang sama —
+      browser meng-easing tiap tulisan GSAP selama 300ms, sehingga kartu
+      tertinggal sesaat dan sesekali berhenti tidak sejajar dengan tetangganya.
+      Pembungkus ini yang dianimasikan; kartunya bebas memakai transisi hover
+      sendiri.
+    */
+    <div className={span}>
+      <SpotlightCard
+        as="a"
+        href={`#${route}`}
+        className="ds-card group flex h-full flex-col gap-4 p-5 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg"
+      >
+        <div className="flex min-h-[92px] flex-wrap items-center gap-3 rounded-xl bg-surface-subtle p-4">
+          {children}
+        </div>
+        <div className="mt-auto flex items-center justify-between">
+          <span className="text-sm font-black text-gray-900">{name}</span>
+          <span className="text-xs font-bold text-primary-700 transition-transform group-hover:translate-x-0.5">
+            Lihat →
+          </span>
+        </div>
+      </SpotlightCard>
+    </div>
   )
 }
 

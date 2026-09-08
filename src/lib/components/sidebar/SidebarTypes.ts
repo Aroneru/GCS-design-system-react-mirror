@@ -50,8 +50,20 @@ export interface SidebarProps extends HTMLAttributes<HTMLElement> {
   collapsedLogo?: ReactNode;
   logo?: ReactNode;
   user?: SidebarUser;
+  /** Menempelkan Sidebar di bagian atas viewport dengan tinggi satu viewport. */
+  sticky?: boolean;
   collapsed?: boolean;
   /** Menampilkan tombol collapse tanpa mengaktifkan interaksinya. */
   showCollapseButton?: boolean;
   onCollapse?: () => void;
+  /**
+   * Area di kaki Sidebar, di bawah daftar menu — versi aplikasi, tautan bantuan,
+   * catatan status.
+   *
+   * Menempel ke dasar karena navigasinya yang memakan sisa ruang, bukan karena
+   * footer-nya didorong: dengan begitu ia tetap terlihat meski menunya panjang
+   * dan harus digulir sendiri. Saat `collapsed`, lebarnya tinggal 72px — isi
+   * yang dititipkan ke sini harus menyiapkan bentuk ringkasnya sendiri.
+   */
+  footer?: ReactNode;
 }

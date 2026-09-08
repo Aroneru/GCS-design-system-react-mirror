@@ -1,5 +1,6 @@
 import {
   Alert,
+  Avatar,
   Badge,
   Breadcrumb,
   Button,
@@ -68,6 +69,18 @@ export function ComponentsOverview() {
           <Alert variant="success" heading="Ini adalah Alert" dismissible={false}>
             Ini merupakan Design system Stasi berupa component alert.
           </Alert>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/avatar"
+        name="Avatar"
+        desc="Lingkaran identitas berisi foto profil, atau inisial namanya bila fotonya tidak ada."
+      >
+        <div className="flex items-center justify-center gap-4 rounded-xl bg-surface-subtle p-5">
+          <Avatar src={asset("/images/avatar-sample.svg")} alt="" size="large" />
+          <Avatar initials="PH" />
+          <Avatar initials="PH" size="small" />
         </div>
       </OverviewCard>
 

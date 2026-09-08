@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { asset } from './asset'
 import { DocHero } from './DocHero'
 import { DocUsage } from './DocUsage'
+import { SpotlightCard } from './motion'
 
 /**
  * Elemen bersama seluruh halaman dokumentasi.
@@ -244,9 +245,16 @@ export function OverviewCard({
   if (soon) return null
 
   return (
-    <a
+    /*
+      Sorotan yang sama dengan kotak komponen di HomePage: gradien radial lembut
+      mengikuti kursor, ditambah cincin tepi yang menyala di sisi terdekat.
+      Keduanya duduk di belakang isi kartu, jadi yang tersorot hanya ruang di
+      sekeliling kotak preview — kotak previewnya sendiri tetap berlatar netral.
+    */
+    <SpotlightCard
+      as="a"
       href={`#${route}`}
-      className={`ds-card group flex flex-col p-6 transition-shadow hover:shadow-md ${wide ? 'sm:col-span-2' : ''}`}
+      className={`ds-card group flex flex-col p-6 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg ${wide ? 'sm:col-span-2' : ''}`}
     >
       {/*
         Grid meregangkan tiap kartu setinggi baris, jadi kartu berisi sedikit
@@ -262,7 +270,7 @@ export function OverviewCard({
         Lihat detail
         <ArrowRight />
       </span>
-    </a>
+    </SpotlightCard>
   )
 }
 

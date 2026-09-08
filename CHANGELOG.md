@@ -12,22 +12,34 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 ## [Belum dirilis]
 
 Perubahan di bawah ini sudah ada di kode tetapi belum diterbitkan ke npm.
-Isinya menjadikan rilis berikutnya `0.2.0`, bukan `0.1.1`: ada empat komponen
+Isinya menjadikan rilis berikutnya `0.2.0`, bukan `0.1.1`: ada tujuh komponen
 publik baru, dan satu perubahan yang memutus.
 
 ### Ditambahkan
 
+- **`Avatar`** — lingkaran identitas berisi foto (`src`) atau inisial
+  (`initials`) dalam tiga ukuran lewat `size` (`small` 24px, `default` 32px,
+  `large` 80px). Gambar yang gagal dimuat jatuh sendiri ke inisial.
 - **`Modal`**, beserta `ModalHeader`, `ModalBody`, dan `ModalFooter`. Dialog
   berbasis elemen `<dialog>` native, jadi top layer, penguncian fokus, dan latar
   inert diurus browser. Dikendalikan lewat `open` + `onClose`, dengan pilihan
   ukuran melalui `size`.
 - **`Popover`** — panel informasi ringkas dengan arrow pada empat pilihan sisi
   (`side`: `top`, `right`, `bottom`, `left`).
+- **`Search`** — kolom pencarian dengan tombol cari. Dua ukuran lewat
+  `platform` (`default` 54px, `mobile` 50px). Mengisi prop `categories` akan
+  mengubahnya jadi varian tiga ruas: dropdown kategori, isian, lalu tombol
+  ikon. Tipe pendukung `SearchCategory` ikut diekspor.
 - **`Sidebar`** — navigasi samping dengan menu tunggal (`items`) atau
   terkelompok (`groups`), submenu, area profil (`user`), dan mode ringkas
   (`collapsed` + `onCollapse`). Tipe pendukung `SidebarItem`, `SidebarSubItem`,
   `SidebarGroup`, dan `SidebarUser` ikut diekspor.
 - **`Spinner`** — indikator proses dalam ukuran `default` dan `large`.
+- **`Upload`** — pemilih berkas dalam dua bentuk lewat `type`: `default`
+  (tombol pilih berkas + nama berkas terpilih, dua ukuran lewat `platform`) dan
+  `attach` (area seret-lepas bergaris putus-putus setinggi 230px). Membungkus
+  `<input type="file">` sungguhan, jadi dialog berkas dan pengiriman formulir
+  bekerja apa adanya.
 - Tipe **`NavbarContextItem`**, dipakai sebagai bentuk dasar item kontekstual
   pada Navbar.
 

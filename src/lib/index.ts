@@ -11,6 +11,9 @@ export type {
   ButtonTone,
 } from "./components/Button";
 
+export { Avatar } from "./components/Avatar";
+export type { AvatarProps, AvatarSize } from "./components/Avatar";
+
 export { Badge } from "./components/Badge";
 export type { BadgeProps, BadgeVariant } from "./components/Badge";
 
@@ -76,6 +79,22 @@ export type {
   SelectState,
   SelectApplication,
 } from "./components/Select";
+
+export { Search } from "./components/Search";
+export type {
+  SearchProps,
+  SearchCategory,
+  SearchPlatform,
+  SearchApplication,
+} from "./components/Search";
+
+export { Upload } from "./components/Upload";
+export type {
+  UploadProps,
+  UploadType,
+  UploadPlatform,
+  UploadApplication,
+} from "./components/Upload";
 
 export { Radio } from "./components/Radio";
 export type { RadioProps, RadioPlatform, RadioState, RadioApplication } from "./components/Radio";
