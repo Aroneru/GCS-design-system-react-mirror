@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Badge, Button, Icon, Popover, Toggle } from '../../../../lib'
-import { Envelope, User } from '../../../../lib/icons/outline'
-import { PEMOHON } from '../data'
+import { Avatar, Badge, Button, Popover, Toggle } from '../../../../lib'
+import { Envelope } from '../../../../lib/icons/outline'
+import { inisial, PEMOHON } from '../data'
 
 export function Pemohon() {
   // Status aktif dipegang di sini — Toggle-nya benar-benar mengubah data,
@@ -31,11 +31,12 @@ export function Pemohon() {
         {PEMOHON.map((p) => (
           <div key={p.surel} className="ds-card flex flex-col p-5">
             <div className="flex items-start gap-4">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-primary-50 text-primary-700">
-                <Icon>
-                  <User />
-                </Icon>
-              </span>
+              {/*
+                Inisial, bukan ikon orang yang sama untuk semuanya: dalam daftar
+                begini avatarnya baru berguna kalau tiap kartu bisa dibedakan.
+                Namanya sudah tertulis di sebelahnya, jadi alt sengaja kosong.
+              */}
+              <Avatar initials={inisial(p.nama)} alt="" />
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">

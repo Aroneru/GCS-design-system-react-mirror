@@ -75,6 +75,19 @@ export const PEMOHON: Pemohon[] = [
   { nama: 'Dewi Lestari', surel: 'dewi.lestari@contoh.id', instansi: 'Koperasi Maju Bersama', jumlah: 2, aktif: true },
 ]
 
+/**
+ * Dua huruf awal dari sebuah nama, untuk mengisi Avatar saat tidak ada foto.
+ * Nama kosong menghasilkan string kosong — lingkarannya tinggal polos.
+ */
+export function inisial(nama: string): string {
+  return nama
+    .split(/s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((kata) => kata.charAt(0).toUpperCase())
+    .join('')
+}
+
 export interface Layanan {
   slug: string
   judul: string

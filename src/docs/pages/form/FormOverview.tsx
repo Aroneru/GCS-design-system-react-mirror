@@ -1,6 +1,16 @@
-import { Checkbox, FloatingLabel, InputField, Radio, Select, TextArea, Toggle } from '../../../lib'
+import {
+  Checkbox,
+  FloatingLabel,
+  InputField,
+  Radio,
+  Search,
+  Select,
+  TextArea,
+  Toggle,
+  Upload,
+} from '../../../lib'
 import { Envelope, User } from '../../../lib/icons/outline'
-import { NotReadyPreview, OverviewCard, OverviewPage } from '../../pageKit'
+import { OverviewCard, OverviewPage } from '../../pageKit'
 
 /** Pembungkus preview kartu overview — latar netral seragam. */
 function Preview({ children }: { children: React.ReactNode }) {
@@ -76,20 +86,41 @@ export function FormOverview() {
       <OverviewCard
         route="/form/search"
         name="Search Form"
-        desc="Kolom pencarian dengan ikon dan tombol aksi opsional."
-        soon
+        desc="Kolom pencarian dengan tombol cari, plus varian bersama dropdown kategori."
       >
-        <NotReadyPreview name="Search Form" />
+        <Preview>
+          {/*
+            Varian mobile yang dipakai di sini, bukan default: kartunya hanya
+            selebar setengah kisi, dan pada lebar itu varian desktop membuat
+            placeholder-nya terpotong sebelum tombol Cari.
+          */}
+          <Search platform="mobile" placeholder="Search Civitas…" />
+        </Preview>
       </OverviewCard>
 
       <OverviewCard
         route="/form/upload"
         name="Upload Form"
-        desc="Area unggah berkas dengan status proses dan validasi ukuran."
+        desc="Pemilih berkas: satu baris tombol dengan nama berkas, atau area seret-lepas."
         wide
-        soon
       >
-        <NotReadyPreview name="Upload Form" />
+        <Preview>
+          {/*
+            Satu latar, dua kolom: baris pemilih berkas di kiri, area seret-lepas
+            di kanan — dua bentuk yang disebut di deskripsi kartunya, jadi
+            keduanya perlu benar-benar terlihat.
+
+            Barisnya dipusatkan secara vertikal, tidak ditempel ke atas: tingginya
+            cuma seperempat area attach di sebelahnya, dan rata atas membuatnya
+            terbaca menggantung di sudut.
+          */}
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="flex flex-col justify-center">
+              <Upload label="Unggah dokumen" helperText="PDF atau JPG, maksimal 2 MB." />
+            </div>
+            <Upload type="attach" />
+          </div>
+        </Preview>
       </OverviewCard>
 
       <OverviewCard

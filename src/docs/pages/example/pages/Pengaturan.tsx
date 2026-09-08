@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   Alert,
+  Avatar,
   Button,
   Checkbox,
   FloatingLabel,
@@ -17,7 +18,7 @@ import {
   Toggle,
 } from '../../../../lib'
 import { Envelope, ExclamationCircle, InfoCircle, User } from '../../../../lib/icons/outline'
-import { JENIS_LAYANAN } from '../data'
+import { inisial, JENIS_LAYANAN } from '../data'
 
 export function Pengaturan() {
   const [nama, setNama] = useState('Yermi Rachman')
@@ -40,10 +41,19 @@ export function Pengaturan() {
       </Alert>
 
       <section className="ds-card p-6 sm:p-8">
-        <h2 className="text-heading-3 font-black text-gray-900">Profil pemohon</h2>
-        <p className="mt-1 text-body-sm text-gray-500">
-          Data ini otomatis mengisi setiap formulir pengajuan yang Anda buat.
-        </p>
+        <div className="flex items-center gap-5">
+          {/*
+            Inisialnya diturunkan dari kolom Nama lengkap di bawah, jadi
+            mengetik nama baru langsung mengubah avatarnya.
+          */}
+          <Avatar size="large" initials={inisial(nama)} alt="" />
+          <div>
+            <h2 className="text-heading-3 font-black text-gray-900">Profil pemohon</h2>
+            <p className="mt-1 text-body-sm text-gray-500">
+              Data ini otomatis mengisi setiap formulir pengajuan yang Anda buat.
+            </p>
+          </div>
+        </div>
 
         <div className="mt-7 grid gap-5 sm:grid-cols-2">
           <InputField
