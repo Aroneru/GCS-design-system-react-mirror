@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Badge, Button, InputField, Pagination, Select, Spinner } from '../../../../lib'
-import { Download, Filter, Plus, Search } from '../../../../lib/icons/outline'
+import { Badge, Button, Pagination, Search, Select, Spinner } from '../../../../lib'
+import { Download, Filter, Plus } from '../../../../lib/icons/outline'
 import { BARIS_PER_HALAMAN, PENGAJUAN, VARIAN_STATUS } from '../data'
 import { BelumAda } from '../BelumAda'
 
@@ -66,20 +66,18 @@ export function Pengajuan() {
 
         <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           {/*
-            InputField di sini menyamar jadi Search Form, yang komponennya
-            belum ada di kit (/form/search masih placeholder). Kabelnya
-            sengaja dibiarkan utuh: begitu Search Form jadi dan pembungkus
-            ini dilepas, pencariannya langsung hidup kembali.
+            Search Form yang sungguhan — sebelumnya InputField yang menyamar
+            karena komponennya belum ada. Penyaringan tetap berjalan sambil
+            diketik lewat onChange; onSearch dipasang supaya tombol Cari-nya
+            ikut bekerja, meski hasilnya memang sama.
           */}
-          <BelumAda ringkas adaLabel>
-            <InputField
-              label="Cari"
-              placeholder="Nomor atau nama pemohon…"
-              icon={<Search className="size-4" />}
-              value={cari}
-              onChange={(e) => saring(() => setCari(e.target.value))}
-            />
-          </BelumAda>
+          <Search
+            label="Cari"
+            placeholder="Nomor atau nama pemohon…"
+            value={cari}
+            onChange={(e) => saring(() => setCari(e.target.value))}
+            onSearch={(nilai) => saring(() => setCari(nilai))}
+          />
           <Select
             label="Status"
             options={SARINGAN_STATUS}

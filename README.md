@@ -91,6 +91,7 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | ----------- | ------------------------------------------------------------------------- |
 | `Button`    | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `iconOnly`, `as` |
 | `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`                |
+| `Avatar`    | `src`, `alt`, `initials`, `size`: `small \| default \| large`             |
 | `Alert`     | `variant`, `heading`, `icon`, `dismissible`, `actions`                    |
 | `Toast`     | `variant`, `heading`, `icon`, `dismissible`, `actions`                    |
 | `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`           |
@@ -115,6 +116,8 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 | `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `state`: `default \| active \| error`                                     | 58 / 50 px                |
 | `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit` | 162 / 120 px              |
 | `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`                                                             | 37 px                     |
+| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`                                   | 54 / 50 px                |
+| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`                    | 44 / 40 px                |
 | `Radio`         | `label`, `helperText`                                                                                               | 16 / 14 px                |
 | `Toggle`        | `label`, `helperText`                                                                                               | 40×20 / 36×18 px          |
 | `Checkbox`      | `label`, `helperText`                                                                                               | 16 / 14 px                |
@@ -122,7 +125,8 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 Prop yang dipakai bersama seluruh komponen form:
 
 - `platform`: `default | mobile` — hanya mengubah ukuran. Pada `Select`, varian
-  Mobile di Figma cuma menyempitkan wadahnya, jadi prop ini memang tidak ada.
+  Mobile cuma menyempitkan wadahnya, jadi prop ini memang tidak ada; pada
+  `Upload` ia tidak berpengaruh untuk `type="attach"`, karena alasan yang sama.
 - `application`: `default | simaya` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.
@@ -130,9 +134,9 @@ Prop yang dipakai bersama seluruh komponen form:
   `checked`/`defaultChecked` biasa, bukan prop `state`.
 
 > **Catatan konsistensi:** tampilan `inactive` masih berbeda antar komponen
-> karena mengikuti file Figma apa adanya — `Checkbox` tidak meredupkan kotaknya,
-> `Radio` memakai latar gray-100, `Toggle` justru menggelapkan jalurnya ke
-> gray-300. Perlu diseragamkan di Figma lebih dulu.
+> karena mengikuti rancangannya apa adanya — `Checkbox` tidak meredupkan
+> kotaknya, `Radio` memakai latar gray-100, `Toggle` justru menggelapkan
+> jalurnya ke gray-300. Perlu diselaraskan di rancangannya lebih dulu.
 
 ### Navbar
 
