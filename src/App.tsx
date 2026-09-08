@@ -18,6 +18,8 @@ import { InputFieldPage } from "./docs/pages/form/input-field/InputFieldPage";
 import { FloatingLabelPage } from "./docs/pages/form/input-field/FloatingLabelPage";
 import { TextAreaPage } from "./docs/pages/form/input-field/TextAreaPage";
 import { SelectPage } from "./docs/pages/form/SelectPage";
+import { SearchPage } from "./docs/pages/form/SearchPage";
+import { UploadPage } from "./docs/pages/form/UploadPage";
 import { RadioPage } from "./docs/pages/form/RadioPage";
 import { TogglePage } from "./docs/pages/form/TogglePage";
 import { CheckboxPage } from "./docs/pages/form/CheckboxPage";
@@ -27,6 +29,7 @@ import { PlaceholderPage } from "./docs/pages/PlaceholderPage";
 import { ComponentsOverview } from "./docs/pages/components/ComponentsOverview";
 import { ContainerPage } from "./docs/pages/components/ContainerPage";
 import { ButtonPage } from "./docs/pages/components/ButtonPage";
+import { AvatarPage } from "./docs/pages/components/AvatarPage";
 import { BadgePage } from "./docs/pages/components/BadgePage";
 import { SpinnerPage } from "./docs/pages/components/SpinnerPage";
 import { PopoverPage } from "./docs/pages/components/PopoverPage";
@@ -57,15 +60,14 @@ const routes: Record<string, () => React.ReactElement> = {
   "/foundations/elevation": ElevationPage,
   "/foundations/icons": IconsPage,
 
-  // Halaman Form selain Input Field masih placeholder — komponennya menyusul.
   "/form": FormOverview,
   "/form/input-field": InputFieldFormPage,
   "/form/input-field/input": InputFieldPage,
   "/form/input-field/floating-label": FloatingLabelPage,
   "/form/input-field/text-area": TextAreaPage,
   "/form/select": SelectPage,
-  "/form/search": () => <PlaceholderPage eyebrow="Form" title="Search Form" />,
-  "/form/upload": () => <PlaceholderPage eyebrow="Form" title="Upload Form" />,
+  "/form/search": SearchPage,
+  "/form/upload": UploadPage,
   "/form/radio": RadioPage,
   "/form/toggle": TogglePage,
   "/form/checkbox": CheckboxPage,
@@ -73,6 +75,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components": ComponentsOverview,
   "/components/container": ContainerPage,
   "/components/button": ButtonPage,
+  "/components/avatar": AvatarPage,
   "/components/badge": BadgePage,
   "/components/spinner": SpinnerPage,
   "/components/popover": PopoverPage,
@@ -86,7 +89,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/breadcrumb": BreadcrumbPage,
   "/components/pagination": PaginationPage,
   "/components/sidebar": SidebarPage,
-  // Komponen Table belum ada — halamannya masih placeholder seperti Search Form.
+  // Komponen Table belum ada, jadi halamannya masih placeholder.
   "/components/table": () => <PlaceholderPage eyebrow="Components" title="Table" />,
 };
 

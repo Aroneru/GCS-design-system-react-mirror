@@ -51,6 +51,12 @@ const sidebarProps: PropRow[] = [
   ["collapsedLogo", "ReactNode", "undefined", "Logo/mark ringkas untuk Sidebar collapsed."],
   ["user", "SidebarUser", "undefined", "Informasi pengguna yang ditampilkan pada profile section."],
   [
+    "sticky",
+    "boolean",
+    "false",
+    "Menempelkan Sidebar di atas viewport dan membatasi tingginya setinggi viewport.",
+  ],
+  [
     "collapsed",
     "boolean",
     "false",
@@ -60,7 +66,13 @@ const sidebarProps: PropRow[] = [
     "showCollapseButton",
     "boolean",
     "false",
-    "Menampilkan tombol collapse tanpa mengaktifkan interaksi.",
+    "Menampilkan tombol collapse nonaktif; independen dari prop logo.",
+  ],
+  [
+    "onCollapse",
+    "() => void",
+    "undefined",
+    "Menampilkan tombol collapse aktif dan memperbarui state collapsed; independen dari prop logo.",
   ],
   ["onCollapse", "() => void", "undefined", "Handler untuk memperbarui state collapsed."],
   [
@@ -279,6 +291,7 @@ export function SidebarPage() {
   const [separator, setSeparator] = useState<SeparatorOption>("show");
   const [userInfo, setUserInfo] = useState<VisibilityOption>("show");
   const [logoWeb, setLogoWeb] = useState<VisibilityOption>("show");
+  const [collapseButton, setCollapseButton] = useState<VisibilityOption>("show");
 
   const collapsed = collapse === "collapsed";
 
@@ -324,6 +337,7 @@ export function SidebarPage() {
         ]
       : []),
     "",
+    "// Logo dan tombol collapse dikonfigurasi secara independen.",
     usageItems,
     ...(separator === "show"
       ? [
@@ -341,16 +355,21 @@ export function SidebarPage() {
       ? ["  user={{ name: 'Nama User', profileLabel: 'Lihat Profil', href: '#' }}"]
       : []),
     `  ${separator === "show" ? "groups={groups}" : "items={items}"}`,
+    "  sticky",
     `  collapsed={${collapsed}}`,
-    ...(logoWeb === "show" ? ["  onCollapse={() => setCollapsed((current) => !current)}"] : []),
+    ...(collapseButton === "show"
+      ? ["  onCollapse={() => setCollapsed((current) => !current)}"]
+      : []),
     "/>",
   ].join("\n");
   const usageHighlights = [
     "collapsed",
+    "sticky",
     ...(menuIcon === "show" ? ["icon"] : []),
     ...(badge === "show" ? ["badge"] : []),
     ...(userInfo === "show" ? ["user"] : []),
-    ...(logoWeb === "show" ? ["collapsedLogo", "logo", "onCollapse"] : []),
+    ...(logoWeb === "show" ? ["collapsedLogo", "logo"] : []),
+    ...(collapseButton === "show" ? ["onCollapse"] : []),
     ...(separator === "show" ? ["separator: true", "groups"] : []),
   ];
 
@@ -361,8 +380,6 @@ export function SidebarPage() {
       description="Navigasi vertikal yang digunakan untuk menampilkan struktur menu utama aplikasi, profile pengguna, submenu, dan informasi tambahan."
       toc={toc}
     >
-      {/* ==================== VARIANTS ==================== */}
-
       <FlowSection id="variants" title="Variants">
         <p className="mb-6 text-body-sm text-gray-500">
           Sidebar tersedia dalam lima konfigurasi, dari navigasi sederhana sampai menu berikon yang
@@ -406,8 +423,6 @@ export function SidebarPage() {
           </VariantPreview>
         </div>
       </FlowSection>
-
-      {/* ==================== MENU ==================== */}
 
       <FlowSection id="menu" title="Menu">
         <p className="mb-6 text-body-sm text-gray-500">
@@ -501,8 +516,6 @@ export function SidebarPage() {
         </div>
       </FlowSection>
 
-      {/* ==================== BADGE ==================== */}
-
       <FlowSection id="badge" title="Badge">
         <p className="mb-6 text-body-sm text-gray-500">
           Badge dapat digunakan untuk menampilkan informasi singkat seperti jumlah notifikasi atau
@@ -533,8 +546,6 @@ export function SidebarPage() {
           {"}"}
         </SectionCode>
       </FlowSection>
-
-      {/* ==================== SEPARATOR ==================== */}
 
       <FlowSection id="separator" title="Content Separator">
         <p className="mb-6 text-body-sm text-gray-500">
@@ -567,12 +578,10 @@ export function SidebarPage() {
         </SectionCode>
       </FlowSection>
 
-      {/* ==================== PLAYGROUND ==================== */}
-
       <FlowSection id="playground" title="Playground">
         <p className="mb-6 text-body-sm text-gray-500">
           Coba konfigurasi Sidebar melalui kontrol di bawah ini untuk melihat perubahan mode
-          collapse, badge, dan separator.
+          collapse, badge, separator, logo, user info, dan tombol collapse.
         </p>
 
         <Stage maxWidth="max-w-[520px]">
@@ -581,7 +590,7 @@ export function SidebarPage() {
               key={separator}
               collapsed={collapsed}
               onCollapse={
-                logoWeb === "show"
+                collapseButton === "show"
                   ? () =>
                       setCollapse((current) => (current === "expanded" ? "collapsed" : "expanded"))
                   : undefined
@@ -645,6 +654,15 @@ export function SidebarPage() {
             />
           </Control>
 
+          <Control label="Button collapse">
+            <Segmented
+              label="Tampilkan tombol collapse"
+              value={collapseButton}
+              onChange={(value) => setCollapseButton(value as VisibilityOption)}
+              options={visibilityOptions}
+            />
+          </Control>
+
           <Control label="Content separator">
             <Segmented
               label="Tampilkan content separator"
@@ -656,8 +674,6 @@ export function SidebarPage() {
         </Controls>
       </FlowSection>
 
-      {/* ==================== PENGGUNAAN ==================== */}
-
       <FlowSection id="penggunaan" title="Penggunaan">
         <p className="mb-6 text-body-sm text-gray-500">
           Bagian ini menampilkan contoh penggunaan Sidebar berdasarkan konfigurasi yang dipilih pada
@@ -666,8 +682,6 @@ export function SidebarPage() {
 
         <SectionCode flush>{highlightCode(usageCode, usageHighlights)}</SectionCode>
       </FlowSection>
-
-      {/* ==================== PROPERTIES ==================== */}
 
       <FlowSection id="properties" title="Properties">
         <p className="mb-6 text-body-sm text-gray-500">

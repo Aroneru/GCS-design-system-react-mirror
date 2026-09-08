@@ -1,0 +1,31 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Ilustrasi foto profil</title>
+  <!--
+    Foto contoh untuk demo Avatar di situs dokumentasi. Digambar sendiri, bukan
+    foto orang sungguhan: berkas ini ikut terbit ke halaman publik, dan wajah
+    seseorang tidak perlu dibawa-bawa hanya untuk memperagakan lingkaran.
+
+    Bujur sangkar 320×320 supaya `object-cover` memotongnya rata di semua sisi
+    saat dijadikan lingkaran.
+  -->
+  <rect width="320" height="320" fill="#E1EFFE" />
+
+  <!-- Bahu: setengah lingkaran lebar yang keluar dari bawah bingkai. -->
+  <path d="M160 188c-56 0-102 38-110 88 0 24 0 44 0 44h220s0-20 0-44c-8-50-54-88-110-88Z" fill="#1C64F2" />
+
+  <!-- Kerah, dua sapuan tipis supaya bahunya tidak terbaca sebagai satu blok. -->
+  <path d="M136 196l24 34 24-34-12-6-12 14-12-14-12 6Z" fill="#E1EFFE" />
+
+  <!-- Leher, digambar sebelum kepala supaya tepinya tertutup rapi. -->
+  <path d="M140 154h40v42a20 20 0 0 1-40 0v-42Z" fill="#F4C7AE" />
+
+  <!-- Kepala. -->
+  <ellipse cx="160" cy="126" rx="52" ry="58" fill="#FBD5BC" />
+
+  <!-- Rambut: batok atas menutupi dahi, ditambah dua sisi yang jatuh ke pipi. -->
+  <path d="M160 62c-32 0-54 22-56 52-1 12 2 22 5 30l6-34c22 4 38-2 48-14 10 14 26 20 47 20l5 28c3-8 5-18 4-30-2-30-27-52-59-52Z" fill="#3F2C22" />
+
+  <circle cx="142" cy="126" r="5" fill="#3F2C22" />
+  <circle cx="178" cy="126" r="5" fill="#3F2C22" />
+  <path d="M148 152c7 6 17 6 24 0" stroke="#B4795A" stroke-width="5" stroke-linecap="round" />
+</svg>

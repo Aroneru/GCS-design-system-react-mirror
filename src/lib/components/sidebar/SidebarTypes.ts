@@ -50,6 +50,8 @@ export interface SidebarProps extends HTMLAttributes<HTMLElement> {
   collapsedLogo?: ReactNode;
   logo?: ReactNode;
   user?: SidebarUser;
+  /** Menempelkan Sidebar di bagian atas viewport dengan tinggi satu viewport. */
+  sticky?: boolean;
   collapsed?: boolean;
   /** Menampilkan tombol collapse tanpa mengaktifkan interaksinya. */
   showCollapseButton?: boolean;
