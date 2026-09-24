@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 /**
  * Menandai bagian yang komponen aslinya belum ada di kit.
  *
- * Demo ini seluruhnya dirakit dari `@stasi/design-kit-react`, kecuali beberapa
+ * Demo ini seluruhnya dirakit dari `@ceplok-ui/design-kit-react`, kecuali beberapa
  * bagian yang komponennya memang belum dibuat — tabel, misalnya, masih ditulis
  * sebagai markup biasa. Tanpa penanda, markup itu terbaca seolah berasal dari
  * kit, dan contohnya jadi menjanjikan sesuatu yang belum ada.

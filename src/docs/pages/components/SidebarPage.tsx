@@ -221,7 +221,7 @@ function SidebarBrand({ collapsed = false }: { collapsed?: boolean }) {
         <span className="rounded-sm bg-primary-300" />
         <span className="rounded-sm bg-white" />
       </span>
-      {!collapsed && <span className="text-sm font-black tracking-tight text-content">STASI</span>}
+      {!collapsed && <span className="text-sm font-black tracking-tight text-content">CEPLOK</span>}
     </span>
   );
 }

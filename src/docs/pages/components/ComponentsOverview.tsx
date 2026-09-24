@@ -22,7 +22,7 @@ export function ComponentsOverview() {
     <OverviewPage
       eyebrow="Components · Overview"
       title="Components"
-      description="Komponen React siap pakai dari package @stasi/design-kit-react. Dipakai lewat import { Nama } from '@stasi/design-kit-react' setelah package terpasang."
+      description="Komponen React siap pakai dari package @ceplok-ui/design-kit-react. Dipakai lewat import { Nama } from '@ceplok-ui/design-kit-react' setelah package terpasang."
     >
       <OverviewCard
         route="/components/container"
@@ -67,7 +67,7 @@ export function ComponentsOverview() {
       >
         <div className="rounded-xl bg-surface-subtle p-5">
           <Alert variant="success" heading="Ini adalah Alert" dismissible={false}>
-            Ini merupakan Design system Stasi berupa component alert.
+            Ini merupakan Design system Ceplok berupa component alert.
           </Alert>
         </div>
       </OverviewCard>
@@ -180,8 +180,8 @@ export function ComponentsOverview() {
       >
         <div className="overflow-hidden rounded-xl bg-surface-subtle p-2">
           <Navbar
-            brand={<span className="text-sm font-black text-content">STASI</span>}
-            brandLabel="STASI — Beranda"
+            brand={<span className="text-sm font-black text-content">CEPLOK</span>}
+            brandLabel="CEPLOK — Beranda"
             items={[
               { id: "menu-1", label: "Menu 1", href: "#/menu-1" },
               { id: "menu-2", label: "Menu 2", href: "#/menu-2" },
@@ -226,15 +226,15 @@ export function ComponentsOverview() {
         */}
         <div className="overflow-hidden rounded-xl">
           <Footer
-            logo={asset("/images/stasi-logo.svg")}
-            logoAlt="STASI — Ministerium Fur Staatssicherheit"
+            logo={asset("/images/footer-logo.svg")}
+            logoAlt="Ceplok Design System"
             menus={[
               { label: "Menu 1" },
               { label: "Menu 2" },
               { label: "Menu 3" },
               { label: "Menu 4" },
             ]}
-            copyright={`© ${new Date().getFullYear()} STASI`}
+            copyright={`© ${new Date().getFullYear()} CEPLOK`}
           />
         </div>
       </OverviewCard>

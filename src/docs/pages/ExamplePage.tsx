@@ -79,7 +79,7 @@ export function ExamplePage() {
 
           <p data-intro className="mx-auto mt-5 max-w-xl text-body text-gray-600">
             Satu portal layanan lengkap — navigasi, formulir, tabel, dialog, dan notifikasi — dirakit
-            hanya dari komponen <code className="font-mono text-sm">@stasi/design-kit-react</code>.
+            hanya dari komponen <code className="font-mono text-sm">@ceplok-ui/design-kit-react</code>.
           </p>
 
           <div data-intro className="mt-10 flex justify-center">

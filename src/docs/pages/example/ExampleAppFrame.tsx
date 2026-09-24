@@ -19,7 +19,7 @@ import { JUDUL_HALAMAN, type HalamanDemo } from './data'
  *
  * Semua yang bergantung pada GSAP dikumpulkan di sini, di luar `DemoApp`.
  * Batas itu disengaja: aplikasi demonya harus murni memakai
- * `@stasi/design-kit-react` supaya benar-benar menunjukkan kemampuan paket,
+ * `@ceplok-ui/design-kit-react` supaya benar-benar menunjukkan kemampuan paket,
  * sementara transisi antar-rute adalah urusan situs dokumentasi.
  */
 

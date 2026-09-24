@@ -37,10 +37,10 @@ export function DemoFooter() {
       // atasnya bergeser ke kanan mengikuti Sidebar. Tanpa fluid, isinya akan
       // dipusatkan pada 1280px terhadap viewport — melenceng dari kolom konten.
       fluid
-      logo={asset('/images/stasi-logo.svg')}
-      logoAlt="STASI — Ministerium Fur Staatssicherheit"
+      logo={asset('/images/footer-logo.svg')}
+      logoAlt="Ceplok Design System"
       menus={RUTE_FOOTER.map((h) => ({ label: JUDUL_HALAMAN[h], url: href(h) }))}
-      copyright={`© ${new Date().getFullYear()} STASI — contoh aplikasi, bukan layanan sungguhan`}
+      copyright={`© ${new Date().getFullYear()} CEPLOK — contoh aplikasi, bukan layanan sungguhan`}
       socials={[
         { label: 'Instagram', url: '#', icon: InstagramIcon },
         { label: 'X', url: '#', icon: XIcon },

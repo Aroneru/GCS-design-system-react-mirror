@@ -211,7 +211,7 @@ export function BreadcrumbPage() {
         </p>
 
         <SectionCode flush>
-          {"import { Breadcrumb } from '@stasi/design-kit-react'\n"}
+          {"import { Breadcrumb } from '@ceplok-ui/design-kit-react'\n"}
           {"\n"}
           {"const items = [\n"}
 
