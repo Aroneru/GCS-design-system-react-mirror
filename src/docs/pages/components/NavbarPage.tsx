@@ -271,7 +271,7 @@ function DemoBrand() {
         <span className="rounded-sm bg-white" />
       </span>
       <span className="w-[70px] text-sm font-black tracking-tight text-content lg:w-[90px]">
-        STASI
+        CEPLOK
       </span>
     </span>
   );
@@ -489,7 +489,7 @@ function createPlaygroundCode({
     );
   };
 
-  add("import { Navbar } from '@stasi/design-kit-react';\n\n");
+  add("import { Navbar } from '@ceplok-ui/design-kit-react';\n\n");
   add(`const items = [\n${items.replace(/^ {2}/gm, "")}\n];\n\n`, true);
   add("<Navbar\n");
 
@@ -498,7 +498,7 @@ function createPlaygroundCode({
   }
 
   add("  brand={<Logo />}\n");
-  add('  brandLabel="STASI — Beranda"\n');
+  add('  brandLabel="CEPLOK — Beranda"\n');
   add("  items={items}\n");
 
   if (searchEnabled) {
@@ -521,7 +521,7 @@ function createPlaygroundCode({
 
   if (state === "authenticated") {
     add(
-      `  user={{\n    name: 'User STASI',\n    avatarSrc: '/avatar.jpg',\n    items: [{ id: 'profile', label: 'Profil', href: '/profile' }],\n  }}\n${
+      `  user={{\n    name: 'User CEPLOK',\n    avatarSrc: '/avatar.jpg',\n    items: [{ id: 'profile', label: 'Profil', href: '/profile' }],\n  }}\n${
         variant === "front-office"
           ? "  notification={{ unread: true, href: '/notifications' }}\n"
           : ""
@@ -786,7 +786,7 @@ export function NavbarDesktopPreview({
       <Navbar
         variant={navbarVariant}
         brand={<DemoBrand />}
-        brandLabel="STASI — Beranda"
+        brandLabel="CEPLOK — Beranda"
         items={figmaMenuItems[effectiveMenuCount]}
         search={
           searchEnabled
@@ -800,7 +800,7 @@ export function NavbarDesktopPreview({
         }
         guestActions={!authenticated && guestActionsEnabled ? demoGuestActions : undefined}
         user={
-          authenticated ? { name: "User STASI", initials: "US", items: accountItems } : undefined
+          authenticated ? { name: "User CEPLOK", initials: "US", items: accountItems } : undefined
         }
         notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
         menuPosition={menuPosition}
@@ -847,7 +847,7 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
         className="[&_[data-navbar-mobile-sidebar]]:hidden [&_[data-navbar-mobile-drawer]]:hidden"
         brand={<DemoBrand />}
         brandHref="/"
-        brandLabel="STASI — Beranda"
+        brandLabel="CEPLOK — Beranda"
         items={previewItems}
         activeHref={activeHref}
         search={
@@ -862,7 +862,7 @@ export function NavbarMobilePreview({ variant }: { variant: "guest" | "authentic
         }
         guestActions={!authenticated && guestActionsEnabled ? demoGuestActions : undefined}
         user={
-          authenticated ? { name: "User STASI", initials: "US", items: accountItems } : undefined
+          authenticated ? { name: "User CEPLOK", initials: "US", items: accountItems } : undefined
         }
         notification={authenticated ? { unread: true, onClick: () => undefined } : undefined}
         menuPosition={menuPosition}
@@ -915,16 +915,16 @@ const variantsCode = (
   <>
     {"<Navbar\n"}
     <H>{'  variant="back-office"\n'}</H>
-    {"  brand={<Logo />}\n  brandLabel=\"STASI — Beranda\"\n  items={items}\n  search={search}\n/>"}
+    {"  brand={<Logo />}\n  brandLabel=\"CEPLOK — Beranda\"\n  items={items}\n  search={search}\n/>"}
   </>
 );
 
 const statesCode = (
   <>
-    {"// Guest: omit `user` dan gunakan `guestActions` bila diperlukan.\n<Navbar\n  brand={<Logo />}\n  brandLabel=\"STASI — Beranda\"\n  items={items}\n  search={search}\n"}
+    {"// Guest: omit `user` dan gunakan `guestActions` bila diperlukan.\n<Navbar\n  brand={<Logo />}\n  brandLabel=\"CEPLOK — Beranda\"\n  items={items}\n  search={search}\n"}
     <H>
       {
-        "  user={{ name: 'User STASI', items: accountItems }}\n  notification={{ unread: true, href: '/notifications' }}\n"
+        "  user={{ name: 'User CEPLOK', items: accountItems }}\n  notification={{ unread: true, href: '/notifications' }}\n"
       }
     </H>
     {"/>"}

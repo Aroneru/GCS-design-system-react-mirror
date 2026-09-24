@@ -1,6 +1,6 @@
 # Changelog
 
-Perubahan penting pada `@stasi/design-kit-react` dicatat di berkas ini.
+Perubahan penting pada `@ceplok-ui/design-kit-react` dicatat di berkas ini.
 
 Formatnya mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan
 penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
@@ -14,6 +14,14 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 Perubahan di bawah ini sudah ada di kode tetapi belum diterbitkan ke npm.
 Isinya menjadikan rilis berikutnya `0.2.0`, bukan `0.1.1`: ada tujuh komponen
 publik baru, dan satu perubahan yang memutus.
+
+### Diubah
+
+- **`Footer`: logo dibesarkan** dari 40px (44px saat footer ≥ 768px) jadi 64px
+  (80px). Ukuran lama dipatok untuk logo yang isinya cuma mark; begitu logonya
+  berupa lockup dengan baris nama instansi, baris itu jatuh ke sekitar 6px dan
+  berhenti terbaca. Consumer yang logonya mark polos akan melihatnya membesar —
+  pakai `logoContent` bila ukuran lamanya memang disengaja.
 
 ### Ditambahkan
 
@@ -69,10 +77,10 @@ Rilis pertama ke npm.
   `Checkbox`, `Container`, `FloatingLabel`, `Footer`, `Hero`, `Icon`,
   `InputField`, `Navbar`, `Pagination`, `Radio`, `Select`, `TextArea`, `Toast`,
   dan `Toggle`.
-- **Subpath ikon**: `@stasi/design-kit-react/icons/outline` dan
+- **Subpath ikon**: `@ceplok-ui/design-kit-react/icons/outline` dan
   `.../icons/solid`, meneruskan ikon `flowbite-react-icons` sebagai impor
   bernama yang tetap bisa di-tree-shake.
-- **CSS sumber**, bukan CSS terkompilasi: `@stasi/design-kit-react/styles.css`
+- **CSS sumber**, bukan CSS terkompilasi: `@ceplok-ui/design-kit-react/styles.css`
   (token `@theme`, font Lato, base layer, dan kelas `.ds-*`) serta
   `.../tokens.css` bila hanya tokennya yang dibutuhkan.
 - Utilitas `cn` dan kumpulan `brandIcons`.

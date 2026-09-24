@@ -282,8 +282,8 @@ export function Modifikasi() {
         catatan="Urutan yang sama seperti di atas: varian dulu, slot bila perlu, className paling akhir dan sesedikit mungkin."
       >
         <pre className="overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
-          {`import { Button, Card, Badge } from '@stasi/design-kit-react'
-import { Plus, TrashBin } from '@stasi/design-kit-react/icons/outline'
+          {`import { Button, Card, Badge } from '@ceplok-ui/design-kit-react'
+import { Plus, TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
 
 // 1. Varian bawaan — tidak ada CSS yang ditulis sama sekali.
 <Button theme="purple" size="l" variant="outline" leftIcon={<Plus />}>

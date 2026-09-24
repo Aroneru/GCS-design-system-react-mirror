@@ -29,7 +29,7 @@ import {
   useGsap,
 } from "../motion";
 
-const INSTALL = "npm install @stasi/design-kit-react";
+const INSTALL = "npm install @ceplok-ui/design-kit-react";
 
 /**
  * Angka pada halaman ini diturunkan dari sumber aslinya — daftar navigasi dan
@@ -139,16 +139,16 @@ const steps: { title: string; desc: string; label?: string; code: string }[] = [
     desc: "Sekali saja di stylesheet utama. Baris @source yang membuat Tailwind ikut memindai berkas package.",
     label: "CSS",
     code: `/* Sekali saja, di stylesheet utama proyek */
-@import '@stasi/design-kit-react/styles.css';
+@import '@ceplok-ui/design-kit-react/styles.css';
 
 /* Tailwind v4 perlu memindai berkas package agar
    utility yang dipakai komponen ikut ter-generate */
-@source '../node_modules/@stasi/design-kit-react/dist/**/*.js';`,
+@source '../node_modules/@ceplok-ui/design-kit-react/dist/**/*.js';`,
   },
   {
     title: "Impor komponennya",
     desc: "Tidak ada provider yang perlu dibungkus dan tidak ada konfigurasi tambahan.",
-    code: `import { Button, Badge, InputField } from '@stasi/design-kit-react'
+    code: `import { Button, Badge, InputField } from '@ceplok-ui/design-kit-react'
 
 export function FormPermohonan() {
   return (
@@ -1056,13 +1056,13 @@ export function HomePage() {
         <Aurora />
 
         {/*
-          Lencana STASI sebagai cap air di ujung kanan hero. Dekoratif penuh dan
+          Lencana CEPLOK sebagai cap air di ujung kanan hero. Dekoratif penuh dan
           sengaja sangat samar — kehadirannya membangun kedalaman, bukan menuntut
           dibaca. Hanya muncul dari lebar xl ke atas; di bawah itu ia bertabrakan
           dengan jendela kode.
         */}
         <img
-          src={asset("/stasi.svg")}
+          src={asset("/images/ceplok.svg")}
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute -top-16 -right-40 hidden w-[38rem] opacity-[0.035] xl:block"
@@ -1225,7 +1225,7 @@ export function HomePage() {
             Yang tampil di bawah ini adalah komponen yang benar-benar dirender
             dari{" "}
             <code className="text-xs font-bold text-gray-700">
-              @stasi/design-kit-react
+              @ceplok-ui/design-kit-react
             </code>{" "}
             — sama persis dengan yang akan kamu impor. Klik untuk membuka
             playground-nya.

@@ -2,7 +2,7 @@
  * Primitif gerak untuk situs dokumentasi.
  *
  * Sengaja terpisah dari `src/lib`: semua ini bergantung pada GSAP yang hanya
- * devDependency, dan tidak satu pun ikut diekspor ke `@stasi/design-kit-react`.
+ * devDependency, dan tidak satu pun ikut diekspor ke `@ceplok-ui/design-kit-react`.
  * Kalau suatu saat salah satunya dibutuhkan konsumen paket, ia harus ditulis
  * ulang tanpa GSAP, bukan dipindahkan begitu saja.
  */

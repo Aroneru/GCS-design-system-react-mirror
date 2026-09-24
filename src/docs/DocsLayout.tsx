@@ -65,7 +65,7 @@ function NavLinks({ items, path }: { items: NavItem[]; path: string }) {
 function Logo({ small }: { small?: boolean }) {
   return (
     <img
-      src={asset("/stasi.svg")}
+      src={asset("/images/ceplok.svg")}
       alt=""
       aria-hidden="true"
       className={`${small ? "size-8" : "size-9"} shrink-0 object-contain`}
@@ -377,10 +377,10 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
       {/* Saudara dari baris di atas — melebar penuh selebar layar, di bawah rail. */}
       <Footer
         fluid
-        logo={asset("/images/stasi-logo.svg")}
-        logoAlt="STASI — Ministerium Fur Staatssicherheit"
+        logo={asset("/images/footer-logo.svg")}
+        logoAlt="Ceplok Design System"
         menus={footerMenus}
-        copyright={`© ${new Date().getFullYear()} STASI - Ministerium Fur Staatssicherheit`}
+        copyright={`© ${new Date().getFullYear()} Ceplok Design System`}
         socials={[
           { label: "Instagram", url: "#", icon: InstagramIcon },
           { label: "X", url: "#", icon: XIcon },

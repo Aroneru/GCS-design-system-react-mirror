@@ -31,19 +31,19 @@ import { asset } from "../../asset";
 const allMenus = Array.from({ length: 8 }, (_, i) => ({ label: `Menu ${i + 1}`, url: '#' }))
 
 const footerSocials = [
-  { label: 'Instagram', url: 'https://www.instagram.com/stasi/', icon: InstagramIcon },
-  { label: 'X', url: 'https://x.com/stasi', icon: XIcon },
+  { label: 'Instagram', url: 'https://www.instagram.com/ceplok/', icon: InstagramIcon },
+  { label: 'X', url: 'https://x.com/ceplok', icon: XIcon },
   { label: 'Facebook', url: '#', icon: FacebookIcon },
 ]
 
-const copyrightText = '© 2025 Ministerium Fur Staatssicherheit'
+const copyrightText = '© 2025 Ceplok Design System'
 
 const footerProps: PropRow[] = [
   [
     'logo',
     'string',
     'undefined',
-    'URL berkas gambar logo, dirender sebagai <img> setinggi 40px (44px saat footer ≥ 768px) dengan lebar mengikuti rasio aslinya. Bila diisi, logoContent diabaikan.',
+    'URL berkas gambar logo, dirender sebagai <img> setinggi 64px (80px saat footer ≥ 768px) dengan lebar mengikuti rasio aslinya. Bila diisi, logoContent diabaikan.',
   ],
   [
     'logoAlt',
@@ -133,7 +133,7 @@ function Preview({ label, children }: { label?: string; children: ReactNode }) {
   )
 }
 
-const TextLogo = () => <span className="text-xl font-black text-white">STASI</span>
+const TextLogo = () => <span className="text-xl font-black text-white">CEPLOK</span>
 
 export function FooterPage() {
   const [view, setView] = useState<'mobile' | 'desktop'>('desktop')
@@ -169,8 +169,8 @@ export function FooterPage() {
 
         <Preview>
           <Footer
-            logo={asset("/images/stasi-logo.svg")}
-            logoAlt="STASI — Ministerium Fur Staatssicherheit"
+            logo={asset("/images/footer-logo.svg")}
+            logoAlt="Ceplok Design System"
             menus={allMenus.slice(0, 4)}
             copyright={copyrightText}
             socials={footerSocials}
@@ -178,10 +178,10 @@ export function FooterPage() {
         </Preview>
 
         <SectionCode>
-          {"import { Footer } from '@stasi/design-kit-react'\n\n"}
+          {"import { Footer } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Footer\n'}
-          {'    logo="/images/stasi-logo.svg"\n'}
-          {'    logoAlt="STASI — Ministerium Fur Staatssicherheit"\n'}
+          {'    logo="/images/footer-logo.svg"\n'}
+          {'    logoAlt="Ceplok Design System"\n'}
           {"    menus={[{ label: 'Menu 1', url: '/menu-1' }, …]}\n"}
           {`    copyright="${copyrightText}"\n`}
           {'    socials={socials}\n'}
@@ -191,8 +191,8 @@ export function FooterPage() {
 
       <FlowSection id="logo" title="logo · logoAlt · logoContent">
         <Lead>
-          <C>logo</C> menerima URL berkas gambar dan dirender sebagai <C>{'<img>'}</C> setinggi 40px —
-          44px saat footer selebar ≥ 768px — dengan lebar mengikuti rasio aslinya. <C>logoAlt</C> jadi
+          <C>logo</C> menerima URL berkas gambar dan dirender sebagai <C>{'<img>'}</C> setinggi 64px —
+          80px saat footer selebar ≥ 768px — dengan lebar mengikuti rasio aslinya. <C>logoAlt</C> jadi
           teks alternatifnya; isi dengan nama instansi, bukan kata "logo", supaya wajar dibacakan
           pembaca layar.
         </Lead>
@@ -205,8 +205,8 @@ export function FooterPage() {
         <div className="space-y-6">
           <Preview label="logo — berkas gambar">
             <Footer
-              logo={asset("/images/stasi-logo.svg")}
-              logoAlt="STASI — Ministerium Fur Staatssicherheit"
+              logo={asset("/images/footer-logo.svg")}
+              logoAlt="Ceplok Design System"
               menus={allMenus.slice(0, 4)}
               copyright={copyrightText}
             />
@@ -221,15 +221,15 @@ export function FooterPage() {
           {'<Footer\n'}
           {'    '}
           <Mark>logo</Mark>
-          {'="/images/stasi-logo.svg"\n'}
+          {'="/images/footer-logo.svg"\n'}
           {'    '}
           <Mark>logoAlt</Mark>
-          {'="STASI — Ministerium Fur Staatssicherheit"\n'}
+          {'="Ceplok Design System"\n'}
           {'/>\n\n'}
           {'{/* Bukan berkas gambar — hanya dipakai bila logo kosong */}\n'}
           {'<Footer '}
           <Mark>logoContent</Mark>
-          {'={<span className="text-xl font-black text-white">STASI</span>} … />'}
+          {'={<span className="text-xl font-black text-white">CEPLOK</span>} … />'}
         </SectionCode>
       </FlowSection>
 
@@ -244,8 +244,8 @@ export function FooterPage() {
         <div className="space-y-6">
           <Preview label="Lima menu — masih satu baris">
             <Footer
-              logo={asset("/images/stasi-logo.svg")}
-              logoAlt="STASI"
+              logo={asset("/images/footer-logo.svg")}
+              logoAlt="CEPLOK"
               menus={allMenus.slice(0, 5)}
               copyright={copyrightText}
             />
@@ -253,8 +253,8 @@ export function FooterPage() {
 
           <Preview label="Delapan menu — tiga sisanya turun">
             <Footer
-              logo={asset("/images/stasi-logo.svg")}
-              logoAlt="STASI"
+              logo={asset("/images/footer-logo.svg")}
+              logoAlt="CEPLOK"
               menus={allMenus}
               copyright={copyrightText}
             />
@@ -289,8 +289,8 @@ export function FooterPage() {
 
         <Preview>
           <Footer
-            logo={asset("/images/stasi-logo.svg")}
-            logoAlt="STASI"
+            logo={asset("/images/footer-logo.svg")}
+            logoAlt="CEPLOK"
             menus={allMenus.slice(0, 4)}
             copyright={
               <>
@@ -311,15 +311,15 @@ export function FooterPage() {
           <Mark>copyright</Mark>
           {'={\n'}
           {'        <>\n'}
-          {'            © 2025 Ministerium Fur Staatssicherheit ·{" "}\n'}
+          {'            © 2025 Ceplok Design System ·{" "}\n'}
           {'            <a href="/privasi">Kebijakan privasi</a>\n'}
           {'        </>\n'}
           {'    }\n'}
           {'    '}
           <Mark>socials</Mark>
           {'={[\n'}
-          {"        { label: 'Instagram', url: 'https://instagram.com/stasi', icon: <Instagram /> },\n"}
-          {"        { label: 'X',         url: 'https://x.com/stasi',         icon: <X /> },\n"}
+          {"        { label: 'Instagram', url: 'https://instagram.com/ceplok', icon: <Instagram /> },\n"}
+          {"        { label: 'X',         url: 'https://x.com/ceplok',         icon: <X /> },\n"}
           {"        { label: 'Facebook',  url: '#',                            icon: <Facebook /> },\n"}
           {'    ]}\n'}
           {'/>'}
@@ -337,8 +337,8 @@ export function FooterPage() {
         <Preview label="fluid — isi menempel ke tepi footer">
           <Footer
             fluid
-            logo={asset("/images/stasi-logo.svg")}
-            logoAlt="STASI"
+            logo={asset("/images/footer-logo.svg")}
+            logoAlt="CEPLOK"
             menus={allMenus.slice(0, 4)}
             copyright={copyrightText}
             socials={footerSocials}
@@ -387,8 +387,8 @@ export function FooterPage() {
         <Stage maxWidth={view === 'mobile' ? 'max-w-[390px]' : 'max-w-full'}>
           <div className="overflow-hidden rounded-xl shadow-soft">
             <Footer
-              logo={logoMode === 'image' ? asset('/images/stasi-logo.svg') : undefined}
-              logoAlt="STASI — Ministerium Fur Staatssicherheit"
+              logo={logoMode === 'image' ? asset('/images/footer-logo.svg') : undefined}
+              logoAlt="Ceplok Design System"
               logoContent={logoMode === 'text' ? <TextLogo /> : undefined}
               menus={allMenus.slice(0, menuCount)}
               copyright={copyrightText}
@@ -454,7 +454,7 @@ export function FooterPage() {
           biru, dan tombol <em>Salin</em> selalu menyalin persis yang sedang tampil.
         </Lead>
         <SectionCode flush>
-          {"import { Footer } from '@stasi/design-kit-react'\n"}
+          {"import { Footer } from '@ceplok-ui/design-kit-react'\n"}
           {withSocials && "import { Instagram, X, Facebook } from './socialIcons'\n"}
           {'\n'}
           {`{/* ${summary} */}\n`}
@@ -472,17 +472,17 @@ export function FooterPage() {
             <>
               {`${ind}    `}
               <Mark>logo</Mark>
-              {'="/images/stasi-logo.svg"\n'}
+              {'="/images/footer-logo.svg"\n'}
               {`${ind}    `}
               <Mark>logoAlt</Mark>
-              {'="STASI"\n'}
+              {'="CEPLOK"\n'}
             </>
           )}
           {logoMode === 'text' && (
             <>
               {`${ind}    `}
               <Mark>logoContent</Mark>
-              {'={<span className="text-xl font-black text-white">STASI</span>}\n'}
+              {'={<span className="text-xl font-black text-white">CEPLOK</span>}\n'}
             </>
           )}
           {`${ind}    `}
@@ -496,8 +496,8 @@ export function FooterPage() {
               {`${ind}    `}
               <Mark>socials</Mark>
               {'={[\n'}
-              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/stasi', icon: <Instagram /> },\n`}
-              {`${ind}        { label: 'X',         url: 'https://x.com/stasi',         icon: <X /> },\n`}
+              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/ceplok', icon: <Instagram /> },\n`}
+              {`${ind}        { label: 'X',         url: 'https://x.com/ceplok',         icon: <X /> },\n`}
               {`${ind}        { label: 'Facebook',  url: '#',                            icon: <Facebook /> },\n`}
               {`${ind}    ]}\n`}
             </>
