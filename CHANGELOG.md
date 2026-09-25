@@ -67,6 +67,13 @@ publik baru, dan satu perubahan yang memutus.
   `NavbarSubItem` kini merupakan turunan `NavbarContextItem` dengan tambahan
   `contextualItems`, dan `onNavigate` menerima ketiga bentuk item tersebut.
 
+### Diperbaiki
+
+- **`Sidebar`: logo tidak lagi meleset dari sumbu saat ringkas.** Pembungkus
+  logonya satu-satunya yang dirapatkan ke kanan di dalam kotak isi 40px, jadi
+  mark 32px duduk 4px di sebelah kanan tombol lipat dan avatar yang sudah di
+  tengah. Hanya berpengaruh pada keadaan `collapsed`.
+
 ## [0.1.0] - 2026-09-01
 
 Rilis pertama ke npm.

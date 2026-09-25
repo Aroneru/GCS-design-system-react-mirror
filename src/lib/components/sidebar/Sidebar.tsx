@@ -45,7 +45,11 @@ export function Sidebar({
             <div
               className={cn(
                 "flex min-w-0 items-center",
-                collapsed && "order-2 w-full max-w-full justify-end",
+                // justify-center, bukan justify-end: saat ringkas, kotak isi
+                // header hanya 40px (72 - padding) sedangkan logonya 32px, jadi
+                // merapat ke kanan menggeser logo 4px dari sumbu rail — meleset
+                // dari tombol lipat dan avatar di bawahnya yang sudah di tengah.
+                collapsed && "order-2 w-full max-w-full justify-center",
               )}
             >
               {visibleLogo}

@@ -3,8 +3,10 @@ import { ArrowRight } from '../../lib/icons/outline'
 import { useHashRoute } from '../useHashRoute'
 import { Aurora, Magnetic, SplitWords, gsap, useGsap } from '../motion'
 import {
+  GAYA_TIRAI,
   KELAS_PANEL,
   KELAS_TIRAI,
+  KELAS_TIRAI_PUTIH,
   ambilAsal,
   bukaKeAtas,
   lupakanAsal,
@@ -23,6 +25,10 @@ import {
 export function ExamplePage() {
   const [, navigate] = useHashRoute()
   const tirai = useRef<HTMLDivElement>(null)
+  // Dua lapisan gaya `riak`. Tetap null pada gaya `tunggal` — divnya memang
+  // tidak dirender — dan tutupLalu melewati yang null.
+  const riakPutih = useRef<HTMLDivElement>(null)
+  const riakBiru = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const konten = useRef<HTMLDivElement>(null)
 
@@ -31,6 +37,17 @@ export function ExamplePage() {
   // sempat berkedip sebelum sapuannya jalan. Initializer-nya murni, jadi aman
   // meski StrictMode menjalankannya dua kali.
   const [pulang] = useState(() => ambilAsal() === 'app')
+
+  /*
+   * Tombol masuk mati begitu ditekan sekali.
+   *
+   * Tanpa ini, tiap klik berikutnya memulai timeline baru dari titik yang
+   * baru pula: gelembung yang sudah setengah jalan melompat balik ke nol,
+   * dan setiap klik menitipkan satu `navigate` lagi di `onComplete`-nya.
+   * Yang terlihat adalah animasi yang tersendat lalu berpindah halaman
+   * berkali-kali berturut-turut.
+   */
+  const [berangkat, setBerangkat] = useState(false)
 
   useLayoutEffect(() => {
     if (!pulang) return
@@ -91,13 +108,24 @@ export function ExamplePage() {
             <Magnetic strength={22}>
               <button
                 type="button"
+                disabled={berangkat}
                 onClick={(e) => {
+                  // `disabled` sudah menutup klik kedua pada praktiknya: klik
+                  // itu event diskret, jadi React merender ulang sebelum klik
+                  // berikutnya sampai. Penjagaan ini untuk yang tidak datang
+                  // dari tetikus — klik yang dikirim skrip bisa tiba dua kali
+                  // dalam satu tick, sebelum render ulangnya sempat jalan.
+                  if (berangkat) return
+                  setBerangkat(true)
                   tandaiAsal('docs')
-                  tutupLalu(tirai.current, konten.current, titikTengah(e.currentTarget), () =>
-                    navigate('/example/app'),
+                  tutupLalu(
+                    [tirai.current, riakPutih.current, riakBiru.current],
+                    konten.current,
+                    titikTengah(e.currentTarget),
+                    () => navigate('/example/app'),
                   )
                 }}
-                className="group inline-flex items-center gap-3 rounded-full bg-primary-700 px-8 py-4 text-base font-black text-white shadow-lg transition-colors hover:bg-primary-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700"
+                className="group inline-flex items-center gap-3 rounded-full bg-primary-700 px-8 py-4 text-base font-black text-white shadow-lg transition-colors hover:bg-primary-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:cursor-default disabled:hover:bg-primary-700"
               >
                 Buka contoh aplikasi
                 <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
@@ -108,8 +136,27 @@ export function ExamplePage() {
         </div>
       </div>
 
-      {/* Gelembung: paruh pertama transisi masuk. Panel: paruh kedua transisi pulang. */}
+      {/*
+        Gelembung: paruh pertama transisi masuk. Panel: paruh kedua transisi
+        pulang.
+
+        Pada gaya `riak`, dua lapisan menyusul di belakang gelembung utama.
+        Urutan DOM-nya yang menentukan tumpukan — semuanya z-[100], jadi yang
+        ditulis belakangan digambar di atas — dan yang paling atas sengaja
+        biru lagi, bukan putih: lapisan teratas itulah yang tersisa menutup
+        layar saat halaman berpindah.
+      */}
       <div ref={tirai} className={`${KELAS_TIRAI} scale-0`} aria-hidden="true" />
+      {GAYA_TIRAI === 'riak' && (
+        <>
+          <div
+            ref={riakPutih}
+            className={`${KELAS_TIRAI_PUTIH} scale-0`}
+            aria-hidden="true"
+          />
+          <div ref={riakBiru} className={`${KELAS_TIRAI} scale-0`} aria-hidden="true" />
+        </>
+      )}
       <div
         ref={panel}
         className={`${KELAS_PANEL} ${pulang ? 'translate-y-0' : 'translate-y-full'}`}
