@@ -7,6 +7,7 @@
  * ulang tanpa GSAP, bukan dipindahkan begitu saja.
  */
 export { Aurora } from './Aurora'
+export { Collapse } from './Collapse'
 export { CountUp } from './CountUp'
 export { Drawer } from './Drawer'
 export { Magnetic } from './Magnetic'

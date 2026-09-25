@@ -3,7 +3,7 @@ import { Footer, type FooterMenu } from "../lib";
 import { FacebookIcon, InstagramIcon, XIcon } from "./socialIcons";
 import { asset } from "./asset";
 import { rail, sidebars, type NavItem, type Section } from "./navigation";
-import { Drawer, prefersReducedMotion, SlideIn } from "./motion";
+import { Collapse, Drawer, prefersReducedMotion, SlideIn } from "./motion";
 
 /**
  * Menu footer sama di seluruh halaman: kelima area utama, diturunkan dari
@@ -193,6 +193,18 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
   const [drawer, setDrawer] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  /*
+   * Area terakhir yang punya sub-navigasi, ditahan selama daftarnya menutup.
+   * Tanpa ini yang menyusut cuma kotak kosong: `sidebar` sudah null di frame
+   * yang sama dengan perintah menutupnya. Pola yang sama dipakai SidebarPanel
+   * untuk panel samping di desktop.
+   */
+  const [lastSection, setLastSection] = useState<Section | null>(sidebar ? section : null);
+  // Perbandingan string, jadi setelah satu render ulang nilainya sudah sama dan
+  // cabang ini tidak bisa berputar — pola resmi menyelaraskan state dengan prop.
+  if (sidebar && section !== lastSection) setLastSection(section);
+  const lastSidebar = lastSection ? sidebars[lastSection] : null;
+
   useEffect(() => {
     document.body.classList.toggle("overflow-hidden", drawer);
     return () => document.body.classList.remove("overflow-hidden");
@@ -253,7 +265,15 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
         </div>
         <nav
           className="px-4 py-5"
-          onClick={(e) => (e.target as HTMLElement).closest("a") && setDrawer(false)}
+          onClick={(e) => {
+            // Tautan area yang punya sub-navigasi tidak menutup panel: daftarnya
+            // baru saja terbuka tepat di bawahnya, dan itulah yang mau dipilih
+            // berikutnya. Sama seperti di desktop, tempat panel samping juga
+            // tetap terbuka setelah areanya diganti. Sisanya menutup seperti
+            // biasa — tautan halaman, juga area yang memang tak punya daftar.
+            const link = (e.target as HTMLElement).closest("a");
+            if (link && !link.hasAttribute("data-keep")) setDrawer(false);
+          }}
         >
           <p
             data-drawer-item
@@ -265,6 +285,7 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
             <a
               key={item.key}
               data-drawer-item
+              data-keep={sidebars[item.key] ? "" : undefined}
               href={`#${item.route}`}
               className={`ds-nav-link mt-1 w-full ${section === item.key ? "is-active" : ""}`}
             >
@@ -280,19 +301,28 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
               {item.label}
             </a>
           ))}
-          {sidebar && (
-            <>
-              <p
-                data-drawer-item
-                className="mt-6 mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase"
-              >
-                {sidebar.title}
-              </p>
-              <div data-drawer-item>
-                <NavLinks items={sidebar.items} path={path} />
-              </div>
-            </>
-          )}
+          {/*
+            Daftar sub-halaman area yang sedang dibuka. Tingginya ditransisikan
+            oleh `Collapse`, jadi mengganti area tidak lagi menukar daftarnya
+            dalam satu frame.
+
+            `data-drawer-item` ada di pembungkusnya, bukan di tiap barisnya:
+            saat panel baru dibuka seluruh daftar masuk sebagai satu kesatuan,
+            dan tiap barisnya baru tersusun sendiri-sendiri ketika areanya
+            diganti — itu urusan `Collapse`.
+          */}
+          <div data-drawer-item>
+            <Collapse open={Boolean(sidebar)} keyed={lastSection ?? ""}>
+              {lastSidebar && (
+                <>
+                  <p className="mt-6 mb-2 px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">
+                    {lastSidebar.title}
+                  </p>
+                  <NavLinks items={lastSidebar.items} path={path} />
+                </>
+              )}
+            </Collapse>
+          </div>
         </nav>
       </Drawer>
 

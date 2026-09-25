@@ -9,6 +9,7 @@ import {
   InputField,
   Popover,
   Spinner,
+  TextArea,
 } from '../../../../lib'
 import { Check, Edit, Plus, Search, TrashBin } from '../../../../lib/icons/outline'
 import { asset } from '../../../asset'
@@ -30,6 +31,17 @@ import { asset } from '../../../asset'
 const TEMA = ['primary', 'green', 'gray', 'purple', 'orange', 'yellow'] as const
 const UKURAN = ['xs', 's', 'base', 'l', 'xl'] as const
 const VARIAN_BADGE = ['gray', 'brand', 'success', 'warning', 'danger'] as const
+
+/**
+ * Isi toolbar editor buatan sendiri. Hurufnya sengaja diberi gaya sesuai
+ * artinya — tebal, miring, coret — supaya bedanya dengan tujuh ikon bawaan
+ * terbaca sekali lihat, bukan setelah dibandingkan.
+ */
+const ALAT = [
+  { huruf: 'B', gaya: 'font-black', nama: 'Tebal' },
+  { huruf: 'I', gaya: 'italic', nama: 'Miring' },
+  { huruf: 'S', gaya: 'line-through', nama: 'Coret' },
+]
 
 function Blok({
   judul,
@@ -54,6 +66,7 @@ export function Modifikasi() {
   const [ukuran, setUkuran] = useState<(typeof UKURAN)[number]>('base')
   const [outline, setOutline] = useState(false)
   const [gelap, setGelap] = useState(false)
+  const [catatan, setCatatan] = useState('')
 
   return (
     <div className="space-y-8">
@@ -164,8 +177,11 @@ export function Modifikasi() {
               </div>
             </div>
 
-            <pre className="overflow-x-auto rounded-xl bg-gray-900 p-4 font-mono text-xs text-gray-100">
-              {`<Button
+            <pre className="overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
+              {`import { Button } from '@ceplok-ui/design-kit-react'
+import { Plus } from '@ceplok-ui/design-kit-react/icons/outline'
+
+<Button
   theme="${tema}"
   size="${ukuran}"${outline ? '\n  variant="outline"' : ''}${gelap ? '\n  tone="dark"' : ''}
   leftIcon={<Plus />}
@@ -180,9 +196,73 @@ export function Modifikasi() {
       {/* ── 2. Slot ── */}
       <Blok
         judul="2. Menyusun ulang lewat slot"
-        catatan="Prop seperti actions dan icon menerima ReactNode apa pun, jadi isinya Anda tentukan sendiri tanpa mengubah komponennya."
+        catatan="Prop seperti toolbar, actions, dan icon menerima ReactNode apa pun, jadi isinya Anda tentukan sendiri tanpa mengubah komponennya."
       >
+        {/*
+          Dua editor yang sama persis kecuali satu prop. Yang kiri memakai
+          toolbar bawaan — tujuh ikon abu-abu; yang kanan menggantinya
+          seluruhnya. Perubahan sebesar ini tidak butuh satu baris pun di
+          dalam TextArea.
+        */}
         <div className="grid gap-5 sm:grid-cols-2">
+          <TextArea
+            type="editor"
+            label="toolbar bawaan"
+            placeholder="Tulis catatan…"
+          />
+          <TextArea
+            type="editor"
+            label="toolbar diganti"
+            placeholder="Tulis catatan…"
+            value={catatan}
+            onChange={(e) => setCatatan(e.target.value)}
+            toolbar={
+              <>
+                <div className="flex items-center gap-1">
+                  {ALAT.map((a) => (
+                    <button
+                      key={a.huruf}
+                      type="button"
+                      title={a.nama}
+                      aria-label={a.nama}
+                      className={`grid size-7 place-items-center rounded-md bg-white text-xs text-gray-700 shadow-sm transition-colors hover:bg-primary-50 hover:text-primary-700 ${a.gaya}`}
+                    >
+                      {a.huruf}
+                    </button>
+                  ))}
+                </div>
+                <Badge variant="brand">Markdown</Badge>
+                <span className="ml-auto font-mono text-xs text-gray-500">
+                  {catatan.length}/280
+                </span>
+              </>
+            }
+          />
+        </div>
+
+        <pre className="mt-5 overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
+          {`import { Badge, TextArea } from '@ceplok-ui/design-kit-react'
+
+// Tanpa toolbar: tujuh tombol bawaan yang tampil.
+<TextArea type="editor" label="Catatan" />
+
+// Dengan toolbar: isi bawaannya diganti seluruhnya. Komponennya tetap
+// yang sama — tinggi bar, garis, radius, dan warna fokusnya tidak
+// berubah — hanya isi barnya yang jadi milik Anda.
+<TextArea
+  type="editor"
+  label="Catatan"
+  toolbar={
+    <>
+      <button type="button" className="size-7 rounded-md bg-white font-black">B</button>
+      <Badge variant="brand">Markdown</Badge>
+      <span className="ml-auto font-mono text-xs text-gray-500">0/280</span>
+    </>
+  }
+/>`}
+        </pre>
+
+        <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <Card
             image={asset('/images/card-sample.svg')}
             imageAlt=""
@@ -209,6 +289,29 @@ export function Modifikasi() {
             }
           />
         </div>
+
+        <pre className="mt-5 overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
+          {`import { Badge, Button, Card } from '@ceplok-ui/design-kit-react'
+import { TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
+
+// Tanpa actions: Card berhenti di deskripsi.
+<Card image="/images/card-sample.svg" title="Judul" description="Deskripsi singkat." />
+
+// Dengan actions: baris di bawahnya sepenuhnya markup Anda sendiri.
+<Card
+  image="/images/card-sample.svg"
+  title="Judul"
+  description="Deskripsi singkat."
+  actions={
+    <div className="flex w-full items-center justify-between">
+      <Badge variant="success">Aktif</Badge>
+      <Button type="iconOnly" size="xs" theme="gray" variant="outline" aria-label="Hapus">
+        <TrashBin />
+      </Button>
+    </div>
+  }
+/>`}
+        </pre>
 
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <InputField label="icon bawaan" placeholder="Tanpa icon" />
@@ -254,6 +357,17 @@ export function Modifikasi() {
               <Button theme="orange">Pakai theme yang ada</Button>
             </div>
           </div>
+
+          <pre className="overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
+            {`import { Button } from '@ceplok-ui/design-kit-react'
+
+// Aman — w-full belum dipakai Button, jadi tidak ada yang ditandingi.
+<Button className="w-full sm:w-56">Lebar penuh di mobile</Button>
+
+// Hindari — theme sudah menetapkan latar, jadi bg-red-600 tidak
+// menggantikannya. Keduanya terpasang dan urutan CSS yang menentukan.
+<Button theme="primary" className="bg-red-600">Hasilnya tak terjamin</Button>`}
+          </pre>
         </div>
       </Blok>
 
@@ -274,44 +388,6 @@ export function Modifikasi() {
             </Container>
           ))}
         </div>
-      </Blok>
-
-      {/* ── Ringkasan ── */}
-      <Blok
-        judul="Ketiganya dalam satu berkas"
-        catatan="Urutan yang sama seperti di atas: varian dulu, slot bila perlu, className paling akhir dan sesedikit mungkin."
-      >
-        <pre className="overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
-          {`import { Button, Card, Badge } from '@ceplok-ui/design-kit-react'
-import { Plus, TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
-
-// 1. Varian bawaan — tidak ada CSS yang ditulis sama sekali.
-<Button theme="purple" size="l" variant="outline" leftIcon={<Plus />}>
-  Tambah data
-</Button>
-
-// 2. Slot — actions menerima ReactNode apa pun.
-<Card
-  image="/images/card-sample.svg"
-  title="Judul Kartu"
-  description="Deskripsi singkat."
-  actions={
-    <div className="flex w-full items-center justify-between">
-      <Badge variant="success">Aktif</Badge>
-      <Button type="iconOnly" size="xs" theme="gray" variant="outline" aria-label="Hapus">
-        <TrashBin />
-      </Button>
-    </div>
-  }
-/>
-
-// 3. className — hanya untuk properti yang belum dipakai komponen.
-<Button className="w-full sm:w-56">Lebar penuh di mobile</Button>
-
-// Hindari: theme sudah menetapkan latar, jadi bg-red-600 tidak
-// menggantikannya — keduanya terpasang dan urutan CSS yang menentukan.
-<Button theme="primary" className="bg-red-600">Hasilnya tak terjamin</Button>`}
-        </pre>
       </Blok>
     </div>
   )
