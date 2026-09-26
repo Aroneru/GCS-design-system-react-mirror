@@ -107,6 +107,26 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/dropdown"
+        name="Dropdown"
+        desc="Kumpulan aksi atau pilihan tambahan yang dibuka dari sebuah trigger."
+      >
+        <div className="rounded-xl bg-surface-subtle p-5">
+          <div className="mx-auto w-56 max-w-full">
+            <div className="inline-flex h-10 items-center rounded-lg bg-primary-700 px-4 text-sm font-medium text-white">
+              Aksi
+            </div>
+            <div className="mt-2 rounded-lg bg-surface py-1 shadow-md" aria-hidden="true">
+              <div className="px-4 py-2 text-sm font-medium text-gray-700">Profil</div>
+              <div className="px-4 py-2 text-sm font-medium text-gray-700">Pengaturan</div>
+              <div className="my-1 border-t border-border" />
+              <div className="px-4 py-2 text-sm font-medium text-red-600">Keluar</div>
+            </div>
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/modal"
         name="Modal"
         desc="Dialog terkontrol untuk informasi atau tindakan yang harus diselesaikan sebelum kembali ke halaman utama."
