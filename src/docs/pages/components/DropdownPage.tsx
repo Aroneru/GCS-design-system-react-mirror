@@ -50,7 +50,7 @@ const variationMinHeights: Record<DropdownExample, string> = {
 }
 
 const triggerClassName =
-  'h-[40px] !bg-primary-700 !text-base !text-white duration-200 hover:!bg-primary-800 focus:!outline-none focus:ring-2 focus:ring-primary-400 disabled:pointer-events-none'
+  'h-10 !bg-primary-700 !text-base !text-white duration-200 hover:!bg-primary-800 focus:!outline-none focus:ring-2 focus:ring-primary-400 disabled:pointer-events-none'
 
 const selectionRowClassName = 'w-full rounded-md px-2 hover:bg-gray-100'
 const disabledSelectionRowClassName = 'w-full rounded-md px-2'
@@ -250,7 +250,7 @@ function ExampleCode({ example }: { example: DropdownExample }) {
       {`import { ${componentImports.join(', ')} } from '@stasi/design-kit-react'\n`}
       {example === 'icons' &&
         "import { ArrowRightToBracket, Cog, QuestionCircle, User } from '@stasi/design-kit-react/icons/outline'\n"}
-      {`\n<Dropdown>\n  <DropdownTrigger className="${triggerClassName}">Dropdown button</DropdownTrigger>\n`}
+      {`\n<Dropdown>\n  <DropdownTrigger\n    className="\n      h-10 !bg-primary-700 !text-base !text-white\n      duration-200 hover:!bg-primary-800 focus:!outline-none\n      focus:ring-2 focus:ring-primary-400 disabled:pointer-events-none\n    "\n  >\n    Dropdown button\n  </DropdownTrigger>\n`}
       {example === 'actions' ? (
         <H>{'  <DropdownContent className="py-1">\n    <DropdownItem>Profil</DropdownItem>\n    <DropdownItem>Pengaturan</DropdownItem>\n    <DropdownItem>Bantuan</DropdownItem>\n    <DropdownSeparator />\n    <DropdownItem tone="danger">Keluar</DropdownItem>\n  </DropdownContent>'}</H>
       ) : example === 'icons' ? (
@@ -412,7 +412,8 @@ export function DropdownPage() {
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
           Gunakan DropdownTrigger sebagai pemicu dan DropdownContent sebagai panel. DropdownItem digunakan
-          untuk aksi, sedangkan Radio atau Checkbox dapat disusun langsung di dalam panel. Kode berikut
+          untuk aksi, sedangkan DropdownSeparator dapat digunakan untuk memisahkan kelompok aksi.
+          Radio atau Checkbox dapat disusun langsung di dalam panel. Kode berikut
           mengikuti pilihan Contoh di Playground.
         </Lead>
         <SectionCode flush><ExampleCode example={example} /></SectionCode>
