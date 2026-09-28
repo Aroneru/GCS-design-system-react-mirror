@@ -1,6 +1,8 @@
 import {
+  cloneElement,
   createContext,
   forwardRef,
+  isValidElement,
   useCallback,
   useContext,
   useId,
@@ -9,7 +11,9 @@ import {
   type ButtonHTMLAttributes,
   type HTMLAttributes,
   type MouseEvent,
+  type ReactElement,
   type ReactNode,
+  type Ref,
 } from 'react'
 import { cn } from '../utils/cn'
 
@@ -19,16 +23,12 @@ export interface DropdownProps {
   className?: string
 }
 
-type OwnedTriggerAttributes =
-  | 'aria-controls'
-  | 'aria-expanded'
-  | 'popoverTarget'
-  | 'popoverTargetAction'
+type TriggerElementProps = ButtonHTMLAttributes<HTMLButtonElement>
 
-export type DropdownTriggerProps = Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  OwnedTriggerAttributes
->
+export interface DropdownTriggerProps {
+  /** Satu elemen button milik consumer yang menerima wiring popover. */
+  children: ReactElement<TriggerElementProps>
+}
 
 export type DropdownContentProps = Omit<HTMLAttributes<HTMLDivElement>, 'id' | 'popover'>
 
@@ -58,7 +58,7 @@ function useDropdownContext(component: string) {
   return context
 }
 
-function assignRef<T>(ref: React.ForwardedRef<T>, value: T | null) {
+function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
   if (typeof ref === 'function') {
     ref(value)
   } else if (ref) {
@@ -67,7 +67,7 @@ function assignRef<T>(ref: React.ForwardedRef<T>, value: T | null) {
 }
 
 /** Dropdown nonmodal berbasis HTML Popover API dengan visibilitas native. */
-export function Dropdown({ children, className }: DropdownProps) {
+export function DropdownRoot({ children, className }: DropdownProps) {
   const contentId = useId()
   const contentRef = useRef<HTMLDivElement | null>(null)
 
@@ -94,29 +94,17 @@ export function Dropdown({ children, className }: DropdownProps) {
   )
 }
 
-export const DropdownTrigger = forwardRef<HTMLButtonElement, DropdownTriggerProps>(
-  function DropdownTrigger({ type = 'button', className, children, ...props }, forwardedRef) {
-    const { contentId } = useDropdownContext('DropdownTrigger')
+export function DropdownTrigger({ children }: DropdownTriggerProps) {
+  const { contentId } = useDropdownContext('DropdownTrigger')
+  if (!isValidElement<TriggerElementProps>(children)) {
+    throw new Error('Dropdown.Trigger memerlukan satu elemen button yang valid.')
+  }
 
-    return (
-      <button
-        {...props}
-        ref={forwardedRef}
-        type={type}
-        popoverTarget={contentId}
-        popoverTargetAction="toggle"
-        className={cn(
-          'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium leading-normal text-content transition-colors',
-          'hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-          className,
-        )}
-      >
-        {children}
-      </button>
-    )
-  },
-)
+  return cloneElement(children, {
+    popoverTarget: contentId,
+    popoverTargetAction: 'toggle',
+  })
+}
 
 DropdownTrigger.displayName = 'DropdownTrigger'
 
@@ -196,3 +184,12 @@ export const DropdownSeparator = forwardRef<HTMLHRElement, DropdownSeparatorProp
 )
 
 DropdownSeparator.displayName = 'DropdownSeparator'
+
+// Compound component tetap satu runtime import bagi consumer.
+// eslint-disable-next-line react-refresh/only-export-components
+export const Dropdown = Object.assign(DropdownRoot, {
+  Trigger: DropdownTrigger,
+  Content: DropdownContent,
+  Item: DropdownItem,
+  Separator: DropdownSeparator,
+})

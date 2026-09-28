@@ -4,9 +4,6 @@ import {
   Button,
   Card,
   Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
   Toast,
 } from '../../../../lib'
 import { asset } from '../../../asset'
@@ -52,8 +49,8 @@ export function Layanan() {
         onClose={() => setDipilih(null)}
         aria-label="Konfirmasi pengajuan layanan"
       >
-        <ModalHeader>{layanan?.judul ?? 'Ajukan layanan'}</ModalHeader>
-        <ModalBody>
+        <Modal.Header>{layanan?.judul ?? 'Ajukan layanan'}</Modal.Header>
+        <Modal.Body>
           <p>{layanan?.deskripsi}</p>
           <dl className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-surface-subtle p-4">
             <div>
@@ -67,8 +64,8 @@ export function Layanan() {
               <dd className="mt-1 text-body-sm font-bold text-gray-900">{layanan?.biaya}</dd>
             </div>
           </dl>
-        </ModalBody>
-        <ModalFooter>
+        </Modal.Body>
+        <Modal.Footer>
           <Button variant="outline" theme="gray" size="xs" onClick={() => setDipilih(null)}>
             Batal
           </Button>
@@ -81,7 +78,7 @@ export function Layanan() {
           >
             Lanjutkan
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
       </Modal>
 
       {terkirim && (

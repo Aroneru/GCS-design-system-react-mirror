@@ -4,9 +4,6 @@ import {
   Button,
   Icon,
   Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
   type ModalSize,
 } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
@@ -47,14 +44,14 @@ const examples: { value: ModalExample; label: string }[] = [
 const longContent = [
   'Modal dapat memuat informasi yang perlu dibaca sebelum pengguna melanjutkan proses.',
   'Saat isi bertambah, tinggi panel tetap dibatasi oleh viewport agar tombol tutup dan action tetap dapat dijangkau.',
-  'Header berada di bagian atas dan tidak ikut bergerak ketika pengguna menggulir isi ModalBody.',
+  'Header berada di bagian atas dan tidak ikut bergerak ketika pengguna menggulir isi Modal.Body.',
   'Footer juga tetap terlihat sehingga pengguna tidak perlu menggulir halaman utama untuk menemukan action.',
-  'Gunakan struktur semantik seperti paragraf, daftar, heading bagian, atau field form langsung di dalam ModalBody.',
+  'Gunakan struktur semantik seperti paragraf, daftar, heading bagian, atau field form langsung di dalam Modal.Body.',
   'Hindari menetapkan tinggi tetap hanya untuk menyamai satu contoh desain karena panjang isi dan ukuran viewport dapat berubah.',
   'Pada perangkat yang lebih sempit, lebar Modal menyesuaikan ruang yang tersedia sambil mempertahankan gutter di kedua sisi.',
   'Consumer tetap menentukan hasil action, validasi, status loading, dan kapan state open diubah menjadi false.',
   'Jika proses menyimpan data membutuhkan waktu, tampilkan status yang relevan pada action tanpa mengubah tanggung jawab Modal.',
-  'Pesan error dari server tetap menjadi bagian dari content atau form yang disusun consumer di dalam ModalBody.',
+  'Pesan error dari server tetap menjadi bagian dari content atau form yang disusun consumer di dalam Modal.Body.',
   'Konten yang terstruktur sebaiknya mempertahankan urutan baca yang jelas agar tetap mudah dipahami saat body digulir.',
   'Gunakan label yang spesifik pada action sehingga pengguna memahami konsekuensi sebelum menjalankan perubahan.',
   'Untuk tindakan destruktif, sediakan pilihan pembatalan dan jangan mengarahkan fokus awal ke action yang merusak data.',
@@ -68,14 +65,14 @@ const longContent = [
 function ModalExampleCode({ example, size }: { example: ModalExample; size: ModalSize }) {
   const componentImport =
     example === 'confirmation'
-      ? "import { Button, Icon, Modal, ModalBody, ModalFooter, ModalHeader } from '@tpl/design-kit-react'\n"
-      : "import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@tpl/design-kit-react'\n"
+      ? "import { Button, Icon, Modal } from '@ceplok-ui/design-kit-react'\n"
+      : "import { Button, Modal } from '@ceplok-ui/design-kit-react'\n"
 
   return (
     <>
       {componentImport}
       {example === 'confirmation' &&
-        "import { ExclamationCircle } from '@tpl/design-kit-react/icons/outline'\n"}
+        "import { ExclamationCircle } from '@ceplok-ui/design-kit-react/icons/outline'\n"}
       {'\nconst [open, setOpen] = useState(false)\n'}
       {example === 'confirmation' &&
         '\nasync function handleDelete() {\n  await deleteContent()\n  setOpen(false)\n}\n'}
@@ -87,26 +84,26 @@ function ModalExampleCode({ example, size }: { example: ModalExample; size: Moda
           {'\n  '}
           <H>aria-label=&quot;Konfirmasi hapus konten&quot;</H>
           {'\n>\n  '}
-          <H>&lt;ModalHeader /&gt;</H>
-          {'\n  <ModalBody>\n    <div className="text-center">\n      <Icon><ExclamationCircle /></Icon>\n      <p>Apakah anda yakin ingin menghapus konten ini?</p>\n    </div>\n  </ModalBody>\n  <ModalFooter className="justify-center">\n    <Button variant="outline" theme="gray" size="xs" onClick={() => setOpen(false)}>\n      Tidak, Batalkan\n    </Button>\n    <Button theme="orange" size="xs" onClick={handleDelete}>\n      Ya, hapus konten ini\n    </Button>\n  </ModalFooter>\n</Modal>'}
+          <H>&lt;Modal.Header /&gt;</H>
+          {'\n  <Modal.Body>\n    <div className="text-center">\n      <Icon><ExclamationCircle /></Icon>\n      <p>Apakah anda yakin ingin menghapus konten ini?</p>\n    </div>\n  </Modal.Body>\n  <Modal.Footer className="justify-center">\n    <Button variant="outline" theme="gray" size="xs" onClick={() => setOpen(false)}>\n      Tidak, Batalkan\n    </Button>\n    <Button theme="orange" size="xs" onClick={handleDelete}>\n      Ya, hapus konten ini\n    </Button>\n  </Modal.Footer>\n</Modal>'}
         </>
       ) : example === 'image' ? (
         <>
-          {'>\n  <ModalHeader>Designing Interfaces</ModalHeader>\n  <ModalBody>\n    '}
+          {'>\n  <Modal.Header>Designing Interfaces</Modal.Header>\n  <Modal.Body>\n    '}
           <H>
             {'<img\n      src={imageUrl}\n      alt="Sampul Designing Interfaces"\n      className="aspect-video w-full rounded-lg object-cover"\n    />'}
           </H>
-          {'\n    <p className="mt-5">...</p>\n  </ModalBody>\n  <ModalFooter>\n    <Button size="xs" onClick={() => setOpen(false)}>Ya, saya setuju</Button>\n  </ModalFooter>\n</Modal>'}
+          {'\n    <p className="mt-5">...</p>\n  </Modal.Body>\n  <Modal.Footer>\n    <Button size="xs" onClick={() => setOpen(false)}>Ya, saya setuju</Button>\n  </Modal.Footer>\n</Modal>'}
         </>
       ) : example === 'long' ? (
         <>
-          {'>\n  <ModalHeader>Ketentuan Layanan</ModalHeader>\n  <ModalBody>\n    '}
-          <H>{'{/* Konten panjang; ModalBody menangani scrolling. */}'}</H>
-          {'\n  </ModalBody>\n  <ModalFooter>\n    <Button size="xs" onClick={() => setOpen(false)}>Saya mengerti</Button>\n  </ModalFooter>\n</Modal>'}
+          {'>\n  <Modal.Header>Ketentuan Layanan</Modal.Header>\n  <Modal.Body>\n    '}
+          <H>{'{/* Konten panjang; Modal.Body menangani scrolling. */}'}</H>
+          {'\n  </Modal.Body>\n  <Modal.Footer>\n    <Button size="xs" onClick={() => setOpen(false)}>Saya mengerti</Button>\n  </Modal.Footer>\n</Modal>'}
         </>
       ) : (
         <>
-          {'>\n  <ModalHeader>Terms of Service</ModalHeader>\n  <ModalBody>\n    <p>Modal tetap responsif pada viewport sempit.</p>\n  </ModalBody>\n  <ModalFooter>\n    <Button size="xs" onClick={() => setOpen(false)}>Ya, saya setuju</Button>\n  </ModalFooter>\n</Modal>'}
+          {'>\n  <Modal.Header>Terms of Service</Modal.Header>\n  <Modal.Body>\n    <p>Modal tetap responsif pada viewport sempit.</p>\n  </Modal.Body>\n  <Modal.Footer>\n    <Button size="xs" onClick={() => setOpen(false)}>Ya, saya setuju</Button>\n  </Modal.Footer>\n</Modal>'}
         </>
       )}
     </>
@@ -117,7 +114,7 @@ const modalProps: PropRow[] = [
   ['open', 'boolean', 'required', 'Menentukan apakah Modal sedang terbuka.'],
   ['onClose', '() => void', 'required', 'Meminta consumer menutup Modal dengan memperbarui state open.'],
   ['size', "'s' | 'm'", "'s'", 'Lebar maksimum Modal: 416px untuk s dan 640px untuk m.'],
-  ['children', 'ReactNode', 'required', 'Susunan ModalHeader, ModalBody, dan ModalFooter.'],
+  ['children', 'ReactNode', 'required', 'Susunan Modal.Header, Modal.Body, dan Modal.Footer.'],
   ['className', 'string', 'undefined', 'Class tambahan nonstruktural pada elemen <dialog>.'],
   [
     '…props',
@@ -195,25 +192,25 @@ export function ModalPage() {
           size={sizeExample ?? 's'}
           onClose={() => setSizeExample(null)}
         >
-          <ModalHeader>Terms of Service</ModalHeader>
-          <ModalBody>
+          <Modal.Header>Terms of Service</Modal.Header>
+          <Modal.Body>
             <p>
               Baca informasi berikut sebelum melanjutkan. Tinggi Modal mengikuti isi dan body akan
               bergulir ketika konten melebihi ruang viewport.
             </p>
-          </ModalBody>
-          <ModalFooter>
+          </Modal.Body>
+          <Modal.Footer>
             <Button size="xs" onClick={() => setSizeExample(null)}>
               Ya, saya setuju
             </Button>
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
 
         <SectionCode>
           {'<Modal open={open} size="s" onClose={handleClose}>\n'}
-          {'  <ModalHeader>Terms of Service</ModalHeader>\n'}
-          {'  <ModalBody>...</ModalBody>\n'}
-          {'  <ModalFooter>...</ModalFooter>\n'}
+          {'  <Modal.Header>Terms of Service</Modal.Header>\n'}
+          {'  <Modal.Body>...</Modal.Body>\n'}
+          {'  <Modal.Footer>...</Modal.Footer>\n'}
           {'</Modal>\n\n'}
           {'<Modal open={open} '}
           <H>size=&quot;m&quot;</H>
@@ -261,7 +258,7 @@ export function ModalPage() {
         </p>
         {playgroundExample === 'image' && (
           <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-            Gambar ditempatkan langsung di ModalBody bersama konten lain; Modal tidak memiliki prop
+            Gambar ditempatkan langsung di Modal.Body bersama konten lain; Modal tidak memiliki prop
             image khusus.
           </p>
         )}
@@ -273,7 +270,7 @@ export function ModalPage() {
         )}
         {playgroundExample === 'long' && (
           <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-            Konten panjang menguji scrolling alami ModalBody tanpa fixed height atau prop khusus.
+            Konten panjang menguji scrolling alami Modal.Body tanpa fixed height atau prop khusus.
           </p>
         )}
 
@@ -283,7 +280,7 @@ export function ModalPage() {
           onClose={() => setPlaygroundOpen(false)}
           aria-label={playgroundExample === 'confirmation' ? 'Konfirmasi hapus konten' : undefined}
         >
-          <ModalHeader>
+          <Modal.Header>
             {playgroundExample === 'confirmation'
               ? undefined
               : playgroundExample === 'image'
@@ -291,8 +288,8 @@ export function ModalPage() {
                 : playgroundExample === 'long'
                   ? 'Ketentuan Layanan'
                   : 'Terms of Service'}
-          </ModalHeader>
-          <ModalBody>
+          </Modal.Header>
+          <Modal.Body>
             {playgroundExample === 'image' ? (
               <>
                 <img
@@ -326,8 +323,8 @@ export function ModalPage() {
                 bukan lebar paksa.
               </p>
             )}
-          </ModalBody>
-          <ModalFooter className={playgroundExample === 'confirmation' ? 'justify-center' : undefined}>
+          </Modal.Body>
+          <Modal.Footer className={playgroundExample === 'confirmation' ? 'justify-center' : undefined}>
             {playgroundExample === 'confirmation' ? (
               <>
                 <Button
@@ -347,7 +344,7 @@ export function ModalPage() {
                 {playgroundExample === 'long' ? 'Saya mengerti' : 'Ya, saya setuju'}
               </Button>
             )}
-          </ModalFooter>
+          </Modal.Footer>
         </Modal>
       </FlowSection>
 
@@ -390,9 +387,9 @@ export function ModalPage() {
         <h3 className="mt-8 text-sm font-black text-gray-900">Accessibility</h3>
         <div className="mt-1 max-w-2xl space-y-3 text-body-sm text-gray-500">
           <p>
-            Modal memakai elemen dialog native. Judul yang terlihat di ModalHeader memberi nama
+            Modal memakai elemen dialog native. Judul yang terlihat di Modal.Header memberi nama
             aksesibel secara otomatis. Jika tidak ada judul yang terlihat, berikan{' '}
-            <code>aria-label</code> pada Modal. Modal tidak otomatis memakai seluruh ModalBody sebagai{' '}
+            <code>aria-label</code> pada Modal. Modal tidak otomatis memakai seluruh Modal.Body sebagai{' '}
             <code>aria-describedby</code>. Tombol tutup dapat dijangkau dengan keyboard; tombol
             Escape dan klik backdrop meminta penutupan melalui <code>onClose</code>.
           </p>
@@ -402,9 +399,9 @@ export function ModalPage() {
             fokus awal, prioritaskan action yang lebih aman seperti tombol Batal.
           </p>
           <p>
-            Gunakan satu ModalHeader per Modal dan berikan isi judul langsung sebagai children.
+            Gunakan satu Modal.Header per Modal dan berikan isi judul langsung sebagai children.
             Jangan membungkus judul dengan <code>&lt;h2&gt;</code> atau <code>&lt;h3&gt;</code> karena
-            ModalHeader sudah menyediakan heading semantics.
+            Modal.Header sudah menyediakan heading semantics.
           </p>
         </div>
       </FlowSection>
@@ -415,13 +412,13 @@ export function ModalPage() {
         <h3 className="mb-3 text-sm font-black text-gray-900">Modal</h3>
         <PropsTable rows={modalProps} minWidth="52rem" />
 
-        <h3 className="mt-8 mb-3 text-sm font-black text-gray-900">ModalHeader</h3>
+        <h3 className="mt-8 mb-3 text-sm font-black text-gray-900">Modal.Header</h3>
         <PropsTable rows={headerProps} minWidth="46rem" />
 
-        <h3 className="mt-8 mb-3 text-sm font-black text-gray-900">ModalBody</h3>
+        <h3 className="mt-8 mb-3 text-sm font-black text-gray-900">Modal.Body</h3>
         <PropsTable rows={sectionProps} minWidth="46rem" />
 
-        <h3 className="mt-8 mb-3 text-sm font-black text-gray-900">ModalFooter</h3>
+        <h3 className="mt-8 mb-3 text-sm font-black text-gray-900">Modal.Footer</h3>
         <PropsTable rows={sectionProps} minWidth="46rem" />
       </FlowSection>
     </UsulanPage>

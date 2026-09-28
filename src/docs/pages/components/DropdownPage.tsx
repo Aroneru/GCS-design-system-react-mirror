@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type Ref } from 'react'
 import {
   ArrowRightToBracket,
   ChevronDown,
@@ -9,10 +9,6 @@ import {
 import {
   Checkbox,
   Dropdown,
-  DropdownContent,
-  DropdownItem,
-  DropdownSeparator,
-  DropdownTrigger,
   Icon,
   Radio,
 } from '../../../lib'
@@ -28,15 +24,15 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../usulanKit'
+import { adaTidakAda } from '../../usulanOptions'
 
-type DropdownExample = 'actions' | 'icons' | 'radio' | 'checkbox' | 'radio-caption' | 'scroll'
+type DropdownExample = 'actions' | 'icons' | 'radio' | 'checkbox' | 'scroll'
 
 const examples: { value: DropdownExample; label: string }[] = [
-  { value: 'actions', label: 'Default' },
+  { value: 'actions', label: 'Tanpa ikon' },
   { value: 'icons', label: 'Dengan ikon' },
   { value: 'radio', label: 'Radio' },
   { value: 'checkbox', label: 'Checkbox' },
-  { value: 'radio-caption', label: 'Radio dengan keterangan' },
   { value: 'scroll', label: 'Dengan scroll' },
 ]
 
@@ -45,19 +41,19 @@ const variationMinHeights: Record<DropdownExample, string> = {
   icons: 'min-h-72',
   radio: 'min-h-56',
   checkbox: 'min-h-56',
-  'radio-caption': 'min-h-64',
   scroll: 'min-h-72',
 }
 
 const triggerClassName =
-  'h-10 !bg-primary-700 !text-base !text-white duration-200 hover:!bg-primary-800 focus:!outline-none focus:ring-2 focus:ring-primary-400 disabled:pointer-events-none'
+  'inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-700 px-4 text-base font-medium text-white transition-colors duration-200 hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-400 disabled:pointer-events-none disabled:opacity-50'
 
 const selectionRowClassName = 'w-full rounded-md px-2 hover:bg-gray-100'
 const disabledSelectionRowClassName = 'w-full rounded-md px-2'
 
 const toc: TocEntry[] = [
   { id: 'dropdown', label: 'Dropdown' },
-  { id: 'variasi', label: 'Variasi' },
+  { id: 'separator', label: 'Separator' },
+  { id: 'keterangan', label: 'Keterangan' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -69,14 +65,7 @@ const dropdownProps: PropRow[] = [
 ]
 
 const triggerProps: PropRow[] = [
-  ['children', 'ReactNode', 'undefined', 'Isi tombol trigger.'],
-  ['className', 'string', 'undefined', 'Class tambahan nonstruktural pada tombol.'],
-  [
-    '…props',
-    'ButtonHTMLAttributes<HTMLButtonElement>',
-    '—',
-    'Atribut <button> native yang relevan diteruskan.',
-  ],
+  ['children', 'ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>', 'required', 'Satu button milik consumer yang menerima wiring popover.'],
 ]
 
 const contentProps: PropRow[] = [
@@ -109,24 +98,36 @@ const separatorProps: PropRow[] = [
 
 function Trigger({ label = 'Dropdown button' }: { label?: string }) {
   return (
-    <DropdownTrigger className={triggerClassName}>
-      {label}
-      <Icon className="!size-3.5">
-        <ChevronDown />
-      </Icon>
-    </DropdownTrigger>
+    <Dropdown.Trigger>
+      <button type="button" className={triggerClassName}>
+        {label}
+        <Icon className="!size-3.5">
+          <ChevronDown />
+        </Icon>
+      </button>
+    </Dropdown.Trigger>
   )
 }
+function ActionLabel({ children, description }: { children: string; description?: string }) {
+  if (!description) return children
 
-function ScrollContentItems() {
+  return (
+    <span className="flex flex-col items-start">
+      <span>{children}</span>
+      <span className="text-xs font-normal text-gray-500">{description}</span>
+    </span>
+  )
+}
+function ScrollContentItems({ withSeparator, withDescription }: VariationOptions) {
   return (
     <>
-      <Checkbox className={selectionRowClassName} label="Email" defaultChecked />
-      <Checkbox className={selectionRowClassName} label="Push notification" />
-      <Checkbox className={selectionRowClassName} label="SMS" />
+      <Checkbox className={selectionRowClassName} label="Email" helperText={withDescription ? 'Notifikasi melalui email.' : undefined} defaultChecked />
+      <Checkbox className={selectionRowClassName} label="Push notification" helperText={withDescription ? 'Notifikasi pada perangkat.' : undefined} />
+      <Checkbox className={selectionRowClassName} label="SMS" helperText={withDescription ? 'Notifikasi melalui SMS.' : undefined} />
       <Checkbox className={selectionRowClassName} label="WhatsApp" defaultChecked />
       <Checkbox className={selectionRowClassName} label="Pembaruan produk" />
       <Checkbox className={selectionRowClassName} label="Aktivitas akun" />
+      {withSeparator && <Dropdown.Separator />}
       <Checkbox className={disabledSelectionRowClassName} label="Keamanan" disabled />
       <Checkbox className={selectionRowClassName} label="Promosi" />
       <Checkbox className={selectionRowClassName} label="Laporan mingguan" />
@@ -137,145 +138,232 @@ function ScrollContentItems() {
   )
 }
 
-function ExampleContent({ example, groupName }: { example: DropdownExample; groupName: string }) {
+interface VariationOptions {
+  withSeparator: boolean
+  withDescription: boolean
+}
+
+interface ExampleContentProps extends VariationOptions {
+  example: DropdownExample
+  groupName: string
+  contentRef?: Ref<HTMLDivElement>
+}
+
+function ExampleContent({ example, groupName, withSeparator, withDescription, contentRef }: ExampleContentProps) {
   if (example === 'scroll') {
     return (
-      <DropdownContent className="p-4" aria-label="Pilih notifikasi dengan scroll">
+      <Dropdown.Content ref={contentRef} className="p-4" aria-label="Pilih notifikasi dengan scroll">
         <div className="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">
-          <ScrollContentItems />
+          <ScrollContentItems withSeparator={withSeparator} withDescription={withDescription} />
         </div>
-      </DropdownContent>
+      </Dropdown.Content>
     )
   }
 
   if (example === 'icons') {
     return (
-      <DropdownContent className="py-1" aria-label="Daftar aksi">
-        <DropdownItem>
+      <Dropdown.Content ref={contentRef} className="py-1" aria-label="Daftar aksi">
+        <Dropdown.Item>
           <Icon className="!size-3.5 text-gray-500"><User /></Icon>
-          Profil
-        </DropdownItem>
-        <DropdownItem>
+          <ActionLabel description={withDescription ? 'Lihat dan ubah profil.' : undefined}>Profil</ActionLabel>
+        </Dropdown.Item>
+        <Dropdown.Item>
           <Icon className="!size-3.5 text-gray-500"><Cog /></Icon>
-          Pengaturan
-        </DropdownItem>
-        <DropdownItem>
+          <ActionLabel description={withDescription ? 'Atur preferensi akun.' : undefined}>Pengaturan</ActionLabel>
+        </Dropdown.Item>
+        <Dropdown.Item>
           <Icon className="!size-3.5 text-gray-500"><QuestionCircle /></Icon>
           Bantuan
-        </DropdownItem>
-        <DropdownSeparator />
-        <DropdownItem tone="danger">
+        </Dropdown.Item>
+        {withSeparator && <Dropdown.Separator />}
+        <Dropdown.Item tone="danger">
           <Icon className="!size-3.5"><ArrowRightToBracket /></Icon>
           Keluar
-        </DropdownItem>
-      </DropdownContent>
+        </Dropdown.Item>
+      </Dropdown.Content>
     )
   }
 
   if (example === 'radio') {
     return (
-      <DropdownContent className="p-4" aria-label="Pilih akses">
+      <Dropdown.Content ref={contentRef} className="p-4" aria-label="Pilih akses">
         <div className="flex flex-col gap-4">
           <Radio className={selectionRowClassName} name={groupName} value="viewer" label="Viewer" />
-          <Radio className={selectionRowClassName} name={groupName} value="editor" label="Editor" defaultChecked />
+          <Radio className={selectionRowClassName} name={groupName} value="editor" label="Editor" helperText={withDescription ? 'Dapat mengubah konten.' : undefined} defaultChecked />
+          {withSeparator && <Dropdown.Separator />}
           <Radio className={disabledSelectionRowClassName} name={groupName} value="admin" label="Admin" disabled />
         </div>
-      </DropdownContent>
+      </Dropdown.Content>
     )
   }
 
   if (example === 'checkbox') {
     return (
-      <DropdownContent className="p-4" aria-label="Pilih notifikasi">
+      <Dropdown.Content ref={contentRef} className="p-4" aria-label="Pilih notifikasi">
         <div className="flex flex-col gap-4">
-          <Checkbox className={selectionRowClassName} label="Email" />
-          <Checkbox className={selectionRowClassName} label="Push notification" defaultChecked />
+          <Checkbox className={selectionRowClassName} label="Email" helperText={withDescription ? 'Kirim pembaruan melalui email.' : undefined} />
+          <Checkbox className={selectionRowClassName} label="Push notification" helperText={withDescription ? 'Tampilkan pada perangkat.' : undefined} defaultChecked />
+          {withSeparator && <Dropdown.Separator />}
           <Checkbox className={disabledSelectionRowClassName} label="SMS" disabled />
         </div>
-      </DropdownContent>
-    )
-  }
-
-  if (example === 'radio-caption') {
-    return (
-      <DropdownContent className="p-4" aria-label="Pilih pengiriman">
-        <div className="flex flex-col gap-4">
-          <Radio
-            className={selectionRowClassName}
-            name={groupName}
-            value="standard"
-            label="Standar"
-            helperText="Tiba dalam 3–5 hari kerja."
-            defaultChecked
-          />
-          <Radio
-            className={selectionRowClassName}
-            name={groupName}
-            value="express"
-            label="Ekspres"
-            helperText="Tiba pada hari kerja berikutnya."
-          />
-        </div>
-      </DropdownContent>
+      </Dropdown.Content>
     )
   }
 
   return (
-    <DropdownContent className="py-1" aria-label="Daftar aksi">
-      <DropdownItem>Profil</DropdownItem>
-      <DropdownItem>Pengaturan</DropdownItem>
-      <DropdownItem>Bantuan</DropdownItem>
-      <DropdownSeparator />
-      <DropdownItem tone="danger">Keluar</DropdownItem>
-    </DropdownContent>
+    <Dropdown.Content ref={contentRef} className="py-1" aria-label="Daftar aksi">
+      <Dropdown.Item><ActionLabel description={withDescription ? 'Lihat dan ubah profil.' : undefined}>Profil</ActionLabel></Dropdown.Item>
+      <Dropdown.Item><ActionLabel description={withDescription ? 'Atur preferensi akun.' : undefined}>Pengaturan</ActionLabel></Dropdown.Item>
+      <Dropdown.Item>Bantuan</Dropdown.Item>
+      {withSeparator && <Dropdown.Separator />}
+      <Dropdown.Item tone="danger">Keluar</Dropdown.Item>
+    </Dropdown.Content>
   )
 }
 
-function ExampleCode({ example }: { example: DropdownExample }) {
-  const componentImports = ['Dropdown', 'DropdownContent', 'DropdownTrigger']
-  if (example === 'actions' || example === 'icons') {
-    componentImports.splice(2, 0, 'DropdownItem', 'DropdownSeparator')
-  }
-  const selectionImport =
-    example === 'checkbox' || example === 'scroll'
-      ? 'Checkbox'
-      : example === 'radio' || example === 'radio-caption'
-        ? 'Radio'
-        : ''
-  if (selectionImport) componentImports.push(selectionImport)
-  if (example === 'icons') componentImports.push('Icon')
+function DescriptionCode({
+  label,
+  description,
+  multiline = false,
+}: {
+  label: string
+  description: string
+  multiline?: boolean
+}) {
+  return (
+    <>
+      {multiline
+        ? `\n      <span className="flex flex-col items-start">\n        <span>${label}</span>\n        <span `
+        : `<span className="flex flex-col items-start"><span>${label}</span><span `}
+      <H>className</H>
+      {'="text-xs font-normal text-gray-500">'}
+      {description}
+      {multiline ? '</span>\n      </span>\n    ' : '</span></span>'}
+    </>
+  )
+}
+
+function ExampleCode({
+  example,
+  withSeparator,
+  withDescription,
+}: VariationOptions & { example: DropdownExample }) {
+  const componentImports = new Set(['Dropdown'])
+  if (example === 'checkbox' || example === 'scroll') componentImports.add('Checkbox')
+  if (example === 'radio') componentImports.add('Radio')
+  if (example === 'icons') componentImports.add('Icon')
+  const sortedComponentImports = [...componentImports].sort((a, b) => a.localeCompare(b))
 
   return (
     <>
-      {`import { ${componentImports.join(', ')} } from '@stasi/design-kit-react'\n`}
+      {`import { ${sortedComponentImports.join(', ')} } from '@ceplok-ui/design-kit-react'\n`}
       {example === 'icons' &&
-        "import { ArrowRightToBracket, Cog, QuestionCircle, User } from '@stasi/design-kit-react/icons/outline'\n"}
-      {`\n<Dropdown>\n  <DropdownTrigger\n    className="\n      h-10 !bg-primary-700 !text-base !text-white\n      duration-200 hover:!bg-primary-800 focus:!outline-none\n      focus:ring-2 focus:ring-primary-400 disabled:pointer-events-none\n    "\n  >\n    Dropdown button\n  </DropdownTrigger>\n`}
+        "import { ArrowRightToBracket, Cog, QuestionCircle, User } from '@ceplok-ui/design-kit-react/icons/outline'\n"}
+      {'\n<Dropdown>\n  <Dropdown.Trigger>\n    <button\n      type="button"\n      className="\n        inline-flex h-10 items-center justify-center gap-2 rounded-lg\n        bg-primary-700 px-4 text-base font-medium text-white transition-colors\n        duration-200 hover:bg-primary-800 focus:outline-none focus:ring-2\n        focus:ring-primary-400 disabled:pointer-events-none disabled:opacity-50\n      "\n    >\n      Dropdown button\n    </button>\n  </Dropdown.Trigger>\n'}
       {example === 'actions' ? (
-        <H>{'  <DropdownContent className="py-1">\n    <DropdownItem>Profil</DropdownItem>\n    <DropdownItem>Pengaturan</DropdownItem>\n    <DropdownItem>Bantuan</DropdownItem>\n    <DropdownSeparator />\n    <DropdownItem tone="danger">Keluar</DropdownItem>\n  </DropdownContent>'}</H>
+        <>
+          {'  <Dropdown.Content className="py-1">\n    <Dropdown.Item>'}
+          {withDescription ? <DescriptionCode label="Profil" description="Lihat dan ubah profil." multiline /> : 'Profil'}
+          {'</Dropdown.Item>\n    <Dropdown.Item>'}
+          {withDescription ? <DescriptionCode label="Pengaturan" description="Atur preferensi akun." multiline /> : 'Pengaturan'}
+          {'</Dropdown.Item>\n    <Dropdown.Item>Bantuan</Dropdown.Item>\n'}
+          {withSeparator && <>{'    <'}<H>Dropdown.Separator</H>{' />\n'}</>}
+          {'    <Dropdown.Item tone="danger">Keluar</Dropdown.Item>\n  </Dropdown.Content>'}
+        </>
       ) : example === 'icons' ? (
-        <H>{'  <DropdownContent className="py-1">\n    <DropdownItem><Icon className="!size-3.5 text-gray-500"><User /></Icon>Profil</DropdownItem>\n    <DropdownItem><Icon className="!size-3.5 text-gray-500"><Cog /></Icon>Pengaturan</DropdownItem>\n    <DropdownItem><Icon className="!size-3.5 text-gray-500"><QuestionCircle /></Icon>Bantuan</DropdownItem>\n    <DropdownSeparator />\n    <DropdownItem tone="danger"><Icon className="!size-3.5"><ArrowRightToBracket /></Icon>Keluar</DropdownItem>\n  </DropdownContent>'}</H>
+        <>
+          {'  <Dropdown.Content className="py-1">\n    <Dropdown.Item>\n      <'}
+          <H>Icon</H>
+          {' className="!size-3.5 text-gray-500"><User /></'}
+          <H>Icon</H>
+          {'>\n      '}
+          {withDescription ? <DescriptionCode label="Profil" description="Lihat dan ubah profil." /> : 'Profil'}
+          {'\n    </Dropdown.Item>\n    <Dropdown.Item>\n      <'}
+          <H>Icon</H>
+          {' className="!size-3.5 text-gray-500"><Cog /></'}
+          <H>Icon</H>
+          {'>\n      '}
+          {withDescription ? <DescriptionCode label="Pengaturan" description="Atur preferensi akun." /> : 'Pengaturan'}
+          {'\n    </Dropdown.Item>\n    <Dropdown.Item><'}
+          <H>Icon</H>
+          {' className="!size-3.5 text-gray-500"><QuestionCircle /></'}
+          <H>Icon</H>
+          {'>Bantuan</Dropdown.Item>\n'}
+          {withSeparator && <>{'    <'}<H>Dropdown.Separator</H>{' />\n'}</>}
+          {'    <Dropdown.Item tone="danger"><'}
+          <H>Icon</H>
+          {' className="!size-3.5"><ArrowRightToBracket /></'}
+          <H>Icon</H>
+          {'>Keluar</Dropdown.Item>\n  </Dropdown.Content>'}
+        </>
       ) : example === 'scroll' ? (
-        <H>{'  <DropdownContent className="p-4">\n    <div className="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Email" defaultChecked />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Push notification" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="SMS" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="WhatsApp" defaultChecked />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Pembaruan produk" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Aktivitas akun" />\n      <Checkbox className="w-full rounded-md px-2" label="Keamanan" disabled />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Promosi" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Laporan mingguan" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Pengingat" defaultChecked />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Integrasi" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Sistem" />\n    </div>\n  </DropdownContent>'}</H>
+        <>
+          {'  <Dropdown.Content className="p-4">\n    <div '}
+          <H>className</H>
+          {'="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Email" '}
+          {withDescription && <><H>helperText</H>{'="Notifikasi melalui email." '}</>}
+          {'defaultChecked />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Push notification" '}
+          {withDescription && <><H>helperText</H>{'="Notifikasi pada perangkat." '}</>}
+          {'/>\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="SMS" '}
+          {withDescription && <><H>helperText</H>{'="Notifikasi melalui SMS." '}</>}
+          {'/>\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="WhatsApp" defaultChecked />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Pembaruan produk" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Aktivitas akun" />\n'}
+          {withSeparator && <>{'      <'}<H>Dropdown.Separator</H>{' />\n'}</>}
+          {'      <Checkbox className="w-full rounded-md px-2" label="Keamanan" disabled />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Promosi" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Laporan mingguan" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Pengingat" defaultChecked />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Integrasi" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Sistem" />\n    </div>\n  </Dropdown.Content>'}
+        </>
       ) : example === 'radio' ? (
-        <H>{'  <DropdownContent className="p-4">\n    <div className="flex flex-col gap-4">\n      <Radio className="w-full rounded-md px-2 hover:bg-gray-100" name="access" value="viewer" label="Viewer" />\n      <Radio className="w-full rounded-md px-2 hover:bg-gray-100" name="access" value="editor" label="Editor" defaultChecked />\n      <Radio className="w-full rounded-md px-2" name="access" value="admin" label="Admin" disabled />\n    </div>\n  </DropdownContent>'}</H>
-      ) : example === 'checkbox' ? (
-        <H>{'  <DropdownContent className="p-4">\n    <div className="flex flex-col gap-4">\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Email" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Push notification" defaultChecked />\n      <Checkbox className="w-full rounded-md px-2" label="SMS" disabled />\n    </div>\n  </DropdownContent>'}</H>
+        <>
+          {'  <Dropdown.Content className="p-4">\n    <div className="flex flex-col gap-4">\n      <'}
+          <H>Radio</H>
+          {' className="w-full rounded-md px-2 hover:bg-gray-100" name="access" value="viewer" label="Viewer" />\n      <'}
+          <H>Radio</H>
+          {' className="w-full rounded-md px-2 hover:bg-gray-100" name="access" value="editor" label="Editor" '}
+          {withDescription && <><H>helperText</H>{'="Dapat mengubah konten." '}</>}
+          {'defaultChecked />\n'}
+          {withSeparator && <>{'      <'}<H>Dropdown.Separator</H>{' />\n'}</>}
+          {'      <'}
+          <H>Radio</H>
+          {' className="w-full rounded-md px-2" name="access" value="admin" label="Admin" disabled />\n    </div>\n  </Dropdown.Content>'}
+        </>
       ) : (
-        <H>{'  <DropdownContent className="p-4">\n    <div className="flex flex-col gap-4">\n      <Radio\n        className="w-full rounded-md px-2 hover:bg-gray-100"\n        name="delivery"\n        value="standard"\n        label="Standar"\n        helperText="Tiba dalam 3–5 hari kerja."\n        defaultChecked\n      />\n      <Radio\n        className="w-full rounded-md px-2 hover:bg-gray-100"\n        name="delivery"\n        value="express"\n        label="Ekspres"\n        helperText="Tiba pada hari kerja berikutnya."\n      />\n    </div>\n  </DropdownContent>'}</H>
+        <>
+          {'  <Dropdown.Content className="p-4">\n    <div className="flex flex-col gap-4">\n      <'}
+          <H>Checkbox</H>
+          {' className="w-full rounded-md px-2 hover:bg-gray-100" label="Email" '}
+          {withDescription && <><H>helperText</H>{'="Kirim pembaruan melalui email." '}</>}
+          {'/>\n      <'}
+          <H>Checkbox</H>
+          {' className="w-full rounded-md px-2 hover:bg-gray-100" label="Push notification" '}
+          {withDescription && <><H>helperText</H>{'="Tampilkan pada perangkat." '}</>}
+          {'defaultChecked />\n'}
+          {withSeparator && <>{'      <'}<H>Dropdown.Separator</H>{' />\n'}</>}
+          {'      <'}
+          <H>Checkbox</H>
+          {' className="w-full rounded-md px-2" label="SMS" disabled />\n    </div>\n  </Dropdown.Content>'}
+        </>
       )}
       {'\n</Dropdown>'}
     </>
   )
 }
 
-function CompositionDemo({ example, label, groupName }: { example: DropdownExample; label: string; groupName: string }) {
+function CompositionDemo({
+  example,
+  label,
+  groupName,
+  withSeparator,
+  withDescription,
+}: ExampleContentProps & { label: string }) {
   return (
     <Demo label={label}>
       <div className={`flex ${variationMinHeights[example]} items-start justify-center pt-3`}>
         <Dropdown>
           <Trigger />
-          <ExampleContent example={example} groupName={groupName} />
+          <ExampleContent
+            example={example}
+            groupName={groupName}
+            withSeparator={withSeparator}
+            withDescription={withDescription}
+          />
         </Dropdown>
       </div>
     </Demo>
@@ -284,6 +372,8 @@ function CompositionDemo({ example, label, groupName }: { example: DropdownExamp
 
 export function DropdownPage() {
   const [example, setExample] = useState<DropdownExample>('actions')
+  const [withSeparator, setWithSeparator] = useState(false)
+  const [withDescription, setWithDescription] = useState(false)
   const playgroundTriggerRef = useRef<HTMLButtonElement>(null)
   const playgroundContentRef = useRef<HTMLDivElement>(null)
   const playgroundOpenRef = useRef(false)
@@ -322,10 +412,10 @@ export function DropdownPage() {
     restoreAfterExampleChangeRef.current = playgroundOpenRef.current
   }
 
-  const changeExample = (nextExample: DropdownExample) => {
+  const updatePlayground = (update: () => void) => {
     const shouldRestore = restoreAfterExampleChangeRef.current
     restoreAfterExampleChangeRef.current = false
-    setExample(nextExample)
+    update()
 
     if (!shouldRestore) return
     if (reopenFrameRef.current) window.cancelAnimationFrame(reopenFrameRef.current)
@@ -340,6 +430,10 @@ export function DropdownPage() {
     })
   }
 
+  const changeExample = (nextExample: DropdownExample) => {
+    updatePlayground(() => setExample(nextExample))
+  }
+
   return (
     <UsulanPage
       eyebrow="Components · Dropdown"
@@ -350,25 +444,41 @@ export function DropdownPage() {
       <FlowSection id="dropdown" title="Dropdown">
         <Lead>
           Dropdown menampilkan panel dari sebuah trigger. Panel dapat ditutup melalui trigger, klik di luar,
-          atau Escape; membuka Dropdown lain yang terpisah menutup panel sebelumnya. DropdownItem menutup
+          atau Escape; membuka Dropdown lain yang terpisah menutup panel sebelumnya. Dropdown.Item menutup
           panel setelah aktivasi, kecuali handler memanggil <H>event.preventDefault()</H>. Radio dan Checkbox
           tetap terbuka saat pilihan berubah, dan panel mengikuti trigger ketika halaman digulir atau viewport
           berubah.
         </Lead>
       </FlowSection>
 
-      <FlowSection id="variasi" title="Variasi">
-        <Lead>Beberapa variasi susunan Dropdown untuk kebutuhan aksi dan pilihan.</Lead>
+      <FlowSection id="separator" title="Separator">
+        <Lead>
+          Gunakan separator untuk memisahkan kelompok aksi di dalam panel Dropdown.
+        </Lead>
         <div className="grid gap-6 sm:grid-cols-2">
-          {examples.map((item) => (
-            <CompositionDemo
-              key={item.value}
-              example={item.value}
-              label={item.label}
-              groupName={`dropdown-${item.value}`}
-            />
-          ))}
+          <CompositionDemo example="actions" label="Tanpa separator" groupName="separator-none" withSeparator={false} withDescription={false} />
+          <CompositionDemo example="actions" label="Dengan separator" groupName="separator-with" withSeparator withDescription={false} />
         </div>
+        <SectionCode>
+          {'<Dropdown.Content className="py-1">\n  <Dropdown.Item>Profil</Dropdown.Item>\n  <Dropdown.Item>Pengaturan</Dropdown.Item>\n\n  <'}
+          <H>Dropdown.Separator</H>
+          {' />\n\n  <Dropdown.Item tone="danger">Keluar</Dropdown.Item>\n</Dropdown.Content>'}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="keterangan" title="Keterangan">
+        <Lead>
+          Tambahkan keterangan pada kontrol di dalam Dropdown ketika pengguna memerlukan konteks tambahan.
+        </Lead>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <CompositionDemo example="radio" label="Tanpa keterangan" groupName="description-none" withSeparator={false} withDescription={false} />
+          <CompositionDemo example="radio" label="Dengan keterangan" groupName="description-with" withSeparator={false} withDescription />
+        </div>
+        <SectionCode>
+          {'<Radio\n  name="access"\n  value="editor"\n  label="Editor"\n  '}
+          <H>helperText</H>
+          {'="Dapat mengubah konten."\n/>'}
+        </SectionCode>
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
@@ -380,14 +490,18 @@ export function DropdownPage() {
         <Stage maxWidth="max-w-xl">
           <div className="flex min-h-80 items-start justify-center pt-10">
             <Dropdown>
-              <DropdownTrigger ref={playgroundTriggerRef} className={triggerClassName}>
-                Dropdown button
-                <Icon className="!size-3.5"><ChevronDown /></Icon>
-              </DropdownTrigger>
-              <ExampleContentWithRef
-                ref={playgroundContentRef}
+              <Dropdown.Trigger>
+                <button ref={playgroundTriggerRef} type="button" className={triggerClassName}>
+                  Dropdown button
+                  <Icon className="!size-3.5"><ChevronDown /></Icon>
+                </button>
+              </Dropdown.Trigger>
+              <ExampleContent
+                contentRef={playgroundContentRef}
                 example={example}
                 groupName="playground-dropdown"
+                withSeparator={withSeparator}
+                withDescription={withDescription}
               />
             </Dropdown>
           </div>
@@ -406,17 +520,47 @@ export function DropdownPage() {
               />
             </div>
           </Control>
+          <Control label="Separator">
+            <div onPointerDownCapture={rememberPlaygroundVisibility}>
+              <Segmented
+                label="Tampilkan separator"
+                value={withSeparator}
+                onChange={(value) => updatePlayground(() => setWithSeparator(value))}
+                options={adaTidakAda}
+              />
+            </div>
+          </Control>
+          <Control label="Keterangan">
+            <div onPointerDownCapture={rememberPlaygroundVisibility}>
+              <Segmented
+                label="Tampilkan keterangan"
+                value={withDescription}
+                onChange={(value) => updatePlayground(() => setWithDescription(value))}
+                options={adaTidakAda}
+              />
+            </div>
+          </Control>
         </Controls>
       </FlowSection>
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Gunakan DropdownTrigger sebagai pemicu dan DropdownContent sebagai panel. DropdownItem digunakan
-          untuk aksi, sedangkan DropdownSeparator dapat digunakan untuk memisahkan kelompok aksi.
+          Bungkus button milik consumer dengan Dropdown.Trigger dan gunakan Dropdown.Content sebagai panel.
+          Dropdown.Item digunakan untuk aksi, sedangkan Dropdown.Separator memisahkan kelompok aksi.
           Radio atau Checkbox dapat disusun langsung di dalam panel. Kode berikut
           mengikuti pilihan Contoh di Playground.
         </Lead>
-        <SectionCode flush><ExampleCode example={example} /></SectionCode>
+        <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+          Jika memakai komponen trigger kustom, pastikan atribut native button diteruskan ke elemen{' '}
+          <H>&lt;button&gt;</H> yang dirender.
+        </p>
+        <SectionCode flush>
+          <ExampleCode
+            example={example}
+            withSeparator={withSeparator}
+            withDescription={withDescription}
+          />
+        </SectionCode>
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
@@ -428,19 +572,19 @@ export function DropdownPage() {
             <PropsTable rows={dropdownProps} minWidth="42rem" />
           </div>
           <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DropdownTrigger</h3>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Dropdown.Trigger</h3>
             <PropsTable rows={triggerProps} minWidth="42rem" />
           </div>
           <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DropdownContent</h3>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Dropdown.Content</h3>
             <PropsTable rows={contentProps} minWidth="42rem" />
           </div>
           <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DropdownItem</h3>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Dropdown.Item</h3>
             <PropsTable rows={itemProps} minWidth="42rem" />
           </div>
           <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DropdownSeparator</h3>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Dropdown.Separator</h3>
             <PropsTable rows={separatorProps} minWidth="42rem" />
           </div>
         </div>
@@ -448,74 +592,3 @@ export function DropdownPage() {
     </UsulanPage>
   )
 }
-
-const ExampleContentWithRef = forwardRef<HTMLDivElement, { example: DropdownExample; groupName: string }>(
-  function ExampleContentWithRef({ example, groupName }, ref) {
-    if (example === 'actions' || example === 'icons' || example === 'scroll') {
-      return (
-        <DropdownContent
-          ref={ref}
-          className={example === 'scroll' ? 'p-4' : 'py-1'}
-          aria-label={example === 'scroll' ? 'Pilih notifikasi dengan scroll' : 'Daftar aksi'}
-        >
-          {example === 'scroll' ? (
-            <div className="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">
-              <ScrollContentItems />
-            </div>
-          ) : example === 'icons' ? (
-            <>
-              <DropdownItem><Icon className="!size-3.5 text-gray-500"><User /></Icon>Profil</DropdownItem>
-              <DropdownItem><Icon className="!size-3.5 text-gray-500"><Cog /></Icon>Pengaturan</DropdownItem>
-              <DropdownItem><Icon className="!size-3.5 text-gray-500"><QuestionCircle /></Icon>Bantuan</DropdownItem>
-              <DropdownSeparator />
-              <DropdownItem tone="danger"><Icon className="!size-3.5"><ArrowRightToBracket /></Icon>Keluar</DropdownItem>
-            </>
-          ) : (
-            <>
-              <DropdownItem>Profil</DropdownItem>
-              <DropdownItem>Pengaturan</DropdownItem>
-              <DropdownItem>Bantuan</DropdownItem>
-              <DropdownSeparator />
-              <DropdownItem tone="danger">Keluar</DropdownItem>
-            </>
-          )}
-        </DropdownContent>
-      )
-    }
-
-    if (example === 'checkbox') {
-      return (
-        <DropdownContent ref={ref} className="p-4" aria-label="Pilih notifikasi">
-          <div className="flex flex-col gap-4">
-            <Checkbox className={selectionRowClassName} label="Email" />
-            <Checkbox className={selectionRowClassName} label="Push notification" defaultChecked />
-            <Checkbox className={disabledSelectionRowClassName} label="SMS" disabled />
-          </div>
-        </DropdownContent>
-      )
-    }
-
-    if (example === 'radio-caption') {
-      return (
-        <DropdownContent ref={ref} className="p-4" aria-label="Pilih pengiriman">
-          <div className="flex flex-col gap-4">
-            <Radio className={selectionRowClassName} name={groupName} value="standard" label="Standar" helperText="Tiba dalam 3–5 hari kerja." defaultChecked />
-            <Radio className={selectionRowClassName} name={groupName} value="express" label="Ekspres" helperText="Tiba pada hari kerja berikutnya." />
-          </div>
-        </DropdownContent>
-      )
-    }
-
-    return (
-      <DropdownContent ref={ref} className="p-4" aria-label="Pilih akses">
-        <div className="flex flex-col gap-4">
-          <Radio className={selectionRowClassName} name={groupName} value="viewer" label="Viewer" />
-          <Radio className={selectionRowClassName} name={groupName} value="editor" label="Editor" defaultChecked />
-          <Radio className={disabledSelectionRowClassName} name={groupName} value="admin" label="Admin" disabled />
-        </div>
-      </DropdownContent>
-    )
-  },
-)
-
-ExampleContentWithRef.displayName = 'ExampleContentWithRef'
