@@ -69,7 +69,9 @@ const dropdownProps: PropRow[] = [
   ['items', 'DropdownItem[]', 'undefined', 'Daftar aksi tanpa pengelompokan.'],
   ['groups', 'DropdownGroup[]', 'undefined', 'Aksi terkelompok, lengkap dengan label dan pemisah antar-kelompok.'],
   ['children', 'ReactNode', 'undefined', 'Isi panel bila bukan daftar aksi. Diabaikan selama items atau groups terisi.'],
+  ['attached', 'boolean', 'false', 'Menempelkan panel pada tombolnya: selebar tombol, dan mengikutinya saat halaman digulir.'],
   ['className', 'string', 'undefined', 'Class tambahan pada pembungkus terluar.'],
+  ['contentLabel', 'string', 'undefined', 'Nama panel bagi pembaca layar; hanya terpasang pada bentuk daftar pilihan.'],
   ['contentClassName', 'string', 'undefined', 'Class tambahan pada panelnya.'],
   ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut <div> standar diteruskan ke pembungkus.'],
 ]
@@ -82,6 +84,7 @@ const itemProps: PropRow[] = [
   ['onClick', '() => void', 'undefined', 'Dipanggil saat aksi ditekan. Panel menutup sendiri setelahnya.'],
   ['tone', "'default' | 'danger'", "'default'", 'Warna semantik aksi.'],
   ['disabled', 'boolean', 'false', 'Mematikan aksi.'],
+  ['selected', 'boolean', 'undefined', 'Menandai baris aktif. Begitu dipakai, panel jadi daftar pilihan (listbox). Tidak mengubah rupa barisnya.'],
   ['id', 'string', 'undefined', 'Kunci React; bila kosong dipakai urutannya.'],
 ]
 

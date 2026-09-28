@@ -80,6 +80,7 @@ export type {
   SelectOption,
   SelectState,
   SelectApplication,
+  SelectMenuMode,
 } from "./components/Select";
 
 export { Search } from "./components/Search";
@@ -88,6 +89,7 @@ export type {
   SearchCategory,
   SearchPlatform,
   SearchApplication,
+  SearchMenuMode,
 } from "./components/Search";
 
 export { Upload } from "./components/Upload";
