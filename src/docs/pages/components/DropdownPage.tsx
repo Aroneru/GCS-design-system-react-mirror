@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type Ref } from 'react'
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import {
   ArrowRightToBracket,
   ChevronDown,
@@ -11,6 +11,8 @@ import {
   Dropdown,
   Icon,
   Radio,
+  type DropdownGroup,
+  type DropdownItem,
 } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Segmented } from '../../pageKit'
@@ -50,9 +52,12 @@ const triggerClassName =
 const selectionRowClassName = 'w-full rounded-md px-2 hover:bg-gray-100'
 const disabledSelectionRowClassName = 'w-full rounded-md px-2'
 
+/** Pemisah untuk panel berisi kontrol bebas — daftar aksi memakai `groups`. */
+const hrClassName = 'my-1 border-0 border-t border-border'
+
 const toc: TocEntry[] = [
   { id: 'dropdown', label: 'Dropdown' },
-  { id: 'separator', label: 'Separator' },
+  { id: 'kelompok', label: 'Kelompok' },
   { id: 'keterangan', label: 'Keterangan' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
@@ -60,64 +65,76 @@ const toc: TocEntry[] = [
 ]
 
 const dropdownProps: PropRow[] = [
-  ['children', 'ReactNode', 'required', 'Susunan trigger dan content Dropdown.'],
+  ['trigger', 'ReactElement', 'required', 'Satu <button> milik Anda. Komponen menyalinnya untuk memasang atribut Popover.'],
+  ['items', 'DropdownItem[]', 'undefined', 'Daftar aksi tanpa pengelompokan.'],
+  ['groups', 'DropdownGroup[]', 'undefined', 'Aksi terkelompok, lengkap dengan label dan pemisah antar-kelompok.'],
+  ['children', 'ReactNode', 'undefined', 'Isi panel bila bukan daftar aksi. Diabaikan selama items atau groups terisi.'],
   ['className', 'string', 'undefined', 'Class tambahan pada pembungkus terluar.'],
-]
-
-const triggerProps: PropRow[] = [
-  ['children', 'ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>', 'required', 'Satu button milik consumer yang menerima wiring popover.'],
-]
-
-const contentProps: PropRow[] = [
-  ['children', 'ReactNode', 'undefined', 'Aksi atau kontrol yang ditampilkan.'],
-  ['className', 'string', 'undefined', 'Class tambahan untuk menyusun isi Dropdown.'],
-  [
-    '…props',
-    'HTMLAttributes<HTMLDivElement>',
-    '—',
-    'Atribut <div> native yang relevan diteruskan.',
-  ],
+  ['contentClassName', 'string', 'undefined', 'Class tambahan pada panelnya.'],
+  ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut <div> standar diteruskan ke pembungkus.'],
 ]
 
 const itemProps: PropRow[] = [
-  ['children', 'ReactNode', 'undefined', 'Label dan ikon opsional untuk aksi.'],
+  ['label', 'ReactNode', 'required', 'Teks aksi.'],
+  ['description', 'ReactNode', 'undefined', 'Baris kedua di bawah label.'],
+  ['icon', 'ReactNode', 'undefined', 'Ikon kecil di kiri label; ukurannya diatur komponen.'],
+  ['href', 'string', 'undefined', 'Bila diisi, aksinya dirender sebagai tautan.'],
+  ['onClick', '() => void', 'undefined', 'Dipanggil saat aksi ditekan. Panel menutup sendiri setelahnya.'],
   ['tone', "'default' | 'danger'", "'default'", 'Warna semantik aksi.'],
-  ['className', 'string', 'undefined', 'Class tambahan nonstruktural pada item.'],
-  [
-    '…props',
-    'ButtonHTMLAttributes<HTMLButtonElement>',
-    '—',
-    'Atribut <button> native yang relevan diteruskan.',
-  ],
+  ['disabled', 'boolean', 'false', 'Mematikan aksi.'],
+  ['id', 'string', 'undefined', 'Kunci React; bila kosong dipakai urutannya.'],
 ]
 
-const separatorProps: PropRow[] = [
-  ['className', 'string', 'undefined', 'Class tambahan nonstruktural pada separator.'],
-  ['…props', 'HTMLAttributes<HTMLHRElement>', '—', 'Atribut <hr> native yang relevan diteruskan.'],
+const groupProps: PropRow[] = [
+  ['id', 'string', 'required', 'Kunci React untuk kelompok.'],
+  ['label', 'string', 'undefined', 'Judul kecil di atas kelompok.'],
+  ['separator', 'boolean', 'false', 'Menambahkan garis pemisah sebelum kelompok ini.'],
+  ['items', 'DropdownItem[]', 'required', 'Aksi di dalam kelompok.'],
 ]
 
-function Trigger({ label = 'Dropdown button' }: { label?: string }) {
+function trigger(label = 'Dropdown button') {
   return (
-    <Dropdown.Trigger>
-      <button type="button" className={triggerClassName}>
-        {label}
-        <Icon className="!size-3.5">
-          <ChevronDown />
-        </Icon>
-      </button>
-    </Dropdown.Trigger>
+    <button type="button" className={triggerClassName}>
+      {label}
+      <Icon className="!size-3.5">
+        <ChevronDown />
+      </Icon>
+    </button>
   )
 }
-function ActionLabel({ children, description }: { children: string; description?: string }) {
-  if (!description) return children
 
-  return (
-    <span className="flex flex-col items-start">
-      <span>{children}</span>
-      <span className="text-xs font-normal text-gray-500">{description}</span>
-    </span>
-  )
+interface VariationOptions {
+  withSeparator: boolean
+  withDescription: boolean
 }
+
+/** Empat aksi yang dipakai contoh "Tanpa ikon" dan "Dengan ikon". */
+function aksi({ withDescription }: VariationOptions, withIcons: boolean): DropdownItem[] {
+  return [
+    {
+      label: 'Profil',
+      icon: withIcons ? <User /> : undefined,
+      description: withDescription ? 'Lihat dan ubah profil.' : undefined,
+    },
+    {
+      label: 'Pengaturan',
+      icon: withIcons ? <Cog /> : undefined,
+      description: withDescription ? 'Atur preferensi akun.' : undefined,
+    },
+    { label: 'Bantuan', icon: withIcons ? <QuestionCircle /> : undefined },
+    { label: 'Keluar', tone: 'danger', icon: withIcons ? <ArrowRightToBracket /> : undefined },
+  ]
+}
+
+/** Aksi yang sama, dipecah dua kelompok supaya pemisahnya punya tempat. */
+function kelompokAksi(options: VariationOptions, withIcons: boolean): DropdownGroup[] {
+  const semua = aksi(options, withIcons)
+  return [
+    { id: 'utama', items: semua.slice(0, 3) },
+    { id: 'keluar', separator: true, items: semua.slice(3) },
+  ]
+}
+
 function ScrollContentItems({ withSeparator, withDescription }: VariationOptions) {
   return (
     <>
@@ -127,7 +144,7 @@ function ScrollContentItems({ withSeparator, withDescription }: VariationOptions
       <Checkbox className={selectionRowClassName} label="WhatsApp" defaultChecked />
       <Checkbox className={selectionRowClassName} label="Pembaruan produk" />
       <Checkbox className={selectionRowClassName} label="Aktivitas akun" />
-      {withSeparator && <Dropdown.Separator />}
+      {withSeparator && <hr className={hrClassName} />}
       <Checkbox className={disabledSelectionRowClassName} label="Keamanan" disabled />
       <Checkbox className={selectionRowClassName} label="Promosi" />
       <Checkbox className={selectionRowClassName} label="Laporan mingguan" />
@@ -138,235 +155,198 @@ function ScrollContentItems({ withSeparator, withDescription }: VariationOptions
   )
 }
 
-interface VariationOptions {
-  withSeparator: boolean
-  withDescription: boolean
-}
-
-interface ExampleContentProps extends VariationOptions {
+interface ContohProps extends VariationOptions {
   example: DropdownExample
   groupName: string
-  contentRef?: Ref<HTMLDivElement>
+  label?: string
 }
 
-function ExampleContent({ example, groupName, withSeparator, withDescription, contentRef }: ExampleContentProps) {
-  if (example === 'scroll') {
-    return (
-      <Dropdown.Content ref={contentRef} className="p-4" aria-label="Pilih notifikasi dengan scroll">
-        <div className="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">
-          <ScrollContentItems withSeparator={withSeparator} withDescription={withDescription} />
-        </div>
-      </Dropdown.Content>
+/**
+ * Satu Dropdown utuh untuk contoh mana pun.
+ *
+ * Dua contoh pertama memakai `items`/`groups` — Dropdown yang menyusun
+ * daftarnya. Tiga sisanya memakai `children`, karena isinya kontrol form, bukan
+ * daftar aksi.
+ */
+function ContohDropdown({ example, groupName, withSeparator, withDescription }: ContohProps) {
+  const opsi = { withSeparator, withDescription }
+
+  if (example === 'actions' || example === 'icons') {
+    const withIcons = example === 'icons'
+    return withSeparator ? (
+      <Dropdown trigger={trigger()} groups={kelompokAksi(opsi, withIcons)} aria-label="Daftar aksi" />
+    ) : (
+      <Dropdown trigger={trigger()} items={aksi(opsi, withIcons)} aria-label="Daftar aksi" />
     )
   }
 
-  if (example === 'icons') {
+  if (example === 'scroll') {
     return (
-      <Dropdown.Content ref={contentRef} className="py-1" aria-label="Daftar aksi">
-        <Dropdown.Item>
-          <Icon className="!size-3.5 text-gray-500"><User /></Icon>
-          <ActionLabel description={withDescription ? 'Lihat dan ubah profil.' : undefined}>Profil</ActionLabel>
-        </Dropdown.Item>
-        <Dropdown.Item>
-          <Icon className="!size-3.5 text-gray-500"><Cog /></Icon>
-          <ActionLabel description={withDescription ? 'Atur preferensi akun.' : undefined}>Pengaturan</ActionLabel>
-        </Dropdown.Item>
-        <Dropdown.Item>
-          <Icon className="!size-3.5 text-gray-500"><QuestionCircle /></Icon>
-          Bantuan
-        </Dropdown.Item>
-        {withSeparator && <Dropdown.Separator />}
-        <Dropdown.Item tone="danger">
-          <Icon className="!size-3.5"><ArrowRightToBracket /></Icon>
-          Keluar
-        </Dropdown.Item>
-      </Dropdown.Content>
+      <Dropdown trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
+        <div className="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">
+          <ScrollContentItems withSeparator={withSeparator} withDescription={withDescription} />
+        </div>
+      </Dropdown>
     )
   }
 
   if (example === 'radio') {
     return (
-      <Dropdown.Content ref={contentRef} className="p-4" aria-label="Pilih akses">
+      <Dropdown trigger={trigger()} contentClassName="p-4" aria-label="Pilih akses">
         <div className="flex flex-col gap-4">
           <Radio className={selectionRowClassName} name={groupName} value="viewer" label="Viewer" />
           <Radio className={selectionRowClassName} name={groupName} value="editor" label="Editor" helperText={withDescription ? 'Dapat mengubah konten.' : undefined} defaultChecked />
-          {withSeparator && <Dropdown.Separator />}
+          {withSeparator && <hr className={hrClassName} />}
           <Radio className={disabledSelectionRowClassName} name={groupName} value="admin" label="Admin" disabled />
         </div>
-      </Dropdown.Content>
-    )
-  }
-
-  if (example === 'checkbox') {
-    return (
-      <Dropdown.Content ref={contentRef} className="p-4" aria-label="Pilih notifikasi">
-        <div className="flex flex-col gap-4">
-          <Checkbox className={selectionRowClassName} label="Email" helperText={withDescription ? 'Kirim pembaruan melalui email.' : undefined} />
-          <Checkbox className={selectionRowClassName} label="Push notification" helperText={withDescription ? 'Tampilkan pada perangkat.' : undefined} defaultChecked />
-          {withSeparator && <Dropdown.Separator />}
-          <Checkbox className={disabledSelectionRowClassName} label="SMS" disabled />
-        </div>
-      </Dropdown.Content>
+      </Dropdown>
     )
   }
 
   return (
-    <Dropdown.Content ref={contentRef} className="py-1" aria-label="Daftar aksi">
-      <Dropdown.Item><ActionLabel description={withDescription ? 'Lihat dan ubah profil.' : undefined}>Profil</ActionLabel></Dropdown.Item>
-      <Dropdown.Item><ActionLabel description={withDescription ? 'Atur preferensi akun.' : undefined}>Pengaturan</ActionLabel></Dropdown.Item>
-      <Dropdown.Item>Bantuan</Dropdown.Item>
-      {withSeparator && <Dropdown.Separator />}
-      <Dropdown.Item tone="danger">Keluar</Dropdown.Item>
-    </Dropdown.Content>
+    <Dropdown trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi">
+      <div className="flex flex-col gap-4">
+        <Checkbox className={selectionRowClassName} label="Email" helperText={withDescription ? 'Kirim pembaruan melalui email.' : undefined} />
+        <Checkbox className={selectionRowClassName} label="Push notification" helperText={withDescription ? 'Tampilkan pada perangkat.' : undefined} defaultChecked />
+        {withSeparator && <hr className={hrClassName} />}
+        <Checkbox className={disabledSelectionRowClassName} label="SMS" disabled />
+      </div>
+    </Dropdown>
   )
 }
 
-function DescriptionCode({
-  label,
-  description,
-  multiline = false,
-}: {
-  label: string
-  description: string
-  multiline?: boolean
-}) {
-  return (
-    <>
-      {multiline
-        ? `\n      <span className="flex flex-col items-start">\n        <span>${label}</span>\n        <span `
-        : `<span className="flex flex-col items-start"><span>${label}</span><span `}
-      <H>className</H>
-      {'="text-xs font-normal text-gray-500">'}
-      {description}
-      {multiline ? '</span>\n      </span>\n    ' : '</span></span>'}
-    </>
-  )
-}
-
-function ExampleCode({
-  example,
-  withSeparator,
-  withDescription,
-}: VariationOptions & { example: DropdownExample }) {
-  const componentImports = new Set(['Dropdown'])
-  if (example === 'checkbox' || example === 'scroll') componentImports.add('Checkbox')
-  if (example === 'radio') componentImports.add('Radio')
-  if (example === 'icons') componentImports.add('Icon')
-  const sortedComponentImports = [...componentImports].sort((a, b) => a.localeCompare(b))
-
-  return (
-    <>
-      {`import { ${sortedComponentImports.join(', ')} } from '@ceplok-ui/design-kit-react'\n`}
-      {example === 'icons' &&
-        "import { ArrowRightToBracket, Cog, QuestionCircle, User } from '@ceplok-ui/design-kit-react/icons/outline'\n"}
-      {'\n<Dropdown>\n  <Dropdown.Trigger>\n    <button\n      type="button"\n      className="\n        inline-flex h-10 items-center justify-center gap-2 rounded-lg\n        bg-primary-700 px-4 text-base font-medium text-white transition-colors\n        duration-200 hover:bg-primary-800 focus:outline-none focus:ring-2\n        focus:ring-primary-400 disabled:pointer-events-none disabled:opacity-50\n      "\n    >\n      Dropdown button\n    </button>\n  </Dropdown.Trigger>\n'}
-      {example === 'actions' ? (
-        <>
-          {'  <Dropdown.Content className="py-1">\n    <Dropdown.Item>'}
-          {withDescription ? <DescriptionCode label="Profil" description="Lihat dan ubah profil." multiline /> : 'Profil'}
-          {'</Dropdown.Item>\n    <Dropdown.Item>'}
-          {withDescription ? <DescriptionCode label="Pengaturan" description="Atur preferensi akun." multiline /> : 'Pengaturan'}
-          {'</Dropdown.Item>\n    <Dropdown.Item>Bantuan</Dropdown.Item>\n'}
-          {withSeparator && <>{'    <'}<H>Dropdown.Separator</H>{' />\n'}</>}
-          {'    <Dropdown.Item tone="danger">Keluar</Dropdown.Item>\n  </Dropdown.Content>'}
-        </>
-      ) : example === 'icons' ? (
-        <>
-          {'  <Dropdown.Content className="py-1">\n    <Dropdown.Item>\n      <'}
-          <H>Icon</H>
-          {' className="!size-3.5 text-gray-500"><User /></'}
-          <H>Icon</H>
-          {'>\n      '}
-          {withDescription ? <DescriptionCode label="Profil" description="Lihat dan ubah profil." /> : 'Profil'}
-          {'\n    </Dropdown.Item>\n    <Dropdown.Item>\n      <'}
-          <H>Icon</H>
-          {' className="!size-3.5 text-gray-500"><Cog /></'}
-          <H>Icon</H>
-          {'>\n      '}
-          {withDescription ? <DescriptionCode label="Pengaturan" description="Atur preferensi akun." /> : 'Pengaturan'}
-          {'\n    </Dropdown.Item>\n    <Dropdown.Item><'}
-          <H>Icon</H>
-          {' className="!size-3.5 text-gray-500"><QuestionCircle /></'}
-          <H>Icon</H>
-          {'>Bantuan</Dropdown.Item>\n'}
-          {withSeparator && <>{'    <'}<H>Dropdown.Separator</H>{' />\n'}</>}
-          {'    <Dropdown.Item tone="danger"><'}
-          <H>Icon</H>
-          {' className="!size-3.5"><ArrowRightToBracket /></'}
-          <H>Icon</H>
-          {'>Keluar</Dropdown.Item>\n  </Dropdown.Content>'}
-        </>
-      ) : example === 'scroll' ? (
-        <>
-          {'  <Dropdown.Content className="p-4">\n    <div '}
-          <H>className</H>
-          {'="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Email" '}
-          {withDescription && <><H>helperText</H>{'="Notifikasi melalui email." '}</>}
-          {'defaultChecked />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Push notification" '}
-          {withDescription && <><H>helperText</H>{'="Notifikasi pada perangkat." '}</>}
-          {'/>\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="SMS" '}
-          {withDescription && <><H>helperText</H>{'="Notifikasi melalui SMS." '}</>}
-          {'/>\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="WhatsApp" defaultChecked />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Pembaruan produk" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Aktivitas akun" />\n'}
-          {withSeparator && <>{'      <'}<H>Dropdown.Separator</H>{' />\n'}</>}
-          {'      <Checkbox className="w-full rounded-md px-2" label="Keamanan" disabled />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Promosi" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Laporan mingguan" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Pengingat" defaultChecked />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Integrasi" />\n      <Checkbox className="w-full rounded-md px-2 hover:bg-gray-100" label="Sistem" />\n    </div>\n  </Dropdown.Content>'}
-        </>
-      ) : example === 'radio' ? (
-        <>
-          {'  <Dropdown.Content className="p-4">\n    <div className="flex flex-col gap-4">\n      <'}
-          <H>Radio</H>
-          {' className="w-full rounded-md px-2 hover:bg-gray-100" name="access" value="viewer" label="Viewer" />\n      <'}
-          <H>Radio</H>
-          {' className="w-full rounded-md px-2 hover:bg-gray-100" name="access" value="editor" label="Editor" '}
-          {withDescription && <><H>helperText</H>{'="Dapat mengubah konten." '}</>}
-          {'defaultChecked />\n'}
-          {withSeparator && <>{'      <'}<H>Dropdown.Separator</H>{' />\n'}</>}
-          {'      <'}
-          <H>Radio</H>
-          {' className="w-full rounded-md px-2" name="access" value="admin" label="Admin" disabled />\n    </div>\n  </Dropdown.Content>'}
-        </>
-      ) : (
-        <>
-          {'  <Dropdown.Content className="p-4">\n    <div className="flex flex-col gap-4">\n      <'}
-          <H>Checkbox</H>
-          {' className="w-full rounded-md px-2 hover:bg-gray-100" label="Email" '}
-          {withDescription && <><H>helperText</H>{'="Kirim pembaruan melalui email." '}</>}
-          {'/>\n      <'}
-          <H>Checkbox</H>
-          {' className="w-full rounded-md px-2 hover:bg-gray-100" label="Push notification" '}
-          {withDescription && <><H>helperText</H>{'="Tampilkan pada perangkat." '}</>}
-          {'defaultChecked />\n'}
-          {withSeparator && <>{'      <'}<H>Dropdown.Separator</H>{' />\n'}</>}
-          {'      <'}
-          <H>Checkbox</H>
-          {' className="w-full rounded-md px-2" label="SMS" disabled />\n    </div>\n  </Dropdown.Content>'}
-        </>
-      )}
-      {'\n</Dropdown>'}
-    </>
-  )
-}
-
-function CompositionDemo({
-  example,
-  label,
-  groupName,
-  withSeparator,
-  withDescription,
-}: ExampleContentProps & { label: string }) {
+function CompositionDemo({ example, label, groupName, withSeparator, withDescription }: ContohProps) {
   return (
     <Demo label={label}>
       <div className={`flex ${variationMinHeights[example]} items-start justify-center pt-3`}>
-        <Dropdown>
-          <Trigger />
-          <ExampleContent
-            example={example}
-            groupName={groupName}
-            withSeparator={withSeparator}
-            withDescription={withDescription}
-          />
-        </Dropdown>
+        <ContohDropdown
+          example={example}
+          groupName={groupName}
+          withSeparator={withSeparator}
+          withDescription={withDescription}
+        />
       </div>
     </Demo>
+  )
+}
+
+/** Satu entri `items` dalam bentuk kode, mengikuti kontrol Playground. */
+function ItemCode({
+  label,
+  description,
+  icon,
+  tone,
+}: {
+  label: string
+  description?: string
+  icon?: string
+  tone?: string
+}) {
+  const bagian: ReactNode[] = [`{ label: '${label}'`]
+  if (icon) bagian.push(`, icon: <${icon} />`)
+  if (description) bagian.push(`, description: '${description}'`)
+  if (tone) bagian.push(`, tone: '${tone}'`)
+  bagian.push(' },')
+  return <>{bagian}</>
+}
+
+function ExampleCode({ example, withSeparator, withDescription }: VariationOptions & { example: DropdownExample }) {
+  const imports = new Set(['Dropdown'])
+  if (example === 'checkbox' || example === 'scroll') imports.add('Checkbox')
+  if (example === 'radio') imports.add('Radio')
+  const daftarImport = [...imports].sort((a, b) => a.localeCompare(b))
+
+  const withIcons = example === 'icons'
+  const daftarAksi = example === 'actions' || example === 'icons'
+
+  const tombol =
+    '\nconst tombol = (\n  <button type="button" className="...">\n    Dropdown button\n  </button>\n)\n'
+
+  return (
+    <>
+      {`import { ${daftarImport.join(', ')} } from '@ceplok-ui/design-kit-react'\n`}
+      {withIcons &&
+        "import { ArrowRightToBracket, Cog, QuestionCircle, User } from '@ceplok-ui/design-kit-react/icons/outline'\n"}
+      {tombol}
+
+      {daftarAksi ? (
+        withSeparator ? (
+          <>
+            {'\n<Dropdown\n  trigger={tombol}\n  '}
+            <H>groups</H>
+            {'={[\n    { id: \'utama\', items: [\n      '}
+            <ItemCode label="Profil" icon={withIcons ? 'User' : undefined} description={withDescription ? 'Lihat dan ubah profil.' : undefined} />
+            {'\n      '}
+            <ItemCode label="Pengaturan" icon={withIcons ? 'Cog' : undefined} description={withDescription ? 'Atur preferensi akun.' : undefined} />
+            {'\n      '}
+            <ItemCode label="Bantuan" icon={withIcons ? 'QuestionCircle' : undefined} />
+            {'\n    ] },\n    { id: \'keluar\', '}
+            <H>separator: true</H>
+            {', items: [\n      '}
+            <ItemCode label="Keluar" icon={withIcons ? 'ArrowRightToBracket' : undefined} tone="danger" />
+            {'\n    ] },\n  ]}\n/>'}
+          </>
+        ) : (
+          <>
+            {'\n<Dropdown\n  trigger={tombol}\n  '}
+            <H>items</H>
+            {'={[\n    '}
+            <ItemCode label="Profil" icon={withIcons ? 'User' : undefined} description={withDescription ? 'Lihat dan ubah profil.' : undefined} />
+            {'\n    '}
+            <ItemCode label="Pengaturan" icon={withIcons ? 'Cog' : undefined} description={withDescription ? 'Atur preferensi akun.' : undefined} />
+            {'\n    '}
+            <ItemCode label="Bantuan" icon={withIcons ? 'QuestionCircle' : undefined} />
+            {'\n    '}
+            <ItemCode label="Keluar" icon={withIcons ? 'ArrowRightToBracket' : undefined} tone="danger" />
+            {'\n  ]}\n/>'}
+          </>
+        )
+      ) : (
+        <>
+          {'\n<Dropdown trigger={tombol} '}
+          <H>contentClassName</H>
+          {'="p-4">\n'}
+          {example === 'scroll' ? (
+            <>
+              {'  <div className="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">\n'}
+              {'    <Checkbox label="Email" '}
+              {withDescription && <><H>helperText</H>{'="Notifikasi melalui email." '}</>}
+              {'defaultChecked />\n    <Checkbox label="Push notification" />\n    {/* … */}\n'}
+              {withSeparator && <>{'    <'}<H>hr className=&quot;my-1 border-0 border-t border-border&quot;</H>{' />\n'}</>}
+              {'    <Checkbox label="Sistem" />\n  </div>\n</Dropdown>'}
+            </>
+          ) : example === 'radio' ? (
+            <>
+              {'  <div className="flex flex-col gap-4">\n    <'}
+              <H>Radio</H>
+              {' name="access" value="viewer" label="Viewer" />\n    <'}
+              <H>Radio</H>
+              {' name="access" value="editor" label="Editor" '}
+              {withDescription && <><H>helperText</H>{'="Dapat mengubah konten." '}</>}
+              {'defaultChecked />\n'}
+              {withSeparator && <>{'    <'}<H>hr className=&quot;my-1 border-0 border-t border-border&quot;</H>{' />\n'}</>}
+              {'    <'}
+              <H>Radio</H>
+              {' name="access" value="admin" label="Admin" disabled />\n  </div>\n</Dropdown>'}
+            </>
+          ) : (
+            <>
+              {'  <div className="flex flex-col gap-4">\n    <'}
+              <H>Checkbox</H>
+              {' label="Email" '}
+              {withDescription && <><H>helperText</H>{'="Kirim pembaruan melalui email." '}</>}
+              {'/>\n    <'}
+              <H>Checkbox</H>
+              {' label="Push notification" defaultChecked />\n'}
+              {withSeparator && <>{'    <'}<H>hr className=&quot;my-1 border-0 border-t border-border&quot;</H>{' />\n'}</>}
+              {'    <'}
+              <H>Checkbox</H>
+              {' label="SMS" disabled />\n  </div>\n</Dropdown>'}
+            </>
+          )}
+        </>
+      )}
+    </>
   )
 }
 
@@ -374,168 +354,170 @@ export function DropdownPage() {
   const [example, setExample] = useState<DropdownExample>('actions')
   const [withSeparator, setWithSeparator] = useState(false)
   const [withDescription, setWithDescription] = useState(false)
-  const playgroundTriggerRef = useRef<HTMLButtonElement>(null)
-  const playgroundContentRef = useRef<HTMLDivElement>(null)
-  const playgroundOpenRef = useRef(false)
-  const restoreAfterExampleChangeRef = useRef(false)
-  const didInitiallyOpenRef = useRef(false)
-  const reopenFrameRef = useRef(0)
+
+  /*
+   * Panelnya dibuka sejak halaman dimuat, dan dibuka lagi setelah kontrolnya
+   * diganti — kalau tidak, setiap penggantian menutup panel dan variasinya
+   * tidak bisa dibandingkan.
+   *
+   * Tombol dan panelnya dicari dari DOM pembungkus, bukan lewat ref ke
+   * masing-masing: sejak API-nya rata, panel itu urusan dalam komponen dan
+   * tidak lagi punya ref sendiri. Ini halaman dokumentasi yang mengintip
+   * DOM-nya sendiri, bukan pemakaian yang dianjurkan.
+   */
+  const panggung = useRef<HTMLDivElement>(null)
+  const bukaLagi = useRef(false)
+  const frame = useRef(0)
+  const sudahDibuka = useRef(false)
+
+  const panel = () => panggung.current?.querySelector<HTMLDivElement>('[popover]') ?? null
+  const tombol = () => panggung.current?.querySelector('button') ?? null
 
   useEffect(() => {
-    const trigger = playgroundTriggerRef.current
-    const content = playgroundContentRef.current
-    if (!trigger || !content) return
+    if (sudahDibuka.current) return
+    sudahDibuka.current = true
 
-    const handleToggle = (event: Event) => {
-      playgroundOpenRef.current = (event as ToggleEvent).newState === 'open'
-    }
-
-    content.addEventListener('toggle', handleToggle)
-
-    if (!didInitiallyOpenRef.current) {
-      didInitiallyOpenRef.current = true
-      if (!content.matches(':popover-open')) content.showPopover({ source: trigger })
-    }
-    playgroundOpenRef.current = content.matches(':popover-open')
+    const p = panel()
+    const t = tombol()
+    if (p && t && !p.matches(':popover-open')) p.showPopover({ source: t })
 
     return () => {
-      content.removeEventListener('toggle', handleToggle)
-      if (reopenFrameRef.current) window.cancelAnimationFrame(reopenFrameRef.current)
-      reopenFrameRef.current = 0
+      if (frame.current) window.cancelAnimationFrame(frame.current)
+      frame.current = 0
     }
   }, [])
 
-  const rememberPlaygroundVisibility = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const ingatKeadaan = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return
-    const isOpen = playgroundContentRef.current?.matches(':popover-open') ?? false
-    playgroundOpenRef.current = isOpen
-    restoreAfterExampleChangeRef.current = playgroundOpenRef.current
+    bukaLagi.current = panel()?.matches(':popover-open') ?? false
   }
 
-  const updatePlayground = (update: () => void) => {
-    const shouldRestore = restoreAfterExampleChangeRef.current
-    restoreAfterExampleChangeRef.current = false
+  const ubah = (update: () => void) => {
+    const perluDibuka = bukaLagi.current
+    bukaLagi.current = false
     update()
 
-    if (!shouldRestore) return
-    if (reopenFrameRef.current) window.cancelAnimationFrame(reopenFrameRef.current)
+    if (!perluDibuka) return
+    if (frame.current) window.cancelAnimationFrame(frame.current)
 
-    reopenFrameRef.current = window.requestAnimationFrame(() => {
-      reopenFrameRef.current = 0
-      const currentContent = playgroundContentRef.current
-      const currentTrigger = playgroundTriggerRef.current
-      if (currentContent?.isConnected && currentTrigger && !currentContent.matches(':popover-open')) {
-        currentContent.showPopover({ source: currentTrigger })
-      }
+    // Satu frame ditunggu supaya panel yang baru sudah terpasang sebelum
+    // diminta terbuka.
+    frame.current = window.requestAnimationFrame(() => {
+      frame.current = 0
+      const p = panel()
+      const t = tombol()
+      if (p?.isConnected && t && !p.matches(':popover-open')) p.showPopover({ source: t })
     })
-  }
-
-  const changeExample = (nextExample: DropdownExample) => {
-    updatePlayground(() => setExample(nextExample))
   }
 
   return (
     <UsulanPage
       eyebrow="Components · Dropdown"
       title="Dropdown"
-      description="Menampilkan kumpulan aksi atau kontrol tambahan dari sebuah trigger."
+      description="Panel aksi yang dibuka dari sebuah tombol. Isinya ditentukan prop — trigger untuk tombolnya, items atau groups untuk daftarnya — seperti Sidebar dan Select."
       toc={toc}
     >
       <FlowSection id="dropdown" title="Dropdown">
         <Lead>
-          Dropdown menampilkan panel dari sebuah trigger. Panel dapat ditutup melalui trigger, klik di luar,
-          atau Escape; membuka Dropdown lain yang terpisah menutup panel sebelumnya. Dropdown.Item menutup
-          panel setelah aktivasi, kecuali handler memanggil <H>event.preventDefault()</H>. Radio dan Checkbox
-          tetap terbuka saat pilihan berubah, dan panel mengikuti trigger ketika halaman digulir atau viewport
-          berubah.
-        </Lead>
-      </FlowSection>
-
-      <FlowSection id="separator" title="Separator">
-        <Lead>
-          Gunakan separator untuk memisahkan kelompok aksi di dalam panel Dropdown.
+          <H>trigger</H> menerima satu tombol milik Anda; <H>items</H> menerima daftar aksinya. Panel
+          ditutup lewat trigger, klik di luar, atau Escape — semuanya diurus HTML Popover API, jadi
+          tidak ada state buka/tutup yang bisa melenceng. Aksi menutup panel setelah ditekan;
+          kontrol seperti Radio dan Checkbox tetap terbuka saat pilihannya berubah.
         </Lead>
         <div className="grid gap-6 sm:grid-cols-2">
-          <CompositionDemo example="actions" label="Tanpa separator" groupName="separator-none" withSeparator={false} withDescription={false} />
-          <CompositionDemo example="actions" label="Dengan separator" groupName="separator-with" withSeparator withDescription={false} />
+          <CompositionDemo example="actions" label="Tanpa ikon" groupName="dasar-polos" withSeparator={false} withDescription={false} />
+          <CompositionDemo example="icons" label="Dengan ikon" groupName="dasar-ikon" withSeparator={false} withDescription={false} />
         </div>
         <SectionCode>
-          {'<Dropdown.Content className="py-1">\n  <Dropdown.Item>Profil</Dropdown.Item>\n  <Dropdown.Item>Pengaturan</Dropdown.Item>\n\n  <'}
-          <H>Dropdown.Separator</H>
-          {' />\n\n  <Dropdown.Item tone="danger">Keluar</Dropdown.Item>\n</Dropdown.Content>'}
+          {'<Dropdown\n  trigger={<button type="button">Dropdown button</button>}\n  '}
+          <H>items</H>
+          {"={[\n    { label: 'Profil' },\n    { label: 'Pengaturan' },\n    { label: 'Keluar', tone: 'danger' },\n  ]}\n/>"}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="kelompok" title="Kelompok">
+        <Lead>
+          Aksi yang perlu dipisah disusun lewat <H>groups</H>. Prop <H>separator</H> menambahkan
+          garis sebelum sebuah kelompok — artinya sama persis dengan <H>SidebarGroup</H>, jadi tidak
+          ada yang perlu dihafal ulang. Untuk panel berisi kontrol bebas, pakai <H>&lt;hr&gt;</H>
+          biasa.
+        </Lead>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <CompositionDemo example="actions" label="Satu daftar" groupName="separator-none" withSeparator={false} withDescription={false} />
+          <CompositionDemo example="actions" label="Dua kelompok" groupName="separator-with" withSeparator withDescription={false} />
+        </div>
+        <SectionCode>
+          {'<Dropdown\n  trigger={tombol}\n  '}
+          <H>groups</H>
+          {"={[\n    { id: 'utama', items: [{ label: 'Profil' }, { label: 'Pengaturan' }] },\n    { id: 'keluar', "}
+          <H>separator: true</H>
+          {", items: [{ label: 'Keluar', tone: 'danger' }] },\n  ]}\n/>"}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="keterangan" title="Keterangan">
         <Lead>
-          Tambahkan keterangan pada kontrol di dalam Dropdown ketika pengguna memerlukan konteks tambahan.
+          Aksi yang perlu konteks tambahan diberi <H>description</H> — baris kedua yang lebih kecil
+          di bawah labelnya. Untuk panel berisi Radio atau Checkbox, yang dipakai <H>helperText</H>{' '}
+          milik komponen itu sendiri.
         </Lead>
         <div className="grid gap-6 sm:grid-cols-2">
-          <CompositionDemo example="radio" label="Tanpa keterangan" groupName="description-none" withSeparator={false} withDescription={false} />
-          <CompositionDemo example="radio" label="Dengan keterangan" groupName="description-with" withSeparator={false} withDescription />
+          <CompositionDemo example="actions" label="Tanpa keterangan" groupName="description-none" withSeparator={false} withDescription={false} />
+          <CompositionDemo example="actions" label="Dengan keterangan" groupName="description-with" withSeparator={false} withDescription />
         </div>
         <SectionCode>
-          {'<Radio\n  name="access"\n  value="editor"\n  label="Editor"\n  '}
-          <H>helperText</H>
-          {'="Dapat mengubah konten."\n/>'}
+          {"{ label: 'Editor', "}
+          <H>description</H>
+          {": 'Dapat mengubah konten.' }"}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
-          Preview dibuka saat halaman dimuat agar setiap variasi mudah dibandingkan. Gunakan kontrol di bawah
-          untuk mengganti susunan Dropdown.
+          Pratinjaunya dibuka sejak halaman dimuat supaya tiap variasi mudah dibandingkan. Gunakan
+          kontrol di bawah untuk mengganti susunannya.
         </Lead>
 
         <Stage maxWidth="max-w-xl">
-          <div className="flex min-h-80 items-start justify-center pt-10">
-            <Dropdown>
-              <Dropdown.Trigger>
-                <button ref={playgroundTriggerRef} type="button" className={triggerClassName}>
-                  Dropdown button
-                  <Icon className="!size-3.5"><ChevronDown /></Icon>
-                </button>
-              </Dropdown.Trigger>
-              <ExampleContent
-                contentRef={playgroundContentRef}
-                example={example}
-                groupName="playground-dropdown"
-                withSeparator={withSeparator}
-                withDescription={withDescription}
-              />
-            </Dropdown>
+          <div ref={panggung} className="flex min-h-80 items-start justify-center pt-10">
+            <ContohDropdown
+              example={example}
+              groupName="playground-dropdown"
+              withSeparator={withSeparator}
+              withDescription={withDescription}
+            />
           </div>
         </Stage>
 
         <Controls>
           <Control label="Contoh">
-            <div onPointerDownCapture={rememberPlaygroundVisibility}>
+            <div onPointerDownCapture={ingatKeadaan}>
               <Segmented
                 label="Pilih contoh Dropdown"
                 value={example}
-                onChange={changeExample}
+                onChange={(value) => ubah(() => setExample(value))}
                 options={examples}
                 itemClassName="basis-1/2 justify-center px-2.5 sm:basis-1/3"
                 wrap
               />
             </div>
           </Control>
-          <Control label="Separator">
-            <div onPointerDownCapture={rememberPlaygroundVisibility}>
+          <Control label="Kelompok">
+            <div onPointerDownCapture={ingatKeadaan}>
               <Segmented
-                label="Tampilkan separator"
+                label="Pisahkan jadi dua kelompok"
                 value={withSeparator}
-                onChange={(value) => updatePlayground(() => setWithSeparator(value))}
+                onChange={(value) => ubah(() => setWithSeparator(value))}
                 options={adaTidakAda}
               />
             </div>
           </Control>
           <Control label="Keterangan">
-            <div onPointerDownCapture={rememberPlaygroundVisibility}>
+            <div onPointerDownCapture={ingatKeadaan}>
               <Segmented
                 label="Tampilkan keterangan"
                 value={withDescription}
-                onChange={(value) => updatePlayground(() => setWithDescription(value))}
+                onChange={(value) => ubah(() => setWithDescription(value))}
                 options={adaTidakAda}
               />
             </div>
@@ -545,14 +527,15 @@ export function DropdownPage() {
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Bungkus button milik consumer dengan Dropdown.Trigger dan gunakan Dropdown.Content sebagai panel.
-          Dropdown.Item digunakan untuk aksi, sedangkan Dropdown.Separator memisahkan kelompok aksi.
-          Radio atau Checkbox dapat disusun langsung di dalam panel. Kode berikut
-          mengikuti pilihan Contoh di Playground.
+          Daftar aksi cukup diisi lewat <H>items</H> atau <H>groups</H>; panel yang isinya bukan
+          daftar aksi — form kecil, daftar panjang yang digulir — diisi lewat <H>children</H> dan
+          diberi jarak sendiri lewat <H>contentClassName</H>. Kode berikut mengikuti pilihan Contoh
+          di Playground.
         </Lead>
         <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-          Jika memakai komponen trigger kustom, pastikan atribut native button diteruskan ke elemen{' '}
-          <H>&lt;button&gt;</H> yang dirender.
+          Prop <H>trigger</H> harus berisi satu elemen tunggal, bukan teks atau pecahan — komponen
+          menyalinnya untuk memasang atribut Popover. Kalau memakai komponen tombol sendiri,
+          pastikan ia meneruskan atribut <H>&lt;button&gt;</H> standar ke elemen yang dirender.
         </p>
         <SectionCode flush>
           <ExampleCode
@@ -564,28 +547,23 @@ export function DropdownPage() {
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
-        <Lead>Setiap primitive memiliki tanggung jawab dan atribut native masing-masing.</Lead>
+        <Lead>
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya, diikuti bentuk data
+          untuk <H>items</H> dan <H>groups</H>.
+        </Lead>
 
         <div className="space-y-8">
           <div>
             <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Dropdown</h3>
-            <PropsTable rows={dropdownProps} minWidth="42rem" />
+            <PropsTable rows={dropdownProps} minWidth="48rem" />
           </div>
           <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Dropdown.Trigger</h3>
-            <PropsTable rows={triggerProps} minWidth="42rem" />
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DropdownItem</h3>
+            <PropsTable rows={itemProps} minWidth="46rem" />
           </div>
           <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Dropdown.Content</h3>
-            <PropsTable rows={contentProps} minWidth="42rem" />
-          </div>
-          <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Dropdown.Item</h3>
-            <PropsTable rows={itemProps} minWidth="42rem" />
-          </div>
-          <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Dropdown.Separator</h3>
-            <PropsTable rows={separatorProps} minWidth="42rem" />
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DropdownGroup</h3>
+            <PropsTable rows={groupProps} minWidth="42rem" />
           </div>
         </div>
       </FlowSection>

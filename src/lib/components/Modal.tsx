@@ -1,14 +1,10 @@
 import {
-  createContext,
   forwardRef,
   useCallback,
-  useContext,
   useEffect,
   useId,
   useRef,
-  useState,
   type DialogHTMLAttributes,
-  type HTMLAttributes,
   type MouseEvent,
   type ReactNode,
   type SyntheticEvent,
@@ -19,57 +15,63 @@ import { cn } from '../utils/cn'
 export type ModalSize = 's' | 'm'
 
 export interface ModalProps
-  extends Omit<DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose' | 'onCancel'> {
+  extends Omit<
+    DialogHTMLAttributes<HTMLDialogElement>,
+    'open' | 'onClose' | 'onCancel' | 'title'
+  > {
+  /** Sumber kebenaran buka/tutup. Modal ini terkendali sepenuhnya. */
   open: boolean
+  /**
+   * Dipanggil setiap kali modal minta ditutup — tombol tutup, Escape, atau
+   * klik di luar panel. Consumer yang memutuskan apakah `open` ikut berubah.
+   */
   onClose: () => void
   size?: ModalSize
-  children: ReactNode
-}
-
-export interface ModalHeaderProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * Judul di header. Sekaligus jadi nama aksesibilitas dialognya, kecuali
+   * `aria-label` atau `aria-labelledby` diisi sendiri.
+   */
+  title?: ReactNode
+  /**
+   * Tombol tutup di kanan header. Matikan bila modalnya harus diselesaikan
+   * lewat tombol di footer — misalnya konfirmasi yang tak boleh dilewati.
+   */
+  dismissible?: boolean
   /** Nama aksesibel tombol tutup. */
   closeLabel?: string
+  /** Baris tombol di kaki modal. */
+  footer?: ReactNode
+  /** Isi modal. */
+  children?: ReactNode
 }
-
-export type ModalBodyProps = HTMLAttributes<HTMLDivElement>
-
-export type ModalFooterProps = HTMLAttributes<HTMLDivElement>
-
-interface ModalContextValue {
-  onClose: () => void
-  titleId: string
-  registerTitle: (id: string, node: HTMLHeadingElement | null) => void
-}
-
-const ModalContext = createContext<ModalContextValue | null>(null)
 
 const sizes: Record<ModalSize, string> = {
   s: 'max-w-[416px]',
   m: 'max-w-[640px]',
 }
 
-function useModalContext(component: string) {
-  const context = useContext(ModalContext)
-
-  if (!context) {
-    throw new Error(`${component} harus digunakan di dalam Modal.`)
-  }
-
-  return context
-}
-
 /**
- * Modal interaktif berbasis elemen <dialog> native.
+ * Modal — dialog di atas halaman, berbasis elemen `<dialog>` bawaan.
  *
- * Prop `open` tetap menjadi sumber kebenaran. Browser menangani top layer,
- * inert background, dan fokus modal; event cancel hanya meminta consumer
- * memperbarui `open` melalui `onClose`.
+ * Susunannya ditentukan prop, bukan subkomponen: `title` mengisi header,
+ * `children` mengisi badan, `footer` mengisi kakinya. Itu mengikuti komponen
+ * lain di kit ini — Alert punya `heading` + `actions`, Card punya `title` +
+ * `description` + `actions` — sehingga tidak ada satu komponen pun yang
+ * dipakai dengan cara yang berbeda dari tetangganya.
+ *
+ * `open` tetap sumber kebenaran. Peramban yang mengurus top layer, latar yang
+ * ikut mati, dan jebakan fokus; `onClose` hanya MEMINTA consumer memperbarui
+ * `open` — Escape maupun klik di luar panel tidak menutupnya sendiri.
  */
-export const ModalRoot = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
+export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   {
     open,
     onClose,
     size = 's',
+    title,
+    dismissible = true,
+    closeLabel = 'Tutup modal',
+    footer,
     className,
     children,
     'aria-label': ariaLabel,
@@ -81,21 +83,6 @@ export const ModalRoot = forwardRef<HTMLDialogElement, ModalProps>(function Moda
 ) {
   const internalRef = useRef<HTMLDialogElement | null>(null)
   const titleId = useId()
-  const mountedTitleIdRef = useRef<string | undefined>(undefined)
-  const [registeredTitleId, setRegisteredTitleId] = useState<string>()
-
-  const registerTitle = useCallback((id: string, node: HTMLHeadingElement | null) => {
-    if (node) {
-      mountedTitleIdRef.current = id
-      setRegisteredTitleId((current) => (current === id ? current : id))
-      return
-    }
-
-    if (mountedTitleIdRef.current !== id) return
-
-    mountedTitleIdRef.current = undefined
-    setRegisteredTitleId((current) => (current === id ? undefined : current))
-  }, [])
 
   const setRef = useCallback(
     (node: HTMLDialogElement | null) => {
@@ -110,6 +97,9 @@ export const ModalRoot = forwardRef<HTMLDialogElement, ModalProps>(function Moda
     [forwardedRef],
   )
 
+  // Escape memicu `cancel`; dicegah supaya penutupan tetap lewat satu jalan —
+  // `onClose`. Kalau dibiarkan, dialognya tertutup sendiri sementara `open`
+  // masih true, dan keduanya jadi tidak sinkron.
   const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     event.preventDefault()
     onClose()
@@ -119,153 +109,91 @@ export const ModalRoot = forwardRef<HTMLDialogElement, ModalProps>(function Moda
     if (open) onClose()
   }
 
+  // Klik di luar panel. `<dialog>` membentang selebar viewport sementara
+  // panelnya hanya kotak di tengah, jadi yang dibandingkan koordinat klik
+  // terhadap kotak itu — bukan sekadar `event.target`.
   const handleClick = (event: MouseEvent<HTMLDialogElement>) => {
     onClick?.(event)
     if (event.defaultPrevented || event.target !== event.currentTarget) return
 
     const rect = event.currentTarget.getBoundingClientRect()
-    const outsidePanel =
+    const diLuarPanel =
       event.clientX < rect.left ||
       event.clientX > rect.right ||
       event.clientY < rect.top ||
       event.clientY > rect.bottom
 
-    if (outsidePanel) onClose()
+    if (diLuarPanel) onClose()
   }
 
-  const explicitAriaLabelledBy = ariaLabelledBy?.trim() || undefined
-  const explicitAriaLabel = ariaLabel?.trim() ? ariaLabel : undefined
-  const resolvedAriaLabelledBy =
-    explicitAriaLabelledBy ?? (explicitAriaLabel ? undefined : registeredTitleId)
-  const usesExplicitAccessibleName = Boolean(explicitAriaLabelledBy || explicitAriaLabel)
+  const labelSendiri = ariaLabel?.trim() ? ariaLabel : undefined
+  const labelledBySendiri = ariaLabelledBy?.trim() || undefined
+  const adaJudul = title !== undefined && title !== null && title !== false
+  const namaOtomatis = adaJudul && !labelSendiri ? titleId : undefined
 
   useEffect(() => {
     const dialog = internalRef.current
     if (!dialog) return
 
-    if (!open && dialog.open) {
-      dialog.close()
-      return
-    }
+    if (open && !dialog.open) dialog.showModal()
+    else if (!open && dialog.open) dialog.close()
+  }, [open])
 
-    if (!open || dialog.open) return
-
-    const mountedTitleId = mountedTitleIdRef.current
-    const waitingForAutomaticTitle =
-      !usesExplicitAccessibleName &&
-      mountedTitleId !== undefined &&
-      registeredTitleId !== mountedTitleId
-
-    if (!waitingForAutomaticTitle) dialog.showModal()
-  }, [open, registeredTitleId, usesExplicitAccessibleName])
+  const adaHeader = adaJudul || dismissible
 
   return (
-    <ModalContext.Provider value={{ onClose, titleId, registerTitle }}>
-      <dialog
-        ref={setRef}
-        aria-label={explicitAriaLabel}
-        aria-labelledby={resolvedAriaLabelledBy}
-        onCancel={handleCancel}
-        onClose={handleNativeClose}
-        onClick={handleClick}
-        className={cn(
-          'm-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-hidden rounded-lg border border-border bg-surface p-0 text-left text-content shadow-xl',
-          'backdrop:bg-gray-900/50 open:flex open:flex-col',
-          sizes[size],
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </dialog>
-    </ModalContext.Provider>
-  )
-})
-
-ModalRoot.displayName = 'Modal'
-
-export const ModalHeader = forwardRef<HTMLDivElement, ModalHeaderProps>(function ModalHeader(
-  { children, closeLabel = 'Tutup modal', className, ...props },
-  ref,
-) {
-  const { onClose, titleId, registerTitle } = useModalContext('ModalHeader')
-  const hasTitle = children !== undefined && children !== null && children !== false
-  const titleRef = useCallback(
-    (node: HTMLHeadingElement | null) => registerTitle(titleId, node),
-    [registerTitle, titleId],
-  )
-
-  return (
-    <div
-      ref={ref}
+    <dialog
+      ref={setRef}
+      aria-label={labelSendiri}
+      aria-labelledby={labelledBySendiri ?? namaOtomatis}
+      onCancel={handleCancel}
+      onClose={handleNativeClose}
+      onClick={handleClick}
       className={cn(
-        'flex shrink-0 items-start justify-between gap-4 px-6',
-        hasTitle ? 'border-b border-border py-5' : 'pt-4',
+        'm-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-hidden rounded-lg border border-border bg-surface p-0 text-left text-content shadow-xl',
+        'backdrop:bg-gray-900/50 open:flex open:flex-col',
+        sizes[size],
         className,
       )}
       {...props}
     >
-      {hasTitle && (
-        <h2
-          ref={titleRef}
-          id={titleId}
-          className="min-w-0 flex-1 text-heading-4 font-bold text-gray-900"
+      {adaHeader && (
+        <div
+          className={cn(
+            'flex shrink-0 items-start justify-between gap-4 px-6',
+            adaJudul ? 'border-b border-border py-5' : 'pt-4',
+          )}
         >
-          {children}
-        </h2>
+          {adaJudul && (
+            <h2 id={titleId} className="min-w-0 flex-1 text-heading-4 font-bold text-gray-900">
+              {title}
+            </h2>
+          )}
+
+          {dismissible && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={closeLabel}
+              className="-my-2 -mr-2 ml-auto inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+            >
+              <Close className="size-4" aria-hidden="true" />
+            </button>
+          )}
+        </div>
       )}
 
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label={closeLabel}
-        className="-my-2 -mr-2 ml-auto inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-      >
-        <Close className="size-4" aria-hidden="true" />
-      </button>
-    </div>
-  )
-})
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-6 text-body-sm text-gray-500">
+        {children}
+      </div>
 
-ModalHeader.displayName = 'ModalHeader'
-
-export const ModalBody = forwardRef<HTMLDivElement, ModalBodyProps>(function ModalBody(
-  { className, ...props },
-  ref,
-) {
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        'min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-6 text-body-sm text-gray-500',
-        className,
+      {footer && (
+        <div className="flex shrink-0 flex-wrap items-center gap-3 border-t border-border px-6 py-4">
+          {footer}
+        </div>
       )}
-      {...props}
-    />
+    </dialog>
   )
 })
 
-ModalBody.displayName = 'ModalBody'
-
-export const ModalFooter = forwardRef<HTMLDivElement, ModalFooterProps>(function ModalFooter(
-  { className, ...props },
-  ref,
-) {
-  return (
-    <div
-      ref={ref}
-      className={cn('flex shrink-0 flex-wrap items-center gap-3 border-t border-border px-6 py-4', className)}
-      {...props}
-    />
-  )
-})
-
-ModalFooter.displayName = 'ModalFooter'
-
-// Compound component tetap satu runtime import bagi consumer.
-// eslint-disable-next-line react-refresh/only-export-components
-export const Modal = Object.assign(ModalRoot, {
-  Header: ModalHeader,
-  Body: ModalBody,
-  Footer: ModalFooter,
-})
+Modal.displayName = 'Modal'
