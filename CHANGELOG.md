@@ -12,7 +12,7 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 ## [Belum dirilis]
 
 Perubahan di bawah ini sudah ada di kode tetapi belum diterbitkan ke npm.
-Isinya menjadikan rilis berikutnya `0.2.0`, bukan `0.1.1`: ada tujuh komponen
+Isinya menjadikan rilis berikutnya `0.2.0`, bukan `0.1.1`: ada delapan komponen
 publik baru, dan satu perubahan yang memutus.
 
 ### Diubah
@@ -28,10 +28,18 @@ publik baru, dan satu perubahan yang memutus.
 - **`Avatar`** — lingkaran identitas berisi foto (`src`) atau inisial
   (`initials`) dalam tiga ukuran lewat `size` (`small` 24px, `default` 32px,
   `large` 80px). Gambar yang gagal dimuat jatuh sendiri ke inisial.
-- **`Modal`**, beserta `ModalHeader`, `ModalBody`, dan `ModalFooter`. Dialog
-  berbasis elemen `<dialog>` native, jadi top layer, penguncian fokus, dan latar
-  inert diurus browser. Dikendalikan lewat `open` + `onClose`, dengan pilihan
-  ukuran melalui `size`.
+- **`Dropdown`** — panel aksi yang dibuka dari sebuah tombol (`trigger`),
+  memakai HTML Popover API sehingga browser yang mengurus penutupan, top layer,
+  dan urutan fokus. Aksinya diisi lewat `items`, atau `groups` bila perlu
+  dipisah — `separator` di sana artinya sama persis dengan pada Sidebar. Panel
+  yang isinya bukan daftar aksi diisi lewat `children` dan diberi jarak lewat
+  `contentClassName`. Tipe pendukung `DropdownItem` dan `DropdownGroup` ikut
+  diekspor.
+- **`Modal`** — dialog berbasis elemen `<dialog>` native, jadi top layer,
+  penguncian fokus, dan latar inert diurus browser. Dikendalikan lewat `open` +
+  `onClose`. Susunannya diisi prop — `title` untuk header, `children` untuk
+  badannya, `footer` untuk kakinya — dengan pilihan ukuran lewat `size` dan
+  tombol tutup yang bisa dimatikan lewat `dismissible`.
 - **`Popover`** — panel informasi ringkas dengan arrow pada empat pilihan sisi
   (`side`: `top`, `right`, `bottom`, `left`).
 - **`Search`** — kolom pencarian dengan tombol cari. Dua ukuran lewat

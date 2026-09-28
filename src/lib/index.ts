@@ -26,21 +26,13 @@ export type { PopoverProps, PopoverSide } from "./components/Popover";
 export { Dropdown } from "./components/Dropdown";
 export type {
   DropdownProps,
-  DropdownTriggerProps,
-  DropdownContentProps,
-  DropdownItemProps,
+  DropdownItem,
+  DropdownGroup,
   DropdownItemTone,
-  DropdownSeparatorProps,
 } from "./components/Dropdown";
 
 export { Modal } from "./components/Modal";
-export type {
-  ModalProps,
-  ModalSize,
-  ModalHeaderProps,
-  ModalBodyProps,
-  ModalFooterProps,
-} from "./components/Modal";
+export type { ModalProps, ModalSize } from "./components/Modal";
 
 export { Alert } from "./components/Alert";
 export type { AlertProps, AlertVariant } from "./components/Alert";
