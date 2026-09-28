@@ -107,6 +107,38 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/dropdown"
+        name="Dropdown"
+        desc="Kumpulan aksi atau pilihan tambahan yang dibuka dari sebuah trigger."
+      >
+        <div className="rounded-xl bg-surface-subtle p-5">
+          <div className="mx-auto flex w-56 max-w-full flex-col items-center gap-2">
+            <div className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-700 px-4 text-base font-medium text-white">
+              Dropdown button
+              <svg
+                aria-hidden="true"
+                className="size-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
+            <div className="w-full rounded-lg bg-surface py-1 shadow-md" aria-hidden="true">
+              <div className="px-4 py-2 text-sm font-medium text-gray-700">Profil</div>
+              <div className="px-4 py-2 text-sm font-medium text-gray-700">Pengaturan</div>
+              <div className="my-1 border-t border-border" />
+              <div className="px-4 py-2 text-sm font-medium text-red-600">Keluar</div>
+            </div>
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/modal"
         name="Modal"
         desc="Dialog terkontrol untuk informasi atau tindakan yang harus diselesaikan sebelum kembali ke halaman utama."
