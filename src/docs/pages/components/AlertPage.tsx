@@ -32,7 +32,7 @@ const variants: { value: AlertVariant; label: string; button: string }[] = [
 ]
 
 const isiAlert =
-  'Ini merupakan Design system Stasi berupa component alert. Ini merupakan Design system Stasi berupa component alert.'
+  'Ini merupakan Design system Ceplok berupa component alert. Ini merupakan Design system Ceplok berupa component alert.'
 
 /** Tombol contoh untuk slot `actions`. */
 function AksiButton({ variant }: { variant: AlertVariant }) {
@@ -104,7 +104,7 @@ export function AlertPage() {
           ))}
         </div>
         <SectionCode>
-          {"import { Alert } from '@stasi/design-kit-react'\n\n"}
+          {"import { Alert } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Alert\n'}
           {'    '}
           <H>variant</H>
@@ -112,7 +112,7 @@ export function AlertPage() {
           {'    heading="Ini adalah Alert"\n'}
           {'    actions={<button type="button" className="…">Button text</button>}\n'}
           {'>\n'}
-          {'    Ini merupakan Design system Stasi berupa component alert.\n'}
+          {'    Ini merupakan Design system Ceplok berupa component alert.\n'}
           {'</Alert>'}
         </SectionCode>
       </FlowSection>
@@ -140,7 +140,7 @@ export function AlertPage() {
           </Demo>
           <Demo label="Hanya pesan">
             <Alert variant="warning" dismissible={false}>
-              Ini merupakan Design system Stasi berupa component alert.
+              Ini merupakan Design system Ceplok berupa component alert.
             </Alert>
           </Demo>
         </div>
@@ -174,7 +174,7 @@ export function AlertPage() {
             dismissible={pakaiTutup}
             actions={pakaiAksi ? <AksiButton variant={variant} /> : undefined}
           >
-            Ini merupakan Design system Ministerium Fur Staatssicherheit berupa component alert.
+            Ini merupakan Design system Ceplok berupa component alert.
           </Alert>
         </Stage>
 
@@ -251,7 +251,7 @@ export function AlertPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Alert } from '@stasi/design-kit-react'\n\n"}
+          {"import { Alert } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Alert\n'}
           {variant !== 'info' && (
             <>
@@ -283,7 +283,7 @@ export function AlertPage() {
             </>
           )}
           {'>\n'}
-          {'    Ini merupakan Design system STASI berupa component alert.\n'}
+          {'    Ini merupakan Design system CEPLOK berupa component alert.\n'}
           {'</Alert>'}
         </SectionCode>
       </FlowSection>

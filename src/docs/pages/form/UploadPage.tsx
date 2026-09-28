@@ -68,7 +68,7 @@ export function UploadPage() {
           <Upload label="Unggah dokumen" helperText="PDF atau JPG, maksimal 2 MB." />
         </Demo>
         <SectionCode>
-          {"import { Upload } from '@stasi/design-kit-react'\n\n"}
+          {"import { Upload } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Upload\n'}
           {'    label="Unggah dokumen"\n'}
           {'    helperText="PDF atau JPG, maksimal 2 MB."\n'}
@@ -288,7 +288,7 @@ export function UploadPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Upload } from '@stasi/design-kit-react'\n\n"}
+          {"import { Upload } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Upload\n'}
           {type !== 'default' && (
             <>

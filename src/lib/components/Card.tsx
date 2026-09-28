@@ -25,7 +25,7 @@ export function Card({
   href,
   linkLabel,
   actions,
-  className,
+  className,            
   children,
   ...props
 }: CardProps) {

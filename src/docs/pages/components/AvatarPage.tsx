@@ -67,7 +67,7 @@ export function AvatarPage() {
           </div>
         </Demo>
         <SectionCode>
-          {"import { Avatar } from '@stasi/design-kit-react'\n\n"}
+          {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Avatar src="/foto/putri.jpg" alt="Putri Handayani" />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
@@ -207,7 +207,7 @@ export function AvatarPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Avatar } from '@stasi/design-kit-react'\n\n"}
+          {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Avatar\n'}
           {size !== 'default' && (
             <>

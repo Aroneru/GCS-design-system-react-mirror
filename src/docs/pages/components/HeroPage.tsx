@@ -28,10 +28,10 @@ import { asset } from "../../asset";
  */
 
 /** Isi contoh diambil apa adanya dari frame Hero di Figma. */
-const heroText = "Hero Design system Stasi";
-const heroSubHeading = "Hero Design system Stasi";
+const heroText = "Hero Design system Ceplok";
+const heroSubHeading = "Hero Design system Ceplok";
 const heroDesc =
-  "Design System Stasi adalah sebuah kumpulan standar desain terpadu yang digunakan untuk memastikan seluruh produk digital di lingkungan Kementerian Komunikasi dan Informatika (Stasi)";
+  "Design System Ceplok adalah sebuah kumpulan standar desain terpadu yang digunakan untuk memastikan seluruh produk digital di lingkungan Kementerian Komunikasi dan Informatika (Ceplok)";
 
 const heroImage = asset("/images/hero-sample.svg");
 const heroImageLandscape = asset("/images/hero-sample-landscape.svg");
@@ -266,11 +266,11 @@ export function HeroPage() {
         </Preview>
 
         <SectionCode>
-          {"import { Hero } from '@stasi/design-kit-react'\n\n"}
+          {"import { Hero } from '@ceplok-ui/design-kit-react'\n\n"}
           {"<Hero\n"}
           {'    type="horizontal-image-left"\n'}
-          {'    heading="Hero Design system Stasi"\n'}
-          {'    subHeading="Hero Design system Stasi"\n'}
+          {'    heading="Hero Design system Ceplok"\n'}
+          {'    subHeading="Hero Design system Ceplok"\n'}
           {`    description="${heroDesc}"\n`}
           {'    image="/images/hero-sample.svg"\n'}
           {'    buttonHref="/design-system"\n'}
@@ -425,7 +425,7 @@ export function HeroPage() {
             heading={
               <>
                 Hero <span className="text-primary-700">Design system</span>{" "}
-                Stasi
+                Ceplok
               </>
             }
             subHeading={heroSubHeading}
@@ -453,7 +453,7 @@ export function HeroPage() {
           <Mark>heading</Mark>
           {"={\n"}
           {
-            '        <>Hero <span className="text-primary-700">Design system</span> Stasi</>\n'
+            '        <>Hero <span className="text-primary-700">Design system</span> Ceplok</>\n'
           }
           {"    }\n"}
           {"    "}
@@ -463,7 +463,7 @@ export function HeroPage() {
           <Mark>description</Mark>
           {"={\n"}
           {
-            '        <>Design System Stasi … <a href="/foundations">halaman Foundations</a>.</>\n'
+            '        <>Design System Ceplok … <a href="/foundations">halaman Foundations</a>.</>\n'
           }
           {"    }\n"}
           {"/>"}
@@ -737,7 +737,7 @@ export function HeroPage() {
           menyalin persis yang sedang tampil.
         </Lead>
         <SectionCode flush>
-          {"import { Hero } from '@stasi/design-kit-react'\n\n"}
+          {"import { Hero } from '@ceplok-ui/design-kit-react'\n\n"}
           {`{/* ${summary} */}\n`}
           {view === "mobile" && (
             <>

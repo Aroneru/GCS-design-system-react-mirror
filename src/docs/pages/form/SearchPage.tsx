@@ -86,7 +86,7 @@ export function SearchPage() {
           <Search placeholder={PLACEHOLDER} onSearch={(v) => setTerakhir(v)} />
         </Demo>
         <SectionCode>
-          {"import { Search } from '@stasi/design-kit-react'\n\n"}
+          {"import { Search } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Search\n'}
           {'    placeholder="Search Civitas, Organisasi…"\n'}
           {'    '}
@@ -288,7 +288,7 @@ export function SearchPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Search } from '@stasi/design-kit-react'\n\n"}
+          {"import { Search } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Search\n'}
           {application !== 'default' && (
             <>

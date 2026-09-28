@@ -26,9 +26,17 @@ import { gsap, prefersReducedMotion } from '../../motion'
  * ya, `z-[100]`-nya terkurung di sana dan elemen lain berlapis lebih tinggi —
  * misalnya rail `z-30` milik DocsLayout — akan tetap terlihat menembusnya.
  */
-export const KELAS_TIRAI =
-  'pointer-events-none fixed top-0 left-0 z-[100] aspect-square w-[300vmax] rounded-full ' +
-  'bg-gradient-to-br from-primary-100 to-primary-300'
+const DASAR_TIRAI =
+  'pointer-events-none fixed top-0 left-0 z-[100] aspect-square w-[300vmax] rounded-full'
+
+export const KELAS_TIRAI = `${DASAR_TIRAI} bg-gradient-to-br from-primary-100 to-primary-300`
+
+/**
+ * Lapisan putih di gaya `riak`. Geometrinya sama persis dengan gelembung
+ * biru — hanya isiannya yang berbeda — supaya keduanya tumbuh sebangun dan
+ * pitanya selebar jeda waktu, bukan selebar selisih ukuran.
+ */
+export const KELAS_TIRAI_PUTIH = `${DASAR_TIRAI} bg-white`
 
 /**
  * Warna dan kecepatan di sini dipilih untuk kenyamanan mata, bukan untuk
@@ -48,6 +56,36 @@ export const KELAS_TIRAI =
 const DURASI_TUTUP = 1
 const DURASI_BUKA = 0.95
 const EASE = 'sine.inOut'
+
+/**
+ * Gaya gelembung saat MASUK ke contoh aplikasi — satu baris untuk diganti.
+ *
+ * - `tunggal` — satu gelembung biru yang melebar. Gaya asal.
+ * - `riak`    — tiga lapisan berurutan: biru, putih, lalu biru lagi,
+ *               sehingga tepinya menyapu layar sebagai riak biru-putih-biru.
+ *
+ * Sakelarnya ada di modul ini, bukan di komponen, karena kedua halaman
+ * membaca modul yang sama — dengan begitu tidak ada cara mereka berbeda gaya.
+ *
+ * Hanya berlaku untuk arah MASUK. Saat gelembung mengempis di halaman tujuan,
+ * kedua gaya tetap satu lingkaran biru: lapisan tambahan di sana tidak akan
+ * terlihat sama sekali — yang digambar paling atas menutupi sisanya sampai
+ * habis — jadi ia hanya menambah kerja tanpa menambah apa pun yang terlihat.
+ */
+export type GayaTirai = 'tunggal' | 'riak'
+
+export const GAYA_TIRAI: GayaTirai = 'riak'
+
+/**
+ * Jeda berangkat antar-lapisan pada gaya `riak`.
+ *
+ * 0,1 detik: cukup renggang untuk terbaca sebagai pita warna yang tegas di
+ * tengah animasi — di sanalah gelembung bergerak paling cepat — dan cukup
+ * rapat supaya navigasinya hanya mundur 0,2 detik dari gaya `tunggal`.
+ * Yang menandai layar tertutup penuh adalah lapisan TERAKHIR, jadi tiap
+ * lapisan tambahan berarti tambahan tunggu sebelum halaman berpindah.
+ */
+const JEDA_RIAK = 0.1
 
 /** Titik pusat pertumbuhan gelembung, dalam koordinat viewport. */
 export interface Titik {
@@ -70,12 +108,15 @@ const tengahLayar = (): Titik => ({
  * dijalankan — bukan dijalankan setelah jeda kosong.
  */
 export function tutupLalu(
-  tirai: HTMLElement | null,
+  /** Lapisan gelembung, urut dari yang paling belakang. Yang null dilewati. */
+  lapisan: (HTMLElement | null)[],
   konten: HTMLElement | null,
   titik: Titik | null,
   lalu: () => void,
 ) {
-  if (!tirai || prefersReducedMotion()) {
+  const hidup = lapisan.filter((el): el is HTMLElement => el !== null)
+
+  if (hidup.length === 0 || prefersReducedMotion()) {
     lalu()
     return
   }
@@ -89,12 +130,18 @@ export function tutupLalu(
     tl.to(konten, { opacity: 0, scale: 0.96, duration: 0.55, ease: 'sine.in' }, 0)
   }
 
-  tl.fromTo(
-    tirai,
-    { left: x, top: y, xPercent: -50, yPercent: -50, scale: 0 },
-    { scale: 1, duration: DURASI_TUTUP, ease: EASE },
-    0.12,
-  )
+  // Urutan larik = urutan tumpuk = urutan berangkat. Yang berangkat duluan
+  // jadi lingkaran terluar, dan yang terakhir — yang digambar paling atas —
+  // harus biru, supaya keadaan akhirnya sama persis dengan gelembung yang
+  // sudah menutup di halaman tujuan dan serah terimanya tak terlihat.
+  hidup.forEach((el, i) => {
+    tl.fromTo(
+      el,
+      { left: x, top: y, xPercent: -50, yPercent: -50, scale: 0 },
+      { scale: 1, duration: DURASI_TUTUP, ease: EASE },
+      0.12 + i * JEDA_RIAK,
+    )
+  })
 }
 
 /**

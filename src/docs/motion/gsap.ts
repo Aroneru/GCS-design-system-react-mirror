@@ -3,7 +3,7 @@
  *
  * PENTING — batas paket: berkas ini dan seluruh isi `src/docs/motion/` hanya
  * dipakai situs dokumentasi, tidak pernah diekspor lewat `src/lib`. GSAP
- * terpasang sebagai devDependency, jadi konsumen `@stasi/design-kit-react`
+ * terpasang sebagai devDependency, jadi konsumen `@ceplok-ui/design-kit-react`
  * tidak ikut menariknya. Jangan mengimpor apa pun dari sini di dalam `src/lib`.
  *
  * `registerPlugin` idempoten, tapi tetap dipanggil sekali di level modul supaya

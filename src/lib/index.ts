@@ -1,5 +1,5 @@
-// @stasi/design-kit-react — entry point library.
-// Import token/CSS terpisah: import '@stasi/design-kit-react/styles.css'
+// @ceplok-ui/design-kit-react — entry point library.
+// Import token/CSS terpisah: import '@ceplok-ui/design-kit-react/styles.css'
 
 export { Button } from "./components/Button";
 

@@ -164,7 +164,7 @@ export function TypographyPage() {
         <article className="ds-card divide-y divide-border overflow-hidden">
           {fontWeights.map(([cls, value]) => (
             <div key={cls} className="grid gap-2 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6">
-              <p className={`${cls} text-4xl text-gray-900`}>State Security Service</p>
+              <p className={`${cls} text-4xl text-gray-900`}>Ceplok Design System</p>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:justify-end">
                 <code className="text-sm font-bold text-primary-700">.{cls}</code>
                 <code className="text-xs text-gray-400">font-weight: {value}</code>

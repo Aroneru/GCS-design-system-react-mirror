@@ -414,8 +414,8 @@ export function ButtonPage() {
           yang tampil di sini adalah kode yang siap diimplementasikan ke aplikasi.
         </p>
         <SectionCode flush>
-          {"import { Button } from '@stasi/design-kit-react'\n"}
-          {"import { Messages } from '@stasi/design-kit-react/icons/solid'\n"}
+          {"import { Button } from '@ceplok-ui/design-kit-react'\n"}
+          {"import { Messages } from '@ceplok-ui/design-kit-react/icons/solid'\n"}
           {"\n"}
           {"<Button\n"}
 
