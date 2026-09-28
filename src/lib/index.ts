@@ -54,6 +54,8 @@ export type {
   DrawerFooterProps,
   DrawerNavItemProps,
   DrawerSubItemProps,
+  DrawerMenuItem,
+  DrawerMenuSubItem,
 } from "./components/Drawer";
 
 export { Alert } from "./components/Alert";

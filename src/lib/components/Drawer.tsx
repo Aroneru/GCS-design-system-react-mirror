@@ -23,6 +23,30 @@ export type DrawerPosition = 'right' | 'left' | 'top' | 'bottom'
 export type DrawerSize = 's' | 'm' | 'l' | 'xl' | 'full'
 export type DrawerNavItemTheme = 'primary' | 'purple' | 'blue' | 'gray'
 
+export interface DrawerMenuSubItem {
+  id?: string
+  label: ReactNode
+  active?: boolean
+  href?: string
+  disabled?: boolean
+  onClick?: (e: MouseEvent<HTMLElement>) => void
+}
+
+export interface DrawerMenuItem {
+  id?: string
+  icon?: ReactNode
+  label: ReactNode
+  active?: boolean
+  expanded?: boolean
+  collapsible?: boolean
+  theme?: DrawerNavItemTheme
+  href?: string
+  badge?: ReactNode
+  disabled?: boolean
+  onClick?: (e: MouseEvent<HTMLElement>) => void
+  children?: DrawerMenuSubItem[]
+}
+
 export interface DrawerProps
   extends Omit<DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose' | 'onCancel'> {
   open: boolean
@@ -31,7 +55,11 @@ export interface DrawerProps
   size?: DrawerSize
   closeOnOverlayClick?: boolean
   closeOnEsc?: boolean
-  children: ReactNode
+  eyebrow?: string
+  header?: ReactNode
+  items?: DrawerMenuItem[]
+  theme?: DrawerNavItemTheme
+  children?: ReactNode
 }
 
 export interface DrawerHeaderProps extends HTMLAttributes<HTMLDivElement> {
@@ -151,6 +179,52 @@ const subItemHoverClasses: Record<DrawerNavItemTheme, string> = {
   gray: 'hover:bg-gray-100/70 hover:text-gray-900',
 }
 
+function DrawerMenuItemRenderer({ item, theme = 'primary' }: { item: DrawerMenuItem; theme?: DrawerNavItemTheme }) {
+  const [expanded, setExpanded] = useState(Boolean(item.expanded ?? (item.children && item.children.length > 0)))
+  const [activeSubId, setActiveSubId] = useState<string | undefined>()
+
+  const hasChildren = Boolean(item.children && item.children.length > 0)
+
+  const handleClick = (e: MouseEvent<HTMLElement>) => {
+    if (hasChildren) {
+      setExpanded((prev) => !prev)
+    }
+    item.onClick?.(e)
+  }
+
+  return (
+    <DrawerNavItem
+      icon={item.icon}
+      label={item.label}
+      active={item.active}
+      expanded={expanded}
+      collapsible={item.collapsible}
+      theme={item.theme ?? theme}
+      href={item.href}
+      badge={item.badge}
+      onClick={handleClick}
+    >
+      {item.children?.map((sub, sIdx) => {
+        const subKey = sub.id ?? `sub-${sIdx}`
+        const isSubActive = sub.active ?? (activeSubId === subKey)
+        return (
+          <DrawerSubItem
+            key={subKey}
+            label={sub.label}
+            active={isSubActive}
+            href={sub.href}
+            theme={item.theme ?? theme}
+            onClick={(e) => {
+              setActiveSubId(subKey)
+              sub.onClick?.(e)
+            }}
+          />
+        )
+      })}
+    </DrawerNavItem>
+  )
+}
+
 /**
  * Drawer interaktif berbasis elemen <dialog> native (Side Sheet / Off-canvas panel).
  */
@@ -162,6 +236,10 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
     size = 'm',
     closeOnOverlayClick = true,
     closeOnEsc = true,
+    eyebrow,
+    header,
+    items,
+    theme = 'primary',
     className,
     children,
     'aria-label': ariaLabel,
@@ -271,6 +349,9 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
     if (!waitingForAutomaticTitle) dialog.showModal()
   }, [open, registeredTitleId, usesExplicitAccessibleName])
 
+  const hasHeaderProps = Boolean(eyebrow || header)
+  const hasItems = Boolean(items && items.length > 0)
+
   return (
     <DrawerContext.Provider
       value={{ onClose, titleId, descriptionId, registerTitle, registerDescription }}
@@ -290,7 +371,22 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
         )}
         {...props}
       >
-        {children}
+        {children ?? (
+          <>
+            {hasHeaderProps && (
+              <DrawerHeader eyebrow={eyebrow}>
+                {header}
+              </DrawerHeader>
+            )}
+            {hasItems && (
+              <DrawerBody className="p-3 space-y-1">
+                {items.map((item, index) => (
+                  <DrawerMenuItemRenderer key={item.id ?? index} item={item} theme={item.theme ?? theme} />
+                ))}
+              </DrawerBody>
+            )}
+          </>
+        )}
       </dialog>
     </DrawerContext.Provider>
   )

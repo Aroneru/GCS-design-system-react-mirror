@@ -12,6 +12,7 @@ import {
     DrawerHeader,
     DrawerNavItem,
     DrawerSubItem,
+    type DrawerMenuItem,
     type DrawerNavItemTheme,
 } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
@@ -38,7 +39,11 @@ const drawerProps: PropRow[] = [
     ['size', "'s' | 'm' | 'l' | 'xl' | 'full'", "'m'", 'Ukuran lebar (atau tinggi pada top/bottom) dari panel Drawer.'],
     ['closeOnOverlayClick', 'boolean', 'true', 'Jika true, mengklik backdrop akan memicu onClose.'],
     ['closeOnEsc', 'boolean', 'true', 'Jika true, menekan tombol ESC akan memicu onClose.'],
-    ['children', 'ReactNode', 'required', 'Komponen anak berupa DrawerHeader, DrawerBody, dan DrawerFooter.'],
+    ['eyebrow', 'string', 'optional', 'Label kapital bagian atas header (mis. "MENU").'],
+    ['header', 'ReactNode', 'optional', 'Elemen kustom untuk konten header.'],
+    ['items', 'DrawerMenuItem[]', 'optional', 'Daftar konfigurasi menu item (otomatis merender DrawerHeader & DrawerNavItem jika tidak menggunakan children JSX).'],
+    ['theme', "'purple' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna item yang aktif.'],
+    ['children', 'ReactNode', 'optional', 'Komponen anak opsional (DrawerHeader, DrawerBody, dll) untuk layout kustom.'],
 ]
 
 const headerProps: PropRow[] = [
@@ -135,48 +140,40 @@ function DrawerExampleCode({
         <>
             {`import { Drawer } from '@ceplok-ui/design-kit-react'\n`}
             {`import { ChartPie, FileLines, Cart, Inbox, Lock } from '@ceplok-ui/design-kit-react/icons/solid'\n\n`}
-            {'const [open, setOpen] = useState(true)\n'}
-            {'const [expandedMenu2, setExpandedMenu2] = useState(false)\n'}
-            {'const [expandedMenu3, setExpandedMenu3] = useState(true)\n'}
-            {'const [expandedMenu5, setExpandedMenu5] = useState(false)\n\n'}
-            {'<Drawer open={open} onClose={() => setOpen(false)} position="right" size="s">\n'}
-            {'  <Drawer.Header eyebrow="MENU" />\n'}
-            {'  <Drawer.Body className="p-4 space-y-1">\n'}
-            {'    <Drawer.NavItem icon={<ChartPie />} label="Menu 1" />\n'}
-            {'    <Drawer.NavItem\n'}
-            {'      icon={<FileLines />}\n'}
-            {'      label="Menu 2"\n'}
-            {'      expanded={expandedMenu2}\n'}
-            {'      onClick={() => setExpandedMenu2(!expandedMenu2)}\n'}
-            {'    >\n'}
-            {'      <Drawer.SubItem label="sub menu 1" />\n'}
-            {'      <Drawer.SubItem label="sub menu 2" />\n'}
-            {'    </Drawer.NavItem>\n'}
-            {'    <Drawer.NavItem\n'}
-            {'      icon={<Cart />}\n'}
-            {'      label="Menu 3"\n'}
-            {'      active\n'}
-            {'      expanded={expandedMenu3}\n'}
-            {'      theme='}
+            {'const [open, setOpen] = useState(true)\n\n'}
+            {'<Drawer\n'}
+            {'  open={open}\n'}
+            {'  onClose={() => setOpen(false)}\n'}
+            {'  position="right"\n'}
+            {'  size="s"\n'}
+            {'  eyebrow="MENU"\n'}
+            {'  theme='}
             <H>{`"${theme}"`}</H>
-            {'\n      onClick={() => setExpandedMenu3(!expandedMenu3)}\n'}
-            {'    >\n'}
-            {'      <Drawer.SubItem label="sub menu 1" active />\n'}
-            {'      <Drawer.SubItem label="sub menu 2" />\n'}
-            {'      <Drawer.SubItem label="sub menu 3" />\n'}
-            {'    </Drawer.NavItem>\n'}
-            {'    <Drawer.NavItem icon={<Inbox />} label="Menu 4" />\n'}
-            {'    <Drawer.NavItem\n'}
-            {'      icon={<Lock />}\n'}
-            {'      label="Menu 5"\n'}
-            {'      expanded={expandedMenu5}\n'}
-            {'      onClick={() => setExpandedMenu5(!expandedMenu5)}\n'}
-            {'    >\n'}
-            {'      <Drawer.SubItem label="sub menu 1" />\n'}
-            {'      <Drawer.SubItem label="sub menu 2" />\n'}
-            {'    </Drawer.NavItem>\n'}
-            {'  </Drawer.Body>\n'}
-            {'</Drawer>'}
+            {'\n  items={[\n'}
+            {'    { icon: <ChartPie />, label: "Menu 1" },\n'}
+            {'    {\n'}
+            {'      icon: <FileLines />,\n'}
+            {'      label: "Menu 2",\n'}
+            {'      children: [{ label: "sub menu 1" }, { label: "sub menu 2" }],\n'}
+            {'    },\n'}
+            {'    {\n'}
+            {'      icon: <Cart />,\n'}
+            {'      label: "Menu 3",\n'}
+            {'      active: true,\n'}
+            {'      children: [\n'}
+            {'        { label: "sub menu 1", active: true },\n'}
+            {'        { label: "sub menu 2" },\n'}
+            {'        { label: "sub menu 3" },\n'}
+            {'      ],\n'}
+            {'    },\n'}
+            {'    { icon: <Inbox />, label: "Menu 4" },\n'}
+            {'    {\n'}
+            {'      icon: <Lock />,\n'}
+            {'      label: "Menu 5",\n'}
+            {'      children: [{ label: "sub menu 1" }, { label: "sub menu 2" }],\n'}
+            {'    },\n'}
+            {'  ]}\n'}
+            {'/>'}
         </>
     )
 }
@@ -188,6 +185,31 @@ export function DrawerPage() {
     const [expandedMenu3, setExpandedMenu3] = useState(true)
     const [expandedMenu5, setExpandedMenu5] = useState(false)
     const [activeSubMenu, setActiveSubMenu] = useState('sub1')
+
+    const playgroundItems: DrawerMenuItem[] = [
+        { icon: <ChartPie className="size-5" />, label: 'Menu 1' },
+        {
+            icon: <FileLines className="size-5" />,
+            label: 'Menu 2',
+            children: [{ label: 'sub menu 1' }, { label: 'sub menu 2' }],
+        },
+        {
+            icon: <Cart className="size-5" />,
+            label: 'Menu 3',
+            active: true,
+            children: [
+                { label: 'sub menu 1', active: true },
+                { label: 'sub menu 2' },
+                { label: 'sub menu 3' },
+            ],
+        },
+        { icon: <Inbox className="size-5" />, label: 'Menu 4' },
+        {
+            icon: <Lock className="size-5" />,
+            label: 'Menu 5',
+            children: [{ label: 'sub menu 1' }, { label: 'sub menu 2' }],
+        },
+    ]
 
     return (
         <UsulanPage
@@ -286,7 +308,7 @@ export function DrawerPage() {
             {/* SECTION 2: MENU NAVIGASI */}
             <FlowSection id="menu" title="Menu">
                 <Lead>
-                    Menu pada Drawer disusun menggunakan <code>DrawerNavItem</code> dan <code>DrawerSubItem</code>. Anda dapat membuat item menu biasa maupun item menu dengan submenu bertingkat.
+                    Menu pada Drawer dapat dikonfigurasi melalui prop <code>items</code> (Data-driven array) atau disusun manual menggunakan <code>DrawerNavItem</code> dan <code>DrawerSubItem</code>.
                 </Lead>
 
                 <div className="grid gap-6 lg:grid-cols-2">
@@ -384,60 +406,30 @@ export function DrawerPage() {
                                 <div className="absolute right-0 top-0 bottom-0 z-20 flex h-full w-[260px] flex-col border-l border-gray-200 bg-white shadow-2xl rounded-none">
                                     <DrawerHeader eyebrow="MENU" onClose={() => setOpenPlayground(false)} />
                                     <div className="flex-1 space-y-1 overflow-y-auto p-3">
-                                        <DrawerNavItem
-                                            icon={<ChartPie className="size-5" />}
-                                            label="Menu 1"
-                                            theme={playgroundTheme}
-                                        />
-                                        <DrawerNavItem
-                                            icon={<FileLines className="size-5" />}
-                                            label="Menu 2"
-                                            expanded={expandedMenu2}
-                                            theme={playgroundTheme}
-                                            onClick={() => setExpandedMenu2(!expandedMenu2)}
-                                        >
-                                            <DrawerSubItem label="sub menu 1" />
-                                            <DrawerSubItem label="sub menu 2" />
-                                        </DrawerNavItem>
-                                        <DrawerNavItem
-                                            icon={<Cart className="size-5" />}
-                                            label="Menu 3"
-                                            active
-                                            expanded={expandedMenu3}
-                                            theme={playgroundTheme}
-                                            onClick={() => setExpandedMenu3(!expandedMenu3)}
-                                        >
-                                            <DrawerSubItem
-                                                label="sub menu 1"
-                                                active={activeSubMenu === 'sub1'}
-                                                onClick={() => setActiveSubMenu('sub1')}
-                                            />
-                                            <DrawerSubItem
-                                                label="sub menu 2"
-                                                active={activeSubMenu === 'sub2'}
-                                                onClick={() => setActiveSubMenu('sub2')}
-                                            />
-                                            <DrawerSubItem
-                                                label="sub menu 3"
-                                                active={activeSubMenu === 'sub3'}
-                                                onClick={() => setActiveSubMenu('sub3')}
-                                            />
-                                        </DrawerNavItem>
-                                        <DrawerNavItem
-                                            icon={<Inbox className="size-5" />}
-                                            label="Menu 4"
-                                            theme={playgroundTheme}
-                                        />
-                                        <DrawerNavItem
-                                            icon={<Lock className="size-5" />}
-                                            label="Menu 5"
-                                            expanded={expandedMenu5}
-                                            theme={playgroundTheme}
-                                            onClick={() => setExpandedMenu5(!expandedMenu5)}
-                                        >
-                                            <DrawerSubItem label="sub menu 1" />
-                                            <DrawerSubItem label="sub menu 2" />
-                                        </DrawerNavItem>
+                                        {playgroundItems.map((item, index) => (
+                                            <DrawerNavItem
+                                                key={index}
+                                                icon={item.icon}
+                                                label={item.label}
+                                                active={item.active}
+                                                expanded={index === 1 ? expandedMenu2 : index === 2 ? expandedMenu3 : index === 4 ? expandedMenu5 : false}
+                                                theme={playgroundTheme}
+                                                onClick={() => {
+                                                    if (index === 1) setExpandedMenu2(!expandedMenu2)
+                                                    if (index === 2) setExpandedMenu3(!expandedMenu3)
+                                                    if (index === 4) setExpandedMenu5(!expandedMenu5)
+                                                }}
+                                            >
+                                                {item.children?.map((sub, sIdx) => (
+                                                    <DrawerSubItem
+                                                        key={sIdx}
+                                                        label={sub.label}
+                                                        active={sub.active}
+                                                        theme={playgroundTheme}
+                                                    />
+                                                ))}
+                                            </DrawerNavItem>
+                                        ))}
                                     </div>
                                 </div>
                             </>
