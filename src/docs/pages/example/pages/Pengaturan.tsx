@@ -8,9 +8,6 @@ import {
   Icon,
   InputField,
   Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
   Radio,
   Select,
   TextArea,
@@ -160,8 +157,8 @@ export function Pengaturan() {
         onClose={() => setKonfirmasi(false)}
         aria-label="Konfirmasi penyimpanan pengaturan"
       >
-        <ModalHeader>Simpan perubahan?</ModalHeader>
-        <ModalBody>
+        <Modal.Header>Simpan perubahan?</Modal.Header>
+        <Modal.Body>
           <div className="flex gap-3">
             <Icon className="mt-0.5 shrink-0 text-primary-700">
               <InfoCircle />
@@ -183,8 +180,8 @@ export function Pengaturan() {
               </span>
             </div>
           )}
-        </ModalBody>
-        <ModalFooter>
+        </Modal.Body>
+        <Modal.Footer>
           <Button variant="outline" theme="gray" size="xs" onClick={() => setKonfirmasi(false)}>
             Batal
           </Button>
@@ -197,7 +194,7 @@ export function Pengaturan() {
           >
             Ya, simpan
           </Button>
-        </ModalFooter>
+        </Modal.Footer>
       </Modal>
 
       {tersimpan && (

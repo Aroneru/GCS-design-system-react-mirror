@@ -23,13 +23,7 @@ export type { SpinnerProps, SpinnerSize } from "./components/Spinner";
 export { Popover } from "./components/Popover";
 export type { PopoverProps, PopoverSide } from "./components/Popover";
 
-export {
-  Dropdown,
-  DropdownTrigger,
-  DropdownContent,
-  DropdownItem,
-  DropdownSeparator,
-} from "./components/Dropdown";
+export { Dropdown } from "./components/Dropdown";
 export type {
   DropdownProps,
   DropdownTriggerProps,
@@ -39,7 +33,7 @@ export type {
   DropdownSeparatorProps,
 } from "./components/Dropdown";
 
-export { Modal, ModalHeader, ModalBody, ModalFooter } from "./components/Modal";
+export { Modal } from "./components/Modal";
 export type {
   ModalProps,
   ModalSize,

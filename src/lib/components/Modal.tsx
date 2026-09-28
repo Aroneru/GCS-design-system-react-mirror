@@ -65,7 +65,7 @@ function useModalContext(component: string) {
  * inert background, dan fokus modal; event cancel hanya meminta consumer
  * memperbarui `open` melalui `onClose`.
  */
-export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
+export const ModalRoot = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   {
     open,
     onClose,
@@ -182,7 +182,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   )
 })
 
-Modal.displayName = 'Modal'
+ModalRoot.displayName = 'Modal'
 
 export const ModalHeader = forwardRef<HTMLDivElement, ModalHeaderProps>(function ModalHeader(
   { children, closeLabel = 'Tutup modal', className, ...props },
@@ -261,3 +261,11 @@ export const ModalFooter = forwardRef<HTMLDivElement, ModalFooterProps>(function
 })
 
 ModalFooter.displayName = 'ModalFooter'
+
+// Compound component tetap satu runtime import bagi consumer.
+// eslint-disable-next-line react-refresh/only-export-components
+export const Modal = Object.assign(ModalRoot, {
+  Header: ModalHeader,
+  Body: ModalBody,
+  Footer: ModalFooter,
+})
