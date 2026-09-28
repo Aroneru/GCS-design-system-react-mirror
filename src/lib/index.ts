@@ -32,6 +32,30 @@ export type {
   ModalFooterProps,
 } from "./components/Modal";
 
+export {
+  Drawer,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerBody,
+  DrawerFooter,
+  DrawerNavItem,
+  DrawerSubItem,
+} from "./components/Drawer";
+export type {
+  DrawerProps,
+  DrawerPosition,
+  DrawerSize,
+  DrawerNavItemTheme,
+  DrawerHeaderProps,
+  DrawerTitleProps,
+  DrawerDescriptionProps,
+  DrawerBodyProps,
+  DrawerFooterProps,
+  DrawerNavItemProps,
+  DrawerSubItemProps,
+} from "./components/Drawer";
+
 export { Alert } from "./components/Alert";
 export type { AlertProps, AlertVariant } from "./components/Alert";
 

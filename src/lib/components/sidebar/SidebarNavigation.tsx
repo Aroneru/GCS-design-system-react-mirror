@@ -16,9 +16,9 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
   const itemId = item.id ?? item.label;
   const className = cn(
     "flex w-full rounded-lg text-sm font-medium text-gray-700 transition-colors",
-    "hover:bg-gray-50 hover:text-gray-900",
+    "hover:bg-gray-100 hover:text-gray-900",
     collapsed ? "justify-center px-2 py-2.5" : "items-center gap-3 px-3 py-2.5",
-    item.active && "bg-gray-50 text-gray-900",
+    item.active && "bg-gray-100 text-gray-900",
     item.disabled && "pointer-events-none cursor-not-allowed opacity-50",
   );
 
@@ -80,8 +80,8 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
                 href={child.disabled ? undefined : child.href ?? "#"}
                 className={cn(
                   "flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors",
-                  "hover:bg-gray-50 hover:text-gray-900",
-                  child.active && "bg-gray-50 font-medium text-gray-900",
+                  "hover:bg-gray-100 hover:text-gray-900",
+                  child.active && "bg-gray-100 font-medium text-gray-900",
                   child.disabled && "pointer-events-none cursor-not-allowed opacity-50",
                 )}
                 aria-current={child.active ? "page" : undefined}
