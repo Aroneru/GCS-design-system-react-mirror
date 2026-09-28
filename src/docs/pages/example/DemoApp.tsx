@@ -115,7 +115,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
              */
             collapsedLogo={<img src={asset("/images/ceplok.svg")} alt="CEPLOK" className="size-8" />}
             items={menu}
-            user={{ name: "Yermi Rachman", profileLabel: "Administrator" }}
+            user={{ name: "Rafli Arandhana", profileLabel: "Administrator" }}
             sticky
             collapsed={ringkas}
             onCollapse={() => setRingkas((v) => !v)}
@@ -144,7 +144,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
               active: h === halaman,
             }))}
             search={{ onSubmit: () => undefined, placeholder: "Cari pengajuan, pemohon ..." }}
-            user={{ name: "Yermi Rachman", initials: "YR" }}
+            user={{ name: "Rafli Arandhana", initials: "RA" }}
             notification={{ unread: 3, onClick: () => undefined }}
             mobileOpen={mobileSidebarOpen}
             onMobileOpenChange={setMobileSidebarOpen}
@@ -168,7 +168,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
                   />
                 }
                 items={menu}
-                user={{ name: "Yermi Rachman", profileLabel: "Administrator" }}
+                user={{ name: "Rafli Arandhana", profileLabel: "Administrator" }}
                 onCollapse={() => setMobileSidebarOpen(false)}
                 onClick={(event) => {
                   if ((event.target as HTMLElement).closest("a")) setMobileSidebarOpen(false);

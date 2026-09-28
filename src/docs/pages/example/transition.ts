@@ -74,7 +74,7 @@ const EASE = 'sine.inOut'
  */
 export type GayaTirai = 'tunggal' | 'riak'
 
-export const GAYA_TIRAI: GayaTirai = 'riak'
+export const GAYA_TIRAI: GayaTirai = 'tunggal'
 
 /**
  * Jeda berangkat antar-lapisan pada gaya `riak`.

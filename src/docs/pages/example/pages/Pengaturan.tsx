@@ -18,8 +18,8 @@ import { Envelope, ExclamationCircle, InfoCircle, User } from '../../../../lib/i
 import { inisial, JENIS_LAYANAN } from '../data'
 
 export function Pengaturan() {
-  const [nama, setNama] = useState('Yermi Rachman')
-  const [surel, setSurel] = useState('yermi@contoh.id')
+  const [nama, setNama] = useState('Rafli Arandhana')
+  const [surel, setSurel] = useState('rafli@contoh.id')
   const [telepon, setTelepon] = useState('')
   const [jenis, setJenis] = useState('perizinan')
   const [prioritas, setPrioritas] = useState('normal')
