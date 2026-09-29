@@ -7,7 +7,7 @@ export type ButtonVariant = "filled" | "outline";
 
 export type ButtonSize = "xs" | "s" | "base" | "l" | "xl";
 
-export type ButtonTheme = "primary" | "green" | "gray" | "purple" | "orange" | "yellow";
+export type ButtonTheme = "primary" | "green" | "gray" | "simaya" | "orange" | "yellow";
 
 export type ButtonTone = "light" | "dark";
 
@@ -108,7 +108,7 @@ const colorClasses: Record<ButtonTheme, Record<ButtonTone, Record<ButtonVariant,
     },
   },
 
-  purple: {
+  simaya: {
     light: {
       filled: "bg-purple-700 text-white hover:bg-purple-800",
       outline: "border border-purple-700 text-purple-700 hover:bg-purple-50",

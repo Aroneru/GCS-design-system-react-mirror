@@ -28,7 +28,7 @@ import {
 
 const menuThemes: { value: DrawerNavItemTheme; label: string }[] = [
     { value: 'primary', label: 'Primary' },
-    { value: 'purple', label: 'Purple' },
+    { value: 'simaya', label: 'Simaya' },
 ]
 
 const iconOptions = [
@@ -46,7 +46,7 @@ const drawerProps: PropRow[] = [
     ['eyebrow', 'string', 'optional', 'Label kapital bagian atas header (mis. "MENU").'],
     ['header', 'ReactNode', 'optional', 'Elemen kustom untuk konten header.'],
     ['items', 'DrawerMenuItem[]', 'optional', 'Daftar konfigurasi menu item (otomatis merender DrawerHeader & DrawerNavItem jika tidak menggunakan children JSX).'],
-    ['theme', "'purple' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna item yang aktif.'],
+    ['theme', "'simaya' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna item yang aktif.'],
     ['children', 'ReactNode', 'optional', 'Komponen anak opsional (DrawerHeader, DrawerBody, dll) untuk layout kustom.'],
 ]
 
@@ -63,7 +63,7 @@ const navItemProps: PropRow[] = [
     ['active', 'boolean', 'false', 'Menandai status aktif dengan latar pill berwarna.'],
     ['expanded', 'boolean', 'false', 'Menentukan apakah sub-menu sedang terbuka (menampilkan chevron atas/bawah).'],
     ['collapsible', 'boolean', 'false', 'Menampilkan ikon chevron tanda dropdown jika tidak memiliki anak.'],
-    ['theme', "'purple' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna sorotan saat item status active.'],
+    ['theme', "'simaya' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna sorotan saat item status active.'],
     ['children', 'ReactNode', 'optional', 'Daftar DrawerSubItem ter-indentasi di bawah item.'],
 ]
 

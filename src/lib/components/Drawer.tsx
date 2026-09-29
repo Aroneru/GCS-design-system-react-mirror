@@ -23,7 +23,7 @@ import { cn } from '../utils/cn'
 
 export type DrawerPosition = 'right' | 'left' | 'top' | 'bottom'
 export type DrawerSize = 's' | 'm' | 'l' | 'xl' | 'full'
-export type DrawerNavItemTheme = 'primary' | 'purple' | 'blue' | 'gray'
+export type DrawerNavItemTheme = 'primary' | 'simaya' | 'blue' | 'gray'
 
 export interface DrawerMenuSubItem {
   id?: string
@@ -148,35 +148,35 @@ const positionClasses: Record<DrawerPosition, (size: DrawerSize) => string> = {
 
 const activeThemeClasses: Record<DrawerNavItemTheme, string> = {
   primary: 'bg-blue-50 text-blue-600 font-medium',
-  purple: 'bg-purple-100/70 text-purple-700 font-medium',
+  simaya: 'bg-purple-100/70 text-purple-700 font-medium',
   blue: 'bg-blue-50 text-blue-600 font-medium',
   gray: 'bg-gray-100 text-gray-900 font-medium',
 }
 
 const activeIconClasses: Record<DrawerNavItemTheme, string> = {
   primary: 'text-blue-600',
-  purple: 'text-purple-600',
+  simaya: 'text-purple-600',
   blue: 'text-blue-600',
   gray: 'text-gray-700',
 }
 
 const hoverThemeClasses: Record<DrawerNavItemTheme, string> = {
   primary: 'hover:bg-blue-50 hover:text-blue-600',
-  purple: 'hover:bg-purple-100/70 hover:text-purple-700',
+  simaya: 'hover:bg-purple-100/70 hover:text-purple-700',
   blue: 'hover:bg-blue-50 hover:text-blue-600',
   gray: 'hover:bg-gray-100/70 hover:text-gray-900',
 }
 
 const hoverIconClasses: Record<DrawerNavItemTheme, string> = {
   primary: 'group-hover:text-blue-600',
-  purple: 'group-hover:text-purple-700',
+  simaya: 'group-hover:text-purple-700',
   blue: 'group-hover:text-blue-600',
   gray: 'group-hover:text-gray-900',
 }
 
 const subItemHoverClasses: Record<DrawerNavItemTheme, string> = {
   primary: 'hover:bg-blue-50 hover:text-blue-600',
-  purple: 'hover:bg-purple-100/70 hover:text-purple-700',
+  simaya: 'hover:bg-purple-100/70 hover:text-purple-700',
   blue: 'hover:bg-blue-50 hover:text-blue-600',
   gray: 'hover:bg-gray-100/70 hover:text-gray-900',
 }
@@ -632,7 +632,7 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
         'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-base text-left transition-colors font-medium text-gray-900',
         subItemHoverClasses[theme],
         active
-          ? theme === 'purple'
+          ? theme === 'simaya'
             ? 'font-medium text-purple-700 bg-purple-50/70'
             : theme === 'gray'
               ? 'font-medium text-gray-900 bg-gray-100'

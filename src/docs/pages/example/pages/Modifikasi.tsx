@@ -28,7 +28,7 @@ import { asset } from '../../../asset'
  * yang lebih besar), bukan menandingi properti yang sama.
  */
 
-const TEMA = ['primary', 'green', 'gray', 'purple', 'orange', 'yellow'] as const
+const TEMA = ['primary', 'green', 'gray', 'simaya', 'orange', 'yellow'] as const
 const UKURAN = ['xs', 's', 'base', 'l', 'xl'] as const
 const VARIAN_BADGE = ['gray', 'brand', 'success', 'warning', 'danger'] as const
 

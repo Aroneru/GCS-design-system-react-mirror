@@ -27,7 +27,7 @@ const themeOptions: { value: ButtonTheme; label: string }[] = [
   { value: "primary", label: "Primary" },
   { value: "green", label: "Green" },
   { value: "gray", label: "Gray" },
-  { value: "purple", label: "Purple" },
+  { value: "simaya", label: "Simaya" },
   { value: "orange", label: "Orange" },
   { value: "yellow", label: "Yellow" },
 ];
@@ -232,12 +232,12 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button variant="filled" theme="purple" tone="light">
-              Purple
+            <Button variant="filled" theme="simaya" tone="light">
+              Simaya
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Purple</H> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
+              <H>Simaya</H> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
               visual berbeda.
             </p>
           </div>
@@ -339,7 +339,7 @@ export function ButtonPage() {
             <Segmented
               label="Pilih ukuran"
               value={selectedSize}
-              onChange={setSelectedSize}
+              onChange={(value) => setSelectedSize(value as ButtonSize)}
               options={sizeOptions}
               wrap
             />
@@ -349,7 +349,7 @@ export function ButtonPage() {
             <Segmented
               label="Pilih variant"
               value={variant}
-              onChange={setVariant}
+              onChange={(value) => setVariant(value as ButtonVariant)}
               options={variantOptions}
             />
           </Control>
@@ -399,7 +399,7 @@ export function ButtonPage() {
             <Segmented
               label="Pilih theme"
               value={theme}
-              onChange={setTheme}
+              onChange={(value) => setTheme(value as ButtonTheme)}
               options={themeOptions}
               wrap
               itemClassName="basis-1/3 justify-center"
