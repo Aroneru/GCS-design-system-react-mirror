@@ -330,7 +330,7 @@ export function SidebarPage() {
   { label: "Menu 8", href: "#"${iconProperty("ChartPie")} },
 ]`;
   const usageCode = [
-    "import { Sidebar } from '@tpl/design-kit-react'",
+    "import { Sidebar } from '@ceplok-ui/design-kit-react'",
     ...(menuIcon === "show"
       ? [
           "import { Cart, ChartPie, Clipboard, Inbox, Layers, Lock } from 'flowbite-react-icons/solid'",

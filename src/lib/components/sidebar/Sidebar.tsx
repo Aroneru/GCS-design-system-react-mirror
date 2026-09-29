@@ -78,6 +78,12 @@ export function Sidebar({
         <div className={cn("px-4 pb-3", !hasHeader && "pt-4")}>
           <a
             href={user.href ?? "#"}
+            onClick={(e) => {
+              if (!user.href || user.href === "#") {
+                e.preventDefault();
+              }
+              user.onClick?.(e);
+            }}
             className={cn(
               "flex",
               collapsed

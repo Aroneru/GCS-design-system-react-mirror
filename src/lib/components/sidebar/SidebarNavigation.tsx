@@ -30,6 +30,12 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
         aria-current={item.active ? "page" : undefined}
         aria-disabled={item.disabled || undefined}
         title={collapsed ? item.label : undefined}
+        onClick={(e) => {
+          if (!item.href || item.href === "#") {
+            e.preventDefault();
+          }
+          item.onClick?.(e);
+        }}
       >
         {item.icon && (
           <span className="flex size-5 shrink-0 items-center justify-center">{item.icon}</span>
@@ -86,6 +92,12 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
                 )}
                 aria-current={child.active ? "page" : undefined}
                 aria-disabled={child.disabled || undefined}
+                onClick={(e) => {
+                  if (!child.href || child.href === "#") {
+                    e.preventDefault();
+                  }
+                  child.onClick?.(e);
+                }}
               >
                 {child.icon && <span className="flex size-4 shrink-0 items-center justify-center">{child.icon}</span>}
                 <span className="truncate">{child.label}</span>

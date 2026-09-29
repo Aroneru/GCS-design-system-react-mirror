@@ -68,14 +68,14 @@ const longContent = [
 function ModalExampleCode({ example, size }: { example: ModalExample; size: ModalSize }) {
   const componentImport =
     example === 'confirmation'
-      ? "import { Button, Icon, Modal, ModalBody, ModalFooter, ModalHeader } from '@tpl/design-kit-react'\n"
-      : "import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@tpl/design-kit-react'\n"
+      ? "import { Button, Icon, Modal, ModalBody, ModalFooter, ModalHeader } from '@ceplok-ui/design-kit-react'\n"
+      : "import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from '@ceplok-ui/design-kit-react'\n"
 
   return (
     <>
       {componentImport}
       {example === 'confirmation' &&
-        "import { ExclamationCircle } from '@tpl/design-kit-react/icons/outline'\n"}
+        "import { ExclamationCircle } from '@ceplok-ui/design-kit-react/icons/outline'\n"}
       {'\nconst [open, setOpen] = useState(false)\n'}
       {example === 'confirmation' &&
         '\nasync function handleDelete() {\n  await deleteContent()\n  setOpen(false)\n}\n'}
@@ -249,7 +249,7 @@ export function ModalPage() {
             <Segmented
               label="Pilih ukuran Modal"
               value={playgroundSize}
-              onChange={setPlaygroundSize}
+              onChange={(val) => setPlaygroundSize(val as ModalSize)}
               options={sizes.map(({ value, label }) => ({ value, label }))}
             />
           </Control>
