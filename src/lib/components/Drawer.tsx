@@ -352,7 +352,6 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
   }, [open, registeredTitleId, usesExplicitAccessibleName])
 
   const hasHeaderProps = Boolean(eyebrow || header)
-  const hasItems = Boolean(items && items.length > 0)
 
   return (
     <DrawerContext.Provider
@@ -380,7 +379,7 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
                 {header}
               </DrawerHeader>
             )}
-            {hasItems && (
+            {items && items.length > 0 && (
               <DrawerBody className="p-3 space-y-1">
                 {items.map((item, index) => (
                   <DrawerMenuItemRenderer key={item.id ?? index} item={item} theme={item.theme ?? theme} />

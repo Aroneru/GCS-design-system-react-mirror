@@ -19,7 +19,11 @@ export function Sidebar({
   className,
   ...props
 }: SidebarProps) {
-  const hasCollapseButton = Boolean(onCollapse || showCollapseButton);
+  const allItems = groups?.length ? groups.flatMap((g) => g.items) : items;
+  const hasMenuIcons = allItems.some(
+    (item) => Boolean(item.icon) || Boolean(item.children?.some((child) => Boolean(child.icon))),
+  );
+  const hasCollapseButton = hasMenuIcons && Boolean(onCollapse || showCollapseButton);
   const hasHeader = Boolean(logo || collapsedLogo || hasCollapseButton);
   const visibleLogo = collapsed ? (collapsedLogo ?? logo) : logo;
 
