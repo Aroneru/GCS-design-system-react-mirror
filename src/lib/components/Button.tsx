@@ -28,7 +28,7 @@ type AsButton = CommonProps & {
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof CommonProps>;
 
 type AsAnchor = CommonProps & {
-  as: "a";
+  as: "anchor";
 } & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof CommonProps>;
 
 export type ButtonProps = AsButton | AsAnchor;
@@ -98,13 +98,13 @@ const colorClasses: Record<ButtonTheme, Record<ButtonTone, Record<ButtonVariant,
     // Gray light menggunakan 500
     light: {
       filled: "bg-gray-500 text-white hover:bg-gray-700",
-      outline: "border border-gray-500 text-gray-500 hover:bg-gray-50",
+      outline: "border border-gray-500 text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:border-gray-700",
     },
 
     // Gray dark menggunakan 700
     dark: {
       filled: "bg-gray-700 text-white hover:bg-gray-500",
-      outline: "border border-gray-700 text-gray-700 hover:bg-gray-50",
+      outline: "border border-gray-700 text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-900",
     },
   },
 
@@ -197,7 +197,7 @@ export function Button({
     </>
   );
 
-  if (props.as === "a") {
+  if (props.as === "anchor") {
     const { as: _as, ...anchorProps } = props;
 
     return (

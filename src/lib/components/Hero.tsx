@@ -127,7 +127,7 @@ export function Hero({
 
   const button = showButton ? (
     buttonHref ? (
-      <Button as="a" href={buttonHref} className={buttonWidth} rightIcon={<ArrowRight />}>
+      <Button as="anchor" href={buttonHref} className={buttonWidth} rightIcon={<ArrowRight />}>
         {buttonLabel}
       </Button>
     ) : (

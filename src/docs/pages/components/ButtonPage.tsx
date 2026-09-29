@@ -38,7 +38,7 @@ const typeOptions = [
 ];
 
 const buttonProps: PropRow[] = [
-  ["as", '"button" | "a"', "button", "Menentukan elemen yang dirender. Bisa jadi anchor."],
+  ["as", '"button" | "anchor"', "button", "Menentukan elemen yang dirender. Bisa jadi anchor."],
   ["type", '"button" | "iconOnly"', "button", "Menentukan tipe tombol."],
   ["size", '"xs" | "s" | "base" | "l" | "xl"', "base", "Menentukan ukuran tombol."],
   ["variant", '"filled" | "outline"', "filled", "Gaya utama tombol: solid atau outline."],
@@ -66,7 +66,7 @@ export function ButtonPage() {
   const [type, setType] = useState<"button" | "iconOnly">("button");
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
-  const [asLink, setAsLink] = useState<"button" | "a">("button");
+  const [asLink, setAsLink] = useState<"button" | "anchor">("button");
 
   return (
     <UsulanPage
@@ -291,7 +291,7 @@ export function ButtonPage() {
             <Button
               type={type === "iconOnly" ? "iconOnly" : "button"}
               as={asLink}
-              href={asLink === "a" ? "/foundations/colors" : undefined}
+              href={asLink === "anchor" ? "/foundations/colors" : undefined}
               size={selectedSize}
               variant={variant}
               theme={theme}
@@ -309,10 +309,10 @@ export function ButtonPage() {
             <Segmented
               label="Pilih render"
               value={asLink}
-              onChange={(value) => setAsLink(value as "button" | "a")}
+              onChange={(value) => setAsLink(value as "button" | "anchor")}
               options={[
                 { value: "button", label: "Button" },
-                { value: "a", label: "Link" },
+                { value: "anchor", label: "Link" },
               ]}
             />
           </Control>
