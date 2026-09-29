@@ -115,16 +115,16 @@ const baseItems = [
   {
     label: "Menu 1",
     href: "#",
-    icon: <ChartPie className="size-4" />,
+    icon: <ChartPie className="size-5" />,
   },
   {
     label: "Menu 2",
     href: "#",
-    icon: <Clipboard className="size-4" />,
+    icon: <Clipboard className="size-5" />,
   },
   {
     label: "Menu 3",
-    icon: <Cart className="size-4" />,
+    icon: <Cart className="size-5" />,
     defaultOpen: true,
     children: [
       { label: "Sub - Menu 1", href: "#" },
@@ -135,28 +135,28 @@ const baseItems = [
   {
     label: "Menu 4",
     href: "#",
-    icon: <Inbox className="size-4" />,
+    icon: <Inbox className="size-5" />,
     badge: 1,
   },
   {
     label: "Menu 5",
     href: "#",
-    icon: <Lock className="size-4" />,
+    icon: <Lock className="size-5" />,
   },
   {
     label: "Menu 6",
     href: "#",
-    icon: <Clipboard className="size-4" />,
+    icon: <Clipboard className="size-5" />,
   },
   {
     label: "Menu 7",
     href: "#",
-    icon: <Layers className="size-4" />,
+    icon: <Layers className="size-5" />,
   },
   {
     label: "Menu 8",
     href: "#",
-    icon: <ChartPie className="size-4" />,
+    icon: <ChartPie className="size-5" />,
   },
 ];
 
@@ -197,17 +197,17 @@ const separatorGroups: SidebarGroup[] = [
   {
     id: "primary",
     items: [
-      { label: "Menu 4", href: "#", icon: <Inbox className="size-4" />, badge: 1 },
-      { label: "Menu 5", icon: <Lock className="size-4" /> },
+      { label: "Menu 4", href: "#", icon: <Inbox className="size-5" />, badge: 1 },
+      { label: "Menu 5", icon: <Lock className="size-5" /> },
     ],
   },
   {
     id: "secondary",
     separator: true,
     items: [
-      { label: "Menu 6", href: "#", icon: <Clipboard className="size-4" /> },
-      { label: "Menu 7", href: "#", icon: <Layers className="size-4" /> },
-      { label: "Menu 8", href: "#", icon: <ChartPie className="size-4" /> },
+      { label: "Menu 6", href: "#", icon: <Clipboard className="size-5" /> },
+      { label: "Menu 7", href: "#", icon: <Layers className="size-5" /> },
+      { label: "Menu 8", href: "#", icon: <ChartPie className="size-5" /> },
     ],
   },
 ];
@@ -310,7 +310,7 @@ export function SidebarPage() {
       : undefined;
 
   const iconProperty = (icon: string) =>
-    menuIcon === "show" ? `, icon: <${icon} className="size-4" />` : "";
+    menuIcon === "show" ? `, icon: <${icon} className="size-5" />` : "";
   const usageItems = `const items = [
   { label: "Menu 1", href: "#"${iconProperty("ChartPie")} },
   { label: "Menu 2", href: "#"${iconProperty("Clipboard")} },
@@ -436,17 +436,17 @@ export function SidebarPage() {
             <div className="mb-4 max-w-[280px] rounded-xl border border-gray-200 bg-white p-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-                  <ChartPie className="size-4" />
+                  <ChartPie className="size-5" />
                   <span>Menu 1</span>
                 </div>
 
                 <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-                  <Clipboard className="size-4" />
+                  <Clipboard className="size-5" />
                   <span>Menu 2</span>
                 </div>
 
                 <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-                  <Inbox className="size-4" />
+                  <Inbox className="size-5" />
                   <span>Menu 3</span>
                 </div>
               </div>
@@ -481,7 +481,7 @@ export function SidebarPage() {
                 items={[
                   {
                     label: "Menu 3",
-                    icon: <Cart className="size-4" />,
+                    icon: <Cart className="size-5" />,
                     active: true,
                     defaultOpen: true,
                     submenuToggleDisabled: true,
@@ -524,7 +524,7 @@ export function SidebarPage() {
 
         <div className="mb-4 max-w-[280px] rounded-xl border border-gray-200 bg-white p-4">
           <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-            <Inbox className="size-4" />
+            <Inbox className="size-5" />
 
             <span className="flex-1">Menu 4</span>
 

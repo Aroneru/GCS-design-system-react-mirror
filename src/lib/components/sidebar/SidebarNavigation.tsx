@@ -40,7 +40,7 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
         {item.icon && (
           <span
             className={cn(
-              "flex size-5 shrink-0 items-center justify-center transition-colors",
+              "flex size-5 shrink-0 items-center justify-center transition-colors [&>svg]:size-5",
               item.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
             )}
           >
@@ -72,7 +72,7 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
         {item.icon && (
           <span
             className={cn(
-              "flex size-5 shrink-0 items-center justify-center transition-colors",
+              "flex size-5 shrink-0 items-center justify-center transition-colors [&>svg]:size-5",
               item.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
             )}
           >
@@ -89,8 +89,7 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
             )}
             <ChevronDown
               className={cn(
-                "size-4 shrink-0 transition-transform",
-                item.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
+                "w-[28px] h-[28px] shrink-0 text-gray-900 transition-transform",
                 open && "rotate-180",
               )}
             />
@@ -122,7 +121,7 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
                 {child.icon && (
                   <span
                     className={cn(
-                      "flex size-4 shrink-0 items-center justify-center transition-colors",
+                      "flex size-5 shrink-0 items-center justify-center transition-colors [&>svg]:size-5",
                       child.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
                     )}
                   >

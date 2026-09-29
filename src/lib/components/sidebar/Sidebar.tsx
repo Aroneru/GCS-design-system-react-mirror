@@ -67,7 +67,7 @@ export function Sidebar({
                 collapsed && "order-1",
               )}
             >
-              <ChevronLeft className={cn("size-4 transition-transform", collapsed && "rotate-180")} />
+              <ChevronLeft className={cn("w-[28px] h-[28px] shrink-0 text-gray-900 transition-transform", collapsed && "rotate-180")} />
             </button>
           )}
         </header>
