@@ -30,6 +30,7 @@ const themeOptions: { value: ButtonTheme; label: string }[] = [
   { value: "purple", label: "Purple" },
   { value: "orange", label: "Orange" },
   { value: "yellow", label: "Yellow" },
+  { value: "red", label: "Red" },
 ];
 
 const typeOptions = [
@@ -42,7 +43,8 @@ const buttonProps: PropRow[] = [
   ["type", '"button" | "iconOnly"', "button", "Menentukan tipe tombol."],
   ["size", '"xs" | "s" | "base" | "l" | "xl"', "base", "Menentukan ukuran tombol."],
   ["variant", '"filled" | "outline"', "filled", "Gaya utama tombol: solid atau outline."],
-  ["tone", '"light" | "dark"', "light", "Menyetel kontras warna untuk variant atau theme."],
+  ["tone", '"light" | "dark" | "bright"', "light", "Menyetel kontras warna untuk variant atau theme."],
+  ["shape", '"circle" | "square"', "circle", "Sudut tombol iconOnly: bulat penuh atau kotak."],
   ["leftIcon", "ReactNode", "undefined", "Ikon di sisi kiri tombol."],
   ["rightIcon", "ReactNode", "undefined", "Ikon di sisi kanan tombol."],
   ["theme", "ButtonTheme", "primary", "Warna aksen tombol."],

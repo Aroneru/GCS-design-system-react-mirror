@@ -9,6 +9,7 @@ export type {
   ButtonVariant,
   ButtonTheme,
   ButtonTone,
+  ButtonShape,
 } from "./components/Button";
 
 export { Avatar } from "./components/Avatar";
@@ -154,6 +155,24 @@ export type {
 
 export { Pagination } from "./components/Pagination";
 export type { PaginationProps, PaginationTheme } from "./components/Pagination";
+
+export { Table, TableImage } from "./components/Table";
+export type {
+  TableProps,
+  TableColumn,
+  TableColumnImage,
+  TableImageProps,
+  TableAlign,
+  TableSort,
+  TableSortDirection,
+  TableSortIcon,
+  TableRowAction,
+  TableSize,
+  TableSticky,
+  TableSearchConfig,
+  TableFilterConfig,
+  TablePaginationConfig,
+} from "./components/Table";
 
 export { Sidebar } from "./components/sidebar/Sidebar";
 export type {
