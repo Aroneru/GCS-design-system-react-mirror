@@ -15,7 +15,7 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
   const [open, setOpen] = useState(Boolean(item.defaultOpen || item.active));
   const itemId = item.id ?? item.label;
   const className = cn(
-    "flex w-full rounded-lg text-sm font-medium text-gray-700 transition-colors",
+    "group flex w-full rounded-lg text-sm font-medium text-gray-700 transition-colors",
     "hover:bg-gray-100 hover:text-gray-900",
     collapsed ? "justify-center px-2 py-2.5" : "items-center gap-3 px-3 py-2.5",
     item.active && "bg-gray-100 text-gray-900",
@@ -38,7 +38,14 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
         }}
       >
         {item.icon && (
-          <span className="flex size-5 shrink-0 items-center justify-center">{item.icon}</span>
+          <span
+            className={cn(
+              "flex size-5 shrink-0 items-center justify-center transition-colors",
+              item.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
+            )}
+          >
+            {item.icon}
+          </span>
         )}
         {!collapsed && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
         {!collapsed && item.badge != null && (
@@ -63,7 +70,14 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
         title={collapsed ? item.label : undefined}
       >
         {item.icon && (
-          <span className="flex size-5 shrink-0 items-center justify-center">{item.icon}</span>
+          <span
+            className={cn(
+              "flex size-5 shrink-0 items-center justify-center transition-colors",
+              item.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
+            )}
+          >
+            {item.icon}
+          </span>
         )}
         {!collapsed && (
           <>
@@ -73,7 +87,13 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
                 {item.badge}
               </span>
             )}
-            <ChevronDown className={cn("size-4 shrink-0 transition-transform", open && "rotate-180")} />
+            <ChevronDown
+              className={cn(
+                "size-4 shrink-0 transition-transform",
+                item.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
+                open && "rotate-180",
+              )}
+            />
           </>
         )}
       </button>
@@ -85,7 +105,7 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
               <a
                 href={child.disabled ? undefined : child.href ?? "#"}
                 className={cn(
-                  "flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors",
+                  "group flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors",
                   "hover:bg-gray-100 hover:text-gray-900",
                   child.active && "bg-gray-100 font-medium text-gray-900",
                   child.disabled && "pointer-events-none cursor-not-allowed opacity-50",
@@ -99,7 +119,16 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
                   child.onClick?.(e);
                 }}
               >
-                {child.icon && <span className="flex size-4 shrink-0 items-center justify-center">{child.icon}</span>}
+                {child.icon && (
+                  <span
+                    className={cn(
+                      "flex size-4 shrink-0 items-center justify-center transition-colors",
+                      child.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
+                    )}
+                  >
+                    {child.icon}
+                  </span>
+                )}
                 <span className="truncate">{child.label}</span>
               </a>
             </li>
