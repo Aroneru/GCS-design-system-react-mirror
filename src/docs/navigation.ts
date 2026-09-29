@@ -105,6 +105,7 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: "Popover", route: "/components/popover" },
       { label: "Dropdown", route: "/components/dropdown" },
       { label: "Modal", route: "/components/modal" },
+      { label: "Drawer", route: "/components/drawer" },
       { label: "Alert", route: "/components/alert" },
       { label: "Toast", route: "/components/toast" },
       { label: "Card", route: "/components/card" },

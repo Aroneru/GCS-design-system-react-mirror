@@ -15,7 +15,7 @@ import {
 const themeOptions: { value: PaginationTheme; label: string }[] = [
   { value: "default", label: "Default" },
   { value: "primary", label: "Primary" },
-  { value: "purple", label: "Purple" },
+  { value: "simaya", label: "Simaya" },
 ];
 
 const totalPageOptions = [25, 50, 75, 100].map((value) => ({
@@ -32,7 +32,7 @@ const paginationProps: PropRow[] = [
     "—",
     "Callback yang dijalankan ketika pengguna berpindah halaman.",
   ],
-  ["theme", '"default" | "primary" | "purple"', "primary", "Menentukan warna pagination."],
+  ["theme", '"default" | "primary" | "simaya"', "primary", "Menentukan warna pagination."],
 ];
 
 const toc: TocEntry[] = [
@@ -118,10 +118,10 @@ export function PaginationPage() {
             </div>
 
             <div>
-              <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} theme="purple" />
+              <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} theme="simaya" />
 
               <p className="mt-2 mb-5 text-sm text-gray-600">
-                <H>Purple</H> digunakan ketika pagination membutuhkan aksen ungu.
+                <H>Simaya</H> digunakan ketika pagination membutuhkan aksen ungu.
               </p>
             </div>
           </Demo>

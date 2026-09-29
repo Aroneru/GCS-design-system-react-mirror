@@ -92,9 +92,8 @@ function ModalExampleCode({ example, size }: { example: ModalExample; size: Moda
           <H>title</H>
           {`="${judul}"\n  `}
           <H>footer</H>
-          {`={<Button size="xs" onClick={() => setOpen(false)}>${
-            example === 'long' ? 'Saya mengerti' : 'Ya, saya setuju'
-          }</Button>}\n>\n`}
+          {`={<Button size="xs" onClick={() => setOpen(false)}>${example === 'long' ? 'Saya mengerti' : 'Ya, saya setuju'
+            }</Button>}\n>\n`}
           {example === 'image' ? (
             <>
               {'  '}
@@ -241,7 +240,7 @@ export function ModalPage() {
             <Segmented
               label="Pilih ukuran Modal"
               value={playgroundSize}
-              onChange={setPlaygroundSize}
+              onChange={(val) => setPlaygroundSize(val as ModalSize)}
               options={sizes.map(({ value, label }) => ({ value, label }))}
             />
           </Control>
