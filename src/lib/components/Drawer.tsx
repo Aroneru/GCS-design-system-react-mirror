@@ -10,6 +10,7 @@ import {
   useId,
   useRef,
   useState,
+  type ButtonHTMLAttributes,
   type DialogHTMLAttributes,
   type HTMLAttributes,
   type MouseEvent,
@@ -17,6 +18,7 @@ import {
   type SyntheticEvent,
 } from 'react'
 import { Close, ChevronDown, ChevronUp } from 'flowbite-react-icons/outline'
+import { BarsFromLeft } from '../icons/outline'
 import { cn } from '../utils/cn'
 
 export type DrawerPosition = 'right' | 'left' | 'top' | 'bottom'
@@ -414,7 +416,7 @@ export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(functi
     >
       <div className="min-w-0 flex-1 space-y-1">
         {eyebrow && (
-          <span className="block text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+          <span className="block text-base font-semibold tracking-wider text-gray-500 uppercase">
             {eyebrow}
           </span>
         )}
@@ -426,9 +428,9 @@ export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(functi
           type="button"
           onClick={handleClose}
           aria-label={closeLabel}
-          className="-mr-2 ml-auto inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-gray-100 hover:text-slate-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+          className="-mr-2 ml-auto inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
         >
-          <Close className="size-4" aria-hidden="true" />
+          <Close className="w-[18px] h-[18px]" aria-hidden="true" />
         </button>
       )}
     </div>
@@ -554,18 +556,18 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
         onClick={onClick}
         type={href ? undefined : 'button'}
         className={cn(
-          'group flex w-full items-center justify-between gap-2.5 rounded-xl px-3.5 py-2.5 text-xs transition-all text-left font-medium',
+          'group flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-base transition-all text-left font-medium',
           active
             ? activeThemeClasses[theme]
-            : cn('text-slate-800', hoverThemeClasses[theme]),
+            : cn('text-gray-900', hoverThemeClasses[theme]),
         )}
       >
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
           {icon && (
             <span
               className={cn(
-                'flex size-4 shrink-0 items-center justify-center transition-colors',
-                active ? activeIconClasses[theme] : cn('text-slate-500', hoverIconClasses[theme]),
+                'flex w-[18px] h-[18px] shrink-0 items-center justify-center transition-colors',
+                active ? activeIconClasses[theme] : cn('text-gray-500', hoverIconClasses[theme]),
               )}
             >
               {icon}
@@ -579,18 +581,18 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
           {isExpandable && (
             <span
               className={cn(
-                'size-3.5 transition-all',
-                active ? activeIconClasses[theme] : cn('text-slate-500', hoverIconClasses[theme]),
+                'flex w-[18px] h-[18px] items-center justify-center transition-all',
+                active ? activeIconClasses[theme] : cn('text-gray-500', hoverIconClasses[theme]),
               )}
             >
-              {expanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+              {expanded ? <ChevronUp className="w-[18px] h-[18px]" /> : <ChevronDown className="w-[18px] h-[18px]" />}
             </span>
           )}
         </div>
       </Component>
 
       {expanded && children && (
-        <div className="mt-0.5 space-y-0.5">
+        <div className="mt-1 space-y-1 pl-8">
           {Children.map(children, (child) => {
             if (isValidElement<DrawerSubItemProps>(child)) {
               return cloneElement(child, { theme: child.props.theme ?? theme })
@@ -627,13 +629,15 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
       type={href ? undefined : 'button'}
       onClick={handleClick}
       className={cn(
-        'block w-full text-left rounded-lg pl-10 pr-3 py-1.5 text-xs transition-colors font-medium text-slate-800',
+        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-base text-left transition-colors font-medium text-gray-900',
         subItemHoverClasses[theme],
         active
           ? theme === 'purple'
             ? 'font-medium text-purple-700 bg-purple-50/70'
-            : 'font-medium text-blue-600 bg-blue-50/70'
-          : 'text-slate-800',
+            : theme === 'gray'
+              ? 'font-medium text-gray-900 bg-gray-100'
+              : 'font-medium text-blue-600 bg-blue-50/70'
+          : 'text-gray-900',
         className,
       )}
       {...props}
@@ -645,6 +649,34 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
 
 DrawerSubItem.displayName = 'DrawerSubItem'
 
+export interface DrawerTriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  icon?: ReactNode
+}
+
+/**
+ * Subkomponen pemicu (tombol hamburger menu) untuk membuka Drawer.
+ */
+export const DrawerTrigger = forwardRef<HTMLButtonElement, DrawerTriggerProps>(
+  function DrawerTrigger({ className, icon, children, ...props }, ref) {
+    return (
+      <button
+        ref={ref}
+        type="button"
+        aria-label="Buka menu drawer"
+        className={cn(
+          'inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+          className,
+        )}
+        {...props}
+      >
+        {children ?? icon ?? <BarsFromLeft className="w-6 h-6 text-gray-500" />}
+      </button>
+    )
+  },
+)
+
+DrawerTrigger.displayName = 'DrawerTrigger'
+
 export type DrawerComponentType = typeof DrawerRoot & {
   Header: typeof DrawerHeader
   Title: typeof DrawerTitle
@@ -653,6 +685,7 @@ export type DrawerComponentType = typeof DrawerRoot & {
   Footer: typeof DrawerFooter
   NavItem: typeof DrawerNavItem
   SubItem: typeof DrawerSubItem
+  Trigger: typeof DrawerTrigger
 }
 
 export const Drawer: DrawerComponentType = Object.assign(DrawerRoot, {
@@ -663,4 +696,5 @@ export const Drawer: DrawerComponentType = Object.assign(DrawerRoot, {
   Footer: DrawerFooter,
   NavItem: DrawerNavItem,
   SubItem: DrawerSubItem,
+  Trigger: DrawerTrigger,
 })

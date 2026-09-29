@@ -41,6 +41,7 @@ export {
   DrawerFooter,
   DrawerNavItem,
   DrawerSubItem,
+  DrawerTrigger,
 } from "./components/Drawer";
 export type {
   DrawerProps,
@@ -54,6 +55,7 @@ export type {
   DrawerFooterProps,
   DrawerNavItemProps,
   DrawerSubItemProps,
+  DrawerTriggerProps,
   DrawerMenuItem,
   DrawerMenuSubItem,
 } from "./components/Drawer";

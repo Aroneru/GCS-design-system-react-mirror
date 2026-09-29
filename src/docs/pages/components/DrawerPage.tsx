@@ -1,5 +1,4 @@
 import { useState, type ReactNode } from 'react'
-import { BarsFromLeft } from '../../../lib/icons/outline'
 import {
     Cart,
     ChartPie,
@@ -8,10 +7,10 @@ import {
     Lock,
 } from 'flowbite-react-icons/solid'
 import {
-    Drawer,
     DrawerHeader,
     DrawerNavItem,
     DrawerSubItem,
+    DrawerTrigger,
     type DrawerMenuItem,
     type DrawerNavItemTheme,
 } from '../../../lib'
@@ -30,6 +29,11 @@ import {
 const menuThemes: { value: DrawerNavItemTheme; label: string }[] = [
     { value: 'primary', label: 'Primary' },
     { value: 'purple', label: 'Purple' },
+]
+
+const iconOptions = [
+    { value: 'true', label: 'Ada' },
+    { value: 'false', label: 'Tidak Ada' },
 ]
 
 const drawerProps: PropRow[] = [
@@ -63,6 +67,11 @@ const navItemProps: PropRow[] = [
     ['children', 'ReactNode', 'optional', 'Daftar DrawerSubItem ter-indentasi di bawah item.'],
 ]
 
+const triggerProps: PropRow[] = [
+    ['icon', 'ReactNode', '<BarsFromLeft />', 'Ikon kustom untuk tombol trigger (default icon hamburger 27x16px gray-500).'],
+    ['onClick', '() => void', 'optional', 'Fungsi callback saat tombol pemicu diklik untuk membuka Drawer.'],
+]
+
 const toc: TocEntry[] = [
     { id: 'variants', label: 'Variants' },
     { id: 'menu', label: 'Menu' },
@@ -73,16 +82,16 @@ const toc: TocEntry[] = [
 
 function DummyPageContent() {
     return (
-        <div className="flex-1 min-w-0 bg-white p-6 overflow-y-auto space-y-5">
-            <div className="space-y-2.5">
-                <div className="h-3.5 w-1/3 rounded-full bg-gray-100" />
-                <div className="h-2.5 w-full rounded-full bg-gray-100" />
-                <div className="h-2.5 w-11/12 rounded-full bg-gray-100" />
-                <div className="h-2.5 w-4/5 rounded-full bg-gray-100" />
-                <div className="h-2.5 w-3/4 rounded-full bg-gray-100" />
+        <div className="flex-1 min-w-0 bg-white p-6 overflow-y-auto space-y-6">
+            <div className="space-y-3">
+                <div className="h-4 w-1/3 rounded-full bg-gray-200" />
+                <div className="h-3.5 w-full rounded-full bg-gray-100" />
+                <div className="h-3.5 w-11/12 rounded-full bg-gray-100" />
+                <div className="h-3.5 w-4/5 rounded-full bg-gray-100" />
+                <div className="h-3.5 w-3/4 rounded-full bg-gray-100" />
             </div>
 
-            <div className="flex h-44 w-full items-center justify-center rounded-xl bg-gray-100/80 text-gray-300">
+            <div className="flex h-44 w-full shrink-0 items-center justify-center rounded-xl bg-gray-100/80 text-gray-300">
                 <svg
                     className="size-12 text-gray-300"
                     fill="currentColor"
@@ -97,13 +106,33 @@ function DummyPageContent() {
                 </svg>
             </div>
 
-            <div className="space-y-2.5">
-                <div className="h-2.5 w-full rounded-full bg-gray-100" />
-                <div className="h-2.5 w-11/12 rounded-full bg-gray-100" />
-                <div className="h-2.5 w-full rounded-full bg-gray-100" />
-                <div className="h-2.5 w-4/5 rounded-full bg-gray-100" />
-                <div className="h-2.5 w-3/4 rounded-full bg-gray-100" />
-                <div className="h-2.5 w-5/6 rounded-full bg-gray-100" />
+            <div className="space-y-3">
+                <div className="h-3.5 w-full rounded-full bg-gray-100" />
+                <div className="h-3.5 w-11/12 rounded-full bg-gray-100" />
+                <div className="h-3.5 w-full rounded-full bg-gray-100" />
+                <div className="h-3.5 w-4/5 rounded-full bg-gray-100" />
+                <div className="h-3.5 w-3/4 rounded-full bg-gray-100" />
+                <div className="h-3.5 w-5/6 rounded-full bg-gray-100" />
+            </div>
+
+            <div className="space-y-3">
+                <div className="h-4 w-1/4 rounded-full bg-gray-200" />
+                <div className="h-3.5 w-full rounded-full bg-gray-100" />
+                <div className="h-3.5 w-10/12 rounded-full bg-gray-100" />
+                <div className="h-3.5 w-4/5 rounded-full bg-gray-100" />
+                <div className="h-3.5 w-3/4 rounded-full bg-gray-100" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 shrink-0">
+                <div className="h-20 rounded-lg bg-gray-100" />
+                <div className="h-20 rounded-lg bg-gray-100" />
+            </div>
+
+            <div className="space-y-3">
+                <div className="h-3.5 w-full rounded-full bg-gray-100" />
+                <div className="h-3.5 w-11/12 rounded-full bg-gray-100" />
+                <div className="h-3.5 w-4/5 rounded-full bg-gray-100" />
+                <div className="h-3.5 w-2/3 rounded-full bg-gray-100" />
             </div>
         </div>
     )
@@ -119,13 +148,15 @@ function VariantPreview({
     children: ReactNode
 }) {
     return (
-        <article className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
-            <div className="border-b border-gray-200 px-4 py-3">
+        <article className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
+            <div className="shrink-0 border-b border-gray-200 bg-white px-4 py-3">
                 <h3 className="text-sm font-bold text-gray-900">{title}</h3>
                 <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
             </div>
-            <div className="h-[460px] w-full overflow-hidden bg-white flex flex-col relative">
-                {children}
+            <div className="flex h-[500px] w-full items-center justify-center bg-gray-50/80 py-4">
+                <div className="relative flex h-full w-[420px] max-w-full flex-col overflow-hidden rounded-none border-x border-gray-200 bg-white shadow-md">
+                    {children}
+                </div>
             </div>
         </article>
     )
@@ -133,14 +164,16 @@ function VariantPreview({
 
 function DrawerExampleCode({
     theme,
+    showIcons = true,
 }: {
     theme: DrawerNavItemTheme
+    showIcons?: boolean
 }) {
     return (
         <>
             {`import { Drawer } from '@ceplok-ui/design-kit-react'\n`}
-            {`import { ChartPie, FileLines, Cart, Inbox, Lock } from '@ceplok-ui/design-kit-react/icons/solid'\n\n`}
-            {'const [open, setOpen] = useState(true)\n\n'}
+            {showIcons && `import { ChartPie, FileLines, Cart, Inbox, Lock } from '@ceplok-ui/design-kit-react/icons/solid'\n`}
+            {`\nconst [open, setOpen] = useState(true)\n\n`}
             {'<Drawer\n'}
             {'  open={open}\n'}
             {'  onClose={() => setOpen(false)}\n'}
@@ -150,28 +183,64 @@ function DrawerExampleCode({
             {'  theme='}
             <H>{`"${theme}"`}</H>
             {'\n  items={[\n'}
-            {'    { icon: <ChartPie />, label: "Menu 1" },\n'}
-            {'    {\n'}
-            {'      icon: <FileLines />,\n'}
-            {'      label: "Menu 2",\n'}
-            {'      children: [{ label: "sub menu 1" }, { label: "sub menu 2" }],\n'}
-            {'    },\n'}
-            {'    {\n'}
-            {'      icon: <Cart />,\n'}
-            {'      label: "Menu 3",\n'}
-            {'      active: true,\n'}
-            {'      children: [\n'}
-            {'        { label: "sub menu 1", active: true },\n'}
-            {'        { label: "sub menu 2" },\n'}
-            {'        { label: "sub menu 3" },\n'}
-            {'      ],\n'}
-            {'    },\n'}
-            {'    { icon: <Inbox />, label: "Menu 4" },\n'}
-            {'    {\n'}
-            {'      icon: <Lock />,\n'}
-            {'      label: "Menu 5",\n'}
-            {'      children: [{ label: "sub menu 1" }, { label: "sub menu 2" }],\n'}
-            {'    },\n'}
+            {showIcons ? (
+                <>
+                    {'    { '}
+                    <H>{'icon: <ChartPie />'}</H>
+                    {', label: "Menu 1" },\n'}
+                    {'    {\n'}
+                    {'      '}
+                    <H>{'icon: <FileLines />'}</H>
+                    {',\n'}
+                    {'      label: "Menu 2",\n'}
+                    {'      children: [{ label: "sub menu 1" }, { label: "sub menu 2" }],\n'}
+                    {'    },\n'}
+                    {'    {\n'}
+                    {'      '}
+                    <H>{'icon: <Cart />'}</H>
+                    {',\n'}
+                    {'      label: "Menu 3",\n'}
+                    {'      active: true,\n'}
+                    {'      children: [\n'}
+                    {'        { label: "sub menu 1", active: true },\n'}
+                    {'        { label: "sub menu 2" },\n'}
+                    {'        { label: "sub menu 3" },\n'}
+                    {'      ],\n'}
+                    {'    },\n'}
+                    {'    { '}
+                    <H>{'icon: <Inbox />'}</H>
+                    {', label: "Menu 4" },\n'}
+                    {'    {\n'}
+                    {'      '}
+                    <H>{'icon: <Lock />'}</H>
+                    {',\n'}
+                    {'      label: "Menu 5",\n'}
+                    {'      children: [{ label: "sub menu 1" }, { label: "sub menu 2" }],\n'}
+                    {'    },\n'}
+                </>
+            ) : (
+                <>
+                    {'    { label: "Menu 1" },\n'}
+                    {'    {\n'}
+                    {'      label: "Menu 2",\n'}
+                    {'      children: [{ label: "sub menu 1" }, { label: "sub menu 2" }],\n'}
+                    {'    },\n'}
+                    {'    {\n'}
+                    {'      label: "Menu 3",\n'}
+                    {'      active: true,\n'}
+                    {'      children: [\n'}
+                    {'        { label: "sub menu 1", active: true },\n'}
+                    {'        { label: "sub menu 2" },\n'}
+                    {'        { label: "sub menu 3" },\n'}
+                    {'      ],\n'}
+                    {'    },\n'}
+                    {'    { label: "Menu 4" },\n'}
+                    {'    {\n'}
+                    {'      label: "Menu 5",\n'}
+                    {'      children: [{ label: "sub menu 1" }, { label: "sub menu 2" }],\n'}
+                    {'    },\n'}
+                </>
+            )}
             {'  ]}\n'}
             {'/>'}
         </>
@@ -181,6 +250,7 @@ function DrawerExampleCode({
 export function DrawerPage() {
     const [openPlayground, setOpenPlayground] = useState(true)
     const [playgroundTheme, setPlaygroundTheme] = useState<DrawerNavItemTheme>('primary')
+    const [showIcons, setShowIcons] = useState<boolean>(true)
     const [expandedMenu2, setExpandedMenu2] = useState(false)
     const [expandedMenu3, setExpandedMenu3] = useState(true)
     const [expandedMenu5, setExpandedMenu5] = useState(false)
@@ -229,10 +299,21 @@ export function DrawerPage() {
                         title="1. Drawer Terbuka (Open Drawer)"
                         description="Drawer muncul dari sisi kanan secara mengambang (overlay) di atas tampilan layar mobile."
                     >
-                        <DummyPageContent />
+                        <div className="flex flex-col w-full h-full">
+                            <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3.5">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-xs font-bold text-white">
+                                        C
+                                    </div>
+                                    <span className="text-base font-bold tracking-tight text-gray-900">CEPLOK</span>
+                                </div>
+                                <DrawerTrigger />
+                            </div>
+                            <DummyPageContent />
+                        </div>
                         <div className="absolute inset-0 bg-gray-900/20 z-10 pointer-events-none" />
                         <div className="absolute right-0 top-0 bottom-0 w-[250px] h-full border-l border-gray-200 bg-white flex flex-col rounded-none z-20 shadow-2xl">
-                            <DrawerHeader eyebrow="MENU" showCloseButton={false} />
+                            <DrawerHeader eyebrow="MENU" />
                             <div className="p-3 space-y-1 flex-1 overflow-y-auto">
                                 <DrawerNavItem icon={<ChartPie className="size-5" />} label="Menu 1" theme={playgroundTheme} />
                                 <DrawerNavItem
@@ -284,20 +365,14 @@ export function DrawerPage() {
                         description="Tampilan utama layar mobile dengan topbar header dan icon hamburger drawer di bagian kanan."
                     >
                         <div className="flex flex-col w-full h-full">
-                            <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 bg-white shrink-0">
-                                <div className="flex items-center gap-2">
-                                    <div className="flex size-6 items-center justify-center rounded-lg bg-primary-600 text-white font-bold text-[10px]">
+                            <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3.5">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-xs font-bold text-white">
                                         C
                                     </div>
-                                    <span className="text-xs font-bold text-gray-900 tracking-tight">Ceplok UI</span>
+                                    <span className="text-base font-bold tracking-tight text-gray-900">CEPLOK</span>
                                 </div>
-                                <button
-                                    type="button"
-                                    className="p-1 rounded-lg text-slate-700 hover:bg-gray-100 transition-colors focus:outline-none shrink-0"
-                                    aria-label="Hamburger menu"
-                                >
-                                    <BarsFromLeft className="size-5 text-slate-700" />
-                                </button>
+                                <DrawerTrigger />
                             </div>
                             <DummyPageContent />
                         </div>
@@ -372,25 +447,18 @@ export function DrawerPage() {
             <FlowSection id="playground" title="Playground">
                 <Lead>Uji coba perilaku dan variasi konfigurasi Drawer secara langsung pada tampilan mobile.</Lead>
 
-                <div className="flex h-[520px] justify-center overflow-hidden rounded-2xl border border-border bg-surface-subtle">
-                    {/* Mobile Screen Canvas - Full height setinggi Stage container */}
-                    <div className="relative flex h-full w-[340px] flex-col overflow-hidden rounded-none border-x border-gray-200 bg-white shadow-md">
+                <div className="flex h-[580px] w-full items-center justify-center py-4 overflow-hidden rounded-2xl border border-border bg-gray-50/80">
+                    {/* Mobile Screen Canvas */}
+                    <div className="relative flex h-full w-[420px] max-w-full flex-col overflow-hidden rounded-none border-x border-gray-200 bg-white shadow-md">
                         {/* Topbar Header */}
-                        <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
-                            <div className="flex items-center gap-2">
-                                <div className="flex size-6 items-center justify-center rounded-lg bg-primary-600 text-[10px] font-bold text-white">
+                        <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3.5">
+                            <div className="flex items-center gap-2.5">
+                                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-xs font-bold text-white">
                                     C
                                 </div>
-                                <span className="text-xs font-bold tracking-tight text-gray-900">Ceplok UI</span>
+                                <span className="text-base font-bold tracking-tight text-gray-900">CEPLOK</span>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => setOpenPlayground(!openPlayground)}
-                                className="shrink-0 rounded-lg p-1 text-slate-700 transition-colors hover:bg-gray-100 focus:outline-none"
-                                aria-label="Toggle drawer"
-                            >
-                                <BarsFromLeft className="size-5 text-slate-700" />
-                            </button>
+                            <DrawerTrigger onClick={() => setOpenPlayground(!openPlayground)} />
                         </div>
 
                         {/* Mobile Page Content */}
@@ -409,7 +477,7 @@ export function DrawerPage() {
                                         {playgroundItems.map((item, index) => (
                                             <DrawerNavItem
                                                 key={index}
-                                                icon={item.icon}
+                                                icon={showIcons ? item.icon : undefined}
                                                 label={item.label}
                                                 active={item.active}
                                                 expanded={index === 1 ? expandedMenu2 : index === 2 ? expandedMenu3 : index === 4 ? expandedMenu5 : false}
@@ -446,6 +514,14 @@ export function DrawerPage() {
                             options={menuThemes}
                         />
                     </Control>
+                    <Control label="icons">
+                        <Segmented
+                            label="icons"
+                            value={showIcons ? 'true' : 'false'}
+                            onChange={(val) => setShowIcons(val === 'true')}
+                            options={iconOptions}
+                        />
+                    </Control>
                 </Controls>
             </FlowSection>
 
@@ -454,7 +530,7 @@ export function DrawerPage() {
                 <Lead>Praktik terbaik dan panduan integrasi Drawer dalam aplikasi React.</Lead>
 
                 <SectionCode>
-                    <DrawerExampleCode theme={playgroundTheme} />
+                    <DrawerExampleCode theme={playgroundTheme} showIcons={showIcons} />
                 </SectionCode>
             </FlowSection>
 
@@ -475,6 +551,11 @@ export function DrawerPage() {
                     <div>
                         <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DrawerNavItem Props</h3>
                         <PropsTable rows={navItemProps} />
+                    </div>
+
+                    <div>
+                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DrawerTrigger Props</h3>
+                        <PropsTable rows={triggerProps} />
                     </div>
                 </div>
             </FlowSection>
