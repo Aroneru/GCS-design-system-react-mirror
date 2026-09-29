@@ -97,7 +97,7 @@ const tones: Record<DropdownItemTone, string> = {
 
 
 /** Jarak panel dari tombol dan dari tepi layar, dalam piksel. */
-const JARAK = 8
+const JARAK = 4
 
 /** Jeda antar-ketikan yang masih dianggap satu kata saat melompat ke baris. */
 const JEDA_KETIK = 500
