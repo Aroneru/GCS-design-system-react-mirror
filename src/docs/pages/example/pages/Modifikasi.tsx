@@ -1,15 +1,18 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import {
   Alert,
   Badge,
   Button,
   Card,
+  Checkbox,
   Container,
   Icon,
   InputField,
   Popover,
+  Select,
   Spinner,
   TextArea,
+  Toggle,
 } from '../../../../lib'
 import { Check, Edit, Plus, Search, TrashBin } from '../../../../lib/icons/outline'
 import { asset } from '../../../asset'
@@ -19,7 +22,11 @@ import { asset } from '../../../asset'
  *
  * Menunjukkan tiga tingkat penyesuaian yang tersedia tanpa menyentuh kode
  * library: memilih varian yang sudah disediakan, menyusun ulang lewat slot
- * (`actions`, `icon`), dan menimpa tampilan lewat `className`.
+ * (`toolbar`, `actions`, `icon`), dan menimpa tampilan lewat `className`.
+ *
+ * Tiga bagian terakhir keluar dari tangga itu dan berdiri sendiri: mengatur
+ * lebar lewat Container, menempelkan gerak dari luar, dan menimpa token warna
+ * pada satu bagian halaman saja.
  *
  * Perlu dicatat soal `className`: `cn()` di library ini clsx murni, bukan
  * tailwind-merge. Kelas yang bertabrakan tidak saling menggantikan — keduanya
@@ -32,6 +39,45 @@ const TEMA = ['primary', 'green', 'gray', 'simaya', 'orange', 'yellow'] as const
 const UKURAN = ['xs', 's', 'base', 'l', 'xl'] as const
 const VARIAN_BADGE = ['gray', 'brand', 'success', 'warning', 'danger'] as const
 
+/** Isi dropdown di bagian 5. Isinya tidak penting — yang diperagakan panahnya. */
+const PILIHAN = [
+  { value: 'ktp', label: 'Perekaman KTP' },
+  { value: 'kk', label: 'Kartu Keluarga' },
+  { value: 'akta', label: 'Akta Kelahiran' },
+]
+
+/**
+ * Gerak untuk panah Select, ditempelkan lewat `className`.
+ *
+ * Panahnya digambar komponen sebagai `<svg>` di dalam `<span>` tepat setelah
+ * `<select>`; itulah yang dijangkau `select~span_svg`. Menjangkau ke dalam
+ * markup komponen seperti ini yang paling rapuh di halaman ini — begitu
+ * susunannya berubah, gerakannya diam-diam berhenti tanpa ada yang gagal
+ * dikompilasi.
+ *
+ * Ditulis terpisah, bukan berderet di JSX, supaya ketiga kelasnya terbaca
+ * satu per satu. Tailwind memindai nama kelas secara harfiah, dan tiap kelas
+ * di sini tetap utuh dalam satu string.
+ */
+const PANAH_BERANIMASI =
+  '[&_select~span_svg]:transition-transform ' +
+  '[&_select~span_svg]:duration-300 ' +
+  '[&:has(select:focus)_select~span_svg]:rotate-180'
+
+/**
+ * Token `primary` versi hijau untuk bagian 6.
+ *
+ * Hanya tiga nilai yang benar-benar dipakai komponen di bawah yang ditimpa;
+ * sisanya tetap mewarisi yang asli. Itu memang cukup — dan sekaligus jadi
+ * peringatan: menimpa setengah tangga warna bisa memutus kontrasnya kalau
+ * komponen lain ikut masuk ke dalam pembungkus yang sama.
+ */
+const HIJAU = {
+  '--color-primary-50': '#f0fdf4',
+  '--color-primary-700': '#15803d',
+  '--color-primary-800': '#166534',
+} as CSSProperties
+
 /**
  * Isi toolbar editor buatan sendiri. Hurufnya sengaja diberi gaya sesuai
  * artinya — tebal, miring, coret — supaya bedanya dengan tujuh ikon bawaan
@@ -42,6 +88,22 @@ const ALAT = [
   { huruf: 'I', gaya: 'italic', nama: 'Miring' },
   { huruf: 'S', gaya: 'line-through', nama: 'Coret' },
 ]
+
+/**
+ * Empat komponen yang warnanya sama-sama datang dari token `primary`, dan
+ * tak satu pun punya prop untuk menggantinya. Dirender dua kali di bagian 6
+ * — sekali dengan token bawaan, sekali di dalam pembungkus yang menimpanya.
+ */
+function ContohToken() {
+  return (
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+      <Button size="s">Simpan</Button>
+      <Badge variant="brand">Aktif</Badge>
+      <Toggle defaultChecked label="Notifikasi" />
+      <Checkbox defaultChecked label="Setuju" />
+    </div>
+  )
+}
 
 function Blok({
   judul,
@@ -70,10 +132,21 @@ export function Modifikasi() {
 
   return (
     <div className="space-y-8">
-      <Alert variant="info" heading="Tiga cara menyesuaikan" dismissible={false}>
-        Varian bawaan, slot, lalu <code className="font-mono text-xs">className</code> — dalam urutan
-        itu. Menyentuh kode library sebaiknya jadi pilihan terakhir, karena perubahannya hilang di
-        pembaruan paket berikutnya.
+      <Alert variant="info" heading="Enam contoh cara menyesuaikan" dismissible={false}>
+        <p>
+          Tiga yang pertama satu tangga: varian bawaan, slot, lalu{' '}
+          <code className="font-mono text-xs">className</code> — dalam urutan itu, karena tiap
+          anak tangga lebih rapuh dari yang di atasnya.
+        </p>
+        {/* Jaraknya ditulis sendiri: preflight Tailwind menihilkan margin <p>. */}
+        <p className="mt-2">
+          Tiga sisanya berdiri sendiri: lebar lewat Container, gerak dari luar, dan token warna
+          yang ditimpa setempat. 
+        </p>
+        <p className="mt-2">
+          Menyentuh kode library tetap pilihan terakhir — perubahannya hilang di pembaruan 
+          paket berikutnya.
+        </p>
       </Alert>
 
       {/* ── 1. Varian bawaan ── */}
@@ -388,6 +461,119 @@ import { TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
             </Container>
           ))}
         </div>
+
+        <pre className="mt-5 overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
+          {`import { Container } from '@ceplok-ui/design-kit-react'
+
+// Empat batas lebar; isinya tidak perlu tahu angkanya.
+<Container size="prose">…</Container>   // 720px  — teks panjang & formulir
+<Container>…</Container>                // 1126px — bawaan
+<Container size="wide">…</Container>    // 1440px — tabel & dasbor
+<Container size="full">…</Container>    // selebar induknya
+
+// Jarak sisinya ikut melebar bersama layar (20px → 56px). Matikan bila
+// induknya sudah punya jarak sendiri — seperti keempat contoh di atas.
+<Container size="wide" padded={false}>
+  <Tabel />
+</Container>
+
+// as mengganti tag yang dirender, jadi Container bisa langsung menjadi
+// elemen semantiknya alih-alih menambah satu <div> pembungkus lagi.
+<Container as="main" size="prose">
+  <Artikel />
+</Container>`}
+        </pre>
+      </Blok>
+
+      {/* ── 5. Animasi ── */}
+      <Blok
+        judul="5. Menempelkan animasi"
+        catatan="Komponen kit ini tidak membawa gerak apa pun. Transisi bisa ditempelkan dari luar lewat className, tanpa menyentuh kode di dalamnya."
+      >
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Select label="panah bawaan" placeholder="Pilih layanan" options={PILIHAN} />
+          <Select
+            label="panah beranimasi"
+            placeholder="Pilih layanan"
+            options={PILIHAN}
+            className={PANAH_BERANIMASI}
+          />
+        </div>
+
+        <pre className="mt-5 overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
+          {`import { Select } from '@ceplok-ui/design-kit-react'
+
+// Panahnya <svg> di dalam <span> tepat setelah <select>.
+const PANAH_BERANIMASI =
+  '[&_select~span_svg]:transition-transform ' +
+  '[&_select~span_svg]:duration-300 ' +
+  '[&:has(select:focus)_select~span_svg]:rotate-180'
+
+<Select label="Layanan" options={pilihan} className={PANAH_BERANIMASI} />`}
+        </pre>
+
+        <p className="mt-4 text-body-sm text-gray-500">
+          Panahnya mengikuti <strong>fokus</strong>, bukan terbuka atau tertutupnya daftar:
+          peramban tidak memberi tahu CSS kapan daftar bawaan sistem sedang terbentang. Jadi
+          setelah Anda memilih, panahnya tetap menghadap ke atas selama field-nya masih
+          difokus. Itu batas yang melekat pada <code className="font-mono text-xs">&lt;select&gt;</code>
+          asli, dan menukarnya dengan dropdown buatan sendiri berarti kehilangan papan tombol
+          serta pemilih bawaan ponsel — harga yang jauh lebih mahal daripada panah yang
+          telat berbalik.
+        </p>
+      </Blok>
+
+      {/* ── 6. Token ── */}
+      <Blok
+        judul="6. Menimpa token pada satu bagian saja"
+        catatan="Setiap warna kit ini dibaca lewat CSS variable. Menimpanya di satu pembungkus mengganti semua komponen di dalamnya sekaligus — termasuk yang tidak punya prop warna."
+      >
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="rounded-xl bg-surface-subtle p-6">
+            <p className="text-caption font-bold tracking-wide text-gray-500 uppercase">Token bawaan</p>
+            <div className="mt-4">
+              <ContohToken />
+            </div>
+          </div>
+
+          {/*
+            Pembungkus yang sama persis, hanya diberi tiga nilai token. Tak satu
+            pun komponen di dalamnya menerima prop warna.
+          */}
+          <div style={HIJAU} className="rounded-xl bg-surface-subtle p-6">
+            <p className="text-caption font-bold tracking-wide text-gray-500 uppercase">--color-primary-* ditimpa</p>
+            <div className="mt-4">
+              <ContohToken />
+            </div>
+          </div>
+        </div>
+
+        <pre className="mt-5 overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
+          {`import { Badge, Button, Checkbox, Toggle } from '@ceplok-ui/design-kit-react'
+
+// Semua warna kit dibaca lewat var(--color-*), jadi menimpanya di satu
+// pembungkus mengubah seluruh isinya — tanpa satu prop pun berubah.
+<div
+  style={{
+    '--color-primary-50': '#f0fdf4',
+    '--color-primary-700': '#15803d',
+    '--color-primary-800': '#166534',
+  } as CSSProperties}
+>
+  <Button>Simpan</Button>
+  <Badge variant="brand">Aktif</Badge>
+  <Toggle defaultChecked label="Notifikasi" />
+  <Checkbox defaultChecked label="Setuju" />
+</div>`}
+        </pre>
+
+        <p className="mt-4 text-body-sm text-gray-500">
+          Berbeda dengan <code className="font-mono text-xs">theme</code> di bagian 1, cara ini
+          menjangkau komponen yang memang <em>tidak punya</em> prop warna — Toggle, Checkbox,
+          dan Badge di atas tidak menerima satu pun prop di sini. Timpa tokennya di
+          <code className="font-mono text-xs">:root</code> kalau seluruh aplikasi memang berganti
+          warna; pakai pembungkus seperti ini kalau yang berganti hanya satu bagian halaman.
+        </p>
       </Blok>
     </div>
   )

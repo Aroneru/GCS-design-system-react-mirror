@@ -33,6 +33,7 @@ import { AvatarPage } from "./docs/pages/components/AvatarPage";
 import { BadgePage } from "./docs/pages/components/BadgePage";
 import { SpinnerPage } from "./docs/pages/components/SpinnerPage";
 import { PopoverPage } from "./docs/pages/components/PopoverPage";
+import { DropdownPage } from "./docs/pages/components/DropdownPage";
 import { ModalPage } from "./docs/pages/components/ModalPage";
 import { DrawerPage } from "./docs/pages/components/DrawerPage";
 import { AlertPage } from "./docs/pages/components/AlertPage";
@@ -80,6 +81,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/badge": BadgePage,
   "/components/spinner": SpinnerPage,
   "/components/popover": PopoverPage,
+  "/components/dropdown": DropdownPage,
   "/components/modal": ModalPage,
   "/components/drawer": DrawerPage,
   "/components/alert": AlertPage,

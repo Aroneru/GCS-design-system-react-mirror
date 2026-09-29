@@ -1,5 +1,11 @@
 import { useState } from 'react'
-import { Select, type SelectApplication, type SelectOption, type SelectState } from '../../../lib'
+import {
+  Select,
+  type SelectApplication,
+  type SelectMenuMode,
+  type SelectOption,
+  type SelectState,
+} from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Segmented } from '../../pageKit'
 import {
@@ -33,6 +39,7 @@ const selectProps: PropRow[] = [
   ['helperText', 'ReactNode', 'undefined', 'Caption di bawah field.'],
   ['placeholder', 'string', 'undefined', 'Teks saat belum ada pilihan, mis. "Pilih Apapun Itu".'],
   ['options', 'SelectOption[]', 'undefined', 'Daftar pilihan { value, label, disabled }. Bila kosong, children yang dipakai.'],
+  ['menu', "'native' | 'panel'", 'native', 'Bentuk daftar pilihan: popup bawaan sistem, atau panel bergaya kit. Perlu options.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna ikon info dan garis saat difokus.'],
   ['…props', 'SelectHTMLAttributes', '—', 'Seluruh atribut <select> standar diteruskan (value, onChange, required, name, …).'],
@@ -42,6 +49,7 @@ const toc: TocEntry[] = [
   { id: 'select-input', label: 'Select Input' },
   { id: 'state', label: 'State' },
   { id: 'application', label: 'Application' },
+  { id: 'daftar', label: 'Daftar pilihan' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -53,6 +61,7 @@ export function SelectPage() {
   const [withInfo, setWithInfo] = useState(true)
   const [withHelper, setWithHelper] = useState(true)
   const [narrow, setNarrow] = useState(false)
+  const [menu, setMenu] = useState<SelectMenuMode>('native')
   const [value, setValue] = useState('')
 
   return (
@@ -171,6 +180,40 @@ export function SelectPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="daftar" title="Daftar pilihan">
+        <Lead>
+          Prop <H>menu</H> menentukan bentuk daftar pilihannya. Bawaannya <H>native</H>: popup milik
+          sistem operasi — paling ringan, dan di ponsel muncul sebagai pemilih layar penuh yang sudah
+          dikenal semua orang. Bentuk <H>panel</H> menggantinya dengan panel yang sama persis dengan
+          Dropdown, untuk halaman yang tampilannya harus seragam sampai ke daftar pilihan.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="native">
+            <Select label="Label" placeholder="Pilih Apapun Itu" options={provinsi} />
+          </Demo>
+          <Demo label="panel">
+            <Select menu="panel" label="Label" placeholder="Pilih Apapun Itu" options={provinsi} />
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Select '}
+          <H>menu</H>
+          {'="panel" label="Label" placeholder="Pilih Apapun Itu" options={provinsi} />'}
+        </SectionCode>
+        <p className="mt-4 text-body-sm text-gray-500">
+          Yang berpindah hanya rupanya. Di balik keduanya tetap ada elemen <H>&lt;select&gt;</H> yang
+          sama, jadi <H>value</H>, <H>onChange</H>, <H>name</H>, dan pengiriman formulir bekerja persis
+          sama — berganti bentuk tidak menuntut satu baris pun perubahan pada kode Anda. Di dalam panel,
+          pilihan ditelusuri dengan panah, Home/End, atau dengan mengetik huruf awalnya, seperti pada
+          popup bawaan.
+        </p>
+        <p className="mt-2 text-body-sm text-gray-500">
+          Bentuk panel memerlukan <H>options</H>. Bila daftar pilihannya Anda tulis sendiri sebagai
+          <H>&lt;option&gt;</H>, komponen tidak punya cara membacanya, jadi ia tetap memakai popup
+          bawaan — bukan gagal, hanya kembali ke bentuk yang selalu bisa.
+        </p>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
@@ -181,6 +224,7 @@ export function SelectPage() {
           <Select
             application={application}
             state={state}
+            menu={menu}
             label="Label"
             info={withInfo ? 'Keterangan singkat tentang isian ini.' : undefined}
             placeholder="Pilih Apapun Itu"
@@ -210,6 +254,18 @@ export function SelectPage() {
               options={[
                 { value: 'default', label: 'Default' },
                 { value: 'inactive', label: 'Inactive' },
+              ]}
+            />
+          </Control>
+
+          <Control label="Daftar pilihan">
+            <Segmented
+              label="Pilih bentuk daftar"
+              value={menu}
+              onChange={setMenu}
+              options={[
+                { value: 'native', label: 'Native' },
+                { value: 'panel', label: 'Panel' },
               ]}
             />
           </Control>
@@ -272,6 +328,13 @@ export function SelectPage() {
               {'    '}
               <H>application</H>
               {`="${application}"\n`}
+            </>
+          )}
+          {menu !== 'native' && (
+            <>
+              {'    '}
+              <H>menu</H>
+              {'="panel"\n'}
             </>
           )}
           {'    label="Label"\n'}

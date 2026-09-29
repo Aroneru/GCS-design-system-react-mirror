@@ -103,6 +103,7 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: "Avatar", route: "/components/avatar" },
       { label: "Spinner", route: "/components/spinner" },
       { label: "Popover", route: "/components/popover" },
+      { label: "Dropdown", route: "/components/dropdown" },
       { label: "Modal", route: "/components/modal" },
       { label: "Drawer", route: "/components/drawer" },
       { label: "Alert", route: "/components/alert" },

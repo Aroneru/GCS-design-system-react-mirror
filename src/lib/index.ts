@@ -23,14 +23,16 @@ export type { SpinnerProps, SpinnerSize } from "./components/Spinner";
 export { Popover } from "./components/Popover";
 export type { PopoverProps, PopoverSide } from "./components/Popover";
 
-export { Modal, ModalHeader, ModalBody, ModalFooter } from "./components/Modal";
+export { Dropdown } from "./components/Dropdown";
 export type {
-  ModalProps,
-  ModalSize,
-  ModalHeaderProps,
-  ModalBodyProps,
-  ModalFooterProps,
-} from "./components/Modal";
+  DropdownProps,
+  DropdownItem,
+  DropdownGroup,
+  DropdownItemTone,
+} from "./components/Dropdown";
+
+export { Modal } from "./components/Modal";
+export type { ModalProps, ModalSize } from "./components/Modal";
 
 export {
   Drawer,
@@ -106,6 +108,7 @@ export type {
   SelectOption,
   SelectState,
   SelectApplication,
+  SelectMenuMode,
 } from "./components/Select";
 
 export { Search } from "./components/Search";
@@ -114,6 +117,7 @@ export type {
   SearchCategory,
   SearchPlatform,
   SearchApplication,
+  SearchMenuMode,
 } from "./components/Search";
 
 export { Upload } from "./components/Upload";

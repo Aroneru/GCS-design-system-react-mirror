@@ -4,9 +4,6 @@ import {
   Button,
   Card,
   Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
   Toast,
 } from '../../../../lib'
 import { asset } from '../../../asset'
@@ -50,38 +47,37 @@ export function Layanan() {
       <Modal
         open={dipilih !== null}
         onClose={() => setDipilih(null)}
-        aria-label="Konfirmasi pengajuan layanan"
+        title={layanan?.judul ?? 'Ajukan layanan'}
+        footer={
+          <>
+            <Button variant="outline" theme="gray" size="xs" onClick={() => setDipilih(null)}>
+              Batal
+            </Button>
+            <Button
+              size="xs"
+              onClick={() => {
+                setDipilih(null)
+                setTerkirim(true)
+              }}
+            >
+              Lanjutkan
+            </Button>
+          </>
+        }
       >
-        <ModalHeader>{layanan?.judul ?? 'Ajukan layanan'}</ModalHeader>
-        <ModalBody>
-          <p>{layanan?.deskripsi}</p>
-          <dl className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-surface-subtle p-4">
-            <div>
-              <dt className="text-caption font-bold tracking-wide text-gray-500 uppercase">
-                Estimasi
-              </dt>
-              <dd className="mt-1 text-body-sm font-bold text-gray-900">{layanan?.durasi}</dd>
-            </div>
-            <div>
-              <dt className="text-caption font-bold tracking-wide text-gray-500 uppercase">Biaya</dt>
-              <dd className="mt-1 text-body-sm font-bold text-gray-900">{layanan?.biaya}</dd>
-            </div>
-          </dl>
-        </ModalBody>
-        <ModalFooter>
-          <Button variant="outline" theme="gray" size="xs" onClick={() => setDipilih(null)}>
-            Batal
-          </Button>
-          <Button
-            size="xs"
-            onClick={() => {
-              setDipilih(null)
-              setTerkirim(true)
-            }}
-          >
-            Lanjutkan
-          </Button>
-        </ModalFooter>
+        <p>{layanan?.deskripsi}</p>
+        <dl className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-surface-subtle p-4">
+          <div>
+            <dt className="text-caption font-bold tracking-wide text-gray-500 uppercase">
+              Estimasi
+            </dt>
+            <dd className="mt-1 text-body-sm font-bold text-gray-900">{layanan?.durasi}</dd>
+          </div>
+          <div>
+            <dt className="text-caption font-bold tracking-wide text-gray-500 uppercase">Biaya</dt>
+            <dd className="mt-1 text-body-sm font-bold text-gray-900">{layanan?.biaya}</dd>
+          </div>
+        </dl>
       </Modal>
 
       {terkirim && (
