@@ -28,13 +28,25 @@ publik baru, dan satu perubahan yang memutus.
 - **`Avatar`** — lingkaran identitas berisi foto (`src`) atau inisial
   (`initials`) dalam tiga ukuran lewat `size` (`small` 24px, `default` 32px,
   `large` 80px). Gambar yang gagal dimuat jatuh sendiri ke inisial.
-- **`Dropdown`** — panel aksi yang dibuka dari sebuah tombol (`trigger`),
-  memakai HTML Popover API sehingga browser yang mengurus penutupan, top layer,
-  dan urutan fokus. Aksinya diisi lewat `items`, atau `groups` bila perlu
-  dipisah — `separator` di sana artinya sama persis dengan pada Sidebar. Panel
-  yang isinya bukan daftar aksi diisi lewat `children` dan diberi jarak lewat
-  `contentClassName`. Tipe pendukung `DropdownItem` dan `DropdownGroup` ikut
-  diekspor.
+- **`Dropdown`** — panel yang dibuka dari sebuah tombol (`trigger`), memakai
+  HTML Popover API sehingga browser yang mengurus penutupan, top layer, dan
+  urutan fokus. Barisnya diisi lewat `items`, atau `groups` bila perlu dipisah
+  — `separator` di sana artinya sama persis dengan pada Sidebar. Panel yang
+  isinya bukan daftar baris diisi lewat `children` dan diberi jarak lewat
+  `contentClassName`.
+
+  Punya dua peran. Bawaannya menu aksi: tiap baris sebuah tombol atau tautan,
+  ditelusuri dengan Tab. Begitu ada baris yang memakai `selected`, ia jadi
+  daftar pilihan — `listbox` berisi `option` yang ditelusuri dengan panah,
+  Home/End, atau dengan mengetik huruf awalnya. Rupa panelnya sama persis di
+  kedua peran; `selected` menandai baris aktif bagi pembaca layar dan menaruh
+  fokus di sana saat panel dibuka, tanpa warna baru. Prop `attached` menempelkannya
+  pada tombol pemicunya: selebar tombol itu, dan ikut bergerak saat halaman
+  digulir. `contentLabel` memberi panelnya nama bagi pembaca layar. Ketiga prop
+  itulah yang dipakai Select dan Search untuk daftar pilihannya, jadi panel
+  melayang di seluruh kit ini hanya ada satu.
+
+  Tipe pendukung `DropdownItem` dan `DropdownGroup` ikut diekspor.
 - **`Modal`** — dialog berbasis elemen `<dialog>` native, jadi top layer,
   penguncian fokus, dan latar inert diurus browser. Dikendalikan lewat `open` +
   `onClose`. Susunannya diisi prop — `title` untuk header, `children` untuk
@@ -45,7 +57,18 @@ publik baru, dan satu perubahan yang memutus.
 - **`Search`** — kolom pencarian dengan tombol cari. Dua ukuran lewat
   `platform` (`default` 54px, `mobile` 50px). Mengisi prop `categories` akan
   mengubahnya jadi varian tiga ruas: dropdown kategori, isian, lalu tombol
-  ikon. Tipe pendukung `SearchCategory` ikut diekspor.
+  ikon, dan `categoryMenu` memilih bentuk daftar kategorinya — popup bawaan
+  sistem, atau panel Dropdown. Tipe pendukung `SearchCategory` dan
+  `SearchMenuMode` ikut diekspor.
+- **`Select`: prop `menu`.** `native` — bawaannya — memakai popup milik sistem
+  operasi seperti selama ini; `panel` menggantinya dengan panel Dropdown, untuk
+  halaman yang tampilannya harus seragam sampai ke daftar pilihan. Di balik
+  keduanya tetap ada elemen `<select>` yang sama, jadi `value`, `onChange`,
+  `name`, dan pengiriman formulir bekerja persis sama — berganti bentuk tidak
+  menuntut satu baris pun perubahan lain. Bentuk `panel` memerlukan `options`;
+  daftar yang ditulis sendiri sebagai `<option>` tidak bisa dibaca komponen,
+  jadi di situ ia tetap memakai popup bawaan. Tipe `SelectMenuMode` ikut
+  diekspor.
 - **`Sidebar`** — navigasi samping dengan menu tunggal (`items`) atau
   terkelompok (`groups`), submenu, area profil (`user`), dan mode ringkas
   (`collapsed` + `onCollapse`). Tipe pendukung `SidebarItem`, `SidebarSubItem`,
