@@ -1,11 +1,16 @@
 import {
+  cloneElement,
   forwardRef,
+  isValidElement,
   useCallback,
   useEffect,
   useId,
   useRef,
+  useState,
+  type ButtonHTMLAttributes,
   type DialogHTMLAttributes,
   type MouseEvent,
+  type ReactElement,
   type ReactNode,
   type SyntheticEvent,
 } from 'react'
@@ -13,37 +18,40 @@ import { Close } from 'flowbite-react-icons/outline'
 import { cn } from '../utils/cn'
 
 export type ModalSize = 's' | 'm'
+export type ModalVariant = 'default' | 'popup'
 
-export interface ModalProps
+interface ModalCommonProps
   extends Omit<
     DialogHTMLAttributes<HTMLDialogElement>,
     'open' | 'onClose' | 'onCancel' | 'title'
   > {
-  /** Sumber kebenaran buka/tutup. Modal ini terkendali sepenuhnya. */
-  open: boolean
-  /**
-   * Dipanggil setiap kali modal minta ditutup — tombol tutup, Escape, atau
-   * klik di luar panel. Consumer yang memutuskan apakah `open` ikut berubah.
-   */
-  onClose: () => void
+  /** Tombol milik consumer yang membuka Modal. */
+  trigger: ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>
+  /** Nama aksesibel tombol tutup. */
+  closeLabel?: string
+  /** Isi modal. */
+  children?: ReactNode
+  /** Area aksi, atau render function yang menerima fungsi penutup Modal. */
+  footer?: ReactNode | ((actions: { close: () => void }) => ReactNode)
+}
+
+interface ModalDefaultProps extends ModalCommonProps {
+  variant?: 'default'
   size?: ModalSize
   /**
    * Judul di header. Sekaligus jadi nama aksesibilitas dialognya, kecuali
    * `aria-label` atau `aria-labelledby` diisi sendiri.
    */
   title?: ReactNode
-  /**
-   * Tombol tutup di kanan header. Matikan bila modalnya harus diselesaikan
-   * lewat tombol di footer — misalnya konfirmasi yang tak boleh dilewati.
-   */
-  dismissible?: boolean
-  /** Nama aksesibel tombol tutup. */
-  closeLabel?: string
-  /** Baris tombol di kaki modal. */
-  footer?: ReactNode
-  /** Isi modal. */
-  children?: ReactNode
 }
+
+interface ModalPopupProps extends ModalCommonProps {
+  variant: 'popup'
+  size?: never
+  title?: never
+}
+
+export type ModalProps = ModalDefaultProps | ModalPopupProps
 
 const sizes: Record<ModalSize, string> = {
   s: 'max-w-[416px]',
@@ -53,23 +61,19 @@ const sizes: Record<ModalSize, string> = {
 /**
  * Modal — dialog di atas halaman, berbasis elemen `<dialog>` bawaan.
  *
- * Susunannya ditentukan prop, bukan subkomponen: `title` mengisi header,
- * `children` mengisi badan, `footer` mengisi kakinya. Itu mengikuti komponen
- * lain di kit ini — Alert punya `heading` + `actions`, Card punya `title` +
- * `description` + `actions` — sehingga tidak ada satu komponen pun yang
- * dipakai dengan cara yang berbeda dari tetangganya.
+ * Pada variant default, `title` mengisi header, `children` mengisi badan, dan
+ * `footer` mengisi kakinya. Variant popup memakai `children` untuk konten
+ * ringkas dan menampilkan footer tanpa divider.
  *
- * `open` tetap sumber kebenaran. Peramban yang mengurus top layer, latar yang
- * ikut mati, dan jebakan fokus; `onClose` hanya MEMINTA consumer memperbarui
- * `open` — Escape maupun klik di luar panel tidak menutupnya sendiri.
+ * Modal mengurus visibilitas internal dan `trigger` membukanya. Peramban tetap
+ * mengurus top layer, latar yang ikut mati, dan jebakan fokus.
  */
 export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   {
-    open,
-    onClose,
-    size = 's',
+    trigger,
+    variant = 'default',
+    size,
     title,
-    dismissible = true,
     closeLabel = 'Tutup modal',
     footer,
     className,
@@ -83,6 +87,15 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
 ) {
   const internalRef = useRef<HTMLDialogElement | null>(null)
   const titleId = useId()
+  const isPopup = variant === 'popup'
+  const [internalOpen, setInternalOpen] = useState(false)
+  const requestOpen = useCallback(() => {
+    setInternalOpen(true)
+  }, [])
+
+  const requestClose = useCallback(() => {
+    setInternalOpen(false)
+  }, [])
 
   const setRef = useCallback(
     (node: HTMLDialogElement | null) => {
@@ -97,16 +110,15 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
     [forwardedRef],
   )
 
-  // Escape memicu `cancel`; dicegah supaya penutupan tetap lewat satu jalan —
-  // `onClose`. Kalau dibiarkan, dialognya tertutup sendiri sementara `open`
-  // masih true, dan keduanya jadi tidak sinkron.
+  // Escape memicu `cancel`; dicegah supaya penutupan tetap lewat satu jalan
+  // dan state internal selalu sinkron dengan elemen dialog native.
   const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     event.preventDefault()
-    onClose()
+    requestClose()
   }
 
   const handleNativeClose = () => {
-    if (open) onClose()
+    if (internalOpen) requestClose()
   }
 
   // Klik di luar panel. `<dialog>` membentang selebar viewport sementara
@@ -123,45 +135,61 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
       event.clientY < rect.top ||
       event.clientY > rect.bottom
 
-    if (diLuarPanel) onClose()
+    if (diLuarPanel) requestClose()
   }
 
   const labelSendiri = ariaLabel?.trim() ? ariaLabel : undefined
   const labelledBySendiri = ariaLabelledBy?.trim() || undefined
-  const adaJudul = title !== undefined && title !== null && title !== false
+  const adaJudul = !isPopup && title !== undefined && title !== null && title !== false
   const namaOtomatis = adaJudul && !labelSendiri ? titleId : undefined
 
   useEffect(() => {
     const dialog = internalRef.current
     if (!dialog) return
 
-    if (open && !dialog.open) dialog.showModal()
-    else if (!open && dialog.open) dialog.close()
-  }, [open])
+    if (internalOpen && !dialog.open) dialog.showModal()
+    else if (!internalOpen && dialog.open) dialog.close()
+  }, [internalOpen])
 
-  const adaHeader = adaJudul || dismissible
+  if (!isValidElement<ButtonHTMLAttributes<HTMLButtonElement>>(trigger)) {
+    throw new Error('Modal memerlukan satu elemen <button> yang valid pada prop `trigger`.')
+  }
+
+  const renderedTrigger = cloneElement(trigger, {
+    'aria-haspopup': 'dialog',
+    'aria-expanded': internalOpen,
+    onClick: (event: MouseEvent<HTMLButtonElement>) => {
+      trigger.props.onClick?.(event)
+      if (event.defaultPrevented || trigger.props.disabled) return
+      requestOpen()
+    },
+  })
+  const renderedFooter = typeof footer === 'function' ? footer({ close: requestClose }) : footer
 
   return (
-    <dialog
-      ref={setRef}
-      aria-label={labelSendiri}
-      aria-labelledby={labelledBySendiri ?? namaOtomatis}
-      onCancel={handleCancel}
-      onClose={handleNativeClose}
-      onClick={handleClick}
-      className={cn(
-        'm-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-hidden rounded-lg border border-border bg-surface p-0 text-left text-content shadow-xl',
-        'backdrop:bg-gray-900/50 open:flex open:flex-col',
-        sizes[size],
-        className,
-      )}
-      {...props}
-    >
-      {adaHeader && (
+    <>
+      {renderedTrigger}
+      <dialog
+        ref={setRef}
+        aria-label={labelSendiri}
+        aria-labelledby={labelledBySendiri ?? namaOtomatis}
+        onCancel={handleCancel}
+        onClose={handleNativeClose}
+        onClick={handleClick}
+        className={cn(
+          'm-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-hidden rounded-lg border border-border bg-surface p-0 text-left text-content shadow-xl',
+          'backdrop:bg-gray-900/50 open:flex open:flex-col',
+          isPopup ? 'max-w-[416px]' : sizes[size ?? 's'],
+          className,
+        )}
+        {...props}
+      >
         <div
           className={cn(
-            'flex shrink-0 items-start justify-between gap-4 px-6',
-            adaJudul ? 'border-b border-border py-5' : 'pt-4',
+            'flex shrink-0 items-start justify-between gap-4',
+            isPopup
+              ? 'relative h-7 px-5'
+              : cn('px-6', adaJudul ? 'border-b border-border py-5' : 'pt-4'),
           )}
         >
           {adaJudul && (
@@ -170,29 +198,40 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
             </h2>
           )}
 
-          {dismissible && (
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label={closeLabel}
-              className="-my-2 -mr-2 ml-auto inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-            >
-              <Close className="size-4" aria-hidden="true" />
-            </button>
+          <button
+            type="button"
+            onClick={requestClose}
+            aria-label={closeLabel}
+            className={cn(
+              'ml-auto inline-flex shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+              isPopup ? 'absolute right-0.5 top-0.5 size-10' : '-my-2 -mr-2 size-10',
+            )}
+          >
+            <Close className="size-4" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div
+          className={cn(
+            'min-h-0 flex-1 overflow-y-auto overscroll-y-contain text-body-sm text-gray-500',
+            isPopup ? 'px-5 pb-4 pt-5' : 'px-5 py-6',
           )}
+        >
+          {children}
         </div>
-      )}
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-6 text-body-sm text-gray-500">
-        {children}
-      </div>
-
-      {footer && (
-        <div className="flex shrink-0 flex-wrap items-center gap-3 border-t border-border px-6 py-4">
-          {footer}
-        </div>
-      )}
-    </dialog>
+        {renderedFooter && (
+          <div
+            className={cn(
+              'flex shrink-0 flex-wrap items-center gap-3',
+              isPopup ? 'px-5 pb-5' : 'border-t border-border px-6 py-4',
+            )}
+          >
+            {renderedFooter}
+          </div>
+        )}
+      </dialog>
+    </>
   )
 })
 

@@ -32,7 +32,7 @@ export type {
 } from "./components/Dropdown";
 
 export { Modal } from "./components/Modal";
-export type { ModalProps, ModalSize } from "./components/Modal";
+export type { ModalProps, ModalSize, ModalVariant } from "./components/Modal";
 
 export { Alert } from "./components/Alert";
 export type { AlertProps, AlertVariant } from "./components/Alert";
