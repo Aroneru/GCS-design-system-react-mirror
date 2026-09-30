@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { ExclamationCircle } from '../../../lib/icons/solid'
 import { Button, Icon, Modal, type ModalSize, type ModalVariant } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
@@ -57,7 +57,7 @@ const longContent = [
   'Gambar boleh diletakkan bersama teks selama sumber, teks alternatif, dan perilaku responsifnya Anda tentukan.',
   'Tabel atau daftar panjang tetap bisa dipakai, tapi Anda yang memastikan isinya ikut responsif.',
   'Tombol di footer menjalankan aksi milik consumer dan tidak menutup Modal secara otomatis.',
-  'Klik latar dan tombol Escape menutup Modal melalui state internalnya.',
+  'Secara bawaan, klik latar dan tombol Escape menutup Modal melalui state internalnya.',
   'Contoh ini sengaja tidak menetapkan tinggi tetap — gulirannya muncul sendiri dari panjang isi dan ukuran layar.',
 ]
 
@@ -70,11 +70,22 @@ function ModalExampleCode({
   variant,
   example,
   size,
+  dismissal,
 }: {
   variant: ModalVariant
   example: ModalExample
   size: ModalSize
+  dismissal: { closeOnBackdrop: boolean; closeOnEscape: boolean; showCloseButton: boolean }
 }) {
+  const dismissalCode = Object.entries(dismissal)
+    .filter(([, enabled]) => !enabled)
+    .map(([prop]) => (
+      <Fragment key={prop}>
+        {'\n  '}
+        <H>{prop}</H>
+        {'={false}'}
+      </Fragment>
+    ))
   const judul = example === 'long' ? 'Ketentuan Layanan' : 'Terms of Service'
 
   if (variant === 'popup') {
@@ -82,7 +93,9 @@ function ModalExampleCode({
       <>
         {"import { Button, Icon, Modal } from '@ceplok-ui/design-kit-react'\n"}
         {"import { ExclamationCircle } from '@ceplok-ui/design-kit-react/icons/solid'\n"}
-        {'\n<Modal\n  trigger={<Button>Buka Modal</Button>}\n  '}
+        {'\n<Modal\n  trigger={<Button>Buka Modal</Button>}'}
+        {dismissalCode}
+        {'\n  '}
         <H>variant</H>
         {'="popup"\n  '}
         <H>aria-label</H>
@@ -95,6 +108,7 @@ function ModalExampleCode({
     <>
       {"import { Button, Modal } from '@ceplok-ui/design-kit-react'\n"}
       {'\n<Modal\n  trigger={<Button>Buka Modal</Button>}'}
+      {dismissalCode}
       {size === 'm' && (
         <>
           {'\n  '}
@@ -126,6 +140,9 @@ const modalProps: PropRow[] = [
   ['variant', "'default' | 'popup'", "'default'", 'Menentukan struktur Modal. Popup digunakan untuk dialog konfirmasi ringkas.'],
   ['size', "'s' | 'm'", "'s'", 'Ukuran Default Modal. Tidak tersedia untuk Popup.'],
   ['title', 'ReactNode', 'undefined', 'Judul Default Modal sekaligus nama aksesibel. Tidak tersedia untuk Popup.'],
+  ['closeOnBackdrop', 'boolean', 'true', 'Tutup Modal saat klik backdrop. Tidak memengaruhi klik di dalam dialog.'],
+  ['closeOnEscape', 'boolean', 'true', 'Tutup Modal saat menekan Escape. Jika false, cancel native dicegah.'],
+  ['showCloseButton', 'boolean', 'true', 'Tampilkan tombol X. Jika false, tombol dihapus sepenuhnya.'],
   ['closeLabel', 'string', "'Tutup modal'", 'Nama aksesibel tombol tutup.'],
   ['footer', 'ReactNode | ({ close }) => ReactNode', 'undefined', 'Area aksi Default dan Popup. Render function menyediakan close untuk penutupan eksplisit; footer Popup tidak memakai divider.'],
   ['children', 'ReactNode', 'undefined', 'Isi Modal. Pada Popup, icon dan pesan disusun di sini.'],
@@ -151,6 +168,12 @@ export function ModalPage() {
   const [playgroundVariant, setPlaygroundVariant] = useState<ModalVariant>('default')
   const [playgroundExample, setPlaygroundExample] = useState<ModalExample>('basic')
   const [playgroundSize, setPlaygroundSize] = useState<ModalSize>('s')
+
+  const [dismissal, setDismissal] = useState({
+    closeOnBackdrop: true,
+    closeOnEscape: true,
+    showCloseButton: true,
+  })
 
   const isPopup = playgroundVariant === 'popup'
 
@@ -296,6 +319,7 @@ export function ModalPage() {
           <div className="flex min-h-40 items-center justify-center">
             {isPopup ? (
               <Modal
+                {...dismissal}
                 trigger={<Button>Buka Modal</Button>}
                 variant="popup"
                 aria-label="Konfirmasi hapus konten"
@@ -323,6 +347,7 @@ export function ModalPage() {
               </Modal>
             ) : (
               <Modal
+                {...dismissal}
                 trigger={<Button>Buka Modal</Button>}
                 size={playgroundSize}
                 title={playgroundExample === 'long' ? 'Ketentuan Layanan' : 'Terms of Service'}
@@ -373,6 +398,16 @@ export function ModalPage() {
             />
           </Control>
 
+          <Control label="Size">
+            <Segmented
+              label="Pilih ukuran Modal"
+              value={playgroundSize}
+              onChange={setPlaygroundSize}
+              options={sizes.map(({ value, label }) => ({ value, label }))}
+              disabled={isPopup}
+            />
+          </Control>
+
           <Control label="Contoh">
             <Segmented
               label="Pilih contoh susunan Modal"
@@ -385,14 +420,23 @@ export function ModalPage() {
             />
           </Control>
 
-          <Control label="Size">
-            <Segmented
-              label="Pilih ukuran Modal"
-              value={playgroundSize}
-              onChange={setPlaygroundSize}
-              options={sizes.map(({ value, label }) => ({ value, label }))}
-              disabled={isPopup}
-            />
+          <Control label="Cara Menutup">
+            <div className="flex flex-col gap-2">
+              {([
+                ['closeOnBackdrop', 'Tutup lewat backdrop'],
+                ['closeOnEscape', 'Tutup lewat Escape'],
+                ['showCloseButton', 'Tampilkan tombol X'],
+              ] as const).map(([prop, label]) => (
+                <label key={prop} className="flex items-center gap-2 text-body-sm">
+                  <input
+                    type="checkbox"
+                    checked={dismissal[prop]}
+                    onChange={(event) => setDismissal({ ...dismissal, [prop]: event.target.checked })}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
           </Control>
         </Controls>
 
@@ -432,12 +476,16 @@ export function ModalPage() {
             variant={playgroundVariant}
             example={playgroundExample}
             size={playgroundSize}
+            dismissal={dismissal}
           />
         </SectionCode>
 
         <p className="mt-5 max-w-2xl text-body-sm text-gray-500">
           Panggil <code>close()</code> hanya ketika aksi perlu menutup Modal. Untuk validasi atau
-          proses asinkron, panggil setelah proses berhasil.
+          proses asinkron, panggil setelah proses berhasil. Ketiga kontrol penutupan bekerja
+          independen; <code>close()</code> tetap dapat menutup Modal apa pun nilainya.
+          Jika backdrop, Escape, dan tombol X dinonaktifkan, sediakan aksi eksplisit yang
+          memanggil <code>close()</code>, misalnya tombol Saya Mengerti di footer.
         </p>
 
         <p className="mt-3 max-w-2xl text-body-sm text-gray-500">

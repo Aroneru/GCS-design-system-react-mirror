@@ -29,6 +29,12 @@ interface ModalCommonProps
   trigger: ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>
   /** Nama aksesibel tombol tutup. */
   closeLabel?: string
+  /** Tutup saat klik backdrop. Bawaan: true. */
+  closeOnBackdrop?: boolean
+  /** Tutup saat menekan Escape. Bawaan: true. */
+  closeOnEscape?: boolean
+  /** Tampilkan tombol tutup. Bawaan: true. */
+  showCloseButton?: boolean
   /** Isi modal. */
   children?: ReactNode
   /** Area aksi, atau render function yang menerima fungsi penutup Modal. */
@@ -75,6 +81,9 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
     size,
     title,
     closeLabel = 'Tutup modal',
+    closeOnBackdrop = true,
+    closeOnEscape = true,
+    showCloseButton = true,
     footer,
     className,
     children,
@@ -114,19 +123,18 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   // dan state internal selalu sinkron dengan elemen dialog native.
   const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     event.preventDefault()
-    requestClose()
+    if (closeOnEscape) requestClose()
   }
 
   const handleNativeClose = () => {
     if (internalOpen) requestClose()
   }
 
-  // Klik di luar panel. `<dialog>` membentang selebar viewport sementara
-  // panelnya hanya kotak di tengah, jadi yang dibandingkan koordinat klik
-  // terhadap kotak itu — bukan sekadar `event.target`.
+  // Backdrop menargetkan dialog; abaikan bubbling dari children dan klik
+  // pada permukaan panel dengan memeriksa target serta batas dialog.
   const handleClick = (event: MouseEvent<HTMLDialogElement>) => {
     onClick?.(event)
-    if (event.defaultPrevented || event.target !== event.currentTarget) return
+    if (!closeOnBackdrop || event.defaultPrevented || event.target !== event.currentTarget) return
 
     const rect = event.currentTarget.getBoundingClientRect()
     const diLuarPanel =
@@ -198,17 +206,19 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
             </h2>
           )}
 
-          <button
-            type="button"
-            onClick={requestClose}
-            aria-label={closeLabel}
-            className={cn(
-              'ml-auto inline-flex shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
-              isPopup ? 'absolute right-0.5 top-0.5 size-10' : '-my-2 -mr-2 size-10',
-            )}
-          >
-            <Close className="size-4" aria-hidden="true" />
-          </button>
+          {showCloseButton && (
+            <button
+              type="button"
+              onClick={requestClose}
+              aria-label={closeLabel}
+              className={cn(
+                'ml-auto inline-flex shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                isPopup ? 'absolute right-0.5 top-0.5 size-10' : '-my-2 -mr-2 size-10',
+              )}
+            >
+              <Close className="size-4" aria-hidden="true" />
+            </button>
+          )}
         </div>
 
         <div
