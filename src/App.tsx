@@ -19,6 +19,7 @@ import { FloatingLabelPage } from "./docs/pages/form/input-field/FloatingLabelPa
 import { TextAreaPage } from "./docs/pages/form/input-field/TextAreaPage";
 import { SelectPage } from "./docs/pages/form/SelectPage";
 import { SearchPage } from "./docs/pages/form/SearchPage";
+import { DatepickerPage } from "./docs/pages/form/DatepickerPage";
 import { UploadPage } from "./docs/pages/form/UploadPage";
 import { RadioPage } from "./docs/pages/form/RadioPage";
 import { TogglePage } from "./docs/pages/form/TogglePage";
@@ -69,6 +70,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/form/input-field/text-area": TextAreaPage,
   "/form/select": SelectPage,
   "/form/search": SearchPage,
+  "/form/datepicker": DatepickerPage,
   "/form/upload": UploadPage,
   "/form/radio": RadioPage,
   "/form/toggle": TogglePage,

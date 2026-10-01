@@ -1,4 +1,4 @@
-import { useMemo, useState, type Key, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type Key, type ReactNode } from "react";
 import { Plus } from "flowbite-react-icons/outline";
 import { Download, Edit, Eye, Printer, TrashBin } from "flowbite-react-icons/solid";
 import {
@@ -8,12 +8,10 @@ import {
   type BadgeVariant,
   type PaginationTheme,
   type TableActionIconSize,
-  type TableActionRadius,
-  type TableActionTone,
-  type TableActionVariant,
   type TableColumn,
   type TableRowAction,
   type TableSize,
+  type TableSort,
 } from "../../../lib";
 import { asset } from "../../asset";
 import { adaTidakAda } from "../../usulanOptions";
@@ -54,9 +52,9 @@ const allRows: Row[] = Array.from({ length: 1000 }, (_, i) => ({
 /**
  * Aksi per baris: ikon, judul (tooltip), dan tujuannya ditentukan pemakai.
  * Dibuat generik supaya bisa dipakai tabel penduduk di bawah juga. `style`
- * diisi Playground untuk ukuran ikon, sudut, dan warna tombol.
+ * diisi Playground untuk ukuran ikon.
  */
-type ActionStyle = Pick<TableRowAction<unknown>, "iconSize" | "radius" | "variant" | "tone">;
+type ActionStyle = Pick<TableRowAction<unknown>, "iconSize">;
 
 const makeActions = <T extends { id: number }>(style: ActionStyle = {}): TableRowAction<T>[] => [
   { key: "ubah", icon: <Edit />, label: "Ubah", theme: "yellow", ...style, href: (r) => `#/ubah/${r.id}` },
@@ -316,23 +314,6 @@ const actionIconSizeOptions: { value: TableActionIconSize; label: string }[] = [
   { value: "xl", label: "XL" },
 ];
 
-const actionRadiusOptions: { value: TableActionRadius; label: string }[] = [
-  { value: "none", label: "None" },
-  { value: "s", label: "S" },
-  { value: "base", label: "Base" },
-  { value: "l", label: "L" },
-  { value: "full", label: "Full" },
-];
-
-const actionVariantOptions: { value: TableActionVariant; label: string }[] = [
-  { value: "filled", label: "Filled" },
-  { value: "outline", label: "Outline" },
-];
-
-const actionToneOptions: { value: TableActionTone; label: string }[] = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-];
 
 const onOff = [
   { value: true, label: "On" },
@@ -468,6 +449,166 @@ const toc: TocEntry[] = [
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
 ];
+
+/** Kolom demo Data server. Sort `field1`/`field2` memakai id supaya "Record 10" jatuh setelah "Record 9". */
+const serverColumns: TableColumn<Row>[] = [
+  { key: "field1", header: "Field 1", sortable: true, emphasis: true, align: "left" },
+  { key: "field2", header: "Field 2", sortable: true, align: "left" },
+  {
+    key: "status",
+    header: "Status",
+    sortable: true,
+    cell: (row) => <Badge variant={row.status}>{row.status}</Badge>,
+  },
+];
+
+type ServerQuery = { page: number; pageSize: number; sort: TableSort | null; q: string };
+type ServerResponse = { items: Row[]; total: number };
+
+/**
+ * Server palsu untuk demo: `allRows` berperan sebagai database. Ia mencari,
+ * mengurutkan, dan memotong satu halaman, lalu menjawab setelah 600ms supaya
+ * keadaan loading terlihat. Di aplikasi asli, isi fungsi ini diganti `fetch`.
+ */
+function fakeServer({ page, pageSize, sort, q }: ServerQuery): Promise<ServerResponse> {
+  const found = allRows.filter((r) => r.field1.toLowerCase().includes(q.toLowerCase()));
+  if (sort) {
+    const value = (r: Row) => (sort.key === "status" ? r.status : r.id);
+    const factor = sort.direction === "asc" ? 1 : -1;
+    found.sort((a, b) => (value(a) > value(b) ? 1 : value(a) < value(b) ? -1 : 0) * factor);
+  }
+  const items = found.slice((page - 1) * pageSize, page * pageSize);
+  return new Promise((resolve) => setTimeout(() => resolve({ items, total: found.length }), 600));
+}
+
+/** Alamat request yang setara, ditampilkan di bawah demo supaya terlihat apa yang dikirim. */
+const requestUrl = ({ page, pageSize, sort, q }: ServerQuery) =>
+  `GET /api/data?page=${page}&pageSize=${pageSize}` +
+  (sort ? `&sort=${sort.key}&dir=${sort.direction}` : "") +
+  (q ? `&q=${encodeURIComponent(q)}` : "");
+
+/**
+ * Demo `manual`. `input` adalah isi kotak pencarian, `q` adalah kata yang benar-
+ * benar dikirim ke server. Dengan "Tunda pencarian" On, `q` baru diperbarui
+ * 300ms setelah user berhenti mengetik (debounce). Penghitung request
+ * memperlihatkan bedanya.
+ */
+function ServerTable() {
+  const pageSize = 10;
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState<TableSort | null>(null);
+  const [input, setInput] = useState("");
+  const [q, setQ] = useState("");
+  const [debounce, setDebounce] = useState(true);
+  // Mulai dari 1: request pertama saat tabel tampil.
+  const [sent, setSent] = useState(1);
+  const countRequest = () => setSent((n) => n + 1);
+
+  /** Kirim kata pencarian ke server: selalu mulai lagi dari halaman 1. */
+  const sendSearch = (value: string) => {
+    setQ(value);
+    setPage(1);
+    countRequest();
+  };
+
+  useEffect(() => {
+    if (!debounce || input === q) return;
+    const timer = setTimeout(() => {
+      setQ(input);
+      setPage(1);
+      setSent((n) => n + 1);
+    }, 300);
+    // Setiap ketikan baru membatalkan timer sebelumnya.
+    return () => clearTimeout(timer);
+  }, [input, q, debounce]);
+  // Jawaban server disimpan bersama request-nya. Selama request terakhir belum
+  // dijawab, tabel dianggap loading — tidak perlu state `loading` terpisah.
+  const [res, setRes] = useState<ServerResponse & { request: string }>({
+    items: [],
+    total: 0,
+    request: "",
+  });
+
+  const query: ServerQuery = { page, pageSize, sort, q };
+  const request = requestUrl(query);
+  const loading = res.request !== request;
+
+  useEffect(() => {
+    // Abaikan jawaban lama bila user sudah pindah halaman sebelum server menjawab.
+    let stale = false;
+    const current = { page, pageSize, sort, q };
+    fakeServer(current).then((next) => {
+      if (!stale) setRes({ ...next, request: requestUrl(current) });
+    });
+    return () => {
+      stale = true;
+    };
+  }, [page, sort, q]);
+
+  return (
+    <div className="space-y-3">
+      <Table
+        columns={serverColumns}
+        data={res.items}
+        rowKey="id"
+        manual
+        loading={loading}
+        search={{
+          value: input,
+          onChange: (e) => {
+            setInput(e.target.value);
+            if (!debounce) sendSearch(e.target.value);
+          },
+        }}
+        sort={sort}
+        onSortChange={(next) => {
+          setSort(next);
+          setPage(1);
+          countRequest();
+        }}
+        pagination={{
+          page,
+          pageSize,
+          total: res.total,
+          onPageChange: (next) => {
+            setPage(next);
+            countRequest();
+          },
+        }}
+      />
+
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-body-sm font-semibold text-gray-900">Tunda pencarian 300ms</span>
+        <Segmented
+          label="Tunda pencarian"
+          value={debounce}
+          onChange={(on) => {
+            setDebounce(on);
+            // Kirim ketikan yang masih tertunda supaya tabel tidak tertinggal.
+            if (!on && input !== q) sendSearch(input);
+          }}
+          options={onOff}
+        />
+      </div>
+
+      <div className="space-y-1 rounded-lg bg-gray-900 px-4 py-2.5 font-mono text-xs text-gray-300">
+        <p>
+          <span className="text-gray-500">Request terkirim: </span>
+          <span className="font-bold text-white">{sent}</span>
+        </p>
+        <p>
+          <span className="text-gray-500">Request terakhir: </span>
+          {request}
+          {debounce && input !== q ? (
+            <span className="text-yellow-300"> · menunggu user berhenti mengetik…</span>
+          ) : (
+            loading && <span className="text-yellow-300"> · menunggu jawaban server…</span>
+          )}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function DataTable({ cols = columns }: { cols?: TableColumn<Row>[] }) {
   const [query, setQuery] = useState("");
@@ -711,15 +852,9 @@ export function TablePage() {
   const [withPagination, setWithPagination] = useState(true);
   const [withRowActions, setWithRowActions] = useState(true);
   const [actionIconSize, setActionIconSize] = useState<TableActionIconSize>("base");
-  const [actionRadius, setActionRadius] = useState<TableActionRadius>("base");
-  const [actionVariant, setActionVariant] = useState<TableActionVariant>("filled");
-  const [actionTone, setActionTone] = useState<TableActionTone>("light");
   // Hanya nilai yang bukan bawaan, supaya kode di Penggunaan tetap ringkas.
   const actionStyle: ActionStyle = {
     ...(actionIconSize !== "base" && { iconSize: actionIconSize }),
-    ...(actionRadius !== "base" && { radius: actionRadius }),
-    ...(actionVariant !== "filled" && { variant: actionVariant }),
-    ...(actionTone !== "light" && { tone: actionTone }),
   };
   const actionStyleCode = Object.entries(actionStyle)
     .map(([prop, value]) => `, ${prop}: '${value}'`)
@@ -1217,37 +1352,190 @@ export function TablePage() {
 
       <FlowSection id="server" title="Data server">
         <Lead>
-          Bawaannya, kamu kirim <b>semua</b> data sekaligus, lalu Table sendiri yang mengurutkan
-          dan membaginya per halaman. Kalau datanya besar dan diambil per halaman dari server
-          (API), pasang <Hl>manual</Hl>. Caranya:
+          Ada dua cara memberi data ke Table. Bedanya ada di siapa yang mengurutkan dan
+          membagi data per halaman: Table sendiri, atau server.
         </Lead>
+        <Points
+          items={[
+            <><b>Bawaan:</b> kirim <b>semua</b> data sekaligus. Table yang mengurutkan, mencari, dan membagi per halaman.</>,
+            <><b><Hl>manual</Hl>:</b> kirim <b>satu halaman</b> saja. Server yang mengurutkan, mencari, dan membagi. Table hanya menampilkan.</>,
+          ]}
+        />
+
+        <div className="mb-6 grid gap-4 sm:grid-cols-2">
+          <Box
+            title="Pakai bawaan bila"
+            items={[
+              "Datanya kurang dari sekitar 1.000 baris.",
+              "Semua data sudah ada di browser, mis. dari satu kali fetch.",
+              "API tidak mendukung page, sort, atau search.",
+            ]}
+          />
+          <Box
+            title="Pakai manual bila"
+            items={[
+              "Datanya ribuan baris atau lebih.",
+              "API sudah mengembalikan data per halaman, mis. ?page=2&size=10.",
+              "Data berubah terus, jadi harus selalu diambil yang terbaru.",
+            ]}
+          />
+        </div>
+
+        <p className="mb-2 text-body-sm font-semibold text-gray-900">Yang harus diisi saat memakai manual</p>
         <Points
           items={[
             <>Pasang <Hl>manual</Hl>.</>,
             <>Isi <Hl>data</Hl> dengan baris halaman yang sedang tampil saja, mis. 10 baris.</>,
-            <>Isi <Hl>pagination.total</Hl> dengan jumlah seluruh data dari server, supaya jumlah halamannya benar.</>,
-            <>Saat user pindah halaman, <Hl>onPageChange</Hl> dipanggil. Ambil data halaman itu dari server.</>,
+            <>Isi <Hl>pagination.total</Hl> dengan jumlah seluruh data dari server. Tanpa ini jumlah halamannya salah.</>,
+            <>Saat user pindah halaman, <Hl>onPageChange</Hl> dipanggil. Ambil halaman itu dari server.</>,
             <>Saat user klik judul kolom, <Hl>onSortChange</Hl> dipanggil. Ambil data yang sudah diurutkan dari server.</>,
-            <>Pasang <Hl>loading</Hl> selama menunggu respons.</>,
+            <>Kirim kata pencarian ke server juga. Table hanya memegang 10 baris, jadi mencari di browser hanya mencari 10 baris itu.</>,
+            <>Kembalikan ke halaman 1 setiap kali sort atau pencarian berubah.</>,
+            <>Tunda pencarian sekitar 300ms setelah user berhenti mengetik (<i>debounce</i>), supaya tidak mengirim request di setiap huruf.</>,
+            <>Pasang <Hl>loading</Hl> selama menunggu jawaban server.</>,
           ]}
         />
 
+        <Demo label="Coba sendiri: 1000 baris di server palsu, jawaban ditunda 0,6 detik">
+          <ServerTable />
+        </Demo>
+        <div className="mt-2 mb-6 text-body-sm text-gray-500">
+          <p>Klik halaman, judul kolom, atau ketik di pencarian, lalu lihat kotak hitam di bawah tabel.</p>
+          <Points
+            items={[
+              <>Server hanya mengirim 10 baris setiap kali. Browser tidak pernah memegang 1000 baris.</>,
+              <>Matikan <b>Tunda pencarian</b>, lalu ketik "Record 12". Request terkirim naik 9, satu per huruf.</>,
+              <>Nyalakan lagi, lalu ketik kata yang sama. Request terkirim hanya naik 1.</>,
+            ]}
+          />
+        </div>
+
         <SectionCode flush>
-          {"<Table\n"}
-          {"  columns={columns}\n"}
-          {"  data={response.items}\n"}
-          {'  rowKey="id"\n'}
+          {"import { useEffect, useState } from 'react'\n"}
+          {"import { Table, type TableSort } from '@ceplok-ui/design-kit-react'\n\n"}
+          {"function PengajuanTable() {\n"}
+          {"  const [page, setPage] = useState(1)\n"}
+          {"  const [sort, setSort] = useState<TableSort | null>(null)\n"}
+          {"  const [input, setInput] = useState('') // isi kotak pencarian\n"}
+          {"  const [q, setQ] = useState('')         // kata yang dikirim ke server\n"}
+          {"  const [res, setRes] = useState({ items: [], total: 0 })\n"}
+          {"  const [loading, setLoading] = useState(true)\n\n"}
+          {"  // Tunda 300ms: q baru berubah setelah user berhenti mengetik\n"}
           {"  "}
+          <H>useEffect</H>
+          {"(() => {\n"}
+          {"    const timer = setTimeout(() => { setQ(input); setPage(1) }, 300)\n"}
+          {"    return () => clearTimeout(timer)\n"}
+          {"  }, [input])\n\n"}
+          {"  // Ambil satu halaman setiap kali page, sort, atau q berubah\n"}
+          {"  useEffect(() => {\n"}
+          {"    const params = new URLSearchParams({ page: String(page), size: '10', q })\n"}
+          {"    if (sort) params.set('sort', `${sort.key}:${sort.direction}`)\n\n"}
+          {"    setLoading(true)\n"}
+          {"    fetch(`/api/pengajuan?${params}`)\n"}
+          {"      .then((r) => r.json())\n"}
+          {"      .then(setRes) // { items: [...10 baris], total: 1000 }\n"}
+          {"      .finally(() => setLoading(false))\n"}
+          {"  }, [page, sort, q])\n\n"}
+          {"  return (\n"}
+          {"    <Table\n"}
+          {"      columns={columns}\n"}
+          {"      data={res.items}\n"}
+          {'      rowKey="id"\n'}
+          {"      "}
           <H>manual</H>
           {"\n"}
-          {"  loading={isFetching}\n"}
-          {"  sort={sort}\n"}
-          {"  onSortChange={setSort}\n"}
-          {"  pagination={{ page, pageSize: 10, "}
+          {"      "}
+          <H>loading</H>
+          {"={loading}\n"}
+          {"      search={{ value: input, onChange: (e) => setInput(e.target.value) }}\n"}
+          {"      sort={sort}\n"}
+          {"      "}
+          <H>onSortChange</H>
+          {"={(next) => { setSort(next); setPage(1) }}\n"}
+          {"      pagination={{ page, pageSize: 10, "}
           <H>total</H>
-          {": response.total, onPageChange: setPage }}\n"}
-          {"/>"}
+          {": res.total, "}
+          <H>onPageChange</H>
+          {": setPage }}\n"}
+          {"    />\n"}
+          {"  )\n"}
+          {"}"}
         </SectionCode>
+
+        <div className="mt-6">
+          <Box
+            title="Kesalahan yang sering terjadi"
+            items={[
+              <>Lupa mengisi <Hl>total</Hl>: pagination hanya menampilkan 1 halaman.</>,
+              <>Lupa memasang <Hl>manual</Hl>: Table mengurutkan ulang 10 baris yang sudah diurutkan server, dan footer menulis "of 10 Data".</>,
+              <>Mencari di browser, bukan di server: hasil pencarian hanya dari halaman yang sedang tampil.</>,
+              <>Tidak kembali ke halaman 1 setelah mencari: server tetap diminta halaman 8 padahal hasilnya hanya 2 halaman, jadi tabel tampil kosong.</>,
+              <>Tidak menunda pencarian: mengetik satu kata mengirim belasan request, dan jawabannya bisa datang tidak berurutan.</>,
+            ]}
+          />
+        </div>
+
+        <h3 className="mt-10 mb-2 text-base font-bold text-gray-900">Kalau datanya sangat banyak</h3>
+        <p className="mb-4 text-body-sm text-gray-500">
+          Dengan <Hl>manual</Hl>, browser selalu menerima 10 baris, sebanyak apa pun datanya. Mau
+          1.000 atau 10 juta baris, frontend tidak jadi lebih berat. Bebannya pindah ke backend, jadi
+          yang perlu dijaga ada di sana.
+        </p>
+
+        <div className="mb-6 grid gap-4 sm:grid-cols-2">
+          <Box
+            title="Dijaga di backend"
+            items={[
+              <>Pasang index di kolom yang bisa di-sort dan dicari. Tanpa index, database membaca semua baris setiap kali user klik judul kolom.</>,
+              <>Hati-hati dengan <code>COUNT(*)</code> untuk <Hl>total</Hl>. Di tabel jutaan baris ini bisa makan beberapa detik. Simpan di cache atau pakai angka perkiraan.</>,
+              <>Halaman jauh makin lambat. <code>OFFSET 5000000</code> tetap melewati 5 juta baris dulu.</>,
+              <>Pencarian <code>LIKE '%kata%'</code> tidak memakai index. Untuk data besar pakai full-text index atau mesin pencari.</>,
+            ]}
+          />
+          <Box
+            title="Dijaga di frontend"
+            items={[
+              <>Tunda pencarian 300ms, seperti di demo atas.</>,
+              <>Jangan memperbesar <Hl>pageSize</Hl>. Tetap 10 sampai 50 baris. Table merender semua baris yang diberikan, jadi 5.000 baris sekaligus akan berat.</>,
+              <>Abaikan jawaban lama bila user sudah pindah halaman sebelum server menjawab.</>,
+            ]}
+          />
+        </div>
+
+        <div className="mb-4 overflow-x-auto rounded-lg border border-gray-200">
+          <table className="w-full text-left text-body-sm">
+            <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+              <tr>
+                <th className="px-4 py-3 font-semibold">Jumlah data</th>
+                <th className="px-4 py-3 font-semibold">Yang disarankan</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white text-gray-600">
+              <tr>
+                <td className="px-4 py-3 font-semibold whitespace-nowrap text-gray-900">Kurang dari 1.000</td>
+                <td className="px-4 py-3">Mode bawaan. Kirim semua data ke Table.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-semibold whitespace-nowrap text-gray-900">Ribuan sampai ratusan ribu</td>
+                <td className="px-4 py-3"><Hl>manual</Hl>, index di backend, dan pencarian ditunda.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-semibold whitespace-nowrap text-gray-900">Jutaan</td>
+                <td className="px-4 py-3">
+                  <Hl>manual</Hl> dengan <i>cursor pagination</i> di backend: "ambil 10 baris setelah id
+                  terakhir", bukan "lewati sekian baris". Lihat catatan di bawah.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-body-sm text-gray-500">
+          <b className="text-gray-900">Catatan:</b> cursor pagination biasanya tidak mengirim{" "}
+          <Hl>total</Hl> dan tidak bisa loncat ke halaman tertentu. Pagination Table butuh{" "}
+          <Hl>total</Hl> untuk menggambar nomor halaman, jadi untuk saat ini Table belum cocok dengan
+          cursor pagination.
+        </p>
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
@@ -1295,15 +1583,6 @@ export function TablePage() {
             <>
               <Control label="Ukuran ikon aksi">
                 <Segmented label="Ukuran ikon aksi" value={actionIconSize} onChange={setActionIconSize} options={actionIconSizeOptions} />
-              </Control>
-              <Control label="Sudut tombol aksi">
-                <Segmented label="Sudut tombol aksi" value={actionRadius} onChange={setActionRadius} options={actionRadiusOptions} />
-              </Control>
-              <Control label="Rupa tombol aksi">
-                <Segmented label="Rupa tombol aksi" value={actionVariant} onChange={setActionVariant} options={actionVariantOptions} />
-              </Control>
-              <Control label="Tone tombol aksi">
-                <Segmented label="Tone tombol aksi" value={actionTone} onChange={setActionTone} options={actionToneOptions} />
               </Control>
             </>
           )}

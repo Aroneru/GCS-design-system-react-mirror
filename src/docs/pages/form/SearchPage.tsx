@@ -3,7 +3,6 @@ import {
   Search,
   type SearchApplication,
   type SearchCategory,
-  type SearchMenuMode,
   type SearchPlatform,
 } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
@@ -44,7 +43,6 @@ const searchProps: PropRow[] = [
   ['platform', "'default' | 'mobile' | 'compact'", 'default', 'Tinggi, ukuran ikon, teks, dan tombol. `compact` (38px) untuk toolbar seperti di Table. Tidak berlaku pada varian kategori.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna tombol cari dan garis saat field difokus.'],
   ['categories', 'SearchCategory[]', 'undefined', 'Bila diisi, komponen berpindah ke varian dengan kategori.'],
-  ['categoryMenu', "'native' | 'panel'", 'native', 'Bentuk daftar kategori: popup bawaan sistem, atau panel bergaya kit.'],
   ['categoryPlaceholder', 'string', 'Kategori', 'Teks dropdown saat kategori belum dipilih.'],
   ['category / defaultCategory', 'string', 'undefined', 'Kategori terpilih, terkendali maupun tidak.'],
   ['onCategoryChange', '(value: string) => void', 'undefined', 'Dipanggil saat kategori berganti.'],
@@ -65,7 +63,6 @@ export function SearchPage() {
   const [application, setApplication] = useState<SearchApplication>('default')
   const [platform, setPlatform] = useState<SearchPlatform>('default')
   const [withCategory, setWithCategory] = useState(false)
-  const [categoryMenu, setCategoryMenu] = useState<SearchMenuMode>('native')
   const [withLabel, setWithLabel] = useState(false)
   const [withHelper, setWithHelper] = useState(false)
 
@@ -148,16 +145,6 @@ export function SearchPage() {
               />
             </div>
           </Demo>
-          <Demo label={'categoryMenu="panel"'}>
-            <div className="max-w-[882px]">
-              <Search
-                categories={kategori}
-                categoryMenu="panel"
-                placeholder={PLACEHOLDER}
-                onSearch={(v, c) => setTerakhir(c ? `${v} · ${c}` : v)}
-              />
-            </div>
-          </Demo>
         </div>
         <SectionCode>
           {'<Search\n'}
@@ -175,11 +162,9 @@ export function SearchPage() {
           ini; cukup atur lebar wadahnya.
         </p>
         <p className="mt-2 text-body-sm text-gray-500">
-          Daftar kategorinya <H>&lt;select&gt;</H> biasa, jadi yang muncul adalah pemilih bawaan
-          sistem — di ponsel berupa pemilih layar penuh. Prop <H>categoryMenu</H> menggantinya dengan
-          panel yang sama dengan Dropdown, seperti contoh ketiga di atas. Nilai kategorinya tetap
-          dibawa <H>&lt;select&gt;</H> yang sama, jadi <H>onCategoryChange</H> dan argumen kedua
-          <H>onSearch</H> tidak berubah sedikit pun.
+          Daftar kategorinya panel Dropdown, sama dengan daftar pilihan Regular Select Form. Nilai
+          kategorinya dibawa elemen <H>&lt;select&gt;</H> di belakang tombolnya, dan itulah yang
+          diteruskan ke <H>onCategoryChange</H> serta argumen kedua <H>onSearch</H>.
         </p>
       </FlowSection>
 
@@ -228,7 +213,6 @@ export function SearchPage() {
             application={application}
             platform={platform}
             categories={withCategory ? kategori : undefined}
-            categoryMenu={categoryMenu}
             label={withLabel ? 'Cari data' : undefined}
             helperText={withHelper ? 'Tekan Enter atau tombol Cari.' : undefined}
             placeholder={PLACEHOLDER}
@@ -272,20 +256,6 @@ export function SearchPage() {
             />
           </Control>
 
-          <Control label="Daftar kategori">
-            <Segmented
-              label="Pilih bentuk daftar kategori"
-              value={categoryMenu}
-              onChange={setCategoryMenu}
-              // Tanpa kategori tidak ada daftar yang bisa diganti bentuknya.
-              disabled={!withCategory}
-              options={[
-                { value: 'native', label: 'Native' },
-                { value: 'panel', label: 'Panel' },
-              ]}
-            />
-          </Control>
-
           <Control label="Label">
             <Segmented
               label="Tampilkan label"
@@ -313,8 +283,7 @@ export function SearchPage() {
             <code className="text-xs font-bold text-gray-700">{terakhir}</code>
           )}
 . Saat kategori dinyalakan, <em>Platform</em> hanya mengganti lebar wadah pratinjaunya — 882px
-          atau 382px — sedangkan tinggi dan isi ruasnya tetap sama. <em>Daftar kategori</em> mati
-          selama kategori dimatikan, karena saat itu tidak ada daftar yang bisa diganti bentuknya.
+          atau 382px — sedangkan tinggi dan isi ruasnya tetap sama.
         </p>
       </FlowSection>
 
@@ -345,13 +314,6 @@ export function SearchPage() {
               {'    '}
               <H>categories</H>
               {'={kategori}\n'}
-            </>
-          )}
-          {withCategory && categoryMenu !== 'native' && (
-            <>
-              {'    '}
-              <H>categoryMenu</H>
-              {'="panel"\n'}
             </>
           )}
           {withLabel && (

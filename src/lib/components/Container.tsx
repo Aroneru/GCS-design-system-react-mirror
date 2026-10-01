@@ -21,6 +21,11 @@ export interface ContainerProps extends HTMLAttributes<HTMLElement> {
    * Matikan bila elemen induk sudah punya padding sendiri.
    */
   padded?: boolean
+  /**
+   * Tampilan gelap: latar gray-800 dan teks bawaan gray-300 di elemen dalam.
+   * Tanpa ini Container transparan dan tidak memberi warna apa pun.
+   */
+  darkMode?: boolean
 }
 
 /**
@@ -49,12 +54,16 @@ const sizeClasses: Record<ContainerSize, string> = {
  * Elemen luar hanya menjadi titik ukur (dan pemegang `className` milik pemakai);
  * lebar, pemusatan, dan padding hidup di elemen dalam karena sebuah elemen
  * tidak bisa mengueri container-nya sendiri.
+ *
+ * `darkMode` memberi latar gray-800 di elemen dalam — sama dengan kartu Card dan
+ * Toast versi gelap — sehingga sudut rounded-xl di ruang sempit ikut terlihat.
  */
 export function Container({
   as: Tag = 'div',
   size = 'default',
   className,
   padded = true,
+  darkMode = false,
   children,
   ...props
 }: ContainerProps) {
@@ -65,6 +74,7 @@ export function Container({
           'mx-auto w-full',
           sizeClasses[size],
           padded && 'px-5 @[640px]:px-8 @[1024px]:px-12 @[1280px]:px-14',
+          darkMode && 'bg-gray-800 text-gray-300',
         )}
       >
         {children}

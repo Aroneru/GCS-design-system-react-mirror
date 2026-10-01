@@ -139,9 +139,22 @@ export function PrincipleList({ items }: { items: ReactNode[] }) {
 }
 
 /** Panggung Playground: kartu berlatar netral, lebarnya bisa dianimasikan. */
-export function Stage({ maxWidth, children }: { maxWidth: string; children: ReactNode }) {
+export function Stage({
+  maxWidth,
+  dark,
+  children,
+}: {
+  maxWidth: string
+  /** Latar gelap, untuk komponen yang sedang ditampilkan dalam tampilan gelapnya. */
+  dark?: boolean
+  children: ReactNode
+}) {
   return (
-    <div className="rounded-2xl border border-border bg-surface-subtle p-6 sm:p-10">
+    <div
+      className={`rounded-2xl border p-6 transition-colors sm:p-10 ${
+        dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
+      }`}
+    >
       <div className={`mx-auto transition-[max-width] duration-300 ease-out ${maxWidth}`}>
         {children}
       </div>

@@ -3,7 +3,6 @@ import {
   useId,
   useRef,
   useState,
-  type ChangeEvent,
   type InputHTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
@@ -21,9 +20,6 @@ export type SearchPlatform = 'default' | 'mobile' | 'compact'
 
 /** Warna aksen per aplikasi — dipakai tombol cari dan garis saat field difokus. */
 export type SearchApplication = 'default' | 'simaya'
-
-/** Bentuk daftar kategori: popup bawaan sistem, atau panel bergaya kit. */
-export type SearchMenuMode = 'native' | 'panel'
 
 /** Satu pilihan pada dropdown kategori. */
 export interface SearchCategory {
@@ -131,14 +127,6 @@ export interface SearchProps
    * jadi prop `type` sendiri hanya akan membuka keadaan yang mustahil dipakai.
    */
   categories?: SearchCategory[]
-  /**
-   * Bentuk daftar kategorinya. `native` memakai popup bawaan sistem, `panel`
-   * menggantinya dengan panel bergaya kit — rupanya sama dengan Dropdown.
-   * Hanya berpengaruh pada varian kategori, dan tidak mengubah apa pun
-   * selain rupanya: nilai kategori tetap dibawa `<select>` yang sama, jadi
-   * `onCategoryChange` dan argumen kedua `onSearch` tetap seperti biasa.
-   */
-  categoryMenu?: SearchMenuMode
   /** Teks dropdown saat kategori belum dipilih. */
   categoryPlaceholder?: string
   category?: string
@@ -153,7 +141,8 @@ export interface SearchProps
  *
  * Punya dua bentuk. Tanpa prop `categories` ia jadi satu kotak berisi ikon
  * kaca pembesar, isian, dan tombol berlabel. Dengan `categories` ia jadi tiga
- * ruas menyatu: dropdown kategori, isian, lalu tombol ikon.
+ * ruas menyatu: dropdown kategori, isian, lalu tombol ikon. Daftar kategorinya
+ * panel Dropdown, sama dengan daftar pilihan Select.
  *
  * Pembungkusnya `<div role="search">`, bukan `<form>`. Kolom pencarian sering
  * dipasang di dalam formulir lain — halaman pengajuan, misalnya — dan `<form>`
@@ -170,7 +159,6 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
     platform = 'default',
     application = 'default',
     categories,
-    categoryMenu = 'native',
     categoryPlaceholder = 'Kategori',
     category,
     defaultCategory,
@@ -193,16 +181,15 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   const size = platforms[platform]
   const accent = accents[application]
   const withCategory = Boolean(categories?.length)
-  const usePanel = withCategory && categoryMenu === 'panel'
 
-  // Bentuk panel perlu tahu kategori mana yang sedang aktif untuk menulis
-  // label tombolnya; pada dropdown tak terkendali itu tidak ada di prop,
-  // jadi dicatat sendiri persis seperti yang dilakukan Select.
+  // Tombol kategori perlu tahu kategori mana yang sedang aktif untuk menulis
+  // labelnya; pada dropdown tak terkendali itu tidak ada di prop, jadi
+  // dicatat sendiri persis seperti yang dilakukan Select.
   const [kategoriDipilih, setKategoriDipilih] = useState(() => String(defaultCategory ?? ""))
   const kategoriKini = category !== undefined ? String(category) : kategoriDipilih
 
   // Placeholder ikut jadi baris pilihan biasa, sama seperti ia jadi
-  // <option value=""> pertama pada bentuk native.
+  // <option value=""> pertama di <select>.
   const opsiKategori = [{ value: "", label: categoryPlaceholder }, ...(categories ?? [])]
   const labelKategori =
     opsiKategori.find((option) => option.value === kategoriKini)?.label ?? categoryPlaceholder
@@ -217,16 +204,11 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
 
   const submit = () => onSearch?.(inputRef.current?.value ?? '', categoryRef.current?.value ?? '')
 
-  const handleCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setKategoriDipilih(event.target.value)
-    onCategoryChange?.(event.target.value)
-  }
-
-  // Pada bentuk panel, <select> di belakangnya dikendalikan state ini, jadi
-  // memilih cukup memperbarui state: nilai yang dibaca `onSearch` lewat
-  // `categoryRef` ikut tersetel oleh React. Bandingkan dengan Select, yang
-  // harus menyetel <select>-nya sendiri karena `onChange` di sana menjanjikan
-  // sebuah ChangeEvent, dan itu hanya bisa datang dari elemennya.
+  // <select> di belakang tombol kategori dikendalikan state ini, jadi memilih
+  // cukup memperbarui state: nilai yang dibaca `onSearch` lewat `categoryRef`
+  // ikut tersetel oleh React. Bandingkan dengan Select, yang harus menyetel
+  // <select>-nya sendiri karena `onChange` di sana menjanjikan sebuah
+  // ChangeEvent, dan itu hanya bisa datang dari elemennya.
   const pilihKategori = (nilai: string) => {
     setKategoriDipilih(nilai)
     onCategoryChange?.(nilai)
@@ -291,23 +273,17 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
           >
             <select
               ref={categoryRef}
-              value={usePanel ? kategoriKini : category}
-              defaultValue={usePanel ? undefined : defaultCategory}
+              value={kategoriKini}
               disabled={disabled}
-              aria-label={categoryPlaceholder}
-              aria-hidden={usePanel || undefined}
-              tabIndex={usePanel ? -1 : undefined}
-              onChange={handleCategoryChange}
-              className={cn(
-                'h-full appearance-none bg-transparent pr-10 pl-5 text-sm outline-none',
-                'disabled:cursor-not-allowed disabled:text-gray-400',
-                'text-gray-900',
-                // Pada bentuk panel ia tetap di alur karena lebar ruas kategori
-                // ditentukan pilihan terpanjang, bukan yang sedang aktif — kalau
-                // ia dicabut, kotaknya melebar-menyempit tiap kali memilih. Ia
-                // hanya jadi tak terlihat dan tak bisa disentuh.
-                usePanel && 'pointer-events-none opacity-0',
-              )}
+              aria-hidden="true"
+              tabIndex={-1}
+              onChange={(event) => pilihKategori(event.target.value)}
+              // Pembawa nilai saja, tapi tetap di alur: lebar ruas kategori
+              // ditentukan pilihan terpanjangnya, bukan yang sedang aktif —
+              // kalau ia dicabut, kotaknya melebar-menyempit tiap kali memilih.
+              // Karena itu kelas ukurannya dipertahankan, sementara ia sendiri
+              // tak terlihat dan tak bisa disentuh.
+              className="pointer-events-none h-full appearance-none pr-10 pl-5 text-sm opacity-0"
             >
               <option value="">{categoryPlaceholder}</option>
               {categories?.map((option) => (
@@ -317,27 +293,25 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               ))}
             </select>
 
-            {usePanel && (
-              <Dropdown
-                attached
-                contentLabel={categoryPlaceholder}
-                items={itemKategori}
-                trigger={
-                  <button
-                    type="button"
-                    disabled={disabled}
-                    aria-label={categoryPlaceholder}
-                    className={cn(
-                      'absolute inset-0 flex items-center pr-10 pl-5 text-left text-sm outline-none',
-                      'disabled:cursor-not-allowed disabled:text-gray-400',
-                      'text-gray-900',
-                    )}
-                  >
-                    <span className="truncate">{labelKategori}</span>
-                  </button>
-                }
-              />
-            )}
+            <Dropdown
+              attached
+              contentLabel={categoryPlaceholder}
+              items={itemKategori}
+              trigger={
+                <button
+                  type="button"
+                  disabled={disabled}
+                  aria-label={categoryPlaceholder}
+                  className={cn(
+                    'absolute inset-0 flex items-center pr-10 pl-5 text-left text-sm outline-none',
+                    'disabled:cursor-not-allowed disabled:text-gray-400',
+                    'text-gray-900',
+                  )}
+                >
+                  <span className="truncate">{labelKategori}</span>
+                </button>
+              }
+            />
 
             <span
               aria-hidden="true"
