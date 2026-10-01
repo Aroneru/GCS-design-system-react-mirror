@@ -95,7 +95,6 @@ const tones: Record<DropdownItemTone, string> = {
   danger: 'text-red-600 hover:bg-red-50',
 }
 
-
 /** Jarak panel dari tombol dan dari tepi layar, dalam piksel. */
 const JARAK = 4
 
@@ -456,7 +455,13 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
                     <hr aria-hidden="true" className="my-1 border-0 border-t border-border" />
                   )}
                   {group.label && (
-                    <p className="px-4 pt-2 pb-1 text-caption font-bold tracking-wide text-gray-400 uppercase">
+                    // Pada daftar pilihan kelompoknya sudah bernama lewat
+                    // `aria-label`, jadi judul yang terlihat ini disembunyikan
+                    // dari pembaca layar supaya tidak dibacakan dua kali.
+                    <p
+                      aria-hidden={pilihan || undefined}
+                      className="px-4 pt-2 pb-1 text-caption font-bold tracking-wide text-gray-400 uppercase"
+                    >
                       {group.label}
                     </p>
                   )}

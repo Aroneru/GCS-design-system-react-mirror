@@ -12,10 +12,10 @@ export type ToastVariant = 'success' | 'danger' | 'warning' | 'info' | 'purple'
  * ikon yang membawa warna variant. Menjaga notifikasi tetap ringan saat
  * beberapa toast menumpuk di layar sekaligus.
  *
- * Nilai success, danger, dan info diambil persis dari Figma — termasuk dua
+ * Nilai success, danger, dan info diambil persis dari desain — termasuk dua
  * ketidakseragamannya: danger memakai latar -50 (bukan -100 seperti dua
  * lainnya) dan info memakai ikon -600 (bukan -500). warning dan purple belum
- * ada di Figma, jadi keduanya mengikuti pola mayoritas: latar -100, ikon -500.
+ * ada di desain, jadi keduanya mengikuti pola mayoritas: latar -100, ikon -500.
  */
 const variants: Record<
   ToastVariant,
@@ -26,6 +26,40 @@ const variants: Record<
   warning: { badge: 'bg-yellow-100 text-yellow-500', icon: ExclamationCircle },
   info: { badge: 'bg-primary-100 text-primary-600', icon: InfoCircle },
   purple: { badge: 'bg-purple-100 text-purple-500', icon: InfoCircle },
+}
+
+/**
+ * Badge ikon pada tampilan gelap, juga dari desain — ikonnya selalu -400, tetapi
+ * latarnya lagi-lagi tidak seragam: success -900, danger dan info -800.
+ * warning dan purple mengikuti mayoritas: latar -800.
+ */
+const badgeDark: Record<ToastVariant, string> = {
+  success: 'bg-green-900 text-green-400',
+  danger: 'bg-red-800 text-red-400',
+  warning: 'bg-yellow-800 text-yellow-400',
+  info: 'bg-primary-800 text-primary-400',
+  purple: 'bg-purple-800 text-purple-400',
+}
+
+/** Warna kartu, teks, dan tombol tutup untuk tampilan terang dan gelap. */
+const themes = {
+  light: {
+    card: 'bg-surface',
+    heading: 'text-gray-900',
+    // Pesan tunggal gray-500, teks pendukung di bawah heading gray-600.
+    message: 'text-gray-500',
+    body: 'text-gray-600',
+    close: 'hover:text-gray-600 focus-visible:text-gray-600 focus-visible:outline-primary-600',
+  },
+  dark: {
+    card: 'bg-gray-800',
+    heading: 'text-gray-300',
+    // Pesan tunggal dan teks pendukung sama-sama gray-400.
+    message: 'text-gray-400',
+    body: 'text-gray-400',
+    // Cincin fokus primary-600 hanya 2,9:1 di atas gray-800; primary-400 lebih dari 6:1.
+    close: 'hover:text-gray-200 focus-visible:text-gray-200 focus-visible:outline-primary-400',
+  },
 }
 
 export interface ToastProps extends HTMLAttributes<HTMLDivElement> {
@@ -42,18 +76,23 @@ export interface ToastProps extends HTMLAttributes<HTMLDivElement> {
   open?: boolean
   /** Tombol tindak lanjut di bawah isi — umumnya dibuat `w-full`. */
   actions?: ReactNode
+  /** Tampilan gelap: kartu gray-800, teks lebih terang, dan badge ikon versi gelap. */
+  darkMode?: boolean
 }
 
 /**
  * Toast — notifikasi sekilas yang melayang di atas konten halaman.
  *
- * Ukurannya mengikuti Figma: kartu 320px beradius 8px, padding 16px, badge
+ * Ukurannya mengikuti desain: kartu 320px beradius 8px, padding 16px, badge
  * ikon 32px berisi ikon 20px, dan tombol tutup 12px yang tepat 16px dari tepi
  * kanan kartu.
  *
  * Komponennya sendiri tidak memposisikan apa pun: bungkus dengan wadah
  * `fixed` (mis. `fixed bottom-4 left-4 z-50 space-y-3`) supaya bisa ditumpuk
  * di sudut mana pun tanpa mengunci satu posisi ke dalam komponen.
+ *
+ * `darkMode` mengganti kartu, teks, dan badge ikonnya ke tampilan gelap. Tombol
+ * di `actions` tidak ikut diubah — desainnya memakai primary-700 di kedua tampilan.
  */
 export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
   {
@@ -64,6 +103,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
     onDismiss,
     open,
     actions,
+    darkMode = false,
     className,
     children,
     ...props
@@ -72,6 +112,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
 ) {
   const { mounted, visible, close } = useDismissible(open)
   const v = variants[variant]
+  const theme = darkMode ? themes.dark : themes.light
   const DefaultIcon = v.icon
   const showIcon = icon !== false
 
@@ -92,9 +133,10 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
       role="status"
       aria-live="polite"
       className={cn(
-        // `shadow` (bukan shadow-sm) — nilainya persis dua lapis dari Figma;
+        // `shadow` (bukan shadow-sm) — nilainya persis dua lapis dari desain;
         // --shadow-sm di tokens.css sudah dipakai untuk nilai lain.
-        'relative w-full max-w-80 rounded-lg bg-surface p-4 shadow',
+        'relative w-full max-w-80 rounded-lg p-4 shadow',
+        theme.card,
         'transition ease-out',
         visible ? 'translate-y-0 opacity-100 duration-300' : 'translate-y-2 opacity-0 duration-200',
         className,
@@ -103,21 +145,24 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
     >
       <div className={cn('flex gap-3', multiline ? 'items-start' : 'items-center')}>
         {showIcon && (
-          <span className={cn('grid size-8 shrink-0 place-items-center rounded-lg', v.badge)}>
+          <span
+            className={cn(
+              'grid size-8 shrink-0 place-items-center rounded-lg',
+              darkMode ? badgeDark[variant] : v.badge,
+            )}
+          >
             <Icon className="size-5">{icon ?? <DefaultIcon />}</Icon>
           </span>
         )}
 
         {/*
           Kolom isi memenuhi sisa lebar kartu — tombol aksi ikut selebar itu,
-          sesuai Figma. Tombol tutup melayang di atasnya, jadi teksnya yang
+          sesuai desain. Tombol tutup melayang di atasnya, jadi teksnya yang
           diberi ruang kanan supaya tidak tertimpa.
         */}
         <div className="min-w-0 flex-1">
           {heading && (
-            <p
-              className={cn('text-sm leading-normal font-bold text-gray-900', dismissible && 'pr-6')}
-            >
+            <p className={cn('text-sm leading-normal font-bold', theme.heading, dismissible && 'pr-6')}>
               {heading}
             </p>
           )}
@@ -126,8 +171,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
             <div
               className={cn(
                 'text-sm leading-normal',
-                // Figma: pesan tunggal gray-500, teks pendukung di bawah heading gray-600.
-                heading ? 'text-gray-600' : 'text-gray-500',
+                heading ? theme.body : theme.message,
                 dismissible && 'pr-6',
               )}
             >
@@ -145,8 +189,10 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
           onClick={handleClose}
           className={cn(
             // right-3 + p-1 menaruh ikon 12px tepat 16px dari tepi kartu,
-            // sambil menyisakan area klik 20px.
-            'absolute right-3 rounded-md p-1 text-gray-400 transition-colors hover:text-gray-600 focus-visible:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+            // sambil menyisakan area klik 20px. Ikonnya gray-400 di kedua
+            // tampilan, sesuai desain.
+            'absolute right-3 rounded-md p-1 text-gray-400 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
+            theme.close,
             multiline ? 'top-3' : 'top-1/2 -translate-y-1/2',
           )}
           aria-label="Tutup notifikasi"

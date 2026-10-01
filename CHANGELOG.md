@@ -12,7 +12,7 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 ## [Belum dirilis]
 
 Perubahan di bawah ini sudah ada di kode tetapi belum diterbitkan ke npm.
-Isinya menjadikan rilis berikutnya `0.2.0`, bukan `0.1.1`: ada delapan komponen
+Isinya menjadikan rilis berikutnya `0.2.0`, bukan `0.1.1`: ada sembilan komponen
 publik baru, dan satu perubahan yang memutus.
 
 ### Diubah
@@ -22,12 +22,53 @@ publik baru, dan satu perubahan yang memutus.
   berupa lockup dengan baris nama instansi, baris itu jatuh ke sekitar 6px dan
   berhenti terbaca. Consumer yang logonya mark polos akan melihatnya membesar —
   pakai `logoContent` bila ukuran lamanya memang disengaja.
+- **`Select`: daftar pilihannya kini panel Dropdown**, bukan popup milik sistem
+  operasi, jadi rupanya seragam dengan menu lain di kit ini. API-nya tidak
+  berubah: nilainya tetap dibawa elemen `<select>` yang dirender tersembunyi,
+  sehingga `value`, `onChange`, `name`, dan pengiriman formulir bekerja seperti
+  sebelumnya, dan `<option>` maupun `<optgroup>` yang ditulis sebagai `children`
+  dibaca lalu tampil di panel yang sama. Dua hal yang akan terasa berbeda: di
+  ponsel tidak lagi muncul pemilih layar penuh milik sistem, dan `ref` masih
+  menunjuk `<select>` yang kini tersembunyi — memanggil `.focus()` padanya tidak
+  lagi memfokuskan field yang terlihat.
 
 ### Ditambahkan
 
+- **`Alert`: prop `darkMode`** — tampilan gelap: latar gray-800 untuk semua
+  variant, dengan ikon, heading, dan tombol tutup -300 serta isi pesan -400.
+  Isi `actions` tidak ikut diubah, jadi pilih warna tombol yang kontras di atas
+  gray-800. Bawaannya `false`, jadi Alert yang sudah ada tetap terang.
 - **`Avatar`** — lingkaran identitas berisi foto (`src`) atau inisial
   (`initials`) dalam tiga ukuran lewat `size` (`small` 24px, `default` 32px,
   `large` 80px). Gambar yang gagal dimuat jatuh sendiri ke inisial.
+- **`Datepicker`** — pemilih tanggal dengan kalender di panel melayang, dalam
+  tiga bentuk lewat `type`: `single` (satu tanggal, dengan tombol Hari ini dan
+  Hapus), `period` (satu kalender dengan pintasan Hari ini, Minggu ini, Bulan
+  ini, Hapus, dan Semua Waktu), dan `multiple` (dua kotak — mulai dan selesai —
+  dengan dua kalender berdampingan yang bisa digeser sendiri-sendiri, bertombol
+  Hari ini dan Hapus; prop `shortcuts` menambahkan pintasan periode milik
+  `period`). Nilai `single` berupa `Date`; `period` dan `multiple` berupa
+  `DateRange` (`{ start, end }`). Pada keduanya rentang dipilih dengan dua klik
+  — tanggal mulai, lalu tanggal selesai — dan panel baru tertutup setelah klik
+  kedua. Lebar bawaannya sama dengan panelnya (284px, 325px, dan 600px), jadi
+  tepi kotak dan kalendernya segaris.
+
+  Prop `min` dan `max` menandai awal dan akhir data — misalnya tiket pesawat
+  dari hari ini sampai tanggal yang sama tahun depan. Tanggal di luarnya tidak
+  bisa dipilih, pintasan periode dipotong ke rentang itu (atau dimatikan bila
+  seluruhnya di luar), dan Semua Waktu memilih seluruh rentang data,
+  `{ start: min, end: max }`. Sisi yang tidak diberi batas bernilai `null`, jadi
+  tanpa keduanya Semua Waktu bernilai `{ start: null, end: null }`.
+
+  Seperti Dropdown, panelnya memakai HTML Popover API, dan kalendernya bisa
+  ditelusuri dengan panah, Home/End, serta PageUp/PageDown. Dengan `name`,
+  tanggalnya ikut terkirim bersama formulir sebagai `YYYY-MM-DD`.
+
+  Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert,
+  Datepicker, dan Toast yang memilikinya; komponen lain menyusul.
+
+  Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
+  `DatepickerRangeProps` ikut diekspor.
 - **`Dropdown`** — panel yang dibuka dari sebuah tombol (`trigger`), memakai
   HTML Popover API sehingga browser yang mengurus penutupan, top layer, dan
   urutan fokus. Barisnya diisi lewat `items`, atau `groups` bila perlu dipisah
@@ -57,23 +98,17 @@ publik baru, dan satu perubahan yang memutus.
 - **`Search`** — kolom pencarian dengan tombol cari. Dua ukuran lewat
   `platform` (`default` 54px, `mobile` 50px). Mengisi prop `categories` akan
   mengubahnya jadi varian tiga ruas: dropdown kategori, isian, lalu tombol
-  ikon, dan `categoryMenu` memilih bentuk daftar kategorinya — popup bawaan
-  sistem, atau panel Dropdown. Tipe pendukung `SearchCategory` dan
-  `SearchMenuMode` ikut diekspor.
-- **`Select`: prop `menu`.** `native` — bawaannya — memakai popup milik sistem
-  operasi seperti selama ini; `panel` menggantinya dengan panel Dropdown, untuk
-  halaman yang tampilannya harus seragam sampai ke daftar pilihan. Di balik
-  keduanya tetap ada elemen `<select>` yang sama, jadi `value`, `onChange`,
-  `name`, dan pengiriman formulir bekerja persis sama — berganti bentuk tidak
-  menuntut satu baris pun perubahan lain. Bentuk `panel` memerlukan `options`;
-  daftar yang ditulis sendiri sebagai `<option>` tidak bisa dibaca komponen,
-  jadi di situ ia tetap memakai popup bawaan. Tipe `SelectMenuMode` ikut
-  diekspor.
+  ikon. Daftar kategorinya panel Dropdown, sama dengan daftar pilihan Select.
+  Tipe pendukung `SearchCategory` ikut diekspor.
 - **`Sidebar`** — navigasi samping dengan menu tunggal (`items`) atau
   terkelompok (`groups`), submenu, area profil (`user`), dan mode ringkas
   (`collapsed` + `onCollapse`). Tipe pendukung `SidebarItem`, `SidebarSubItem`,
   `SidebarGroup`, dan `SidebarUser` ikut diekspor.
 - **`Spinner`** — indikator proses dalam ukuran `default` dan `large`.
+- **`Toast`: prop `darkMode`** — tampilan gelap sesuai desain: kartu gray-800,
+  heading gray-300, teks lainnya gray-400, dan badge ikon berlatar gelap (-800;
+  success -900) dengan ikon -400. Tombol tutup dan tombol di `actions` tidak
+  berubah. Bawaannya `false`, jadi Toast yang sudah ada tetap terang.
 - **`Upload`** — pemilih berkas dalam dua bentuk lewat `type`: `default`
   (tombol pilih berkas + nama berkas terpilih, dua ukuran lewat `platform`) dan
   `attach` (area seret-lepas bergaris putus-putus setinggi 230px). Membungkus
