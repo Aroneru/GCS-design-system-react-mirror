@@ -80,7 +80,6 @@ export type {
   SelectOption,
   SelectState,
   SelectApplication,
-  SelectMenuMode,
 } from "./components/Select";
 
 export { Search } from "./components/Search";
@@ -89,8 +88,16 @@ export type {
   SearchCategory,
   SearchPlatform,
   SearchApplication,
-  SearchMenuMode,
 } from "./components/Search";
+
+export { Datepicker } from "./components/Datepicker";
+export type {
+  DatepickerProps,
+  DatepickerSingleProps,
+  DatepickerRangeProps,
+  DatepickerType,
+  DateRange,
+} from "./components/Datepicker";
 
 export { Upload } from "./components/Upload";
 export type {

@@ -42,6 +42,7 @@ const toastProps: PropRow[] = [
   ['onDismiss', '() => void', 'undefined', 'Dipanggil saat tombol tutup diklik.'],
   ['open', 'boolean', 'undefined', 'Kendalikan tampil/sembunyi dari luar; tanpa ini Toast mengurusnya sendiri.'],
   ['actions', 'ReactNode', 'undefined', 'Tombol tindak lanjut di bawah isi — umumnya dibuat w-full.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kartu gray-800, teks lebih terang, dan badge ikon versi gelap.'],
   ['children', 'ReactNode', 'undefined', 'Isi pesan.'],
   ['…props', 'HTMLAttributes', '—', 'Seluruh atribut <div> diteruskan (className, id, …).'],
 ]
@@ -49,6 +50,7 @@ const toastProps: PropRow[] = [
 const toc: TocEntry[] = [
   { id: 'toast', label: 'Toast' },
   { id: 'heading-aksi', label: 'Dengan heading & aksi' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'posisi', label: 'Posisi & tumpukan' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
@@ -57,7 +59,7 @@ const toc: TocEntry[] = [
 
 /**
  * Tombol contoh untuk slot `actions`. Ukuran xs (tinggi 34px, teks 12px,
- * radius 8px, primary-700) kebetulan persis tombol yang digambar di Figma,
+ * radius 8px, primary-700) kebetulan persis tombol yang digambar di desain,
  * jadi contohnya memakai <Button> dari kit apa adanya.
  */
 function AksiButton() {
@@ -73,17 +75,21 @@ export function ToastPage() {
   const [lebar, setLebar] = useState<'mobile' | 'desktop'>('desktop')
   const [posisi, setPosisi] = useState<Sudut>('bottom-left')
   const [pakaiAksi, setPakaiAksi] = useState(false)
+  const [dark, setDark] = useState(false)
 
   // Toast menutup dirinya sendiri; ganti key untuk memasangnya kembali dari nol.
   const [tayangan, setTayangan] = useState(0)
 
   const sudutTerpilih = sudut.find((s) => s.value === posisi) ?? sudut[2]
+  // Skeleton halaman ikut gelap bersama bingkainya.
+  const garisJudul = dark ? 'bg-gray-600' : 'bg-gray-300'
+  const garis = dark ? 'bg-gray-700' : 'bg-gray-200'
 
   return (
     <UsulanPage
       eyebrow="Components"
       title="Toast"
-      description="Notifikasi sekilas yang melayang di atas konten halaman — untuk konfirmasi aksi, pembaruan status, atau ajakan tindak lanjut. Berbeda dari Alert: kartu tetap netral, hanya badge ikon yang membawa warna variant."
+      description="Notifikasi sekilas yang melayang di atas konten halaman — untuk konfirmasi aksi, pembaruan status, atau ajakan tindak lanjut. Berbeda dari Alert: kartu tetap netral, hanya badge ikon yang membawa warna variant. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="toast" title="Toast">
@@ -145,6 +151,45 @@ export function ToastPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti kartunya ke gray-800, heading ke gray-300, dan teks lainnya ke
+          gray-400. Badge ikon ikut memakai versi gelapnya — latar gelap dengan ikon -400 — sedangkan tombol
+          tutup tetap gray-400 dan tombol di <H>actions</H> tetap primary-700 di kedua tampilan.
+        </Lead>
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Demo label="Pesan singkat" dark>
+            <div className="space-y-3">
+              {variants.map((v) => (
+                <Toast key={v.value} darkMode variant={v.value} dismissible={false}>
+                  {v.pesan}
+                </Toast>
+              ))}
+            </div>
+          </Demo>
+          <Demo label="Dengan heading & aksi" dark>
+            <Toast
+              darkMode
+              variant="info"
+              icon={<Refresh />}
+              heading="Update 2FA sudah tersedia!"
+              actions={<AksiButton />}
+            >
+              Update Metode Password anda sekarang
+            </Toast>
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Toast '}
+          <H>darkMode</H>
+          {' variant="success">Sukses Membuat Data!</Toast>'}
+        </SectionCode>
+        <p className="mt-4 text-body-sm text-gray-500">
+          Warning dan purple belum punya versi gelap di desain, jadi keduanya mengikuti pola mayoritas: latar
+          -800 dengan ikon -400.
+        </p>
+      </FlowSection>
+
       <FlowSection id="posisi" title="Posisi & tumpukan">
         <Lead>
           Komponennya sendiri tidak memposisikan apa pun. Bungkus dengan wadah <H>fixed</H> di sudut yang
@@ -181,7 +226,11 @@ export function ToastPage() {
           sedangkan di sini perlu tinggi tetap dan `relative` supaya Toast bisa
           benar-benar ditempel ke sudut bingkainya.
         */}
-        <div className="relative h-72 overflow-hidden rounded-2xl border border-border bg-surface-subtle p-4 sm:h-80 sm:p-6">
+        <div
+          className={`relative h-72 overflow-hidden rounded-2xl border p-4 transition-colors sm:h-80 sm:p-6 ${
+            dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
+          }`}
+        >
           <div
             className={`relative mx-auto h-full transition-[max-width] duration-300 ease-out ${
               lebar === 'mobile' ? 'max-w-75' : 'max-w-full'
@@ -189,13 +238,13 @@ export function ToastPage() {
           >
             {/* Skeleton konten halaman, hanya latar */}
             <div className="space-y-3 opacity-60" aria-hidden="true">
-              <div className="h-2 w-2/5 rounded bg-gray-300" />
-              <div className="h-1.5 w-full rounded bg-gray-200" />
-              <div className="h-1.5 w-5/6 rounded bg-gray-200" />
-              <div className="h-1.5 w-3/4 rounded bg-gray-200" />
-              <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
-              <div className="h-1.5 w-full rounded bg-gray-200" />
-              <div className="h-1.5 w-4/6 rounded bg-gray-200" />
+              <div className={`h-2 w-2/5 rounded ${garisJudul}`} />
+              <div className={`h-1.5 w-full rounded ${garis}`} />
+              <div className={`h-1.5 w-5/6 rounded ${garis}`} />
+              <div className={`h-1.5 w-3/4 rounded ${garis}`} />
+              <div className={`mt-6 h-2 w-1/3 rounded ${garisJudul}`} />
+              <div className={`h-1.5 w-full rounded ${garis}`} />
+              <div className={`h-1.5 w-4/6 rounded ${garis}`} />
             </div>
 
             <div
@@ -207,6 +256,7 @@ export function ToastPage() {
                 <Toast
                   key={`aksi-${tayangan}`}
                   variant={variant}
+                  darkMode={dark}
                   icon={<Refresh />}
                   heading="Update 2FA sudah tersedia!"
                   actions={<AksiButton />}
@@ -214,7 +264,7 @@ export function ToastPage() {
                   Update Metode Password anda sekarang
                 </Toast>
               ) : (
-                <Toast key={`singkat-${tayangan}`} variant={variant}>
+                <Toast key={`singkat-${tayangan}`} variant={variant} darkMode={dark}>
                   {variants.find((v) => v.value === variant)?.pesan}
                 </Toast>
               )}
@@ -254,6 +304,18 @@ export function ToastPage() {
               options={[
                 { value: false, label: 'Pesan singkat' },
                 { value: true, label: 'Heading + aksi' },
+              ]}
+            />
+          </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Terang' },
+                { value: true, label: 'Gelap' },
               ]}
             />
           </Control>
@@ -317,6 +379,13 @@ export function ToastPage() {
               {'        '}
               <H>variant</H>
               {`="${variant}"\n`}
+            </>
+          )}
+          {dark && (
+            <>
+              {'        '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {pakaiAksi && (

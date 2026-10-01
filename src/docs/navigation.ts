@@ -87,6 +87,7 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       },
       { label: "Regular Select Form", route: "/form/select" },
       { label: "Search Form", route: "/form/search" },
+      { label: "Datepicker", route: "/form/datepicker" },
       { label: "Upload Form", route: "/form/upload" },
       { label: "Radio Button", route: "/form/radio" },
       { label: "Toggle Button", route: "/form/toggle" },

@@ -1,15 +1,21 @@
 import {
+  Children,
   forwardRef,
+  Fragment,
+  isValidElement,
   useId,
   useRef,
   useState,
   type ChangeEvent,
+  type OptgroupHTMLAttributes,
+  type OptionHTMLAttributes,
+  type ReactElement,
   type ReactNode,
   type SelectHTMLAttributes,
 } from 'react'
 import { InfoCircle } from 'flowbite-react-icons/solid'
 import { cn } from '../utils/cn'
-import { Dropdown, type DropdownItem } from './Dropdown'
+import { Dropdown, type DropdownGroup } from './Dropdown'
 
 /** Warna aksen per aplikasi — dipakai ikon info dan garis saat field difokus. */
 export type SelectApplication = 'default' | 'simaya'
@@ -17,15 +23,18 @@ export type SelectApplication = 'default' | 'simaya'
 /** State mengikuti varian Figma. `inactive` sekaligus menonaktifkan kontrol. */
 export type SelectState = 'default' | 'inactive'
 
-/** Bentuk daftar pilihan: popup bawaan sistem, atau panel bergaya kit. */
-export type SelectMenuMode = 'native' | 'panel'
-
 /** Satu pilihan pada dropdown. */
 export interface SelectOption {
   value: string
   label: string
   disabled?: boolean
 }
+
+/** Satu baris panel. Labelnya ReactNode karena `<option>` tulisan sendiri boleh berisi apa saja. */
+type Opsi = { value: string; label: ReactNode; disabled?: boolean }
+
+/** Satu kelompok baris; berlabel bila asalnya `<optgroup>`. */
+type KelompokOpsi = { label?: string; options: Opsi[] }
 
 const accents: Record<SelectApplication, { icon: string; focus: string }> = {
   default: { icon: 'text-primary-500', focus: 'focus-within:border-primary-500' },
@@ -37,9 +46,9 @@ const accents: Record<SelectApplication, { icon: string; focus: string }> = {
  * disetel lewat setter bawaan, lalu event `change` sungguhan dilepas supaya
  * React memanggil `onChange` seperti biasa.
  *
- * Itu yang membuat bentuk `panel` tidak punya jalur pemberitahuan sendiri:
- * apa pun bentuk daftarnya, kabar perubahan tetap berangkat dari `<select>`
- * yang sama, lengkap dengan `ChangeEvent` yang dijanjikan `onChange`.
+ * Itu yang membuat panel tidak punya jalur pemberitahuan sendiri: kabar
+ * perubahan tetap berangkat dari `<select>`, lengkap dengan `ChangeEvent` yang
+ * dijanjikan `onChange`.
  */
 function setelSelect(el: HTMLSelectElement | null, nilai: string) {
   if (!el) return
@@ -47,6 +56,58 @@ function setelSelect(el: HTMLSelectElement | null, nilai: string) {
   if (setter) setter.call(el, nilai)
   else el.value = nilai
   el.dispatchEvent(new Event('change', { bubbles: true }))
+}
+
+/** Teks polos isi sebuah `<option>` — nilai cadangan bila `value` tidak ditulis. */
+const teksDari = (node: ReactNode): string =>
+  Children.toArray(node)
+    .map((n) => (typeof n === 'string' || typeof n === 'number' ? String(n) : ''))
+    .join('')
+    .trim()
+
+/**
+ * Membaca `<option>` dan `<optgroup>` yang ditulis sebagai `children`, supaya
+ * daftar tulisan sendiri pun tampil di panel yang sama dengan daftar lewat
+ * `options`. Aturannya mengikuti HTML: tanpa `value`, teksnya yang jadi nilai,
+ * dan `<optgroup disabled>` mematikan seluruh isinya. Baris `awal` (placeholder)
+ * mendahului semuanya, seperti `<option value="">` pertama di `<select>`.
+ */
+function bacaOpsi(children: ReactNode, awal: Opsi[]): KelompokOpsi[] {
+  const kelompok: KelompokOpsi[] = [{ options: [...awal] }]
+
+  const opsiDari = (el: ReactElement<OptionHTMLAttributes<HTMLOptionElement>>, mati?: boolean): Opsi => ({
+    value: el.props.value !== undefined ? String(el.props.value) : teksDari(el.props.children),
+    label: el.props.children,
+    disabled: mati || el.props.disabled,
+  })
+
+  const telusuri = (node: ReactNode) =>
+    Children.forEach(node, (anak) => {
+      if (!isValidElement<{ children?: ReactNode }>(anak)) return
+      if (anak.type === Fragment) return telusuri(anak.props.children)
+
+      if (anak.type === 'option') {
+        kelompok[kelompok.length - 1].options.push(
+          opsiDari(anak as ReactElement<OptionHTMLAttributes<HTMLOptionElement>>),
+        )
+      } else if (anak.type === 'optgroup') {
+        const { label, disabled, children: isi } = (
+          anak as ReactElement<OptgroupHTMLAttributes<HTMLOptGroupElement>>
+        ).props
+        const grup: KelompokOpsi = { label, options: [] }
+        Children.forEach(isi, (o) => {
+          if (isValidElement(o) && o.type === 'option') {
+            grup.options.push(opsiDari(o as ReactElement<OptionHTMLAttributes<HTMLOptionElement>>, disabled))
+          }
+        })
+        // `<option>` lepas sesudah sebuah `<optgroup>` masuk kelompok tanpa
+        // label yang baru, bukan menempel ke kelompok sebelumnya.
+        kelompok.push(grup, { options: [] })
+      }
+    })
+
+  telusuri(children)
+  return kelompok.filter((k) => k.options.length > 0)
 }
 
 /**
@@ -75,19 +136,11 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
   helperText?: ReactNode
   /** Teks saat belum ada pilihan, mis. "Pilih Apapun Itu". */
   placeholder?: string
-  /** Daftar pilihan. Bila kosong, `children` (<option> sendiri) yang dipakai. */
-  options?: SelectOption[]
   /**
-   * Bentuk daftar pilihannya. `native` memakai popup bawaan sistem: paling
-   * ringan, dan di ponsel muncul sebagai pemilih layar penuh yang sudah akrab.
-   * `panel` menggantinya dengan panel bergaya kit — sama rupanya dengan
-   * Dropdown — untuk halaman yang tampilannya harus seragam sampai ke daftar
-   * pilihan. Hanya berlaku bila `options` diisi; daftar yang ditulis sebagai
-   * `children` tidak bisa dibaca komponen, jadi di situ ia tetap memakai popup
-   * bawaan. Selain rupanya tidak ada yang berubah: `value`, `onChange`,
-   * `name`, dan pengiriman formulir sama persis di kedua bentuk.
+   * Daftar pilihan. Bila kosong, `<option>` — dan `<optgroup>` — yang ditulis
+   * sebagai `children` yang dipakai; keduanya tampil di panel yang sama.
    */
-  menu?: SelectMenuMode
+  options?: SelectOption[]
   application?: SelectApplication
   state?: SelectState
   /** Kelas untuk pembungkus terluar (label + field + caption). */
@@ -97,11 +150,11 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
 /**
  * Regular Select Form — dropdown satu pilihan.
  *
- * Selalu memakai elemen `<select>` bawaan sebagai kontrol sebenarnya, supaya
- * nilai, `name`, dan pengiriman formulir tidak pernah bergantung pada tampilan.
- * Dalam bentuk `native` ia juga yang terlihat dan hanya panahnya yang digambar
- * sendiri; dalam bentuk `panel` ia tetap ada di belakang layar sementara yang
- * terlihat adalah tombol dan panel bergaya kit.
+ * Daftar pilihannya panel Dropdown, bukan popup milik sistem operasi, jadi
+ * rupanya seragam dengan menu lain di kit ini. Nilainya tetap dibawa elemen
+ * `<select>` yang dirender tersembunyi di belakang tombolnya: `value`,
+ * `onChange`, `name`, `ref`, dan pengiriman formulir bekerja seperti pada
+ * `<select>` biasa.
  *
  * State `inactive` menonaktifkan kontrol sekaligus meredupkan tampilannya, dan
  * warna ikon info serta garis saat difokus mengikuti prop `application`.
@@ -113,7 +166,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
     helperText,
     placeholder,
     options,
-    menu = 'native',
     application = 'default',
     state = 'default',
     className,
@@ -140,7 +192,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   const isInactive = disabled || state === 'inactive'
   const isPlaceholder = current === ''
   const accent = accents[application]
-  const usePanel = menu === 'panel' && Boolean(options?.length)
 
   // Ref internal dipakai untuk menyetel nilai saat memilih dari panel; ref dari
   // luar tetap diteruskan supaya pemakai masih memegang `<select>` yang sama.
@@ -156,33 +207,29 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
     onChange?.(event)
   }
 
-  // Placeholder di panel adalah baris pilihan biasa, sama seperti ia jadi
-  // <option value=""> pertama pada bentuk native.
-  const menuOptions = placeholder
-    ? [{ value: '', label: placeholder }, ...(options ?? [])]
-    : (options ?? [])
-  const chosenOption = menuOptions.find((option) => option.value === current)
+  const awal: Opsi[] = placeholder ? [{ value: '', label: placeholder }] : []
+  const kelompok = options ? [{ options: [...awal, ...options] }] : bacaOpsi(children, awal)
+  const chosenOption = kelompok.flatMap((k) => k.options).find((o) => o.value === current)
 
-  // `selected` inilah yang membuat panel Dropdown berpindah peran jadi
-  // daftar pilihan; sisanya — penempatan, papan ketik, penutupan — sudah
-  // jadi urusan Dropdown, jadi tidak ada panel kedua di kit ini.
-  const menuItems: DropdownItem[] = menuOptions.map((option) => ({
-    id: `opsi-${option.value}`,
-    label: option.label,
-    disabled: option.disabled,
-    selected: option.value === current,
-    onClick: () => setelSelect(selectRef.current, option.value),
+  // `selected` inilah yang membuat panel Dropdown berperan sebagai daftar
+  // pilihan; penempatan, papan ketik, dan penutupannya sudah urusan Dropdown.
+  const menuGroups: DropdownGroup[] = kelompok.map((k, i) => ({
+    id: `kelompok-${i}`,
+    label: k.label,
+    items: k.options.map((option) => ({
+      id: `opsi-${option.value}`,
+      label: option.label,
+      disabled: option.disabled,
+      selected: option.value === current,
+      onClick: () => setelSelect(selectRef.current, option.value),
+    })),
   }))
 
   return (
     <div className={cn('w-full', className)}>
       {label && (
         <div className="mb-2 flex items-center gap-2">
-          <label
-            htmlFor={fieldId}
-            id={usePanel ? labelId : undefined}
-            className="text-sm font-bold text-gray-900"
-          >
+          <label htmlFor={fieldId} id={labelId} className="text-sm font-bold text-gray-900">
             {label}
           </label>
           {info && (
@@ -205,32 +252,18 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
       >
         <select
           ref={attachSelect}
-          // Pada bentuk panel, tombollah yang memegang id dan ditunjuk label;
-          // `<select>` tinggal jadi pembawa nilai.
-          id={usePanel ? undefined : fieldId}
           value={value}
           defaultValue={defaultValue}
           disabled={isInactive}
-          aria-describedby={helperText && !usePanel ? helperId : undefined}
-          aria-hidden={usePanel || undefined}
-          tabIndex={usePanel ? -1 : undefined}
+          aria-hidden="true"
+          tabIndex={-1}
           onChange={handleChange}
-          className={cn(
-            // Tinggi 37px mengikuti Figma; panah bawaan browser dimatikan dan
-            // diganti ikon sendiri, jadi sisi kanan diberi ruang lebih.
-            'h-9.25 w-full appearance-none bg-transparent pr-8 pl-2.5 text-sm outline-none disabled:cursor-not-allowed',
-            usePanel
-              ? // Pada bentuk panel ia keluar dari alur supaya tombollah yang
-                // mengisi field, tapi tetap dirender: disembunyikan lewat
-                // `opacity`, bukan `hidden`, supaya peramban masih bisa
-                // memfokusnya untuk menampilkan pesan validasi `required`.
-                'pointer-events-none absolute opacity-0'
-              : isInactive
-                ? 'text-gray-300'
-                : isPlaceholder
-                  ? 'text-gray-500'
-                  : 'text-gray-900',
-          )}
+          // Pembawa nilai saja: tombol di bawahnya yang terlihat, memegang id,
+          // dan ditunjuk label. Ia disembunyikan lewat `opacity`, bukan
+          // `hidden`, supaya peramban masih bisa memfokusnya untuk menampilkan
+          // pesan validasi `required` — dan menutupi field supaya pesan itu
+          // muncul di tempat yang benar.
+          className="pointer-events-none absolute inset-0 size-full opacity-0"
           {...props}
         >
           {placeholder && <option value="">{placeholder}</option>}
@@ -243,30 +276,29 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
             : children}
         </select>
 
-        {usePanel && (
-          <Dropdown
-            attached
-            contentLabel={typeof label === 'string' ? label : props['aria-label']}
-            items={menuItems}
-            trigger={
-              <button
-                type="button"
-                id={fieldId}
-                disabled={isInactive}
-                aria-labelledby={label ? labelId : undefined}
-                aria-label={label ? undefined : props['aria-label']}
-                aria-describedby={helperText ? helperId : undefined}
-                className={cn(
-                  'flex h-9.25 w-full items-center pr-8 pl-2.5 text-left text-sm outline-none',
-                  'disabled:cursor-not-allowed',
-                  isInactive ? 'text-gray-300' : isPlaceholder ? 'text-gray-500' : 'text-gray-900',
-                )}
-              >
-                <span className="truncate">{chosenOption?.label ?? placeholder ?? ''}</span>
-              </button>
-            }
-          />
-        )}
+        <Dropdown
+          attached
+          contentLabel={typeof label === 'string' ? label : props['aria-label']}
+          groups={menuGroups}
+          trigger={
+            <button
+              type="button"
+              id={fieldId}
+              disabled={isInactive}
+              aria-labelledby={label ? labelId : undefined}
+              aria-label={label ? undefined : props['aria-label']}
+              aria-describedby={helperText ? helperId : undefined}
+              // Tinggi 37px mengikuti Figma; sisi kanan diberi ruang untuk panah.
+              className={cn(
+                'flex h-9.25 w-full items-center pr-8 pl-2.5 text-left text-sm outline-none',
+                'disabled:cursor-not-allowed',
+                isInactive ? 'text-gray-300' : isPlaceholder ? 'text-gray-500' : 'text-gray-900',
+              )}
+            >
+              <span className="truncate">{chosenOption?.label ?? placeholder ?? ''}</span>
+            </button>
+          }
+        />
 
         <span
           aria-hidden="true"
