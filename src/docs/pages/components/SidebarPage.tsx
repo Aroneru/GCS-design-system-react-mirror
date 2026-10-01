@@ -7,6 +7,7 @@ import {
   Control,
   Controls,
   FlowSection,
+  Lead,
   SectionCode,
   Stage,
   UsulanPage,
@@ -684,15 +685,22 @@ export function SidebarPage() {
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Referensi seluruh prop Sidebar, termasuk state container serta state per-item
           menu/submenu.
-        </p>
+        </Lead>
 
-        <PropsTable rows={sidebarProps} minWidth="46rem" />
+        <div className="space-y-6">
+          <div>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Sidebar Props</h3>
+            <PropsTable rows={sidebarProps} minWidth="46rem" />
+          </div>
 
-        <h3 className="mt-8 mb-3 text-sm font-bold text-gray-900">SidebarItem</h3>
-        <PropsTable rows={sidebarItemProps} minWidth="46rem" />
+          <div>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">SidebarItem Props</h3>
+            <PropsTable rows={sidebarItemProps} minWidth="46rem" />
+          </div>
+        </div>
       </FlowSection>
     </UsulanPage>
   );
