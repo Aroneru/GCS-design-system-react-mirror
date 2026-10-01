@@ -37,23 +37,23 @@ export interface NavbarSubItem extends NavbarContextItem {
 
 export type NavbarItem =
   | (NavbarItemBase & {
-      href: string;
-      external?: boolean;
-      children?: never;
-      contextualItems?: NavbarContextItem[];
-    })
+    href: string;
+    external?: boolean;
+    children?: never;
+    contextualItems?: NavbarContextItem[];
+  })
   | (NavbarItemBase & {
-      href: string;
-      external?: boolean;
-      children: NavbarSubItem[];
-      contextualItems?: NavbarContextItem[];
-    })
+    href: string;
+    external?: boolean;
+    children: NavbarSubItem[];
+    contextualItems?: NavbarContextItem[];
+  })
   | (NavbarItemBase & {
-      href?: never;
-      external?: never;
-      children: NavbarSubItem[];
-      contextualItems?: never;
-    });
+    href?: never;
+    external?: never;
+    children: NavbarSubItem[];
+    contextualItems?: never;
+  });
 
 interface NavbarSearchBase {
   onSubmit: (query: string, event: FormEvent<HTMLFormElement>) => void;
@@ -68,13 +68,13 @@ interface NavbarSearchBase {
 export type NavbarSearchConfig = NavbarSearchBase &
   (
     | {
-        value: string;
-        defaultValue?: never;
-      }
+      value: string;
+      defaultValue?: never;
+    }
     | {
-        value?: never;
-        defaultValue?: string;
-      }
+      value?: never;
+      defaultValue?: string;
+    }
   );
 
 interface NavbarActionBase {
@@ -83,15 +83,15 @@ interface NavbarActionBase {
 
 export type NavbarAction =
   | (NavbarActionBase & {
-      href: string;
-      external?: boolean;
-      onClick?: never;
-    })
+    href: string;
+    external?: boolean;
+    onClick?: never;
+  })
   | (NavbarActionBase & {
-      href?: never;
-      external?: never;
-      onClick: MouseEventHandler<HTMLButtonElement>;
-    });
+    href?: never;
+    external?: never;
+    onClick: MouseEventHandler<HTMLButtonElement>;
+  });
 
 export interface NavbarGuestActions {
   login?: NavbarAction;
@@ -113,15 +113,15 @@ interface NavbarNotificationBase {
 
 export type NavbarNotification =
   | (NavbarNotificationBase & {
-      href: string;
-      external?: boolean;
-      onClick?: never;
-    })
+    href: string;
+    external?: boolean;
+    onClick?: never;
+  })
   | (NavbarNotificationBase & {
-      href?: never;
-      external?: never;
-      onClick: MouseEventHandler<HTMLButtonElement>;
-    });
+    href?: never;
+    external?: never;
+    onClick: MouseEventHandler<HTMLButtonElement>;
+  });
 
 export type NavbarMenuPosition = "left" | "right";
 export type NavbarVariant = "front-office" | "back-office";
@@ -142,6 +142,10 @@ type ResolvedNavbarContext = {
 
 function isNavbarSectionItem(item: NavbarItem): item is NavbarSectionItem {
   return Array.isArray(item.children) && item.children.length > 0;
+}
+
+function isNavbarLinkItem(item: NavbarItem): item is NavbarLinkItem {
+  return typeof item.href === "string";
 }
 
 function getOwnContextualItems(
@@ -180,7 +184,7 @@ function findActiveNavbarPage(
   }
 
   for (const parent of enabledItems) {
-    if (typeof parent.href !== "string") continue;
+    if (!isNavbarLinkItem(parent)) continue;
     const contextualItems = getOwnContextualItems(parent);
     if (contextualItems?.some((item) => !item.disabled && item.href === activeHref)) {
       return { ownerKey: `primary:${parent.id}`, item: parent };
@@ -232,13 +236,13 @@ interface NavbarPropsBase extends Omit<HTMLAttributes<HTMLElement>, "children"> 
 export type NavbarProps = NavbarPropsBase &
   (
     | {
-        mobileOpen: boolean;
-        defaultMobileOpen?: never;
-      }
+      mobileOpen: boolean;
+      defaultMobileOpen?: never;
+    }
     | {
-        mobileOpen?: never;
-        defaultMobileOpen?: boolean;
-      }
+      mobileOpen?: never;
+      defaultMobileOpen?: boolean;
+    }
   );
 
 function GuestAction({
@@ -266,7 +270,7 @@ function GuestAction({
   if (action.href !== undefined) {
     return (
       <Button
-        as="a"
+        as="anchor"
         href={action.href}
         variant={buttonVariant}
         theme="primary"
@@ -448,10 +452,10 @@ export function Navbar({
   const activeMobileSection: ResolvedNavbarContext | undefined =
     isBackOffice && activeNavbarPage && activeContextualItems
       ? {
-          ownerKey: activeNavbarPage.ownerKey,
-          item: activeNavbarPage.item,
-          contextualItems: activeContextualItems,
-        }
+        ownerKey: activeNavbarPage.ownerKey,
+        item: activeNavbarPage.item,
+        contextualItems: activeContextualItems,
+      }
       : undefined;
   const openMobileDrawerContext: ResolvedNavbarContext | undefined =
     activeMobileSection?.ownerKey === openMobileDrawerOwnerKey
@@ -631,122 +635,122 @@ export function Navbar({
               isBackOffice ? "h-[46px] gap-2" : "pt-4 pb-0",
             )}
           >
-          {isBackOffice && mobileHamburger}
-          <a
-            href={brandHref}
-            className={cn(
-              "inline-flex shrink-0 items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
-              isBackOffice &&
-                "h-[46px] w-16 flex-col justify-center text-center [&>*]:flex-col [&>*]:items-center [&>*]:gap-px [&>*>span:first-child]:!size-8 [&>*>span:last-child]:!w-auto [&>*>span:last-child]:text-[10px] [&>*>span:last-child]:leading-3 [&>*>span:last-child]:whitespace-nowrap lg:hidden",
-            )}
-            aria-label={brandLabel}
-          >
-            {brand}
-          </a>
-          {isBackOffice && search && (
-            <div className="min-w-0 flex-1 lg:hidden">
-              <NavbarSearchForm
-                search={search}
-                inputId={mobileSearchInputId}
-                value={searchValue}
-                className="w-full"
-                onSubmit={handleSearchSubmit}
-                onValueChange={handleSearchValueChange}
-              />
-            </div>
-          )}
-          {isBackOffice && !search && (
-            <div className="min-w-0 flex-1 lg:hidden" aria-hidden="true" />
-          )}
-          {search && (
-            <NavbarSearchForm
-              search={search}
-              inputId={searchInputId}
-              value={searchValue}
+            {isBackOffice && mobileHamburger}
+            <a
+              href={brandHref}
               className={cn(
-                "hidden shrink-0 lg:block",
-                isBackOffice
-                  ? "w-[348px]"
-                  : "lg:w-16 min-[1100px]:!w-[130px] min-[1184px]:!w-[220px] min-[1280px]:!w-[260px] min-[1400px]:!w-[348px]",
+                "inline-flex shrink-0 items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
+                isBackOffice &&
+                "h-[46px] w-16 flex-col justify-center text-center [&>*]:flex-col [&>*]:items-center [&>*]:gap-px [&>*>span:first-child]:!size-8 [&>*>span:last-child]:!w-auto [&>*>span:last-child]:text-[10px] [&>*>span:last-child]:leading-3 [&>*>span:last-child]:whitespace-nowrap lg:hidden",
               )}
-              onSubmit={handleSearchSubmit}
-              onValueChange={handleSearchValueChange}
-            />
-          )}
-          <div
-            className={cn(
-              "ml-auto min-w-0 items-center lg:flex lg:gap-4 2xl:gap-6",
-              user ? "flex" : "hidden",
-              !isBackOffice && menuPosition === "left" && "lg:flex-1 lg:justify-between",
-            )}
-          >
-            <NavbarNavigation
-              items={items}
-              activeHref={activeHref}
-              ariaLabel={ariaLabel}
-              idPrefix={navigationId}
-              openMenuId={openMenuId}
-              onOpenMenuChange={handleNavigationMenuChange}
-              onNavigate={onNavigate}
-            />
-            {showGuestActions && guestActions && (
-              <div className="hidden shrink-0 items-center gap-2 lg:flex">
-                {guestActions.login && (
-                  <GuestAction action={guestActions.login} variant="secondary" />
-                )}
-                {guestActions.register && (
-                  <GuestAction action={guestActions.register} variant="primary" />
-                )}
-              </div>
-            )}
-            {user && (
-              <div className="flex min-w-0 shrink-0 items-center gap-1">
-                {notification && !isBackOffice && (
-                  <div className="hidden lg:block">
-                    <NotificationControl notification={notification} />
-                  </div>
-                )}
-                <NavbarUserMenu
-                  user={user}
-                  mobileAvatarClassName="size-6"
-                  activeHref={activeHref}
-                  menuId={userMenuId}
-                  open={userMenuOpen}
-                  onOpenChange={handleUserMenuChange}
-                  onNavigate={onNavigate}
+              aria-label={brandLabel}
+            >
+              {brand}
+            </a>
+            {isBackOffice && search && (
+              <div className="min-w-0 flex-1 lg:hidden">
+                <NavbarSearchForm
+                  search={search}
+                  inputId={mobileSearchInputId}
+                  value={searchValue}
+                  className="w-full"
+                  onSubmit={handleSearchSubmit}
+                  onValueChange={handleSearchValueChange}
                 />
               </div>
             )}
-          </div>
-          {!isBackOffice && (
-            <div className={cn("lg:hidden", user ? "ml-2" : "ml-auto")}>{mobileHamburger}</div>
-          )}
-          {activeMobileSection && (
-            <button
-              ref={mobileDrawerTriggerRef}
-              type="button"
+            {isBackOffice && !search && (
+              <div className="min-w-0 flex-1 lg:hidden" aria-hidden="true" />
+            )}
+            {search && (
+              <NavbarSearchForm
+                search={search}
+                inputId={searchInputId}
+                value={searchValue}
+                className={cn(
+                  "hidden shrink-0 lg:block",
+                  isBackOffice
+                    ? "w-[348px]"
+                    : "lg:w-16 min-[1100px]:!w-[130px] min-[1184px]:!w-[220px] min-[1280px]:!w-[260px] min-[1400px]:!w-[348px]",
+                )}
+                onSubmit={handleSearchSubmit}
+                onValueChange={handleSearchValueChange}
+              />
+            )}
+            <div
               className={cn(
-                mobileBackOfficeNavigationTriggerClasses,
-                "lg:hidden",
+                "ml-auto min-w-0 items-center lg:flex lg:gap-4 2xl:gap-6",
+                user ? "flex" : "hidden",
+                !isBackOffice && menuPosition === "left" && "lg:flex-1 lg:justify-between",
               )}
-              aria-label={`${mobileDrawerOpen ? "Tutup" : "Buka"} navigasi sekunder ${activeMobileSection.item.label}`}
-              aria-expanded={mobileDrawerOpen}
-              aria-controls={mobileDrawerId}
-              onClick={() => {
-                if (mobileDrawerOpen) {
-                  handleMobileDrawerClose();
-                  return;
-                }
-
-                setOpenMobileDrawerOwnerKey(activeMobileSection.ownerKey);
-                window.setTimeout(() => mobileDrawerCloseRef.current?.focus(), 50);
-              }}
             >
-              <Icon className="size-[18px]">
-                <BarsFromLeft aria-hidden="true" focusable="false" />
-              </Icon>
-            </button>
-          )}
+              <NavbarNavigation
+                items={items}
+                activeHref={activeHref}
+                ariaLabel={ariaLabel}
+                idPrefix={navigationId}
+                openMenuId={openMenuId}
+                onOpenMenuChange={handleNavigationMenuChange}
+                onNavigate={onNavigate}
+              />
+              {showGuestActions && guestActions && (
+                <div className="hidden shrink-0 items-center gap-2 lg:flex">
+                  {guestActions.login && (
+                    <GuestAction action={guestActions.login} variant="secondary" />
+                  )}
+                  {guestActions.register && (
+                    <GuestAction action={guestActions.register} variant="primary" />
+                  )}
+                </div>
+              )}
+              {user && (
+                <div className="flex min-w-0 shrink-0 items-center gap-1">
+                  {notification && !isBackOffice && (
+                    <div className="hidden lg:block">
+                      <NotificationControl notification={notification} />
+                    </div>
+                  )}
+                  <NavbarUserMenu
+                    user={user}
+                    mobileAvatarClassName="size-6"
+                    activeHref={activeHref}
+                    menuId={userMenuId}
+                    open={userMenuOpen}
+                    onOpenChange={handleUserMenuChange}
+                    onNavigate={onNavigate}
+                  />
+                </div>
+              )}
+            </div>
+            {!isBackOffice && (
+              <div className={cn("lg:hidden", user ? "ml-2" : "ml-auto")}>{mobileHamburger}</div>
+            )}
+            {activeMobileSection && (
+              <button
+                ref={mobileDrawerTriggerRef}
+                type="button"
+                className={cn(
+                  mobileBackOfficeNavigationTriggerClasses,
+                  "lg:hidden",
+                )}
+                aria-label={`${mobileDrawerOpen ? "Tutup" : "Buka"} navigasi sekunder ${activeMobileSection.item.label}`}
+                aria-expanded={mobileDrawerOpen}
+                aria-controls={mobileDrawerId}
+                onClick={() => {
+                  if (mobileDrawerOpen) {
+                    handleMobileDrawerClose();
+                    return;
+                  }
+
+                  setOpenMobileDrawerOwnerKey(activeMobileSection.ownerKey);
+                  window.setTimeout(() => mobileDrawerCloseRef.current?.focus(), 50);
+                }}
+              >
+                <Icon className="size-[18px]">
+                  <BarsFromLeft aria-hidden="true" focusable="false" />
+                </Icon>
+              </button>
+            )}
           </div>
 
           {!isBackOffice && search && (
@@ -765,43 +769,43 @@ export function Navbar({
       </div>
 
       <NavbarMobilePanel
-          sidebarId={mobilePanelId}
-          drawerId={mobileDrawerId}
-          sidebarOpen={isMobileOpen}
-          drawerItem={openMobileDrawerContext}
-          drawerEnabled={isBackOffice}
-          sidebarCloseRef={mobileSidebarCloseRef}
-          drawerCloseRef={mobileDrawerCloseRef}
-          items={items}
-          activeHref={activeHref}
-          ariaLabel={ariaLabel}
-          onDrawerClose={handleMobileDrawerClose}
-          onNavigate={onNavigate}
-          onSidebarClose={() => {
-            handleMobileOpenChange(false);
-            hamburgerRef.current?.focus();
-          }}
-          guestActionsContent={
-            showGuestActions && guestActions ? (
-              <div className="flex flex-col gap-2 border-t border-border pt-4">
-                {guestActions.login && (
-                  <GuestAction
-                    action={guestActions.login}
-                    variant="secondary"
-                    onAction={() => handleMobileOpenChange(false)}
-                  />
-                )}
-                {guestActions.register && (
-                  <GuestAction
-                    action={guestActions.register}
-                    variant="primary"
-                    onAction={() => handleMobileOpenChange(false)}
-                  />
-                )}
-              </div>
-            ) : undefined
-          }
-          user={user}
+        sidebarId={mobilePanelId}
+        drawerId={mobileDrawerId}
+        sidebarOpen={isMobileOpen}
+        drawerItem={openMobileDrawerContext}
+        drawerEnabled={isBackOffice}
+        sidebarCloseRef={mobileSidebarCloseRef}
+        drawerCloseRef={mobileDrawerCloseRef}
+        items={items}
+        activeHref={activeHref}
+        ariaLabel={ariaLabel}
+        onDrawerClose={handleMobileDrawerClose}
+        onNavigate={onNavigate}
+        onSidebarClose={() => {
+          handleMobileOpenChange(false);
+          hamburgerRef.current?.focus();
+        }}
+        guestActionsContent={
+          showGuestActions && guestActions ? (
+            <div className="flex flex-col gap-2 border-t border-border pt-4">
+              {guestActions.login && (
+                <GuestAction
+                  action={guestActions.login}
+                  variant="secondary"
+                  onAction={() => handleMobileOpenChange(false)}
+                />
+              )}
+              {guestActions.register && (
+                <GuestAction
+                  action={guestActions.register}
+                  variant="primary"
+                  onAction={() => handleMobileOpenChange(false)}
+                />
+              )}
+            </div>
+          ) : undefined
+        }
+        user={user}
       />
     </header>
   );

@@ -2,7 +2,7 @@ import { type HTMLAttributes } from "react";
 import { ChevronLeft, ChevronRight } from "../icons/outline";
 import { cn } from "../utils/cn";
 
-export type PaginationTheme = "default" | "primary" | "purple";
+export type PaginationTheme = "default" | "primary" | "simaya";
 
 export interface PaginationProps extends HTMLAttributes<HTMLElement> {
   currentPage: number;
@@ -28,7 +28,7 @@ const themeClasses: Record<
     activeText: "text-primary-500",
   },
 
-  purple: {
+  simaya: {
     active: "bg-purple-50",
     activeText: "text-purple-500",
   },

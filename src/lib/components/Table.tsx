@@ -65,7 +65,7 @@ export interface TableRowAction<T> {
   showLabel?: boolean;
   theme?: ButtonTheme;
   variant?: ButtonVariant;
-  /** Bawaannya `bright`, rupa ikon aksi kecil di rancangan. */
+  /** Bawaannya `light`. */
   tone?: ButtonTone;
   /** Tujuan tautan. Bila diisi tombol dirender sebagai `<a>`. */
   href?: string | ((row: T) => string);
@@ -626,10 +626,9 @@ export function Table<T>({
         const common = {
           type: action.showLabel ? ("button" as const) : ("iconOnly" as const),
           size: density.action,
-          shape: "square" as const,
           theme: action.theme,
           variant: action.variant,
-          tone: action.tone ?? "bright",
+          tone: action.tone ?? ("light" as const),
           leftIcon: action.showLabel ? action.icon : undefined,
           "aria-label": action.showLabel ? undefined : label,
           children: action.showLabel ? label : action.icon,
@@ -641,7 +640,7 @@ export function Table<T>({
           action.href !== undefined && !disabled ? (
             <Button
               {...common}
-              as="a"
+              as="anchor"
               href={resolve(action.href, row)}
               target={action.target}
               rel={action.target === "_blank" ? "noopener noreferrer" : undefined}

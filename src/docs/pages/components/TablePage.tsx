@@ -169,7 +169,7 @@ const actionColumns: TableColumn<Penduduk>[] = [
     header: "Aksi",
     actions: [
       { key: "detail", icon: <Eye />, label: "Lihat detail", showLabel: true, variant: "outline", tone: "light", href: (r) => `#/penduduk/${r.id}` },
-      { key: "hapus", icon: <TrashBin />, label: "Hapus", theme: "red", disabled: (r) => r.id === 1, onClick: (r) => console.log("hapus", r) },
+      { key: "hapus", icon: <TrashBin />, label: "Hapus", theme: "orange", disabled: (r) => r.id === 1, onClick: (r) => console.log("hapus", r) },
     ],
   },
 ];
@@ -299,7 +299,7 @@ const sizeOptions: { value: TableSize; label: string }[] = [
 const themeOptions: { value: PaginationTheme; label: string }[] = [
   { value: "default", label: "Default" },
   { value: "primary", label: "Primary" },
-  { value: "purple", label: "Purple" },
+  { value: "simaya", label: "Simaya" },
 ];
 
 const onOff = [
@@ -358,7 +358,7 @@ const actionProps: PropRow[] = [
   ["showLabel", "boolean", "false", "Tulis judul di samping ikon."],
   ["theme", "ButtonTheme", "primary", "Warna tombol, mis. `\"yellow\"`, `\"green\"`, `\"red\"`."],
   ["variant", '"filled" | "outline"', "filled", "Tombol berisi warna atau hanya garis tepi."],
-  ["tone", "ButtonTone", "bright", "Terang-gelapnya warna tombol."],
+  ["tone", "ButtonTone", "light", "Terang-gelapnya warna tombol."],
   ["href", "string | (row) => string", "undefined", "Alamat tujuan saat tombol diklik."],
   ["target", "string", "undefined", "Isi `\"_blank\"` untuk membuka di tab baru."],
   ["onClick", "(row, index) => void", "undefined", "Fungsi yang dijalankan saat tombol diklik."],
@@ -461,7 +461,7 @@ function DataTable({ cols = columns }: { cols?: TableColumn<Row>[] }) {
           </Button>
           <Button
             size="s"
-            theme="red"
+            theme="orange"
             leftIcon={<TrashBin />}
             disabled={selected.length === 0}
             onClick={() => setSelected([])}
@@ -619,7 +619,7 @@ function PlaygroundTable({
           </Button>
           <Button
             size="s"
-            theme="red"
+            theme="orange"
             leftIcon={<TrashBin />}
             disabled={selected.length === 0}
             onClick={() => setSelected([])}
@@ -654,7 +654,7 @@ function OrderTable({ hiddenColumns = [] }: { hiddenColumns?: string[] }) {
           <Button size="s" leftIcon={<Plus />}>
             Tambah Data
           </Button>
-          <Button size="s" theme="red" leftIcon={<TrashBin />}>
+          <Button size="s" theme="orange" leftIcon={<TrashBin />}>
             Hapus Data
           </Button>
         </>

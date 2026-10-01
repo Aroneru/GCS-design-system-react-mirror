@@ -34,6 +34,7 @@ import { SpinnerPage } from "./docs/pages/components/SpinnerPage";
 import { PopoverPage } from "./docs/pages/components/PopoverPage";
 import { DropdownPage } from "./docs/pages/components/DropdownPage";
 import { ModalPage } from "./docs/pages/components/ModalPage";
+import { DrawerPage } from "./docs/pages/components/DrawerPage";
 import { AlertPage } from "./docs/pages/components/AlertPage";
 import { ToastPage } from "./docs/pages/components/ToastPage";
 import { CardPage } from "./docs/pages/components/CardPage";
@@ -82,6 +83,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/popover": PopoverPage,
   "/components/dropdown": DropdownPage,
   "/components/modal": ModalPage,
+  "/components/drawer": DrawerPage,
   "/components/alert": AlertPage,
   "/components/toast": ToastPage,
   "/components/card": CardPage,
