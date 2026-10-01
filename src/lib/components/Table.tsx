@@ -4,6 +4,7 @@ import {
   useState,
   type HTMLAttributeAnchorTarget,
   type HTMLAttributes,
+  type InputHTMLAttributes,
   type Key,
   type ReactNode,
 } from "react";
@@ -13,13 +14,13 @@ import {
   ChevronDown,
   ChevronUp,
   Close,
+  Search as SearchIcon,
 } from "flowbite-react-icons/outline";
 import { cn } from "../utils/cn";
 import { Button } from "./Button";
 import { Checkbox } from "./Checkbox";
 import { Dropdown } from "./Dropdown";
 import { Pagination, type PaginationTheme } from "./Pagination";
-import { Search, type SearchProps } from "./Search";
 import { Spinner } from "./Spinner";
 
 export type TableAlign = "left" | "center" | "right";
@@ -169,8 +170,17 @@ export interface TableColumn<T> {
   wrap?: boolean;
 }
 
-/** Search di kiri toolbar — prop-nya diteruskan utuh ke komponen Search. */
-export type TableSearchConfig = Omit<SearchProps, "categories" | "platform">;
+/**
+ * Kotak pencarian di kiri toolbar. Dibuat sendiri oleh Table, tidak memakai
+ * komponen Search, jadi perubahan di Search tidak menggeser tampilan tabel.
+ * Semua atribut `<input>` diteruskan ke isiannya — biasanya cukup `value`,
+ * `onChange`, dan `placeholder`.
+ */
+export interface TableSearchConfig
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "className"> {
+  /** Kelas untuk pembungkus kotak, mis. untuk mengatur lebarnya. */
+  className?: string;
+}
 
 /**
  * Tombol "Filter Data": memilih kolom mana yang ditampilkan. Panelnya berisi
@@ -414,6 +424,46 @@ const defaultSortIcon: TableSortIcon = (direction) => {
   return <Icon aria-hidden="true" className="size-3.5 shrink-0" />;
 };
 
+/**
+ * Kotak pencarian toolbar: tinggi 40px, latar gray-50, ikon kaca pembesar di
+ * kiri. Selebar penuh di tabel sempit, minimal 22rem mulai 576px.
+ */
+function TableSearch({
+  className,
+  placeholder = "Cari Data",
+  disabled,
+  "aria-label": ariaLabel,
+  ...props
+}: TableSearchConfig) {
+  return (
+    <label
+      className={cn(
+        "flex h-10 w-full items-center gap-2 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm transition-colors",
+        "focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500",
+        "@xl:w-auto @xl:min-w-[22rem]",
+        disabled && "cursor-not-allowed opacity-60",
+        className,
+      )}
+    >
+      <SearchIcon aria-hidden="true" className="size-4 shrink-0 text-gray-500" />
+      <input
+        type="search"
+        placeholder={placeholder}
+        disabled={disabled}
+        // Tanpa label terlihat, pembaca layar memakai placeholder sebagai nama.
+        aria-label={ariaLabel ?? placeholder}
+        className={cn(
+          "min-w-0 flex-1 bg-transparent text-gray-900 outline-none placeholder:text-gray-500",
+          "disabled:cursor-not-allowed",
+          // Tombol silang bawaan type="search" di Chrome/Safari bukan bagian rancangan.
+          "[&::-webkit-search-cancel-button]:appearance-none",
+        )}
+        {...props}
+      />
+    </label>
+  );
+}
+
 /** Nilai aksi yang boleh statis atau per baris. */
 const resolve = <T, V>(value: V | ((row: T) => V), row: T): V =>
   typeof value === "function" ? (value as (row: T) => V)(row) : value;
@@ -607,10 +657,11 @@ export function TableImage({
 /**
  * Table — tabel data dengan toolbar, pengurutan, seleksi baris, dan pagination.
  *
- * Bagian-bagiannya bukan buatan sendiri: toolbar memakai Search, Dropdown, dan
- * Button; kolom seleksi memakai Checkbox; kaki tabel memakai Pagination. Jadi
- * rupa dan perilaku papan ketiknya ikut komponen-komponen itu. Pengecualiannya
- * tombol aksi baris: dibuat sendiri di sini, tidak bergantung pada Button.
+ * Sebagian besar bagiannya bukan buatan sendiri: tombol Filter Data memakai
+ * Dropdown dan Button; kolom seleksi memakai Checkbox; kaki tabel memakai
+ * Pagination. Jadi rupa dan perilaku papan ketiknya ikut komponen-komponen itu.
+ * Pengecualiannya kotak pencarian dan tombol aksi baris: keduanya dibuat sendiri
+ * di sini, tidak bergantung pada Search maupun Button.
  *
  * Bawaannya tabel mengurutkan dan membagi halaman `data` sendiri. Untuk data
  * dari server pasang `manual`: tabel hanya menampilkan baris yang diberikan,
@@ -880,15 +931,7 @@ export function Table<T>({
     >
       {hasToolbar && (
         <div className="flex flex-wrap items-center gap-4 p-4">
-          {search && (
-            <Search
-              platform="compact"
-              withButton={false}
-              placeholder="Cari Data"
-              {...search}
-              className={cn("w-full @xl:w-auto @xl:min-w-[22rem]", search.className)}
-            />
-          )}
+          {search && <TableSearch {...search} />}
 
           {filter && (
             <Dropdown

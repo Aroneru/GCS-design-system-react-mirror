@@ -11,12 +11,8 @@ import { Search as SearchIcon } from 'flowbite-react-icons/outline'
 import { cn } from '../utils/cn'
 import { Dropdown, type DropdownItem } from './Dropdown'
 
-/**
- * Ukuran kotak: `default` 54px (desktop), `mobile` 50px, `compact` 38px —
- * yang terakhir untuk toolbar yang berjajar dengan Button size `s`, seperti
- * di Table.
- */
-export type SearchPlatform = 'default' | 'mobile' | 'compact'
+/** Ukuran kotak: `default` 54px (desktop), `mobile` 50px. */
+export type SearchPlatform = 'default' | 'mobile'
 
 /** Warna aksen per aplikasi — dipakai tombol cari dan garis saat field difokus. */
 export type SearchApplication = 'default' | 'simaya'
@@ -53,12 +49,6 @@ const platforms: Record<
     icon: 'size-3.5',
     text: 'text-sm',
     button: 'h-[34px] px-[13px] text-xs',
-  },
-  compact: {
-    field: 'h-[38px]',
-    icon: 'size-4',
-    text: 'text-sm',
-    button: 'h-[30px] px-[13px] text-xs',
   },
 }
 
@@ -109,12 +99,6 @@ export interface SearchProps
   /** Dipanggil saat tombol ditekan atau Enter di dalam field. */
   onSearch?: (value: string, category: string) => void
   /**
-   * Menyembunyikan tombol cari pada varian polos — untuk pencarian yang
-   * berjalan sambil mengetik lewat `onChange`. Enter tetap memanggil
-   * `onSearch`. Varian kategori selalu memakai tombol ikonnya.
-   */
-  withButton?: boolean
-  /**
    * Hanya berlaku pada varian polos. Varian kategori tingginya tetap 39px di
    * lebar berapa pun — yang memanjang hanya isian di tengahnya.
    */
@@ -155,7 +139,6 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
     helperText,
     buttonLabel = 'Cari',
     onSearch,
-    withButton = true,
     platform = 'default',
     application = 'default',
     categories,
@@ -369,22 +352,20 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
 
           {input}
 
-          {withButton && (
-            <button
-              type="button"
-              onClick={submit}
-              disabled={disabled}
-              className={cn(
-                'shrink-0 rounded-lg font-medium text-white transition-colors',
-                'focus-visible:outline-2 focus-visible:outline-offset-2',
-                'disabled:cursor-not-allowed disabled:opacity-50',
-                size.button,
-                accent.solid,
-              )}
-            >
-              {buttonLabel}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={submit}
+            disabled={disabled}
+            className={cn(
+              'shrink-0 rounded-lg font-medium text-white transition-colors',
+              'focus-visible:outline-2 focus-visible:outline-offset-2',
+              'disabled:cursor-not-allowed disabled:opacity-50',
+              size.button,
+              accent.solid,
+            )}
+          >
+            {buttonLabel}
+          </button>
         </div>
       )}
 
