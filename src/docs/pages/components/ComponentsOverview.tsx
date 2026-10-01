@@ -49,6 +49,20 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/clipboard"
+        name="Clipboard"
+        desc="Teks hanya-baca dengan tombol salin, label, dan keterangan opsional."
+      >
+        <div aria-hidden="true" className="rounded-xl bg-surface-subtle p-5">
+          <div className="mb-2 text-sm font-medium text-content">Nomor referensi</div>
+          <div className="flex items-center gap-2">
+            <div className="flex h-10.5 min-w-0 flex-1 items-center rounded-lg border border-gray-300 bg-surface-subtle px-3 text-sm text-content"><span className="truncate">INV-2026-001</span></div>
+            <span className="inline-flex h-10.5 shrink-0 items-center rounded-lg bg-primary-700 px-4 text-sm font-medium text-white">Copy</span>
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/badge"
         name="Badge"
         desc="Label status ringkas dengan lima variant warna semantik."

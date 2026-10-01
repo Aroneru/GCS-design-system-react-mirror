@@ -11,6 +11,9 @@ export type {
   ButtonTone,
 } from "./components/Button";
 
+export { Clipboard } from "./components/Clipboard";
+export type { ClipboardProps, ClipboardVariant, ClipboardPlatform } from "./components/Clipboard";
+
 export { Avatar } from "./components/Avatar";
 export type { AvatarProps, AvatarSize } from "./components/Avatar";
 
