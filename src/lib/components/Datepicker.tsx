@@ -30,8 +30,10 @@ export type DatepickerType = 'single' | 'period' | 'multiple'
  * Rentang tanggal milik `period` dan `multiple`. Selama pengguna baru memilih
  * tanggal mulai, `end` masih `null`.
  *
- * Keduanya `null` artinya Semua Waktu — rentang tanpa batas. Itu berbeda dari
- * belum diisi, yang ditandai dengan nilai `null` untuk seluruh rentangnya.
+ * Semua Waktu bernilai seluruh rentang data, `{ start: min, end: max }`. Sisi
+ * yang tidak diberi batas tetap `null`, jadi tanpa `min` dan `max` keduanya
+ * `null` — rentang tanpa batas. Itu berbeda dari belum diisi, yang ditandai
+ * dengan nilai `null` untuk seluruh rentangnya.
  */
 export interface DateRange {
   start: Date | null
@@ -47,6 +49,16 @@ interface DatepickerBaseProps
    * `endPlaceholder` diisi.
    */
   placeholder?: string
+  /**
+   * Awal data: tanggal sebelumnya tidak bisa dipilih. Pada `period` dan
+   * `multiple`, Semua Waktu dimulai dari sini.
+   */
+  min?: Date | null
+  /**
+   * Akhir data: tanggal sesudahnya tidak bisa dipilih. Pada `period` dan
+   * `multiple`, Semua Waktu berakhir di sini.
+   */
+  max?: Date | null
   /** Tampilan gelap untuk kotak, panel, kalender, dan tombolnya. */
   darkMode?: boolean
   disabled?: boolean
@@ -150,23 +162,49 @@ function isiBulan(bulan: Date): Date[] {
   return Array.from({ length: baris * 7 }, (_, i) => geserHari(awal, i))
 }
 
+/** Awal dan akhir data, tanpa jam. `null` di satu sisi artinya sisi itu tidak berbatas. */
+interface Batas {
+  awal: Date | null
+  akhir: Date | null
+}
+
+const dalamBatas = (d: Date, b: Batas) =>
+  (!b.awal || kunci(d) >= kunci(b.awal)) && (!b.akhir || kunci(d) <= kunci(b.akhir))
+
+/** Tanggal terdekat yang masih di dalam batas. */
+const jepit = (d: Date, b: Batas) =>
+  b.awal && kunci(d) < kunci(b.awal) ? b.awal : b.akhir && kunci(d) > kunci(b.akhir) ? b.akhir : d
+
 type Pintasan = 'hari' | 'minggu' | 'bulan' | 'hapus' | 'semua'
 
-function rentangPintasan(p: Pintasan, hariIni: Date): DateRange | null {
+/**
+ * Nilai yang dihasilkan sebuah pintasan, sudah dipotong ke batas data. Semua
+ * Waktu adalah seluruh rentang data itu sendiri. `undefined` artinya pintasan
+ * tidak berlaku: rentangnya jatuh sepenuhnya di luar batas.
+ */
+function rentangPintasan(p: Pintasan, hariIni: Date, b: Batas): DateRange | null | undefined {
+  let r: { start: Date; end: Date }
   switch (p) {
-    case 'hari':
-      return { start: hariIni, end: hariIni }
-    case 'minggu': {
-      const awal = geserHari(hariIni, -hariIni.getDay())
-      return { start: awal, end: geserHari(awal, 6) }
-    }
-    case 'bulan':
-      return { start: awalBulan(hariIni), end: new Date(hariIni.getFullYear(), hariIni.getMonth() + 1, 0) }
-    case 'semua':
-      return { start: null, end: null }
     case 'hapus':
       return null
+    case 'semua':
+      return { start: b.awal, end: b.akhir }
+    case 'hari':
+      r = { start: hariIni, end: hariIni }
+      break
+    case 'minggu': {
+      const awal = geserHari(hariIni, -hariIni.getDay())
+      r = { start: awal, end: geserHari(awal, 6) }
+      break
+    }
+    case 'bulan':
+      r = { start: awalBulan(hariIni), end: new Date(hariIni.getFullYear(), hariIni.getMonth() + 1, 0) }
+      break
   }
+  // Irisan rentang pintasan dengan batas data.
+  const start = b.awal && kunci(r.start) < kunci(b.awal) ? b.awal : r.start
+  const end = b.akhir && kunci(r.end) > kunci(b.akhir) ? b.akhir : r.end
+  return kunci(start) <= kunci(end) ? { start, end } : undefined
 }
 
 /** Warna tiap bagian untuk tampilan terang dan gelap. */
@@ -182,6 +220,8 @@ const temaTerang = {
   namaHari: 'text-gray-500',
   tanggal: 'text-gray-900',
   luarBulan: 'text-gray-500',
+  // Lebih pudar dari tanggal luar bulan, yang masih bisa dipilih.
+  diLuarBatas: 'text-gray-300',
   sorot: 'hover:bg-gray-100',
   terpilih: 'bg-primary-700 text-white',
   antara: 'bg-gray-100',
@@ -203,6 +243,7 @@ const temaGelap: Tema = {
   namaHari: 'text-gray-400',
   tanggal: 'text-white',
   luarBulan: 'text-gray-500',
+  diLuarBatas: 'text-gray-600',
   sorot: 'hover:bg-gray-600',
   terpilih: 'bg-primary-600 text-white',
   antara: 'bg-gray-600',
@@ -269,6 +310,8 @@ interface KalenderProps {
    */
   bulanSebelah?: Date
   nilai: DateRange | null
+  /** Tanggal di luar batas data tidak bisa dipilih. */
+  batas: Batas
   hariIni: Date
   /** Tanggal yang menerima Tab — hanya satu di seluruh panel. */
   sasaran: Date
@@ -287,6 +330,7 @@ function Kalender({
   bulan,
   bulanSebelah,
   nilai,
+  batas,
   hariIni,
   sasaran,
   tema,
@@ -308,18 +352,37 @@ function Kalender({
 
   // Panah dibuat lebih besar 6px ke segala arah supaya mudah ditekan, lalu
   // ditarik kembali dengan margin negatif — ikonnya tetap menempel di tepi.
-  const panah = cn('-m-1.5 flex items-center justify-center rounded-lg p-1.5 transition-colors', tema.panah)
+  const panah = cn(
+    '-m-1.5 flex items-center justify-center rounded-lg p-1.5 transition-colors',
+    'disabled:pointer-events-none disabled:opacity-50',
+    tema.panah,
+  )
+  // Panah mati bila bulan di baliknya seluruhnya di luar batas data.
+  const bisaSebelum = !batas.awal || kunci(bulan) > kunci(batas.awal)
+  const bisaSesudah = !batas.akhir || kunci(awalBulan(bulan, 1)) <= kunci(batas.akhir)
 
   return (
     <div>
       <div className="flex h-4.5 items-center justify-between">
-        <button type="button" onClick={onSebelum} aria-label="Bulan sebelumnya" className={panah}>
+        <button
+          type="button"
+          onClick={onSebelum}
+          disabled={!bisaSebelum}
+          aria-label="Bulan sebelumnya"
+          className={panah}
+        >
           <Panah />
         </button>
         <p id={idJudul} aria-live="polite" className={cn('text-xs font-bold', tema.judul)}>
           {BULAN[bulan.getMonth()]} {bulan.getFullYear()}
         </p>
-        <button type="button" onClick={onSesudah} aria-label="Bulan berikutnya" className={panah}>
+        <button
+          type="button"
+          onClick={onSesudah}
+          disabled={!bisaSesudah}
+          aria-label="Bulan berikutnya"
+          className={panah}
+        >
           <Panah kanan />
         </button>
       </div>
@@ -356,6 +419,7 @@ function Kalender({
               const ujungSelesai = !kembar && k === kSelesai
               const terpilih = ujungMulai || ujungSelesai
               const antara = !kembar && rentangUtuh && k > kMulai && k < kSelesai
+              const bisa = dalamBatas(d, batas)
               // Hanya tanggal di dalam bulannya yang bisa menerima Tab: tanggal
               // luar bulan juga muncul di kalender sebelah pada bentuk `multiple`.
               const fokus = dalamBulan && k === kSasaran
@@ -366,11 +430,13 @@ function Kalender({
                     type="button"
                     tabIndex={fokus ? 0 : -1}
                     data-fokus={fokus || undefined}
+                    disabled={!bisa}
                     aria-label={`${HARI[d.getDay()]}, ${tulis(d)}`}
                     aria-current={k === kHariIni ? 'date' : undefined}
                     onClick={() => onPilih(d)}
                     className={cn(
                       'flex size-full items-center justify-center text-xs font-semibold transition-colors',
+                      'disabled:cursor-not-allowed',
                       // Pada rentang, ujungnya hanya membulat di sisi luar supaya
                       // menyambung dengan tanggal di antaranya.
                       terpilih && rentangUtuh ? (ujungMulai ? 'rounded-l-lg' : 'rounded-r-lg') : antara ? '' : 'rounded-lg',
@@ -379,7 +445,9 @@ function Kalender({
                         : antara
                           ? // Di dalam rentang, tanggal bulan sebelah tidak diredupkan.
                             cn(tema.antara, tema.tanggal)
-                          : cn(dalamBulan ? tema.tanggal : tema.luarBulan, tema.sorot),
+                          : !bisa
+                            ? tema.diLuarBatas
+                            : cn(dalamBulan ? tema.tanggal : tema.luarBulan, tema.sorot),
                     )}
                   >
                     {d.getDate()}
@@ -406,6 +474,11 @@ function Kalender({
  *
  * Lebar bawaannya sama dengan panelnya, jadi tepi kotak dan kalender segaris.
  *
+ * `min` dan `max` menandai awal dan akhir data — misalnya tiket pesawat dari
+ * hari ini sampai tanggal yang sama tahun depan. Tanggal di luarnya tidak bisa
+ * dipilih, pintasan periode dipotong ke rentang itu, dan Semua Waktu memilih
+ * seluruhnya.
+ *
  * Seperti Dropdown, panelnya memakai HTML Popover API: peramban yang menutupnya
  * saat pengguna menekan di luar atau menekan Escape, dan mengangkatnya ke top
  * layer. Tanggal ditelusuri dengan panah, Home/End (awal/akhir minggu), dan
@@ -420,6 +493,8 @@ export function Datepicker(props: DatepickerProps) {
     placeholder = 'Pilih Tanggal',
     endPlaceholder = placeholder,
     shortcuts = false,
+    min,
+    max,
     darkMode = false,
     disabled = false,
     name,
@@ -442,6 +517,7 @@ export function Datepicker(props: DatepickerProps) {
   // Dua kotak dan dua kalender.
   const ganda = type === 'multiple'
   const pintasanPeriode = type === 'period' || (ganda && shortcuts)
+  const batas: Batas = { awal: min ? polos(min) : null, akhir: max ? polos(max) : null }
 
   const [simpanan, setSimpanan] = useState(() => keRentang(defaultValue))
   const nilai = value !== undefined ? keRentang(value) : simpanan
@@ -465,8 +541,9 @@ export function Datepicker(props: DatepickerProps) {
 
   const terlihat = (d: Date) => bulanSama(d, tampil) || (ganda && bulanSama(d, tampilKanan))
   // Bila bulan yang tampil sudah digeser menjauh dari tanggal yang difokus,
-  // Tab jatuh ke tanggal 1 bulan pertama supaya kisi tetap bisa dicapai.
-  const sasaran = terlihat(fokus) ? fokus : tampil
+  // Tab jatuh ke tanggal 1 bulan pertama — atau tanggal terdekat yang masih di
+  // dalam batas data — supaya kisi tetap bisa dicapai.
+  const sasaran = terlihat(fokus) ? fokus : jepit(tampil, batas)
 
   const tutup = useCallback(() => {
     const panel = panelRef.current
@@ -575,8 +652,10 @@ export function Datepicker(props: DatepickerProps) {
     setHariIni(kini)
     setUjung('start')
 
-    const kiri = awalBulan(mulai ?? kini)
-    setFokus(mulai ?? kini)
+    // Hari ini bisa saja di luar batas data; panel lalu dibuka di tanggal terdekatnya.
+    const acuan = jepit(mulai ?? kini, batas)
+    const kiri = awalBulan(acuan)
+    setFokus(acuan)
     setTampil(kiri)
     setTampilKanan(selesai && selisihBulan(kiri, selesai) >= 1 ? awalBulan(selesai) : awalBulan(kiri, 1))
   }
@@ -602,7 +681,9 @@ export function Datepicker(props: DatepickerProps) {
   }
 
   const pakai = (p: Pintasan) => {
-    kirim(rentangPintasan(p, hariIni))
+    const hasil = rentangPintasan(p, hariIni, batas)
+    if (hasil === undefined) return
+    kirim(hasil)
     tutup()
   }
 
@@ -636,7 +717,8 @@ export function Datepicker(props: DatepickerProps) {
     const geser = langkah[e.key]
     if (!geser) return
     e.preventDefault()
-    const baru = geser(sasaran)
+    // Berhenti di tepi batas data: tanggal di luarnya tidak bisa difokus.
+    const baru = jepit(geser(sasaran), batas)
     setFokus(baru)
     tampilkan(baru)
     pindahFokus.current = true
@@ -663,6 +745,7 @@ export function Datepicker(props: DatepickerProps) {
       bulan={bulan}
       bulanSebelah={ganda ? (sisi === 'kiri' ? tampilKanan : tampil) : undefined}
       nilai={nilai}
+      batas={batas}
       hariIni={hariIni}
       sasaran={sasaran}
       tema={tema}
@@ -681,6 +764,8 @@ export function Datepicker(props: DatepickerProps) {
       // Tampilan gelap memakai tombol berisi; tampilan terang tombol bergaris.
       variant={darkMode ? 'filled' : 'outline'}
       className="w-full"
+      // Mati bila seluruh rentangnya di luar batas data, mis. Hari ini sebelum `min`.
+      disabled={rentangPintasan(p, hariIni, batas) === undefined}
       onClick={() => pakai(p)}
     >
       {teks}

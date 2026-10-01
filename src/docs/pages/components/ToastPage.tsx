@@ -314,8 +314,8 @@ export function ToastPage() {
               value={dark}
               onChange={setDark}
               options={[
-                { value: false, label: 'Terang' },
-                { value: true, label: 'Gelap' },
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
               ]}
             />
           </Control>

@@ -20,6 +20,11 @@ const SEPEKAN: DateRange = { start: new Date(2021, 5, 20), end: new Date(2021, 5
 const RENTANG: DateRange = { start: new Date(2021, 5, 25), end: new Date(2021, 6, 12) }
 const SEMUA_WAKTU: DateRange = { start: null, end: null }
 
+// Batas data contoh: tiket pesawat yang bisa dipesan dari hari ini sampai tanggal
+// yang sama tahun depan. Yang ini sengaja mengikuti hari ini — begitulah pemakaiannya.
+const HARI_INI = new Date()
+const SETAHUN_LAGI = new Date(HARI_INI.getFullYear() + 1, HARI_INI.getMonth(), HARI_INI.getDate())
+
 const types: { value: DatepickerType; label: string }[] = [
   { value: 'single', label: 'Single' },
   { value: 'period', label: 'Period' },
@@ -47,6 +52,8 @@ const iso = (d: Date | null) =>
 const datepickerProps: PropRow[] = [
   ['type', "'single' | 'period' | 'multiple'", 'single', 'Bentuk pemilih: satu tanggal, satu kalender dengan pintasan periode, atau rentang dengan dua kalender.'],
   ['shortcuts', 'boolean', 'false', 'Khusus multiple: menambahkan Minggu ini, Bulan ini, dan Semua Waktu di samping Hari ini dan Hapus. Period selalu memilikinya.'],
+  ['min', 'Date | null', 'undefined', 'Awal data: tanggal sebelumnya tidak bisa dipilih, pintasan dipotong ke sini, dan Semua Waktu dimulai dari sini.'],
+  ['max', 'Date | null', 'undefined', 'Akhir data: tanggal sesudahnya tidak bisa dipilih, pintasan dipotong ke sini, dan Semua Waktu berakhir di sini.'],
   ['label', 'ReactNode', 'undefined', 'Teks label di atas kotak tanggal.'],
   ['placeholder', 'string', "'Pilih Tanggal'", 'Teks saat belum ada tanggal. Pada multiple dipakai kedua kotak, kecuali endPlaceholder diisi.'],
   ['endPlaceholder', 'string', 'placeholder', 'Teks kotak kedua pada multiple.'],
@@ -64,6 +71,7 @@ const toc: TocEntry[] = [
   { id: 'single', label: 'Single' },
   { id: 'period', label: 'Period' },
   { id: 'multiple', label: 'Multiple' },
+  { id: 'batas', label: 'Batas data' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'nilai', label: 'Nilai & formulir' },
   { id: 'papan-ketik', label: 'Papan ketik' },
@@ -78,10 +86,12 @@ export function DatepickerPage() {
   const [withLabel, setWithLabel] = useState(true)
   const [disabled, setDisabled] = useState(false)
   const [shortcuts, setShortcuts] = useState(false)
+  const [pakaiBatas, setPakaiBatas] = useState(false)
   const [tunggal, setTunggal] = useState<Date | null>(null)
   const [rentang, setRentang] = useState<DateRange | null>(null)
 
   const namaLabel = withLabel ? { label: 'Nama Tanggal' } : { 'aria-label': 'Nama Tanggal' }
+  const batasData = pakaiBatas ? { min: HARI_INI, max: SETAHUN_LAGI } : {}
   const nilaiTerakhir =
     type === 'single'
       ? tunggal
@@ -202,6 +212,53 @@ export function DatepickerPage() {
         </p>
       </FlowSection>
 
+      <FlowSection id="batas" title="Batas data">
+        <Lead>
+          Prop <H>min</H> dan <H>max</H> menandai dari mana data tersedia sampai di mana batas akhirnya —
+          misalnya tiket pesawat yang bisa dipesan dari hari ini sampai tanggal yang sama tahun depan.
+          Tanggal di luarnya tidak bisa dipilih, dan <H>Semua Waktu</H> memilih seluruh rentang itu: dari{' '}
+          <H>min</H> sampai <H>max</H>.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Period">
+            <Datepicker type="period" label="Tanggal penerbangan" min={HARI_INI} max={SETAHUN_LAGI} />
+          </Demo>
+          <div className="sm:col-span-2">
+            <Demo label="Multiple dengan shortcuts">
+              <Datepicker
+                type="multiple"
+                shortcuts
+                label="Tanggal penerbangan"
+                min={HARI_INI}
+                max={SETAHUN_LAGI}
+              />
+            </Demo>
+          </div>
+        </div>
+        <SectionCode>
+          {'const hariIni = new Date()\n'}
+          {'const setahunLagi = new Date(hariIni.getFullYear() + 1, hariIni.getMonth(), hariIni.getDate())\n\n'}
+          {'<Datepicker\n'}
+          {'    type="period"\n'}
+          {'    label="Tanggal penerbangan"\n'}
+          {'    '}
+          <H>min</H>
+          {'={hariIni}\n'}
+          {'    '}
+          <H>max</H>
+          {'={setahunLagi}\n'}
+          {'/>\n'}
+          {'// Semua Waktu → { start: hariIni, end: setahunLagi }'}
+        </SectionCode>
+        <p className="mt-4 text-body-sm text-gray-500">
+          Pintasan lain ikut dipotong ke batas itu: Minggu ini yang dimulai sebelum <H>min</H> hanya diambil
+          mulai <H>min</H>, sedangkan pintasan yang seluruh rentangnya di luar batas — misalnya Hari ini saat
+          datanya baru mulai minggu depan — dimatikan. Panah bulan berhenti di bulan pertama dan terakhir yang
+          masih punya tanggal di dalam batas, begitu pula panah papan ketik. Tanpa <H>min</H> dan <H>max</H>,
+          Semua Waktu bernilai <H>{'{ start: null, end: null }'}</H> — rentang tanpa batas.
+        </p>
+      </FlowSection>
+
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
           Prop <H>darkMode</H> mengganti seluruh warnanya ke tampilan gelap: kotak dan panel gray-700,
@@ -239,14 +296,16 @@ export function DatepickerPage() {
           </li>
           <li>
             <H>{'{ start: Date, end: Date }'}</H> — rentang. Hari ini, Minggu ini (Minggu–Sabtu, mengikuti
-            urutan hari di kalender), dan Bulan ini (tanggal 1 sampai terakhir) menghasilkan bentuk ini.
+            urutan hari di kalender), dan Bulan ini (tanggal 1 sampai terakhir) menghasilkan bentuk ini —
+            dipotong ke <H>min</H> dan <H>max</H> bila ada.
           </li>
           <li>
             <H>{'{ start: Date, end: null }'}</H> — period atau multiple yang baru terisi tanggal mulainya.
           </li>
           <li>
-            <H>{'{ start: null, end: null }'}</H> — Semua Waktu: rentang tanpa batas, berbeda dari belum
-            diisi.
+            <H>{'{ start: min, end: max }'}</H> — Semua Waktu: seluruh rentang data. Sisi yang tidak diberi
+            batas bernilai <H>null</H>, jadi tanpa keduanya hasilnya <H>{'{ start: null, end: null }'}</H> —
+            rentang tanpa batas, berbeda dari belum diisi.
           </li>
         </ul>
         <SectionCode>
@@ -261,7 +320,7 @@ export function DatepickerPage() {
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
           Dengan <H>name</H>, tanggalnya ikut terkirim bersama formulir dalam format <H>YYYY-MM-DD</H>. Semua
-          Waktu dikirim sebagai dua field kosong.
+          Waktu terkirim sebagai <H>min</H> dan <H>max</H>-nya; sisi yang tidak berbatas terkirim kosong.
         </p>
       </FlowSection>
 
@@ -299,6 +358,7 @@ export function DatepickerPage() {
           {type === 'single' ? (
             <Datepicker
               {...namaLabel}
+              {...batasData}
               darkMode={dark}
               disabled={disabled}
               value={tunggal}
@@ -307,6 +367,7 @@ export function DatepickerPage() {
           ) : (
             <Datepicker
               {...namaLabel}
+              {...batasData}
               type={type}
               shortcuts={shortcuts}
               darkMode={dark}
@@ -340,14 +401,26 @@ export function DatepickerPage() {
             />
           </Control>
 
+          <Control label="Batas data">
+            <Segmented
+              label="Pilih batas data"
+              value={pakaiBatas}
+              onChange={setPakaiBatas}
+              options={[
+                { value: false, label: 'Tidak ada' },
+                { value: true, label: 'Hari ini – setahun lagi' },
+              ]}
+            />
+          </Control>
+
           <Control label="Tampilan">
             <Segmented
               label="Pilih tampilan"
               value={dark}
               onChange={setDark}
               options={[
-                { value: false, label: 'Terang' },
-                { value: true, label: 'Gelap' },
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
               ]}
             />
           </Control>
@@ -380,6 +453,9 @@ export function DatepickerPage() {
             ? "import { Datepicker } from '@ceplok-ui/design-kit-react'\n\n"
             : "import { Datepicker, type DateRange } from '@ceplok-ui/design-kit-react'\n\n"}
           {`const [${namaNilai}, ${namaSetel}] = useState<${type === 'single' ? 'Date' : 'DateRange'} | null>(null)\n\n`}
+          {pakaiBatas &&
+            'const hariIni = new Date()\n' +
+              'const setahunLagi = new Date(hariIni.getFullYear() + 1, hariIni.getMonth(), hariIni.getDate())\n\n'}
           {'<Datepicker\n'}
           {type !== 'single' && (
             <>
@@ -393,6 +469,16 @@ export function DatepickerPage() {
               {'    '}
               <H>shortcuts</H>
               {'\n'}
+            </>
+          )}
+          {pakaiBatas && (
+            <>
+              {'    '}
+              <H>min</H>
+              {'={hariIni}\n'}
+              {'    '}
+              <H>max</H>
+              {'={setahunLagi}\n'}
             </>
           )}
           {dark && (

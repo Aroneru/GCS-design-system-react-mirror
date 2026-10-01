@@ -48,11 +48,18 @@ publik baru, dan satu perubahan yang memutus.
   dengan dua kalender berdampingan yang bisa digeser sendiri-sendiri, bertombol
   Hari ini dan Hapus; prop `shortcuts` menambahkan pintasan periode milik
   `period`). Nilai `single` berupa `Date`; `period` dan `multiple` berupa
-  `DateRange` (`{ start, end }`), dengan `{ start: null, end: null }` sebagai
-  Semua Waktu. Pada keduanya rentang dipilih dengan dua klik — tanggal mulai,
-  lalu tanggal selesai — dan panel baru tertutup setelah klik kedua.
-  Lebar bawaannya sama dengan panelnya (284px, 325px, dan 600px), jadi tepi
-  kotak dan kalendernya segaris.
+  `DateRange` (`{ start, end }`). Pada keduanya rentang dipilih dengan dua klik
+  — tanggal mulai, lalu tanggal selesai — dan panel baru tertutup setelah klik
+  kedua. Lebar bawaannya sama dengan panelnya (284px, 325px, dan 600px), jadi
+  tepi kotak dan kalendernya segaris.
+
+  Prop `min` dan `max` menandai awal dan akhir data — misalnya tiket pesawat
+  dari hari ini sampai tanggal yang sama tahun depan. Tanggal di luarnya tidak
+  bisa dipilih, pintasan periode dipotong ke rentang itu (atau dimatikan bila
+  seluruhnya di luar), dan Semua Waktu memilih seluruh rentang data,
+  `{ start: min, end: max }`. Sisi yang tidak diberi batas bernilai `null`, jadi
+  tanpa keduanya Semua Waktu bernilai `{ start: null, end: null }`.
+
   Seperti Dropdown, panelnya memakai HTML Popover API, dan kalendernya bisa
   ditelusuri dengan panah, Home/End, serta PageUp/PageDown. Dengan `name`,
   tanggalnya ikut terkirim bersama formulir sebagai `YYYY-MM-DD`.
