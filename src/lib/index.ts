@@ -188,7 +188,7 @@ export type {
 } from "./components/Breadcrumb";
 
 export { Pagination } from "./components/Pagination";
-export type { PaginationProps, PaginationTheme } from "./components/Pagination";
+export type { PaginationProps, PaginationSize, PaginationTheme } from "./components/Pagination";
 
 export { Table, TableImage } from "./components/Table";
 export type {

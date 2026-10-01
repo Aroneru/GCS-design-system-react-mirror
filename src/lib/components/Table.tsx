@@ -870,7 +870,12 @@ export function Table<T>({
 
   return (
     <div
-      className={cn("overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm", className)}
+      // `@container`: toolbar, footer, dan Pagination menyesuaikan lebar tabel ini,
+      // bukan lebar layar — tetap benar di kolom sempit maupun pratinjau mobile.
+      className={cn(
+        "@container overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm",
+        className,
+      )}
       {...props}
     >
       {hasToolbar && (
@@ -881,7 +886,7 @@ export function Table<T>({
               withButton={false}
               placeholder="Cari Data"
               {...search}
-              className={cn("w-full sm:w-auto sm:min-w-[22rem]", search.className)}
+              className={cn("w-full @xl:w-auto @xl:min-w-[22rem]", search.className)}
             />
           )}
 
@@ -929,7 +934,17 @@ export function Table<T>({
         </div>
       )}
 
-      <div className="overflow-x-auto">
+      {/* Scrollbar tipis yang selalu terlihat, seperti rancangan mobile: tanda
+          bahwa tabel bisa digeser ke samping. Firefox memakai scrollbar-*,
+          Chromium/Safari memakai ::-webkit-scrollbar. */}
+      <div
+        className={cn(
+          "overflow-x-auto [scrollbar-color:var(--color-gray-300)_var(--color-gray-100)] [scrollbar-width:thin]",
+          "[&::-webkit-scrollbar]:h-1.5",
+          "[&::-webkit-scrollbar-track]:mx-4 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100",
+          "[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300",
+        )}
+      >
         <table
           className="w-full border-separate border-spacing-0 text-sm"
           aria-busy={loading || undefined}
@@ -1098,7 +1113,9 @@ export function Table<T>({
       </div>
 
       {pagination && (
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 p-4">
+        // Sempit: pagination di atas, ringkasan di bawahnya, rata kiri (rancangan
+        // mobile). Mulai 512px: ringkasan kiri, pagination kanan.
+        <div className="flex flex-col-reverse items-start gap-3 border-t border-gray-200 p-4 @lg:flex-row @lg:items-center @lg:justify-between">
           <p className="text-sm text-gray-500">
             {(pagination.summary ?? defaultSummary)({ from, to, total })}
           </p>
@@ -1107,6 +1124,7 @@ export function Table<T>({
             totalPages={totalPages}
             onPageChange={changePage}
             theme={pagination.theme}
+            size="responsive"
           />
         </div>
       )}
