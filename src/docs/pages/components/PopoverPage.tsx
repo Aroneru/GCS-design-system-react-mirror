@@ -84,7 +84,7 @@ export function PopoverPage() {
             <Segmented
               label="Pilih sisi arrow Popover"
               value={side}
-              onChange={setSide}
+              onChange={(val) => setSide(val as PopoverSide)}
               wrap
               options={sides}
             />
@@ -100,7 +100,7 @@ export function PopoverPage() {
           tidak mengubah padding internal header dan body.
         </Lead>
         <SectionCode flush>
-          {"import { Popover } from '@tpl/design-kit-react'\n\n"}
+          {"import { Popover } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Popover title="Popover"'}
           {side !== 'right' && (
             <>

@@ -34,6 +34,34 @@ export type {
 export { Modal } from "./components/Modal";
 export type { ModalProps, ModalSize } from "./components/Modal";
 
+export {
+  Drawer,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerBody,
+  DrawerFooter,
+  DrawerNavItem,
+  DrawerSubItem,
+  DrawerTrigger,
+} from "./components/Drawer";
+export type {
+  DrawerProps,
+  DrawerPosition,
+  DrawerSize,
+  DrawerNavItemTheme,
+  DrawerHeaderProps,
+  DrawerTitleProps,
+  DrawerDescriptionProps,
+  DrawerBodyProps,
+  DrawerFooterProps,
+  DrawerNavItemProps,
+  DrawerSubItemProps,
+  DrawerTriggerProps,
+  DrawerMenuItem,
+  DrawerMenuSubItem,
+} from "./components/Drawer";
+
 export { Alert } from "./components/Alert";
 export type { AlertProps, AlertVariant } from "./components/Alert";
 

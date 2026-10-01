@@ -19,7 +19,11 @@ export function Sidebar({
   className,
   ...props
 }: SidebarProps) {
-  const hasCollapseButton = Boolean(onCollapse || showCollapseButton);
+  const allItems = groups?.length ? groups.flatMap((g) => g.items) : items;
+  const hasMenuIcons = allItems.some(
+    (item) => Boolean(item.icon) || Boolean(item.children?.some((child) => Boolean(child.icon))),
+  );
+  const hasCollapseButton = hasMenuIcons && Boolean(onCollapse || showCollapseButton);
   const hasHeader = Boolean(logo || collapsedLogo || hasCollapseButton);
   const visibleLogo = collapsed ? (collapsedLogo ?? logo) : logo;
 
@@ -67,7 +71,7 @@ export function Sidebar({
                 collapsed && "order-1",
               )}
             >
-              <ChevronLeft className={cn("size-4 transition-transform", collapsed && "rotate-180")} />
+              <ChevronLeft className={cn("w-[28px] h-[28px] shrink-0 text-gray-900 transition-transform", collapsed && "rotate-180")} />
             </button>
           )}
         </header>
@@ -78,6 +82,12 @@ export function Sidebar({
         <div className={cn("px-4 pb-3", !hasHeader && "pt-4")}>
           <a
             href={user.href ?? "#"}
+            onClick={(e) => {
+              if (!user.href || user.href === "#") {
+                e.preventDefault();
+              }
+              user.onClick?.(e);
+            }}
             className={cn(
               "flex",
               collapsed

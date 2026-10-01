@@ -1118,12 +1118,12 @@ export function HomePage() {
                 className="mt-4 flex flex-wrap items-center gap-3"
               >
                 <Magnetic>
-                  <Button as="a" href="#/components" variant="filled">
+                  <Button as="anchor" href="#/components" variant="filled">
                     Mulai pakai
                   </Button>
                 </Magnetic>
                 <Magnetic strength={12}>
-                  <Button as="a" href="#/foundations" variant="outline">
+                  <Button as="anchor" href="#/foundations" variant="outline">
                     Lihat Foundations
                   </Button>
                 </Magnetic>
