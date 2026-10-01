@@ -82,13 +82,23 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
   ref,
 ) {
   const contentId = useId()
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
   const contentRef = useRef<HTMLDivElement | null>(null)
 
   // Menutup panel setelah sebuah aksi dijalankan. Dicek dulu apakah ia memang
   // sedang terbuka: `hidePopover()` pada panel yang tertutup melempar.
-  const tutup = useCallback(() => {
+  const tutup = useCallback((pulihkanFokus = false) => {
     const panel = contentRef.current
-    if (panel?.isConnected && panel.matches(':popover-open')) panel.hidePopover()
+    if (!panel?.isConnected || !panel.matches(':popover-open')) return
+
+    const fokusMasihDiPanel = pulihkanFokus && panel.contains(document.activeElement)
+    const pemicu = triggerRef.current
+
+    panel.hidePopover()
+
+    if (fokusMasihDiPanel && pemicu instanceof HTMLButtonElement && pemicu.isConnected) {
+      pemicu.focus()
+    }
   }, [])
 
   if (!isValidElement<ButtonHTMLAttributes<HTMLButtonElement>>(trigger)) {
@@ -115,14 +125,14 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
         )}
 
         {item.description ? (
-          <span className="min-w-0 flex-1">
+          <span className="min-w-0 flex-1 break-words">
             <span className="block">{item.label}</span>
             <span className="mt-0.5 block text-xs font-normal text-gray-500">
               {item.description}
             </span>
           </span>
         ) : (
-          item.label
+          <span className="min-w-0 flex-1 break-words">{item.label}</span>
         )}
       </>
     )
@@ -150,7 +160,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
         type="button"
         disabled={item.disabled}
         className={kelas}
-        onClick={() => { item.onClick?.(); tutup() }}
+        onClick={() => { item.onClick?.(); tutup(true) }}
       >
         {isi}
       </button>
@@ -162,6 +172,10 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
       {cloneElement(trigger, {
         popoverTarget: contentId,
         popoverTargetAction: 'toggle',
+        onClick: (event) => {
+          triggerRef.current = event.currentTarget
+          trigger.props.onClick?.(event)
+        },
       })}
 
       <div
@@ -169,7 +183,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
         id={contentId}
         popover="auto"
         className={cn(
-          'fixed inset-auto mt-2 mr-0 mb-0 ml-0 w-56 max-w-[calc(100vw-1rem)] [position-area:bottom_center] rounded-lg bg-surface text-content shadow-md',
+          'fixed inset-auto mt-2 mr-0 mb-0 ml-0 [width:min(anchor-size(width),calc(100vw-1rem))] max-w-[calc(100vw-1rem)] [position-area:bottom_center] rounded-lg bg-surface text-content shadow-md',
           pakaiDaftar && 'py-1',
           contentClassName,
         )}

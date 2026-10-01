@@ -112,7 +112,7 @@ export function ComponentsOverview() {
         desc="Kumpulan aksi atau pilihan tambahan yang dibuka dari sebuah trigger."
       >
         <div className="rounded-xl bg-surface-subtle p-5">
-          <div className="mx-auto flex w-56 max-w-full flex-col items-center gap-2">
+          <div className="mx-auto flex w-fit max-w-full flex-col items-center gap-2">
             <div className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-700 px-4 text-base font-medium text-white">
               Dropdown button
               <svg
