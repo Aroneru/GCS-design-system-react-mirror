@@ -7,6 +7,10 @@ import {
   Table,
   type BadgeVariant,
   type PaginationTheme,
+  type TableActionIconSize,
+  type TableActionRadius,
+  type TableActionTone,
+  type TableActionVariant,
   type TableColumn,
   type TableRowAction,
   type TableSize,
@@ -49,12 +53,15 @@ const allRows: Row[] = Array.from({ length: 1000 }, (_, i) => ({
 
 /**
  * Aksi per baris: ikon, judul (tooltip), dan tujuannya ditentukan pemakai.
- * Dibuat generik supaya bisa dipakai tabel penduduk di bawah juga.
+ * Dibuat generik supaya bisa dipakai tabel penduduk di bawah juga. `style`
+ * diisi Playground untuk ukuran ikon, sudut, dan warna tombol.
  */
-const makeActions = <T extends { id: number }>(): TableRowAction<T>[] => [
-  { key: "ubah", icon: <Edit />, label: "Ubah", theme: "yellow", href: (r) => `#/ubah/${r.id}` },
-  { key: "unduh", icon: <Download />, label: "Unduh", onClick: (r) => console.log("unduh", r) },
-  { key: "cetak", icon: <Printer />, label: "Cetak", theme: "green", onClick: () => window.print() },
+type ActionStyle = Pick<TableRowAction<unknown>, "iconSize" | "radius" | "variant" | "tone">;
+
+const makeActions = <T extends { id: number }>(style: ActionStyle = {}): TableRowAction<T>[] => [
+  { key: "ubah", icon: <Edit />, label: "Ubah", theme: "yellow", ...style, href: (r) => `#/ubah/${r.id}` },
+  { key: "unduh", icon: <Download />, label: "Unduh", ...style, onClick: (r) => console.log("unduh", r) },
+  { key: "cetak", icon: <Printer />, label: "Cetak", theme: "green", ...style, onClick: () => window.print() },
 ];
 
 const rowActions = makeActions<Row>();
@@ -302,6 +309,31 @@ const themeOptions: { value: PaginationTheme; label: string }[] = [
   { value: "simaya", label: "Simaya" },
 ];
 
+const actionIconSizeOptions: { value: TableActionIconSize; label: string }[] = [
+  { value: "s", label: "S" },
+  { value: "base", label: "Base" },
+  { value: "l", label: "L" },
+  { value: "xl", label: "XL" },
+];
+
+const actionRadiusOptions: { value: TableActionRadius; label: string }[] = [
+  { value: "none", label: "None" },
+  { value: "s", label: "S" },
+  { value: "base", label: "Base" },
+  { value: "l", label: "L" },
+  { value: "full", label: "Full" },
+];
+
+const actionVariantOptions: { value: TableActionVariant; label: string }[] = [
+  { value: "filled", label: "Filled" },
+  { value: "outline", label: "Outline" },
+];
+
+const actionToneOptions: { value: TableActionTone; label: string }[] = [
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
+
 const onOff = [
   { value: true, label: "On" },
   { value: false, label: "Off" },
@@ -356,9 +388,11 @@ const actionProps: PropRow[] = [
   ["icon", "ReactNode", "—", "Ikon tombol."],
   ["label", "string | (row) => string", "—", "Judul tombol, muncul sebagai tooltip."],
   ["showLabel", "boolean", "false", "Tulis judul di samping ikon."],
-  ["theme", "ButtonTheme", "primary", "Warna tombol, mis. `\"yellow\"`, `\"green\"`, `\"red\"`."],
+  ["theme", "TableActionTheme", "primary", "Warna tombol: `\"primary\"`, `\"green\"`, `\"gray\"`, `\"simaya\"`, `\"orange\"`, `\"yellow\"`, `\"red\"`."],
   ["variant", '"filled" | "outline"', "filled", "Tombol berisi warna atau hanya garis tepi."],
-  ["tone", "ButtonTone", "light", "Terang-gelapnya warna tombol."],
+  ["tone", '"light" | "dark"', "light", "Terang-gelapnya warna tombol."],
+  ["iconSize", '"s" | "base" | "l" | "xl"', "base", "Ukuran ikon. Tombol ikut membesar: 20px, 24px, 32px, 40px."],
+  ["radius", '"none" | "s" | "base" | "l" | "full"', "base", "Kelengkungan sudut tombol. `\"full\"` membuat tombol bulat."],
   ["href", "string | (row) => string", "undefined", "Alamat tujuan saat tombol diklik."],
   ["target", "string", "undefined", "Isi `\"_blank\"` untuk membuka di tab baru."],
   ["onClick", "(row, index) => void", "undefined", "Fungsi yang dijalankan saat tombol diklik."],
@@ -532,10 +566,12 @@ function pengajuanColumns({
   preview,
   grouped,
   withRowActions,
+  actionStyle,
 }: {
   preview: boolean;
   grouped: boolean;
   withRowActions: boolean;
+  actionStyle: ActionStyle;
 }): TableColumn<Pengajuan>[] {
   const nama: TableColumn<Pengajuan> = { key: "nama", header: "Nama", align: "left", emphasis: true, sortable: true };
   const email: TableColumn<Pengajuan> = { key: "email", header: "Email", align: "left" };
@@ -562,7 +598,7 @@ function pengajuanColumns({
       cell: (row) => <Badge variant={statusBadge[row.status]}>{row.status}</Badge>,
     },
     ...(withRowActions
-      ? [{ key: "aksi", header: "Aksi", actions: makeActions<Pengajuan>(), hideable: false }]
+      ? [{ key: "aksi", header: "Aksi", actions: makeActions<Pengajuan>(actionStyle), hideable: false }]
       : []),
   ];
 }
@@ -576,6 +612,7 @@ function PlaygroundTable({
   size,
   withPagination,
   withRowActions,
+  actionStyle,
   preview,
   grouped,
 }: {
@@ -587,6 +624,7 @@ function PlaygroundTable({
   size: TableSize;
   withPagination: boolean;
   withRowActions: boolean;
+  actionStyle: ActionStyle;
   preview: boolean;
   grouped: boolean;
 }) {
@@ -603,7 +641,7 @@ function PlaygroundTable({
 
   return (
     <Table
-      columns={pengajuanColumns({ preview, grouped, withRowActions })}
+      columns={pengajuanColumns({ preview, grouped, withRowActions, actionStyle })}
       data={rows}
       rowKey="id"
       size={size}
@@ -672,6 +710,20 @@ export function TablePage() {
   const [size, setSize] = useState<TableSize>("normal");
   const [withPagination, setWithPagination] = useState(true);
   const [withRowActions, setWithRowActions] = useState(true);
+  const [actionIconSize, setActionIconSize] = useState<TableActionIconSize>("base");
+  const [actionRadius, setActionRadius] = useState<TableActionRadius>("base");
+  const [actionVariant, setActionVariant] = useState<TableActionVariant>("filled");
+  const [actionTone, setActionTone] = useState<TableActionTone>("light");
+  // Hanya nilai yang bukan bawaan, supaya kode di Penggunaan tetap ringkas.
+  const actionStyle: ActionStyle = {
+    ...(actionIconSize !== "base" && { iconSize: actionIconSize }),
+    ...(actionRadius !== "base" && { radius: actionRadius }),
+    ...(actionVariant !== "filled" && { variant: actionVariant }),
+    ...(actionTone !== "light" && { tone: actionTone }),
+  };
+  const actionStyleCode = Object.entries(actionStyle)
+    .map(([prop, value]) => `, ${prop}: '${value}'`)
+    .join("");
   const [withPreview, setWithPreview] = useState(true);
   const [grouped, setGrouped] = useState(false);
   const [count, setCount] = useState(50);
@@ -1214,6 +1266,7 @@ export function TablePage() {
             size={size}
             withPagination={withPagination}
             withRowActions={withRowActions}
+            actionStyle={actionStyle}
             preview={withPreview}
             grouped={grouped}
           />
@@ -1238,6 +1291,22 @@ export function TablePage() {
           <Control label="Kolom aksi">
             <Segmented label="Kolom aksi" value={withRowActions} onChange={setWithRowActions} options={adaTidakAda} />
           </Control>
+          {withRowActions && (
+            <>
+              <Control label="Ukuran ikon aksi">
+                <Segmented label="Ukuran ikon aksi" value={actionIconSize} onChange={setActionIconSize} options={actionIconSizeOptions} />
+              </Control>
+              <Control label="Sudut tombol aksi">
+                <Segmented label="Sudut tombol aksi" value={actionRadius} onChange={setActionRadius} options={actionRadiusOptions} />
+              </Control>
+              <Control label="Rupa tombol aksi">
+                <Segmented label="Rupa tombol aksi" value={actionVariant} onChange={setActionVariant} options={actionVariantOptions} />
+              </Control>
+              <Control label="Tone tombol aksi">
+                <Segmented label="Tone tombol aksi" value={actionTone} onChange={setActionTone} options={actionToneOptions} />
+              </Control>
+            </>
+          )}
           <Control label="Pratinjau gambar">
             <Segmented label="Pratinjau gambar" value={withPreview} onChange={setWithPreview} options={onOff} />
           </Control>
@@ -1303,9 +1372,9 @@ export function TablePage() {
               {"    { key: 'aksi', header: 'Aksi', "}
               <H>actions</H>
               {": [\n"}
-              {"        { key: 'ubah', icon: <Edit />, label: 'Ubah', theme: 'yellow', href: (row) => `/ubah/${row.id}` },\n"}
-              {"        { key: 'unduh', icon: <Download />, label: 'Unduh', onClick: (row) => unduh(row) },\n"}
-              {"        { key: 'cetak', icon: <Printer />, label: 'Cetak', theme: 'green', onClick: () => window.print() },\n"}
+              {`        { key: 'ubah', icon: <Edit />, label: 'Ubah', theme: 'yellow'${actionStyleCode}, href: (row) => \`/ubah/\${row.id}\` },\n`}
+              {`        { key: 'unduh', icon: <Download />, label: 'Unduh'${actionStyleCode}, onClick: (row) => unduh(row) },\n`}
+              {`        { key: 'cetak', icon: <Printer />, label: 'Cetak', theme: 'green'${actionStyleCode}, onClick: () => window.print() },\n`}
               {"    ], "}
               <H>hideable</H>
               {": false },\n"}

@@ -15,13 +15,7 @@ import {
   Close,
 } from "flowbite-react-icons/outline";
 import { cn } from "../utils/cn";
-import {
-  Button,
-  type ButtonSize,
-  type ButtonTheme,
-  type ButtonTone,
-  type ButtonVariant,
-} from "./Button";
+import { Button } from "./Button";
 import { Checkbox } from "./Checkbox";
 import { Dropdown } from "./Dropdown";
 import { Pagination, type PaginationTheme } from "./Pagination";
@@ -48,6 +42,26 @@ export interface TableSticky {
   end?: boolean;
 }
 
+/** Warna tombol aksi baris. */
+export type TableActionTheme =
+  | "primary"
+  | "green"
+  | "gray"
+  | "simaya"
+  | "orange"
+  | "yellow"
+  | "red";
+
+export type TableActionVariant = "filled" | "outline";
+
+export type TableActionTone = "light" | "dark";
+
+/** Ukuran ikon tombol aksi. Kotak tombolnya ikut membesar. */
+export type TableActionIconSize = "s" | "base" | "l" | "xl";
+
+/** Kelengkungan sudut tombol aksi. */
+export type TableActionRadius = "none" | "s" | "base" | "l" | "full";
+
 /** Ikon sort untuk satu arah; `null` berarti kolom itu sedang tidak mengurutkan. */
 export type TableSortIcon = (direction: TableSortDirection | null) => ReactNode;
 
@@ -63,10 +77,16 @@ export interface TableRowAction<T> {
   label: string | ((row: T) => string);
   /** Tampilkan judul sebagai teks di samping ikon, bukan hanya tooltip. */
   showLabel?: boolean;
-  theme?: ButtonTheme;
-  variant?: ButtonVariant;
+  /** Bawaannya `primary`. */
+  theme?: TableActionTheme;
+  /** Bawaannya `filled`. */
+  variant?: TableActionVariant;
   /** Bawaannya `light`. */
-  tone?: ButtonTone;
+  tone?: TableActionTone;
+  /** Ukuran ikon; tombol ikut membesar. Bawaannya `base` (tombol 24px, ikon 16px). */
+  iconSize?: TableActionIconSize;
+  /** Kelengkungan sudut. Bawaannya `base` (4px). */
+  radius?: TableActionRadius;
   /** Tujuan tautan. Bila diisi tombol dirender sebagai `<a>`. */
   href?: string | ((row: T) => string);
   target?: HTMLAttributeAnchorTarget;
@@ -100,7 +120,7 @@ export interface TableColumn<T> {
   cell?: (row: T, index: number) => ReactNode;
   /**
    * Deretan tombol aksi di sel. Diabaikan bila `cell` diisi — untuk tata letak
-   * yang lebih bebas, render Button sendiri di `cell`.
+   * yang lebih bebas, render tombol sendiri di `cell`.
    */
   actions?: TableRowAction<T>[];
   /** Gambar di sel, dengan pratinjau saat diklik. Diabaikan bila `cell` atau `actions` diisi. */
@@ -252,7 +272,6 @@ const sizes: Record<
     cellText: string | null;
     thumb?: string;
     check: "default" | "mobile";
-    action: ButtonSize;
   }
 > = {
   normal: {
@@ -264,7 +283,6 @@ const sizes: Record<
     headTop: "border-t-gray-200",
     cellText: null,
     check: "default",
-    action: "base",
   },
   compact: {
     head: "h-16 px-4 py-2",
@@ -276,7 +294,104 @@ const sizes: Record<
     cellText: "text-gray-900",
     thumb: "size-8 rounded-md",
     check: "mobile",
-    action: "xs",
+  },
+};
+
+/**
+ * Ukuran tombol aksi per `iconSize`: kotak untuk tombol ikon saja, tinggi dan
+ * padding untuk tombol berjudul, serta ukuran ikonnya. `base` mengikuti Figma.
+ */
+const actionSizes: Record<TableActionIconSize, { iconOnly: string; labeled: string; icon: string }> =
+  {
+    s: { iconOnly: "size-5", labeled: "h-5 gap-1 px-1.5 text-xs", icon: "size-3.5" },
+    base: { iconOnly: "size-6", labeled: "h-6 gap-1.5 px-2 text-xs", icon: "size-4" },
+    l: { iconOnly: "size-8", labeled: "h-8 gap-2 px-3 text-sm", icon: "size-5" },
+    xl: { iconOnly: "size-10", labeled: "h-10 gap-2 px-4 text-base", icon: "size-6" },
+  };
+
+const actionRadii: Record<TableActionRadius, string> = {
+  none: "rounded-none",
+  s: "rounded-xs",
+  base: "rounded",
+  l: "rounded-lg",
+  full: "rounded-full",
+};
+
+/** Warna tombol aksi baris, terpisah dari Button supaya Table bisa diatur sendiri. */
+const actionColors: Record<
+  TableActionTheme,
+  Record<TableActionTone, Record<TableActionVariant, string>>
+> = {
+  primary: {
+    light: {
+      filled: "bg-primary-700 text-white hover:bg-primary-800",
+      outline: "border border-primary-700 text-primary-700 hover:bg-primary-50",
+    },
+    dark: {
+      filled: "bg-primary-800 text-white hover:bg-primary-700",
+      outline: "border border-primary-800 text-primary-800 hover:bg-primary-50",
+    },
+  },
+  green: {
+    light: {
+      filled: "bg-green-700 text-white hover:bg-green-800",
+      outline: "border border-green-700 text-green-700 hover:bg-green-50",
+    },
+    dark: {
+      filled: "bg-green-800 text-white hover:bg-green-700",
+      outline: "border border-green-800 text-green-800 hover:bg-green-50",
+    },
+  },
+  gray: {
+    light: {
+      filled: "bg-gray-500 text-white hover:bg-gray-700",
+      outline: "border border-gray-500 text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+    },
+    dark: {
+      filled: "bg-gray-700 text-white hover:bg-gray-500",
+      outline: "border border-gray-700 text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+    },
+  },
+  simaya: {
+    light: {
+      filled: "bg-purple-700 text-white hover:bg-purple-800",
+      outline: "border border-purple-700 text-purple-700 hover:bg-purple-50",
+    },
+    dark: {
+      filled: "bg-purple-800 text-white hover:bg-purple-700",
+      outline: "border border-purple-800 text-purple-800 hover:bg-purple-50",
+    },
+  },
+  orange: {
+    light: {
+      filled: "bg-orange-600 text-white hover:bg-orange-700",
+      outline: "border border-orange-600 text-orange-600 hover:bg-orange-50",
+    },
+    dark: {
+      filled: "bg-orange-700 text-white hover:bg-orange-800",
+      outline: "border border-orange-700 text-orange-700 hover:bg-orange-50",
+    },
+  },
+  // Kuning mengikuti Figma: 400 (#e3a008). Token 700 ke atas sudah cokelat.
+  yellow: {
+    light: {
+      filled: "bg-yellow-400 text-white hover:bg-yellow-500",
+      outline: "border border-yellow-400 text-yellow-500 hover:bg-yellow-50",
+    },
+    dark: {
+      filled: "bg-yellow-500 text-white hover:bg-yellow-400",
+      outline: "border border-yellow-500 text-yellow-600 hover:bg-yellow-50",
+    },
+  },
+  red: {
+    light: {
+      filled: "bg-red-700 text-white hover:bg-red-800",
+      outline: "border border-red-700 text-red-700 hover:bg-red-50",
+    },
+    dark: {
+      filled: "bg-red-800 text-white hover:bg-red-700",
+      outline: "border border-red-800 text-red-800 hover:bg-red-50",
+    },
   },
 };
 
@@ -494,7 +609,8 @@ export function TableImage({
  *
  * Bagian-bagiannya bukan buatan sendiri: toolbar memakai Search, Dropdown, dan
  * Button; kolom seleksi memakai Checkbox; kaki tabel memakai Pagination. Jadi
- * rupa dan perilaku papan ketiknya ikut komponen-komponen itu.
+ * rupa dan perilaku papan ketiknya ikut komponen-komponen itu. Pengecualiannya
+ * tombol aksi baris: dibuat sendiri di sini, tidak bergantung pada Button.
  *
  * Bawaannya tabel mengurutkan dan membagi halaman `data` sendiri. Untuk data
  * dari server pasang `manual`: tabel hanya menampilkan baris yang diberikan,
@@ -623,31 +739,60 @@ export function Table<T>({
         if (action.hidden !== undefined && resolve(action.hidden, row)) return null;
         const label = resolve(action.label, row);
         const disabled = action.disabled !== undefined && resolve(action.disabled, row);
-        const common = {
-          type: action.showLabel ? ("button" as const) : ("iconOnly" as const),
-          size: density.action,
-          theme: action.theme,
-          variant: action.variant,
-          tone: action.tone ?? ("light" as const),
-          leftIcon: action.showLabel ? action.icon : undefined,
-          "aria-label": action.showLabel ? undefined : label,
-          children: action.showLabel ? label : action.icon,
-        };
+        const actionSize = actionSizes[action.iconSize ?? "base"];
+        const className = cn(
+          "inline-flex shrink-0 items-center justify-center font-medium whitespace-nowrap",
+          "transition-colors duration-200",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400",
+          "disabled:pointer-events-none disabled:opacity-50",
+          actionColors[action.theme ?? "primary"][action.tone ?? "light"][
+            action.variant ?? "filled"
+          ],
+          action.showLabel ? actionSize.labeled : actionSize.iconOnly,
+          actionRadii[action.radius ?? "base"],
+        );
+        // `[&>svg]:size-full` supaya ikon yang membawa ukuran sendiri tetap
+        // mengikuti `iconSize`.
+        const content = (
+          <>
+            <span
+              className={cn(
+                "flex shrink-0 items-center justify-center [&>svg]:size-full",
+                actionSize.icon,
+              )}
+            >
+              {action.icon}
+            </span>
+            {action.showLabel && label}
+          </>
+        );
+        const ariaLabel = action.showLabel ? undefined : label;
+        const onClick = () => action.onClick?.(row, index);
 
         // `<a>` tidak bisa dinonaktifkan, jadi tautan yang disabled dirender
         // sebagai `<button disabled>`.
         const button =
           action.href !== undefined && !disabled ? (
-            <Button
-              {...common}
-              as="anchor"
+            <a
               href={resolve(action.href, row)}
               target={action.target}
               rel={action.target === "_blank" ? "noopener noreferrer" : undefined}
-              onClick={() => action.onClick?.(row, index)}
-            />
+              aria-label={ariaLabel}
+              className={className}
+              onClick={onClick}
+            >
+              {content}
+            </a>
           ) : (
-            <Button {...common} disabled={disabled} onClick={() => action.onClick?.(row, index)} />
+            <button
+              type="button"
+              disabled={disabled}
+              aria-label={ariaLabel}
+              className={className}
+              onClick={onClick}
+            >
+              {content}
+            </button>
           );
 
         if (action.showLabel) return <Fragment key={action.key}>{button}</Fragment>;
