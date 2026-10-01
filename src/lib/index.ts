@@ -188,7 +188,30 @@ export type {
 } from "./components/Breadcrumb";
 
 export { Pagination } from "./components/Pagination";
-export type { PaginationProps, PaginationTheme } from "./components/Pagination";
+export type { PaginationProps, PaginationSize, PaginationTheme } from "./components/Pagination";
+
+export { Table, TableImage } from "./components/Table";
+export type {
+  TableProps,
+  TableColumn,
+  TableColumnImage,
+  TableImageProps,
+  TableAlign,
+  TableSort,
+  TableSortDirection,
+  TableSortIcon,
+  TableRowAction,
+  TableActionTheme,
+  TableActionVariant,
+  TableActionTone,
+  TableActionIconSize,
+  TableActionRadius,
+  TableSize,
+  TableSticky,
+  TableSearchConfig,
+  TableFilterConfig,
+  TablePaginationConfig,
+} from "./components/Table";
 
 export { Sidebar } from "./components/sidebar/Sidebar";
 export type {
