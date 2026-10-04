@@ -22,26 +22,29 @@ import { adaTidakAda } from '../../usulanOptions'
  *
  * Belum memakai <Button> dari kit: theme-nya belum punya merah untuk danger,
  * jadi kelima variant ditulis seragam sebagai <button> biasa.
+ *
+ * Pada tampilan gelap tombolnya -600 (hover -700): -800 nyaris tenggelam di
+ * latar gray-800, sedangkan teks putih di atas -600 tetap di atas 4,5:1.
  */
-const variants: { value: AlertVariant; label: string; button: string }[] = [
-  { value: 'success', label: 'Success', button: 'bg-green-800 hover:bg-green-900' },
-  { value: 'danger', label: 'Danger', button: 'bg-red-800 hover:bg-red-900' },
-  { value: 'warning', label: 'Warning', button: 'bg-yellow-800 hover:bg-yellow-900' },
-  { value: 'info', label: 'Info', button: 'bg-primary-800 hover:bg-primary-900' },
-  { value: 'purple', label: 'Purple', button: 'bg-purple-800 hover:bg-purple-900' },
+const variants: { value: AlertVariant; label: string; button: string; buttonDark: string }[] = [
+  { value: 'success', label: 'Success', button: 'bg-green-800 hover:bg-green-900', buttonDark: 'bg-green-600 hover:bg-green-700' },
+  { value: 'danger', label: 'Danger', button: 'bg-red-800 hover:bg-red-900', buttonDark: 'bg-red-600 hover:bg-red-700' },
+  { value: 'warning', label: 'Warning', button: 'bg-yellow-800 hover:bg-yellow-900', buttonDark: 'bg-yellow-600 hover:bg-yellow-700' },
+  { value: 'info', label: 'Info', button: 'bg-primary-800 hover:bg-primary-900', buttonDark: 'bg-primary-600 hover:bg-primary-700' },
+  { value: 'purple', label: 'Purple', button: 'bg-purple-800 hover:bg-purple-900', buttonDark: 'bg-purple-600 hover:bg-purple-700' },
 ]
 
 const isiAlert =
   'Ini merupakan Design system Ceplok berupa component alert. Ini merupakan Design system Ceplok berupa component alert.'
 
 /** Tombol contoh untuk slot `actions`. */
-function AksiButton({ variant }: { variant: AlertVariant }) {
-  const { button } = variants.find((v) => v.value === variant) ?? variants[3]
+function AksiButton({ variant, dark }: { variant: AlertVariant; dark?: boolean }) {
+  const { button, buttonDark } = variants.find((v) => v.value === variant) ?? variants[3]
 
   return (
     <button
       type="button"
-      className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${button}`}
+      className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 ${dark ? buttonDark : button}`}
     >
       Button text
       <Messages className="size-4" />
@@ -57,6 +60,7 @@ const alertProps: PropRow[] = [
   ['onDismiss', '() => void', 'undefined', 'Dipanggil saat tombol tutup diklik.'],
   ['open', 'boolean', 'undefined', 'Kendalikan tampil/sembunyi dari luar; tanpa ini Alert mengurusnya sendiri.'],
   ['actions', 'ReactNode', 'undefined', 'Baris tombol tindak lanjut di bawah isi.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: latar gray-800 dengan teks dan ikon berwarna variant.'],
   ['children', 'ReactNode', 'undefined', 'Isi pesan.'],
   ['…props', 'HTMLAttributes', '—', 'Seluruh atribut <div> diteruskan (className, id, …).'],
 ]
@@ -64,6 +68,7 @@ const alertProps: PropRow[] = [
 const toc: TocEntry[] = [
   { id: 'alert', label: 'Alert' },
   { id: 'opsional', label: 'Elemen opsional' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -75,6 +80,7 @@ export function AlertPage() {
   const [pakaiIkon, setPakaiIkon] = useState(true)
   const [pakaiTutup, setPakaiTutup] = useState(true)
   const [pakaiAksi, setPakaiAksi] = useState(true)
+  const [dark, setDark] = useState(false)
 
   // Alert menutup dirinya sendiri; ganti key untuk memasangnya kembali dari nol.
   const [tayangan, setTayangan] = useState(0)
@@ -83,7 +89,7 @@ export function AlertPage() {
     <UsulanPage
       eyebrow="Components"
       title="Alert"
-      description="Menyampaikan pesan status — sukses, error, peringatan, atau informasi — tepat di dalam alur halaman. Lima variant warna dengan elemen yang sepenuhnya opsional."
+      description="Menyampaikan pesan status — sukses, error, peringatan, atau informasi — tepat di dalam alur halaman. Lima variant warna dengan elemen yang sepenuhnya opsional. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="alert" title="Alert">
@@ -158,6 +164,38 @@ export function AlertPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti latarnya ke gray-800 untuk semua variant, seperti kartu Toast gelap,
+          lalu warna variant pindah ke teks dan ikonnya. Dua tingkatnya tetap ada tetapi dibalik: ikon, heading,
+          dan tombol tutup -300, isi pesan -400 — keduanya di atas 4,5:1 terhadap gray-800.
+        </Lead>
+        <Demo dark>
+          <div className="space-y-4">
+            {variants.map((v) => (
+              <Alert
+                key={v.value}
+                darkMode
+                variant={v.value}
+                heading="Ini adalah Alert"
+                actions={<AksiButton variant={v.value} dark />}
+              >
+                {isiAlert}
+              </Alert>
+            ))}
+          </div>
+        </Demo>
+        <SectionCode>
+          {'<Alert '}
+          <H>darkMode</H>
+          {' variant="success" heading="Ini adalah Alert">…</Alert>'}
+        </SectionCode>
+        <p className="mt-4 text-body-sm text-gray-500">
+          Isi <H>actions</H> tetap milik Anda, jadi warnanya tidak ikut diganti. Tombol contoh di atas memakai
+          -600 (hover -700) karena -800 dari tampilan terang nyaris tenggelam di latar gray-800.
+        </p>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu Alert yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung terlihat
@@ -165,14 +203,15 @@ export function AlertPage() {
           <H>Tampilkan Alert</H> untuk memasangnya kembali.
         </Lead>
 
-        <Stage maxWidth={lebar === 'mobile' ? 'max-w-75' : 'max-w-full'}>
+        <Stage maxWidth={lebar === 'mobile' ? 'max-w-75' : 'max-w-full'} dark={dark}>
           <Alert
             key={tayangan}
             variant={variant}
+            darkMode={dark}
             heading="Ini adalah Alert"
             icon={pakaiIkon ? undefined : false}
             dismissible={pakaiTutup}
-            actions={pakaiAksi ? <AksiButton variant={variant} /> : undefined}
+            actions={pakaiAksi ? <AksiButton variant={variant} dark={dark} /> : undefined}
           >
             Ini merupakan Design system Ceplok berupa component alert.
           </Alert>
@@ -228,6 +267,18 @@ export function AlertPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <button
@@ -258,6 +309,13 @@ export function AlertPage() {
               {'    '}
               <H>variant</H>
               {`="${variant}"\n`}
+            </>
+          )}
+          {dark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'    heading="Ini adalah Alert"\n'}

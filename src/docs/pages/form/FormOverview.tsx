@@ -1,5 +1,6 @@
 import {
   Checkbox,
+  Datepicker,
   FloatingLabel,
   InputField,
   Radio,
@@ -95,6 +96,16 @@ export function FormOverview() {
             placeholder-nya terpotong sebelum tombol Cari.
           */}
           <Search platform="mobile" placeholder="Search Civitas…" />
+        </Preview>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/form/datepicker"
+        name="Datepicker"
+        desc="Pemilih tanggal dengan kalender: satu tanggal, pintasan periode, atau rentang dua kalender."
+      >
+        <Preview>
+          <Datepicker label="Tanggal pengajuan" defaultValue={new Date(2021, 5, 25)} />
         </Preview>
       </OverviewCard>
 

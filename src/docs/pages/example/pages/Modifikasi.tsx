@@ -35,7 +35,7 @@ import { asset } from '../../../asset'
  * yang lebih besar), bukan menandingi properti yang sama.
  */
 
-const TEMA = ['primary', 'green', 'gray', 'purple', 'orange', 'yellow'] as const
+const TEMA = ['primary', 'green', 'gray', 'simaya', 'orange', 'yellow'] as const
 const UKURAN = ['xs', 's', 'base', 'l', 'xl'] as const
 const VARIAN_BADGE = ['gray', 'brand', 'success', 'warning', 'danger'] as const
 
@@ -49,11 +49,12 @@ const PILIHAN = [
 /**
  * Gerak untuk panah Select, ditempelkan lewat `className`.
  *
- * Panahnya digambar komponen sebagai `<svg>` di dalam `<span>` tepat setelah
- * `<select>`; itulah yang dijangkau `select~span_svg`. Menjangkau ke dalam
- * markup komponen seperti ini yang paling rapuh di halaman ini — begitu
- * susunannya berubah, gerakannya diam-diam berhenti tanpa ada yang gagal
- * dikompilasi.
+ * Panahnya digambar komponen sebagai `<svg>` di dalam `<span>` sesudah
+ * `<select>`; itulah yang dijangkau `select~span_svg`. Kapan ia berputar
+ * dibaca dari `aria-expanded` pada tombol pemicunya, yang bernilai `true`
+ * selama daftar terbuka. Menjangkau ke dalam markup komponen seperti ini yang
+ * paling rapuh di halaman ini — begitu susunannya berubah, gerakannya
+ * diam-diam berhenti tanpa ada yang gagal dikompilasi.
  *
  * Ditulis terpisah, bukan berderet di JSX, supaya ketiga kelasnya terbaca
  * satu per satu. Tailwind memindai nama kelas secara harfiah, dan tiap kelas
@@ -62,7 +63,7 @@ const PILIHAN = [
 const PANAH_BERANIMASI =
   '[&_select~span_svg]:transition-transform ' +
   '[&_select~span_svg]:duration-300 ' +
-  '[&:has(select:focus)_select~span_svg]:rotate-180'
+  '[&:has([aria-expanded=true])_select~span_svg]:rotate-180'
 
 /**
  * Token `primary` versi hijau untuk bagian 6.
@@ -503,23 +504,23 @@ import { TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
         <pre className="mt-5 overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
           {`import { Select } from '@ceplok-ui/design-kit-react'
 
-// Panahnya <svg> di dalam <span> tepat setelah <select>.
+// Panahnya <svg> di dalam <span> sesudah <select>; tombol pemicunya
+// membawa aria-expanded="true" selama daftar terbuka.
 const PANAH_BERANIMASI =
   '[&_select~span_svg]:transition-transform ' +
   '[&_select~span_svg]:duration-300 ' +
-  '[&:has(select:focus)_select~span_svg]:rotate-180'
+  '[&:has([aria-expanded=true])_select~span_svg]:rotate-180'
 
 <Select label="Layanan" options={pilihan} className={PANAH_BERANIMASI} />`}
         </pre>
 
         <p className="mt-4 text-body-sm text-gray-500">
-          Panahnya mengikuti <strong>fokus</strong>, bukan terbuka atau tertutupnya daftar:
-          peramban tidak memberi tahu CSS kapan daftar bawaan sistem sedang terbentang. Jadi
-          setelah Anda memilih, panahnya tetap menghadap ke atas selama field-nya masih
-          difokus. Itu batas yang melekat pada <code className="font-mono text-xs">&lt;select&gt;</code>
-          asli, dan menukarnya dengan dropdown buatan sendiri berarti kehilangan papan tombol
-          serta pemilih bawaan ponsel — harga yang jauh lebih mahal daripada panah yang
-          telat berbalik.
+          Panahnya mengikuti <strong>terbuka-tutupnya daftar</strong>. Tombol pemicunya membawa{' '}
+          <code className="font-mono text-xs">aria-expanded</code> yang dibaca langsung dari
+          peramban, jadi CSS cukup bertanya lewat <code className="font-mono text-xs">:has()</code> —
+          begitu Anda memilih atau menekan di luar, daftarnya menutup dan panahnya ikut berbalik.
+          Atribut yang sama juga yang memberi tahu pembaca layar bahwa daftarnya terbuka, jadi
+          animasi ini menumpang pada keadaan yang memang sudah harus ada.
         </p>
       </Blok>
 

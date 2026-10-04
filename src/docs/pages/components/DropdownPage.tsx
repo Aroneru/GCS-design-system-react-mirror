@@ -28,6 +28,12 @@ import {
 } from '../../usulanKit'
 
 type DropdownExample = 'actions' | 'icons' | 'radio' | 'checkbox' | 'scroll'
+type DropdownMode = 'action' | 'selection'
+
+const modes: { value: DropdownMode; label: string }[] = [
+  { value: 'action', label: 'Action' },
+  { value: 'selection', label: 'Selection' },
+]
 
 const examples: { value: DropdownExample; label: string }[] = [
   { value: 'actions', label: 'Tanpa ikon' },
@@ -70,6 +76,7 @@ const toc: TocEntry[] = [
   { id: 'kelompok', label: 'Kelompok' },
   { id: 'keterangan', label: 'Keterangan' },
   { id: 'disable', label: 'Disable' },
+  { id: 'selection', label: 'Selection' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -80,7 +87,9 @@ const dropdownProps: PropRow[] = [
   ['items', 'DropdownItem[]', 'undefined', 'Daftar aksi tanpa pengelompokan.'],
   ['groups', 'DropdownGroup[]', 'undefined', 'Aksi terkelompok, lengkap dengan label dan pemisah antar-kelompok.'],
   ['children', 'ReactNode', 'undefined', 'Isi panel bila bukan daftar aksi. Diabaikan selama items atau groups terisi.'],
+  ['attached', 'boolean', 'false', 'Mengaktifkan positioning panel relatif terhadap trigger dengan penyesuaian batas viewport, termasuk flip dan pembatasan tinggi saat ruang terbatas.'],
   ['className', 'string', 'undefined', 'Class tambahan pada pembungkus terluar.'],
+  ['contentLabel', 'string', 'undefined', 'Nama panel bagi pembaca layar; hanya terpasang pada bentuk daftar pilihan.'],
   ['contentClassName', 'string', 'undefined', 'Class tambahan pada panelnya.'],
   ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut <div> standar diteruskan ke pembungkus.'],
 ]
@@ -93,14 +102,15 @@ const itemProps: PropRow[] = [
   ['onClick', '() => void', 'undefined', 'Dipanggil saat aksi ditekan. Panel menutup sendiri setelahnya.'],
   ['tone', "'default' | 'danger'", "'default'", 'Warna semantik aksi.'],
   ['disabled', 'boolean', 'false', 'Mematikan aksi.'],
+  ['selected', 'boolean', 'undefined', 'Menandai item sebagai opsi terpilih. Jika digunakan pada item, Dropdown menggunakan semantik daftar pilihan (listbox).'],
   ['id', 'string', 'undefined', 'Kunci React; bila kosong dipakai urutannya.'],
 ]
 
 const groupProps: PropRow[] = [
-  ['id', 'string', 'required', 'Kunci React untuk kelompok.'],
-  ['label', 'string', 'undefined', 'Judul kecil di atas kelompok.'],
-  ['separator', 'boolean', 'false', 'Menambahkan garis pemisah sebelum kelompok ini.'],
-  ['items', 'DropdownItem[]', 'required', 'Aksi di dalam kelompok.'],
+  ['id', 'string', 'required', 'ID unik kelompok yang digunakan sebagai key React.'],
+  ['label', 'string', 'undefined', 'Judul opsional yang ditampilkan di atas item dalam kelompok.'],
+  ['separator', 'boolean', 'false', 'Menampilkan garis pemisah sebelum kelompok ini.'],
+  ['items', 'DropdownItem[]', 'required', 'Daftar item yang ditampilkan di dalam kelompok.'],
 ]
 
 function trigger(label = 'Dropdown button') {
@@ -186,6 +196,7 @@ interface ContohProps extends VariationOptions {
   example: DropdownExample
   groupName: string
   label?: string
+  attached?: boolean
 }
 
 /**
@@ -201,21 +212,22 @@ function ContohDropdown({
   withSeparator,
   withDescription,
   withDisabled,
+  attached,
 }: ContohProps) {
   const opsi = { withSeparator, withDescription, withDisabled }
 
   if (example === 'actions' || example === 'icons') {
     const withIcons = example === 'icons'
     return withSeparator ? (
-      <Dropdown trigger={trigger()} groups={kelompokAksi(opsi, withIcons)} aria-label="Daftar aksi" />
+      <Dropdown attached={attached} trigger={trigger()} groups={kelompokAksi(opsi, withIcons)} aria-label="Daftar aksi" />
     ) : (
-      <Dropdown trigger={trigger()} items={aksi(opsi, withIcons)} aria-label="Daftar aksi" />
+      <Dropdown attached={attached} trigger={trigger()} items={aksi(opsi, withIcons)} aria-label="Daftar aksi" />
     )
   }
 
   if (example === 'scroll') {
     return (
-      <Dropdown trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
+      <Dropdown attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
         <div className="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">
           <ScrollContentItems {...opsi} />
         </div>
@@ -225,7 +237,7 @@ function ContohDropdown({
 
   if (example === 'radio') {
     return (
-      <Dropdown trigger={trigger()} contentClassName="p-4" aria-label="Pilih akses">
+      <Dropdown attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih akses">
         <div className="flex flex-col gap-4">
           <Radio className={selectionRowClassName} name={groupName} value="viewer" label="Viewer" />
           <Radio className={selectionRowClassName} name={groupName} value="editor" label="Editor" helperText={withDescription ? 'Dapat mengubah konten.' : undefined} defaultChecked />
@@ -243,7 +255,7 @@ function ContohDropdown({
   }
 
   return (
-    <Dropdown trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi">
+    <Dropdown attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi">
       <div className="flex flex-col gap-4">
         <Checkbox className={selectionRowClassName} label="Email" helperText={withDescription ? 'Kirim pembaruan melalui email.' : undefined} />
         <Checkbox className={selectionRowClassName} label="Push notification" helperText={withDescription ? 'Tampilkan pada perangkat.' : undefined} defaultChecked />
@@ -278,6 +290,78 @@ function CompositionDemo({
         />
       </div>
     </Demo>
+  )
+}
+
+function SelectionDemo() {
+  const [selected, setSelected] = useState('Terbaru')
+  const options = ['Terbaru', 'Terlama', 'Nama A–Z']
+
+  return (
+    <Dropdown
+      attached
+      contentLabel="Urutan hasil"
+      trigger={trigger(`Urutkan: ${selected}`)}
+      items={options.map((label) => ({
+        id: label,
+        label,
+        selected: label === selected,
+        onClick: () => setSelected(label),
+      }))}
+    />
+  )
+}
+
+function SelectionPlayground({
+  selected,
+  onSelectedChange,
+  withSeparator,
+  withDescription,
+  withDisabled,
+  attached,
+}: VariationOptions & {
+  selected: string
+  onSelectedChange: (value: string) => void
+  attached: boolean
+}) {
+  const items: DropdownItem[] = [
+    {
+      id: 'terbaru',
+      label: 'Terbaru',
+      description: withDescription ? 'Urutkan dari yang paling baru.' : undefined,
+      selected: selected === 'Terbaru',
+      onClick: () => onSelectedChange('Terbaru'),
+    },
+    {
+      id: 'terlama',
+      label: 'Terlama',
+      description: withDescription ? 'Urutkan dari yang paling lama.' : undefined,
+      selected: selected === 'Terlama',
+      onClick: () => onSelectedChange('Terlama'),
+    },
+    {
+      id: 'nama',
+      label: 'Nama A–Z',
+      disabled: withDisabled,
+      selected: selected === 'Nama A–Z',
+      onClick: () => onSelectedChange('Nama A–Z'),
+    },
+  ]
+
+  return (
+    <Dropdown
+      attached={attached}
+      contentLabel="Urutan hasil"
+      trigger={trigger(`Urutkan: ${selected}`)}
+      {...(withSeparator
+        ? {
+            groups: [
+              { id: 'waktu', label: 'Waktu', items: items.slice(0, 2) },
+              { id: 'nama', separator: true, items: items.slice(2) },
+            ],
+          }
+        : { items })}
+    />
   )
 }
 
@@ -320,12 +404,119 @@ function ItemCode({
   return <>{bagian}</>
 }
 
+function SelectionExampleCode({
+  selected,
+  withSeparator,
+  withDescription,
+  withDisabled,
+  attached,
+}: VariationOptions & { selected: string; attached: boolean }) {
+  const item = (label: string, description?: string, disabled?: boolean) => (
+    <>
+      {'        {\n          label: '}
+      {`'${label}'`}
+      {',\n'}
+      {description && (
+        <>
+          {'          '}
+          <H>description</H>
+          {': '}
+          {`'${description}'`}
+          {',\n'}
+        </>
+      )}
+      {disabled && <>{'          '}<H>disabled</H>{': true,\n'}</>}
+      {'          '}
+      <H>selected</H>
+      {': selected === '}
+      {`'${label}'`}
+      {',\n          '}
+      <H>onClick</H>
+      {': () => setSelected('}
+      {`'${label}'`}
+      {'),\n        },\n'}
+    </>
+  )
+
+  const terbaru = item('Terbaru', withDescription ? 'Urutkan dari yang paling baru.' : undefined)
+  const terlama = item('Terlama', withDescription ? 'Urutkan dari yang paling lama.' : undefined)
+  const nama = item('Nama A–Z', undefined, withDisabled)
+
+  return (
+    <>
+      {'import { '}
+      {'useState'}
+      {' } from '}
+      {"'react'"}
+      {'\nimport { '}
+      {'Dropdown'}
+      {' } from '}
+      {"'@ceplok-ui/design-kit-react'"}
+      {'\n\nfunction SortDropdown() {\n  const ['}
+      {'selected'}
+      {', setSelected] = '}
+      {'useState'}
+      {'('}
+      {`'${selected}'`}
+      {')\n\n  return (\n    <'}
+      {'Dropdown'}
+      {'\n'}
+      {attached && <>{'      '}<H>attached</H>{'\n'}</>}
+      {'      '}
+      <H>contentLabel</H>
+      {'='}
+      {'"Urutan hasil"'}
+      {'\n      '}
+      <H>trigger</H>
+      {'={<button type="button">Urutkan: {selected}</button>}\n'}
+      {withSeparator ? (
+        <>
+          {'      '}<H>groups</H>{"={[\n        {\n          id: 'waktu',\n          label: 'Waktu',\n          items: [\n"}
+          {terbaru}{terlama}
+          {"          ],\n        },\n        {\n          id: 'nama',\n          "}
+          <H>separator</H>
+          {': true,\n          items: [\n'}
+          {nama}
+          {'          ],\n        },\n      ]}\n'}
+        </>
+      ) : (
+        <>
+          {'      '}<H>items</H>{'={[\n'}
+          {terbaru}{terlama}{nama}
+          {'      ]}\n'}
+        </>
+      )}
+      {'    />\n  )\n}'}
+    </>
+  )
+}
+
 function ExampleCode({
+  mode,
+  selected,
   example,
   withSeparator,
   withDescription,
   withDisabled,
-}: VariationOptions & { example: DropdownExample }) {
+  attached,
+}: VariationOptions & {
+  mode: DropdownMode
+  selected: string
+  example: DropdownExample
+  attached: boolean
+}) {
+  if (mode === 'selection') {
+    return (
+      <SelectionExampleCode
+        selected={selected}
+        withSeparator={withSeparator}
+        withDescription={withDescription}
+        withDisabled={withDisabled}
+        attached={attached}
+      />
+    )
+  }
+
   const imports = new Set(['Dropdown'])
   if (example === 'checkbox' || example === 'scroll') imports.add('Checkbox')
   if (example === 'radio') imports.add('Radio')
@@ -336,18 +527,30 @@ function ExampleCode({
 
   const triggerCode =
     '\nconst trigger = (\n  <button type="button" className="...">\n    Dropdown button\n  </button>\n)\n'
-
   return (
     <>
-      {`import { ${daftarImport.join(', ')} } from '@ceplok-ui/design-kit-react'\n`}
-      {withIcons &&
-        "import { ArrowRightToBracket, Cog, QuestionCircle, User } from '@ceplok-ui/design-kit-react/icons/outline'\n"}
+      {'import { '}
+      {daftarImport.join(', ')}
+      {' } from '}
+      {"'@ceplok-ui/design-kit-react'"}
+      {'\n'}
+      {withIcons && (
+        <>
+          {'import { '}
+          {'ArrowRightToBracket, Cog, QuestionCircle, User'}
+          {' } from '}
+          {"'@ceplok-ui/design-kit-react/icons/outline'"}
+          {'\n'}
+        </>
+      )}
       {triggerCode}
 
       {daftarAksi ? (
         withSeparator ? (
           <>
-            {'\n<Dropdown\n  trigger={trigger}\n  '}
+            {'\n<Dropdown\n'}
+            {attached && <>{'  '}<H>attached</H>{'\n'}</>}
+            {'  trigger={trigger}\n  '}
             <H>groups</H>
             {'={[\n    {\n      id: \'utama\',\n      items: [\n        '}
             <ItemCode
@@ -379,7 +582,9 @@ function ExampleCode({
           </>
         ) : (
           <>
-            {'\n<Dropdown\n  trigger={trigger}\n  items={[\n    '}
+            {'\n<Dropdown\n'}
+            {attached && <>{'  '}<H>attached</H>{'\n'}</>}
+            {'  trigger={trigger}\n  items={[\n    '}
             <ItemCode
               label="Profil"
               icon={withIcons ? 'User' : undefined}
@@ -408,7 +613,9 @@ function ExampleCode({
         )
       ) : (
         <>
-          {'\n<Dropdown trigger={trigger} '}
+          {'\n<Dropdown '}
+          {attached && <><H>attached</H>{' '}</>}
+          {'trigger={trigger} '}
           <H>contentClassName</H>
           {'="p-4">\n'}
           {example === 'scroll' ? (
@@ -419,7 +626,13 @@ function ExampleCode({
               {'    <Checkbox label="Email" '}
               {withDescription && <><H>helperText</H>{'="Notifikasi melalui email." '}</>}
               {'defaultChecked />\n    <Checkbox label="Push notification" />\n    {/* … */}\n'}
-              {withSeparator && '    <hr className="my-1 border-0 border-t border-border" />\n'}
+              {withSeparator && (
+                <>
+                  {'    <hr '}
+                  <H>className</H>
+                  {'="my-1 border-0 border-t border-border" />\n'}
+                </>
+              )}
               {'    <Checkbox label="Pembaruan produk" />\n    {/* … */}\n    <Checkbox label="Keamanan" '}
               {withDisabled && <><H>disabled</H>{' '}</>}
               {'/>\n    {/* … */}\n    <Checkbox label="Sistem" />\n  </div>\n</Dropdown>'}
@@ -433,7 +646,13 @@ function ExampleCode({
               {' name="access" value="editor" label="Editor" '}
               {withDescription && <><H>helperText</H>{'="Dapat mengubah konten." '}</>}
               {'defaultChecked />\n'}
-              {withSeparator && '    <hr className="my-1 border-0 border-t border-border" />\n'}
+              {withSeparator && (
+                <>
+                  {'    <hr '}
+                  <H>className</H>
+                  {'="my-1 border-0 border-t border-border" />\n'}
+                </>
+              )}
               {'    <'}
               <H>Radio</H>
               {' name="access" value="admin" label="Admin" '}
@@ -449,7 +668,13 @@ function ExampleCode({
               {'/>\n    <'}
               <H>Checkbox</H>
               {' label="Push notification" defaultChecked />\n'}
-              {withSeparator && '    <hr className="my-1 border-0 border-t border-border" />\n'}
+              {withSeparator && (
+                <>
+                  {'    <hr '}
+                  <H>className</H>
+                  {'="my-1 border-0 border-t border-border" />\n'}
+                </>
+              )}
               {'    <'}
               <H>Checkbox</H>
               {' label="SMS" '}
@@ -464,10 +689,15 @@ function ExampleCode({
 }
 
 export function DropdownPage() {
+  const [mode, setMode] = useState<DropdownMode>('action')
   const [example, setExample] = useState<DropdownExample>('actions')
   const [withSeparator, setWithSeparator] = useState(false)
   const [withDescription, setWithDescription] = useState(false)
   const [withDisabled, setWithDisabled] = useState(false)
+  const [attached, setAttached] = useState(false)
+  const [selected, setSelected] = useState('Terbaru')
+  const separatorDataDriven =
+    mode === 'selection' || example === 'actions' || example === 'icons'
 
   /*
    * Panelnya dibuka sejak halaman dimuat, dan dibuka lagi setelah kontrolnya
@@ -649,34 +879,92 @@ export function DropdownPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="selection" title="Selection">
+        <Lead>
+          Gunakan Selection ketika Dropdown dipakai untuk memilih nilai. Saat item menggunakan{' '}
+          <H>selected</H>, koleksinya memakai pola <H>listbox</H>, setiap baris menjadi{' '}
+          <H>option</H>, dan pilihan aktif menerima fokus saat dibuka. Option dapat ditelusuri
+          dengan tombol panah, Home, End, dan pencarian lewat ketikan. Gunakan{' '}
+          <H>contentLabel</H> untuk menamai listbox tersebut.
+        </Lead>
+        <Stage maxWidth="max-w-xl">
+          <div className="flex min-h-56 items-start justify-center pt-10">
+            <SelectionDemo />
+          </div>
+        </Stage>
+        <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+          Prop <H>attached</H> mengaktifkan positioning panel relatif terhadap trigger dengan penyesuaian batas viewport,
+          termasuk flip dan pembatasan tinggi saat ruang terbatas.
+        </p>
+        <SectionCode>
+          {"const [selected, setSelected] = useState('Terbaru')\n\n<Dropdown"}
+          {'\n  '}<H>attached</H>
+          {'\n  '}<H>contentLabel</H>{'="Urutan hasil"'}
+          {'\n  '}<H>trigger</H>{'={<button type="button">Urutkan: {selected}</button>}\n  '}
+          <H>items</H>
+          {"={['Terbaru', 'Terlama', 'Nama A–Z'].map((label) => ({\n    label,\n    "}
+          <H>selected</H>{': label === selected,\n    '}<H>onClick</H>
+          {': () => setSelected(label),\n  }))}\n/>'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
-          Pratinjaunya dibuka sejak halaman dimuat supaya tiap variasi mudah dibandingkan. Gunakan
-          kontrol di bawah untuk mengganti susunannya.
+          Mode Action memakai button atau link native untuk menjalankan aksi dan navigasi. Mode
+          Selection memakai <H>selected</H> untuk membentuk listbox berisi option yang dapat
+          dinavigasi lewat keyboard. Pratinjaunya dibuka sejak halaman dimuat supaya tiap variasi
+          mudah dibandingkan.
         </Lead>
 
         <Stage maxWidth="max-w-xl">
           <div ref={panggung} className="flex min-h-80 items-start justify-center pt-10">
-            <ContohDropdown
-              example={example}
-              groupName="playground-dropdown"
-              withSeparator={withSeparator}
-              withDescription={withDescription}
-              withDisabled={withDisabled}
-            />
+            {mode === 'action' ? (
+              <ContohDropdown
+                example={example}
+                groupName="playground-dropdown"
+                withSeparator={withSeparator}
+                withDescription={withDescription}
+                withDisabled={withDisabled}
+                attached={attached}
+              />
+            ) : (
+              <SelectionPlayground
+                selected={selected}
+                onSelectedChange={setSelected}
+                withSeparator={withSeparator}
+                withDescription={withDescription}
+                withDisabled={withDisabled}
+                attached={attached}
+              />
+            )}
           </div>
         </Stage>
 
         <Controls>
+          <Control label="Mode">
+            <div onPointerDownCapture={ingatKeadaan}>
+              <Segmented
+                label="Pilih mode Dropdown"
+                value={mode}
+                onChange={(value) => ubah(() => setMode(value))}
+                options={modes}
+              />
+            </div>
+          </Control>
           <Control label="Kelompok">
             <div onPointerDownCapture={ingatKeadaan}>
               <Segmented
-                label="Pisahkan jadi dua kelompok"
+                label="Tampilkan kelompok"
                 value={withSeparator}
                 onChange={(value) => ubah(() => setWithSeparator(value))}
                 options={booleanOptions}
               />
             </div>
+            <p className="mt-2 text-xs text-gray-500">
+              {separatorDataDriven
+                ? 'Kelompok dibuat melalui groups dengan separator: true.'
+                : 'Kelompok dibuat dengan garis pemisah (border) di antara custom children.'}
+            </p>
           </Control>
           <Control label="Keterangan">
             <div onPointerDownCapture={ingatKeadaan}>
@@ -698,6 +986,16 @@ export function DropdownPage() {
               />
             </div>
           </Control>
+          <Control label="Attached">
+            <div onPointerDownCapture={ingatKeadaan}>
+              <Segmented
+                label="Tempelkan panel pada trigger"
+                value={attached}
+                onChange={(value) => ubah(() => setAttached(value))}
+                options={booleanOptions}
+              />
+            </div>
+          </Control>
           <Control label="Contoh">
             <div onPointerDownCapture={ingatKeadaan}>
               <Segmented
@@ -706,19 +1004,25 @@ export function DropdownPage() {
                 onChange={(value) => ubah(() => setExample(value))}
                 options={examples}
                 itemClassName="basis-1/2 justify-center px-2.5 sm:basis-1/3"
+                disabled={mode === 'selection'}
                 wrap
               />
             </div>
+            {mode === 'selection' && (
+              <p className="mt-2 text-xs text-gray-500">
+                Tidak tersedia pada mode Selection. Item dirender sebagai option dalam listbox.
+              </p>
+            )}
           </Control>
         </Controls>
       </FlowSection>
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Daftar aksi cukup diisi lewat <H>items</H> atau <H>groups</H>; panel yang isinya bukan
-          daftar aksi — form kecil, daftar panjang yang digulir — diisi lewat <H>children</H> dan
-          diberi jarak sendiri lewat <H>contentClassName</H>. Kode berikut mengikuti pilihan Contoh
-          di Playground.
+          Action cukup diisi lewat <H>items</H> atau <H>groups</H>. Selection memakai struktur yang
+          sama dengan menambahkan <H>selected</H> dan pembaruan state pada setiap option. Panel
+          yang berisi kontrol bebas diisi lewat <H>children</H> dan diberi jarak sendiri lewat{' '}
+          <H>contentClassName</H>. Kode berikut mengikuti Mode dan kontrol Playground.
         </Lead>
         <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
           Prop <H>trigger</H> harus berisi satu elemen tunggal, bukan teks atau pecahan — komponen
@@ -727,10 +1031,13 @@ export function DropdownPage() {
         </p>
         <SectionCode flush>
           <ExampleCode
+            mode={mode}
+            selected={selected}
             example={example}
             withSeparator={withSeparator}
             withDescription={withDescription}
             withDisabled={withDisabled}
+            attached={attached}
           />
         </SectionCode>
       </FlowSection>

@@ -37,6 +37,34 @@ export type {
 export { Modal } from "./components/Modal";
 export type { ModalProps, ModalSize, ModalVariant } from "./components/Modal";
 
+export {
+  Drawer,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerBody,
+  DrawerFooter,
+  DrawerNavItem,
+  DrawerSubItem,
+  DrawerTrigger,
+} from "./components/Drawer";
+export type {
+  DrawerProps,
+  DrawerPosition,
+  DrawerSize,
+  DrawerNavItemTheme,
+  DrawerHeaderProps,
+  DrawerTitleProps,
+  DrawerDescriptionProps,
+  DrawerBodyProps,
+  DrawerFooterProps,
+  DrawerNavItemProps,
+  DrawerSubItemProps,
+  DrawerTriggerProps,
+  DrawerMenuItem,
+  DrawerMenuSubItem,
+} from "./components/Drawer";
+
 export { Alert } from "./components/Alert";
 export type { AlertProps, AlertVariant } from "./components/Alert";
 
@@ -92,6 +120,15 @@ export type {
   SearchPlatform,
   SearchApplication,
 } from "./components/Search";
+
+export { Datepicker } from "./components/Datepicker";
+export type {
+  DatepickerProps,
+  DatepickerSingleProps,
+  DatepickerRangeProps,
+  DatepickerType,
+  DateRange,
+} from "./components/Datepicker";
 
 export { Upload } from "./components/Upload";
 export type {

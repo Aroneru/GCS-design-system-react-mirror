@@ -27,7 +27,7 @@ const themeOptions: { value: ButtonTheme; label: string }[] = [
   { value: "primary", label: "Primary" },
   { value: "green", label: "Green" },
   { value: "gray", label: "Gray" },
-  { value: "purple", label: "Purple" },
+  { value: "simaya", label: "Simaya" },
   { value: "orange", label: "Orange" },
   { value: "yellow", label: "Yellow" },
 ];
@@ -38,7 +38,7 @@ const typeOptions = [
 ];
 
 const buttonProps: PropRow[] = [
-  ["as", '"button" | "a"', "button", "Menentukan elemen yang dirender. Bisa jadi anchor."],
+  ["as", '"button" | "anchor"', "button", "Menentukan elemen yang dirender. Bisa jadi anchor."],
   ["type", '"button" | "iconOnly"', "button", "Menentukan tipe tombol."],
   ["size", '"xs" | "s" | "base" | "l" | "xl"', "base", "Menentukan ukuran tombol."],
   ["variant", '"filled" | "outline"', "filled", "Gaya utama tombol: solid atau outline."],
@@ -66,7 +66,7 @@ export function ButtonPage() {
   const [type, setType] = useState<"button" | "iconOnly">("button");
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
-  const [asLink, setAsLink] = useState<"button" | "a">("button");
+  const [asLink, setAsLink] = useState<"button" | "anchor">("button");
 
   return (
     <UsulanPage
@@ -232,12 +232,12 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button variant="filled" theme="purple" tone="light">
-              Purple
+            <Button variant="filled" theme="simaya" tone="light">
+              Simaya
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Purple</H> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
+              <H>Simaya</H> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
               visual berbeda.
             </p>
           </div>
@@ -291,7 +291,7 @@ export function ButtonPage() {
             <Button
               type={type === "iconOnly" ? "iconOnly" : "button"}
               as={asLink}
-              href={asLink === "a" ? "/foundations/colors" : undefined}
+              href={asLink === "anchor" ? "/foundations/colors" : undefined}
               size={selectedSize}
               variant={variant}
               theme={theme}
@@ -309,10 +309,10 @@ export function ButtonPage() {
             <Segmented
               label="Pilih render"
               value={asLink}
-              onChange={(value) => setAsLink(value as "button" | "a")}
+              onChange={(value) => setAsLink(value as "button" | "anchor")}
               options={[
                 { value: "button", label: "Button" },
-                { value: "a", label: "Link" },
+                { value: "anchor", label: "Link" },
               ]}
             />
           </Control>
@@ -339,7 +339,7 @@ export function ButtonPage() {
             <Segmented
               label="Pilih ukuran"
               value={selectedSize}
-              onChange={setSelectedSize}
+              onChange={(value) => setSelectedSize(value as ButtonSize)}
               options={sizeOptions}
               wrap
             />
@@ -349,7 +349,7 @@ export function ButtonPage() {
             <Segmented
               label="Pilih variant"
               value={variant}
-              onChange={setVariant}
+              onChange={(value) => setVariant(value as ButtonVariant)}
               options={variantOptions}
             />
           </Control>
@@ -399,7 +399,7 @@ export function ButtonPage() {
             <Segmented
               label="Pilih theme"
               value={theme}
-              onChange={setTheme}
+              onChange={(value) => setTheme(value as ButtonTheme)}
               options={themeOptions}
               wrap
               itemClassName="basis-1/3 justify-center"

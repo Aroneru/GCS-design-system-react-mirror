@@ -149,9 +149,9 @@ const modalProps: PropRow[] = [
   ['className', 'string', 'undefined', 'Class tambahan pada elemen <dialog>.'],
   [
     '…props',
-    'DialogHTMLAttributes<HTMLDialogElement>',
+    "Omit<DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose' | 'onCancel' | 'title'>",
     '—',
-    'Atribut dialog native yang didukung diteruskan ke elemen <dialog>.',
+    'Atribut dialog native yang didukung diteruskan ke <dialog>. open, onClose, dan onCancel sengaja tidak tersedia sebagai API publik; title diatur khusus untuk Default.',
   ],
 ]
 
@@ -488,7 +488,28 @@ export function ModalPage() {
           memanggil <code>close()</code>, misalnya tombol Saya Mengerti di footer.
         </p>
 
-        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+        <h3 className="mt-8 text-sm font-black text-gray-900">State dan aksi</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
+          Modal mengelola visibilitasnya secara internal. State aplikasi atau form di dalam Modal,
+          validasi, dan pengiriman asinkron tetap menjadi tanggung jawab consumer. Modal tidak
+          mengambil alih event submit atau otomatis menutup setelah tombol aksi ditekan. Gunakan
+          fungsi <code>close()</code> dari render function footer setelah proses berhasil.
+        </p>
+        <SectionCode>
+          {'<Modal\n  trigger={<Button>Edit data</Button>}\n  title="Edit data"\n  '}
+          <H>footer</H>
+          {'={({ close }) => (\n    <>\n      <Button variant="outline" theme="gray" onClick={close}>Batal</Button>\n      <Button\n        onClick={async () => {\n          const success = await save()\n          if (success) close()\n        }}\n      >\n        Simpan\n      </Button>\n    </>\n  )}\n>\n  {/* Form milik consumer; save() menjalankan validasi dan penyimpanan. */}\n</Modal>'}
+        </SectionCode>
+
+        <p className="mt-5 max-w-2xl text-body-sm text-gray-500">
+          Gunakan <code>className</code> untuk gaya tambahan. Utility yang bertabrakan tetap
+          terpasang karena <code>cn()</code> memakai clsx; hasil override mengikuti urutan CSS,
+          bukan urutan class. Untuk pilihan lebar Default, utamakan <code>size="s"</code> atau{' '}
+          <code>size="m"</code>. Popup tidak menerima ukuran yang dapat dikonfigurasi.
+        </p>
+
+        <h3 className="mt-8 text-sm font-black text-gray-900">Accessibility</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
           {isPopup ? (
             <>
               Popup tidak memiliki judul visual. Berikan <code>aria-label</code> atau{' '}
@@ -496,18 +517,37 @@ export function ModalPage() {
             </>
           ) : (
             <>
-              Gunakan <code>title</code> sebagai judul sekaligus nama aksesibel Modal. Jika Modal
+              Gunakan <code>title</code> khusus Default sebagai judul sekaligus nama aksesibel
+              Modal, kecuali Anda memberikan <code>aria-label</code> atau{' '}
+              <code>aria-labelledby</code> sendiri. Jika Modal
               tidak memiliki judul visual, berikan <code>aria-label</code> atau{' '}
               <code>aria-labelledby</code>.
             </>
           )}
+        </p>
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+          Untuk nama eksplisit, gunakan <code>aria-label</code> atau arahkan{' '}
+          <code>aria-labelledby</code> ke ID elemen di dalam dialog yang memuat namanya.
+          Pastikan Popup selalu memiliki nama aksesibel.
+        </p>
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+          Title Default sudah dirender sebagai <code>&lt;h2&gt;</code>; jangan membungkus isinya
+          dengan heading tambahan hanya untuk membuat judul. Modal tidak otomatis membuat{' '}
+          <code>aria-describedby</code>; berikan atribut tersebut bila diperlukan.
+        </p>
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+          Elemen native <code>&lt;dialog&gt;</code> menyediakan perilaku dialog dan top layer;
+          browser mengelola fokus serta membuat latar belakang tidak interaktif. Susun kontrol
+          awal yang aman, misalnya Batal, dan jangan arahkan fokus awal ke aksi yang merusak data.
         </p>
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;dialog&gt;</H> standar juga diteruskan apa adanya.
+          <H>&lt;dialog&gt;</H> yang didukung diteruskan, dengan pengecualian{' '}
+          <code>open</code>, <code>onClose</code>, dan <code>onCancel</code> dari API publik.
+          Prop <code>title</code> diatur khusus untuk Default.
         </Lead>
         <PropsTable rows={modalProps} minWidth="52rem" />
       </FlowSection>

@@ -36,7 +36,7 @@ export function Dasbor() {
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-5">
           <h2 className="text-heading-4 font-black text-gray-900">Pengajuan terbaru</h2>
           <Button
-            as="a"
+            as="anchor"
             href="#/example/app/pengajuan"
             size="xs"
             variant="outline"

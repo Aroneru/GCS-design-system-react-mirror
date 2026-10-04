@@ -92,8 +92,8 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | `Button`    | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `iconOnly`, `as` |
 | `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`                |
 | `Avatar`    | `src`, `alt`, `initials`, `size`: `small \| default \| large`             |
-| `Alert`     | `variant`, `heading`, `icon`, `dismissible`, `actions`                    |
-| `Toast`     | `variant`, `heading`, `icon`, `dismissible`, `actions`                    |
+| `Alert`     | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`        |
+| `Toast`     | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`        |
 | `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`           |
 | `Container` | `as` (default `div`), `padded` (default `true`)                           |
 | `Icon`      | `children` (SVG dengan `currentColor`)                                    |
@@ -110,17 +110,18 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 `name`, `required`, …) dan mengaitkan `label` ke `id` serta caption ke
 `aria-describedby` secara otomatis.
 
-| Komponen        | Props khas                                                                                                          | Ukuran (desktop / mobile) |
-| --------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `InputField`    | `label`, `helperText`, `icon`, `onClear`, `state`: `default \| typing \| inactive \| failed`                        | 52 / 40 px                |
-| `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `state`: `default \| active \| error`                                     | 58 / 50 px                |
-| `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit` | 162 / 120 px              |
-| `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`                                                             | 37 px                     |
-| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`                                   | 54 / 50 px                |
-| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`                    | 44 / 40 px                |
-| `Radio`         | `label`, `helperText`                                                                                               | 16 / 14 px                |
-| `Toggle`        | `label`, `helperText`                                                                                               | 40×20 / 36×18 px          |
-| `Checkbox`      | `label`, `helperText`                                                                                               | 16 / 14 px                |
+| Komponen        | Props khas                                                                                                                 | Ukuran (desktop / mobile) |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `InputField`    | `label`, `helperText`, `icon`, `onClear`, `state`: `default \| typing \| inactive \| failed`                               | 52 / 40 px                |
+| `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `state`: `default \| active \| error`                                            | 58 / 50 px                |
+| `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit`        | 162 / 120 px              |
+| `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`                                                                    | 37 px                     |
+| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`                                         | 54 / 50 px                |
+| `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange` | 42 px                     |
+| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`                          | 44 / 40 px                |
+| `Radio`         | `label`, `helperText`                                                                                                      | 16 / 14 px                |
+| `Toggle`        | `label`, `helperText`                                                                                                      | 40×20 / 36×18 px          |
+| `Checkbox`      | `label`, `helperText`                                                                                                      | 16 / 14 px                |
 
 Prop yang dipakai bersama seluruh komponen form:
 

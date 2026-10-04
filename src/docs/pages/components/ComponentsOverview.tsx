@@ -175,6 +175,28 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/drawer"
+        name="Drawer"
+        desc="Panel kontekstual di tepi layar (Side Sheet / Off-canvas) untuk form, filter, atau detail data."
+      >
+        <div className="rounded-xl bg-gray-900/40 p-5 relative overflow-hidden h-[150px]">
+          <div className="absolute top-0 right-0 bottom-0 w-32 bg-white border-l border-border shadow-2xl flex flex-col">
+            <div className="p-3 border-b border-border flex justify-between items-center">
+              <div className="h-2 w-14 rounded bg-gray-300" />
+              <div className="size-2.5 rounded bg-gray-200" />
+            </div>
+            <div className="p-3 space-y-2 flex-1">
+              <div className="h-1.5 w-full rounded bg-gray-200" />
+              <div className="h-1.5 w-3/4 rounded bg-gray-200" />
+            </div>
+            <div className="p-3 border-t border-border">
+              <div className="h-4 w-full rounded bg-primary-600" />
+            </div>
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/toast"
         name="Toast"
         desc="Notifikasi sekilas yang melayang di atas konten, dengan heading dan aksi opsional."

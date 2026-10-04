@@ -158,8 +158,12 @@ export function SearchPage() {
           Kedua ukuran di atas isinya sama persis: tinggi 39px, ruas kategori 113px, dan tombol
           44px. Yang berbeda cuma isian di tengah — ia memanjang mengikuti wadahnya, dari 382px di
           ponsel sampai 882px di layar lebar. Karena itu prop <H>platform</H> tidak dipakai bentuk
-          ini; cukup atur lebar wadahnya. Dropdown-nya <H>&lt;select&gt;</H> biasa, jadi di ponsel
-          yang muncul pemilih bawaan sistem.
+          ini; cukup atur lebar wadahnya.
+        </p>
+        <p className="mt-2 text-body-sm text-gray-500">
+          Daftar kategorinya panel Dropdown, sama dengan daftar pilihan Regular Select Form. Nilai
+          kategorinya dibawa elemen <H>&lt;select&gt;</H> di belakang tombolnya, dan itulah yang
+          diteruskan ke <H>onCategoryChange</H> serta argumen kedua <H>onSearch</H>.
         </p>
       </FlowSection>
 

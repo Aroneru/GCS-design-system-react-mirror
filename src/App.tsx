@@ -19,6 +19,7 @@ import { FloatingLabelPage } from "./docs/pages/form/input-field/FloatingLabelPa
 import { TextAreaPage } from "./docs/pages/form/input-field/TextAreaPage";
 import { SelectPage } from "./docs/pages/form/SelectPage";
 import { SearchPage } from "./docs/pages/form/SearchPage";
+import { DatepickerPage } from "./docs/pages/form/DatepickerPage";
 import { UploadPage } from "./docs/pages/form/UploadPage";
 import { RadioPage } from "./docs/pages/form/RadioPage";
 import { TogglePage } from "./docs/pages/form/TogglePage";
@@ -36,6 +37,7 @@ import { SpinnerPage } from "./docs/pages/components/SpinnerPage";
 import { PopoverPage } from "./docs/pages/components/PopoverPage";
 import { DropdownPage } from "./docs/pages/components/DropdownPage";
 import { ModalPage } from "./docs/pages/components/ModalPage";
+import { DrawerPage } from "./docs/pages/components/DrawerPage";
 import { AlertPage } from "./docs/pages/components/AlertPage";
 import { ToastPage } from "./docs/pages/components/ToastPage";
 import { CardPage } from "./docs/pages/components/CardPage";
@@ -69,6 +71,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/form/input-field/text-area": TextAreaPage,
   "/form/select": SelectPage,
   "/form/search": SearchPage,
+  "/form/datepicker": DatepickerPage,
   "/form/upload": UploadPage,
   "/form/radio": RadioPage,
   "/form/toggle": TogglePage,
@@ -84,6 +87,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/popover": PopoverPage,
   "/components/dropdown": DropdownPage,
   "/components/modal": ModalPage,
+  "/components/drawer": DrawerPage,
   "/components/alert": AlertPage,
   "/components/toast": ToastPage,
   "/components/card": CardPage,
