@@ -25,7 +25,6 @@ import { RadioPage } from "./docs/pages/form/RadioPage";
 import { TogglePage } from "./docs/pages/form/TogglePage";
 import { CheckboxPage } from "./docs/pages/form/CheckboxPage";
 
-import { PlaceholderPage } from "./docs/pages/PlaceholderPage";
 
 import { ComponentsOverview } from "./docs/pages/components/ComponentsOverview";
 import { ContainerPage } from "./docs/pages/components/ContainerPage";
@@ -51,6 +50,7 @@ import {
 } from "./docs/pages/components/NavbarPage";
 import { BreadcrumbPage } from "./docs/pages/components/BreadcrumbPage";
 import { PaginationPage } from "./docs/pages/components/PaginationPage";
+import { TablePage } from "./docs/pages/components/TablePage";
 
 const routes: Record<string, () => React.ReactElement> = {
   "/": HomePage,
@@ -98,7 +98,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/pagination": PaginationPage,
   "/components/sidebar": SidebarPage,
   // Komponen Table belum ada, jadi halamannya masih placeholder.
-  "/components/table": () => <PlaceholderPage eyebrow="Components" title="Table" />,
+  "/components/table": TablePage,
 };
 
 function renderNavbarPreview(path: string) {

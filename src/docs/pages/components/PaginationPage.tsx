@@ -33,6 +33,7 @@ const paginationProps: PropRow[] = [
     "Callback yang dijalankan ketika pengguna berpindah halaman.",
   ],
   ["theme", '"default" | "primary" | "simaya"', "primary", "Menentukan warna pagination."],
+  ["size", '"base" | "s" | "responsive"', "base", "Ukuran kotak: 40px atau 32px. `responsive` memakai 32px lalu 40px saat container induk ≥ 512px; butuh induk ber-`@container`, seperti di Table."],
 ];
 
 const toc: TocEntry[] = [

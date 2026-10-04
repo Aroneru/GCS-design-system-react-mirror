@@ -42,6 +42,12 @@ const containerProps: PropRow[] = [
     "Padding horizontal bawaan (20px → 56px). Matikan bila elemen induk sudah punya padding sendiri.",
   ],
   [
+    "darkMode",
+    "boolean",
+    "false",
+    "Tampilan gelap: latar gray-800 dan teks gray-300 di elemen dalam. Tanpa ini Container transparan.",
+  ],
+  [
     "className",
     "string",
     "—",
@@ -160,6 +166,7 @@ const toc: TocEntry[] = [
   { id: "as", label: "as" },
   { id: "padded", label: "padded" },
   { id: "class-name", label: "className" },
+  { id: "dark-mode", label: "Dark mode" },
   { id: "spesifikasi", label: "Angka per ambang" },
   // Playground di urutan belakang: pembaca tahu dulu apa yang diatur Container,
   // baru mencobanya sendiri.
@@ -179,22 +186,43 @@ const presetWidth: Record<Exclude<View, "custom">, number> = {
   desktop: 1126,
 };
 
+/**
+ * Warna kotak contoh per tampilan. Versi gelap mengikuti Demo `dark` milik
+ * Toast dan Card: panggung gray-900, sehingga Container gray-800 terlihat batasnya.
+ */
+const tones = {
+  light: {
+    stage: "border-border bg-surface-subtle",
+    room: "bg-primary-50 ring-primary-100",
+    isi: "border-primary-300 bg-surface",
+    isiLabel: "text-primary-700",
+    isiNote: "text-gray-500",
+  },
+  dark: {
+    stage: "border-gray-800 bg-gray-900",
+    room: "bg-gray-900 ring-gray-700",
+    isi: "border-primary-500 bg-gray-900",
+    isiLabel: "text-primary-400",
+    isiNote: "text-gray-400",
+  },
+};
+
 /** Isi contoh: kotak putus-putus supaya batas konten terlihat jelas. */
-function Isi({ label }: { label: string }) {
+function Isi({ label, dark = false }: { label: string; dark?: boolean }) {
+  const t = dark ? tones.dark : tones.light;
   return (
-    <div className="rounded-lg border-2 border-dashed border-primary-300 bg-surface px-4 py-6 text-center">
-      <p className="text-sm font-black text-primary-700">{label}</p>
+    <div className={`rounded-lg border-2 border-dashed px-4 py-6 text-center ${t.isi}`}>
+      <p className={`text-sm font-black ${t.isiLabel}`}>{label}</p>
     </div>
   );
 }
 
-/** Kotak "ruang yang tersedia" berlatar biru muda. */
-function Ruang({ children }: { children: ReactNode }) {
+/** Kotak "ruang yang tersedia": biru muda di tampilan terang, gray-900 di gelap. */
+function Ruang({ children, dark = false }: { children: ReactNode; dark?: boolean }) {
+  const t = dark ? tones.dark : tones.light;
   return (
-    <div className="rounded-2xl border border-border bg-surface-subtle p-4 sm:p-6">
-      <div className="rounded-xl bg-primary-50 ring-1 ring-primary-100">
-        {children}
-      </div>
+    <div className={`rounded-2xl border p-4 sm:p-6 ${t.stage}`}>
+      <div className={`rounded-xl ring-1 ${t.room}`}>{children}</div>
     </div>
   );
 }
@@ -203,6 +231,8 @@ export function ContainerPage() {
   const [view, setView] = useState<View>("desktop");
   const [size, setSize] = useState<ContainerSize>("default");
   const [customWidth, setCustomWidth] = useState(900);
+  const [darkMode, setDarkMode] = useState(false);
+  const tone = darkMode ? tones.dark : tones.light;
 
   const width = view === "custom" ? customWidth : presetWidth[view];
 
@@ -441,6 +471,35 @@ export function ContainerPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> memberi elemen dalam latar gray-800 dan teks bawaan
+          gray-300, sama dengan kartu Card dan Toast versi gelap. Lebar, padding,
+          dan pemusatan tidak berubah. Di ruang sempit sudut rounded-xl ikut
+          terlihat karena sekarang ada latarnya. Tanpa <H>darkMode</H>, Container
+          tetap transparan.
+        </Lead>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Ruang dark>
+            <Container darkMode className="py-6">
+              <Isi label="darkMode" dark />
+            </Container>
+          </Ruang>
+          <Ruang dark>
+            <div className="mx-auto max-w-[380px]">
+              <Container darkMode className="py-6">
+                <Isi label="darkMode · ruang sempit" dark />
+              </Container>
+            </div>
+          </Ruang>
+        </div>
+        <SectionCode>
+          {"<Container "}
+          <Mark>darkMode</Mark>
+          {' className="py-12">\n    ...\n</Container>'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="spesifikasi" title="Angka per ambang">
         <Lead>
           Nilai pasti yang dipakai komponen, diukur dari lebar ruang yang
@@ -473,21 +532,21 @@ export function ContainerPage() {
           tiruan: angkanya diukur langsung dari elemen yang dirender.
         </Lead>
 
-        <div className="rounded-2xl border border-border bg-surface-subtle p-4 sm:p-6">
+        <div className={`rounded-2xl border p-4 transition-colors sm:p-6 ${tone.stage}`}>
           <div
             ref={availRef}
-            className="mx-auto max-w-full rounded-xl bg-primary-50 ring-1 ring-primary-100 transition-[width] duration-300 ease-out"
+            className={`mx-auto max-w-full rounded-xl ring-1 transition-[width] duration-300 ease-out ${tone.room}`}
             style={{ width: `${width}px` }}
           >
-            <Container size={size} className="py-6">
+            <Container size={size} darkMode={darkMode} className="py-6">
               <div
                 ref={contentRef}
-                className="rounded-lg border-2 border-dashed border-primary-300 bg-surface px-4 py-8 text-center"
+                className={`rounded-lg border-2 border-dashed px-4 py-8 text-center ${tone.isi}`}
               >
-                <p className="text-sm font-black text-primary-700">
+                <p className={`text-sm font-black ${tone.isiLabel}`}>
                   size=&quot;{size}&quot;
                 </p>
-                <p className="mt-1 text-xs text-gray-500">
+                <p className={`mt-1 text-xs ${tone.isiNote}`}>
                   ruang {measured.avail}px · konten {measured.content}px ·
                   padding {measured.padding}px
                 </p>
@@ -518,6 +577,18 @@ export function ContainerPage() {
                 { value: "mobile", label: "Mobile" },
                 { value: "desktop", label: "Desktop" },
                 { value: "custom", label: "Custom" },
+              ]}
+            />
+          </Control>
+
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={darkMode}
+              onChange={setDarkMode}
+              options={[
+                { value: false, label: "Terang" },
+                { value: true, label: "Gelap" },
               ]}
             />
           </Control>
@@ -578,6 +649,12 @@ export function ContainerPage() {
             <>
               {" "}
               <Mark>{`size="${size}"`}</Mark>
+            </>
+          )}
+          {darkMode && (
+            <>
+              {" "}
+              <Mark>darkMode</Mark>
             </>
           )}
           {view === "custom" && (
