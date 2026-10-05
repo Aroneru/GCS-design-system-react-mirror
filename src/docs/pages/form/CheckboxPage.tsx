@@ -36,6 +36,7 @@ const checkboxProps: PropRow[] = [
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran kotak: 16px atau 14px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan teks sekaligus menonaktifkan kontrol.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna kotak saat tercentang.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak gray-700 bergaris gray-600 dengan label putih; inactive meredupkan teksnya ke gray-500.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="checkbox"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
 
@@ -44,6 +45,7 @@ const toc: TocEntry[] = [
   { id: 'caption', label: 'Dengan caption' },
   { id: 'platform', label: 'Platform' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -54,6 +56,7 @@ export function CheckboxPage() {
   const [state, setState] = useState<CheckboxState>('default')
   const [application, setApplication] = useState<CheckboxApplication>('default')
   const [withCaption, setWithCaption] = useState(false)
+  const [dark, setDark] = useState(false)
   const [dipilih, setDipilih] = useState<string[]>(['ktp'])
 
   const toggle = (value: string) =>
@@ -63,7 +66,7 @@ export function CheckboxPage() {
     <UsulanPage
       eyebrow="Form"
       title="Checkbox"
-      description="Pilihan ganda yang bisa dicentang secara mandiri. Dibangun di atas <input type='checkbox'> bawaan supaya keyboard dan pembaca layar tetap berfungsi, dengan warna, ukuran, dan jarak dari Foundations."
+      description="Pilihan ganda yang bisa dicentang secara mandiri. Dibangun di atas <input type='checkbox'> bawaan supaya keyboard dan pembaca layar tetap berfungsi, dengan warna, ukuran, dan jarak dari Foundations. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="checkbox" title="Checkbox">
@@ -81,11 +84,17 @@ export function CheckboxPage() {
         </Demo>
         <SectionCode>
           {"import { Checkbox } from '@ceplok-ui/design-kit-react'\n\n"}
-          {'<Checkbox label="Saya menyetujui syarat" defaultChecked />\n\n'}
+          {'<Checkbox label="Belum dicentang" />\n'}
+          {'<Checkbox label="Sudah dicentang" '}
+          <H>defaultChecked</H>
+          {' />\n\n'}
           {'{/* Inactive — teks meredup sekaligus nonaktif */}\n'}
           {'<Checkbox '}
           <H>state</H>
-          {'="inactive" label="Belum tersedia" />'}
+          {'="inactive" label="Tidak aktif" />\n'}
+          {'<Checkbox '}
+          <H>state</H>
+          {'="inactive" label="Tidak aktif, tercentang" defaultChecked />'}
         </SectionCode>
       </FlowSection>
 
@@ -108,6 +117,13 @@ export function CheckboxPage() {
           </div>
         </Demo>
         <SectionCode>
+          {'<Checkbox\n'}
+          {'    label="Saya menyetujui syarat dan ketentuan"\n'}
+          {'    '}
+          <H>helperText</H>
+          {'="Termasuk pemrosesan data pribadi sesuai kebijakan privasi."\n'}
+          {'    defaultChecked\n'}
+          {'/>\n'}
           {'<Checkbox\n'}
           {'    label="Kirim salinan ke email"\n'}
           {'    '}
@@ -144,16 +160,27 @@ export function CheckboxPage() {
           </Demo>
         </div>
         <SectionCode>
+          {'{/* Desktop — platform bawaan, tanpa prop */}\n'}
+          {'<Checkbox label="KTP elektronik" defaultChecked />\n'}
+          {'<Checkbox label="Kartu keluarga" />\n'}
+          {'<Checkbox label="NPWP" />\n\n'}
+          {'{/* Mobile */}\n'}
           {'<Checkbox '}
           <H>platform</H>
-          {'="mobile" label="KTP elektronik" defaultChecked />'}
+          {'="mobile" label="KTP elektronik" defaultChecked />\n'}
+          {'<Checkbox '}
+          <H>platform</H>
+          {'="mobile" label="Kartu keluarga" />\n'}
+          {'<Checkbox '}
+          <H>platform</H>
+          {'="mobile" label="NPWP" />'}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="application" title="Application">
         <Lead>
-          Warna kotak saat tercentang mengikuti aplikasi yang memakainya; state kosong memakai abu yang
-          sama.
+          Warna kotak saat tercentang mengikuti aplikasi yang memakainya. Kotak yang kosong — gray-50
+          bergaris gray-300 — sama di kedua aplikasi.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
@@ -171,9 +198,59 @@ export function CheckboxPage() {
           ))}
         </div>
         <SectionCode>
+          {'{/* Default — tanpa prop application */}\n'}
+          {'<Checkbox label="Tercentang" helperText="bg-primary-700" defaultChecked />\n'}
+          {'<Checkbox label="Kosong" />\n\n'}
+          {'{/* simaya */}\n'}
           {'<Checkbox '}
           <H>application</H>
-          {'="simaya" label="KTP elektronik" defaultChecked />'}
+          {'="simaya" label="Tercentang" helperText="bg-purple-500" defaultChecked />\n'}
+          {'<Checkbox '}
+          <H>application</H>
+          {'="simaya" label="Kosong" />'}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti kotak ke gray-700 bergaris gray-600, dengan label putih dan caption
+          gray-400. Kotak yang tercentang tetap memakai warna aplikasi. State <H>inactive</H> meredupkan
+          label dan caption ke gray-500; kotaknya tetap, kecuali saat tercentang yang terisi gray-500.
+        </Lead>
+        <Demo dark>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <Checkbox darkMode label="Belum dicentang" helperText="Keterangan singkat." />
+            <Checkbox darkMode label="Sudah dicentang" helperText="Keterangan singkat." defaultChecked />
+            <Checkbox darkMode state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />
+            <Checkbox
+              darkMode
+              state="inactive"
+              label="Tidak aktif, tercentang"
+              helperText="Keterangan singkat."
+              defaultChecked
+            />
+          </div>
+        </Demo>
+        <SectionCode>
+          {'<Checkbox '}
+          <H>darkMode</H>
+          {' label="Belum dicentang" helperText="Keterangan singkat." />\n'}
+          {'<Checkbox '}
+          <H>darkMode</H>
+          {' label="Sudah dicentang" helperText="Keterangan singkat." defaultChecked />\n\n'}
+          {'{/* Inactive */}\n'}
+          {'<Checkbox '}
+          <H>darkMode</H>
+          {' state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />\n'}
+          {'<Checkbox\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    state="inactive"\n'}
+          {'    label="Tidak aktif, tercentang"\n'}
+          {'    helperText="Keterangan singkat."\n'}
+          {'    defaultChecked\n'}
+          {'/>'}
         </SectionCode>
       </FlowSection>
 
@@ -184,7 +261,7 @@ export function CheckboxPage() {
         </Lead>
 
         {/* max-w-fit: blok menyusut seukuran isinya, jadi mx-auto benar-benar memusatkannya. */}
-        <Stage maxWidth="max-w-fit">
+        <Stage maxWidth="max-w-fit" dark={dark}>
           <div className="space-y-4">
             {berkas.map((b) => (
               <Checkbox
@@ -192,6 +269,7 @@ export function CheckboxPage() {
                 platform={platform}
                 state={state}
                 application={application}
+                darkMode={dark}
                 label={b.label}
                 helperText={withCaption ? 'Unggah berkas asli berwarna, maksimal 2 MB.' : undefined}
                 checked={dipilih.includes(b.value)}
@@ -244,6 +322,18 @@ export function CheckboxPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -259,39 +349,50 @@ export function CheckboxPage() {
         </Lead>
         <SectionCode flush>
           {"import { Checkbox } from '@ceplok-ui/design-kit-react'\n\n"}
-          {'<Checkbox\n'}
+          {'{/* berkas = [{ value: "ktp", label: "KTP elektronik" }, …] */}\n'}
+          {'{berkas.map((b) => (\n'}
+          {'    <Checkbox\n'}
+          {'        key={b.value}\n'}
           {platform === 'mobile' && (
             <>
-              {'    '}
+              {'        '}
               <H>platform</H>
               {'="mobile"\n'}
             </>
           )}
           {state !== 'default' && (
             <>
-              {'    '}
+              {'        '}
               <H>state</H>
               {'="inactive"\n'}
             </>
           )}
           {application !== 'default' && (
             <>
-              {'    '}
+              {'        '}
               <H>application</H>
               {`="${application}"\n`}
             </>
           )}
-          {'    label="KTP elektronik"\n'}
+          {dark && (
+            <>
+              {'        '}
+              <H>darkMode</H>
+              {'\n'}
+            </>
+          )}
+          {'        label={b.label}\n'}
           {withCaption && (
             <>
-              {'    '}
+              {'        '}
               <H>helperText</H>
               {'="Unggah berkas asli berwarna, maksimal 2 MB."\n'}
             </>
           )}
-          {'    checked={dipilih.includes("ktp")}\n'}
-          {'    onChange={() => toggle("ktp")}\n'}
-          {'/>'}
+          {'        checked={dipilih.includes(b.value)}\n'}
+          {'        onChange={() => toggle(b.value)}\n'}
+          {'    />\n'}
+          {'))}'}
         </SectionCode>
       </FlowSection>
 

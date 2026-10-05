@@ -25,6 +25,7 @@ const toggleProps: PropRow[] = [
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran sakelar: 40×20px atau 36×18px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna jalur saat sakelar menyala.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: jalur gray-600 dengan bulatan gray-400 yang memutih saat menyala, dan label putih; inactive meredupkan label ke gray-500.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="checkbox"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
 
@@ -33,6 +34,7 @@ const toc: TocEntry[] = [
   { id: 'caption', label: 'Dengan caption' },
   { id: 'platform', label: 'Platform' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -43,13 +45,14 @@ export function TogglePage() {
   const [state, setState] = useState<ToggleState>('default')
   const [application, setApplication] = useState<ToggleApplication>('default')
   const [withCaption, setWithCaption] = useState(false)
+  const [dark, setDark] = useState(false)
   const [aktif, setAktif] = useState(true)
 
   return (
     <UsulanPage
       eyebrow="Form"
       title="Toggle Button"
-      description="Sakelar untuk menyalakan atau mematikan satu pengaturan, berlaku seketika tanpa tombol simpan. Dibangun di atas <input type='checkbox'> dengan role='switch' supaya keyboard dan pembaca layar tetap berfungsi."
+      description="Sakelar untuk menyalakan atau mematikan satu pengaturan, berlaku seketika tanpa tombol simpan. Dibangun di atas <input type='checkbox'> dengan role='switch' supaya keyboard dan pembaca layar tetap berfungsi. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="toggle-button" title="Toggle Button">
@@ -67,12 +70,18 @@ export function TogglePage() {
         </Demo>
         <SectionCode>
           {"import { Toggle } from '@ceplok-ui/design-kit-react'\n\n"}
+          {'<Toggle label="Mati" />\n'}
           {'{/* Menyala sejak awal */}\n'}
-          {'<Toggle label="Notifikasi email" defaultChecked />\n\n'}
+          {'<Toggle label="Menyala" '}
+          <H>defaultChecked</H>
+          {' />\n\n'}
           {'{/* Inactive — meredup sekaligus nonaktif */}\n'}
           {'<Toggle '}
           <H>state</H>
-          {'="inactive" label="Belum tersedia" />'}
+          {'="inactive" label="Tidak aktif" />\n'}
+          {'<Toggle '}
+          <H>state</H>
+          {'="inactive" label="Tidak aktif, menyala" defaultChecked />'}
         </SectionCode>
       </FlowSection>
 
@@ -95,6 +104,13 @@ export function TogglePage() {
           </div>
         </Demo>
         <SectionCode>
+          {'<Toggle\n'}
+          {'    label="Notifikasi email"\n'}
+          {'    '}
+          <H>helperText</H>
+          {'="Kirim ringkasan permohonan baru setiap pagi."\n'}
+          {'    defaultChecked\n'}
+          {'/>\n'}
           {'<Toggle\n'}
           {'    label="Tampilkan data sensitif"\n'}
           {'    '}
@@ -124,16 +140,23 @@ export function TogglePage() {
           </Demo>
         </div>
         <SectionCode>
+          {'{/* Desktop — platform bawaan, tanpa prop */}\n'}
+          {'<Toggle label="Notifikasi aktif" defaultChecked />\n'}
+          {'<Toggle label="Notifikasi nonaktif" />\n\n'}
+          {'{/* Mobile */}\n'}
           {'<Toggle '}
           <H>platform</H>
-          {'="mobile" label="Notifikasi email" defaultChecked />'}
+          {'="mobile" label="Notifikasi aktif" defaultChecked />\n'}
+          {'<Toggle '}
+          <H>platform</H>
+          {'="mobile" label="Notifikasi nonaktif" />'}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="application" title="Application">
         <Lead>
-          Warna jalur saat menyala mengikuti aplikasi yang memakainya; state mati dan inactive memakai abu
-          yang sama.
+          Warna jalur saat menyala mengikuti aplikasi yang memakainya. Jalur yang mati (gray-200) dan yang
+          inactive (gray-300) sama di kedua aplikasi.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
@@ -146,9 +169,60 @@ export function TogglePage() {
           ))}
         </div>
         <SectionCode>
+          {'{/* Default — tanpa prop application */}\n'}
+          {'<Toggle label="Menyala" helperText="bg-primary-700" defaultChecked />\n'}
+          {'<Toggle label="Mati" />\n\n'}
+          {'{/* simaya */}\n'}
           {'<Toggle '}
           <H>application</H>
-          {'="simaya" label="Notifikasi email" defaultChecked />'}
+          {'="simaya" label="Menyala" helperText="bg-purple-500" defaultChecked />\n'}
+          {'<Toggle '}
+          <H>application</H>
+          {'="simaya" label="Mati" />'}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti jalur yang mati ke gray-600 dengan bulatan gray-400, label putih, dan
+          caption gray-400. Saat menyala, jalurnya tetap memakai warna aplikasi dan bulatannya berubah
+          putih. State <H>inactive</H> hanya meredupkan label ke gray-500 — jalur dan bulatannya tetap
+          seperti saat mati, meski sakelarnya menyala.
+        </Lead>
+        <Demo dark>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <Toggle darkMode label="Mati" helperText="Keterangan singkat." />
+            <Toggle darkMode label="Menyala" helperText="Keterangan singkat." defaultChecked />
+            <Toggle darkMode state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />
+            <Toggle
+              darkMode
+              state="inactive"
+              label="Tidak aktif, menyala"
+              helperText="Keterangan singkat."
+              defaultChecked
+            />
+          </div>
+        </Demo>
+        <SectionCode>
+          {'<Toggle '}
+          <H>darkMode</H>
+          {' label="Mati" helperText="Keterangan singkat." />\n'}
+          {'<Toggle '}
+          <H>darkMode</H>
+          {' label="Menyala" helperText="Keterangan singkat." defaultChecked />\n\n'}
+          {'{/* Inactive */}\n'}
+          {'<Toggle '}
+          <H>darkMode</H>
+          {' state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />\n'}
+          {'<Toggle\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    state="inactive"\n'}
+          {'    label="Tidak aktif, menyala"\n'}
+          {'    helperText="Keterangan singkat."\n'}
+          {'    defaultChecked\n'}
+          {'/>'}
         </SectionCode>
       </FlowSection>
 
@@ -159,11 +233,12 @@ export function TogglePage() {
         </Lead>
 
         {/* max-w-fit: blok menyusut seukuran isinya, jadi mx-auto benar-benar memusatkannya. */}
-        <Stage maxWidth="max-w-fit">
+        <Stage maxWidth="max-w-fit" dark={dark}>
           <Toggle
             platform={platform}
             state={state}
             application={application}
+            darkMode={dark}
             label="Notifikasi email"
             helperText={withCaption ? 'Kirim ringkasan permohonan baru setiap pagi.' : undefined}
             checked={aktif}
@@ -214,6 +289,18 @@ export function TogglePage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -249,6 +336,13 @@ export function TogglePage() {
               {'    '}
               <H>application</H>
               {`="${application}"\n`}
+            </>
+          )}
+          {dark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'    label="Notifikasi email"\n'}

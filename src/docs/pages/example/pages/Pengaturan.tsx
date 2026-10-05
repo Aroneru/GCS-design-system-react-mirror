@@ -36,7 +36,8 @@ export function Pengaturan() {
         Nomor telepon belum diisi. Petugas memakainya untuk mengonfirmasi jadwal layanan.
       </Alert>
 
-      <section className="ds-card p-6 sm:p-8">
+      {/* 20px di ponsel agar toolbar editor Text Area (234px) muat di layar 320px. */}
+      <section className="ds-card p-5 sm:p-8">
         <div className="flex items-center gap-5">
           {/*
             Inisialnya diturunkan dari kolom Nama lengkap di bawah, jadi
@@ -119,7 +120,7 @@ export function Pengaturan() {
         </div>
       </section>
 
-      <section className="ds-card p-6 sm:p-8">
+      <section className="ds-card p-5 sm:p-8">
         <h2 className="text-heading-3 font-black text-gray-900">Pemberitahuan</h2>
 
         <div className="mt-6 space-y-4">
