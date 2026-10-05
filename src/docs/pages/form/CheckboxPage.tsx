@@ -36,6 +36,7 @@ const checkboxProps: PropRow[] = [
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran kotak: 16px atau 14px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan teks sekaligus menonaktifkan kontrol.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna kotak saat tercentang.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak gray-700 bergaris gray-600 dengan label putih; inactive meredupkan teksnya ke gray-500.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="checkbox"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
 
@@ -44,6 +45,7 @@ const toc: TocEntry[] = [
   { id: 'caption', label: 'Dengan caption' },
   { id: 'platform', label: 'Platform' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -54,6 +56,7 @@ export function CheckboxPage() {
   const [state, setState] = useState<CheckboxState>('default')
   const [application, setApplication] = useState<CheckboxApplication>('default')
   const [withCaption, setWithCaption] = useState(false)
+  const [dark, setDark] = useState(false)
   const [dipilih, setDipilih] = useState<string[]>(['ktp'])
 
   const toggle = (value: string) =>
@@ -63,7 +66,7 @@ export function CheckboxPage() {
     <UsulanPage
       eyebrow="Form"
       title="Checkbox"
-      description="Pilihan ganda yang bisa dicentang secara mandiri. Dibangun di atas <input type='checkbox'> bawaan supaya keyboard dan pembaca layar tetap berfungsi, dengan warna, ukuran, dan jarak dari Foundations."
+      description="Pilihan ganda yang bisa dicentang secara mandiri. Dibangun di atas <input type='checkbox'> bawaan supaya keyboard dan pembaca layar tetap berfungsi, dengan warna, ukuran, dan jarak dari Foundations. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="checkbox" title="Checkbox">
@@ -208,6 +211,49 @@ export function CheckboxPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti kotak ke gray-700 bergaris gray-600, dengan label putih dan caption
+          gray-400. Kotak yang tercentang tetap memakai warna aplikasi. State <H>inactive</H> meredupkan
+          label dan caption ke gray-500; kotaknya tetap, kecuali saat tercentang yang terisi gray-500.
+        </Lead>
+        <Demo dark>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <Checkbox darkMode label="Belum dicentang" helperText="Keterangan singkat." />
+            <Checkbox darkMode label="Sudah dicentang" helperText="Keterangan singkat." defaultChecked />
+            <Checkbox darkMode state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />
+            <Checkbox
+              darkMode
+              state="inactive"
+              label="Tidak aktif, tercentang"
+              helperText="Keterangan singkat."
+              defaultChecked
+            />
+          </div>
+        </Demo>
+        <SectionCode>
+          {'<Checkbox '}
+          <H>darkMode</H>
+          {' label="Belum dicentang" helperText="Keterangan singkat." />\n'}
+          {'<Checkbox '}
+          <H>darkMode</H>
+          {' label="Sudah dicentang" helperText="Keterangan singkat." defaultChecked />\n\n'}
+          {'{/* Inactive */}\n'}
+          {'<Checkbox '}
+          <H>darkMode</H>
+          {' state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />\n'}
+          {'<Checkbox\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    state="inactive"\n'}
+          {'    label="Tidak aktif, tercentang"\n'}
+          {'    helperText="Keterangan singkat."\n'}
+          {'    defaultChecked\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Sekelompok checkbox yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
@@ -215,7 +261,7 @@ export function CheckboxPage() {
         </Lead>
 
         {/* max-w-fit: blok menyusut seukuran isinya, jadi mx-auto benar-benar memusatkannya. */}
-        <Stage maxWidth="max-w-fit">
+        <Stage maxWidth="max-w-fit" dark={dark}>
           <div className="space-y-4">
             {berkas.map((b) => (
               <Checkbox
@@ -223,6 +269,7 @@ export function CheckboxPage() {
                 platform={platform}
                 state={state}
                 application={application}
+                darkMode={dark}
                 label={b.label}
                 helperText={withCaption ? 'Unggah berkas asli berwarna, maksimal 2 MB.' : undefined}
                 checked={dipilih.includes(b.value)}
@@ -275,6 +322,18 @@ export function CheckboxPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -313,6 +372,13 @@ export function CheckboxPage() {
               {'        '}
               <H>application</H>
               {`="${application}"\n`}
+            </>
+          )}
+          {dark && (
+            <>
+              {'        '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'        label={b.label}\n'}
