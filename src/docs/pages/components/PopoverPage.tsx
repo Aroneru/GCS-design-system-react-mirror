@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Popover, type PopoverSide } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { H, Segmented } from '../../pageKit'
+import { H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -94,9 +94,9 @@ export function PopoverPage() {
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Kode mengikuti pilihan Playground. Nilai default <H>right</H> tidak ditulis. Gunakan
-          <H>className</H> untuk styling tambahan pada root Popover. Untuk menyesuaikan lebar dari
-          default 255px, gunakan atribut <H>style</H> agar override tetap konsisten. Perubahan lebar
+          Kode mengikuti pilihan Playground. Nilai default <Hl>right</Hl> tidak ditulis. Gunakan
+          <Hl>className</Hl> untuk styling tambahan pada root Popover. Untuk menyesuaikan lebar dari
+          default 255px, gunakan atribut <Hl>style</Hl> agar override tetap konsisten. Perubahan lebar
           tidak mengubah padding internal header dan body.
         </Lead>
         <SectionCode flush>

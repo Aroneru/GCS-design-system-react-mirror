@@ -2,7 +2,7 @@ import { type ReactNode, useState } from "react";
 import { ChartPie, Clipboard, Inbox, Layers, Lock, Cart } from "flowbite-react-icons/solid";
 import { Sidebar, type SidebarGroup, type SidebarItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { H, Segmented } from "../../pageKit";
+import { H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -564,10 +564,7 @@ export function SidebarPage() {
       <FlowSection id="separator" title="Content Separator">
         <p className="mb-6 text-body-sm text-gray-500">
           Separator memisahkan kelompok menu yang berbeda. Tambahkan{" "}
-          <H>
-            <code>separator: true </code>
-          </H>
-          pada group yang ingin diberi garis pemisah di bagian atas.
+          <Hl>separator: true</Hl> pada group yang ingin diberi garis pemisah di bagian atas.
         </p>
 
         <div className="mb-4 max-w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white">

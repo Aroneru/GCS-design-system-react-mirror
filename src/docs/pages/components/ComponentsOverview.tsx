@@ -15,8 +15,9 @@ import {
   Toast,
   Drawer,
 } from "../../../lib";
-import { NotReadyPreview, OverviewCard, OverviewPage } from "../../pageKit";
+import { OverviewCard, OverviewPage } from "../../pageKit";
 import { asset } from "../../asset";
+import { FacebookIcon, InstagramIcon, XIcon } from "../../socialIcons";
 
 export function ComponentsOverview() {
   return (
@@ -239,6 +240,34 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/sidebar"
+        name="Sidebar"
+        desc="Navigasi samping dengan grup menu, submenu, profil akun, dan mode ringkas."
+      >
+        {/*
+          Sidebar asli, tapi dipotong pembungkus bertinggi tetap: komponennya
+          memakai min-h-screen, dan cn() di library ini clsx murni tanpa
+          tailwind-merge — jadi tingginya tidak bisa ditimpa lewat className.
+          Yang tampil bagian atasnya, cukup untuk memperlihatkan menu aktif.
+
+          Sama seperti Footer, Sidebar tetap merender <a href="#"> untuk tiap
+          item walau `href` dikosongkan.
+        */}
+        <div className="rounded-xl bg-surface-subtle p-5">
+          <div className="h-56 w-70 max-w-full overflow-hidden rounded-lg border border-border">
+            <Sidebar
+              items={[
+                { label: "Beranda", active: true },
+                { label: "Layanan" },
+                { label: "Laporan" },
+                { label: "Pengaturan" },
+              ]}
+            />
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/navbar"
         name="Navbar"
         desc="Navigasi responsif dengan search, menu, guest actions, dan account controls."
@@ -300,7 +329,12 @@ export function ComponentsOverview() {
               { label: "Menu 3" },
               { label: "Menu 4" },
             ]}
-            copyright={`© ${new Date().getFullYear()} CEPLOK`}
+            copyright={`© ${new Date().getFullYear()} CEPLOK Design System`}
+            socials={[
+              { label: "Facebook", icon: FacebookIcon, url: "#" },
+              { label: "Twitter", icon: XIcon, url: "#" },
+              { label: "Instagram", icon: InstagramIcon, url: "#" },
+            ]}
           />
         </div>
       </OverviewCard>
@@ -330,6 +364,7 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+<<<<<<< HEAD
         route="/components/sidebar"
         name="Sidebar"
         desc="Navigasi samping dengan grup menu, submenu, profil akun, dan mode ringkas."
@@ -371,13 +406,67 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+=======
+>>>>>>> 42611dfd75a0437f423291e6b5372097996e8943
         route="/components/table"
         name="Table"
-        desc="Tabel data dengan header, baris berselang, dan aksi per baris."
+        desc="Tabel data dengan pencarian, filter kolom, pengurutan, pagination, dan aksi per baris."
         wide
-        soon
       >
-        <NotReadyPreview name="Table" />
+        {/*
+          Skeleton, bukan Table asli — sama seperti kartu Modal dan Drawer.
+          Kotak cari, sort, aksi, dan pagination Table asli merender <button>,
+          sedangkan kartu ini sendiri sudah berupa <a>.
+
+          Lima kolom (nomor, pemohon, layanan, status, aksi) hanya mulai sm;
+          di bawahnya kolom layanan dan aksi disembunyikan supaya tetap muat.
+        */}
+        <div className="rounded-xl bg-surface-subtle p-5" aria-hidden="true">
+          <div className="overflow-hidden rounded-lg border border-border bg-white shadow-sm">
+            {/* Toolbar: kotak cari, tombol filter, aksi di kanan */}
+            <div className="flex items-center gap-3 p-4">
+              <div className="h-7 w-40 max-w-full rounded-md border border-gray-200 bg-gray-50 sm:w-56" />
+              <div className="h-7 w-20 shrink-0 rounded-md border border-gray-300" />
+              <div className="ml-auto hidden h-7 w-24 rounded-md bg-primary-700 sm:block" />
+            </div>
+            {/* Header */}
+            <div className="grid grid-cols-[1fr_1.4fr_1fr] items-center gap-4 border-y border-gray-200 bg-gray-50 px-4 py-3 sm:grid-cols-[1fr_1.4fr_1.4fr_1fr_0.8fr]">
+              <div className="h-1.5 w-10 rounded bg-gray-300" />
+              <div className="h-1.5 w-14 rounded bg-gray-300" />
+              <div className="hidden h-1.5 w-14 rounded bg-gray-300 sm:block" />
+              <div className="h-1.5 w-10 rounded bg-gray-300" />
+              <div className="hidden h-1.5 w-8 rounded bg-gray-300 sm:block" />
+            </div>
+            {/* Baris: nomor, nama tebal, layanan, pill status, tombol aksi */}
+            {["bg-green-100", "bg-primary-100", "bg-yellow-100"].map((pill, i) => (
+              <div
+                key={pill}
+                className={`grid grid-cols-[1fr_1.4fr_1fr] items-center gap-4 px-4 py-3.5 sm:grid-cols-[1fr_1.4fr_1.4fr_1fr_0.8fr] ${
+                  i < 2 ? "border-b border-gray-200" : ""
+                }`}
+              >
+                <div className="h-1.5 w-12 rounded bg-gray-200" />
+                <div className="h-2 w-24 max-w-full rounded bg-gray-300" />
+                <div className="hidden h-1.5 w-28 max-w-full rounded bg-gray-200 sm:block" />
+                <div className={`h-4 w-14 rounded-full ${pill}`} />
+                <div className="hidden gap-1.5 sm:flex">
+                  <div className="size-4 rounded bg-primary-700" />
+                  <div className="size-4 rounded border border-gray-300" />
+                </div>
+              </div>
+            ))}
+            {/* Ringkasan dan pagination */}
+            <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+              <div className="h-1.5 w-28 rounded bg-gray-200" />
+              <div className="flex gap-1">
+                <div className="size-5 rounded bg-gray-200" />
+                <div className="size-5 rounded bg-primary-700" />
+                <div className="size-5 rounded bg-gray-200" />
+                <div className="size-5 rounded bg-gray-200" />
+              </div>
+            </div>
+          </div>
+        </div>
       </OverviewCard>
     </OverviewPage>
   );

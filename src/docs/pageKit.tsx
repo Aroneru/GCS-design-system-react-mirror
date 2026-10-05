@@ -141,6 +141,14 @@ export const C = ({ children }: { children: ReactNode }) => (
   <code className="text-xs font-bold text-gray-700">{children}</code>
 )
 
+/**
+ * Penyorot di paragraf berlatar terang — nama prop, nilai, atau istilah kode
+ * yang disebut di luar blok kode. `H` yang primary-300 terlalu pucat di sini.
+ */
+export const Hl = ({ children }: { children: ReactNode }) => (
+  <span className="text-primary-500">{children}</span>
+)
+
 /** Penyorot potongan kode, menggantikan <span class="text-primary-300"> di Blade. */
 export const H = ({ children }: { children: ReactNode }) => (
   <span className="text-primary-300">{children}</span>

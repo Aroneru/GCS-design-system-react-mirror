@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Button, Card } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { C, Demo, Mark, Segmented } from "../../pageKit";
+import { Demo, Hl, Mark, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -165,9 +165,9 @@ export function CardPage() {
       <FlowSection id="varian" title="Varian">
         <Lead>
           Keempatnya komponen yang sama — tidak ada prop varian sama sekali. Yang
-          membedakan hanya bagian mana yang diisi: lepas <C>image</C> untuk kartu
-          tanpa gambar, lepas <C>actions</C> untuk kartu tanpa tombol, isi{" "}
-          <C>href</C> untuk mengganti tombol dengan satu tautan. Bagian yang
+          membedakan hanya bagian mana yang diisi: lepas <Hl>image</Hl> untuk kartu
+          tanpa gambar, lepas <Hl>actions</Hl> untuk kartu tanpa tombol, isi{" "}
+          <Hl>href</Hl> untuk mengganti tombol dengan satu tautan. Bagian yang
           tidak diisi tidak dirender, bukan disembunyikan lewat CSS.
         </Lead>
 
@@ -222,10 +222,10 @@ export function CardPage() {
 
       <FlowSection id="image" title="image · imageAlt">
         <Lead>
-          <C>image</C> berisi URL gambar yang mengisi bagian atas kartu; rasionya
+          <Hl>image</Hl> berisi URL gambar yang mengisi bagian atas kartu; rasionya
           mengikuti lebar kartu — 16:9 di kolom lebar, 5:4 di bawah 320px.{" "}
-          <C>imageAlt</C> jadi teks alternatifnya, dan boleh string kosong bila
-          gambarnya murni dekoratif. Tanpa <C>image</C>, kartu langsung dimulai
+          <Hl>imageAlt</Hl> jadi teks alternatifnya, dan boleh string kosong bila
+          gambarnya murni dekoratif. Tanpa <Hl>image</Hl>, kartu langsung dimulai
           dari judul.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -255,7 +255,7 @@ export function CardPage() {
 
       <FlowSection id="title" title="title · description">
         <Lead>
-          Dua-duanya <C>ReactNode</C>, jadi boleh disisipi elemen. Ukuran judul
+          Dua-duanya <Hl>ReactNode</Hl>, jadi boleh disisipi elemen. Ukuran judul
           mengikuti lebar kartu: 20px di kolom lebar, turun ke 16px di kolom
           sempit. Deskripsi bersifat opsional — kartu dengan judul saja tetap
           rapi karena jaraknya diatur per bagian, bukan lewat margin tetap.
@@ -284,10 +284,10 @@ export function CardPage() {
 
       <FlowSection id="href" title="href · linkLabel">
         <Lead>
-          Mengisi <C>href</C> mengubah bagian bawah kartu jadi satu tautan, bukan
-          deretan tombol. <C>linkLabel</C> menentukan teksnya dan berlaku hanya
-          bersama <C>href</C>; bila dikosongkan, teksnya jatuh ke bawaan{" "}
-          <C>Selengkapnya</C>.
+          Mengisi <Hl>href</Hl> mengubah bagian bawah kartu jadi satu tautan, bukan
+          deretan tombol. <Hl>linkLabel</Hl> menentukan teksnya dan berlaku hanya
+          bersama <Hl>href</Hl>; bila dikosongkan, teksnya jatuh ke bawaan{" "}
+          <Hl>Selengkapnya</Hl>.
         </Lead>
         <Demo>
           <Column>
@@ -357,10 +357,10 @@ export function CardPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Isi <C>darkMode</C> untuk halaman berlatar gelap. Kartu berubah ke
+          Isi <Hl>darkMode</Hl> untuk halaman berlatar gelap. Kartu berubah ke
           gray-800, judul jadi putih, deskripsi gray-400, dan tautan primary-500
           supaya tetap terbaca. Gambar sedikit diredupkan. Semua varian di atas
-          tetap berlaku, termasuk ukuran mobile. Tombol di <C>actions</C> tidak
+          tetap berlaku, termasuk ukuran mobile. Tombol di <Hl>actions</Hl> tidak
           ikut diubah. Tombol outline perlu diberi warna primary-500 sendiri,
           karena primary-700 bawaannya hampir tidak terlihat di kartu gelap.
         </Lead>

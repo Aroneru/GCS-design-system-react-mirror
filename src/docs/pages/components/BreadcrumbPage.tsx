@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Home } from "flowbite-react-icons/solid";
 import { Breadcrumb, type BreadcrumbSize, type BreadcrumbItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { Demo, H, Segmented } from "../../pageKit";
+import { Demo, H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -85,7 +85,7 @@ export function BreadcrumbPage() {
       <FlowSection id="sizes" title="Sizes">
         <p className="mb-6 text-body-sm text-gray-500">
           Breadcrumb tersedia dalam dua ukuran untuk menyesuaikan kebutuhan hierarki dan kepadatan
-          informasi pada layout. Ukuran <H>base</H> adalah ukuran default. Ukuran <H>sm</H>{" "}
+          informasi pada layout. Ukuran <Hl>base</Hl> adalah ukuran default. Ukuran <Hl>sm</Hl>{" "}
           digunakan ketika Breadcrumb diimplementasikan pada mobile.
         </p>
 

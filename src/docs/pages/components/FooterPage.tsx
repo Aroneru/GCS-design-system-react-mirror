@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Footer } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { FacebookIcon, InstagramIcon, XIcon } from '../../socialIcons'
-import { C, Mark, Segmented } from '../../pageKit'
+import { Hl, Mark, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -162,7 +162,7 @@ export function FooterPage() {
     >
       <FlowSection id="dasar" title="Tampilan dasar">
         <Lead>
-          Satu blok utuh berlatar <C>gray-800</C>: baris atas berisi logo dan menu, lalu garis tipis,
+          Satu blok utuh berlatar <Hl>gray-800</Hl>: baris atas berisi logo dan menu, lalu garis tipis,
           lalu baris bawah berisi hak cipta dan ikon sosial. Semua bagiannya opsional — yang tidak
           diisi tidak dirender, bukan disembunyikan lewat CSS.
         </Lead>
@@ -191,15 +191,15 @@ export function FooterPage() {
 
       <FlowSection id="logo" title="logo · logoAlt · logoContent">
         <Lead>
-          <C>logo</C> menerima URL berkas gambar dan dirender sebagai <C>{'<img>'}</C> setinggi 64px —
-          80px saat footer selebar ≥ 768px — dengan lebar mengikuti rasio aslinya. <C>logoAlt</C> jadi
+          <Hl>logo</Hl> menerima URL berkas gambar dan dirender sebagai <Hl>{'<img>'}</Hl> setinggi 64px —
+          80px saat footer selebar ≥ 768px — dengan lebar mengikuti rasio aslinya. <Hl>logoAlt</Hl> jadi
           teks alternatifnya; isi dengan nama instansi, bukan kata "logo", supaya wajar dibacakan
           pembaca layar.
         </Lead>
         <Lead>
-          Bila logonya bukan berkas gambar — logo teks, <C>{'<svg>'}</C> inline, atau gabungan keduanya
-          — pakai <C>logoContent</C>. Prop itu hanya berlaku saat <C>logo</C> kosong: kalau dua-duanya
-          diisi, <C>logo</C> yang menang. Karena latarnya gelap, warnanya harus ditentukan sendiri.
+          Bila logonya bukan berkas gambar — logo teks, <Hl>{'<svg>'}</Hl> inline, atau gabungan keduanya
+          — pakai <Hl>logoContent</Hl>. Prop itu hanya berlaku saat <Hl>logo</Hl> kosong: kalau dua-duanya
+          diisi, <Hl>logo</Hl> yang menang. Karena latarnya gelap, warnanya harus ditentukan sendiri.
         </Lead>
 
         <div className="space-y-6">
@@ -235,9 +235,9 @@ export function FooterPage() {
 
       <FlowSection id="menus" title="menus">
         <Lead>
-          Daftar tautan navigasi. <C>url</C> boleh dikosongkan dan otomatis jadi <C>"#"</C>. Saat footer
+          Daftar tautan navigasi. <Hl>url</Hl> boleh dikosongkan dan otomatis jadi <Hl>"#"</Hl>. Saat footer
           selebar ≥ 768px satu baris memuat paling banyak lima menu; menu keenam dan seterusnya turun ke
-          baris berikutnya dan tetap sejajar kolom di atasnya. Bila <C>menus</C> kosong, blok navigasinya
+          baris berikutnya dan tetap sejajar kolom di atasnya. Bila <Hl>menus</Hl> kosong, blok navigasinya
           tidak dirender sama sekali.
         </Lead>
 
@@ -275,16 +275,16 @@ export function FooterPage() {
 
       <FlowSection id="baris-bawah" title="copyright · socials">
         <Lead>
-          Keduanya mengisi baris bawah — <C>copyright</C> di kiri, <C>socials</C> di ujung kanan.{' '}
-          <C>copyright</C> bertipe <C>ReactNode</C>, jadi tidak harus teks: boleh disisipi tautan
+          Keduanya mengisi baris bawah — <Hl>copyright</Hl> di kiri, <Hl>socials</Hl> di ujung kanan.{' '}
+          <Hl>copyright</Hl> bertipe <Hl>ReactNode</Hl>, jadi tidak harus teks: boleh disisipi tautan
           kebijakan privasi atau nomor versi. Bila kosong, barisnya tidak dirender dan ikon sosial
           bergeser ke kiri.
         </Lead>
         <Lead>
-          Pada <C>socials</C>, <C>icon</C> disisipkan sebagai elemen <C>{'<svg>'}</C> apa adanya —
-          warnanya mengikuti <C>currentColor</C> sehingga ikut berubah saat hover. <C>label</C> menjadi{' '}
-          <C>aria-label</C> tautannya, dan url selain <C>"#"</C> dibuka di tab baru dengan{' '}
-          <C>rel="noopener noreferrer"</C>.
+          Pada <Hl>socials</Hl>, <Hl>icon</Hl> disisipkan sebagai elemen <Hl>{'<svg>'}</Hl> apa adanya —
+          warnanya mengikuti <Hl>currentColor</Hl> sehingga ikut berubah saat hover. <Hl>label</Hl> menjadi{' '}
+          <Hl>aria-label</Hl> tautannya, dan url selain <Hl>"#"</Hl> dibuka di tab baru dengan{' '}
+          <Hl>rel="noopener noreferrer"</Hl>.
         </Lead>
 
         <Preview>
@@ -328,8 +328,8 @@ export function FooterPage() {
 
       <FlowSection id="fluid" title="fluid">
         <Lead>
-          Bawaannya isi footer dibatasi <C>max-w-7xl</C> (1280px) lalu dipusatkan, jadi di layar lebar
-          logo dan menu berhenti sebelum tepi. <C>fluid</C> melepas batas itu: isinya melebar penuh
+          Bawaannya isi footer dibatasi <Hl>max-w-7xl</Hl> (1280px) lalu dipusatkan, jadi di layar lebar
+          logo dan menu berhenti sebelum tepi. <Hl>fluid</Hl> melepas batas itu: isinya melebar penuh
           mengikuti lebar footer, menyisakan padding kiri-kanan saja. Latar dan tinggi footernya sendiri
           tidak berubah — yang bergeser hanya letak isinya.
         </Lead>
@@ -356,7 +356,7 @@ export function FooterPage() {
         <Lead>
           Ambang di bawah ini diukur dari{' '}
           <strong className="text-gray-900">lebar footer itu sendiri</strong>, bukan lebar layar —
-          elemen <C>{'<footer>'}</C> dipasangi <C>@container</C>. Jadi footer yang ditaruh di kolom
+          elemen <Hl>{'<footer>'}</Hl> dipasangi <Hl>@container</Hl>. Jadi footer yang ditaruh di kolom
           sempit pada layar desktop tetap tampil bertumpuk seperti di ponsel, dan sebaliknya. Cara
           mengeceknya: ganti kontrol <em>Tampilan</em> di Playground, atau perkecil jendela.
         </Lead>
@@ -371,8 +371,8 @@ export function FooterPage() {
         </div>
 
         <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500">
-          Yang tidak berubah di ukuran mana pun: latar <C>bg-gray-800</C>, jarak atas-bawah 64px, lebar
-          isi dibatasi <C>max-w-7xl</C> lalu dipusatkan — kecuali bila <C>fluid</C> diisi — dan garis
+          Yang tidak berubah di ukuran mana pun: latar <Hl>bg-gray-800</Hl>, jarak atas-bawah 64px, lebar
+          isi dibatasi <Hl>max-w-7xl</Hl> lalu dipusatkan — kecuali bila <Hl>fluid</Hl> diisi — dan garis
           pemisah tipis di atas baris hak cipta.
         </p>
       </FlowSection>
@@ -510,10 +510,10 @@ export function FooterPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Rangkuman seluruh prop, termasuk yang tidak diberi bagian sendiri di atas. Semuanya opsional —{' '}
-          <C>{'<Footer />'}</C> tanpa prop tetap merender kerangkanya. Dua tipe pendukungnya:{' '}
-          <C>FooterMenu</C> = <C>{'{ label: string; url?: string }'}</C> dan <C>FooterSocial</C> ={' '}
-          <C>{'{ label?: string; url?: string; icon: ReactNode }'}</C>. Atribut HTML di luar daftar ini
-          tidak diteruskan ke elemen <C>{'<footer>'}</C>.
+          <Hl>{'<Footer />'}</Hl> tanpa prop tetap merender kerangkanya. Dua tipe pendukungnya:{' '}
+          <Hl>FooterMenu</Hl> = <Hl>{'{ label: string; url?: string }'}</Hl> dan <Hl>FooterSocial</Hl> ={' '}
+          <Hl>{'{ label?: string; url?: string; icon: ReactNode }'}</Hl>. Atribut HTML di luar daftar ini
+          tidak diteruskan ke elemen <Hl>{'<footer>'}</Hl>.
         </Lead>
         <PropsTable rows={footerProps} minWidth="48rem" />
       </FlowSection>

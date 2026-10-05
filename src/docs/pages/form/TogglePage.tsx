@@ -25,6 +25,7 @@ const toggleProps: PropRow[] = [
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran sakelar: 40×20px atau 36×18px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna jalur saat sakelar menyala.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: jalur gray-600 dengan bulatan gray-400 yang memutih saat menyala, dan label putih; inactive meredupkan label ke gray-500.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="checkbox"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
 
@@ -33,6 +34,7 @@ const toc: TocEntry[] = [
   { id: 'caption', label: 'Dengan caption' },
   { id: 'platform', label: 'Platform' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -43,13 +45,14 @@ export function TogglePage() {
   const [state, setState] = useState<ToggleState>('default')
   const [application, setApplication] = useState<ToggleApplication>('default')
   const [withCaption, setWithCaption] = useState(false)
+  const [dark, setDark] = useState(false)
   const [aktif, setAktif] = useState(true)
 
   return (
     <UsulanPage
       eyebrow="Form"
       title="Toggle Button"
-      description="Sakelar untuk menyalakan atau mematikan satu pengaturan, berlaku seketika tanpa tombol simpan. Dibangun di atas <input type='checkbox'> dengan role='switch' supaya keyboard dan pembaca layar tetap berfungsi."
+      description="Sakelar untuk menyalakan atau mematikan satu pengaturan, berlaku seketika tanpa tombol simpan. Dibangun di atas <input type='checkbox'> dengan role='switch' supaya keyboard dan pembaca layar tetap berfungsi. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="toggle-button" title="Toggle Button">
@@ -179,6 +182,50 @@ export function TogglePage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti jalur yang mati ke gray-600 dengan bulatan gray-400, label putih, dan
+          caption gray-400. Saat menyala, jalurnya tetap memakai warna aplikasi dan bulatannya berubah
+          putih. State <H>inactive</H> hanya meredupkan label ke gray-500 — jalur dan bulatannya tetap
+          seperti saat mati, meski sakelarnya menyala.
+        </Lead>
+        <Demo dark>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <Toggle darkMode label="Mati" helperText="Keterangan singkat." />
+            <Toggle darkMode label="Menyala" helperText="Keterangan singkat." defaultChecked />
+            <Toggle darkMode state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />
+            <Toggle
+              darkMode
+              state="inactive"
+              label="Tidak aktif, menyala"
+              helperText="Keterangan singkat."
+              defaultChecked
+            />
+          </div>
+        </Demo>
+        <SectionCode>
+          {'<Toggle '}
+          <H>darkMode</H>
+          {' label="Mati" helperText="Keterangan singkat." />\n'}
+          {'<Toggle '}
+          <H>darkMode</H>
+          {' label="Menyala" helperText="Keterangan singkat." defaultChecked />\n\n'}
+          {'{/* Inactive */}\n'}
+          {'<Toggle '}
+          <H>darkMode</H>
+          {' state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />\n'}
+          {'<Toggle\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    state="inactive"\n'}
+          {'    label="Tidak aktif, menyala"\n'}
+          {'    helperText="Keterangan singkat."\n'}
+          {'    defaultChecked\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
@@ -186,11 +233,12 @@ export function TogglePage() {
         </Lead>
 
         {/* max-w-fit: blok menyusut seukuran isinya, jadi mx-auto benar-benar memusatkannya. */}
-        <Stage maxWidth="max-w-fit">
+        <Stage maxWidth="max-w-fit" dark={dark}>
           <Toggle
             platform={platform}
             state={state}
             application={application}
+            darkMode={dark}
             label="Notifikasi email"
             helperText={withCaption ? 'Kirim ringkasan permohonan baru setiap pagi.' : undefined}
             checked={aktif}
@@ -241,6 +289,18 @@ export function TogglePage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -276,6 +336,13 @@ export function TogglePage() {
               {'    '}
               <H>application</H>
               {`="${application}"\n`}
+            </>
+          )}
+          {dark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'    label="Notifikasi email"\n'}

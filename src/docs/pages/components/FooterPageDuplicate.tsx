@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Footer } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { FacebookIcon, InstagramIcon, XIcon } from '../../socialIcons'
-import { C, CodeBlock, ComponentPage, Mark, Section, Segmented } from '../../pageKit'
+import { CodeBlock, ComponentPage, Hl, Mark, Section, Segmented } from '../../pageKit'
 import { Control, Controls } from '../../usulanKit'
 import { adaTidakAda } from '../../usulanOptions'
 import { asset } from "../../asset";
@@ -236,16 +236,16 @@ export function FooterPage() {
         </CodeBlock>
 
         <p className="mt-3 text-body-sm text-gray-500">
-          Elemen <code className="text-xs font-bold text-gray-700">&lt;svg&gt;</code> disisipkan langsung,
+          Elemen <Hl>&lt;svg&gt;</Hl> disisipkan langsung,
           sehingga warnanya mengikuti{' '}
-          <code className="text-xs font-bold text-gray-700">currentColor</code> dan bisa berubah saat hover.
+          <Hl>currentColor</Hl> dan bisa berubah saat hover.
         </p>
       </section>
 
       <Section title="Perilaku responsif">
         <p className="mb-4 max-w-5xl text-body-sm leading-6 text-gray-500">
           Ambang di bawah ini diukur dari <strong className="text-gray-900">lebar footer itu sendiri</strong>,
-          bukan lebar layar — elemen <C>{'<footer>'}</C> dipasangi <C>@container</C>. Jadi footer yang ditaruh
+          bukan lebar layar — elemen <Hl>{'<footer>'}</Hl> dipasangi <Hl>@container</Hl>. Jadi footer yang ditaruh
           di kolom sempit pada layar desktop tetap tampil bertumpuk seperti di ponsel, dan sebaliknya. Cara
           mengeceknya: ganti kontrol <em>Tampilan</em> di Preview, atau perkecil jendela.
         </p>
@@ -260,17 +260,17 @@ export function FooterPage() {
         </div>
 
         <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500">
-          Yang tidak berubah di ukuran mana pun: latar <C>bg-gray-800</C>, jarak atas-bawah 64px, lebar isi
-          dibatasi <C>max-w-7xl</C> lalu dipusatkan, dan garis pemisah tipis di atas baris hak cipta.
+          Yang tidak berubah di ukuran mana pun: latar <Hl>bg-gray-800</Hl>, jarak atas-bawah 64px, lebar isi
+          dibatasi <Hl>max-w-7xl</Hl> lalu dipusatkan, dan garis pemisah tipis di atas baris hak cipta.
         </p>
       </Section>
 
       <Section title="Properties">
         <p className="mb-4  text-body-sm leading-6 text-gray-500">
-          Semua prop opsional — <C>{'<Footer />'}</C> tanpa prop tetap merender kerangkanya. Dua tipe
-          pendukungnya: <C>FooterMenu</C> = <C>{'{ label: string; url?: string }'}</C> dan{' '}
-          <C>FooterSocial</C> = <C>{'{ label?: string; url?: string; icon: ReactNode }'}</C>. Atribut HTML di
-          luar daftar ini tidak diteruskan ke elemen <C>{'<footer>'}</C>.
+          Semua prop opsional — <Hl>{'<Footer />'}</Hl> tanpa prop tetap merender kerangkanya. Dua tipe
+          pendukungnya: <Hl>FooterMenu</Hl> = <Hl>{'{ label: string; url?: string }'}</Hl> dan{' '}
+          <Hl>FooterSocial</Hl> = <Hl>{'{ label?: string; url?: string; icon: ReactNode }'}</Hl>. Atribut HTML di
+          luar daftar ini tidak diteruskan ke elemen <Hl>{'<footer>'}</Hl>.
         </p>
         <PropsTable rows={footerProps} minWidth="48rem" />
       </Section>

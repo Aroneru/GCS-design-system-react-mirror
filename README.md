@@ -122,8 +122,8 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 | `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 px                     |
 | `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode`                               | 44 / 40 px                |
 | `Radio`         | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
-| `Toggle`        | `label`, `helperText`                                                                                                           | 40×20 / 36×18 px          |
-| `Checkbox`      | `label`, `helperText`                                                                                                           | 16 / 14 px                |
+| `Toggle`        | `label`, `helperText`, `darkMode`                                                                                               | 40×20 / 36×18 px          |
+| `Checkbox`      | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
 
 Prop yang dipakai bersama seluruh komponen form:
 

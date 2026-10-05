@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Refresh } from '../../../lib/icons/outline'
 import { Button, Toast, type ToastVariant } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -117,8 +117,8 @@ export function ToastPage() {
 
       <FlowSection id="heading-aksi" title="Dengan heading & aksi">
         <Lead>
-          Isi <H>heading</H> untuk memisahkan judul dari isi, dan <H>actions</H> untuk satu tombol tindak
-          lanjut — umumnya dibuat <H>w-full</H> agar memenuhi lebar kartu. Begitu ada salah satunya, badge
+          Isi <Hl>heading</Hl> untuk memisahkan judul dari isi, dan <Hl>actions</Hl> untuk satu tombol tindak
+          lanjut — umumnya dibuat <Hl>w-full</Hl> agar memenuhi lebar kartu. Begitu ada salah satunya, badge
           ikon berpindah ke rata atas supaya sejajar dengan baris pertama.
         </Lead>
         <Demo>
@@ -153,9 +153,9 @@ export function ToastPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti kartunya ke gray-800, heading ke gray-300, dan teks lainnya ke
+          Prop <Hl>darkMode</Hl> mengganti kartunya ke gray-800, heading ke gray-300, dan teks lainnya ke
           gray-400. Badge ikon ikut memakai versi gelapnya — latar gelap dengan ikon -400 — sedangkan tombol
-          tutup tetap gray-400 dan tombol di <H>actions</H> tetap primary-700 di kedua tampilan.
+          tutup tetap gray-400 dan tombol di <Hl>actions</Hl> tetap primary-700 di kedua tampilan.
         </Lead>
         <div className="grid gap-5 lg:grid-cols-2">
           <Demo label="Pesan singkat" dark>
@@ -192,8 +192,8 @@ export function ToastPage() {
 
       <FlowSection id="posisi" title="Posisi & tumpukan">
         <Lead>
-          Komponennya sendiri tidak memposisikan apa pun. Bungkus dengan wadah <H>fixed</H> di sudut yang
-          Anda mau — dengan begitu beberapa Toast bisa ditumpuk dalam satu wadah ber-<H>space-y</H> tanpa
+          Komponennya sendiri tidak memposisikan apa pun. Bungkus dengan wadah <Hl>fixed</Hl> di sudut yang
+          Anda mau — dengan begitu beberapa Toast bisa ditumpuk dalam satu wadah ber-<Hl>space-y</Hl> tanpa
           mengunci satu posisi ke dalam komponen.
         </Lead>
         <Demo label="Tiga Toast dalam satu wadah">
@@ -218,7 +218,7 @@ export function ToastPage() {
         <Lead>
           Bingkai di bawah ini mensimulasikan viewport halaman supaya keempat sudut bisa dicoba. Setiap
           perubahan langsung terlihat, dan bagian Penggunaan menuliskan kodenya. Setelah Toast ditutup,
-          klik <H>Tampilkan Toast</H> untuk memasangnya kembali.
+          klik <Hl>Tampilkan Toast</Hl> untuk memasangnya kembali.
         </Lead>
 
         {/*
@@ -356,7 +356,7 @@ export function ToastPage() {
         </button>
 
         <p className="mt-4 text-body-sm text-gray-500">
-          Lebar mobile memakai <H>inset-x-3</H> agar Toast merentang mengikuti layar; di desktop lebarnya
+          Lebar mobile memakai <Hl>inset-x-3</Hl> agar Toast merentang mengikuti layar; di desktop lebarnya
           dibatasi lalu ditempel ke satu sisi.
         </p>
       </FlowSection>
@@ -364,7 +364,7 @@ export function ToastPage() {
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
           Blok ini mengikuti kontrol di Playground — ubah kontrolnya, kodenya ikut berubah. Wadah{' '}
-          <H>fixed</H> ikut ditulis karena posisinya memang ditentukan di sana, bukan di dalam Toast.
+          <Hl>fixed</Hl> ikut ditulis karena posisinya memang ditentukan di sana, bukan di dalam Toast.
         </Lead>
         <SectionCode flush>
           {"import { Toast } from '@ceplok-ui/design-kit-react'\n"}
@@ -412,7 +412,7 @@ export function ToastPage() {
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <H>&lt;div&gt;</H>{' '}
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <Hl>&lt;div&gt;</Hl>{' '}
           standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={toastProps} minWidth="52rem" />

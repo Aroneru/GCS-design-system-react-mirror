@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 // Footer tidak diimpor: DocsLayout sudah memasangnya untuk seluruh halaman.
 import {
   Badge,
@@ -12,6 +12,7 @@ import {
 import * as OutlineIcons from "../../lib/icons/outline";
 import * as SolidIcons from "../../lib/icons/solid";
 import { brandIcons } from "../../lib/brandIconRegistry";
+import { ReactLogo } from "../../lib/brandIcons";
 import { sidebars } from "../navigation";
 import { asset } from "../asset";
 import { DocUsage } from "../DocUsage";
@@ -165,93 +166,6 @@ export function FormPermohonan() {
 ];
 
 /* ---------- Jendela kode di hero ---------- */
-
-/**
- * Saklar easter egg — foto latar jendela kode beserta tombol suaranya.
- *
- * MATI DI PRODUKSI, dan itu keputusan sadar: isinya memakai potret dan potongan
- * suara tokoh publik, yang tidak layak ikut terbit di situs dokumentasi resmi.
- * Ini lelucon untuk yang mengerjakan, bukan untuk yang memakai.
- *
- * Dikendalikan `VITE_EASTER_EGG` di berkas .env, dan sengaja berupa OPT-IN:
- * hanya teks `'true'` yang menyalakan, apa pun selain itu — termasuk variabelnya
- * yang tidak diisi sama sekali — berarti mati. Default aman tidak boleh
- * bergantung pada seseorang yang ingat mematikannya sebelum deploy.
- *
- * Perbandingannya dengan STRING, bukan dengan nilai kebenaran. Variabel Vite
- * selalu bertipe string, jadi `if (import.meta.env.VITE_EASTER_EGG)` akan
- * bernilai benar bahkan saat isinya `'false'` — string tak kosong selalu truthy.
- *
- * Vite mengganti pembacaannya dengan literal saat build, jadi seluruh cabang di
- * bawahnya ikut dibuang bundler — bukan sekadar disembunyikan lewat CSS,
- * melainkan benar-benar tidak ada di berkas yang terbit.
- *
- * CATATAN — yang dimatikan hanya kodenya. Berkas asetnya tinggal di `public/`,
- * dan Vite menyalin seluruh isi folder itu ke `dist/` tanpa peduli ada yang
- * merujuknya atau tidak. Jadi foto dan klip suaranya tetap ikut terbit dan tetap
- * bisa dibuka siapa pun yang tahu URL-nya; yang hilang cuma tautannya dari
- * halaman. Kalau suatu saat itu tidak lagi bisa diterima, berkasnya yang harus
- * keluar dari `public/` — bukan cuma tombolnya yang disembunyikan.
- */
-const EASTER_EGG = import.meta.env.VITE_EASTER_EGG === "true";
-
-/**
- * Easter egg: klip suara di balik tombol pengeras suara di title bar jendela.
- *
- * Diputar bergantian, bukan acak. Acak berarti klip yang sama bisa keluar dua
- * kali berturut-turut — dan lelucon yang diulang persis terdengar seperti tombol
- * yang rusak, bukan seperti giliran berikutnya.
- */
-const EGG_CLIPS = [
-  {
-    src: "/icons/5d31a94b3f09a18ca28485339e47d67492b8f26443db53f0bdd352655438cba4b2d45e4920d2578f5c538ff0c44b63a417646e1e1db10e50cc2068a34374cb3d.mp3",
-    label: "Hey, antek-antek asing",
-  },
-  {
-    src: "/icons/fd6c085a954ccdeae8b4afe94b06a34b1de98c7ba942c778121a4fd88f0e20b1ff06bc594f81defe832a6a8a14067fdb.mp3",
-    label: "Hidup Jokowi",
-  },
-];
-
-/**
- * Pola kedip lampu rusak untuk latar jendela kode.
- *
- * Ditulis sebagai data, bukan diacak saat berjalan. Angka acak membuat tiap
- * putaran berbeda — kedengarannya bagus, tapi hasilnya justru kehilangan bentuk:
- * yang bikin sebuah kedipan terasa "rusak" adalah iramanya yang timpang tapi
- * DIKENALI, bukan sekadar tak beraturan. Pola tetap juga berarti apa yang dilihat
- * saat menyetel angkanya sama persis dengan yang dilihat pengguna.
- *
- * `on` selalu jauh lebih pendek dari `off` — total menyala kurang dari sepertiga
- * putaran, dan sebagian besar hanya sekelebat. Gelap adalah keadaan normalnya;
- * fotonya cuma tertangkap sesekali.
- *
- * `clip` memotong gambar jadi pita horizontal, meniru baris pindai yang putus —
- * itu yang membedakan ini dari sekadar lampu berkedip. Dipakai hemat: dua-tiga
- * kali per putaran sudah cukup, lebih dari itu terbaca sebagai animasi rusak,
- * bukan gambar yang rusak.
- */
-const FLICKER: {
-  on: number;
-  off: number;
-  opacity: number;
-  x?: number;
-  clip?: string;
-}[] = [
-  { on: 0.05, off: 0.13, opacity: 0.55 },
-  { on: 0.04, off: 0.05, opacity: 0.8, x: -3 },
-  { on: 0.03, off: 0.42, opacity: 0.35 },
-  { on: 0.07, off: 0.06, opacity: 0.7, clip: "inset(28% 0 44% 0)" },
-  { on: 0.04, off: 0.09, opacity: 0.85, x: 4 },
-  { on: 0.02, off: 0.7, opacity: 0.5 },
-  // Satu tarikan panjang di tengah — matanya sempat bertemu, lalu putus lagi.
-  { on: 0.85, off: 0.16, opacity: 0.75 },
-  { on: 0.05, off: 0.07, opacity: 0.6, x: -5, clip: "inset(9% 0 61% 0)" },
-  { on: 0.03, off: 0.05, opacity: 0.9 },
-  { on: 0.12, off: 0.9, opacity: 0.45, clip: "inset(52% 0 12% 0)" },
-  { on: 0.03, off: 0.06, opacity: 0.8, x: 3 },
-  { on: 0.06, off: 1.4, opacity: 0.4 },
-];
 
 /** Titik-titik ala jendela macOS. */
 const WindowDots = () => (
@@ -429,18 +343,12 @@ const SNIPPETS: Snippet[] = [
 ].map((s) => ({ ...s, lines: [...PREAMBLE, ...s.lines] }));
 
 /**
- * Panjang tiap baris dalam karakter, posisi awal baris itu di seluruh potongan,
- * dan totalnya — dihitung sekali di muka untuk tiap potongan, karena animasinya
- * membacanya puluhan kali per detik.
+ * Teks polos tiap baris — dihitung sekali di muka untuk tiap potongan, karena
+ * animasinya membaca panjang baris di setiap ketukan.
  */
-const METRICS = SNIPPETS.map(({ lines }) => {
-  const len = lines.map((line) => line.reduce((n, tok) => n + tok.t.length, 0));
-  const start = len.reduce<number[]>(
-    (acc, _l, i) => [...acc, (acc[i - 1] ?? 0) + (len[i - 1] ?? 0)],
-    [],
-  );
-  return { len, start, total: len.reduce((a, b) => a + b, 0) };
-});
+const LINE_TEXT = SNIPPETS.map(({ lines }) =>
+  lines.map((line) => line.map((tok) => tok.t).join("")),
+);
 
 /**
  * Jumlah baris potongan terpanjang. Tinggi area kode dikunci ke angka ini,
@@ -449,12 +357,57 @@ const METRICS = SNIPPETS.map(({ lines }) => {
  */
 const MAX_LINES = Math.max(...SNIPPETS.map((s) => s.lines.length));
 
-/** Tinggi satu baris, dipakai bersama oleh kelas `leading-6` dan posisi kursor. */
+/** Tinggi satu baris, sama dengan kelas `leading-6` / `h-6` pada baris kode. */
 const LINE_HEIGHT_REM = 1.5;
 
-/** Karakter per detik saat mengetik. Durasi diturunkan dari sini supaya potongan
- *  yang lebih panjang tidak terasa lebih cepat diketik. */
-const TYPE_SPEED = 26;
+/** Satu ketukan: posisi kursor sesudahnya, dan kapan ketukan itu jatuh (detik). */
+type Keystroke = { line: number; col: number; at: number };
+
+const between = (min: number, max: number) => min + Math.random() * (max - min);
+
+/**
+ * Menyusun jadwal ketukan untuk satu potongan, meniru orang yang mengetik.
+ *
+ * Kecepatan tetap per karakter adalah yang membuat versi lama terasa seperti
+ * mesin. Orang tidak mengetik dengan irama metronom:
+ * - jeda antar huruf selalu sedikit berbeda,
+ * - ada jeda kecil sesudah spasi, saat pindah ke kata berikutnya,
+ * - simbol seperti `<`, `=`, `"` lebih lambat karena butuh Shift,
+ * - sesekali ada ragu sejenak di tengah baris,
+ * - sebelum Enter ada jeda lebih panjang, seperti memikirkan baris berikutnya.
+ *
+ * Indentasi di awal baris muncul sekaligus bersama Enter, sama seperti editor
+ * yang menjaga indentasi otomatis. Tidak ada yang mengetik spasi indentasi satu
+ * per satu.
+ *
+ * Acaknya dibuat ulang tiap giliran, jadi potongan yang sama tidak pernah
+ * diketik dengan irama yang persis sama dua kali.
+ */
+function planTyping(lines: string[]): { keys: Keystroke[]; end: number } {
+  const keys: Keystroke[] = [];
+  let t = 0;
+
+  lines.forEach((text, line) => {
+    const indent = text.length - text.trimStart().length;
+
+    if (line > 0) {
+      t += between(0.14, 0.32);
+      keys.push({ line, col: indent, at: t });
+    }
+
+    for (let col = indent; col < text.length; col++) {
+      const ch = text[col];
+      let d = between(0.018, 0.046);
+      if (text[col - 1] === " ") d += between(0.02, 0.06);
+      if (/[<>="'{}[\]/]/.test(ch)) d += between(0.015, 0.045);
+      if (Math.random() < 0.04) d += between(0.14, 0.3);
+      t += d;
+      keys.push({ line, col: col + 1, at: t });
+    }
+  });
+
+  return { keys, end: t };
+}
 
 /**
  * Jendela kode yang mengetik sendiri isinya, menghapusnya, lalu berpindah ke
@@ -482,84 +435,91 @@ const TYPE_SPEED = 26;
 function CodeWindow() {
   const [index, setIndex] = useState(0);
   const snippet = SNIPPETS[index];
-  const metrics = METRICS[index];
+  const lineText = LINE_TEXT[index];
 
   // Hanya giliran pertama yang menunggu; sesudahnya potongan berikutnya langsung
   // menyusul supaya jeda antarpotongan tidak terasa seperti animasi tersendat.
   const firstRun = useRef(true);
 
-  const audio = useRef<HTMLAudioElement>(null);
-  const [clip, setClip] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  // Timeline "lampu menyala" di bawah, disimpan supaya tombol suara bisa
-  // mengambil alih fotonya selagi klip berbunyi.
-  const light = useRef<gsap.core.Timeline | null>(null);
-
   const ref = useGsap<HTMLDivElement>(
     ({ q }) => {
+      const code = q("[data-code]")[0];
       const lineEls = q("[data-line]");
-      const caret = q("[data-caret]")[0];
-      const counter = { n: 0 };
+      const carets = q("[data-caret]");
 
-      const draw = () => {
-        const n = counter.n;
-        let caretLine = 0;
-        let caretCol = 0;
-
-        lineEls.forEach((line, i) => {
-          const visible = Math.min(
-            Math.max(n - metrics.start[i], 0),
-            metrics.len[i],
-          );
-          line.style.width = `${visible}ch`;
-
-          // Kursor duduk di baris terakhir yang sudah tersentuh. Baris kosong ikut
-          // tersentuh pada offset yang sama dengan baris sesudahnya, jadi baris
-          // berikutnya menimpanya dan kursor tidak pernah tertinggal di ruang kosong.
-          if (n >= metrics.start[i]) {
-            caretLine = i;
-            caretCol = visible;
-          }
+      // Baris sebelum kursor tampil utuh, baris kursor terpotong di kolomnya,
+      // baris sesudahnya belum ada. Kursor selalu ikut posisi ketukan terakhir,
+      // termasuk tetap di ujung baris selama jeda sebelum Enter.
+      //
+      // Posisi kursor tidak dihitung sama sekali: ia menempel tepat setelah
+      // potongan baris yang terlihat, jadi cukup menyalakan kursor di baris aktif.
+      const place = (line: number, col: number) => {
+        lineEls.forEach((el, i) => {
+          const width =
+            i < line ? lineText[i].length : i === line ? col : 0;
+          el.style.width = `${width}ch`;
+          carets[i].style.visibility = i === line ? "visible" : "hidden";
         });
-
-        caret.style.transform = `translate(${caretCol}ch, ${caretLine * LINE_HEIGHT_REM}rem)`;
       };
 
       // Digambar sekali sebelum timeline mulai. Tanpa ini, selama `delay` di bawah
       // belum ada satu pun lebar yang tertulis, jadi tiap baris memakai lebar
       // aslinya — kode utuh berkedip muncul lebih dulu, lalu hilang begitu frame
       // pertama animasi menimpanya.
-      draw();
+      place(0, 0);
 
-      const tl = gsap
-        .timeline({ delay: firstRun.current ? 0.5 : 0.25 })
-        .to(counter, {
-          n: metrics.total,
-          duration: metrics.total / TYPE_SPEED,
-          ease: "none",
-          onUpdate: draw,
-        })
-        .to(counter, { duration: 1.8 })
-        // Menghapus selalu lebih cepat daripada mengetik, dan makin cepat di
-        // akhir — itu yang membuatnya terbaca sebagai backspace ditahan, bukan
-        // sebagai animasi yang diputar mundur.
-        .to(counter, { n: 0, duration: 0.7, ease: "power2.in", onUpdate: draw })
-        .call(() => {
-          firstRun.current = false;
-          setIndex((i) => (i + 1) % SNIPPETS.length);
-        });
-
-      // `fromTo`, bukan `to`: kursor berangkat dari `opacity-0` di markup supaya
-      // pada mode gerak dikurangi — ketika seluruh setup ini dilewati — ia tidak
-      // tertinggal diam di pojok kiri atas menutupi karakter pertama.
-      gsap.fromTo(
-        caret,
+      // Kedip kursor seperti di editor: diam menyala selama sedang mengetik, baru
+      // berkedip saat jeda. Tiap ketukan memutar ulang kedipnya dari awal.
+      //
+      // Pada mode gerak dikurangi seluruh setup ini dilewati, dan semua kursor
+      // tetap `invisible` dari markup.
+      const blink = gsap.fromTo(
+        carets,
         { opacity: 1 },
-        { opacity: 0, duration: 0.5, repeat: -1, yoyo: true, ease: "steps(1)" },
+        { opacity: 0, duration: 0.53, repeat: -1, yoyo: true, ease: "steps(1)" },
       );
+
+      const { keys, end } = planTyping(lineText);
+      const tl = gsap.timeline({ delay: firstRun.current ? 0.6 : 0.35 });
+
+      keys.forEach((k) =>
+        tl.call(
+          () => {
+            place(k.line, k.col);
+            blink.restart();
+          },
+          undefined,
+          k.at,
+        ),
+      );
+
+      // Menghapus dengan cara orang menghapus satu berkas: pilih semua, jeda
+      // sebentar, lalu hilang sekaligus. Backspace yang ditahan melintasi
+      // sepuluh baris terlihat seperti animasi diputar mundur, bukan seperti
+      // orang yang sedang bekerja.
+      const hold = end + 1.8;
+      tl.call(() => code.setAttribute("data-selected", ""), undefined, hold)
+        .call(
+          () => {
+            code.removeAttribute("data-selected");
+            place(0, 0);
+            blink.restart();
+          },
+          undefined,
+          hold + 0.45,
+        )
+        .call(
+          () => {
+            firstRun.current = false;
+            setIndex((i) => (i + 1) % SNIPPETS.length);
+          },
+          undefined,
+          hold + 0.75,
+        );
 
       return () => {
         tl.kill();
+        code.removeAttribute("data-selected");
       };
       // `index` WAJIB ada di sini — inilah yang membuat perputarannya hidup.
       //
@@ -573,143 +533,8 @@ function CodeWindow() {
     [index],
   );
 
-  /*
-   * Lampu menyala.
-   *
-   * Jendela ini gelap sepanjang waktu, lalu sesekali "terang" — fotonya naik ke
-   * opacity 75%, bertahan sebentar, lalu pudar lagi sampai habis.
-   *
-   * Naik dan turunnya tidak simetris, dan itu disengaja. Menyala pakai
-   * `power2.out` (cepat di awal lalu melambat) supaya kemunculannya masih terasa
-   * seperti lampu disentak, sementara padamnya pakai `power2.in` yang berangkat
-   * pelan — jadi ia terbaca meredup, bukan dipotong. Fade dengan durasi dan easing
-   * yang sama persis di kedua arah selalu terasa seperti animasi yang diputar
-   * mundur.
-   *
-   * Timeline-nya sengaja terpisah dari timeline mengetik di atas. Yang itu
-   * dibangun ulang tiap potongan kode berganti; kalau siklus lampu ikut menumpang
-   * di sana, ia ter-reset setiap giliran dan iramanya jadi terikat pada panjang
-   * potongan — bukan pada waktunya sendiri. Dependensi kosong membuatnya dibangun
-   * sekali seumur komponen.
-   *
-   * Satu kedipan per ~6 detik (0,17Hz), jauh di bawah ambang 3Hz yang memicu
-   * masalah fotosensitif. Jangan dipercepat sampai ke wilayah itu.
-   */
-  const shell = useGsap<HTMLDivElement>(({ q }) => {
-    // Di produksi fotonya tidak dirender sama sekali, jadi tidak ada yang perlu
-    // dikedipkan. Keluar lebih awal supaya tidak ada timeline tak terhingga yang
-    // berjalan terus tanpa satu pun target.
-    if (!EASTER_EGG) return;
-
-    const wowo = q("[data-wowo]");
-
-    // Semuanya `set`, tidak satu pun `to`. Kedipan lampu rusak tidak punya
-    // easing — ia menyambung atau tidak sama sekali; begitu ada interpolasi,
-    // yang terbaca langsung berubah jadi denyut lembut. Penahan waktunya tween
-    // kosong: yang berjalan cuma waktunya, tidak ada properti yang ditulis.
-    const tl = gsap.timeline({ repeat: -1, repeatDelay: 5.5, delay: 1.5 });
-
-    FLICKER.forEach((beat) => {
-      tl.set(wowo, {
-        opacity: beat.opacity,
-        x: beat.x ?? 0,
-        clipPath: beat.clip ?? "inset(0%)",
-      })
-        .to({}, { duration: beat.on })
-        // Padam berarti benar-benar bersih: geseran dan potongan ikut dinolkan,
-        // kalau tidak sisa transform-nya menempel ke kedipan berikutnya dan
-        // gambarnya terlihat merayap ke satu arah sepanjang putaran.
-        .set(wowo, { opacity: 0, x: 0, clipPath: "inset(0%)" })
-        .to({}, { duration: beat.off });
-    });
-
-    light.current = tl;
-
-    return () => {
-      tl.kill();
-      light.current = null;
-    };
-  }, []);
-
-  /*
-   * Tombol easter egg.
-   *
-   * Selagi klip berbunyi, siklus lampu dihentikan dan fotonya ditahan menyala.
-   * Kalau tidak, timeline yang berjalan sendiri itu akan memudarkan wowo di
-   * tengah kalimatnya — dua animasi menulis `opacity` pada elemen yang sama, dan
-   * yang menang hanya yang kebetulan menulis paling akhir.
-   *
-   * `light.current` bisa null pada mode gerak dikurangi: di sana `useGsap`
-   * melewati setup-nya sama sekali. Suaranya tetap boleh diputar — yang diminta
-   * untuk dikurangi adalah gerak, bukan bunyi.
-   */
-  const wowoEl = () => shell.current?.querySelector("[data-wowo]") ?? null;
-
-  // Klip harus berhenti kalau halamannya ditinggalkan di tengah bunyi. Melepas
-  // elemen <audio> dari DOM tidak dijamin menghentikan pemutarannya, dan suara
-  // yang terus berbunyi dari halaman yang sudah tidak terlihat hanya membuat
-  // orang mencari-cari tab mana yang bersuara.
-  useEffect(() => {
-    const el = audio.current;
-    return () => el?.pause();
-  }, []);
-
-  const stopEgg = () => {
-    const el = audio.current;
-    if (el) {
-      el.pause();
-      el.currentTime = 0;
-    }
-    setPlaying(false);
-
-    const wowo = wowoEl();
-    if (wowo) gsap.to(wowo, { opacity: 0, duration: 0.6, ease: "power2.in" });
-    // Diputar ulang dari nol, bukan dilanjutkan: melanjutkan berarti lampu
-    // menyala lagi sepersekian detik setelah klipnya habis.
-    light.current?.restart(true);
-  };
-
-  const toggleEgg = async () => {
-    const el = audio.current;
-    if (!el) return;
-
-    if (playing) {
-      stopEgg();
-      return;
-    }
-
-    el.src = asset(EGG_CLIPS[clip].src);
-    el.volume = 0.8;
-    light.current?.pause();
-
-    // `x` dan `clipPath` ikut dinolkan: timeline kedip bisa dijeda tepat di
-    // tengah beat yang sedang menggeser atau memotong gambar, dan sisanya akan
-    // menempel selama klip berbunyi.
-    const wowo = wowoEl();
-    if (wowo) {
-      gsap.to(wowo, {
-        opacity: 0.75,
-        x: 0,
-        clipPath: "inset(0%)",
-        duration: 0.35,
-        ease: "power2.out",
-      });
-    }
-
-    try {
-      // Dipanggil dari klik, jadi kebijakan autoplay browser tidak menghalangi.
-      // Tetap dijaga: berkasnya bisa saja gagal dimuat, dan promise yang ditolak
-      // tanpa penangan muncul sebagai error tak tertangani di konsol.
-      await el.play();
-      setPlaying(true);
-      setClip((i) => (i + 1) % EGG_CLIPS.length);
-    } catch {
-      stopEgg();
-    }
-  };
-
   return (
-    <div ref={shell} className="relative">
+    <div className="relative">
       {/*
         Ketinggian jendela dinyatakan lewat bayangan netral berlapis, bukan
         cahaya berwarna. Tiga lapis dengan jarak dan kelembutan yang menaik
@@ -720,120 +545,38 @@ function CodeWindow() {
       */}
       <div
         ref={ref}
-        className="group/window relative overflow-hidden rounded-2xl bg-gray-900 shadow-[0_2px_4px_rgb(17_24_39/0.06),0_12px_28px_rgb(17_24_39/0.12),0_36px_64px_rgb(17_24_39/0.16)] ring-1 ring-gray-900/10"
+        className="relative overflow-hidden rounded-2xl bg-gray-900 shadow-[0_2px_4px_rgb(17_24_39/0.06),0_12px_28px_rgb(17_24_39/0.12),0_36px_64px_rgb(17_24_39/0.16)] ring-1 ring-gray-900/10"
       >
-        {/*
-          Latar jendela kode. Murni dekoratif — karena itu aria-hidden dan alt
-          kosong, biar tidak ikut dibacakan pembaca layar.
-
-          Berangkat dari `opacity-0`, bukan dari nilai akhirnya. Pada mode gerak
-          dikurangi seluruh setup GSAP dilewati, dan di sana justru itulah yang
-          benar: kedipan terang-gelap adalah persis jenis gerak yang diminta
-          untuk tidak dijalankan, jadi jendelanya tinggal gelap seperti biasa.
-        */}
-        {EASTER_EGG && (
-          <img
-            data-wowo
-            src={asset(
-              "/images/87dabbda5bfc01063ce53720723e862b59576b383d1895913e03148d029525d264ebd1461d74ae3e29a50f303ef8a910.png",
-            )}
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-0 size-full object-cover opacity-0 select-none"
-          />
-        )}
-
         <div className="relative z-10 flex items-center gap-3 bg-gray-800/70 px-4 py-3">
           <WindowDots />
           <span className="ml-1 inline-flex items-center gap-2 rounded-md bg-gray-900 px-3 py-1">
-            <span className="font-mono text-[11px] font-black text-yellow-300">
-              TSX
-            </span>
+            {/* Logo React menandai berkas .tsx. */}
+            <ReactLogo className="size-4 shrink-0 text-blue-600" />
+
             <span className="text-xs font-bold text-gray-200">
               {snippet.file}
             </span>
           </span>
 
-          {/*
-            Easter egg. Sengaja nyaris tak terlihat sampai jendelanya disentuh
-            kursor — kalau ia menuntut perhatian seperti kontrol lain, ia berhenti
-            jadi kejutan dan mulai terbaca sebagai fitur yang perlu dijelaskan.
-            Tetap sebuah <button> sungguhan: bisa dicapai dengan Tab, punya nama
-            yang dibacakan, dan cincin fokusnya membuatnya muncul sepenuhnya.
-          */}
-          {EASTER_EGG && (
-            <>
-              <button
-                type="button"
-                onClick={toggleEgg}
-                aria-pressed={playing}
-                aria-label={
-                  playing
-                    ? "Hentikan suara"
-                    : `Putar suara: ${EGG_CLIPS[clip].label}`
-                }
-                title={playing ? "Hentikan" : EGG_CLIPS[clip].label}
-                className={`ml-auto grid size-7 shrink-0 place-items-center rounded-md text-gray-400 transition-[opacity,color,background-color] duration-300 group-hover/window:opacity-100 hover:bg-gray-700/60 hover:text-yellow-300 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:outline-none ${
-                  playing ? "text-yellow-300 opacity-100" : "opacity-15"
-                }`}
-              >
-                <svg
-                  className="size-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M11 5 6.5 9H4v6h2.5L11 19V5Z"
-                  />
-                  {playing ? (
-                    <>
-                      <path
-                        strokeLinecap="round"
-                        d="M14.5 9.5c1.2 1.4 1.2 3.6 0 5"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        d="M17.5 7c2.4 2.6 2.4 7.4 0 10"
-                      />
-                    </>
-                  ) : (
-                    <path
-                      strokeLinecap="round"
-                      d="M14.5 9.5c1.2 1.4 1.2 3.6 0 5"
-                    />
-                  )}
-                </svg>
-              </button>
-
-              {/*
-                `preload="none"`: berkasnya tidak pernah diunduh sampai ada yang
-                benar-benar menekan tombolnya. Easter egg tidak layak menambah
-                beban unduhan beranda bagi orang yang tak pernah menemukannya.
-              */}
-              <audio ref={audio} preload="none" onEnded={stopEgg} />
-            </>
-          )}
         </div>
 
         <pre className="ds-scroll-x relative z-10 overflow-x-auto p-5 font-mono text-xs leading-6 text-gray-300 sm:p-6">
           {/* Tinggi dikunci ke potongan terpanjang supaya jendela tidak berubah
               ukuran saat potongan berganti. */}
           <code
-            className="relative block"
+            data-code
+            className="group/code relative block"
             style={{ height: `${MAX_LINES * LINE_HEIGHT_REM}rem` }}
           >
             {snippet.lines.map((line, i) => (
               // Tinggi baris dikunci di pembungkus luar supaya baris kosong dan
               // baris yang lebarnya sedang nol tetap menahan ruangnya.
               <span key={i} className="block h-6">
+                {/* Latar biru saat `data-selected` = blok seleksi "pilih semua"
+                    sebelum potongannya dihapus. */}
                 <span
                   data-line
-                  className="inline-block overflow-hidden align-top whitespace-pre"
+                  className="inline-block overflow-hidden align-top whitespace-pre group-data-[selected]/code:bg-primary-400/30"
                 >
                   {line.map((tok, j) => (
                     <span key={j} className={tok.cls}>
@@ -841,18 +584,28 @@ function CodeWindow() {
                     </span>
                   ))}
                 </span>
+                {/*
+                  Kursor ada di dalam alur teks, tepat setelah potongan baris
+                  yang terlihat, bukan diposisikan absolut dari luar.
+
+                  Ia elemen inline berisi zero-width space dengan border kiri.
+                  Kotak elemen inline selalu setinggi area huruf font yang
+                  sedang dipakai dan duduk di garis dasar yang sama dengan
+                  teksnya. Jadi tinggi dan posisinya selalu pas dengan huruf,
+                  apa pun font monospace yang dipakai browser. Versi absolut
+                  sebelumnya menebak angka em/rem dan meleset di font tertentu.
+
+                  Satu kursor per baris, hanya yang aktif yang terlihat.
+                */}
+                <span
+                  data-caret
+                  aria-hidden="true"
+                  className="invisible border-l-2 border-primary-300"
+                >
+                  {"​"}
+                </span>
               </span>
             ))}
-
-            {/*
-              Kursor dipisah dari alur teks dan digeser dengan transform: satu
-              elemen yang berpindah, bukan satu per baris yang saling dinyalakan.
-            */}
-            <span
-              data-caret
-              aria-hidden="true"
-              className="absolute top-[0.2em] left-0 inline-block h-[1.05em] w-[0.5ch] bg-primary-300 opacity-0"
-            />
           </code>
         </pre>
       </div>
@@ -1105,10 +858,42 @@ export function HomePage() {
                 >
                   <span className="text-gray-400">$</span>
                   <span>{INSTALL}</span>
-                  <span
-                    className={`text-xs font-bold ${copied ? "text-green-600" : "text-gray-400"}`}
-                  >
-                    {copied ? "Tersalin!" : "Salin"}
+                  {/*
+                    Ikon salin dan ceklis ditumpuk di sel grid yang sama, lalu
+                    bergantian lewat opacity + scale. Ukurannya tetap, jadi
+                    tombolnya tidak melebar atau menyempit saat status berganti.
+                    `-translate-y-px` mengangkat ikonnya sedikit supaya sejajar
+                    dengan huruf monospace di sebelahnya.
+                  */}
+                  <span className="grid size-4 shrink-0 -translate-y-px place-items-center *:col-start-1 *:row-start-1 *:size-4 *:transition-[opacity,scale] *:duration-200">
+                    <svg
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.8}
+                      aria-hidden="true"
+                      className={`text-gray-400 ${copied ? "scale-50 opacity-0" : "scale-100 opacity-100"}`}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 9V5.5A1.5 1.5 0 0 1 10.5 4h8A1.5 1.5 0 0 1 20 5.5v8a1.5 1.5 0 0 1-1.5 1.5H15M5.5 9h8A1.5 1.5 0 0 1 15 10.5v8a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 4 18.5v-8A1.5 1.5 0 0 1 5.5 9Z"
+                      />
+                    </svg>
+                    <svg
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.4}
+                      aria-hidden="true"
+                      className={`text-green-600 ${copied ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m5 13 4.5 4.5L19 7"
+                      />
+                    </svg>
                   </span>
                 </button>
               </Reveal>

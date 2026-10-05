@@ -116,7 +116,9 @@ function Blok({
   children: React.ReactNode
 }) {
   return (
-    <section className="ds-card p-6 sm:p-8">
+    // 20px di ponsel, bukan 24px: toolbar editor Text Area butuh 234px, dan di
+    // layar 320px hanya selebar itu yang tersisa di dalam kartu.
+    <section className="ds-card p-5 sm:p-8">
       <h2 className="text-heading-4 font-black text-gray-900">{judul}</h2>
       <p className="mt-1 max-w-2xl text-body-sm text-gray-500">{catatan}</p>
       <div className="mt-6">{children}</div>
@@ -155,7 +157,13 @@ export function Modifikasi() {
         judul="1. Memilih varian yang sudah ada"
         catatan="Button punya 6 tema × 5 ukuran × 2 variant × 2 tone — 120 kombinasi tanpa satu baris CSS pun."
       >
-        <div className="grid gap-6 lg:grid-cols-[18rem_1fr] lg:items-start">
+        {/*
+          Kolomnya minmax(0, …), bukan auto: tanpa batas itu kolom grid ikut
+          melebar seukuran baris terpanjang di blok kode di bawah, lalu
+          seluruh panel keluar dari kartu di layar sempit. Dengan batas ini
+          blok kodenya yang menggulir.
+        */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-start">
           <div className="space-y-4 rounded-xl bg-surface-subtle p-5">
             <div>
               <p className="text-caption font-bold tracking-wide text-gray-500 uppercase">theme</p>
@@ -278,7 +286,7 @@ import { Plus } from '@ceplok-ui/design-kit-react/icons/outline'
           seluruhnya. Perubahan sebesar ini tidak butuh satu baris pun di
           dalam TextArea.
         */}
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <TextArea
             type="editor"
             label="toolbar bawaan"
@@ -292,14 +300,16 @@ import { Plus } from '@ceplok-ui/design-kit-react/icons/outline'
             onChange={(e) => setCatatan(e.target.value)}
             toolbar={
               <>
-                <div className="flex items-center gap-1">
+                {/* Tombol 24px dan jarak 2px supaya seluruh isi bar muat di editor
+                    selebar 234px — lebar editor di layar 320px. */}
+                <div className="flex items-center gap-0.5">
                   {ALAT.map((a) => (
                     <button
                       key={a.huruf}
                       type="button"
                       title={a.nama}
                       aria-label={a.nama}
-                      className={`grid size-7 place-items-center rounded-md bg-white text-xs text-gray-700 shadow-sm transition-colors hover:bg-primary-50 hover:text-primary-700 ${a.gaya}`}
+                      className={`grid size-6 place-items-center rounded-md bg-white text-xs text-gray-700 shadow-sm transition-colors hover:bg-primary-50 hover:text-primary-700 ${a.gaya}`}
                     >
                       {a.huruf}
                     </button>
@@ -328,7 +338,7 @@ import { Plus } from '@ceplok-ui/design-kit-react/icons/outline'
   label="Catatan"
   toolbar={
     <>
-      <button type="button" className="size-7 rounded-md bg-white font-black">B</button>
+      <button type="button" className="size-6 rounded-md bg-white font-black">B</button>
       <Badge variant="brand">Markdown</Badge>
       <span className="ml-auto font-mono text-xs text-gray-500">0/280</span>
     </>
