@@ -13,7 +13,7 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 Perubahan di bawah ini sudah ada di kode tetapi belum diterbitkan ke npm.
 Isinya menjadikan rilis berikutnya `0.2.0`, bukan `0.1.1`: ada sembilan komponen
-publik baru, dan satu perubahan yang memutus.
+publik baru, dan dua perubahan yang memutus.
 
 ### Diubah
 
@@ -65,7 +65,8 @@ publik baru, dan satu perubahan yang memutus.
   tanggalnya ikut terkirim bersama formulir sebagai `YYYY-MM-DD`.
 
   Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert,
-  Datepicker, dan Toast yang memilikinya; komponen lain menyusul.
+  Datepicker, FloatingLabel, InputField, Radio, Select, TextArea, dan Toast
+  yang memilikinya; komponen lain menyusul.
 
   Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
   `DatepickerRangeProps` ikut diekspor.
@@ -88,6 +89,14 @@ publik baru, dan satu perubahan yang memutus.
   melayang di seluruh kit ini hanya ada satu.
 
   Tipe pendukung `DropdownItem` dan `DropdownGroup` ikut diekspor.
+- **`FloatingLabel`: prop `darkMode`** — tampilan gelap sesuai desain: kotak
+  gray-800 dengan teks, ikon, dan tombol hapus gray-400. Garis aksen tidak
+  berubah, tetapi label yang naik satu tingkat lebih terang (primary-500,
+  purple-400 untuk simaya). Pada `error` hanya garis dan label yang merah.
+- **`InputField`: prop `darkMode`** — tampilan gelap sesuai desain: field
+  gray-800 dengan label putih; garisnya menyatu dengan latar kecuali saat
+  `typing` (warna aplikasi) dan `failed` (red-500). Teks yang diketik putih,
+  placeholder dan caption abu-abu.
 - **`Modal`** — dialog berbasis elemen `<dialog>` native, jadi top layer,
   penguncian fokus, dan latar inert diurus browser. Dikendalikan lewat `open` +
   `onClose`. Susunannya diisi prop — `title` untuk header, `children` untuk
@@ -95,16 +104,27 @@ publik baru, dan satu perubahan yang memutus.
   tombol tutup yang bisa dimatikan lewat `dismissible`.
 - **`Popover`** — panel informasi ringkas dengan arrow pada empat pilihan sisi
   (`side`: `top`, `right`, `bottom`, `left`).
+- **`Radio`: prop `darkMode`** — tampilan gelap sesuai desain: lingkaran
+  gray-300 bergaris gray-400, label gray-50, dan caption gray-400. Cincin
+  pilihan aktif tetap memakai warna aplikasi. `inactive` memakai lingkaran
+  gray-800 dengan teks gray-600.
 - **`Search`** — kolom pencarian dengan tombol cari. Dua ukuran lewat
   `platform` (`default` 54px, `mobile` 50px). Mengisi prop `categories` akan
   mengubahnya jadi varian tiga ruas: dropdown kategori, isian, lalu tombol
   ikon. Daftar kategorinya panel Dropdown, sama dengan daftar pilihan Select.
   Tipe pendukung `SearchCategory` ikut diekspor.
+- **`Select`: prop `darkMode`** — tampilan gelap sesuai desain: field gray-800
+  dengan label terang dan placeholder gray-400. Garis state default menyatu
+  dengan latar (baru terlihat saat difokus); `inactive` bergaris gray-300
+  dengan teks dan panah gray-500. Panel daftar pilihannya tetap terang.
 - **`Sidebar`** — navigasi samping dengan menu tunggal (`items`) atau
   terkelompok (`groups`), submenu, area profil (`user`), dan mode ringkas
   (`collapsed` + `onCollapse`). Tipe pendukung `SidebarItem`, `SidebarSubItem`,
   `SidebarGroup`, dan `SidebarUser` ikut diekspor.
 - **`Spinner`** — indikator proses dalam ukuran `default` dan `large`.
+- **`TextArea`: prop `darkMode`** — tampilan gelap sesuai desain: kotak,
+  toolbar, dan area isian gray-800 dengan label putih. Bingkai editor dan garis
+  pemisah toolbar tetap gray-300; tombol kirim memakai -600 (hover -700).
 - **`Toast`: prop `darkMode`** — tampilan gelap sesuai desain: kartu gray-800,
   heading gray-300, teks lainnya gray-400, dan badge ikon berlatar gelap (-800;
   success -900) dengan ikon -400. Tombol tutup dan tombol di `actions` tidak
@@ -116,6 +136,9 @@ publik baru, dan satu perubahan yang memutus.
   bekerja apa adanya.
 - Tipe **`NavbarContextItem`**, dipakai sebagai bentuk dasar item kontekstual
   pada Navbar.
+- Kelas **`.ds-scroll-y`** — scrollbar vertikal tipis untuk panel yang digulir:
+  batang 6px membulat berwarna gray-300 (gray-400 saat kursor di atasnya),
+  tanpa tombol panah. Pasangan `.ds-scroll-x`.
 
 ### Diubah
 
@@ -133,12 +156,28 @@ publik baru, dan satu perubahan yang memutus.
   `NavbarSubItem` kini merupakan turunan `NavbarContextItem` dengan tambahan
   `contextualItems`, dan `onNavigate` menerima ketiga bentuk item tersebut.
 
+- **Memutus — aksi toolbar `upload` pada TextArea kini `download`.**
+
+  ```diff
+  - | 'upload'
+  + | 'download'
+  ```
+
+  Alat terakhir toolbar editor di desain adalah unduh (panah turun ke baki),
+  bukan unggah, jadi nama aksi dan labelnya ikut diganti (`Unduh`). Di
+  TypeScript, kode yang memeriksa `'upload'` di `onToolbarAction` akan gagal
+  dikompilasi; di JavaScript cabangnya tidak pernah terpanggil lagi. Ganti
+  dengan `'download'`.
+
 ### Diperbaiki
 
 - **`Sidebar`: logo tidak lagi meleset dari sumbu saat ringkas.** Pembungkus
   logonya satu-satunya yang dirapatkan ke kanan di dalam kotak isi 40px, jadi
   mark 32px duduk 4px di sebelah kanan tombol lipat dan avatar yang sudah di
   tengah. Hanya berpengaruh pada keadaan `collapsed`.
+- **`TextArea`: ikon toolbar editor kini sesuai desain.** Sebelumnya ikon garis
+  dari pustaka yang lebih kecil di dalam kotak 16px-nya; kini ikon berisi yang
+  disalin dari desain, dengan jarak antarikon 15px.
 
 ## [0.1.0] - 2026-09-01
 

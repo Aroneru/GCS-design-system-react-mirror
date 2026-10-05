@@ -67,12 +67,18 @@ export function TogglePage() {
         </Demo>
         <SectionCode>
           {"import { Toggle } from '@ceplok-ui/design-kit-react'\n\n"}
+          {'<Toggle label="Mati" />\n'}
           {'{/* Menyala sejak awal */}\n'}
-          {'<Toggle label="Notifikasi email" defaultChecked />\n\n'}
+          {'<Toggle label="Menyala" '}
+          <H>defaultChecked</H>
+          {' />\n\n'}
           {'{/* Inactive — meredup sekaligus nonaktif */}\n'}
           {'<Toggle '}
           <H>state</H>
-          {'="inactive" label="Belum tersedia" />'}
+          {'="inactive" label="Tidak aktif" />\n'}
+          {'<Toggle '}
+          <H>state</H>
+          {'="inactive" label="Tidak aktif, menyala" defaultChecked />'}
         </SectionCode>
       </FlowSection>
 
@@ -95,6 +101,13 @@ export function TogglePage() {
           </div>
         </Demo>
         <SectionCode>
+          {'<Toggle\n'}
+          {'    label="Notifikasi email"\n'}
+          {'    '}
+          <H>helperText</H>
+          {'="Kirim ringkasan permohonan baru setiap pagi."\n'}
+          {'    defaultChecked\n'}
+          {'/>\n'}
           {'<Toggle\n'}
           {'    label="Tampilkan data sensitif"\n'}
           {'    '}
@@ -124,16 +137,23 @@ export function TogglePage() {
           </Demo>
         </div>
         <SectionCode>
+          {'{/* Desktop — platform bawaan, tanpa prop */}\n'}
+          {'<Toggle label="Notifikasi aktif" defaultChecked />\n'}
+          {'<Toggle label="Notifikasi nonaktif" />\n\n'}
+          {'{/* Mobile */}\n'}
           {'<Toggle '}
           <H>platform</H>
-          {'="mobile" label="Notifikasi email" defaultChecked />'}
+          {'="mobile" label="Notifikasi aktif" defaultChecked />\n'}
+          {'<Toggle '}
+          <H>platform</H>
+          {'="mobile" label="Notifikasi nonaktif" />'}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="application" title="Application">
         <Lead>
-          Warna jalur saat menyala mengikuti aplikasi yang memakainya; state mati dan inactive memakai abu
-          yang sama.
+          Warna jalur saat menyala mengikuti aplikasi yang memakainya. Jalur yang mati (gray-200) dan yang
+          inactive (gray-300) sama di kedua aplikasi.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
@@ -146,9 +166,16 @@ export function TogglePage() {
           ))}
         </div>
         <SectionCode>
+          {'{/* Default — tanpa prop application */}\n'}
+          {'<Toggle label="Menyala" helperText="bg-primary-700" defaultChecked />\n'}
+          {'<Toggle label="Mati" />\n\n'}
+          {'{/* simaya */}\n'}
           {'<Toggle '}
           <H>application</H>
-          {'="simaya" label="Notifikasi email" defaultChecked />'}
+          {'="simaya" label="Menyala" helperText="bg-purple-500" defaultChecked />\n'}
+          {'<Toggle '}
+          <H>application</H>
+          {'="simaya" label="Mati" />'}
         </SectionCode>
       </FlowSection>
 
