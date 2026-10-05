@@ -67,9 +67,19 @@ const triggerClassName = [
 
 const selectionRowClassName = 'w-full rounded-md px-2 hover:bg-gray-100'
 const disabledSelectionRowClassName = 'w-full rounded-md px-2'
+const darkSelectionRowClassName = 'w-full rounded-md px-2 hover:bg-gray-700'
 
 /** Pemisah untuk panel berisi kontrol bebas — daftar aksi memakai `groups`. */
 const hrClassName = 'my-1 border-0 border-t border-border'
+const darkHrClassName = 'my-1 border-0 border-t border-gray-700'
+const darkScrollClassName = [
+  'ds-scroll-y',
+  '[&::-webkit-scrollbar-track]:bg-gray-800',
+  '[&::-webkit-scrollbar-thumb]:bg-gray-600',
+  '[&::-webkit-scrollbar-thumb:hover]:bg-gray-500',
+  '[&::-webkit-scrollbar-button]:hidden',
+  '[@supports_not_selector(::-webkit-scrollbar)]:[scrollbar-color:var(--color-gray-600)_var(--color-gray-800)]',
+].join(' ')
 
 const toc: TocEntry[] = [
   { id: 'dropdown', label: 'Dropdown' },
@@ -170,26 +180,29 @@ function ScrollContentItems({
   withSeparator,
   withDescription,
   withDisabled,
-}: VariationOptions) {
+  darkMode,
+}: VariationOptions & { darkMode?: boolean }) {
+  const rowClassName = darkMode ? darkSelectionRowClassName : selectionRowClassName
   return (
     <>
-      <Checkbox className={selectionRowClassName} label="Email" helperText={withDescription ? 'Notifikasi melalui email.' : undefined} defaultChecked />
-      <Checkbox className={selectionRowClassName} label="Push notification" helperText={withDescription ? 'Notifikasi pada perangkat.' : undefined} />
-      <Checkbox className={selectionRowClassName} label="SMS" helperText={withDescription ? 'Notifikasi melalui SMS.' : undefined} />
-      <Checkbox className={selectionRowClassName} label="WhatsApp" defaultChecked />
-      {withSeparator && <hr className={hrClassName} />}
-      <Checkbox className={selectionRowClassName} label="Pembaruan produk" />
-      <Checkbox className={selectionRowClassName} label="Aktivitas akun" />
+      <Checkbox darkMode={darkMode} className={rowClassName} label="Email" helperText={withDescription ? 'Notifikasi melalui email.' : undefined} defaultChecked />
+      <Checkbox darkMode={darkMode} className={rowClassName} label="Push notification" helperText={withDescription ? 'Notifikasi pada perangkat.' : undefined} />
+      <Checkbox darkMode={darkMode} className={rowClassName} label="SMS" helperText={withDescription ? 'Notifikasi melalui SMS.' : undefined} />
+      <Checkbox darkMode={darkMode} className={rowClassName} label="WhatsApp" defaultChecked />
+      {withSeparator && <hr className={darkMode ? darkHrClassName : hrClassName} />}
+      <Checkbox darkMode={darkMode} className={rowClassName} label="Pembaruan produk" />
+      <Checkbox darkMode={darkMode} className={rowClassName} label="Aktivitas akun" />
       <Checkbox
-        className={withDisabled ? disabledSelectionRowClassName : selectionRowClassName}
+        darkMode={darkMode}
+        className={withDisabled ? disabledSelectionRowClassName : rowClassName}
         label="Keamanan"
         disabled={withDisabled}
       />
-      <Checkbox className={selectionRowClassName} label="Promosi" />
-      <Checkbox className={selectionRowClassName} label="Laporan mingguan" />
-      <Checkbox className={selectionRowClassName} label="Pengingat" defaultChecked />
-      <Checkbox className={selectionRowClassName} label="Integrasi" />
-      <Checkbox className={selectionRowClassName} label="Sistem" />
+      <Checkbox darkMode={darkMode} className={rowClassName} label="Promosi" />
+      <Checkbox darkMode={darkMode} className={rowClassName} label="Laporan mingguan" />
+      <Checkbox darkMode={darkMode} className={rowClassName} label="Pengingat" defaultChecked />
+      <Checkbox darkMode={darkMode} className={rowClassName} label="Integrasi" />
+      <Checkbox darkMode={darkMode} className={rowClassName} label="Sistem" />
     </>
   )
 }
@@ -219,6 +232,7 @@ function ContohDropdown({
   darkMode,
 }: ContohProps) {
   const opsi = { withSeparator, withDescription, withDisabled }
+  const rowClassName = darkMode ? darkSelectionRowClassName : selectionRowClassName
 
   if (example === 'actions' || example === 'icons') {
     const withIcons = example === 'icons'
@@ -231,9 +245,9 @@ function ContohDropdown({
 
   if (example === 'scroll') {
     return (
-      <Dropdown attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
-        <div className="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">
-          <ScrollContentItems {...opsi} />
+      <Dropdown darkMode={darkMode} attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
+        <div className={`flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain ${darkMode ? darkScrollClassName : ''}`}>
+          <ScrollContentItems {...opsi} darkMode={darkMode} />
         </div>
       </Dropdown>
     )
@@ -243,11 +257,12 @@ function ContohDropdown({
     return (
       <Dropdown darkMode={darkMode} attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih akses">
         <div className="flex flex-col gap-4">
-          <Radio className={selectionRowClassName} name={groupName} value="viewer" label="Viewer" />
-          <Radio className={selectionRowClassName} name={groupName} value="editor" label="Editor" helperText={withDescription ? 'Dapat mengubah konten.' : undefined} defaultChecked />
-          {withSeparator && <hr className={hrClassName} />}
+          <Radio darkMode={darkMode} className={rowClassName} name={groupName} value="viewer" label="Viewer" />
+          <Radio darkMode={darkMode} className={rowClassName} name={groupName} value="editor" label="Editor" helperText={withDescription ? 'Dapat mengubah konten.' : undefined} defaultChecked />
+          {withSeparator && <hr className={darkMode ? darkHrClassName : hrClassName} />}
           <Radio
-            className={withDisabled ? disabledSelectionRowClassName : selectionRowClassName}
+            darkMode={darkMode}
+            className={withDisabled ? disabledSelectionRowClassName : rowClassName}
             name={groupName}
             value="admin"
             label="Admin"
@@ -259,13 +274,14 @@ function ContohDropdown({
   }
 
   return (
-    <Dropdown attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi">
+    <Dropdown darkMode={darkMode} attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi">
       <div className="flex flex-col gap-4">
-        <Checkbox className={selectionRowClassName} label="Email" helperText={withDescription ? 'Kirim pembaruan melalui email.' : undefined} />
-        <Checkbox className={selectionRowClassName} label="Push notification" helperText={withDescription ? 'Tampilkan pada perangkat.' : undefined} defaultChecked />
-        {withSeparator && <hr className={hrClassName} />}
+        <Checkbox darkMode={darkMode} className={rowClassName} label="Email" helperText={withDescription ? 'Kirim pembaruan melalui email.' : undefined} />
+        <Checkbox darkMode={darkMode} className={rowClassName} label="Push notification" helperText={withDescription ? 'Tampilkan pada perangkat.' : undefined} defaultChecked />
+        {withSeparator && <hr className={darkMode ? darkHrClassName : hrClassName} />}
         <Checkbox
-          className={withDisabled ? disabledSelectionRowClassName : selectionRowClassName}
+          darkMode={darkMode}
+          className={withDisabled ? disabledSelectionRowClassName : rowClassName}
           label="SMS"
           disabled={withDisabled}
         />
@@ -628,7 +644,8 @@ function ExampleCode({
         )
       ) : (
         <>
-          {'\n<Dropdown '}
+          {'\nconst darkMode = '}{darkMode ? 'true' : 'false'}{'\n\n<Dropdown '}
+          <H>darkMode</H>{'={darkMode} '}
           {attached && <><H>attached</H>{' '}</>}
           {'trigger={trigger} '}
           <H>contentClassName</H>
@@ -637,40 +654,40 @@ function ExampleCode({
             <>
               {'  <div '}
               <H>className</H>
-              {'="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain">\n'}
-              {'    <Checkbox label="Email" '}
+              {`="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain${darkMode ? ` ${darkScrollClassName}` : ''}">\n`}
+              {'    <Checkbox '}<H>darkMode</H>{'={darkMode} label="Email" '}
               {withDescription && <><H>helperText</H>{'="Notifikasi melalui email." '}</>}
-              {'defaultChecked />\n    <Checkbox label="Push notification" />\n    {/* … */}\n'}
+              {'defaultChecked />\n    <Checkbox darkMode={darkMode} label="Push notification" />\n    {/* … */}\n'}
               {withSeparator && (
                 <>
                   {'    <hr '}
                   <H>className</H>
-                  {'="my-1 border-0 border-t border-border" />\n'}
+                  {`="${darkMode ? darkHrClassName : hrClassName}" />\n`}
                 </>
               )}
-              {'    <Checkbox label="Pembaruan produk" />\n    {/* … */}\n    <Checkbox label="Keamanan" '}
+              {'    <Checkbox darkMode={darkMode} label="Pembaruan produk" />\n    {/* … */}\n    <Checkbox darkMode={darkMode} label="Keamanan" '}
               {withDisabled && <><H>disabled</H>{' '}</>}
-              {'/>\n    {/* … */}\n    <Checkbox label="Sistem" />\n  </div>\n</Dropdown>'}
+              {'/>\n    {/* … */}\n    <Checkbox darkMode={darkMode} label="Sistem" />\n  </div>\n</Dropdown>'}
             </>
           ) : example === 'radio' ? (
             <>
               {'  <div className="flex flex-col gap-4">\n    <'}
               <H>Radio</H>
-              {' name="access" value="viewer" label="Viewer" />\n    <'}
+              {' '}<H>darkMode</H>{'={darkMode} name="access" value="viewer" label="Viewer" />\n    <'}
               <H>Radio</H>
-              {' name="access" value="editor" label="Editor" '}
+              {' '}<H>darkMode</H>{'={darkMode} name="access" value="editor" label="Editor" '}
               {withDescription && <><H>helperText</H>{'="Dapat mengubah konten." '}</>}
               {'defaultChecked />\n'}
               {withSeparator && (
                 <>
                   {'    <hr '}
                   <H>className</H>
-                  {'="my-1 border-0 border-t border-border" />\n'}
+                  {`="${darkMode ? darkHrClassName : hrClassName}" />\n`}
                 </>
               )}
               {'    <'}
               <H>Radio</H>
-              {' name="access" value="admin" label="Admin" '}
+              {' '}<H>darkMode</H>{'={darkMode} name="access" value="admin" label="Admin" '}
               {withDisabled && <><H>disabled</H>{' '}</>}
               {'/>\n  </div>\n</Dropdown>'}
             </>
@@ -678,21 +695,21 @@ function ExampleCode({
             <>
               {'  <div className="flex flex-col gap-4">\n    <'}
               <H>Checkbox</H>
-              {' label="Email" '}
+              {' '}<H>darkMode</H>{'={darkMode} label="Email" '}
               {withDescription && <><H>helperText</H>{'="Kirim pembaruan melalui email." '}</>}
               {'/>\n    <'}
               <H>Checkbox</H>
-              {' label="Push notification" defaultChecked />\n'}
+              {' '}<H>darkMode</H>{'={darkMode} label="Push notification" defaultChecked />\n'}
               {withSeparator && (
                 <>
                   {'    <hr '}
                   <H>className</H>
-                  {'="my-1 border-0 border-t border-border" />\n'}
+                  {`="${darkMode ? darkHrClassName : hrClassName}" />\n`}
                 </>
               )}
               {'    <'}
               <H>Checkbox</H>
-              {' label="SMS" '}
+              {' '}<H>darkMode</H>{'={darkMode} label="SMS" '}
               {withDisabled && <><H>disabled</H>{' '}</>}
               {'/>\n  </div>\n</Dropdown>'}
             </>
@@ -714,8 +731,7 @@ export function DropdownPage() {
   const [selected, setSelected] = useState('Terbaru')
   const separatorDataDriven =
     mode === 'selection' || example === 'actions' || example === 'icons'
-  const darkModeAvailable = mode === 'selection' || example === 'actions' || example === 'icons'
-  const activeDarkMode = darkModeAvailable && darkMode
+  const activeDarkMode = darkMode
 
   /*
    * Panelnya dibuka sejak halaman dimuat, dan dibuka lagi setelah kontrolnya
@@ -931,8 +947,9 @@ export function DropdownPage() {
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
           Prop <Hl>darkMode</Hl> mengubah panel dan item generated ke tampilan gelap: panel gray-800,
-          teks dan ikon gray-300, pemisah gray-700, serta aksi danger red-500. Custom children tetap
-          opaque dan bertanggung jawab atas styling-nya sendiri.
+          teks dan ikon gray-300, pemisah gray-700, serta aksi danger red-500. Untuk konten kustom,
+          tema komponen di dalam <Hl>children</Hl> dikelola consumer. Teruskan <Hl>darkMode</Hl> ke
+          Radio atau Checkbox jika komposisi perlu mengikuti tema Dropdown.
         </Lead>
         <div className="grid gap-6 md:grid-cols-2">
           <Demo label="Action" dark>
@@ -1072,14 +1089,8 @@ export function DropdownPage() {
                   { value: false, label: 'Light' },
                   { value: true, label: 'Dark' },
                 ]}
-                disabled={!darkModeAvailable}
               />
             </div>
-            {!darkModeAvailable && (
-              <p className="mt-2 text-xs text-gray-500">
-                Tidak tersedia untuk custom children; konten tersebut mengatur styling-nya sendiri.
-              </p>
-            )}
           </Control>
           <Control label="Contoh">
             <div onPointerDownCapture={ingatKeadaan}>
