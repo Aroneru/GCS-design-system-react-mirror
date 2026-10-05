@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Messages } from "../../../lib/icons/solid";
 import { Button, type ButtonTheme, type ButtonVariant } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { Demo, H, Segmented } from "../../pageKit";
+import { Demo, H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -77,7 +77,7 @@ export function ButtonPage() {
     >
       <FlowSection id="button" title="Button & Sizes">
         <p className="mb-4 text-body-sm text-gray-500">
-          Tombol default dalam berbagai ukuran untuk membantu memilih <H>size</H> yang sesuai dengan
+          Tombol default dalam berbagai ukuran untuk membantu memilih <Hl>size</Hl> yang sesuai dengan
           ruang layout. Tombol ditampilkan menggunakan ikon untuk memberikan gambaran untuk tombol
           dengan ikon saat dipakai sebagai aksi utama.
         </p>
@@ -161,8 +161,8 @@ export function ButtonPage() {
 
       <FlowSection id="variants" title="Variants">
         <p className="mb-4 text-body-sm text-gray-500">
-          Variasi tombol yang itentukan oleh <H>variant</H>. Gunakan <H>filled</H> untuk aksi utama
-          yang perlu mendapat perhatian lebih, dan <H>outline</H> untuk tindakan pendukung yang
+          Variasi tombol yang itentukan oleh <Hl>variant</Hl>. Gunakan <Hl>filled</Hl> untuk aksi utama
+          yang perlu mendapat perhatian lebih, dan <Hl>outline</Hl> untuk tindakan pendukung yang
           tetap terlihat, namun tidak terlalu dominan.
         </p>
 
@@ -204,7 +204,7 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Primary</H> digunakan untuk tindakan utama atau aksi yang paling penting dalam
+              <Hl>Primary</Hl> digunakan untuk tindakan utama atau aksi yang paling penting dalam
               suatu halaman.
             </p>
           </div>
@@ -215,7 +215,7 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Green</H> digunakan untuk tindakan yang menunjukkan keberhasilan, konfirmasi, atau
+              <Hl>Green</Hl> digunakan untuk tindakan yang menunjukkan keberhasilan, konfirmasi, atau
               penyelesaian.
             </p>
           </div>
@@ -226,7 +226,7 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Gray</H> digunakan untuk tindakan sekunder atau aksi dengan tingkat prioritas
+              <Hl>Gray</Hl> digunakan untuk tindakan sekunder atau aksi dengan tingkat prioritas
               rendah.
             </p>
           </div>
@@ -237,7 +237,7 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Simaya</H> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
+              <Hl>Simaya</Hl> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
               visual berbeda.
             </p>
           </div>
@@ -248,7 +248,7 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Orange</H> digunakan untuk tindakan yang membutuhkan perhatian atau bersifat
+              <Hl>Orange</Hl> digunakan untuk tindakan yang membutuhkan perhatian atau bersifat
               peringatan.
             </p>
           </div>
@@ -259,7 +259,7 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Yellow</H> digunakan untuk informasi yang perlu diperhatikan tanpa menunjukkan
+              <Hl>Yellow</Hl> digunakan untuk informasi yang perlu diperhatikan tanpa menunjukkan
               kondisi kritis.
             </p>
           </div>

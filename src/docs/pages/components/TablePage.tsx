@@ -16,7 +16,7 @@ import {
 import { asset } from "../../asset";
 import { adaTidakAda } from "../../usulanOptions";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { Demo, H, Segmented } from "../../pageKit";
+import { Demo, H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -30,6 +30,28 @@ import {
 
 /** Gambar contoh bergantian 1.png sampai 5.png di public/images/Placeholder, sesuai id baris. */
 const placeholderImage = (id: number) => asset(`images/Placeholder/${((id - 1) % 5) + 1}.png`);
+
+/*
+ * Aturan sort di contoh halaman ini:
+ * - teks biasa: tanpa sortValue, Table mengurutkan abjad A-Z / Z-A
+ *   (angka di dalam teks ikut urut wajar: "Record 9" sebelum "Record 10");
+ * - tanggal: sortValue berupa waktu (milidetik), bukan teks tampilannya;
+ * - ID: sortValue berupa angka.
+ */
+
+const BULAN = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
+
+/** "10 Maret 1990" → waktu dalam milidetik. */
+const waktuTanggalId = (teks: string) => {
+  const [hari, bulan, tahun] = teks.split(" ");
+  return Date.UTC(Number(tahun), BULAN.indexOf(bulan.toLowerCase()), Number(hari));
+};
+
+/** "28/12/2022" (DD/MM/YYYY) → waktu dalam milidetik. */
+const waktuDmy = (teks: string) => {
+  const [hari, bulan, tahun] = teks.split("/").map(Number);
+  return Date.UTC(tahun, bulan - 1, hari);
+};
 
 type Row = {
   id: number;
@@ -57,20 +79,23 @@ const allRows: Row[] = Array.from({ length: 1000 }, (_, i) => ({
 type ActionStyle = Pick<TableRowAction<unknown>, "iconSize">;
 
 const makeActions = <T extends { id: number }>(style: ActionStyle = {}): TableRowAction<T>[] => [
-  { key: "ubah", icon: <Edit />, label: "Ubah", theme: "yellow", ...style, href: (r) => `#/ubah/${r.id}` },
+  { key: "ubah", icon: <Edit />, label: "Ubah", theme: "yellow", ...style, onClick: (r) => console.log("ubah", r) },
   { key: "unduh", icon: <Download />, label: "Unduh", ...style, onClick: (r) => console.log("unduh", r) },
   { key: "cetak", icon: <Printer />, label: "Cetak", theme: "green", ...style, onClick: () => window.print() },
 ];
 
 const rowActions = makeActions<Row>();
 
+/**
+ * Kolom teks hanya naik ↔ turun (tanpa kembali ke urutan awal). Gambar dan
+ * status tidak bisa diurutkan: urutan gambar atau warna badge tidak berarti.
+ */
 const columns: TableColumn<Row>[] = [
-  { key: "field1", header: "Field 1", sortable: true, emphasis: true, sortValue: (r) => r.id },
-  { key: "field2", header: "Field 2", sortable: true, sortValue: (r) => r.id },
+  { key: "field1", header: "Field 1", sortable: true, sortResettable: false, emphasis: true },
+  { key: "field2", header: "Field 2", sortable: true, sortResettable: false },
   {
     key: "file",
     header: "Field 3",
-    sortable: true,
     image: {
       src: (row) => placeholderImage(row.id),
       alt: (row) => row.file,
@@ -80,7 +105,6 @@ const columns: TableColumn<Row>[] = [
   {
     key: "status",
     header: "Field 4",
-    sortable: true,
     cell: (row) => <Badge variant={row.status}>{row.field1}</Badge>,
   },
   { key: "aksi", header: "Field 5", actions: rowActions, hideable: false },
@@ -146,8 +170,7 @@ const sortColumns: TableColumn<Penduduk>[] = [
     sortable: true,
     sortDirections: ["desc", "asc"],
     sortResettable: false,
-    // Data contoh: tanggal lahir naik seiring id.
-    sortValue: (row) => row.id,
+    sortValue: (row) => waktuTanggalId(row.tanggalLahir),
   },
   // Ikon sort sendiri.
   {
@@ -173,7 +196,7 @@ const actionColumns: TableColumn<Penduduk>[] = [
     key: "aksi",
     header: "Aksi",
     actions: [
-      { key: "detail", icon: <Eye />, label: "Lihat detail", showLabel: true, variant: "outline", tone: "light", href: (r) => `#/penduduk/${r.id}` },
+      { key: "detail", icon: <Eye />, label: "Lihat detail", showLabel: true, variant: "outline", tone: "light", onClick: (r) => console.log("detail", r) },
       { key: "hapus", icon: <TrashBin />, label: "Hapus", theme: "orange", disabled: (r) => r.id === 1, onClick: (r) => console.log("hapus", r) },
     ],
   },
@@ -261,17 +284,15 @@ const orderBadge: Record<Order["status"], BadgeVariant> = {
 
 /** Tabel pesanan dari rancangan Figma untuk size `compact`. */
 const orderColumns: TableColumn<Order>[] = [
-  { key: "kode", header: "ID" },
+  { key: "kode", header: "ID", sortable: true, sortResettable: false, sortValue: (row) => Number(row.kode.slice(1)) },
   {
     key: "gambar",
     header: "Gambar",
     align: "left",
-    sortable: true,
-    sortValue: (row) => row.id,
     image: { src: (row) => placeholderImage(row.id), alt: (row) => `Produk ${row.kode}` },
   },
-  { key: "customer", header: "Customer", align: "left", sortable: true },
-  { key: "tanggal", header: "Date", align: "left", sortable: true, sortValue: (row) => row.id },
+  { key: "customer", header: "Customer", align: "left", sortable: true, sortResettable: false },
+  { key: "tanggal", header: "Date", align: "left", sortable: true, sortResettable: false, sortValue: (row) => waktuDmy(row.tanggal) },
   {
     key: "jumlah",
     header: "Amount",
@@ -283,7 +304,6 @@ const orderColumns: TableColumn<Order>[] = [
     key: "status",
     header: "Status",
     align: "left",
-    sortable: true,
     cell: (row) => <Badge variant={orderBadge[row.status]}>{row.status}</Badge>,
   },
   { key: "aksi", header: "Action", actions: makeActions<Order>(), hideable: false },
@@ -405,11 +425,6 @@ const paginationProps: PropRow[] = [
   ["theme", "PaginationTheme", "primary", "Warna tombol halaman yang aktif."],
   ["summary", "({ from, to, total }) => ReactNode", "Memperlihatkan …", "Ganti tulisan \"Memperlihatkan 1-10 of 1000 Data\"."],
 ];
-
-/** Penyorot di paragraf berlatar terang — `H` yang primary-300 terlalu pucat di sini. */
-const Hl = ({ children }: { children: ReactNode }) => (
-  <span className="text-primary-500">{children}</span>
-);
 
 /** Daftar poin pendek di bawah Lead — lebih mudah dipindai daripada paragraf panjang. */
 const Points = ({ items }: { items: ReactNode[] }) => (
@@ -662,6 +677,8 @@ type Pengajuan = {
   email: string;
   layanan: string;
   tanggal: string;
+  /** Tanggal yang sama dalam format ISO, untuk mengurutkan. */
+  tanggalIso: string;
   dokumen: string;
   status: StatusPengajuan;
 };
@@ -690,6 +707,7 @@ function makePengajuan(count: number): Pengajuan[] {
       email: `${depan}.${belakang}${i + 1}@mail.com`.toLowerCase(),
       layanan: jenisLayanan[(i * 5) % jenisLayanan.length],
       tanggal: date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }),
+      tanggalIso: date.toISOString(),
       dokumen: `berkas-${String(i + 1).padStart(4, "0")}.png`,
       status: statusPengajuan[i % statusPengajuan.length],
     };
@@ -714,14 +732,13 @@ function pengajuanColumns({
   withRowActions: boolean;
   actionStyle: ActionStyle;
 }): TableColumn<Pengajuan>[] {
-  const nama: TableColumn<Pengajuan> = { key: "nama", header: "Nama", align: "left", emphasis: true, sortable: true };
+  const nama: TableColumn<Pengajuan> = { key: "nama", header: "Nama", align: "left", emphasis: true, sortable: true, sortResettable: false };
   const email: TableColumn<Pengajuan> = { key: "email", header: "Email", align: "left" };
 
   return [
     ...(grouped ? [{ key: "pemohon", header: "Pemohon", children: [nama, email] }] : [nama, email]),
-    { key: "layanan", header: "Layanan", align: "left", sortable: true },
-    // Tanggal dibuat berurutan dengan id, jadi id cukup sebagai nilai urut.
-    { key: "tanggal", header: "Tanggal", align: "left", sortable: true, sortValue: (row) => row.id },
+    { key: "layanan", header: "Layanan", align: "left", sortable: true, sortResettable: false },
+    { key: "tanggal", header: "Tanggal", align: "left", sortable: true, sortResettable: false, sortValue: (row) => new Date(row.tanggalIso).getTime() },
     {
       key: "dokumen",
       header: "Dokumen",
@@ -735,7 +752,6 @@ function pengajuanColumns({
     {
       key: "status",
       header: "Status",
-      sortable: true,
       cell: (row) => <Badge variant={statusBadge[row.status]}>{row.status}</Badge>,
     },
     ...(withRowActions
@@ -1171,6 +1187,14 @@ export function TablePage() {
             <><Hl>sortIcon</Hl>: ganti ikon panah di judul kolom.</>,
           ]}
         />
+        <Lead>Pilih nilai urut sesuai jenis datanya:</Lead>
+        <Points
+          items={[
+            <><b>Teks biasa</b> (nama, layanan): tidak perlu <Hl>sortValue</Hl>. Langsung urut A-Z / Z-A.</>,
+            <><b>Tanggal</b>: isi <Hl>sortValue</Hl> dengan waktunya, mis. <Hl>new Date(row.tanggal).getTime()</Hl>. Teks seperti "02 Sep 2026" kalau diurutkan sebagai teks hasilnya salah.</>,
+            <><b>ID atau angka</b>: isi <Hl>sortValue</Hl> dengan angkanya, supaya 9 jatuh sebelum 10.</>,
+          ]}
+        />
         <Lead>
           Di contoh ini: Nama memakai cara bawaan, Tanggal Lahir mulai dari yang terbaru dan tidak
           kembali ke urutan awal, Tempat Lahir memakai ikon sendiri, dan Email tidak bisa
@@ -1488,9 +1512,9 @@ export function TablePage() {
             title="Dijaga di backend"
             items={[
               <>Pasang index di kolom yang bisa di-sort dan dicari. Tanpa index, database membaca semua baris setiap kali user klik judul kolom.</>,
-              <>Hati-hati dengan <code>COUNT(*)</code> untuk <Hl>total</Hl>. Di tabel jutaan baris ini bisa makan beberapa detik. Simpan di cache atau pakai angka perkiraan.</>,
-              <>Halaman jauh makin lambat. <code>OFFSET 5000000</code> tetap melewati 5 juta baris dulu.</>,
-              <>Pencarian <code>LIKE '%kata%'</code> tidak memakai index. Untuk data besar pakai full-text index atau mesin pencari.</>,
+              <>Hati-hati dengan <Hl>COUNT(*)</Hl> untuk <Hl>total</Hl>. Di tabel jutaan baris ini bisa makan beberapa detik. Simpan di cache atau pakai angka perkiraan.</>,
+              <>Halaman jauh makin lambat. <Hl>OFFSET 5000000</Hl> tetap melewati 5 juta baris dulu.</>,
+              <>Pencarian <Hl>LIKE '%kata%'</Hl> tidak memakai index. Untuk data besar pakai full-text index atau mesin pencari.</>,
             ]}
           />
           <Box
@@ -1625,18 +1649,18 @@ export function TablePage() {
               {"    { key: 'pemohon', header: 'Pemohon', "}
               <H>children</H>
               {": [\n"}
-              {"        { key: 'nama', header: 'Nama', align: 'left', emphasis: true, sortable: true },\n"}
+              {"        { key: 'nama', header: 'Nama', align: 'left', emphasis: true, sortable: true, sortResettable: false },\n"}
               {"        { key: 'email', header: 'Email', align: 'left' },\n"}
               {"    ] },\n"}
             </>
           ) : (
             <>
-              {"    { key: 'nama', header: 'Nama', align: 'left', emphasis: true, sortable: true },\n"}
+              {"    { key: 'nama', header: 'Nama', align: 'left', emphasis: true, sortable: true, sortResettable: false },\n"}
               {"    { key: 'email', header: 'Email', align: 'left' },\n"}
             </>
           )}
-          {"    { key: 'layanan', header: 'Layanan', align: 'left', sortable: true },\n"}
-          {"    { key: 'tanggal', header: 'Tanggal', align: 'left', sortable: true,\n"}
+          {"    { key: 'layanan', header: 'Layanan', align: 'left', sortable: true, sortResettable: false },\n"}
+          {"    { key: 'tanggal', header: 'Tanggal', align: 'left', sortable: true, sortResettable: false,\n"}
           {"        sortValue: (row) => new Date(row.tanggalIso).getTime() },\n"}
           {"    { key: 'dokumen', header: 'Dokumen',\n"}
           {"        "}
@@ -1644,7 +1668,7 @@ export function TablePage() {
           {withPreview
             ? ": { src: (row) => row.dokumenUrl, alt: (row) => `Dokumen ${row.nama}`, caption: (row) => row.dokumen } },\n"
             : ": { src: (row) => row.dokumenUrl, alt: (row) => `Dokumen ${row.nama}`, caption: (row) => row.dokumen, preview: false } },\n"}
-          {"    { key: 'status', header: 'Status', sortable: true,\n"}
+          {"    { key: 'status', header: 'Status',\n"}
           {"        cell: (row) => <Badge variant={statusBadge[row.status]}>{row.status}</Badge> },\n"}
           {withRowActions && (
             <>
