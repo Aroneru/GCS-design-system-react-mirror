@@ -8,17 +8,18 @@ interface SidebarNavigationProps {
   groups?: SidebarGroup[];
   items?: SidebarItem[];
   collapsed: boolean;
+  darkMode?: boolean;
 }
 
-function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }) {
+function MenuItem({ item, collapsed, darkMode }: { item: SidebarItem; collapsed: boolean; darkMode?: boolean }) {
   const hasChildren = Boolean(item.children?.length);
   const [open, setOpen] = useState(Boolean(item.defaultOpen || item.active));
   const itemId = item.id ?? item.label;
   const className = cn(
-    "group flex w-full rounded-lg text-sm font-medium text-gray-700 transition-colors",
-    "hover:bg-gray-100 hover:text-gray-900",
+    "group flex w-full rounded-lg text-sm font-medium transition-colors",
+    darkMode ? "text-gray-50 hover:bg-gray-700 hover:text-gray-50" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
     collapsed ? "justify-center px-2 py-2.5" : "items-center gap-3 px-3 py-2.5",
-    item.active && "bg-gray-100 text-gray-900",
+    item.active && (darkMode ? "bg-gray-700 text-gray-50" : "bg-gray-100 text-gray-900"),
     item.disabled && "pointer-events-none cursor-not-allowed opacity-50",
   );
 
@@ -41,7 +42,9 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
           <span
             className={cn(
               "flex size-5 shrink-0 items-center justify-center transition-colors [&>svg]:size-5",
-              item.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
+              item.active 
+                ? (darkMode ? "text-gray-50" : "text-gray-900") 
+                : (darkMode ? "text-gray-400 group-hover:text-gray-50" : "text-gray-500 group-hover:text-gray-900"),
             )}
           >
             {item.icon}
@@ -49,7 +52,10 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
         )}
         {!collapsed && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
         {!collapsed && item.badge != null && (
-          <span className="flex min-w-5 shrink-0 items-center justify-center rounded-full bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-600">
+          <span className={cn(
+            "flex min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-medium",
+            darkMode ? "bg-gray-700 text-red-400" : "bg-red-100 text-red-600"
+          )}>
             {item.badge}
           </span>
         )}
@@ -73,7 +79,9 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
           <span
             className={cn(
               "flex size-5 shrink-0 items-center justify-center transition-colors [&>svg]:size-5",
-              item.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
+              item.active 
+                ? (darkMode ? "text-gray-50" : "text-gray-900") 
+                : (darkMode ? "text-gray-400 group-hover:text-gray-50" : "text-gray-500 group-hover:text-gray-900"),
             )}
           >
             {item.icon}
@@ -83,13 +91,19 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
           <>
             <span className="min-w-0 flex-1 truncate text-left">{item.label}</span>
             {item.badge != null && (
-              <span className="flex min-w-5 shrink-0 items-center justify-center rounded-full bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-600">
+              <span className={cn(
+                "flex min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-medium",
+                darkMode ? "bg-gray-700 text-red-400" : "bg-red-100 text-red-600"
+              )}>
                 {item.badge}
               </span>
             )}
             <ChevronDown
               className={cn(
-                "w-[28px] h-[28px] shrink-0 text-gray-900 transition-transform",
+                "w-[28px] h-[28px] shrink-0 transition-transform",
+                darkMode 
+                  ? (open ? "text-white" : "text-gray-900") 
+                  : "text-gray-900",
                 open && "rotate-180",
               )}
             />
@@ -104,9 +118,9 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
               <a
                 href={child.disabled ? undefined : child.href ?? "#"}
                 className={cn(
-                  "group flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors",
-                  "hover:bg-gray-100 hover:text-gray-900",
-                  child.active && "bg-gray-100 font-medium text-gray-900",
+                  "group flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                  darkMode ? "text-gray-50 hover:bg-gray-700 hover:text-gray-50" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                  child.active && (darkMode ? "bg-gray-700 font-medium text-gray-50" : "bg-gray-100 font-medium text-gray-900"),
                   child.disabled && "pointer-events-none cursor-not-allowed opacity-50",
                 )}
                 aria-current={child.active ? "page" : undefined}
@@ -122,7 +136,9 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
                   <span
                     className={cn(
                       "flex size-5 shrink-0 items-center justify-center transition-colors [&>svg]:size-5",
-                      child.active ? "text-gray-900" : "text-gray-500 group-hover:text-gray-900",
+                      child.active 
+                        ? (darkMode ? "text-gray-50" : "text-gray-900") 
+                        : (darkMode ? "text-gray-400 group-hover:text-gray-50" : "text-gray-500 group-hover:text-gray-900"),
                     )}
                   >
                     {child.icon}
@@ -138,8 +154,7 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean }
   );
 }
 
-/** Navigasi Sidebar, termasuk grup menu dan separator antarkonten. */
-export function SidebarNavigation({ groups, items, collapsed }: SidebarNavigationProps) {
+export function SidebarNavigation({ groups, items, collapsed, darkMode }: SidebarNavigationProps) {
   const resolvedGroups: SidebarGroup[] = groups?.length
     ? groups
     : [{ id: "default", items: items ?? [] }];
@@ -153,14 +168,14 @@ export function SidebarNavigation({ groups, items, collapsed }: SidebarNavigatio
           aria-label={group.label}
         >
           {!collapsed && group.label && (
-            <h2 className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <h2 className={cn("px-3 pb-2 text-xs font-semibold uppercase tracking-wide", darkMode ? "text-gray-400" : "text-gray-500")}>
               {group.label}
             </h2>
           )}
           <ul className="space-y-1">
             {group.items.map((item) => (
               <li key={item.id ?? item.label}>
-                <MenuItem item={item} collapsed={collapsed} />
+                <MenuItem item={item} collapsed={collapsed} darkMode={darkMode} />
               </li>
             ))}
           </ul>
