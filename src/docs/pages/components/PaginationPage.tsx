@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pagination, type PaginationTheme } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { Demo, H, Segmented } from "../../pageKit";
+import { Demo, H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -102,7 +102,7 @@ export function PaginationPage() {
               />
 
               <p className="mt-2 mb-5 text-sm text-gray-600">
-                <H>Default</H> menggunakan gray sebagai warna utama pagination.
+                <Hl>Default</Hl> menggunakan gray sebagai warna utama pagination.
               </p>
             </div>
             <div>
@@ -114,7 +114,7 @@ export function PaginationPage() {
               />
 
               <p className="mt-2 mb-5 text-sm text-gray-600">
-                <H>Primary</H> digunakan sebagai warna utama lain pagination.
+                <Hl>Primary</Hl> digunakan sebagai warna utama lain pagination.
               </p>
             </div>
 
@@ -122,7 +122,7 @@ export function PaginationPage() {
               <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} theme="simaya" />
 
               <p className="mt-2 mb-5 text-sm text-gray-600">
-                <H>Simaya</H> digunakan ketika pagination membutuhkan aksen ungu.
+                <Hl>Simaya</Hl> digunakan ketika pagination membutuhkan aksen ungu.
               </p>
             </div>
           </Demo>

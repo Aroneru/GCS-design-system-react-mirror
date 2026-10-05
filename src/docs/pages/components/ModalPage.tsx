@@ -2,7 +2,7 @@ import { Fragment, useState } from 'react'
 import { ExclamationCircle } from '../../../lib/icons/solid'
 import { Button, Icon, Modal, type ModalSize, type ModalVariant } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { H, Segmented } from '../../pageKit'
+import { H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -305,7 +305,7 @@ export function ModalPage() {
         </SectionCode>
 
         <p className="mt-4 max-w-2xl text-body-sm text-gray-500">
-          Size S digunakan secara bawaan. Gunakan <code>size=&quot;m&quot;</code> untuk lebar M.
+          Size S digunakan secara bawaan. Gunakan <Hl>size=&quot;m&quot;</Hl> untuk lebar M.
         </p>
       </FlowSection>
 
@@ -446,8 +446,8 @@ export function ModalPage() {
         </p>
         {isPopup && (
           <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-            Popup digunakan untuk konfirmasi ringkas. Gunakan <H>aria-label</H> atau{' '}
-            <H>aria-labelledby</H> sebagai nama aksesibel, susun icon dan pesan di dalam children,
+            Popup digunakan untuk konfirmasi ringkas. Gunakan <Hl>aria-label</Hl> atau{' '}
+            <Hl>aria-labelledby</Hl> sebagai nama aksesibel, susun icon dan pesan di dalam children,
             lalu tempatkan tombol di footer. Contoh dan Size hanya tersedia untuk Default Modal.
           </p>
         )}
@@ -481,11 +481,11 @@ export function ModalPage() {
         </SectionCode>
 
         <p className="mt-5 max-w-2xl text-body-sm text-gray-500">
-          Panggil <code>close()</code> hanya ketika aksi perlu menutup Modal. Untuk validasi atau
+          Panggil <Hl>close()</Hl> hanya ketika aksi perlu menutup Modal. Untuk validasi atau
           proses asinkron, panggil setelah proses berhasil. Ketiga kontrol penutupan bekerja
-          independen; <code>close()</code> tetap dapat menutup Modal apa pun nilainya.
+          independen; <Hl>close()</Hl> tetap dapat menutup Modal apa pun nilainya.
           Jika backdrop, Escape, dan tombol X dinonaktifkan, sediakan aksi eksplisit yang
-          memanggil <code>close()</code>, misalnya tombol Saya Mengerti di footer.
+          memanggil <Hl>close()</Hl>, misalnya tombol Saya Mengerti di footer.
         </p>
 
         <h3 className="mt-8 text-sm font-black text-gray-900">State dan aksi</h3>
@@ -493,7 +493,7 @@ export function ModalPage() {
           Modal mengelola visibilitasnya secara internal. State aplikasi atau form di dalam Modal,
           validasi, dan pengiriman asinkron tetap menjadi tanggung jawab consumer. Modal tidak
           mengambil alih event submit atau otomatis menutup setelah tombol aksi ditekan. Gunakan
-          fungsi <code>close()</code> dari render function footer setelah proses berhasil.
+          fungsi <Hl>close()</Hl> dari render function footer setelah proses berhasil.
         </p>
         <SectionCode>
           {'<Modal\n  trigger={<Button>Edit data</Button>}\n  title="Edit data"\n  '}
@@ -502,41 +502,41 @@ export function ModalPage() {
         </SectionCode>
 
         <p className="mt-5 max-w-2xl text-body-sm text-gray-500">
-          Gunakan <code>className</code> untuk gaya tambahan. Utility yang bertabrakan tetap
-          terpasang karena <code>cn()</code> memakai clsx; hasil override mengikuti urutan CSS,
-          bukan urutan class. Untuk pilihan lebar Default, utamakan <code>size="s"</code> atau{' '}
-          <code>size="m"</code>. Popup tidak menerima ukuran yang dapat dikonfigurasi.
+          Gunakan <Hl>className</Hl> untuk gaya tambahan. Utility yang bertabrakan tetap
+          terpasang karena <Hl>cn()</Hl> memakai clsx; hasil override mengikuti urutan CSS,
+          bukan urutan class. Untuk pilihan lebar Default, utamakan <Hl>size="s"</Hl> atau{' '}
+          <Hl>size="m"</Hl>. Popup tidak menerima ukuran yang dapat dikonfigurasi.
         </p>
 
         <h3 className="mt-8 text-sm font-black text-gray-900">Accessibility</h3>
         <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
           {isPopup ? (
             <>
-              Popup tidak memiliki judul visual. Berikan <code>aria-label</code> atau{' '}
-              <code>aria-labelledby</code> sebagai nama aksesibel Modal.
+              Popup tidak memiliki judul visual. Berikan <Hl>aria-label</Hl> atau{' '}
+              <Hl>aria-labelledby</Hl> sebagai nama aksesibel Modal.
             </>
           ) : (
             <>
-              Gunakan <code>title</code> khusus Default sebagai judul sekaligus nama aksesibel
-              Modal, kecuali Anda memberikan <code>aria-label</code> atau{' '}
-              <code>aria-labelledby</code> sendiri. Jika Modal
-              tidak memiliki judul visual, berikan <code>aria-label</code> atau{' '}
-              <code>aria-labelledby</code>.
+              Gunakan <Hl>title</Hl> khusus Default sebagai judul sekaligus nama aksesibel
+              Modal, kecuali Anda memberikan <Hl>aria-label</Hl> atau{' '}
+              <Hl>aria-labelledby</Hl> sendiri. Jika Modal
+              tidak memiliki judul visual, berikan <Hl>aria-label</Hl> atau{' '}
+              <Hl>aria-labelledby</Hl>.
             </>
           )}
         </p>
         <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
-          Untuk nama eksplisit, gunakan <code>aria-label</code> atau arahkan{' '}
-          <code>aria-labelledby</code> ke ID elemen di dalam dialog yang memuat namanya.
+          Untuk nama eksplisit, gunakan <Hl>aria-label</Hl> atau arahkan{' '}
+          <Hl>aria-labelledby</Hl> ke ID elemen di dalam dialog yang memuat namanya.
           Pastikan Popup selalu memiliki nama aksesibel.
         </p>
         <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
-          Title Default sudah dirender sebagai <code>&lt;h2&gt;</code>; jangan membungkus isinya
+          Title Default sudah dirender sebagai <Hl>&lt;h2&gt;</Hl>; jangan membungkus isinya
           dengan heading tambahan hanya untuk membuat judul. Modal tidak otomatis membuat{' '}
-          <code>aria-describedby</code>; berikan atribut tersebut bila diperlukan.
+          <Hl>aria-describedby</Hl>; berikan atribut tersebut bila diperlukan.
         </p>
         <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
-          Elemen native <code>&lt;dialog&gt;</code> menyediakan perilaku dialog dan top layer;
+          Elemen native <Hl>&lt;dialog&gt;</Hl> menyediakan perilaku dialog dan top layer;
           browser mengelola fokus serta membuat latar belakang tidak interaktif. Susun kontrol
           awal yang aman, misalnya Batal, dan jangan arahkan fokus awal ke aksi yang merusak data.
         </p>
@@ -545,9 +545,9 @@ export function ModalPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;dialog&gt;</H> yang didukung diteruskan, dengan pengecualian{' '}
-          <code>open</code>, <code>onClose</code>, dan <code>onCancel</code> dari API publik.
-          Prop <code>title</code> diatur khusus untuk Default.
+          <Hl>&lt;dialog&gt;</Hl> yang didukung diteruskan, dengan pengecualian{' '}
+          <Hl>open</Hl>, <Hl>onClose</Hl>, dan <Hl>onCancel</Hl> dari API publik.
+          Prop <Hl>title</Hl> diatur khusus untuk Default.
         </Lead>
         <PropsTable rows={modalProps} minWidth="52rem" />
       </FlowSection>

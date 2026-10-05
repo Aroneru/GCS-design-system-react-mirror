@@ -15,7 +15,7 @@ import {
   type DropdownItem,
 } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -781,7 +781,7 @@ export function DropdownPage() {
     >
       <FlowSection id="dropdown" title="Dropdown">
         <Lead>
-          <H>trigger</H> menerima satu tombol milik Anda; <H>items</H> menerima daftar aksinya. Panel
+          <Hl>trigger</Hl> menerima satu tombol milik Anda; <Hl>items</Hl> menerima daftar aksinya. Panel
           ditutup lewat trigger, klik di luar, atau Escape — semuanya diurus HTML Popover API, jadi
           tidak ada state buka/tutup yang bisa melenceng. Aksi menutup panel setelah ditekan;
           kontrol seperti Radio dan Checkbox tetap terbuka saat pilihannya berubah.
@@ -804,9 +804,9 @@ export function DropdownPage() {
 
       <FlowSection id="kelompok" title="Kelompok">
         <Lead>
-          Aksi yang perlu dipisah disusun lewat <H>groups</H>. Prop <H>separator</H> menambahkan
-          garis sebelum sebuah kelompok — artinya sama persis dengan <H>SidebarGroup</H>, jadi tidak
-          ada yang perlu dihafal ulang. Untuk panel berisi kontrol bebas, pakai <H>&lt;hr&gt;</H>
+          Aksi yang perlu dipisah disusun lewat <Hl>groups</Hl>. Prop <Hl>separator</Hl> menambahkan
+          garis sebelum sebuah kelompok — artinya sama persis dengan <Hl>SidebarGroup</Hl>, jadi tidak
+          ada yang perlu dihafal ulang. Untuk panel berisi kontrol bebas, pakai <Hl>&lt;hr&gt;</Hl>
           biasa.
         </Lead>
         <div className="grid gap-6 sm:grid-cols-2">
@@ -838,8 +838,8 @@ export function DropdownPage() {
 
       <FlowSection id="keterangan" title="Keterangan">
         <Lead>
-          Aksi yang perlu konteks tambahan diberi <H>description</H> — baris kedua yang lebih kecil
-          di bawah labelnya. Untuk panel berisi Radio atau Checkbox, yang dipakai <H>helperText</H>{' '}
+          Aksi yang perlu konteks tambahan diberi <Hl>description</Hl> — baris kedua yang lebih kecil
+          di bawah labelnya. Untuk panel berisi Radio atau Checkbox, yang dipakai <Hl>helperText</Hl>{' '}
           milik komponen itu sendiri.
         </Lead>
         <div className="grid gap-6 sm:grid-cols-2">
@@ -869,7 +869,7 @@ export function DropdownPage() {
 
       <FlowSection id="disable" title="Disable">
         <Lead>
-          Tambahkan <H>disabled</H> pada item yang belum dapat dipilih. Pengaturan ini berlaku per
+          Tambahkan <Hl>disabled</Hl> pada item yang belum dapat dipilih. Pengaturan ini berlaku per
           item, bukan untuk seluruh Dropdown.
         </Lead>
         <div className="grid gap-6 sm:grid-cols-2">
@@ -900,12 +900,12 @@ export function DropdownPage() {
       <FlowSection id="selection" title="Selection">
         <Lead>
           Gunakan Selection ketika Dropdown dipakai untuk memilih nilai. Saat item menggunakan{' '}
-          <H>selected</H>, koleksinya memakai pola <H>listbox</H>, setiap baris menjadi{' '}
-          <H>option</H>, dan pilihan aktif menerima fokus saat dibuka. Option dapat ditelusuri
+          <Hl>selected</Hl>, koleksinya memakai pola <Hl>listbox</Hl>, setiap baris menjadi{' '}
+          <Hl>option</Hl>, dan pilihan aktif menerima fokus saat dibuka. Option dapat ditelusuri
           dengan tombol panah, Home, End, dan pencarian lewat ketikan. Gunakan{' '}
-          <H>contentLabel</H> untuk menamai listbox tersebut. Action dan Selection tidak dapat
-          dicampur dalam satu koleksi generated: koleksi yang memakai <H>selected</H> seluruhnya
-          diperlakukan sebagai Selection, sedangkan <H>href</H> hanya untuk item Action.
+          <Hl>contentLabel</Hl> untuk menamai listbox tersebut. Action dan Selection tidak dapat
+          dicampur dalam satu koleksi generated: koleksi yang memakai <Hl>selected</Hl> seluruhnya
+          diperlakukan sebagai Selection, sedangkan <Hl>href</Hl> hanya untuk item Action.
         </Lead>
         <Stage maxWidth="max-w-xl">
           <div className="flex min-h-56 items-start justify-center pt-10">
@@ -913,7 +913,7 @@ export function DropdownPage() {
           </div>
         </Stage>
         <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-          Prop <H>attached</H> mengaktifkan positioning panel relatif terhadap trigger dengan penyesuaian batas viewport,
+          Prop <Hl>attached</Hl> mengaktifkan positioning panel relatif terhadap trigger dengan penyesuaian batas viewport,
           termasuk flip dan pembatasan tinggi saat ruang terbatas.
         </p>
         <SectionCode>
@@ -930,7 +930,7 @@ export function DropdownPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengubah panel dan item generated ke tampilan gelap: panel gray-800,
+          Prop <Hl>darkMode</Hl> mengubah panel dan item generated ke tampilan gelap: panel gray-800,
           teks dan ikon gray-300, pemisah gray-700, serta aksi danger red-500. Custom children tetap
           opaque dan bertanggung jawab atas styling-nya sendiri.
         </Lead>
@@ -975,7 +975,7 @@ export function DropdownPage() {
       <FlowSection id="playground" title="Playground">
         <Lead>
           Mode Action memakai button atau link native untuk menjalankan aksi dan navigasi. Mode
-          Selection memakai <H>selected</H> untuk membentuk listbox berisi option yang dapat
+          Selection memakai <Hl>selected</Hl> untuk membentuk listbox berisi option yang dapat
           dinavigasi lewat keyboard. Pratinjaunya dibuka sejak halaman dimuat supaya tiap variasi
           mudah dibandingkan.
         </Lead>
@@ -1104,16 +1104,16 @@ export function DropdownPage() {
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Action cukup diisi lewat <H>items</H> atau <H>groups</H>. Selection memakai struktur yang
-          sama dengan menambahkan <H>selected</H> dan pembaruan state pada setiap option. Panel
-          yang berisi kontrol bebas diisi lewat <H>children</H> dan diberi jarak sendiri lewat{' '}
-          <H>contentClassName</H>. Kode berikut mengikuti Mode dan kontrol Playground.
+          Action cukup diisi lewat <Hl>items</Hl> atau <Hl>groups</Hl>. Selection memakai struktur yang
+          sama dengan menambahkan <Hl>selected</Hl> dan pembaruan state pada setiap option. Panel
+          yang berisi kontrol bebas diisi lewat <Hl>children</Hl> dan diberi jarak sendiri lewat{' '}
+          <Hl>contentClassName</Hl>. Kode berikut mengikuti Mode dan kontrol Playground.
         </Lead>
         <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-          Prop <H>trigger</H> harus menghasilkan satu <H>&lt;button&gt;</H> sebagai root DOM langsung.
-          Native button, <H>&lt;Button&gt;</H> dalam mode button, dan komponen tombol kustom didukung
+          Prop <Hl>trigger</Hl> harus menghasilkan satu <Hl>&lt;button&gt;</Hl> sebagai root DOM langsung.
+          Native button, <Hl>&lt;Button&gt;</Hl> dalam mode button, dan komponen tombol kustom didukung
           selama seluruh atribut button native diteruskan. Trigger icon-only wajib memiliki nama
-          aksesibel, misalnya lewat <H>aria-label</H>. Anchor, div/span, Fragment, button yang
+          aksesibel, misalnya lewat <Hl>aria-label</Hl>. Anchor, div/span, Fragment, button yang
           dibungkus elemen lain, dan komponen yang menelan atribut trigger tidak didukung.
         </p>
         <SectionCode flush>
@@ -1133,7 +1133,7 @@ export function DropdownPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya, diikuti bentuk data
-          untuk <H>items</H> dan <H>groups</H>.
+          untuk <Hl>items</Hl> dan <Hl>groups</Hl>.
         </Lead>
 
         <div className="space-y-8">

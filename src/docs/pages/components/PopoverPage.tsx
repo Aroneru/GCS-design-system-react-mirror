@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { InfoCircle } from 'flowbite-react-icons/outline'
 import { Icon, Popover, type PopoverSide } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { H, Segmented } from '../../pageKit'
+import { H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -113,7 +113,7 @@ export function PopoverPage() {
 
       <FlowSection id="positions" title="Positions">
         <Lead>
-          <H>side</H> menentukan preferensi posisi panel terhadap trigger. Popover dapat berbalik ke
+          <Hl>side</Hl> menentukan preferensi posisi panel terhadap trigger. Popover dapat berbalik ke
           sisi berlawanan ketika ruang viewport tidak cukup.
         </Lead>
         <div className="grid gap-8">
@@ -136,7 +136,7 @@ export function PopoverPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> menggunakan header gray-700, body gray-800, judul gray-50, dan teks
+          Prop <Hl>darkMode</Hl> menggunakan header gray-700, body gray-800, judul gray-50, dan teks
           body gray-400. Arrow mengikuti surface yang bersentuhan dengannya.
         </Lead>
         <Stage maxWidth="max-w-[640px]" dark>
@@ -209,7 +209,7 @@ export function PopoverPage() {
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Kode mengikuti pilihan Playground. Nilai default <H>right</H> dan tampilan light tidak
+          Kode mengikuti pilihan Playground. Nilai default <Hl>right</Hl> dan tampilan light tidak
           ditulis. Trigger harus meneruskan prop native dan ARIA yang disuntikkan Popover ke satu
           elemen DOM fokusabel.
         </Lead>
@@ -242,7 +242,7 @@ export function PopoverPage() {
 
         <h3 className="mt-8 text-sm font-black text-gray-900">Accessibility</h3>
         <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
-          Popover menambahkan <H>aria-expanded</H> dan <H>aria-controls</H> pada trigger, sedangkan
+          Popover menambahkan <Hl>aria-expanded</Hl> dan <Hl>aria-controls</Hl> pada trigger, sedangkan
           trigger tetap harus memiliki nama aksesibel. Panel bersifat non-modal dan tidak memindahkan
           atau mengunci fokus. Role dan atribut ARIA tambahan dapat diteruskan sesuai isi panel.
         </p>

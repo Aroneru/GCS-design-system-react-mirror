@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Messages } from '../../../lib/icons/outline'
 import { Alert, type AlertVariant } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -166,7 +166,7 @@ export function AlertPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti latarnya ke gray-800 untuk semua variant, seperti kartu Toast gelap,
+          Prop <Hl>darkMode</Hl> mengganti latarnya ke gray-800 untuk semua variant, seperti kartu Toast gelap,
           lalu warna variant pindah ke teks dan ikonnya. Dua tingkatnya tetap ada tetapi dibalik: ikon, heading,
           dan tombol tutup -300, isi pesan -400 — keduanya di atas 4,5:1 terhadap gray-800.
         </Lead>
@@ -191,7 +191,7 @@ export function AlertPage() {
           {' variant="success" heading="Ini adalah Alert">…</Alert>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Isi <H>actions</H> tetap milik Anda, jadi warnanya tidak ikut diganti. Tombol contoh di atas memakai
+          Isi <Hl>actions</Hl> tetap milik Anda, jadi warnanya tidak ikut diganti. Tombol contoh di atas memakai
           -600 (hover -700) karena -800 dari tampilan terang nyaris tenggelam di latar gray-800.
         </p>
       </FlowSection>
@@ -200,7 +200,7 @@ export function AlertPage() {
         <Lead>
           Satu Alert yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung terlihat
           di sini, dan bagian Penggunaan menuliskan kodenya. Setelah Alert ditutup, klik{' '}
-          <H>Tampilkan Alert</H> untuk memasangnya kembali.
+          <Hl>Tampilkan Alert</Hl> untuk memasangnya kembali.
         </Lead>
 
         <Stage maxWidth={lebar === 'mobile' ? 'max-w-75' : 'max-w-full'} dark={dark}>
@@ -291,7 +291,7 @@ export function AlertPage() {
 
         <p className="mt-4 text-body-sm text-gray-500">
           Tombol tutup mengurus visibilitasnya sendiri, jadi tidak ada state yang perlu Anda siapkan. Isi{' '}
-          <H>onDismiss</H> bila penutupan perlu dicatat, atau <H>open</H> bila Alert dikendalikan penuh dari
+          <Hl>onDismiss</Hl> bila penutupan perlu dicatat, atau <Hl>open</Hl> bila Alert dikendalikan penuh dari
           luar.
         </p>
       </FlowSection>
@@ -348,7 +348,7 @@ export function AlertPage() {
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <H>&lt;div&gt;</H>{' '}
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <Hl>&lt;div&gt;</Hl>{' '}
           standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={alertProps} minWidth="52rem" />
