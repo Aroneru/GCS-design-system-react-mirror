@@ -306,7 +306,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               aria-hidden="true"
               className={cn(
                 'pointer-events-none absolute right-5 flex items-center',
-                disabled ? (darkMode ? 'text-gray-500' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-900'),
+                disabled ? (darkMode ? 'text-gray-500' : 'text-gray-400') : (darkMode ? 'text-white' : 'text-gray-900'),
               )}
             >
               <ChevronIcon />
@@ -316,7 +316,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
           <div
             className={cn(
               'flex min-w-0 flex-1 items-center border-y px-2.5 text-sm transition-colors',
-              darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-gray-50',
+              darkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-300 bg-gray-50',
               !disabled && accent.groupFocus,
             )}
           >
@@ -343,7 +343,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
           role="search"
           className={cn(
             'flex items-center gap-2 rounded-lg border px-2.5 transition-colors',
-            darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-gray-50',
+            darkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-300 bg-gray-50',
             size.field,
             size.text,
             !disabled && accent.focus,

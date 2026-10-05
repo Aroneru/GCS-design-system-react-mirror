@@ -120,7 +120,7 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 | `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`, `darkMode`                                                             | 37 px                     |
 | `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`, `darkMode`                                  | 54 / 50 px                |
 | `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 px                     |
-| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`                               | 44 / 40 px                |
+| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode`                               | 44 / 40 px                |
 | `Radio`         | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
 | `Toggle`        | `label`, `helperText`                                                                                                           | 40×20 / 36×18 px          |
 | `Checkbox`      | `label`, `helperText`                                                                                                           | 16 / 14 px                |

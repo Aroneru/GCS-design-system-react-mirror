@@ -37,14 +37,16 @@ const platforms: Record<UploadPlatform, { field: string; text: string; button: s
  * area attach selama berkas ditahan di atasnya. Keduanya ditulis utuh karena
  * Tailwind memindai nama kelas secara harfiah.
  */
-const accents: Record<UploadApplication, { solid: string; drag: string }> = {
+const accents: Record<UploadApplication, { solid: string; drag: string; dragDark: string }> = {
   default: {
     solid: 'bg-primary-700 hover:bg-primary-800 focus-visible:outline-primary-700',
     drag: 'border-primary-500 bg-primary-50',
+    dragDark: 'border-primary-500 bg-gray-600',
   },
   simaya: {
     solid: 'bg-purple-500 hover:bg-purple-600 focus-visible:outline-purple-500',
     drag: 'border-purple-500 bg-purple-50',
+    dragDark: 'border-purple-500 bg-gray-600',
   },
 }
 
@@ -75,6 +77,8 @@ export interface UploadProps
   onFilesChange?: (files: FileList | null) => void
   /** Kelas untuk pembungkus terluar (label + kontrol + caption). */
   className?: string
+  /** Tampilan gelap. */
+  darkMode?: boolean
 }
 
 /**
@@ -104,6 +108,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
     id,
     disabled,
     onChange,
+    darkMode = false,
     ...props
   },
   ref,
@@ -163,7 +168,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
   return (
     <div className={cn('w-full', className)}>
       {label && (
-        <label htmlFor={fieldId} className="mb-2 block text-sm font-bold text-gray-900">
+        <label htmlFor={fieldId} className={cn("mb-2 block text-sm font-bold", darkMode ? "text-white" : "text-gray-900")}>
           {label}
         </label>
       )}
@@ -180,8 +185,12 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
           className={cn(
             'flex h-[230px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 text-center transition-colors',
             disabled
-              ? 'cursor-not-allowed border-gray-200 bg-gray-100'
-              : cn('cursor-pointer border-gray-200 bg-gray-50 hover:bg-gray-100', seret && accent.drag),
+              ? (darkMode ? 'cursor-not-allowed border-gray-700 bg-gray-800' : 'cursor-not-allowed border-gray-200 bg-gray-100')
+              : cn(
+                  'cursor-pointer',
+                  darkMode ? 'border-gray-500 bg-gray-700 hover:bg-gray-600' : 'border-gray-200 bg-gray-50 hover:bg-gray-100',
+                  seret && (darkMode ? accent.dragDark : accent.drag),
+                ),
           )}
         >
           {input}
@@ -192,11 +201,11 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
             akan terbaca sebagai keluar dari area dan sorotannya berkedip.
           */}
           <div className="pointer-events-none flex flex-col items-center">
-            <UploadIcon className={cn('size-5', disabled ? 'text-gray-300' : 'text-gray-400')} />
-            <span className={cn('mt-2 text-sm', disabled ? 'text-gray-400' : 'text-gray-500')}>
+            <UploadIcon className={cn('size-5', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-300') : 'text-gray-400')} />
+            <span className={cn('mt-2 text-sm', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
               {nama.length > 0 ? nama.join(', ') : attachLabel}
             </span>
-            <span className={cn('mt-2 text-xs', disabled ? 'text-gray-400' : 'text-gray-500')}>
+            <span className={cn('mt-2 text-xs', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
               {attachHint}
             </span>
           </div>
@@ -204,7 +213,8 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
       ) : (
         <div
           className={cn(
-            'flex items-stretch overflow-hidden rounded-lg border border-gray-300',
+            'flex items-stretch overflow-hidden rounded-lg border',
+            darkMode ? 'border-gray-700' : 'border-gray-300',
             size.field,
           )}
         >
@@ -215,7 +225,8 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
             onClick={() => inputRef.current?.click()}
             disabled={disabled}
             className={cn(
-              'shrink-0 border-r border-gray-300 font-medium text-white transition-colors',
+              'shrink-0 border-r font-medium text-white transition-colors',
+              darkMode ? 'border-gray-700' : 'border-gray-300',
               'focus-visible:outline-2 focus-visible:-outline-offset-2',
               'disabled:cursor-not-allowed disabled:opacity-50',
               size.button,
@@ -227,9 +238,12 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
 
           <p
             className={cn(
-              'flex min-w-0 flex-1 items-center bg-gray-50 px-4',
+              'flex min-w-0 flex-1 items-center px-4',
+              darkMode ? 'bg-gray-800' : 'bg-gray-50',
               size.text,
-              disabled ? 'text-gray-400' : 'text-gray-900',
+              disabled
+                ? (darkMode ? 'text-gray-500' : 'text-gray-400')
+                : (darkMode ? (nama.length > 0 ? 'text-white' : 'text-gray-400') : 'text-gray-900'),
             )}
           >
             <span className="truncate">{nama.length > 0 ? nama.join(', ') : placeholder}</span>
@@ -238,7 +252,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
       )}
 
       {helperText && (
-        <p id={helperId} className={cn('mt-2 text-xs', disabled ? 'text-gray-400' : 'text-gray-500')}>
+        <p id={helperId} className={cn('mt-2 text-xs', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
           {helperText}
         </p>
       )}
