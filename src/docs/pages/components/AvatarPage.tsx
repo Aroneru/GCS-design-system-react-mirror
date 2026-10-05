@@ -29,6 +29,7 @@ const avatarProps: PropRow[] = [
   ['alt', 'string', "''", 'Nama pemiliknya. Jadi alt gambar, atau nama aksesibilitas saat yang tampil hanya inisial.'],
   ['initials', 'ReactNode', 'undefined', 'Isi lingkaran saat tidak ada gambar — umumnya satu atau dua huruf.'],
   ['size', "'small' | 'default' | 'large'", 'default', 'Diameter lingkaran: 24px, 32px, atau 80px.'],
+  ['darkMode', 'boolean', 'false', 'Menggunakan warna fallback Avatar untuk permukaan gelap.'],
   ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut <div> standar diteruskan (className, onClick, title, …).'],
 ]
 
@@ -36,6 +37,7 @@ const toc: TocEntry[] = [
   { id: 'avatar', label: 'Avatar' },
   { id: 'inisial', label: 'Inisial' },
   { id: 'sizes', label: 'Sizes' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -45,6 +47,7 @@ export function AvatarPage() {
   const [size, setSize] = useState<AvatarSize>('default')
   const [withFoto, setWithFoto] = useState(true)
   const [withNama, setWithNama] = useState(true)
+  const [darkMode, setDarkMode] = useState(false)
 
   return (
     <UsulanPage
@@ -68,7 +71,11 @@ export function AvatarPage() {
         </Demo>
         <SectionCode>
           {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
-          {'<Avatar src="/foto/putri.jpg" alt="Putri Handayani" />'}
+          {'<Avatar '}
+          <H>src</H>
+          {'="/foto/putri.jpg" '}
+          <H>alt</H>
+          {'="Putri Handayani" />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
           Beri <Hl>alt</Hl> berisi nama pemiliknya. Kalau namanya sudah tertulis persis di sebelah
@@ -93,7 +100,9 @@ export function AvatarPage() {
         <SectionCode>
           {'<Avatar '}
           <H>initials</H>
-          {'="PH" alt="Putri Handayani" />'}
+          {'="PH" '}
+          <H>alt</H>
+          {'="Putri Handayani" />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
           Inisial juga jadi jaring pengaman: bila <Hl>src</Hl> diisi tapi gambarnya gagal dimuat,
@@ -128,7 +137,11 @@ export function AvatarPage() {
         <SectionCode>
           {'<Avatar '}
           <H>size</H>
-          {'="large" src="/foto/putri.jpg" alt="Putri Handayani" />'}
+          {'="large" '}
+          <H>src</H>
+          {'="/foto/putri.jpg" '}
+          <H>alt</H>
+          {'="Putri Handayani" />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
           Ukuran teks inisialnya berturut-turut{' '}
@@ -143,6 +156,30 @@ export function AvatarPage() {
         </p>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengubah fallback menjadi gray-800 dengan inisial gray-100. Foto
+          profil tetap tampil apa adanya; bila foto gagal dimuat, fallback gelap ini yang mengambil
+          alih.
+        </Lead>
+        <Demo label="Fallback di permukaan gelap" dark>
+          <div className="flex items-center gap-4">
+            <Avatar darkMode initials="PH" alt="Putri Handayani" size="large" />
+            <Avatar darkMode initials="PH" alt="Putri Handayani" />
+            <Avatar darkMode initials="PH" alt="Putri Handayani" size="small" />
+          </div>
+        </Demo>
+        <SectionCode>
+          {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n<Avatar "}
+          <H>darkMode</H>
+          {' '}
+          <H>initials</H>
+          {'="PH" '}
+          <H>alt</H>
+          {'="Putri Handayani" />'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu avatar yang bisa Anda utak-atik lewat kontrol di bawahnya. Matikan fotonya untuk
@@ -153,15 +190,18 @@ export function AvatarPage() {
           Tinggi minimumnya dikunci supaya kotaknya tidak ikut naik-turun saat
           ukuran avatar diganti — 120px cukup untuk melapangi yang 80px.
         */}
-        <Stage maxWidth="max-w-[320px]">
+        <Stage maxWidth="max-w-[320px]" dark={darkMode}>
           <div className="flex min-h-30 items-center justify-center gap-3">
             <Avatar
               size={size}
               src={withFoto ? FOTO : undefined}
               initials="PH"
               alt={withNama ? 'Putri Handayani' : ''}
+              darkMode={darkMode}
             />
-            <span className="text-sm text-gray-900">Putri Handayani</span>
+            <span className={darkMode ? 'text-sm text-gray-100' : 'text-sm text-gray-900'}>
+              Putri Handayani
+            </span>
           </div>
         </Stage>
 
@@ -192,6 +232,18 @@ export function AvatarPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={darkMode}
+              onChange={setDarkMode}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -209,6 +261,13 @@ export function AvatarPage() {
         <SectionCode flush>
           {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Avatar\n'}
+          {darkMode && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
+            </>
+          )}
           {size !== 'default' && (
             <>
               {'    '}
@@ -223,7 +282,9 @@ export function AvatarPage() {
               {'="/foto/putri.jpg"\n'}
             </>
           )}
-          {'    initials="PH"\n'}
+          {'    '}
+          <H>initials</H>
+          {'="PH"\n'}
           {withNama && (
             <>
               {'    '}
