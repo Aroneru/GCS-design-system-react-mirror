@@ -40,6 +40,7 @@ const inputProps: PropRow[] = [
   ['state', "'default' | 'typing' | 'inactive' | 'failed'", 'default', 'Kondisi visual field.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna garis aksen saat field aktif.'],
   ['onClear', '() => void', 'undefined', 'Bila diisi, tombol hapus (×) muncul di kanan field.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: field gray-800, label putih, garis baru terlihat saat typing dan failed.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (type, value, onChange, …).'],
 ]
 
@@ -47,6 +48,7 @@ const toc: TocEntry[] = [
   { id: 'input-field', label: 'Input Field' },
   { id: 'states', label: 'States' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -60,6 +62,7 @@ export function InputFieldPage() {
   const [withHelper, setWithHelper] = useState(true)
   const [withClear, setWithClear] = useState(true)
   const [value, setValue] = useState('')
+  const [dark, setDark] = useState(false)
 
   const isFailed = state === 'failed'
   const helper = isFailed ? 'Nama lengkap wajib diisi.' : 'Sesuai yang tertera pada KTP.'
@@ -68,7 +71,7 @@ export function InputFieldPage() {
     <UsulanPage
       eyebrow="Form · Input Field Form"
       title="Input Field"
-      description="Isian teks satu baris dengan label di atas field. Tinggi, warna, dan jaraknya memakai token yang sama dengan Foundations."
+      description="Isian teks satu baris dengan label di atas field. Tinggi, warna, dan jaraknya memakai token yang sama dengan Foundations. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="input-field" title="Input Field">
@@ -171,17 +174,50 @@ export function InputFieldPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti field ke gray-800 dengan label putih. Garisnya menyatu dengan latar
+          dan baru terlihat saat <H>typing</H> (warna aplikasi) atau <H>failed</H> (red-500). Teks yang
+          diketik putih, sedangkan placeholder, ikon, dan caption abu-abu.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          {states.map((s) => (
+            <Demo key={s.value} label={s.label} dark>
+              <InputField
+                darkMode
+                state={s.value}
+                label="Nama lengkap"
+                placeholder="Masukkan nama lengkap"
+                helperText={s.value === 'failed' ? 'Nama lengkap wajib diisi.' : s.desc}
+                icon={<User className="size-4" />}
+                onClear={() => {}}
+              />
+            </Demo>
+          ))}
+        </div>
+        <SectionCode>
+          {'<InputField\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    label="Nama lengkap"\n'}
+          {'    placeholder="Masukkan nama lengkap"\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth={platform === 'mobile' ? 'max-w-[326px]' : 'max-w-[364px]'}>
+        <Stage maxWidth={platform === 'mobile' ? 'max-w-[326px]' : 'max-w-[364px]'} dark={dark}>
           <InputField
             platform={platform}
             state={state}
             application={application}
+            darkMode={dark}
             label="Nama lengkap"
             placeholder="Masukkan nama lengkap"
             helperText={withHelper ? helper : undefined}
@@ -254,6 +290,18 @@ export function InputFieldPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -292,6 +340,13 @@ export function InputFieldPage() {
               {'    '}
               <H>application</H>
               {`="${application}"\n`}
+            </>
+          )}
+          {dark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'    label="Nama lengkap"\n'}

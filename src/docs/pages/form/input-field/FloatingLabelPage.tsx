@@ -40,6 +40,7 @@ const floatingProps: PropRow[] = [
   ['application', "'default' | 'simaya'", 'default', 'Warna garis dan label saat field aktif.'],
   ['placeholder', 'string', 'undefined', 'Hanya muncul setelah label naik, agar tak bertumpuk dengan label.'],
   ['onClear', '() => void', 'undefined', 'Bila diisi, tombol hapus (×) muncul di kanan field.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak gray-800 dengan teks dan ikon gray-400.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (type, value, onChange, …).'],
 ]
 
@@ -47,6 +48,7 @@ const toc: TocEntry[] = [
   { id: 'floating-label', label: 'Floating Label' },
   { id: 'states', label: 'States' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -60,6 +62,7 @@ export function FloatingLabelPage() {
   const [withHelper, setWithHelper] = useState(true)
   const [withClear, setWithClear] = useState(true)
   const [value, setValue] = useState('')
+  const [dark, setDark] = useState(false)
 
   const helper = state === 'error' ? 'Isian tidak dapat diproses.' : 'Sesuai yang tertera pada KTP.'
 
@@ -67,7 +70,7 @@ export function FloatingLabelPage() {
     <UsulanPage
       eyebrow="Form · Input Field Form"
       title="Floating Label"
-      description="Isian teks yang labelnya naik ke garis atas begitu field difokus atau berisi — menghemat ruang tanpa menghilangkan keterangan field."
+      description="Isian teks yang labelnya naik ke garis atas begitu field difokus atau berisi — menghemat ruang tanpa menghilangkan keterangan field. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="floating-label" title="Floating Label">
@@ -186,17 +189,46 @@ export function FloatingLabelPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti kotak ke gray-800 dengan teks, ikon, dan tombol hapus gray-400. Garis
+          aksen tetap sama, tetapi label yang naik satu tingkat lebih terang — primary-500 — supaya terbaca
+          di latar gelap. Pada <H>error</H>, hanya garis dan label yang berubah merah.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          {states.map((s) => (
+            <Demo key={s.value} label={s.label} dark>
+              <FloatingLabel
+                darkMode
+                state={s.value}
+                label="Placeholder Text"
+                defaultValue={s.value === 'default' ? undefined : 'Text Input'}
+                helperText={s.value === 'error' ? 'Isian tidak dapat diproses.' : s.desc}
+                icon={<User className="size-4" />}
+                onClear={() => {}}
+              />
+            </Demo>
+          ))}
+        </div>
+        <SectionCode>
+          {'<FloatingLabel '}
+          <H>darkMode</H>
+          {' label="Nama lengkap" />'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth={platform === 'mobile' ? 'max-w-[348px]' : 'max-w-[364px]'}>
+        <Stage maxWidth={platform === 'mobile' ? 'max-w-[348px]' : 'max-w-[364px]'} dark={dark}>
           <FloatingLabel
             platform={platform}
             state={state}
             application={application}
+            darkMode={dark}
             label="Placeholder Text"
             helperText={withHelper ? helper : undefined}
             icon={withIcon ? <User className="size-4" /> : undefined}
@@ -265,6 +297,18 @@ export function FloatingLabelPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -303,6 +347,13 @@ export function FloatingLabelPage() {
               {'    '}
               <H>application</H>
               {`="${application}"\n`}
+            </>
+          )}
+          {dark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'    label="Placeholder Text"\n'}

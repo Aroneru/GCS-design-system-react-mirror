@@ -163,7 +163,7 @@ function SidebarPanel({
     >
       {/* Lebar dikunci di dalam supaya isinya tidak ikut mengkerut saat panel menutup. */}
       {filled && body && kept && (
-        <SlideIn keyed={kept} className="flex h-full w-[248px] flex-col overflow-y-auto px-5 py-7">
+        <SlideIn keyed={kept} className="ds-scroll-y flex h-full w-[248px] flex-col overflow-y-auto px-5 py-7">
           <p
             data-slide-item
             className="px-3 text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase"

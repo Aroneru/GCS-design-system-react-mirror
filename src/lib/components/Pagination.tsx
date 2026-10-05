@@ -4,12 +4,33 @@ import { cn } from "../utils/cn";
 
 export type PaginationTheme = "default" | "primary" | "simaya";
 
+/**
+ * `base` kotak 40px, `s` kotak 32px untuk layar sempit. `responsive` memakai `s`
+ * lalu berganti ke `base` saat container terdekat ≥ 512px — wajib ada induk
+ * ber-`@container`, seperti di dalam Table.
+ */
+export type PaginationSize = "base" | "s" | "responsive";
+
 export interface PaginationProps extends HTMLAttributes<HTMLElement> {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
   theme?: PaginationTheme;
+  /** Bawaannya `base`. */
+  size?: PaginationSize;
 }
+
+/** Tinggi bar, ukuran tiap kotak, dan ikon chevron per ukuran. */
+const sizeClasses: Record<PaginationSize, { nav: string; cell: string; icon: string }> = {
+  base: { nav: "h-10", cell: "h-10 w-10", icon: "size-7" },
+  // Lebar minimum, bukan tetap, supaya angka tiga digit seperti "100" tidak berdesakan.
+  s: { nav: "h-8", cell: "h-8 min-w-8 px-2", icon: "size-5" },
+  responsive: {
+    nav: "h-8 @lg:h-10",
+    cell: "h-8 min-w-8 px-2 @lg:h-10 @lg:min-w-10",
+    icon: "size-5 @lg:size-7",
+  },
+};
 
 const themeClasses: Record<
   PaginationTheme,
@@ -39,10 +60,12 @@ export function Pagination({
   totalPages,
   onPageChange,
   theme = "primary",
+  size = "base",
   className,
   ...props
 }: PaginationProps) {
   const colors = themeClasses[theme];
+  const sizing = sizeClasses[size];
 
   const goToPage = (page: number) => {
     if (page < 1 || page > totalPages || page === currentPage) return;
@@ -56,7 +79,8 @@ export function Pagination({
     <nav
       aria-label="Pagination"
       className={cn(
-        "inline-flex h-10 overflow-hidden rounded-lg",
+        "inline-flex overflow-hidden rounded-lg",
+        sizing.nav,
         "border border-gray-300 bg-white",
         className,
       )}
@@ -69,14 +93,15 @@ export function Pagination({
         disabled={currentPage === 1}
         onClick={() => goToPage(currentPage - 1)}
         className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center",
+          "flex shrink-0 items-center justify-center",
+          sizing.cell,
           "border-r border-gray-300",
           "text-gray-500 transition-colors",
           "hover:bg-gray-50",
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}
       >
-        <ChevronLeft className="size-7" />
+        <ChevronLeft className={sizing.icon} />
       </button>
 
       {/* Pages */}
@@ -86,7 +111,8 @@ export function Pagination({
             <span
               key={`ellipsis-${index}`}
               className={cn(
-                "flex h-10 w-10 shrink-0 items-center justify-center",
+                "flex shrink-0 items-center justify-center",
+                sizing.cell,
                 "border-r border-gray-300",
                 "text-sm text-gray-500",
               )}
@@ -105,7 +131,8 @@ export function Pagination({
             aria-current={isActive ? "page" : undefined}
             onClick={() => goToPage(page)}
             className={cn(
-              "flex h-10 w-10 shrink-0 items-center justify-center",
+              "flex shrink-0 items-center justify-center",
+              sizing.cell,
               "border-r border-gray-300",
               "text-sm font-normal transition-colors",
               "hover:bg-gray-50",
@@ -125,14 +152,15 @@ export function Pagination({
         disabled={currentPage === totalPages}
         onClick={() => goToPage(currentPage + 1)}
         className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center",
+          "flex shrink-0 items-center justify-center",
+          sizing.cell,
           "border-r border-gray-300",
           "text-gray-500 transition-colors",
           "hover:bg-gray-50",
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}
       >
-        <ChevronRight className="size-7" />
+        <ChevronRight className={sizing.icon} />
       </button>
     </nav>
   );
