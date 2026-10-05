@@ -45,6 +45,7 @@ const searchProps: PropRow[] = [
   ['categoryPlaceholder', 'string', 'Kategori', 'Teks dropdown saat kategori belum dipilih.'],
   ['category / defaultCategory', 'string', 'undefined', 'Kategori terpilih, terkendali maupun tidak.'],
   ['onCategoryChange', '(value: string) => void', 'undefined', 'Dipanggil saat kategori berganti.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: warna abu-abu gelap dengan teks terang.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (value, onChange, placeholder, name, …).'],
 ]
 
@@ -53,6 +54,7 @@ const toc: TocEntry[] = [
   { id: 'platform', label: 'Platform' },
   { id: 'kategori', label: 'Dengan kategori' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -64,6 +66,7 @@ export function SearchPage() {
   const [withCategory, setWithCategory] = useState(false)
   const [withLabel, setWithLabel] = useState(false)
   const [withHelper, setWithHelper] = useState(false)
+  const [theme, setTheme] = useState('light')
 
   const [value, setValue] = useState('')
   const [category, setCategory] = useState('')
@@ -191,6 +194,31 @@ export function SearchPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, dan batas.
+        </Lead>
+        <div className="grid gap-5">
+          <Demo label="Default" dark>
+            <Search placeholder={PLACEHOLDER} darkMode />
+          </Demo>
+          <Demo label="Dengan Kategori" dark>
+            <div className="max-w-[882px]">
+              <Search
+                categories={kategori}
+                placeholder={PLACEHOLDER}
+                darkMode
+              />
+            </div>
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Search '}
+          <H>darkMode</H>
+          {' placeholder="Search Civitas, Organisasi…" />'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Tekan tombolnya atau Enter di
@@ -198,6 +226,7 @@ export function SearchPage() {
         </Lead>
 
         <Stage
+          dark={theme === 'dark'}
           maxWidth={
             withCategory
               ? platform === 'mobile'
@@ -215,6 +244,7 @@ export function SearchPage() {
             label={withLabel ? 'Cari data' : undefined}
             helperText={withHelper ? 'Tekan Enter atau tombol Cari.' : undefined}
             placeholder={PLACEHOLDER}
+            darkMode={theme === 'dark'}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             category={withCategory ? category : undefined}
@@ -228,7 +258,7 @@ export function SearchPage() {
             <Segmented
               label="Pilih aplikasi"
               value={application}
-              onChange={setApplication}
+              onChange={(v) => setApplication(v as SearchApplication)}
               itemClassName="px-2.5"
               options={applications.map((a) => ({ value: a.value, label: a.label }))}
             />
@@ -238,7 +268,7 @@ export function SearchPage() {
             <Segmented
               label="Pilih platform"
               value={platform}
-              onChange={setPlatform}
+              onChange={(v) => setPlatform(v as SearchPlatform)}
               options={[
                 { value: 'default', label: 'Default' },
                 { value: 'mobile', label: 'Mobile' },
@@ -250,7 +280,7 @@ export function SearchPage() {
             <Segmented
               label="Tampilkan kategori"
               value={withCategory}
-              onChange={setWithCategory}
+              onChange={(v) => setWithCategory(v as boolean)}
               options={adaTidakAda}
             />
           </Control>
@@ -259,7 +289,7 @@ export function SearchPage() {
             <Segmented
               label="Tampilkan label"
               value={withLabel}
-              onChange={setWithLabel}
+              onChange={(v) => setWithLabel(v as boolean)}
               options={adaTidakAda}
             />
           </Control>
@@ -268,8 +298,20 @@ export function SearchPage() {
             <Segmented
               label="Tampilkan helper text"
               value={withHelper}
-              onChange={setWithHelper}
+              onChange={(v) => setWithHelper(v as boolean)}
               options={adaTidakAda}
+            />
+          </Control>
+
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={theme}
+              onChange={(v) => setTheme(v as string)}
+              options={[
+                { value: 'light', label: 'Light' },
+                { value: 'dark', label: 'Dark' },
+              ]}
             />
           </Control>
         </Controls>
@@ -327,6 +369,13 @@ export function SearchPage() {
               {'    '}
               <H>helperText</H>
               {'="Tekan Enter atau tombol Cari."\n'}
+            </>
+          )}
+          {theme === 'dark' && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'    placeholder="Search Civitas, Organisasi…"\n'}

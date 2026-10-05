@@ -66,7 +66,7 @@ publik baru, dan dua perubahan yang memutus.
   tanggalnya ikut terkirim bersama formulir sebagai `YYYY-MM-DD`.
 
   Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert, Breadcrumb,
-  Datepicker, FloatingLabel, InputField, Radio, Select, Sidebar, TextArea, dan Toast
+  Datepicker, FloatingLabel, InputField, Radio, Search, Select, Sidebar, TextArea, dan Toast
   yang memilikinya; komponen lain menyusul.
 
   Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
@@ -109,7 +109,7 @@ publik baru, dan dua perubahan yang memutus.
   gray-300 bergaris gray-400, label gray-50, dan caption gray-400. Cincin
   pilihan aktif tetap memakai warna aplikasi. `inactive` memakai lingkaran
   gray-800 dengan teks gray-600.
-- **`Search`** — kolom pencarian dengan tombol cari. Dua ukuran lewat
+- **`Search`: prop `darkMode`** — kolom pencarian dengan tombol cari. Tampilan gelap: field berlatar gray-800 dengan teks terang, sementara dropdown kategori menggunakan latar gray-700. Dua ukuran lewat
   `platform` (`default` 54px, `mobile` 50px). Mengisi prop `categories` akan
   mengubahnya jadi varian tiga ruas: dropdown kategori, isian, lalu tombol
   ikon. Daftar kategorinya panel Dropdown, sama dengan daftar pilihan Select.
