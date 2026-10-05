@@ -179,10 +179,10 @@ export function ComponentsOverview() {
             <div className="mt-6 h-2 w-2/5 rounded bg-gray-300" />
             <div className="h-1.5 w-full rounded bg-gray-200" />
           </div>
-          
+
           {/* Overlay / Backdrop */}
           <div className="absolute inset-0 bg-gray-900/40" />
-          
+
           {/* Drawer Panel Menggunakan Sub-komponen Asli */}
           <div className="absolute bottom-0 right-0 top-0 flex w-48 flex-col border-l-[0.5px] border-gray-200 bg-white shadow-2xl [&_a]:!py-2 [&_a]:!text-sm [&_button]:!py-2 [&_button]:!text-sm">
             <Drawer.Header eyebrow="MENU" showCloseButton={false} className="!px-4 !pb-3 !pt-5 [&_span]:!text-xs" />
@@ -244,25 +244,40 @@ export function ComponentsOverview() {
         name="Sidebar"
         desc="Navigasi samping dengan grup menu, submenu, profil akun, dan mode ringkas."
       >
-        {/*
-          Sidebar asli, tapi dipotong pembungkus bertinggi tetap: komponennya
-          memakai min-h-screen, dan cn() di library ini clsx murni tanpa
-          tailwind-merge — jadi tingginya tidak bisa ditimpa lewat className.
-          Yang tampil bagian atasnya, cukup untuk memperlihatkan menu aktif.
+        <div className="flex flex-col rounded-xl bg-surface-subtle p-5">
+          <div className="flex flex-1 min-h-[280px] w-full max-w-full overflow-hidden rounded-lg border border-border bg-white shadow-sm">
+            {/* Sidebar Asli di dalam frame */}
+            <div className="w-56 shrink-0 border-r-[0.5px] border-gray-200 [&>aside]:min-h-full [&>aside]:w-full [&>aside]:border-none">
+              <Sidebar
+                logo={
+                  <div className="flex items-center gap-2">
+                    <div className="grid size-8 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5">
+                      <div className="rounded-sm bg-white" />
+                      <div className="rounded-sm bg-primary-300" />
+                      <div className="rounded-sm bg-primary-300" />
+                      <div className="rounded-sm bg-white" />
+                    </div>
+                    <span className="text-sm font-black tracking-tight">CEPLOK</span>
+                  </div>
+                }
+                items={[
+                  { label: "Beranda", active: true },
+                  { label: "Layanan" },
+                  { label: "Laporan" },
+                  { label: "Pengaturan" },
+                ]}
+              />
+            </div>
 
-          Sama seperti Footer, Sidebar tetap merender <a href="#"> untuk tiap
-          item walau `href` dikosongkan.
-        */}
-        <div className="rounded-xl bg-surface-subtle p-5">
-          <div className="h-56 w-70 max-w-full overflow-hidden rounded-lg border border-border">
-            <Sidebar
-              items={[
-                { label: "Beranda", active: true },
-                { label: "Layanan" },
-                { label: "Laporan" },
-                { label: "Pengaturan" },
-              ]}
-            />
+            {/* Skeleton Konten Halaman */}
+            <div className="hidden flex-1 space-y-3 p-5 opacity-60 sm:block" aria-hidden="true">
+              <div className="h-2 w-2/5 rounded bg-gray-300" />
+              <div className="h-1.5 w-full rounded bg-gray-200" />
+              <div className="h-1.5 w-5/6 rounded bg-gray-200" />
+              <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
+              <div className="h-1.5 w-full rounded bg-gray-200" />
+              <div className="h-1.5 w-4/6 rounded bg-gray-200" />
+            </div>
           </div>
         </div>
       </OverviewCard>
@@ -364,50 +379,6 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
-<<<<<<< HEAD
-        route="/components/sidebar"
-        name="Sidebar"
-        desc="Navigasi samping dengan grup menu, submenu, profil akun, dan mode ringkas."
-      >
-        <div className="relative flex h-[264px] overflow-hidden rounded-xl bg-surface-subtle">
-          {/* Sidebar Asli (Mentok Kiri, dimodifikasi dengan utilitas child selector) */}
-          <div className="absolute bottom-0 left-0 top-0 w-64 overflow-hidden shadow-sm [&>aside]:min-h-full [&>aside]:w-full [&>aside]:border-r-[0.5px] [&>aside]:border-gray-200">
-            <Sidebar
-              logo={
-                <div className="flex items-center gap-2">
-                  <div className="grid size-8 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5">
-                    <div className="rounded-sm bg-white" />
-                    <div className="rounded-sm bg-primary-300" />
-                    <div className="rounded-sm bg-primary-300" />
-                    <div className="rounded-sm bg-white" />
-                  </div>
-                  <span className="text-sm font-black tracking-tight">CEPLOK</span>
-                </div>
-              }
-              items={[
-                { label: "Beranda", active: true },
-                { label: "Layanan" },
-                { label: "Laporan" },
-                { label: "Pengaturan" },
-              ]}
-            />
-          </div>
-
-          {/* Skeleton Konten Halaman */}
-          <div className="ml-64 hidden flex-1 space-y-3 p-5 opacity-60 sm:block" aria-hidden="true">
-            <div className="h-2 w-2/5 rounded bg-gray-300" />
-            <div className="h-1.5 w-full rounded bg-gray-200" />
-            <div className="h-1.5 w-5/6 rounded bg-gray-200" />
-            <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
-            <div className="h-1.5 w-full rounded bg-gray-200" />
-            <div className="h-1.5 w-4/6 rounded bg-gray-200" />
-          </div>
-        </div>
-      </OverviewCard>
-
-      <OverviewCard
-=======
->>>>>>> 42611dfd75a0437f423291e6b5372097996e8943
         route="/components/table"
         name="Table"
         desc="Tabel data dengan pencarian, filter kolom, pengurutan, pagination, dan aksi per baris."
@@ -441,9 +412,8 @@ export function ComponentsOverview() {
             {["bg-green-100", "bg-primary-100", "bg-yellow-100"].map((pill, i) => (
               <div
                 key={pill}
-                className={`grid grid-cols-[1fr_1.4fr_1fr] items-center gap-4 px-4 py-3.5 sm:grid-cols-[1fr_1.4fr_1.4fr_1fr_0.8fr] ${
-                  i < 2 ? "border-b border-gray-200" : ""
-                }`}
+                className={`grid grid-cols-[1fr_1.4fr_1fr] items-center gap-4 px-4 py-3.5 sm:grid-cols-[1fr_1.4fr_1.4fr_1fr_0.8fr] ${i < 2 ? "border-b border-gray-200" : ""
+                  }`}
               >
                 <div className="h-1.5 w-12 rounded bg-gray-200" />
                 <div className="h-2 w-24 max-w-full rounded bg-gray-300" />
