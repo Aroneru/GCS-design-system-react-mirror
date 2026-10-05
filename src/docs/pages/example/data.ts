@@ -57,7 +57,7 @@ export const PENGAJUAN: Pengajuan[] = [
   { id: 'PJ-2410', nama: 'Intan Permata', layanan: 'Pengaduan Layanan', tanggal: '29 Agu 2026', status: 'Diproses' },
 ]
 
-/** Jumlah baris per halaman pada tabel Pengajuan; dipakai juga untuk menghitung totalPages. */
+/** Jumlah baris per halaman pada tabel Pengajuan (`pagination.pageSize` di Table). */
 export const BARIS_PER_HALAMAN = 4
 
 export interface Pemohon {
