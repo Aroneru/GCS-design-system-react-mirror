@@ -34,12 +34,14 @@ const paginationProps: PropRow[] = [
   ],
   ["theme", '"default" | "primary" | "simaya"', "primary", "Menentukan warna pagination."],
   ["size", '"base" | "s" | "responsive"', "base", "Ukuran kotak: 40px atau 32px. `responsive` memakai 32px lalu 40px saat container induk ≥ 512px; butuh induk ber-`@container`, seperti di Table."],
+  ["darkMode", "boolean", "false", "Menentukan apakah pagination dirender dalam mode gelap."],
 ];
 
 const toc: TocEntry[] = [
   // { id: "pagination", label: "Pagination" },
   { id: "states", label: "States" },
   { id: "themes", label: "Themes" },
+  { id: "dark-mode", label: "Dark mode" },
   { id: "playground", label: "Playground" },
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
@@ -49,6 +51,7 @@ export function PaginationPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [theme, setTheme] = useState<PaginationTheme>("primary");
   const [totalPages, setTotalPages] = useState(100);
+  const [mode, setMode] = useState("light");
   return (
     <UsulanPage
       eyebrow="Components · Pagination"
@@ -142,19 +145,51 @@ export function PaginationPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <p className="mb-6 text-body-sm text-gray-500">
+          Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Pagination. Komponen secara otomatis menyesuaikan warna latar, teks, batas, dan tema yang aktif.
+        </p>
+
+        <div className="mb-4 grid gap-5 sm:grid-cols-2">
+          <Demo label="Default" dark>
+            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="default" darkMode />
+          </Demo>
+
+          <Demo label="Primary" dark>
+            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="primary" darkMode />
+          </Demo>
+
+          <Demo label="Simaya" dark>
+            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="simaya" darkMode />
+          </Demo>
+        </div>
+
+        <SectionCode>
+          {'<Pagination\n'}
+          {'    currentPage={2}\n'}
+          {'    totalPages={100}\n'}
+          {'    onPageChange={setCurrentPage}\n'}
+          {'    theme="primary"\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n/>'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <p className="mb-6 text-body-sm text-gray-500">
           Coba konfigurasi Pagination secara langsung melalui kontrol di bawah ini untuk melihat
           perubahan halaman dan theme.
         </p>
 
-        <Stage maxWidth="max-w-[700px]">
+        <Stage maxWidth="max-w-[700px]" dark={mode === "dark"}>
           <div className="flex min-h-[160px] items-center justify-center">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
               theme={theme}
+              darkMode={mode === "dark"}
             />
           </div>
         </Stage>
@@ -177,6 +212,17 @@ export function PaginationPage() {
                 setCurrentPage((page) => Math.min(page, value));
               }}
               options={totalPageOptions}
+            />
+          </Control>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={mode}
+              onChange={(value) => setMode(value as string)}
+              options={[
+                { value: "light", label: "Light" },
+                { value: "dark", label: "Dark" },
+              ]}
             />
           </Control>
         </Controls>
@@ -214,6 +260,13 @@ export function PaginationPage() {
             <H>theme</H>
             {`="${theme}"\n`}
           </>
+          {mode === "dark" && (
+            <>
+              {"    "}
+              <H>darkMode</H>
+              {"\n"}
+            </>
+          )}
           {"/>"}
         </SectionCode>
       </FlowSection>

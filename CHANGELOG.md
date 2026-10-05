@@ -70,7 +70,7 @@ publik baru, dan dua perubahan yang memutus.
   tanggalnya ikut terkirim bersama formulir sebagai `YYYY-MM-DD`.
 
   Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert, Breadcrumb, Checkbox,
-  Datepicker, FloatingLabel, InputField, Radio, Search, Select, Sidebar, TextArea, Toast, Toggle, dan Upload
+  Datepicker, FloatingLabel, InputField, Pagination, Radio, Search, Select, Sidebar, TextArea, Toast, Toggle, dan Upload
   yang memilikinya; komponen lain menyusul.
 
   Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
@@ -107,6 +107,9 @@ publik baru, dan dua perubahan yang memutus.
   `onClose`. Susunannya diisi prop — `title` untuk header, `children` untuk
   badannya, `footer` untuk kakinya — dengan pilihan ukuran lewat `size` dan
   tombol tutup yang bisa dimatikan lewat `dismissible`.
+- **`Pagination`: prop `darkMode`** — tampilan gelap: latar navigasi gray-800, batas
+  pinggiran gray-700, teks inaktif dan panah gray-400. Item interaktif di-hover dengan latar gray-700,
+  serta item aktif menyesuaikan `theme` (default/primary/simaya) di atas latar gray-700.
 - **`Popover`** — panel informasi ringkas dengan arrow pada empat pilihan sisi
   (`side`: `top`, `right`, `bottom`, `left`).
 - **`Radio`: prop `darkMode`** — tampilan gelap sesuai desain: lingkaran

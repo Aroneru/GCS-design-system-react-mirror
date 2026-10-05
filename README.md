@@ -98,6 +98,7 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | `Container` | `as` (default `div`), `padded` (default `true`)                           |
 | `Icon`      | `children` (SVG dengan `currentColor`)                                    |
 | `Breadcrumb`| `items`, `darkMode`                                                       |
+| `Pagination`| `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`  |
 | `Navbar`    | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`        |
 | `Sidebar`   | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `darkMode` |
 | `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`                     |
