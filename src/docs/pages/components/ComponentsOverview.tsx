@@ -14,6 +14,7 @@ import {
   Sidebar,
   Spinner,
   Toast,
+  Drawer,
 } from "../../../lib";
 import { OverviewCard, OverviewPage } from "../../pageKit";
 import { asset } from "../../asset";
@@ -204,19 +205,30 @@ export function ComponentsOverview() {
         name="Drawer"
         desc="Panel kontekstual di tepi layar (Side Sheet / Off-canvas) untuk form, filter, atau detail data."
       >
-        <div className="rounded-xl bg-gray-900/40 p-5 relative overflow-hidden h-[150px]">
-          <div className="absolute top-0 right-0 bottom-0 w-32 bg-white border-l border-border shadow-2xl flex flex-col">
-            <div className="p-3 border-b border-border flex justify-between items-center">
-              <div className="h-2 w-14 rounded bg-gray-300" />
-              <div className="size-2.5 rounded bg-gray-200" />
-            </div>
-            <div className="p-3 space-y-2 flex-1">
-              <div className="h-1.5 w-full rounded bg-gray-200" />
-              <div className="h-1.5 w-3/4 rounded bg-gray-200" />
-            </div>
-            <div className="p-3 border-t border-border">
-              <div className="h-4 w-full rounded bg-primary-600" />
-            </div>
+        <div className="relative flex h-[264px] flex-col overflow-hidden rounded-xl bg-surface-subtle p-5">
+          {/* Latar skeleton agar selaras dengan Toast */}
+          <div className="space-y-3 opacity-60" aria-hidden="true">
+            <div className="h-2 w-2/5 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-5/6 rounded bg-gray-200" />
+            <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-4/6 rounded bg-gray-200" />
+            <div className="mt-6 h-2 w-2/5 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+          </div>
+
+          {/* Overlay / Backdrop */}
+          <div className="absolute inset-0 bg-gray-900/40" />
+
+          {/* Drawer Panel Menggunakan Sub-komponen Asli */}
+          <div className="absolute bottom-0 right-0 top-0 flex w-48 flex-col border-l-[0.5px] border-gray-200 bg-white shadow-2xl [&_a]:!py-2 [&_a]:!text-sm [&_button]:!py-2 [&_button]:!text-sm">
+            <Drawer.Header eyebrow="MENU" showCloseButton={false} className="!px-4 !pb-3 !pt-5 [&_span]:!text-xs" />
+            <Drawer.Body className="space-y-1 !p-3">
+              <Drawer.NavItem label="Beranda" active theme="primary" />
+              <Drawer.NavItem label="Layanan" />
+              <Drawer.NavItem label="Laporan" />
+            </Drawer.Body>
           </div>
         </div>
       </OverviewCard>
@@ -270,18 +282,31 @@ export function ComponentsOverview() {
         name="Sidebar"
         desc="Navigasi samping dengan grup menu, submenu, profil akun, dan mode ringkas."
       >
-        {/*
-          Sidebar asli, tapi dipotong pembungkus bertinggi tetap: komponennya
-          memakai min-h-screen, dan cn() di library ini clsx murni tanpa
-          tailwind-merge — jadi tingginya tidak bisa ditimpa lewat className.
-          Yang tampil bagian atasnya, cukup untuk memperlihatkan menu aktif.
+        <div className="relative flex h-[264px] flex-col overflow-hidden rounded-xl bg-surface-subtle p-5">
+          {/* Skeleton Konten Halaman */}
+          <div className="ml-56 hidden space-y-3 opacity-60 sm:block" aria-hidden="true">
+            <div className="h-2 w-2/5 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-5/6 rounded bg-gray-200" />
+            <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-4/6 rounded bg-gray-200" />
+          </div>
 
-          Sama seperti Footer, Sidebar tetap merender <a href="#"> untuk tiap
-          item walau `href` dikosongkan.
-        */}
-        <div className="rounded-xl bg-surface-subtle p-5">
-          <div className="h-56 w-70 max-w-full overflow-hidden rounded-lg border border-border">
+          {/* Sidebar Asli Full */}
+          <div className="absolute bottom-0 left-0 top-0 flex w-56 flex-col overflow-hidden border-r-[0.5px] border-gray-200 bg-white shadow-sm [&>aside]:min-h-full [&>aside]:w-full [&>aside]:border-none [&_nav]:!overflow-hidden">
             <Sidebar
+              logo={
+                <div className="flex items-center gap-2">
+                  <div className="grid size-8 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5">
+                    <div className="rounded-sm bg-white" />
+                    <div className="rounded-sm bg-primary-300" />
+                    <div className="rounded-sm bg-primary-300" />
+                    <div className="rounded-sm bg-white" />
+                  </div>
+                  <span className="text-sm font-black tracking-tight">CEPLOK</span>
+                </div>
+              }
               items={[
                 { label: "Beranda", active: true },
                 { label: "Layanan" },
@@ -423,9 +448,8 @@ export function ComponentsOverview() {
             {["bg-green-100", "bg-primary-100", "bg-yellow-100"].map((pill, i) => (
               <div
                 key={pill}
-                className={`grid grid-cols-[1fr_1.4fr_1fr] items-center gap-4 px-4 py-3.5 sm:grid-cols-[1fr_1.4fr_1.4fr_1fr_0.8fr] ${
-                  i < 2 ? "border-b border-gray-200" : ""
-                }`}
+                className={`grid grid-cols-[1fr_1.4fr_1fr] items-center gap-4 px-4 py-3.5 sm:grid-cols-[1fr_1.4fr_1.4fr_1fr_0.8fr] ${i < 2 ? "border-b border-gray-200" : ""
+                  }`}
               >
                 <div className="h-1.5 w-12 rounded bg-gray-200" />
                 <div className="h-2 w-24 max-w-full rounded bg-gray-300" />

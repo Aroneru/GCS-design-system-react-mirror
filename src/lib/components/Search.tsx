@@ -118,6 +118,8 @@ export interface SearchProps
   onCategoryChange?: (value: string) => void
   /** Kelas untuk pembungkus terluar (label + field + caption). */
   className?: string
+  /** Tampilan gelap: field gray-800 dengan label putih dan teks abu-abu. Pada mode kategori, tombol kategori berlatar gray-700. */
+  darkMode?: boolean
 }
 
 /**
@@ -150,6 +152,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
     id,
     disabled,
     onKeyDown,
+    darkMode = false,
     ...props
   },
   ref,
@@ -225,8 +228,10 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
       aria-describedby={helperText ? helperId : undefined}
       onKeyDown={handleKeyDown}
       className={cn(
-        'min-w-0 flex-1 bg-transparent text-gray-900 outline-none placeholder:text-gray-500',
-        'disabled:cursor-not-allowed disabled:text-gray-400',
+        'min-w-0 flex-1 bg-transparent outline-none',
+        darkMode ? 'text-white placeholder:text-gray-400' : 'text-gray-900 placeholder:text-gray-500',
+        'disabled:cursor-not-allowed',
+        darkMode ? 'disabled:text-gray-500' : 'disabled:text-gray-400',
         // Safari dan Chrome menambahkan tombol silang sendiri pada type="search";
         // ia bukan bagian dari rancangan ini dan tidak bisa diberi gaya, jadi dimatikan.
         '[&::-webkit-search-cancel-button]:appearance-none',
@@ -238,7 +243,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   return (
     <div className={cn('w-full', className)}>
       {label && (
-        <label htmlFor={fieldId} className="mb-2 block text-sm font-bold text-gray-900">
+        <label htmlFor={fieldId} className={cn("mb-2 block text-sm font-bold", darkMode ? "text-white" : "text-gray-900")}>
           {label}
         </label>
       )}
@@ -250,7 +255,8 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
         <div role="search" className="group flex h-[39px] items-stretch">
           <div
             className={cn(
-              'relative flex shrink-0 items-center rounded-l-lg border border-gray-300 bg-gray-100 transition-colors',
+              'relative flex shrink-0 items-center rounded-l-lg border transition-colors',
+              darkMode ? 'border-gray-700 bg-gray-700' : 'border-gray-300 bg-gray-100',
               !disabled && accent.groupFocus,
             )}
           >
@@ -280,6 +286,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               attached
               contentLabel={categoryPlaceholder}
               items={itemKategori}
+              darkMode={darkMode}
               trigger={
                 <button
                   type="button"
@@ -287,8 +294,8 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
                   aria-label={categoryPlaceholder}
                   className={cn(
                     'absolute inset-0 flex items-center pr-10 pl-5 text-left text-sm outline-none',
-                    'disabled:cursor-not-allowed disabled:text-gray-400',
-                    'text-gray-900',
+                    'disabled:cursor-not-allowed',
+                    darkMode ? 'text-white disabled:text-gray-500' : 'text-gray-900 disabled:text-gray-400',
                   )}
                 >
                   <span className="truncate">{labelKategori}</span>
@@ -300,7 +307,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               aria-hidden="true"
               className={cn(
                 'pointer-events-none absolute right-5 flex items-center',
-                disabled ? 'text-gray-400' : 'text-gray-900',
+                disabled ? (darkMode ? 'text-gray-500' : 'text-gray-400') : (darkMode ? 'text-white' : 'text-gray-900'),
               )}
             >
               <ChevronIcon />
@@ -309,7 +316,8 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
 
           <div
             className={cn(
-              'flex min-w-0 flex-1 items-center border-y border-gray-300 bg-gray-50 px-2.5 text-sm transition-colors',
+              'flex min-w-0 flex-1 items-center border-y px-2.5 text-sm transition-colors',
+              darkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-300 bg-gray-50',
               !disabled && accent.groupFocus,
             )}
           >
@@ -335,7 +343,8 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
         <div
           role="search"
           className={cn(
-            'flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-50 px-2.5 transition-colors',
+            'flex items-center gap-2 rounded-lg border px-2.5 transition-colors',
+            darkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-300 bg-gray-50',
             size.field,
             size.text,
             !disabled && accent.focus,
@@ -344,7 +353,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
           <span
             className={cn(
               'flex shrink-0 items-center',
-              disabled ? 'text-gray-400' : 'text-gray-500',
+              disabled ? (darkMode ? 'text-gray-500' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'),
             )}
           >
             <SearchIcon className={size.icon} />
@@ -370,7 +379,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
       )}
 
       {helperText && (
-        <p id={helperId} className={cn('mt-2 text-sm', disabled ? 'text-gray-400' : 'text-gray-500')}>
+        <p id={helperId} className={cn('mt-2 text-sm', disabled ? (darkMode ? 'text-gray-500' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
           {helperText}
         </p>
       )}

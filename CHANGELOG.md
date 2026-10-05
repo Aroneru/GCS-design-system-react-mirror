@@ -41,6 +41,7 @@ publik baru, dan dua perubahan yang memutus.
 - **`Avatar`** — lingkaran identitas berisi foto (`src`) atau inisial
   (`initials`) dalam tiga ukuran lewat `size` (`small` 24px, `default` 32px,
   `large` 80px). Gambar yang gagal dimuat jatuh sendiri ke inisial.
+- **`Breadcrumb`: prop `darkMode`** — tampilan gelap: teks menu aktif menjadi gray-300, teks menu inaktif dan separator ikon menjadi gray-400, serta dukungan properti navigasi yang dinonaktifkan (`onClick` preventDefault) untuk dokumentasi.
 - **`Checkbox`: prop `darkMode`** — tampilan gelap sesuai desain: kotak
   gray-700 bergaris gray-600, label putih, dan caption gray-400. Kotak yang
   tercentang tetap memakai warna aplikasi. `inactive` meredupkan label dan
@@ -68,9 +69,9 @@ publik baru, dan dua perubahan yang memutus.
   ditelusuri dengan panah, Home/End, serta PageUp/PageDown. Dengan `name`,
   tanggalnya ikut terkirim bersama formulir sebagai `YYYY-MM-DD`.
 
-  Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert,
-  Checkbox, Datepicker, FloatingLabel, InputField, Radio, Select, TextArea,
-  Toast, dan Toggle yang memilikinya; komponen lain menyusul.
+  Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert, Breadcrumb, Checkbox,
+  Datepicker, FloatingLabel, InputField, Pagination, Radio, Search, Select, Sidebar, TextArea, Toast, Toggle, dan Upload
+  yang memilikinya; komponen lain menyusul.
 
   Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
   `DatepickerRangeProps` ikut diekspor.
@@ -106,13 +107,16 @@ publik baru, dan dua perubahan yang memutus.
   `onClose`. Susunannya diisi prop — `title` untuk header, `children` untuk
   badannya, `footer` untuk kakinya — dengan pilihan ukuran lewat `size` dan
   tombol tutup yang bisa dimatikan lewat `dismissible`.
+- **`Pagination`: prop `darkMode`** — tampilan gelap: latar navigasi gray-800, batas
+  pinggiran gray-700, teks inaktif dan panah gray-400. Item interaktif di-hover dengan latar gray-700,
+  serta item aktif menyesuaikan `theme` (default/primary/simaya) di atas latar gray-700.
 - **`Popover`** — panel informasi ringkas dengan arrow pada empat pilihan sisi
   (`side`: `top`, `right`, `bottom`, `left`).
 - **`Radio`: prop `darkMode`** — tampilan gelap sesuai desain: lingkaran
   gray-300 bergaris gray-400, label gray-50, dan caption gray-400. Cincin
   pilihan aktif tetap memakai warna aplikasi. `inactive` memakai lingkaran
   gray-800 dengan teks gray-600.
-- **`Search`** — kolom pencarian dengan tombol cari. Dua ukuran lewat
+- **`Search`: prop `darkMode`** — kolom pencarian dengan tombol cari. Tampilan gelap: field berlatar gray-800 dengan teks terang, sementara dropdown kategori menggunakan latar gray-700. Dua ukuran lewat
   `platform` (`default` 54px, `mobile` 50px). Mengisi prop `categories` akan
   mengubahnya jadi varian tiga ruas: dropdown kategori, isian, lalu tombol
   ikon. Daftar kategorinya panel Dropdown, sama dengan daftar pilihan Select.
@@ -123,7 +127,7 @@ publik baru, dan dua perubahan yang memutus.
   dengan teks dan panah gray-500. Panel daftar pilihannya tetap terang.
 - **`Sidebar`** — navigasi samping dengan menu tunggal (`items`) atau
   terkelompok (`groups`), submenu, area profil (`user`), dan mode ringkas
-  (`collapsed` + `onCollapse`). Tipe pendukung `SidebarItem`, `SidebarSubItem`,
+  (`collapsed` + `onCollapse`). Dilengkapi dengan prop `darkMode` untuk tampilan gelap (latar belakang gray-800, menu aktif & profil gray-700, teks menu & ikon aktif gray-50, serta ikon inaktif gray-400). Tipe pendukung `SidebarItem`, `SidebarSubItem`,
   `SidebarGroup`, dan `SidebarUser` ikut diekspor.
 - **`Spinner`** — indikator proses dalam ukuran `default` dan `large`.
 - **`TextArea`: prop `darkMode`** — tampilan gelap sesuai desain: kotak,
@@ -137,9 +141,9 @@ publik baru, dan dua perubahan yang memutus.
   dengan bulatan gray-400, label putih, dan caption gray-400. Saat menyala,
   jalurnya tetap memakai warna aplikasi dan bulatannya putih. `inactive` hanya
   meredupkan label ke gray-500.
-- **`Upload`** — pemilih berkas dalam dua bentuk lewat `type`: `default`
+- **`Upload`: prop `darkMode`** — pemilih berkas dalam dua bentuk lewat `type`: `default`
   (tombol pilih berkas + nama berkas terpilih, dua ukuran lewat `platform`) dan
-  `attach` (area seret-lepas bergaris putus-putus setinggi 230px). Membungkus
+  `attach` (area seret-lepas bergaris putus-putus setinggi 230px). Tampilan gelap menyesuaikan warna latar (`gray-800`), teks, batas komponen (`gray-700`), serta status interaksi `drag`. Membungkus
   `<input type="file">` sungguhan, jadi dialog berkas dan pengiriman formulir
   bekerja apa adanya.
 - Tipe **`NavbarContextItem`**, dipakai sebagai bentuk dasar item kontekstual

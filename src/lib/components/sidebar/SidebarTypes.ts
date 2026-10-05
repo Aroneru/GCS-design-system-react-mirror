@@ -69,4 +69,5 @@ export interface SidebarProps extends HTMLAttributes<HTMLElement> {
    * yang dititipkan ke sini harus menyiapkan bentuk ringkasnya sendiri.
    */
   footer?: ReactNode;
+  darkMode?: boolean;
 }

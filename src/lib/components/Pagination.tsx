@@ -18,6 +18,7 @@ export interface PaginationProps extends HTMLAttributes<HTMLElement> {
   theme?: PaginationTheme;
   /** Bawaannya `base`. */
   size?: PaginationSize;
+  darkMode?: boolean;
 }
 
 /** Tinggi bar, ukuran tiap kotak, dan ikon chevron per ukuran. */
@@ -37,21 +38,29 @@ const themeClasses: Record<
   {
     active: string;
     activeText: string;
+    darkActive: string;
+    darkActiveText: string;
   }
 > = {
   default: {
     active: "bg-gray-50",
     activeText: "text-gray-500",
+    darkActive: "bg-gray-700",
+    darkActiveText: "text-gray-300",
   },
 
   primary: {
     active: "bg-primary-50",
     activeText: "text-primary-500",
+    darkActive: "bg-gray-700",
+    darkActiveText: "text-primary-500",
   },
 
   simaya: {
     active: "bg-purple-50",
     activeText: "text-purple-500",
+    darkActive: "bg-gray-700",
+    darkActiveText: "text-purple-400",
   },
 };
 
@@ -61,6 +70,7 @@ export function Pagination({
   onPageChange,
   theme = "primary",
   size = "base",
+  darkMode = false,
   className,
   ...props
 }: PaginationProps) {
@@ -81,7 +91,7 @@ export function Pagination({
       className={cn(
         "inline-flex overflow-hidden rounded-lg",
         sizing.nav,
-        "border border-gray-300 bg-white",
+        darkMode ? "border border-gray-700 bg-gray-800" : "border border-gray-300 bg-white",
         className,
       )}
       {...props}
@@ -93,11 +103,11 @@ export function Pagination({
         disabled={currentPage === 1}
         onClick={() => goToPage(currentPage - 1)}
         className={cn(
-          "flex shrink-0 items-center justify-center",
+          "flex shrink-0 items-center justify-center transition-colors",
           sizing.cell,
-          "border-r border-gray-300",
-          "text-gray-500 transition-colors",
-          "hover:bg-gray-50",
+          darkMode
+            ? "border-r border-gray-700 text-gray-400 hover:bg-gray-700"
+            : "border-r border-gray-300 text-gray-500 hover:bg-gray-50",
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}
       >
@@ -111,10 +121,11 @@ export function Pagination({
             <span
               key={`ellipsis-${index}`}
               className={cn(
-                "flex shrink-0 items-center justify-center",
+                "flex shrink-0 items-center justify-center text-sm",
                 sizing.cell,
-                "border-r border-gray-300",
-                "text-sm text-gray-500",
+                darkMode
+                  ? "border-r border-gray-700 text-gray-400"
+                  : "border-r border-gray-300 text-gray-500",
               )}
             >
               ...
@@ -131,13 +142,15 @@ export function Pagination({
             aria-current={isActive ? "page" : undefined}
             onClick={() => goToPage(page)}
             className={cn(
-              "flex shrink-0 items-center justify-center",
+              "flex shrink-0 items-center justify-center text-sm font-normal transition-colors",
               sizing.cell,
-              "border-r border-gray-300",
-              "text-sm font-normal transition-colors",
-              "hover:bg-gray-50",
-              isActive && colors.active,
-              isActive ? colors.activeText : "text-gray-500",
+              darkMode
+                ? "border-r border-gray-700 hover:bg-gray-700"
+                : "border-r border-gray-300 hover:bg-gray-50",
+              isActive && (darkMode ? colors.darkActive : colors.active),
+              isActive
+                ? (darkMode ? colors.darkActiveText : colors.activeText)
+                : (darkMode ? "text-gray-400" : "text-gray-500"),
             )}
           >
             {page}
@@ -152,11 +165,11 @@ export function Pagination({
         disabled={currentPage === totalPages}
         onClick={() => goToPage(currentPage + 1)}
         className={cn(
-          "flex shrink-0 items-center justify-center",
+          "flex shrink-0 items-center justify-center transition-colors",
           sizing.cell,
-          "border-r border-gray-300",
-          "text-gray-500 transition-colors",
-          "hover:bg-gray-50",
+          darkMode
+            ? "border-r border-gray-700 text-gray-400 hover:bg-gray-700"
+            : "border-r border-gray-300 text-gray-500 hover:bg-gray-50",
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}
       >

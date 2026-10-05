@@ -97,7 +97,10 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`           |
 | `Container` | `as` (default `div`), `padded` (default `true`)                           |
 | `Icon`      | `children` (SVG dengan `currentColor`)                                    |
+| `Breadcrumb`| `items`, `darkMode`                                                       |
+| `Pagination`| `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`  |
 | `Navbar`    | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`        |
+| `Sidebar`   | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `darkMode` |
 | `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`                     |
 
 Warna Button diatur `theme` (`primary \| green \| gray \| purple \| orange \|
@@ -116,9 +119,9 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 | `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| active \| error`                                     | 58 / 50 px                |
 | `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit`, `darkMode` | 162 / 120 px              |
 | `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`, `darkMode`                                                             | 37 px                     |
-| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`                                              | 54 / 50 px                |
+| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`, `darkMode`                                  | 54 / 50 px                |
 | `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 px                     |
-| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`                               | 44 / 40 px                |
+| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode`                               | 44 / 40 px                |
 | `Radio`         | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
 | `Toggle`        | `label`, `helperText`, `darkMode`                                                                                               | 40×20 / 36×18 px          |
 | `Checkbox`      | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
