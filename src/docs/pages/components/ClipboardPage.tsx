@@ -9,6 +9,7 @@ const toc: TocEntry[] = [
   { id: 'clipboard', label: 'Clipboard' },
   { id: 'platform', label: 'Platform' },
   { id: 'segmen', label: 'Dengan segmen' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -32,6 +33,7 @@ const clipboardProps: PropRow[] = [
   ['prefix', 'ReactNode', 'undefined', 'Konten sebelum nilai pada tampilan bersegmen. Prefix tidak ikut disalin.'],
   ['variant', "'default' | 'segmented'", 'default', 'Menentukan susunan Clipboard.'],
   ['platform', "'default' | 'mobile'", 'default', 'Menentukan preset ukuran Default atau Mobile.'],
+  ['darkMode', 'boolean', 'false', 'Menggunakan warna Clipboard untuk tampilan gelap.'],
   ['disabled', 'boolean', 'false', 'Menonaktifkan aksi salin tanpa menonaktifkan pemilihan nilai.'],
   ['className', 'string', 'undefined', 'Kelas CSS untuk pembungkus terluar Clipboard.'],
   ['onCopySuccess', '(value: string) => void', 'undefined', 'Dipanggil setelah nilai berhasil disalin.'],
@@ -47,6 +49,7 @@ export function ClipboardPage() {
   const [withHelper, setWithHelper] = useState(true)
   const [withPrefix, setWithPrefix] = useState(true)
   const [disabled, setDisabled] = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
   const label = 'Nomor referensi'
   const helper = 'Gunakan nomor ini saat menghubungi layanan.'
   const previewProps = {
@@ -56,6 +59,7 @@ export function ClipboardPage() {
     'aria-label': withLabel ? undefined : label,
     helperText: withHelper ? helper : undefined,
     disabled,
+    darkMode,
   }
 
   return (
@@ -65,12 +69,9 @@ export function ClipboardPage() {
         <Demo label="Default">
           <div className={`mx-auto w-full ${previewWidths.default.default}`}><Clipboard value="INV-2026-001" label="Nomor referensi" /></div>
         </Demo>
-        <SectionCode>{`import { Clipboard } from '@ceplok-ui/design-kit-react'
-
-<Clipboard
-    value="INV-2026-001"
-    label="Nomor referensi"
-/>`}</SectionCode>
+        <SectionCode>
+          {"import { Clipboard } from '@ceplok-ui/design-kit-react'\n\n<Clipboard\n    "}<H>value</H>{'="INV-2026-001"\n    '}<H>label</H>{'="Nomor referensi"\n/>'}
+        </SectionCode>
       </FlowSection>
 
       <FlowSection id="platform" title="Platform">
@@ -88,17 +89,33 @@ export function ClipboardPage() {
           <Demo label="Dengan prefix"><div className={`mx-auto w-full ${previewWidths.segmented.default}`}> <Clipboard value="https://komdigi.go.id/" label="Alamat situs" variant="segmented" prefix="URL" /> </div></Demo>
           <Demo label="Tanpa prefix"><div className={`mx-auto w-full ${previewWidths.segmented.default}`}> <Clipboard value="INV-2026-001" label="Nomor referensi" variant="segmented" /> </div></Demo>
         </div>
-        <SectionCode>{`<Clipboard
-    value="https://komdigi.go.id/"
-    label="Alamat situs"
-    variant="segmented"
-    prefix="URL"
-/>`}</SectionCode>
+        <SectionCode>
+          {'<Clipboard\n    '}<H>value</H>{'="https://komdigi.go.id/"\n    '}<H>label</H>{'="Alamat situs"\n    '}<H>variant</H>{'="segmented"\n    '}<H>prefix</H>{'="URL"\n/>'}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>Prop <H>darkMode</H> menggunakan warna Clipboard dari desain gelap: field gray-800, label dan prefix gray-300, nilai gray-400, serta keterangan gray-500. Aksi salin tetap primary-700. Tekan aksi pada contoh bersegmen untuk melihat ikon sukses tanpa perubahan ukuran.</Lead>
+        <div className="grid gap-5">
+          <Demo label="Tombol teks" dark>
+            <div className={`mx-auto w-full ${previewWidths.default.default}`}>
+              <Clipboard darkMode value="INV-2026-001" label="Nomor referensi" helperText="Gunakan nomor ini saat menghubungi layanan." />
+            </div>
+          </Demo>
+          <Demo label="Tombol ikon" dark>
+            <div className={`mx-auto w-full ${previewWidths.segmented.default}`}>
+              <Clipboard darkMode value="https://komdigi.go.id/" label="Alamat situs" variant="segmented" prefix="URL" />
+            </div>
+          </Demo>
+        </div>
+        <SectionCode>
+          {"import { Clipboard } from '@ceplok-ui/design-kit-react'\n\n<Clipboard\n    "}<H>darkMode</H>{'\n    '}<H>value</H>{'="INV-2026-001"\n    '}<H>label</H>{'="Nomor referensi"\n    '}<H>helperText</H>{'="Gunakan nomor ini saat menghubungi layanan."\n/>'}
+        </SectionCode>
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Tekan tombol salin untuk melihat umpan baliknya; bagian Penggunaan mengikuti pilihan Anda.</Lead>
-        <Stage maxWidth={previewWidths[variant][platform]}>
+        <Stage maxWidth={previewWidths[variant][platform]} dark={darkMode}>
           {variant === 'segmented'
             ? <Clipboard {...previewProps} variant="segmented" prefix={withPrefix ? 'ID' : undefined} />
             : <Clipboard {...previewProps} />}
@@ -106,6 +123,7 @@ export function ClipboardPage() {
         <Controls>
           <Control label="Variasi"><Segmented label="Pilih variasi" value={variant} onChange={setVariant} options={variants} wrap /></Control>
           <Control label="Platform"><Segmented label="Pilih platform" value={platform} onChange={setPlatform} options={[{ value: 'default', label: 'Default' }, { value: 'mobile', label: 'Mobile' }]} /></Control>
+          <Control label="Tampilan"><Segmented label="Pilih tampilan" value={darkMode} onChange={setDarkMode} options={[{ value: false, label: 'Light' }, { value: true, label: 'Dark' }]} /></Control>
           <Control label="Nilai">
             <input aria-label="Nilai yang disalin" value={value} onChange={(event) => setValue(event.target.value)} className="h-10 w-full rounded-lg border border-gray-300 bg-surface px-3 text-sm text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600" />
           </Control>
@@ -125,6 +143,7 @@ export function ClipboardPage() {
           {withLabel ? <>{'    '}<H>label</H>{`="${label}"\n`}</> : <>{'    '}<H>aria-label</H>{`="${label}"\n`}</>}
           {variant === 'segmented' && <>{'    '}<H>variant</H>{'="segmented"\n'}</>}
           {platform === 'mobile' && <>{'    '}<H>platform</H>{'="mobile"\n'}</>}
+          {darkMode && <>{'    '}<H>darkMode</H>{'\n'}</>}
           {variant === 'segmented' && withPrefix && <>{'    '}<H>prefix</H>{'="ID"\n'}</>}
           {withHelper && <>{'    '}<H>helperText</H>{`="${helper}"\n`}</>}
           {disabled && <>{'    '}<H>disabled</H>{'\n'}</>}

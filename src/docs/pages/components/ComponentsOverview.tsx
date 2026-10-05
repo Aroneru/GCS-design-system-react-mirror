@@ -1,3 +1,4 @@
+import { InfoCircle } from "flowbite-react-icons/outline";
 import {
   Alert,
   Avatar,
@@ -7,9 +8,9 @@ import {
   Card,
   Footer,
   Hero,
+  Icon,
   Navbar,
   Pagination,
-  Popover,
   Sidebar,
   Spinner,
   Toast,
@@ -111,12 +112,35 @@ export function ComponentsOverview() {
       <OverviewCard
         route="/components/popover"
         name="Popover"
-        desc="Panel informasi ringkas dengan arrow pada empat pilihan sisi."
+        desc="Menampilkan informasi kontekstual secara ringkas di dekat elemen yang memicunya."
       >
-        <div className="flex items-center justify-center rounded-xl bg-surface-subtle p-5">
-          <Popover title="Popover" side="bottom">
-            Popover Body Text, Popover Body Text, Popover Body Text
-          </Popover>
+        <div className="flex items-center justify-center rounded-xl bg-surface-subtle p-5" aria-hidden="true">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex size-8 shrink-0 items-center justify-center text-gray-500">
+              <Icon className="size-5">
+                <InfoCircle />
+              </Icon>
+            </span>
+            <div className="relative w-56 shrink-0 [filter:drop-shadow(0_1px_2px_rgb(0_0_0/0.08))]">
+              <span className="pointer-events-none absolute top-1/2 left-[-8px] z-30 size-4 -translate-y-1/2 -rotate-90">
+                <span className="absolute top-[3.25px] left-[3px] size-2.5 rotate-45 border-t border-l border-border bg-surface" />
+              </span>
+              <div className="relative z-10 overflow-hidden rounded-md bg-surface">
+                <div className="border-b border-border bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-900">
+                  Informasi
+                </div>
+                <div className="bg-surface px-3 py-2 text-xs font-medium text-gray-500">
+                  <span className="whitespace-nowrap">Informasi tambahan yang relevan</span>
+                  <br />
+                  <span className="whitespace-nowrap">untuk membantu memahami konteks.</span>
+                </div>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 z-20 rounded-md border border-border"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </OverviewCard>
 

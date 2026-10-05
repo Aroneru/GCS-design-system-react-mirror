@@ -64,6 +64,7 @@ export function SpinnerPage() {
 
         <div className="mt-4">
           <CodeBlock>
+            {"import { Spinner } from '@ceplok-ui/design-kit-react'\n\n"}
             {'<Spinner />\n\n<Spinner '}
             <H>size=&quot;large&quot;</H>
             {' />'}
@@ -99,6 +100,7 @@ export function SpinnerPage() {
           yang masih memakai nilai bawaan sengaja tidak ditulis.
         </p>
         <CodeBlock>
+          {"import { Spinner } from '@ceplok-ui/design-kit-react'\n\n"}
           {size === 'default' ? (
             '<Spinner />'
           ) : (
@@ -136,6 +138,7 @@ export function SpinnerPage() {
 
         <div className="mt-4">
           <CodeBlock>
+            {"import { Spinner } from '@ceplok-ui/design-kit-react'\n\n"}
             {'<Spinner '}
             <H>aria-label=&quot;Memuat daftar pengguna&quot;</H>
             {' />\n\n<div className="flex items-center gap-3">\n  <Spinner '}

@@ -88,7 +88,7 @@ export function Pengajuan() {
         </div>
       </div>
 
-      <div className="relative">
+      <div className="relative" aria-busy={memuat}>
         {memuat && (
           <div className="absolute inset-0 z-10 grid place-items-center bg-white/70">
             <Spinner aria-label="Memuat data pengajuan" />

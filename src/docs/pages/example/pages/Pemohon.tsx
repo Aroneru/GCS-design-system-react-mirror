@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Avatar, Badge, Button, Popover, Toggle } from '../../../../lib'
+import { InfoCircle } from 'flowbite-react-icons/outline'
+import { Avatar, Badge, Button, Icon, Popover, Toggle } from '../../../../lib'
 import { Envelope } from '../../../../lib/icons/outline'
 import { inisial, PEMOHON } from '../data'
 
@@ -21,7 +22,21 @@ export function Pemohon() {
             {jumlahAktif} dari {PEMOHON.length} akun sedang aktif.
           </p>
         </div>
-        <Popover title="Akun nonaktif" side="left">
+        <Popover
+          trigger={
+            <button
+              type="button"
+              aria-label="Informasi akun nonaktif"
+              className="inline-flex size-9 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-400"
+            >
+              <Icon>
+                <InfoCircle />
+              </Icon>
+            </button>
+          }
+          title="Akun nonaktif"
+          side="left"
+        >
           Pemohon nonaktif tidak bisa mengirim pengajuan baru, tetapi pengajuan yang sudah berjalan
           tetap diproses sampai selesai.
         </Popover>

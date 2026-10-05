@@ -58,8 +58,9 @@ export interface DropdownGroup {
 export interface DropdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /**
    * Elemen yang membuka panel — satu `<button>` milik Anda, biasanya `Button`.
-   * Komponen ini menyalinnya untuk memasang atribut Popover, jadi yang dikirim
-   * harus satu elemen tunggal, bukan teks atau pecahan.
+   * Komponen ini menyalinnya untuk memasang atribut Popover. Komponen tombol
+   * kustom harus merender `<button>` sebagai root DOM langsung dan meneruskan
+   * atribut `<button>` native yang diterimanya.
    */
   trigger: ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>
   /** Daftar aksi tanpa pengelompokan. */
@@ -89,11 +90,19 @@ export interface DropdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chi
   contentLabel?: string
   /** Kelas untuk panelnya. `className` sendiri menuju pembungkus terluar. */
   contentClassName?: string
+  /** Tampilan gelap untuk panel dan item generated. Custom children tetap mengatur temanya sendiri. */
+  darkMode?: boolean
 }
 
-const tones: Record<DropdownItemTone, string> = {
-  default: 'text-gray-700 hover:bg-gray-100',
-  danger: 'text-red-600 hover:bg-red-50',
+const tones: Record<'light' | 'dark', Record<DropdownItemTone, string>> = {
+  light: {
+    default: 'text-gray-700 hover:bg-gray-100',
+    danger: 'text-red-600 hover:bg-red-50',
+  },
+  dark: {
+    default: 'text-gray-300 hover:bg-gray-700',
+    danger: 'text-red-500 hover:bg-gray-700',
+  },
 }
 
 /** Jarak panel dari tombol dan dari tepi layar, dalam piksel. */
@@ -101,6 +110,9 @@ const JARAK = 4
 
 /** Jeda antar-ketikan yang masih dianggap satu kata saat melompat ke baris. */
 const JEDA_KETIK = 500
+
+const TRIGGER_CONTRACT_ERROR =
+  '[Dropdown] `trigger` must render a native <button> as its direct DOM root and forward standard button attributes. Use a native <button>, the shared <Button> in button mode, or a custom button component that forwards ButtonHTMLAttributes<HTMLButtonElement>. Anchors, div/span elements, Fragments, wrapped buttons, and components that swallow trigger props are not supported.'
 
 /** `newState` belum ada di lib.dom semua versi TypeScript, jadi ditulis sendiri. */
 type PeristiwaToggle = Event & { newState?: string }
@@ -127,7 +139,18 @@ type PeristiwaToggle = Event & { newState?: string }
  * tidak ada yang bisa melenceng dari keadaan sebenarnya.
  */
 export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropdown(
-  { trigger, items, groups, children, attached, className, contentLabel, contentClassName, ...props },
+  {
+    trigger,
+    items,
+    groups,
+    children,
+    attached,
+    darkMode = false,
+    className,
+    contentLabel,
+    contentClassName,
+    ...props
+  },
   ref,
 ) {
   const contentId = useId()
@@ -199,12 +222,22 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
   }, [tempatkan])
 
   if (!isValidElement<ButtonHTMLAttributes<HTMLButtonElement>>(trigger)) {
-    throw new Error('Dropdown memerlukan satu elemen <button> yang valid pada prop `trigger`.')
+    throw new Error(TRIGGER_CONTRACT_ERROR)
   }
 
   const daftar: DropdownGroup[] = groups ?? (items ? [{ id: 'utama', items }] : [])
   const pakaiDaftar = daftar.length > 0
-  const pilihan = daftar.some((group) => group.items.some((item) => item.selected !== undefined))
+  const semuaItem = daftar.flatMap((group) => group.items)
+  const pilihan = semuaItem.some((item) => item.selected !== undefined)
+
+  if (
+    pilihan &&
+    semuaItem.some((item) => item.selected === undefined || item.href !== undefined)
+  ) {
+    throw new Error(
+      '[Dropdown] Action and selection items cannot be mixed in the same collection. Items using `selected` are treated as listbox options. Button/link actions, including items with `href`, must be kept in a separate Dropdown.',
+    )
+  }
 
   /** Baris yang masih bisa dipilih, urut tampilan. */
   const barisHidup = () =>
@@ -213,6 +246,25 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
         '[data-baris]:not([aria-disabled="true"]):not(:disabled)',
       ) ?? [],
     )
+
+  useLayoutEffect(() => {
+    const wrap = wrapRef.current
+    const panel = contentRef.current
+    if (!wrap || !panel) return
+
+    const tombol = wrap.querySelector<HTMLButtonElement>(':scope > button')
+    const tombolAdalahRoot =
+      tombol !== null &&
+      wrap.firstElementChild === tombol &&
+      tombol.nextElementSibling === panel &&
+      panel.nextElementSibling === null
+    const targetBenar = tombol?.getAttribute('popovertarget') === contentId
+    const aksiBenar = tombol?.getAttribute('popovertargetaction') === 'toggle'
+
+    if (!tombolAdalahRoot || !targetBenar || !aksiBenar) {
+      throw new Error(TRIGGER_CONTRACT_ERROR)
+    }
+  }, [contentId, trigger])
 
   useEffect(() => {
     const panel = contentRef.current
@@ -413,7 +465,8 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
             aria-hidden="true"
             className={cn(
               'flex shrink-0 items-center [&_svg]:size-3.5',
-              tone === 'default' && 'text-gray-500',
+              tone === 'default' && (darkMode ? 'text-gray-300' : 'text-gray-500'),
+              item.disabled && darkMode && 'text-gray-500',
             )}
           >
             {item.icon}
@@ -423,7 +476,13 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
         {item.description ? (
           <span className="min-w-0 flex-1">
             <span className="block">{item.label}</span>
-            <span className="mt-0.5 block text-xs font-normal text-gray-500">
+            <span
+              className={cn(
+                'mt-0.5 block text-xs font-normal',
+                darkMode ? 'text-gray-400' : 'text-gray-500',
+                item.disabled && darkMode && 'text-gray-500',
+              )}
+            >
               {item.description}
             </span>
           </span>
@@ -461,8 +520,17 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
             // teksnya dan tidak memunculkan kursor tangan.
             'outline-none select-none',
             item.disabled
-              ? cn('cursor-not-allowed opacity-50', tone === 'danger' ? 'text-red-600' : 'text-gray-700')
-              : cn('cursor-default', tones[tone], 'focus:bg-gray-100'),
+              ? cn(
+                  'cursor-not-allowed opacity-50',
+                  tone === 'danger'
+                    ? darkMode ? 'text-red-500' : 'text-red-600'
+                    : darkMode ? 'text-gray-500' : 'text-gray-700',
+                )
+              : cn(
+                  'cursor-default',
+                  tones[darkMode ? 'dark' : 'light'][tone],
+                  darkMode ? 'focus:bg-gray-700' : 'focus:bg-gray-100',
+                ),
           )}
         >
           {isi}
@@ -472,9 +540,10 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
 
     const kelas = cn(
       dasar,
-      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+      'focus-visible:outline-2 focus-visible:outline-offset-2',
+      darkMode ? 'focus-visible:outline-primary-400' : 'focus-visible:outline-primary-600',
       'disabled:cursor-not-allowed disabled:opacity-50',
-      tones[tone],
+      tones[darkMode ? 'dark' : 'light'][tone],
     )
 
     // Aksi yang berpindah halaman dirender sebagai tautan supaya bisa dibuka
@@ -541,7 +610,8 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
           }
         }}
         className={cn(
-          'fixed inset-auto max-w-[calc(100vw-1rem)] overflow-x-hidden rounded-lg bg-surface text-content shadow-md [overflow-wrap:anywhere]',
+          'fixed inset-auto max-w-[calc(100vw-1rem)] overflow-x-hidden rounded-lg shadow-md [overflow-wrap:anywhere]',
+          darkMode ? 'bg-gray-800 text-gray-300' : 'bg-surface text-content',
           attached
             ? 'm-0 max-h-72 overflow-y-auto overscroll-contain'
             : 'mt-2 mr-0 mb-0 ml-0 w-max min-w-[min(anchor-size(width),calc(100vw-1rem))] [position-area:bottom_center]',
@@ -560,7 +630,13 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
                   aria-label={pilihan ? group.label : undefined}
                 >
                   {group.separator && (
-                    <hr aria-hidden="true" className="my-1 border-0 border-t border-border" />
+                    <hr
+                      aria-hidden="true"
+                      className={cn(
+                        'my-1 border-0 border-t',
+                        darkMode ? 'border-gray-700' : 'border-border',
+                      )}
+                    />
                   )}
                   {group.label && (
                     // Pada daftar pilihan kelompoknya sudah bernama lewat
