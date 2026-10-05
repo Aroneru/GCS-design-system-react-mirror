@@ -52,7 +52,8 @@ export function Simaya() {
         hanya warna aksennya yang berbeda.
       </Alert>
 
-      <section className="ds-card p-6 sm:p-8">
+      {/* 20px di ponsel agar toolbar editor Text Area (234px) muat di layar 320px. */}
+      <section className="ds-card p-5 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-heading-3 font-black text-gray-900">Naskah dinas baru</h2>
@@ -167,7 +168,7 @@ export function Simaya() {
         </div>
       </section>
 
-      <section className="ds-card p-6 sm:p-8">
+      <section className="ds-card p-5 sm:p-8">
         <div className="flex gap-3">
           <Icon className="mt-0.5 shrink-0 text-purple-700">
             <InfoCircle />

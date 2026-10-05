@@ -41,6 +41,10 @@ publik baru, dan dua perubahan yang memutus.
 - **`Avatar`** — lingkaran identitas berisi foto (`src`) atau inisial
   (`initials`) dalam tiga ukuran lewat `size` (`small` 24px, `default` 32px,
   `large` 80px). Gambar yang gagal dimuat jatuh sendiri ke inisial.
+- **`Checkbox`: prop `darkMode`** — tampilan gelap sesuai desain: kotak
+  gray-700 bergaris gray-600, label putih, dan caption gray-400. Kotak yang
+  tercentang tetap memakai warna aplikasi. `inactive` meredupkan label dan
+  caption ke gray-500.
 - **`Datepicker`** — pemilih tanggal dengan kalender di panel melayang, dalam
   tiga bentuk lewat `type`: `single` (satu tanggal, dengan tombol Hari ini dan
   Hapus), `period` (satu kalender dengan pintasan Hari ini, Minggu ini, Bulan
@@ -65,8 +69,8 @@ publik baru, dan dua perubahan yang memutus.
   tanggalnya ikut terkirim bersama formulir sebagai `YYYY-MM-DD`.
 
   Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert,
-  Datepicker, FloatingLabel, InputField, Radio, Select, TextArea, dan Toast
-  yang memilikinya; komponen lain menyusul.
+  Checkbox, Datepicker, FloatingLabel, InputField, Radio, Select, TextArea,
+  Toast, dan Toggle yang memilikinya; komponen lain menyusul.
 
   Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
   `DatepickerRangeProps` ikut diekspor.
@@ -129,6 +133,10 @@ publik baru, dan dua perubahan yang memutus.
   heading gray-300, teks lainnya gray-400, dan badge ikon berlatar gelap (-800;
   success -900) dengan ikon -400. Tombol tutup dan tombol di `actions` tidak
   berubah. Bawaannya `false`, jadi Toast yang sudah ada tetap terang.
+- **`Toggle`: prop `darkMode`** — tampilan gelap sesuai desain: jalur gray-600
+  dengan bulatan gray-400, label putih, dan caption gray-400. Saat menyala,
+  jalurnya tetap memakai warna aplikasi dan bulatannya putih. `inactive` hanya
+  meredupkan label ke gray-500.
 - **`Upload`** — pemilih berkas dalam dua bentuk lewat `type`: `default`
   (tombol pilih berkas + nama berkas terpilih, dua ukuran lewat `platform`) dan
   `attach` (area seret-lepas bergaris putus-putus setinggi 230px). Membungkus
