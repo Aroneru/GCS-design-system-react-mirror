@@ -41,6 +41,7 @@ publik baru, dan dua perubahan yang memutus.
 - **`Avatar`** — lingkaran identitas berisi foto (`src`) atau inisial
   (`initials`) dalam tiga ukuran lewat `size` (`small` 24px, `default` 32px,
   `large` 80px). Gambar yang gagal dimuat jatuh sendiri ke inisial.
+- **`Breadcrumb`: prop `darkMode`** — tampilan gelap: teks menu aktif menjadi gray-300, teks menu inaktif dan separator ikon menjadi gray-400, serta dukungan properti navigasi yang dinonaktifkan (`onClick` preventDefault) untuk dokumentasi.
 - **`Datepicker`** — pemilih tanggal dengan kalender di panel melayang, dalam
   tiga bentuk lewat `type`: `single` (satu tanggal, dengan tombol Hari ini dan
   Hapus), `period` (satu kalender dengan pintasan Hari ini, Minggu ini, Bulan
@@ -64,8 +65,8 @@ publik baru, dan dua perubahan yang memutus.
   ditelusuri dengan panah, Home/End, serta PageUp/PageDown. Dengan `name`,
   tanggalnya ikut terkirim bersama formulir sebagai `YYYY-MM-DD`.
 
-  Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert,
-  Datepicker, FloatingLabel, InputField, Radio, Select, TextArea, dan Toast
+  Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert, Breadcrumb,
+  Datepicker, FloatingLabel, InputField, Radio, Select, Sidebar, TextArea, dan Toast
   yang memilikinya; komponen lain menyusul.
 
   Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
@@ -119,7 +120,7 @@ publik baru, dan dua perubahan yang memutus.
   dengan teks dan panah gray-500. Panel daftar pilihannya tetap terang.
 - **`Sidebar`** — navigasi samping dengan menu tunggal (`items`) atau
   terkelompok (`groups`), submenu, area profil (`user`), dan mode ringkas
-  (`collapsed` + `onCollapse`). Tipe pendukung `SidebarItem`, `SidebarSubItem`,
+  (`collapsed` + `onCollapse`). Dilengkapi dengan prop `darkMode` untuk tampilan gelap (latar belakang gray-800, menu aktif & profil gray-700, teks menu & ikon aktif gray-50, serta ikon inaktif gray-400). Tipe pendukung `SidebarItem`, `SidebarSubItem`,
   `SidebarGroup`, dan `SidebarUser` ikut diekspor.
 - **`Spinner`** — indikator proses dalam ukuran `default` dan `large`.
 - **`TextArea`: prop `darkMode`** — tampilan gelap sesuai desain: kotak,

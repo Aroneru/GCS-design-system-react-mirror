@@ -97,7 +97,9 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`           |
 | `Container` | `as` (default `div`), `padded` (default `true`)                           |
 | `Icon`      | `children` (SVG dengan `currentColor`)                                    |
+| `Breadcrumb`| `items`, `darkMode`                                                       |
 | `Navbar`    | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`        |
+| `Sidebar`   | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `darkMode` |
 | `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`                     |
 
 Warna Button diatur `theme` (`primary \| green \| gray \| purple \| orange \|
