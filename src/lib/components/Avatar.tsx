@@ -32,6 +32,8 @@ export interface AvatarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'child
    */
   initials?: ReactNode
   size?: AvatarSize
+  /** Warna fallback untuk permukaan gelap. Foto profil tidak diubah. */
+  darkMode?: boolean
 }
 
 /**
@@ -46,7 +48,7 @@ export interface AvatarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'child
  * penanganan ini yang tersisa hanya ikon gambar rusak.
  */
 export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
-  { src, alt = '', initials, size = 'default', className, ...props },
+  { src, alt = '', initials, size = 'default', darkMode = false, className, ...props },
   ref,
 ) {
   // Yang diingat adalah alamat yang gagal, bukan sekadar "pernah gagal", supaya
@@ -64,7 +66,10 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
       role={namanya ? 'img' : undefined}
       aria-label={namanya}
       className={cn(
-        'grid shrink-0 place-items-center overflow-hidden rounded-full bg-gray-100 font-normal text-gray-900',
+        'grid shrink-0 place-items-center overflow-hidden rounded-full font-normal',
+        darkMode && !pakaiGambar
+          ? 'bg-gray-800 text-gray-100'
+          : 'bg-gray-100 text-gray-900',
         sizes[size],
         className,
       )}

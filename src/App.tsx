@@ -29,6 +29,7 @@ import { CheckboxPage } from "./docs/pages/form/CheckboxPage";
 import { ComponentsOverview } from "./docs/pages/components/ComponentsOverview";
 import { ContainerPage } from "./docs/pages/components/ContainerPage";
 import { ButtonPage } from "./docs/pages/components/ButtonPage";
+import { ClipboardPage } from "./docs/pages/components/ClipboardPage";
 import { AvatarPage } from "./docs/pages/components/AvatarPage";
 import { BadgePage } from "./docs/pages/components/BadgePage";
 import { SpinnerPage } from "./docs/pages/components/SpinnerPage";
@@ -79,6 +80,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components": ComponentsOverview,
   "/components/container": ContainerPage,
   "/components/button": ButtonPage,
+  "/components/clipboard": ClipboardPage,
   "/components/avatar": AvatarPage,
   "/components/badge": BadgePage,
   "/components/spinner": SpinnerPage,

@@ -28,7 +28,6 @@ export function Pengaturan() {
   const [surelMasuk, setSurelMasuk] = useState(true)
   const [ringkasan, setRingkasan] = useState(false)
 
-  const [konfirmasi, setKonfirmasi] = useState(false)
   const [tersimpan, setTersimpan] = useState(false)
 
   return (
@@ -146,56 +145,53 @@ export function Pengaturan() {
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Button onClick={() => setKonfirmasi(true)}>Simpan perubahan</Button>
+          <Modal
+            trigger={<Button>Simpan perubahan</Button>}
+            title="Simpan perubahan?"
+            footer={({ close }) => (
+              <>
+                <Button variant="outline" theme="gray" size="xs" onClick={close}>
+                  Batal
+                </Button>
+                <Button
+                  size="xs"
+                  onClick={() => {
+                    setTersimpan(true)
+                    close()
+                  }}
+                >
+                  Ya, simpan
+                </Button>
+              </>
+            )}
+          >
+            <div className="flex gap-3">
+              <Icon className="mt-0.5 shrink-0 text-primary-700">
+                <InfoCircle />
+              </Icon>
+              <p>
+                Pengaturan ini akan dipakai pada seluruh pengajuan berikutnya. Pengajuan yang sedang
+                berjalan tidak ikut berubah.
+              </p>
+            </div>
+
+            {!setuju && (
+              <div className="mt-4 flex gap-2 rounded-lg bg-yellow-50 p-3 text-yellow-800">
+                <Icon className="mt-0.5 size-4 shrink-0">
+                  <ExclamationCircle />
+                </Icon>
+                <span className="text-xs">
+                  Pernyataan kebenaran data belum dicentang — ini hanya contoh, penyimpanan tetap
+                  diizinkan.
+                </span>
+              </div>
+            )}
+          </Modal>
           <Button variant="outline" theme="gray">
             Batalkan
           </Button>
         </div>
       </section>
-
-      <Modal
-        open={konfirmasi}
-        onClose={() => setKonfirmasi(false)}
-        title="Simpan perubahan?"
-        footer={
-          <>
-            <Button variant="outline" theme="gray" size="xs" onClick={() => setKonfirmasi(false)}>
-              Batal
-            </Button>
-            <Button
-              size="xs"
-              onClick={() => {
-                setKonfirmasi(false)
-                setTersimpan(true)
-              }}
-            >
-              Ya, simpan
-            </Button>
-          </>
-        }
-      >
-        <div className="flex gap-3">
-          <Icon className="mt-0.5 shrink-0 text-primary-700">
-            <InfoCircle />
-          </Icon>
-          <p>
-            Pengaturan ini akan dipakai pada seluruh pengajuan berikutnya. Pengajuan yang sedang
-            berjalan tidak ikut berubah.
-          </p>
-        </div>
-
-        {!setuju && (
-          <div className="mt-4 flex gap-2 rounded-lg bg-yellow-50 p-3 text-yellow-800">
-            <Icon className="mt-0.5 size-4 shrink-0">
-              <ExclamationCircle />
-            </Icon>
-            <span className="text-xs">
-              Pernyataan kebenaran data belum dicentang — ini hanya contoh, penyimpanan tetap
-              diizinkan.
-            </span>
-          </div>
-        )}
-      </Modal>
 
       {tersimpan && (
         <div className="fixed bottom-4 left-4 z-50">

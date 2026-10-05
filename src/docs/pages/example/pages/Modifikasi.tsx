@@ -8,7 +8,6 @@ import {
   Container,
   Icon,
   InputField,
-  Popover,
   Select,
   Spinner,
   TextArea,
@@ -362,9 +361,9 @@ import { Plus } from '@ceplok-ui/design-kit-react/icons/outline'
               <div className="flex w-full items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Badge variant="success">Aktif</Badge>
-                  <Popover title="Slot bebas" side="top">
+                  <span className="text-xs text-gray-500">
                     Isi actions tidak harus tombol — badge, teks, atau apa pun boleh.
-                  </Popover>
+                  </span>
                 </div>
                 <Button type="iconOnly" size="xs" theme="gray" variant="outline" aria-label="Hapus">
                   <TrashBin />
@@ -422,7 +421,7 @@ import { TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
               <Badge variant="brand" className="tracking-widest uppercase">
                 tracking · uppercase
               </Badge>
-              <Spinner className="text-purple-600" aria-label="Memuat" />
+              <Spinner className="mx-auto" aria-label="Memuat data" />
             </div>
           </div>
 
