@@ -282,40 +282,38 @@ export function ComponentsOverview() {
         name="Sidebar"
         desc="Navigasi samping dengan grup menu, submenu, profil akun, dan mode ringkas."
       >
-        <div className="flex flex-col rounded-xl bg-surface-subtle p-5">
-          <div className="flex flex-1 min-h-[280px] w-full max-w-full overflow-hidden rounded-lg border border-border bg-white shadow-sm">
-            {/* Sidebar Asli di dalam frame */}
-            <div className="w-56 shrink-0 border-r-[0.5px] border-gray-200 [&>aside]:min-h-full [&>aside]:w-full [&>aside]:border-none">
-              <Sidebar
-                logo={
-                  <div className="flex items-center gap-2">
-                    <div className="grid size-8 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5">
-                      <div className="rounded-sm bg-white" />
-                      <div className="rounded-sm bg-primary-300" />
-                      <div className="rounded-sm bg-primary-300" />
-                      <div className="rounded-sm bg-white" />
-                    </div>
-                    <span className="text-sm font-black tracking-tight">CEPLOK</span>
-                  </div>
-                }
-                items={[
-                  { label: "Beranda", active: true },
-                  { label: "Layanan" },
-                  { label: "Laporan" },
-                  { label: "Pengaturan" },
-                ]}
-              />
-            </div>
+        <div className="relative flex h-[264px] flex-col overflow-hidden rounded-xl bg-surface-subtle p-5">
+          {/* Skeleton Konten Halaman */}
+          <div className="ml-56 hidden space-y-3 opacity-60 sm:block" aria-hidden="true">
+            <div className="h-2 w-2/5 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-5/6 rounded bg-gray-200" />
+            <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-4/6 rounded bg-gray-200" />
+          </div>
 
-            {/* Skeleton Konten Halaman */}
-            <div className="hidden flex-1 space-y-3 p-5 opacity-60 sm:block" aria-hidden="true">
-              <div className="h-2 w-2/5 rounded bg-gray-300" />
-              <div className="h-1.5 w-full rounded bg-gray-200" />
-              <div className="h-1.5 w-5/6 rounded bg-gray-200" />
-              <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
-              <div className="h-1.5 w-full rounded bg-gray-200" />
-              <div className="h-1.5 w-4/6 rounded bg-gray-200" />
-            </div>
+          {/* Sidebar Asli Full */}
+          <div className="absolute bottom-0 left-0 top-0 flex w-56 flex-col overflow-hidden border-r-[0.5px] border-gray-200 bg-white shadow-sm [&>aside]:min-h-full [&>aside]:w-full [&>aside]:border-none [&_nav]:!overflow-hidden">
+            <Sidebar
+              logo={
+                <div className="flex items-center gap-2">
+                  <div className="grid size-8 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5">
+                    <div className="rounded-sm bg-white" />
+                    <div className="rounded-sm bg-primary-300" />
+                    <div className="rounded-sm bg-primary-300" />
+                    <div className="rounded-sm bg-white" />
+                  </div>
+                  <span className="text-sm font-black tracking-tight">CEPLOK</span>
+                </div>
+              }
+              items={[
+                { label: "Beranda", active: true },
+                { label: "Layanan" },
+                { label: "Laporan" },
+                { label: "Pengaturan" },
+              ]}
+            />
           </div>
         </div>
       </OverviewCard>

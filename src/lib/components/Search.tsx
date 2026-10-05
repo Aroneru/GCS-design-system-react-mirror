@@ -286,6 +286,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               attached
               contentLabel={categoryPlaceholder}
               items={itemKategori}
+              darkMode={darkMode}
               trigger={
                 <button
                   type="button"
