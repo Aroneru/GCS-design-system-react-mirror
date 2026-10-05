@@ -12,6 +12,7 @@ import {
 import * as OutlineIcons from "../../lib/icons/outline";
 import * as SolidIcons from "../../lib/icons/solid";
 import { brandIcons } from "../../lib/brandIconRegistry";
+import { ReactLogo } from "../../lib/brandIcons";
 import { sidebars } from "../navigation";
 import { asset } from "../asset";
 import { DocUsage } from "../DocUsage";
@@ -429,18 +430,12 @@ const SNIPPETS: Snippet[] = [
 ].map((s) => ({ ...s, lines: [...PREAMBLE, ...s.lines] }));
 
 /**
- * Panjang tiap baris dalam karakter, posisi awal baris itu di seluruh potongan,
- * dan totalnya — dihitung sekali di muka untuk tiap potongan, karena animasinya
- * membacanya puluhan kali per detik.
+ * Teks polos tiap baris — dihitung sekali di muka untuk tiap potongan, karena
+ * animasinya membaca panjang baris di setiap ketukan.
  */
-const METRICS = SNIPPETS.map(({ lines }) => {
-  const len = lines.map((line) => line.reduce((n, tok) => n + tok.t.length, 0));
-  const start = len.reduce<number[]>(
-    (acc, _l, i) => [...acc, (acc[i - 1] ?? 0) + (len[i - 1] ?? 0)],
-    [],
-  );
-  return { len, start, total: len.reduce((a, b) => a + b, 0) };
-});
+const LINE_TEXT = SNIPPETS.map(({ lines }) =>
+  lines.map((line) => line.map((tok) => tok.t).join("")),
+);
 
 /**
  * Jumlah baris potongan terpanjang. Tinggi area kode dikunci ke angka ini,
@@ -449,12 +444,57 @@ const METRICS = SNIPPETS.map(({ lines }) => {
  */
 const MAX_LINES = Math.max(...SNIPPETS.map((s) => s.lines.length));
 
-/** Tinggi satu baris, dipakai bersama oleh kelas `leading-6` dan posisi kursor. */
+/** Tinggi satu baris, sama dengan kelas `leading-6` / `h-6` pada baris kode. */
 const LINE_HEIGHT_REM = 1.5;
 
-/** Karakter per detik saat mengetik. Durasi diturunkan dari sini supaya potongan
- *  yang lebih panjang tidak terasa lebih cepat diketik. */
-const TYPE_SPEED = 26;
+/** Satu ketukan: posisi kursor sesudahnya, dan kapan ketukan itu jatuh (detik). */
+type Keystroke = { line: number; col: number; at: number };
+
+const between = (min: number, max: number) => min + Math.random() * (max - min);
+
+/**
+ * Menyusun jadwal ketukan untuk satu potongan, meniru orang yang mengetik.
+ *
+ * Kecepatan tetap per karakter adalah yang membuat versi lama terasa seperti
+ * mesin. Orang tidak mengetik dengan irama metronom:
+ * - jeda antar huruf selalu sedikit berbeda,
+ * - ada jeda kecil sesudah spasi, saat pindah ke kata berikutnya,
+ * - simbol seperti `<`, `=`, `"` lebih lambat karena butuh Shift,
+ * - sesekali ada ragu sejenak di tengah baris,
+ * - sebelum Enter ada jeda lebih panjang, seperti memikirkan baris berikutnya.
+ *
+ * Indentasi di awal baris muncul sekaligus bersama Enter, sama seperti editor
+ * yang menjaga indentasi otomatis. Tidak ada yang mengetik spasi indentasi satu
+ * per satu.
+ *
+ * Acaknya dibuat ulang tiap giliran, jadi potongan yang sama tidak pernah
+ * diketik dengan irama yang persis sama dua kali.
+ */
+function planTyping(lines: string[]): { keys: Keystroke[]; end: number } {
+  const keys: Keystroke[] = [];
+  let t = 0;
+
+  lines.forEach((text, line) => {
+    const indent = text.length - text.trimStart().length;
+
+    if (line > 0) {
+      t += between(0.14, 0.32);
+      keys.push({ line, col: indent, at: t });
+    }
+
+    for (let col = indent; col < text.length; col++) {
+      const ch = text[col];
+      let d = between(0.018, 0.046);
+      if (text[col - 1] === " ") d += between(0.02, 0.06);
+      if (/[<>="'{}[\]/]/.test(ch)) d += between(0.015, 0.045);
+      if (Math.random() < 0.04) d += between(0.14, 0.3);
+      t += d;
+      keys.push({ line, col: col + 1, at: t });
+    }
+  });
+
+  return { keys, end: t };
+}
 
 /**
  * Jendela kode yang mengetik sendiri isinya, menghapusnya, lalu berpindah ke
@@ -482,7 +522,7 @@ const TYPE_SPEED = 26;
 function CodeWindow() {
   const [index, setIndex] = useState(0);
   const snippet = SNIPPETS[index];
-  const metrics = METRICS[index];
+  const lineText = LINE_TEXT[index];
 
   // Hanya giliran pertama yang menunggu; sesudahnya potongan berikutnya langsung
   // menyusul supaya jeda antarpotongan tidak terasa seperti animasi tersendat.
@@ -497,69 +537,83 @@ function CodeWindow() {
 
   const ref = useGsap<HTMLDivElement>(
     ({ q }) => {
+      const code = q("[data-code]")[0];
       const lineEls = q("[data-line]");
-      const caret = q("[data-caret]")[0];
-      const counter = { n: 0 };
+      const carets = q("[data-caret]");
 
-      const draw = () => {
-        const n = counter.n;
-        let caretLine = 0;
-        let caretCol = 0;
-
-        lineEls.forEach((line, i) => {
-          const visible = Math.min(
-            Math.max(n - metrics.start[i], 0),
-            metrics.len[i],
-          );
-          line.style.width = `${visible}ch`;
-
-          // Kursor duduk di baris terakhir yang sudah tersentuh. Baris kosong ikut
-          // tersentuh pada offset yang sama dengan baris sesudahnya, jadi baris
-          // berikutnya menimpanya dan kursor tidak pernah tertinggal di ruang kosong.
-          if (n >= metrics.start[i]) {
-            caretLine = i;
-            caretCol = visible;
-          }
+      // Baris sebelum kursor tampil utuh, baris kursor terpotong di kolomnya,
+      // baris sesudahnya belum ada. Kursor selalu ikut posisi ketukan terakhir,
+      // termasuk tetap di ujung baris selama jeda sebelum Enter.
+      //
+      // Posisi kursor tidak dihitung sama sekali: ia menempel tepat setelah
+      // potongan baris yang terlihat, jadi cukup menyalakan kursor di baris aktif.
+      const place = (line: number, col: number) => {
+        lineEls.forEach((el, i) => {
+          const width =
+            i < line ? lineText[i].length : i === line ? col : 0;
+          el.style.width = `${width}ch`;
+          carets[i].style.visibility = i === line ? "visible" : "hidden";
         });
-
-        caret.style.transform = `translate(${caretCol}ch, ${caretLine * LINE_HEIGHT_REM}rem)`;
       };
 
       // Digambar sekali sebelum timeline mulai. Tanpa ini, selama `delay` di bawah
       // belum ada satu pun lebar yang tertulis, jadi tiap baris memakai lebar
       // aslinya — kode utuh berkedip muncul lebih dulu, lalu hilang begitu frame
       // pertama animasi menimpanya.
-      draw();
+      place(0, 0);
 
-      const tl = gsap
-        .timeline({ delay: firstRun.current ? 0.5 : 0.25 })
-        .to(counter, {
-          n: metrics.total,
-          duration: metrics.total / TYPE_SPEED,
-          ease: "none",
-          onUpdate: draw,
-        })
-        .to(counter, { duration: 1.8 })
-        // Menghapus selalu lebih cepat daripada mengetik, dan makin cepat di
-        // akhir — itu yang membuatnya terbaca sebagai backspace ditahan, bukan
-        // sebagai animasi yang diputar mundur.
-        .to(counter, { n: 0, duration: 0.7, ease: "power2.in", onUpdate: draw })
-        .call(() => {
-          firstRun.current = false;
-          setIndex((i) => (i + 1) % SNIPPETS.length);
-        });
-
-      // `fromTo`, bukan `to`: kursor berangkat dari `opacity-0` di markup supaya
-      // pada mode gerak dikurangi — ketika seluruh setup ini dilewati — ia tidak
-      // tertinggal diam di pojok kiri atas menutupi karakter pertama.
-      gsap.fromTo(
-        caret,
+      // Kedip kursor seperti di editor: diam menyala selama sedang mengetik, baru
+      // berkedip saat jeda. Tiap ketukan memutar ulang kedipnya dari awal.
+      //
+      // Pada mode gerak dikurangi seluruh setup ini dilewati, dan semua kursor
+      // tetap `invisible` dari markup.
+      const blink = gsap.fromTo(
+        carets,
         { opacity: 1 },
-        { opacity: 0, duration: 0.5, repeat: -1, yoyo: true, ease: "steps(1)" },
+        { opacity: 0, duration: 0.53, repeat: -1, yoyo: true, ease: "steps(1)" },
       );
+
+      const { keys, end } = planTyping(lineText);
+      const tl = gsap.timeline({ delay: firstRun.current ? 0.6 : 0.35 });
+
+      keys.forEach((k) =>
+        tl.call(
+          () => {
+            place(k.line, k.col);
+            blink.restart();
+          },
+          undefined,
+          k.at,
+        ),
+      );
+
+      // Menghapus dengan cara orang menghapus satu berkas: pilih semua, jeda
+      // sebentar, lalu hilang sekaligus. Backspace yang ditahan melintasi
+      // sepuluh baris terlihat seperti animasi diputar mundur, bukan seperti
+      // orang yang sedang bekerja.
+      const hold = end + 1.8;
+      tl.call(() => code.setAttribute("data-selected", ""), undefined, hold)
+        .call(
+          () => {
+            code.removeAttribute("data-selected");
+            place(0, 0);
+            blink.restart();
+          },
+          undefined,
+          hold + 0.45,
+        )
+        .call(
+          () => {
+            firstRun.current = false;
+            setIndex((i) => (i + 1) % SNIPPETS.length);
+          },
+          undefined,
+          hold + 0.75,
+        );
 
       return () => {
         tl.kill();
+        code.removeAttribute("data-selected");
       };
       // `index` WAJIB ada di sini — inilah yang membuat perputarannya hidup.
       //
@@ -746,9 +800,9 @@ function CodeWindow() {
         <div className="relative z-10 flex items-center gap-3 bg-gray-800/70 px-4 py-3">
           <WindowDots />
           <span className="ml-1 inline-flex items-center gap-2 rounded-md bg-gray-900 px-3 py-1">
-            <span className="font-mono text-[11px] font-black text-yellow-300">
-              TSX
-            </span>
+            {/* Logo React menandai berkas .tsx, warnanya cyan khas React. */}
+            <ReactLogo className="size-4 shrink-0 text-blue-600" />
+
             <span className="text-xs font-bold text-gray-200">
               {snippet.file}
             </span>
@@ -824,16 +878,19 @@ function CodeWindow() {
           {/* Tinggi dikunci ke potongan terpanjang supaya jendela tidak berubah
               ukuran saat potongan berganti. */}
           <code
-            className="relative block"
+            data-code
+            className="group/code relative block"
             style={{ height: `${MAX_LINES * LINE_HEIGHT_REM}rem` }}
           >
             {snippet.lines.map((line, i) => (
               // Tinggi baris dikunci di pembungkus luar supaya baris kosong dan
               // baris yang lebarnya sedang nol tetap menahan ruangnya.
               <span key={i} className="block h-6">
+                {/* Latar biru saat `data-selected` = blok seleksi "pilih semua"
+                    sebelum potongannya dihapus. */}
                 <span
                   data-line
-                  className="inline-block overflow-hidden align-top whitespace-pre"
+                  className="inline-block overflow-hidden align-top whitespace-pre group-data-[selected]/code:bg-primary-400/30"
                 >
                   {line.map((tok, j) => (
                     <span key={j} className={tok.cls}>
@@ -841,18 +898,28 @@ function CodeWindow() {
                     </span>
                   ))}
                 </span>
+                {/*
+                  Kursor ada di dalam alur teks, tepat setelah potongan baris
+                  yang terlihat, bukan diposisikan absolut dari luar.
+
+                  Ia elemen inline berisi zero-width space dengan border kiri.
+                  Kotak elemen inline selalu setinggi area huruf font yang
+                  sedang dipakai dan duduk di garis dasar yang sama dengan
+                  teksnya. Jadi tinggi dan posisinya selalu pas dengan huruf,
+                  apa pun font monospace yang dipakai browser. Versi absolut
+                  sebelumnya menebak angka em/rem dan meleset di font tertentu.
+
+                  Satu kursor per baris, hanya yang aktif yang terlihat.
+                */}
+                <span
+                  data-caret
+                  aria-hidden="true"
+                  className="invisible border-l-2 border-primary-300"
+                >
+                  {"​"}
+                </span>
               </span>
             ))}
-
-            {/*
-              Kursor dipisah dari alur teks dan digeser dengan transform: satu
-              elemen yang berpindah, bukan satu per baris yang saling dinyalakan.
-            */}
-            <span
-              data-caret
-              aria-hidden="true"
-              className="absolute top-[0.2em] left-0 inline-block h-[1.05em] w-[0.5ch] bg-primary-300 opacity-0"
-            />
           </code>
         </pre>
       </div>
@@ -1105,10 +1172,42 @@ export function HomePage() {
                 >
                   <span className="text-gray-400">$</span>
                   <span>{INSTALL}</span>
-                  <span
-                    className={`text-xs font-bold ${copied ? "text-green-600" : "text-gray-400"}`}
-                  >
-                    {copied ? "Tersalin!" : "Salin"}
+                  {/*
+                    Ikon salin dan ceklis ditumpuk di sel grid yang sama, lalu
+                    bergantian lewat opacity + scale. Ukurannya tetap, jadi
+                    tombolnya tidak melebar atau menyempit saat status berganti.
+                    `-translate-y-px` mengangkat ikonnya sedikit supaya sejajar
+                    dengan huruf monospace di sebelahnya.
+                  */}
+                  <span className="grid size-4 shrink-0 -translate-y-px place-items-center *:col-start-1 *:row-start-1 *:size-4 *:transition-[opacity,scale] *:duration-200">
+                    <svg
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.8}
+                      aria-hidden="true"
+                      className={`text-gray-400 ${copied ? "scale-50 opacity-0" : "scale-100 opacity-100"}`}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 9V5.5A1.5 1.5 0 0 1 10.5 4h8A1.5 1.5 0 0 1 20 5.5v8a1.5 1.5 0 0 1-1.5 1.5H15M5.5 9h8A1.5 1.5 0 0 1 15 10.5v8a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 4 18.5v-8A1.5 1.5 0 0 1 5.5 9Z"
+                      />
+                    </svg>
+                    <svg
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.4}
+                      aria-hidden="true"
+                      className={`text-green-600 ${copied ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m5 13 4.5 4.5L19 7"
+                      />
+                    </svg>
                   </span>
                 </button>
               </Reveal>
