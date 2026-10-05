@@ -15,7 +15,7 @@ import {
     type DrawerNavItemTheme,
 } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { H, Segmented } from '../../pageKit'
+import { H, Hl, Segmented } from '../../pageKit'
 import {
     Control,
     Controls,
@@ -383,7 +383,7 @@ export function DrawerPage() {
             {/* SECTION 2: MENU NAVIGASI */}
             <FlowSection id="menu" title="Menu">
                 <Lead>
-                    Menu pada Drawer dapat dikonfigurasi melalui prop <code>items</code> (Data-driven array) atau disusun manual menggunakan <code>DrawerNavItem</code> dan <code>DrawerSubItem</code>.
+                    Menu pada Drawer dapat dikonfigurasi melalui prop <Hl>items</Hl> (Data-driven array) atau disusun manual menggunakan <Hl>DrawerNavItem</Hl> dan <Hl>DrawerSubItem</Hl>.
                 </Lead>
 
                 <div className="grid gap-6 lg:grid-cols-2">

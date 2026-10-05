@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ExclamationCircle } from '../../../lib/icons/outline'
 import { Button, Icon, Modal, type ModalSize } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { H, Segmented } from '../../pageKit'
+import { H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -215,7 +215,7 @@ export function ModalPage() {
       <FlowSection id="playground" title="Playground">
         <Lead>
           Pilih susunan isi dan ukurannya, lalu buka satu pratinjau. Tombol tutup, latar, dan Escape
-          memanggil callback yang memperbarui state <H>open</H>.
+          memanggil callback yang memperbarui state <Hl>open</Hl>.
         </Lead>
 
         <Stage maxWidth="max-w-[420px]">
@@ -258,10 +258,10 @@ export function ModalPage() {
         )}
         {isKonfirmasi && (
           <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-            Konfirmasi ini tidak memakai <H>title</H>, jadi headernya tinggal tombol tutup dan nama
-            dialognya datang dari <H>aria-label</H>. Tombolnya dirapatkan ke tengah lewat satu
-            pembungkus <H>w-full</H> di dalam <H>footer</H> — Modal tidak menyediakan prop untuk
-            mengatur tata letak footer, sama seperti <H>actions</H> pada Alert.
+            Konfirmasi ini tidak memakai <Hl>title</Hl>, jadi headernya tinggal tombol tutup dan nama
+            dialognya datang dari <Hl>aria-label</Hl>. Tombolnya dirapatkan ke tengah lewat satu
+            pembungkus <Hl>w-full</Hl> di dalam <Hl>footer</Hl> — Modal tidak menyediakan prop untuk
+            mengatur tata letak footer, sama seperti <Hl>actions</Hl> pada Alert.
           </p>
         )}
         {playgroundExample === 'long' && (
@@ -344,7 +344,7 @@ export function ModalPage() {
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
           Modal mengurus wadah dialog, latar, tombol tutup, dan susunan tiga bagiannya. Anda yang
-          memegang state <H>open</H>, callback <H>onClose</H>, tombol aksi, pengiriman form, proses
+          memegang state <Hl>open</Hl>, callback <Hl>onClose</Hl>, tombol aksi, pengiriman form, proses
           asinkron, dan kapan modalnya benar-benar ditutup.
         </Lead>
 
@@ -355,7 +355,7 @@ export function ModalPage() {
         <h3 className="mt-8 text-sm font-black text-gray-900">State dan aksi</h3>
         <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
           Modal tidak menutup dirinya setelah tombol aksi ditekan. Jalankan validasi atau proses
-          simpan di handler Anda, lalu ubah <code>open</code> jadi false setelah berhasil. Modal juga
+          simpan di handler Anda, lalu ubah <Hl>open</Hl> jadi false setelah berhasil. Modal juga
           tidak mengambil alih event submit form.
         </p>
         <SectionCode>
@@ -363,30 +363,30 @@ export function ModalPage() {
         </SectionCode>
 
         <p className="mt-5 max-w-2xl text-body-sm text-gray-500">
-          Pakai <code>className</code> untuk gaya tambahan yang tidak bertabrakan dengan tata letak
+          Pakai <Hl>className</Hl> untuk gaya tambahan yang tidak bertabrakan dengan tata letak
           bawaannya. Jangan mengandalkan utility yang bertabrakan untuk mengganti width, max-height,
-          overflow, atau perilaku flex — <code>cn()</code> di kit ini clsx biasa, jadi kelas yang
+          overflow, atau perilaku flex — <Hl>cn()</Hl> di kit ini clsx biasa, jadi kelas yang
           bertabrakan sama-sama terpasang dan urutan CSS yang menentukan. Untuk lebar, pilih{' '}
-          <code>size=&quot;s&quot;</code> atau <code>size=&quot;m&quot;</code>.
+          <Hl>size=&quot;s&quot;</Hl> atau <Hl>size=&quot;m&quot;</Hl>.
         </p>
 
         <h3 className="mt-10 text-sm font-black text-gray-900">Perilaku menutup</h3>
         <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
           Modal bisa ditutup lewat tombol tutup, klik pada latar, atau Escape. Ketiganya hanya
-          memanggil <code>onClose</code> — Modal tidak menyimpan keadaan buka/tutupnya sendiri, jadi
+          memanggil <Hl>onClose</Hl> — Modal tidak menyimpan keadaan buka/tutupnya sendiri, jadi
           tidak ada dua sumber kebenaran yang bisa melenceng. Untuk dialog yang wajib diselesaikan,
-          matikan <code>dismissible</code> supaya tombol tutupnya hilang dan hanya tombol di footer
+          matikan <Hl>dismissible</Hl> supaya tombol tutupnya hilang dan hanya tombol di footer
           yang tersisa.
         </p>
 
         <h3 className="mt-8 text-sm font-black text-gray-900">Accessibility</h3>
         <div className="mt-1 max-w-2xl space-y-3 text-body-sm text-gray-500">
           <p>
-            Modal memakai elemen <code>&lt;dialog&gt;</code> bawaan. Isi <code>title</code> otomatis
-            menjadi nama aksesibel dialognya — ia dirender sebagai <code>&lt;h2&gt;</code>, jadi
+            Modal memakai elemen <Hl>&lt;dialog&gt;</Hl> bawaan. Isi <Hl>title</Hl> otomatis
+            menjadi nama aksesibel dialognya — ia dirender sebagai <Hl>&lt;h2&gt;</Hl>, jadi
             jangan membungkusnya lagi dengan heading Anda sendiri. Bila tidak ada judul yang
-            terlihat, beri <code>aria-label</code>. Isi modal tidak otomatis dipakai sebagai{' '}
-            <code>aria-describedby</code>.
+            terlihat, beri <Hl>aria-label</Hl>. Isi modal tidak otomatis dipakai sebagai{' '}
+            <Hl>aria-describedby</Hl>.
           </p>
           <p>
             Dialog bawaan yang mengurus fokus awal, top layer, dan mematikan latar belakangnya. Untuk
@@ -399,7 +399,7 @@ export function ModalPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;dialog&gt;</H> standar juga diteruskan apa adanya.
+          <Hl>&lt;dialog&gt;</Hl> standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={modalProps} minWidth="52rem" />
       </FlowSection>

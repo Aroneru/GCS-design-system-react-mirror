@@ -55,7 +55,32 @@ export interface HeroProps {
   imageOrientation?: HeroImageOrientation
   /** Dipakai bila `image` kosong — misal ilustrasi <svg> inline. */
   imageContent?: ReactNode
+  /**
+   * Tampilan gelap: latar gray-900 untuk semua tipe, judul putih, sub heading
+   * primary-500, deskripsi gray-400. Tombolnya tetap primary-700.
+   */
+  darkMode?: boolean
   className?: string
+}
+
+/** Warna latar dan teks untuk tampilan terang dan gelap. */
+const themes = {
+  light: {
+    // Tipe centered tidak punya gambar, jadi latar primary-50 yang memberinya bentuk.
+    section: (centered: boolean) => (centered ? 'bg-primary-50' : 'bg-surface'),
+    heading: 'text-content',
+    subHeading: 'text-primary-600',
+    description: 'text-content-subtle',
+  },
+  dark: {
+    // Mengikuti desain: satu latar gray-900 untuk ketiga tipe, termasuk centered.
+    section: () => 'bg-gray-900',
+    heading: 'text-white',
+    // primary-600 bawaan terang terlalu gelap di atas gray-900; primary-500
+    // yang ada di desain gelap dan tetap terbaca.
+    subHeading: 'text-primary-500',
+    description: 'text-gray-400',
+  },
 }
 
 /** Panah pada tombol — mengisi kotak ikon yang sudah diukur <Button>. */
@@ -96,6 +121,9 @@ const ArrowRight = () => (
  * `object-cover`): tingginya mengikuti rasio asli berkasnya. Mengunci rasio di
  * sini membuat ilustrasi potret ikut dipipihkan — teks di dalamnya jadi ikut
  * gepeng, dan itu tidak bisa diperbaiki dari sisi pemakai.
+ *
+ * `darkMode` hanya mengganti warna latar dan teks. Susunan, ukuran, dan
+ * perilaku responsifnya sama persis dengan tampilan terang.
  */
 export function Hero({
   type = 'horizontal-image-left',
@@ -112,8 +140,10 @@ export function Hero({
   imageAlt = '',
   imageOrientation = 'portrait',
   imageContent,
+  darkMode = false,
   className,
 }: HeroProps) {
+  const theme = darkMode ? themes.dark : themes.light
   const centered = type === 'centered'
   const stacked = platform === 'mobile'
   const hasMedia = !centered && Boolean(image || imageContent)
@@ -159,7 +189,8 @@ export function Hero({
       {heading && (
         <h1
           className={cn(
-            'text-heading-1 font-black tracking-tight text-content',
+            'text-heading-1 font-black tracking-tight',
+            theme.heading,
             // Judul 48px baru dipakai saat kolomnya memang cukup lega; di kolom
             // sempit ukuran itu memecah judul jadi tiga baris.
             !stacked && '@[1024px]:text-display',
@@ -170,7 +201,7 @@ export function Hero({
       )}
 
       {showHeading && subHeading && (
-        <p className="mt-2 text-body-lg font-bold text-primary-600">{subHeading}</p>
+        <p className={cn('mt-2 text-body-lg font-bold', theme.subHeading)}>{subHeading}</p>
       )}
 
       {description && (
@@ -183,7 +214,8 @@ export function Hero({
             // tipe horizontal — batas ini tidak pernah aktif, jadi deskripsi
             // tetap sebaris dengan judul dan tombolnya; yang ditahan hanya satu
             // kolom di ruang lebar.
-            'mx-auto mt-4 max-w-2xl text-body-lg leading-relaxed text-content-subtle',
+            'mx-auto mt-4 max-w-2xl text-body-lg leading-relaxed',
+            theme.description,
             alignLeftWhenWide && '@[768px]:mx-0',
           )}
         >
@@ -230,7 +262,7 @@ export function Hero({
 
   return (
     <section
-      className={cn('@container w-full', centered ? 'bg-primary-50' : 'bg-surface', className)}
+      className={cn('@container w-full', theme.section(centered), className)}
     >
       <div
         className={cn(

@@ -15,7 +15,7 @@ import {
   type DropdownItem,
 } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -422,7 +422,7 @@ export function DropdownPage() {
     >
       <FlowSection id="dropdown" title="Dropdown">
         <Lead>
-          <H>trigger</H> menerima satu tombol milik Anda; <H>items</H> menerima daftar aksinya. Panel
+          <Hl>trigger</Hl> menerima satu tombol milik Anda; <Hl>items</Hl> menerima daftar aksinya. Panel
           ditutup lewat trigger, klik di luar, atau Escape — semuanya diurus HTML Popover API, jadi
           tidak ada state buka/tutup yang bisa melenceng. Aksi menutup panel setelah ditekan;
           kontrol seperti Radio dan Checkbox tetap terbuka saat pilihannya berubah.
@@ -440,9 +440,9 @@ export function DropdownPage() {
 
       <FlowSection id="kelompok" title="Kelompok">
         <Lead>
-          Aksi yang perlu dipisah disusun lewat <H>groups</H>. Prop <H>separator</H> menambahkan
-          garis sebelum sebuah kelompok — artinya sama persis dengan <H>SidebarGroup</H>, jadi tidak
-          ada yang perlu dihafal ulang. Untuk panel berisi kontrol bebas, pakai <H>&lt;hr&gt;</H>
+          Aksi yang perlu dipisah disusun lewat <Hl>groups</Hl>. Prop <Hl>separator</Hl> menambahkan
+          garis sebelum sebuah kelompok — artinya sama persis dengan <Hl>SidebarGroup</Hl>, jadi tidak
+          ada yang perlu dihafal ulang. Untuk panel berisi kontrol bebas, pakai <Hl>&lt;hr&gt;</Hl>
           biasa.
         </Lead>
         <div className="grid gap-6 sm:grid-cols-2">
@@ -460,8 +460,8 @@ export function DropdownPage() {
 
       <FlowSection id="keterangan" title="Keterangan">
         <Lead>
-          Aksi yang perlu konteks tambahan diberi <H>description</H> — baris kedua yang lebih kecil
-          di bawah labelnya. Untuk panel berisi Radio atau Checkbox, yang dipakai <H>helperText</H>{' '}
+          Aksi yang perlu konteks tambahan diberi <Hl>description</Hl> — baris kedua yang lebih kecil
+          di bawah labelnya. Untuk panel berisi Radio atau Checkbox, yang dipakai <Hl>helperText</Hl>{' '}
           milik komponen itu sendiri.
         </Lead>
         <div className="grid gap-6 sm:grid-cols-2">
@@ -530,15 +530,15 @@ export function DropdownPage() {
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Daftar aksi cukup diisi lewat <H>items</H> atau <H>groups</H>; panel yang isinya bukan
-          daftar aksi — form kecil, daftar panjang yang digulir — diisi lewat <H>children</H> dan
-          diberi jarak sendiri lewat <H>contentClassName</H>. Kode berikut mengikuti pilihan Contoh
+          Daftar aksi cukup diisi lewat <Hl>items</Hl> atau <Hl>groups</Hl>; panel yang isinya bukan
+          daftar aksi — form kecil, daftar panjang yang digulir — diisi lewat <Hl>children</Hl> dan
+          diberi jarak sendiri lewat <Hl>contentClassName</Hl>. Kode berikut mengikuti pilihan Contoh
           di Playground.
         </Lead>
         <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-          Prop <H>trigger</H> harus berisi satu elemen tunggal, bukan teks atau pecahan — komponen
+          Prop <Hl>trigger</Hl> harus berisi satu elemen tunggal, bukan teks atau pecahan — komponen
           menyalinnya untuk memasang atribut Popover. Kalau memakai komponen tombol sendiri,
-          pastikan ia meneruskan atribut <H>&lt;button&gt;</H> standar ke elemen yang dirender.
+          pastikan ia meneruskan atribut <Hl>&lt;button&gt;</Hl> standar ke elemen yang dirender.
         </p>
         <SectionCode flush>
           <ExampleCode
@@ -552,7 +552,7 @@ export function DropdownPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya, diikuti bentuk data
-          untuk <H>items</H> dan <H>groups</H>.
+          untuk <Hl>items</Hl> dan <Hl>groups</Hl>.
         </Lead>
 
         <div className="space-y-8">

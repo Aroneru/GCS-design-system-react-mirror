@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Spinner, type SpinnerSize } from '../../../lib'
 import { DocExample } from '../../DocExample'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { CodeBlock, ControlLabel, H, Segmented } from '../../pageKit'
+import { CodeBlock, ControlLabel, H, Hl, Segmented } from '../../pageKit'
 import { FlowSection, Lead, UsulanPage, type TocEntry } from '../../usulanKit'
 
 const spinnerProps: PropRow[] = [
@@ -43,7 +43,7 @@ export function SpinnerPage() {
             <h3 className="text-sm font-black text-gray-900">Default</h3>
             <p className="mt-1 mb-3 text-body-sm text-gray-500">
               Ukuran standar 50×50 px untuk indikator loading pada area komponen atau konten umum.
-              Ukuran ini digunakan secara default, jadi prop <code>size</code> tidak perlu ditulis.
+              Ukuran ini digunakan secara default, jadi prop <Hl>size</Hl> tidak perlu ditulis.
             </p>
             <DocExample>
               <Spinner />
@@ -54,7 +54,7 @@ export function SpinnerPage() {
             <h3 className="text-sm font-black text-gray-900">Large</h3>
             <p className="mt-1 mb-3 text-body-sm text-gray-500">
               Ukuran 100×100 px untuk loading state yang membutuhkan penekanan visual lebih besar.
-              Gunakan <code>size=&quot;large&quot;</code> untuk memilih ukuran ini.
+              Gunakan <Hl>size=&quot;large&quot;</Hl> untuk memilih ukuran ini.
             </p>
             <DocExample>
               <Spinner size="large" />
@@ -114,7 +114,7 @@ export function SpinnerPage() {
         <h4 className="mt-4 text-sm font-black text-gray-900">Standalone loading</h4>
         <p className="mt-1 mb-3 max-w-2xl text-body-sm text-gray-500">
           Gunakan Spinner secara standalone ketika tidak ada teks loading lain. Spinner memiliki status
-          aksesibel dengan label default “Loading”. Sesuaikan <code>aria-label</code> jika proses yang
+          aksesibel dengan label default “Loading”. Sesuaikan <Hl>aria-label</Hl> jika proses yang
           berlangsung perlu dijelaskan lebih spesifik.
         </p>
         <DocExample>
@@ -124,7 +124,7 @@ export function SpinnerPage() {
         <h4 className="mt-6 text-sm font-black text-gray-900">Spinner dengan teks</h4>
         <p className="mt-1 mb-3 max-w-2xl text-body-sm text-gray-500">
           Jika teks di sebelah Spinner sudah menjelaskan proses loading, sembunyikan Spinner dari screen
-          reader dengan <code>aria-hidden=&quot;true&quot;</code> agar informasi yang sama tidak diumumkan dua kali.
+          reader dengan <Hl>aria-hidden=&quot;true&quot;</Hl> agar informasi yang sama tidak diumumkan dua kali.
           Teks yang terlihat menjadi sumber informasi loading bagi pengguna.
         </p>
         <DocExample>
@@ -146,7 +146,7 @@ export function SpinnerPage() {
 
         <h4 className="mt-6 text-sm font-black text-gray-900">Loading region &amp; reduced motion</h4>
         <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
-          Letakkan <code>aria-busy=&quot;true&quot;</code> pada region yang sedang dimuat, bukan pada Spinner.
+          Letakkan <Hl>aria-busy=&quot;true&quot;</Hl> pada region yang sedang dimuat, bukan pada Spinner.
           Saat pengguna mengaktifkan reduced motion, animasi Spinner dihentikan tetapi indikator loading
           tetap terlihat.
         </p>

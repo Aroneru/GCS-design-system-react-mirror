@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Avatar, type AvatarSize } from '../../../lib'
 import { asset } from '../../asset'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -55,7 +55,7 @@ export function AvatarPage() {
     >
       <FlowSection id="avatar" title="Avatar">
         <Lead>
-          Isinya yang menentukan bentuknya, bukan prop terpisah: begitu <H>src</H> diisi, avatarnya
+          Isinya yang menentukan bentuknya, bukan prop terpisah: begitu <Hl>src</Hl> diisi, avatarnya
           menampilkan foto; tanpa itu ia jatuh ke inisial. Fotonya selalu dipotong ke lingkaran dan
           diratakan di tengah, jadi gambar apa pun bisa masuk tanpa disiapkan lebih dulu.
         </Lead>
@@ -71,7 +71,7 @@ export function AvatarPage() {
           {'<Avatar src="/foto/putri.jpg" alt="Putri Handayani" />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Beri <H>alt</H> berisi nama pemiliknya. Kalau namanya sudah tertulis persis di sebelah
+          Beri <Hl>alt</Hl> berisi nama pemiliknya. Kalau namanya sudah tertulis persis di sebelah
           avatar — seperti pada daftar anggota atau menu profil — kosongkan saja: avatarnya akan
           terbaca sebagai hiasan dan pembaca layar tidak menyebut nama yang sama dua kali.
         </p>
@@ -79,7 +79,7 @@ export function AvatarPage() {
 
       <FlowSection id="inisial" title="Inisial">
         <Lead>
-          Tanpa <H>src</H>, lingkarannya diisi teks yang Anda beri lewat <H>initials</H> di atas latar
+          Tanpa <Hl>src</Hl>, lingkarannya diisi teks yang Anda beri lewat <Hl>initials</Hl> di atas latar
           abu-abu. Satu atau dua huruf adalah takaran yang aman; lebih dari itu mulai berdesakan di
           ukuran kecil.
         </Lead>
@@ -96,7 +96,7 @@ export function AvatarPage() {
           {'="PH" alt="Putri Handayani" />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Inisial juga jadi jaring pengaman: bila <H>src</H> diisi tapi gambarnya gagal dimuat,
+          Inisial juga jadi jaring pengaman: bila <Hl>src</Hl> diisi tapi gambarnya gagal dimuat,
           avatarnya berpindah sendiri ke inisial. Alamat foto profil biasanya datang dari sistem lain
           dan bisa mati kapan saja — tanpa ini yang tersisa di halaman hanya ikon gambar rusak.
         </p>
@@ -112,8 +112,8 @@ export function AvatarPage() {
       <FlowSection id="sizes" title="Sizes">
         <Lead>
           Tiga ukuran, dan teks inisialnya ikut naik bersamanya supaya porsi isian di dalam lingkaran
-          tetap terasa sama. <H>small</H> untuk baris daftar yang padat, <H>default</H> untuk navbar
-          dan menu profil, <H>large</H> untuk kepala halaman profil.
+          tetap terasa sama. <Hl>small</Hl> untuk baris daftar yang padat, <Hl>default</Hl> untuk navbar
+          dan menu profil, <Hl>large</Hl> untuk kepala halaman profil.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-3">
           {ukuran.map((u) => (
@@ -135,7 +135,7 @@ export function AvatarPage() {
           {ukuran.map((u, i) => (
             <span key={u.value}>
               {i > 0 ? ', ' : ''}
-              <H>{u.teks}</H>
+              <Hl>{u.teks}</Hl>
             </span>
           ))}
           . Avatar tidak pernah ikut menyusut oleh flexbox, jadi aman diletakkan di samping teks
@@ -238,7 +238,7 @@ export function AvatarPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;div&gt;</H> standar juga diteruskan apa adanya.
+          <Hl>&lt;div&gt;</Hl> standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={avatarProps} minWidth="48rem" />
       </FlowSection>

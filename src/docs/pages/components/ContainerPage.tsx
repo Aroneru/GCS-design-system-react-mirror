@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Container, type ContainerSize } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { C, H, Mark, Segmented } from "../../pageKit";
+import { H, Hl, Mark, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -342,9 +342,9 @@ export function ContainerPage() {
           ))}
         </ul>
         <p className="mt-3 max-w-2xl text-body-sm leading-6 text-gray-500">
-          <C>wide</C> dan <C>full</C> menggambar bilah yang sama panjang karena
+          <Hl>wide</Hl> dan <Hl>full</Hl> menggambar bilah yang sama panjang karena
           patokannya 1440px — bedanya baru terasa di ruang yang lebih lebar dari
-          itu: <C>wide</C> berhenti, <C>full</C> terus mengikuti induknya.
+          itu: <Hl>wide</Hl> berhenti, <Hl>full</Hl> terus mengikuti induknya.
           Cobalah di Playground dengan lebar Custom di atas 1440px.
         </p>
         <SectionCode>
@@ -403,8 +403,8 @@ export function ContainerPage() {
       <FlowSection id="as" title="as">
         <Lead>
           Mengganti elemen HTML terluar tanpa mengubah perilaku apa pun.
-          Bawaannya <C>div</C>; pakai <C>header</C>, <C>main</C>, <C>section</C>,
-          atau <C>footer</C> supaya struktur halaman tetap terbaca oleh pembaca
+          Bawaannya <Hl>div</Hl>; pakai <Hl>header</Hl>, <Hl>main</Hl>, <Hl>section</Hl>,
+          atau <Hl>footer</Hl> supaya struktur halaman tetap terbaca oleh pembaca
           layar dan mesin pencari — bukan tumpukan div tanpa makna.
         </Lead>
         <Ruang>
@@ -423,9 +423,9 @@ export function ContainerPage() {
         <Lead>
           Mematikan padding kiri-kanan bawaan. Dipakai saat elemen induk sudah
           punya padding sendiri — kalau tidak, jaraknya jadi dobel dan konten
-          menyempit tanpa disadari. Jangan menimpanya dengan <C>px-0</C> lewat{" "}
-          <C>className</C>: paddingnya hidup di elemen dalam, bukan elemen luar
-          yang menerima <C>className</C>.
+          menyempit tanpa disadari. Jangan menimpanya dengan <Hl>px-0</Hl> lewat{" "}
+          <Hl>className</Hl>: paddingnya hidup di elemen dalam, bukan elemen luar
+          yang menerima <Hl>className</Hl>.
         </Lead>
         <div className="grid gap-4 sm:grid-cols-2">
           <Ruang>
@@ -449,9 +449,9 @@ export function ContainerPage() {
       <FlowSection id="class-name" title="className">
         <Lead>
           Menempel di elemen luar, bukan elemen yang memegang lebar. Tiga
-          pemakaian yang wajar: jarak vertikal (<C>py-*</C>) karena Container
+          pemakaian yang wajar: jarak vertikal (<Hl>py-*</Hl>) karena Container
           sengaja tidak punya jarak atas-bawah bawaan; warna latar yang ingin
-          melebar penuh; dan <C>max-w-*</C> bila batasnya perlu lebih sempit dari
+          melebar penuh; dan <Hl>max-w-*</Hl> bila batasnya perlu lebih sempit dari
           bawaan.
         </Lead>
         <Ruang>
@@ -473,10 +473,10 @@ export function ContainerPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> memberi elemen dalam latar gray-800 dan teks bawaan
+          Prop <Hl>darkMode</Hl> memberi elemen dalam latar gray-800 dan teks bawaan
           gray-300, sama dengan kartu Card dan Toast versi gelap. Lebar, padding,
           dan pemusatan tidak berubah. Di ruang sempit sudut rounded-xl ikut
-          terlihat karena sekarang ada latarnya. Tanpa <H>darkMode</H>, Container
+          terlihat karena sekarang ada latarnya. Tanpa <Hl>darkMode</Hl>, Container
           tetap transparan.
         </Lead>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -526,9 +526,9 @@ export function ContainerPage() {
           Kotak biru muda adalah ruang yang tersedia; garis putus-putus adalah
           tempat konten berhenti. Selisih keduanya itulah padding. Ganti{" "}
           <strong className="text-gray-900">Varian</strong> untuk melihat batas
-          lebarnya, lalu <C>Mobile</C>/<C>Desktop</C> untuk melihat ambang
-          bawaannya — atau <C>Custom</C> untuk mengetik lebar sendiri. Yang
-          berganti di atas benar-benar komponen <C>Container</C>, bukan kotak
+          lebarnya, lalu <Hl>Mobile</Hl>/<Hl>Desktop</Hl> untuk melihat ambang
+          bawaannya — atau <Hl>Custom</Hl> untuk mengetik lebar sendiri. Yang
+          berganti di atas benar-benar komponen <Hl>Container</Hl>, bukan kotak
           tiruan: angkanya diukur langsung dari elemen yang dirender.
         </Lead>
 
@@ -632,7 +632,7 @@ export function ContainerPage() {
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
           Contoh pertama bukan contoh tetap: ia dirakit ulang setiap kali pilihan
-          di Playground berubah — saat ini varian <C>{size}</C> ({activeSize.max}
+          di Playground berubah — saat ini varian <Hl>{size}</Hl> ({activeSize.max}
           ) pada {roomLabel}, dengan angka yang diambil dari hasil pengukuran
           preview, bukan ditulis tangan. Tiga pola berikutnya berlaku di semua
           ukuran.
@@ -687,8 +687,8 @@ export function ContainerPage() {
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Container merender elemen luar sebagai titik ukur <C>@container</C>,
-          lalu elemen dalam yang memegang lebar dan padding. <C>className</C> dan
+          Container merender elemen luar sebagai titik ukur <Hl>@container</Hl>,
+          lalu elemen dalam yang memegang lebar dan padding. <Hl>className</Hl> dan
           atribut HTML menempel di elemen luar.
         </Lead>
         <PropsTable rows={containerProps} minWidth="44rem" />
@@ -703,12 +703,12 @@ export function ContainerPage() {
           </>,
           <>
             Pilih satu varian untuk satu halaman dan pakai terus. Berganti-ganti{" "}
-            <C>size</C> antar section membuat garis kiri ikut bergeser — persis
+            <Hl>size</Hl> antar section membuat garis kiri ikut bergeser — persis
             yang ingin dicegah Container.
           </>,
           <>
             Untuk halaman yang isinya teks panjang atau formulir,{" "}
-            <C>size=&quot;prose&quot;</C> lebih terbaca daripada bawaan: baris
+            <Hl>size=&quot;prose&quot;</Hl> lebih terbaca daripada bawaan: baris
             berhenti sebelum mata kehilangan awal baris berikutnya.
           </>,
           <>
@@ -720,12 +720,12 @@ export function ContainerPage() {
             lalu taruh Container di dalamnya — bukan sebaliknya.
           </>,
           <>
-            Jarak vertikal bukan urusan Container; atur lewat <C>py-*</C> saat
+            Jarak vertikal bukan urusan Container; atur lewat <Hl>py-*</Hl> saat
             dipakai supaya ritme tiap halaman bisa berbeda.
           </>,
           <>
             Bila induknya sudah punya padding, matikan lewat{" "}
-            <C>padded={"{false}"}</C> — jangan menimpanya dengan <C>px-0</C>,
+            <Hl>padded={"{false}"}</Hl> — jangan menimpanya dengan <Hl>px-0</Hl>,
             karena padding hidup di elemen dalam.
           </>,
         ]}

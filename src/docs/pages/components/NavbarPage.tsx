@@ -2,12 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Cart, ChartPie, Clipboard, Layers } from "flowbite-react-icons/solid";
 import { Navbar, Sidebar, type NavbarItem, type SidebarItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import {
-  ControlLabel,
-  Demo,
-  H,
-  Segmented,
-} from "../../pageKit";
+import { ControlLabel, Demo, H, Hl, Segmented } from "../../pageKit";
 import {
   FlowSection,
   Lead,
@@ -666,7 +661,7 @@ function NavbarDocumentationDemo() {
               />
             </div>
             <p className="mt-2 max-w-xs text-xs leading-5 text-gray-500">
-              Jumlah menu mengikuti jumlah item pada prop <code>items</code>.
+              Jumlah menu mengikuti jumlah item pada prop <Hl>items</Hl>.
             </p>
           </div>
 
@@ -1053,7 +1048,7 @@ export function NavbarPage() {
 
       <FlowSection id="navigation" title="Navigation">
         <Lead>
-          Bentuk setiap <code>NavbarItem</code> menentukan cara item berperilaku sebagai halaman,
+          Bentuk setiap <Hl>NavbarItem</Hl> menentukan cara item berperilaku sebagai halaman,
           submenu, atau contextual navigation khusus Back Office mobile.
         </Lead>
         <div>
@@ -1064,7 +1059,7 @@ export function NavbarPage() {
               <p className="mt-2 text-xs font-bold text-primary-700">href</p>
               <p className="mt-2 text-body-sm leading-6 text-gray-500">
                 Item dengan href mengarahkan pengguna langsung ke halaman utama. Link aktif
-                ditandai menggunakan <code>aria-current</code>.
+                ditandai menggunakan <Hl>aria-current</Hl>.
               </p>
             </div>
             <div>
@@ -1131,9 +1126,9 @@ export function NavbarPage() {
         </div>
 
         <div className="mt-6 space-y-1 text-body-sm leading-6 text-gray-500">
-          <p><code>children</code> → submenu</p>
-          <p><code>NavbarItem.contextualItems</code> → context parent page</p>
-          <p><code>NavbarSubItem.contextualItems</code> → context submenu page</p>
+          <p><Hl>children</Hl> → submenu</p>
+          <p><Hl>NavbarItem.contextualItems</Hl> → context parent page</p>
+          <p><Hl>NavbarSubItem.contextualItems</Hl> → context submenu page</p>
           <p>Semua contextualItems → Drawer hanya pada Back Office Mobile</p>
           <p>
             Context tidak diwariskan otomatis. Untuk berbagi context, berikan data contextualItems
@@ -1147,13 +1142,13 @@ export function NavbarPage() {
 
       <FlowSection id="properties" title="Properties">
           <Lead>
-            Pada <code>NavbarItem</code>, <code>href</code> membuat primary navigation link,
-            <code>children</code> membentuk submenu. <code>contextualItems</code> pada parent atau
+            Pada <Hl>NavbarItem</Hl>, <Hl>href</Hl> membuat primary navigation link,
+            <Hl>children</Hl> membentuk submenu. <Hl>contextualItems</Hl> pada parent atau
             subitem menjadi context page tersebut dan hanya muncul sebagai Drawer Back Office
             mobile. Field ini tetap valid pada data Front Office atau Back Office desktop, tetapi
             tidak menghasilkan UI tambahan. Jika diomit atau berupa array kosong, page tidak
             memiliki context dan tidak mewarisi context parent.
-            Consumer perlu menyediakan <code>brandLabel</code>, label menu, href, dan alternative
+            Consumer perlu menyediakan <Hl>brandLabel</Hl>, label menu, href, dan alternative
             text yang bermakna.
           </Lead>
           <PropsTable rows={navbarProps} />
