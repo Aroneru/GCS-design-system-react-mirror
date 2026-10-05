@@ -5,14 +5,22 @@ import {
   type ReactNode,
   type TextareaHTMLAttributes,
 } from 'react'
-import { CalendarMonth, Code, Cog, FaceGrin, List, PaperClip, Upload } from 'flowbite-react-icons/outline'
 import { cn } from '../utils/cn'
 import { Button } from './Button'
+import {
+  CalendarIcon,
+  CodeIcon,
+  CogIcon,
+  DownloadIcon,
+  FaceGrinIcon,
+  ListIcon,
+  PaperClipIcon,
+} from './textarea/TextAreaToolbarIcons'
 
-/** Type mengikuti varian Figma: Default = kotak polos, Editor = kotak dengan toolbar. */
+/** Type mengikuti varian desain: Default = kotak polos, Editor = kotak dengan toolbar. */
 export type TextAreaType = 'default' | 'editor'
 
-/** Platform mengikuti varian Figma. Hanya mengubah tinggi kotak pada type `default`. */
+/** Platform mengikuti varian desain. Hanya mengubah tinggi kotak pada type `default`. */
 export type TextAreaPlatform = 'default' | 'mobile'
 
 /** Warna aksen per aplikasi — dipakai garis saat difokus dan tombol kirim. */
@@ -24,14 +32,55 @@ const boxes: Record<TextAreaPlatform, string> = {
   mobile: 'h-30',
 }
 
-const accents: Record<TextAreaApplication, { focus: string; submit: string }> = {
+/**
+ * Tombol kirim gelap satu tingkat lebih terang (desain: primary-600). Button
+ * sudah membawa `bg-primary-700 hover:bg-primary-800` sendiri, dan di antara
+ * dua kelas untuk properti yang sama urutan CSS Tailwind yang menang — di sana
+ * -700 jatuh setelah -600. Tanda `!` membuat warna gelap ini selalu menang.
+ */
+const accents: Record<TextAreaApplication, { focus: string; submit: string; submitDark: string }> = {
   default: {
     focus: 'focus-within:border-primary-600',
     submit: 'bg-primary-700 hover:bg-primary-800 focus-visible:outline-primary-700',
+    submitDark: 'bg-primary-600! hover:bg-primary-700! focus-visible:outline-primary-600',
   },
   simaya: {
     focus: 'focus-within:border-purple-700',
     submit: 'bg-purple-700 hover:bg-purple-800 focus-visible:outline-purple-700',
+    submitDark: 'bg-purple-600! hover:bg-purple-700! focus-visible:outline-purple-600',
+  },
+}
+
+/** Warna tiap bagian untuk tampilan terang dan gelap. */
+const themes = {
+  light: {
+    label: 'text-gray-900',
+    hint: 'text-gray-500',
+    field: 'text-gray-900 placeholder:text-gray-500 disabled:text-gray-400',
+    box: 'border-gray-300 bg-surface-subtle',
+    frame: 'border-gray-300',
+    toolbar: 'bg-surface-subtle',
+    tool: 'text-gray-500 hover:text-gray-800',
+    divider: 'bg-gray-300',
+    body: 'bg-surface',
+    helper: 'text-gray-500',
+  },
+  /**
+   * Dari desain gelap: kotak default tanpa garis yang terlihat, sedangkan
+   * bingkai editor dan pemisah toolbarnya tetap gray-300. Toolbar dan area
+   * isian editor sama-sama gray-800. Teks yang diketik putih seperti label.
+   */
+  dark: {
+    label: 'text-white',
+    hint: 'text-gray-500',
+    field: 'text-white placeholder:text-gray-400 disabled:text-gray-500',
+    box: 'border-gray-800 bg-gray-800',
+    frame: 'border-gray-300',
+    toolbar: 'bg-gray-800',
+    tool: 'text-gray-400 hover:text-gray-200',
+    divider: 'bg-gray-300',
+    body: 'bg-gray-800',
+    helper: 'text-gray-100',
   },
 }
 
@@ -43,16 +92,16 @@ export type TextAreaToolbarAction =
   | 'list'
   | 'settings'
   | 'date'
-  | 'upload'
+  | 'download'
 
-const toolbarItems: { action: TextAreaToolbarAction; label: string; Icon: typeof PaperClip }[] = [
-  { action: 'attachment', label: 'Lampirkan berkas', Icon: PaperClip },
-  { action: 'code', label: 'Sisipkan kode', Icon: Code },
-  { action: 'emoji', label: 'Sisipkan emoji', Icon: FaceGrin },
-  { action: 'list', label: 'Daftar berpoin', Icon: List },
-  { action: 'settings', label: 'Pengaturan', Icon: Cog },
-  { action: 'date', label: 'Sisipkan tanggal', Icon: CalendarMonth },
-  { action: 'upload', label: 'Unggah berkas', Icon: Upload },
+const toolbarItems: { action: TextAreaToolbarAction; label: string; Icon: typeof PaperClipIcon }[] = [
+  { action: 'attachment', label: 'Lampirkan berkas', Icon: PaperClipIcon },
+  { action: 'code', label: 'Sisipkan kode', Icon: CodeIcon },
+  { action: 'emoji', label: 'Sisipkan emoji', Icon: FaceGrinIcon },
+  { action: 'list', label: 'Daftar berpoin', Icon: ListIcon },
+  { action: 'settings', label: 'Pengaturan', Icon: CogIcon },
+  { action: 'date', label: 'Sisipkan tanggal', Icon: CalendarIcon },
+  { action: 'download', label: 'Unduh', Icon: DownloadIcon },
 ]
 
 export interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'style'> {
@@ -72,6 +121,8 @@ export interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaE
   /** Label tombol kirim di bawah editor. Tombol hanya muncul bila prop ini diisi. */
   submitLabel?: ReactNode
   onSubmit?: () => void
+  /** Tampilan gelap: kotak dan toolbar gray-800, label putih. */
+  darkMode?: boolean
   /** Kelas untuk pembungkus terluar (label + kotak + caption + tombol). */
   className?: string
 }
@@ -82,7 +133,7 @@ export interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaE
  * Type `default` menampilkan kotak polos setinggi 162px (120px di mobile),
  * sedangkan `editor` menambahkan toolbar 40px di atas area isian dan tombol
  * kirim opsional di bawahnya. Warna garis saat difokus dan tombol kirim
- * mengikuti prop `application`.
+ * mengikuti prop `application`; `darkMode` mengganti sisanya ke tampilan gelap.
  */
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextArea(
   {
@@ -96,6 +147,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     onToolbarAction,
     submitLabel,
     onSubmit,
+    darkMode = false,
     className,
     id,
     disabled,
@@ -108,6 +160,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   const helperId = `${fieldId}-helper`
 
   const accent = accents[application]
+  const t = darkMode ? themes.dark : themes.light
   const isEditor = type === 'editor'
 
   const field = (
@@ -117,9 +170,10 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
       disabled={disabled}
       aria-describedby={helperText ? helperId : undefined}
       className={cn(
-        'block w-full resize-none p-4 text-sm text-gray-900 outline-none placeholder:text-gray-500 disabled:cursor-not-allowed disabled:text-gray-400',
+        'block w-full resize-none p-4 text-sm outline-none disabled:cursor-not-allowed',
+        t.field,
         // Editor: tinggi area isian 166px, di bawah toolbar 40px (total 206px).
-        isEditor ? 'h-41.5 bg-surface' : cn('rounded-lg border border-gray-300 bg-surface-subtle transition-colors', boxes[platform], accent.focus),
+        isEditor ? cn('h-41.5', t.body) : cn('rounded-lg border transition-colors', t.box, boxes[platform], accent.focus),
       )}
       {...props}
     />
@@ -130,35 +184,35 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
       {(label || hint) && (
         <div className="mb-2 flex items-baseline justify-between gap-3">
           {label && (
-            <label htmlFor={fieldId} className="text-sm font-bold text-gray-900">
+            <label htmlFor={fieldId} className={cn('text-sm font-bold', t.label)}>
               {label}
             </label>
           )}
-          {hint && <span className="text-sm text-gray-500">{hint}</span>}
+          {hint && <span className={cn('text-sm', t.hint)}>{hint}</span>}
         </div>
       )}
 
       {isEditor ? (
-        <div
-          className={cn(
-            'overflow-hidden rounded-lg border border-gray-300 transition-colors',
-            accent.focus,
-          )}
-        >
-          <div className="flex h-10 items-center gap-4 bg-surface-subtle px-4">
+        <div className={cn('overflow-hidden rounded-lg border transition-colors', t.frame, accent.focus)}>
+          {/* Jarak antarikon 15px, sesuai desain. */}
+          <div className={cn('flex h-10 items-center gap-3.75 px-4', t.toolbar)}>
             {toolbar ?? (
               <>
                 {toolbarItems.map(({ action, label: title, Icon }, i) => (
                   <Fragment key={action}>
-                    {/* Garis pemisah memisahkan alat teks dari alat sisipan, sesuai Figma. */}
-                    {i === 3 && <span aria-hidden="true" className="h-4 w-px bg-gray-300" />}
+                    {/* Garis pemisah memisahkan alat teks dari alat sisipan. Di desain ia
+                        berjarak 16px dari ikon sebelumnya dan 15px dari ikon sesudahnya. */}
+                    {i === 3 && <span aria-hidden="true" className={cn('ml-px h-4 w-px', t.divider)} />}
                     <button
                       type="button"
                       onClick={() => onToolbarAction?.(action)}
                       disabled={disabled}
                       aria-label={title}
                       title={title}
-                      className="shrink-0 text-gray-500 transition-colors hover:text-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current disabled:cursor-not-allowed disabled:opacity-50"
+                      className={cn(
+                        'shrink-0 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current disabled:cursor-not-allowed disabled:opacity-50',
+                        t.tool,
+                      )}
                     >
                       <Icon className="size-4" />
                     </button>
@@ -174,14 +228,14 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
       )}
 
       {helperText && (
-        <p id={helperId} className="mt-2 text-xs text-gray-500">
+        <p id={helperId} className={cn('mt-2 text-xs', t.helper)}>
           {helperText}
         </p>
       )}
 
       {isEditor && submitLabel && (
         <div className="mt-2">
-          <Button onClick={onSubmit} disabled={disabled} className={accent.submit}>
+          <Button onClick={onSubmit} disabled={disabled} className={darkMode ? accent.submitDark : accent.submit}>
             {submitLabel}
           </Button>
         </div>

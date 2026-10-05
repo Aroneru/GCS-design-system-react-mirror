@@ -263,7 +263,7 @@ export function DatepickerPage() {
         <Lead>
           Prop <H>darkMode</H> mengganti seluruh warnanya ke tampilan gelap: kotak dan panel gray-700,
           tanggal terpilih primary-600, dan tombol pintasan berisi. Untuk saat ini baru Alert, Datepicker,
-          dan Toast yang memilikinya.
+          Floating Label, Input Field, Radio Button, Regular Select, Text Area, dan Toast yang memilikinya.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Single" dark>

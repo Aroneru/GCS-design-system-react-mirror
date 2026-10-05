@@ -40,6 +40,7 @@ const selectProps: PropRow[] = [
   ['options', 'SelectOption[]', 'undefined', 'Daftar pilihan { value, label, disabled }. Bila kosong, <option> dan <optgroup> di children yang dipakai.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna ikon info dan garis saat difokus.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: field gray-800 dengan label terang; garisnya hanya terlihat saat inactive dan saat difokus. Panel daftar pilihannya tetap terang.'],
   ['…props', 'SelectHTMLAttributes', '—', 'Seluruh atribut <select> standar diteruskan (value, onChange, required, name, …).'],
 ]
 
@@ -48,6 +49,7 @@ const toc: TocEntry[] = [
   { id: 'state', label: 'State' },
   { id: 'application', label: 'Application' },
   { id: 'daftar', label: 'Daftar pilihan' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -59,13 +61,14 @@ export function SelectPage() {
   const [withInfo, setWithInfo] = useState(true)
   const [withHelper, setWithHelper] = useState(true)
   const [narrow, setNarrow] = useState(false)
+  const [dark, setDark] = useState(false)
   const [value, setValue] = useState('')
 
   return (
     <UsulanPage
       eyebrow="Form"
       title="Regular Select Form"
-      description="Dropdown satu pilihan dengan label, ikon info, dan caption. Daftar pilihannya panel Dropdown yang sama dengan menu lain di kit ini, sedangkan nilainya tetap dibawa elemen <select> — jadi formulir, keyboard, dan pembaca layar bekerja apa adanya."
+      description="Dropdown satu pilihan dengan label, ikon info, dan caption. Daftar pilihannya panel Dropdown yang sama dengan menu lain di kit ini, sedangkan nilainya tetap dibawa elemen <select> — jadi formulir, keyboard, dan pembaca layar bekerja apa adanya. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="select-input" title="Select Input">
@@ -222,16 +225,80 @@ export function SelectPage() {
         </p>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti field ke gray-800 dengan label terang. Pada state default garisnya
+          menyatu dengan latar dan baru terlihat saat difokus (warna aplikasi); pada <H>inactive</H> garisnya
+          gray-300, dengan teks dan panah gray-500. Panel daftar pilihannya untuk saat ini tetap terang.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Default" dark>
+            <Select
+              darkMode
+              label="Label"
+              info="Keterangan singkat."
+              placeholder="Pilih Apapun Itu"
+              options={provinsi}
+              helperText="Wajib diisi."
+            />
+          </Demo>
+          <Demo label="Inactive" dark>
+            <Select
+              darkMode
+              state="inactive"
+              label="Label"
+              info="Keterangan singkat."
+              placeholder="Pilih Apapun Itu"
+              options={provinsi}
+              helperText="Wajib diisi."
+            />
+          </Demo>
+          <Demo label="Sudah dipilih" dark>
+            <Select
+              darkMode
+              label="Label"
+              info="Keterangan singkat."
+              placeholder="Pilih Apapun Itu"
+              options={provinsi}
+              defaultValue="jabar"
+              helperText="Wajib diisi."
+            />
+          </Demo>
+          <Demo label="simaya" dark>
+            <Select
+              darkMode
+              application="simaya"
+              label="Label"
+              info="Keterangan singkat."
+              placeholder="Pilih Apapun Itu"
+              options={provinsi}
+              helperText="Wajib diisi."
+            />
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Select\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    label="Label"\n'}
+          {'    placeholder="Pilih Apapun Itu"\n'}
+          {'    options={provinsi}\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth={narrow ? 'max-w-[340px]' : 'max-w-[348px]'}>
+        <Stage maxWidth={narrow ? 'max-w-[340px]' : 'max-w-[348px]'} dark={dark}>
           <Select
             application={application}
             state={state}
+            darkMode={dark}
             label="Label"
             info={withInfo ? 'Keterangan singkat tentang isian ini.' : undefined}
             placeholder="Pilih Apapun Itu"
@@ -294,6 +361,18 @@ export function SelectPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -323,6 +402,13 @@ export function SelectPage() {
               {'    '}
               <H>application</H>
               {`="${application}"\n`}
+            </>
+          )}
+          {dark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'    label="Label"\n'}

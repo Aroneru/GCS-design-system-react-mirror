@@ -20,7 +20,7 @@ import { Dropdown, type DropdownGroup } from './Dropdown'
 /** Warna aksen per aplikasi — dipakai ikon info dan garis saat field difokus. */
 export type SelectApplication = 'default' | 'simaya'
 
-/** State mengikuti varian Figma. `inactive` sekaligus menonaktifkan kontrol. */
+/** State mengikuti varian desain. `inactive` sekaligus menonaktifkan kontrol. */
 export type SelectState = 'default' | 'inactive'
 
 /** Satu pilihan pada dropdown. */
@@ -39,6 +39,65 @@ type KelompokOpsi = { label?: string; options: Opsi[] }
 const accents: Record<SelectApplication, { icon: string; focus: string }> = {
   default: { icon: 'text-primary-500', focus: 'focus-within:border-primary-500' },
   simaya: { icon: 'text-purple-500', focus: 'focus-within:border-purple-500' },
+}
+
+/** Warna satu state. `icon` kosong berarti ikon info mengikuti warna aplikasi. */
+interface Ink {
+  label: string
+  icon: string | null
+  box: string
+  value: string
+  placeholder: string
+  chevron: string
+  helper: string
+}
+
+const inks: Record<SelectState, Ink> = {
+  default: {
+    label: 'text-gray-900',
+    icon: null,
+    box: 'border-gray-300 bg-gray-50',
+    value: 'text-gray-900',
+    placeholder: 'text-gray-500',
+    chevron: 'text-gray-500',
+    helper: 'text-gray-500',
+  },
+  inactive: {
+    label: 'text-gray-900',
+    icon: 'text-gray-400',
+    box: 'border-gray-300 bg-gray-100',
+    value: 'text-gray-300',
+    placeholder: 'text-gray-300',
+    chevron: 'text-gray-300',
+    helper: 'text-gray-400',
+  },
+}
+
+/**
+ * Tampilan gelap sesuai desain. Garis state default menyatu dengan latarnya;
+ * justru `inactive` yang bergaris gray-300. Teks pilihan dan caption tidak
+ * digambar desain: pilihan putih seperti teks isian Input Field gelap, caption
+ * mengikuti caption Input Field gelap.
+ */
+const inksDark: Record<SelectState, Ink> = {
+  default: {
+    label: 'text-gray-50',
+    icon: null,
+    box: 'border-gray-800 bg-gray-800',
+    value: 'text-white',
+    placeholder: 'text-gray-400',
+    chevron: 'text-gray-400',
+    helper: 'text-gray-400',
+  },
+  inactive: {
+    label: 'text-white',
+    icon: 'text-gray-400',
+    box: 'border-gray-300 bg-gray-800',
+    value: 'text-gray-500',
+    placeholder: 'text-gray-500',
+    chevron: 'text-gray-500',
+    helper: 'text-gray-500',
+  },
 }
 
 /**
@@ -112,7 +171,7 @@ function bacaOpsi(children: ReactNode, awal: Opsi[]): KelompokOpsi[] {
 
 /**
  * Panah dropdown 8×4 di dalam kotak ikon 12px, digambar sendiri supaya
- * ukurannya persis seperti Figma — ikon panah dari pustaka jauh lebih kecil.
+ * ukurannya persis seperti desain — ikon panah dari pustaka jauh lebih kecil.
  */
 const ChevronIcon = () => (
   <svg
@@ -143,6 +202,8 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
   options?: SelectOption[]
   application?: SelectApplication
   state?: SelectState
+  /** Tampilan gelap untuk field-nya. Panel daftar pilihannya tetap terang. */
+  darkMode?: boolean
   /** Kelas untuk pembungkus terluar (label + field + caption). */
   className?: string
 }
@@ -158,6 +219,8 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
  *
  * State `inactive` menonaktifkan kontrol sekaligus meredupkan tampilannya, dan
  * warna ikon info serta garis saat difokus mengikuti prop `application`.
+ * `darkMode` mengganti field ke tampilan gelap; panel daftar pilihannya tetap
+ * terang.
  */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   {
@@ -168,6 +231,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
     options,
     application = 'default',
     state = 'default',
+    darkMode = false,
     className,
     id,
     value,
@@ -192,6 +256,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   const isInactive = disabled || state === 'inactive'
   const isPlaceholder = current === ''
   const accent = accents[application]
+  const ink = (darkMode ? inksDark : inks)[isInactive ? 'inactive' : 'default']
 
   // Ref internal dipakai untuk menyetel nilai saat memilih dari panel; ref dari
   // luar tetap diteruskan supaya pemakai masih memegang `<select>` yang sama.
@@ -229,14 +294,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
     <div className={cn('w-full', className)}>
       {label && (
         <div className="mb-2 flex items-center gap-2">
-          <label htmlFor={fieldId} id={labelId} className="text-sm font-bold text-gray-900">
+          <label htmlFor={fieldId} id={labelId} className={cn('text-sm font-bold', ink.label)}>
             {label}
           </label>
           {info && (
             <span
               title={info}
               aria-label={info}
-              className={cn('flex shrink-0 items-center', isInactive ? 'text-gray-400' : accent.icon)}
+              className={cn('flex shrink-0 items-center', ink.icon ?? accent.icon)}
             >
               <InfoCircle className="size-3" />
             </span>
@@ -246,8 +311,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
 
       <div
         className={cn(
-          'relative flex items-center rounded-lg border border-gray-300 transition-colors',
-          isInactive ? 'bg-gray-100' : cn('bg-gray-50', accent.focus),
+          'relative flex items-center rounded-lg border transition-colors',
+          ink.box,
+          !isInactive && accent.focus,
         )}
       >
         <select
@@ -288,11 +354,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
               aria-labelledby={label ? labelId : undefined}
               aria-label={label ? undefined : props['aria-label']}
               aria-describedby={helperText ? helperId : undefined}
-              // Tinggi 37px mengikuti Figma; sisi kanan diberi ruang untuk panah.
+              // Tinggi 37px mengikuti desain; sisi kanan diberi ruang untuk panah.
               className={cn(
                 'flex h-9.25 w-full items-center pr-8 pl-2.5 text-left text-sm outline-none',
                 'disabled:cursor-not-allowed',
-                isInactive ? 'text-gray-300' : isPlaceholder ? 'text-gray-500' : 'text-gray-900',
+                isPlaceholder ? ink.placeholder : ink.value,
               )}
             >
               <span className="truncate">{chosenOption?.label ?? placeholder ?? ''}</span>
@@ -304,7 +370,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           aria-hidden="true"
           className={cn(
             'pointer-events-none absolute right-2.5 flex items-center',
-            isInactive ? 'text-gray-300' : 'text-gray-500',
+            ink.chevron,
           )}
         >
           <ChevronIcon />
@@ -312,7 +378,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
       </div>
 
       {helperText && (
-        <p id={helperId} className={cn('mt-2 text-sm', isInactive ? 'text-gray-400' : 'text-gray-500')}>
+        <p id={helperId} className={cn('mt-2 text-sm', ink.helper)}>
           {helperText}
         </p>
       )}
