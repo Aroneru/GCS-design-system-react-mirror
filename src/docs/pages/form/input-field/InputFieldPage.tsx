@@ -7,7 +7,7 @@ import {
   type InputFieldState,
 } from '../../../../lib'
 import { PropsTable, type PropRow } from '../../../PropsTable'
-import { Demo, H, Segmented } from '../../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../../pageKit'
 import {
   Control,
   Controls,
@@ -116,8 +116,8 @@ export function InputFieldPage() {
 
       <FlowSection id="states" title="States">
         <Lead>
-          Empat kondisi visual field. <H>inactive</H> otomatis menonaktifkan input dan <H>failed</H>{' '}
-          menandainya <H>aria-invalid</H>, jadi tampilan dan makna aksesibilitasnya selalu sejalan.
+          Empat kondisi visual field. <Hl>inactive</Hl> otomatis menonaktifkan input dan <Hl>failed</Hl>{' '}
+          menandainya <Hl>aria-invalid</Hl>, jadi tampilan dan makna aksesibilitasnya selalu sejalan.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
@@ -176,8 +176,8 @@ export function InputFieldPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti field ke gray-800 dengan label putih. Garisnya menyatu dengan latar
-          dan baru terlihat saat <H>typing</H> (warna aplikasi) atau <H>failed</H> (red-500). Teks yang
+          Prop <Hl>darkMode</Hl> mengganti field ke gray-800 dengan label putih. Garisnya menyatu dengan latar
+          dan baru terlihat saat <Hl>typing</Hl> (warna aplikasi) atau <Hl>failed</Hl> (red-500). Teks yang
           diketik putih, sedangkan placeholder, ikon, dan caption abu-abu.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -306,7 +306,7 @@ export function InputFieldPage() {
 
         <p className="mt-4 text-body-sm text-gray-500">
           Ketik pada field di atas untuk melihat state <em>typing</em> yang sesungguhnya — garisnya berubah
-          lewat <H>focus-within</H>, tanpa perlu mengubah prop. Pada state <em>failed</em>, helper text
+          lewat <Hl>focus-within</Hl>, tanpa perlu mengubah prop. Pada state <em>failed</em>, helper text
           otomatis berganti jadi pesan kesalahan.
         </p>
       </FlowSection>
@@ -380,7 +380,7 @@ export function InputFieldPage() {
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <H>&lt;input&gt;</H>{' '}
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <Hl>&lt;input&gt;</Hl>{' '}
           standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={inputProps} minWidth="46rem" />

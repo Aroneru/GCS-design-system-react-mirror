@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Datepicker, type DateRange, type DatepickerType } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -112,7 +112,7 @@ export function DatepickerPage() {
       <FlowSection id="single" title="Single">
         <Lead>
           Kotak setinggi 42px dengan ikon kalender di kiri. Menekannya membuka kalender tepat di bawah kotak,
-          lengkap dengan tombol <H>Hari ini</H> dan <H>Hapus</H>. Memilih tanggal langsung menutup panelnya.
+          lengkap dengan tombol <Hl>Hari ini</Hl> dan <Hl>Hapus</Hl>. Memilih tanggal langsung menutup panelnya.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Belum dipilih">
@@ -138,15 +138,15 @@ export function DatepickerPage() {
         <p className="mt-4 text-body-sm text-gray-500">
           Lebar bawaannya sama dengan panelnya — 284px untuk single, 325px untuk period, dan 600px untuk
           multiple — supaya tepi kotak dan kalendernya segaris. Di wadah yang lebih sempit ia ikut menyusut;{' '}
-          <H>className="max-w-none"</H> melepas batas itu.
+          <Hl>className="max-w-none"</Hl> melepas batas itu.
         </p>
       </FlowSection>
 
       <FlowSection id="period" title="Period">
         <Lead>
-          Satu kalender dengan lima pintasan — <H>Hari ini</H>, <H>Minggu ini</H>, <H>Bulan ini</H>,{' '}
-          <H>Hapus</H>, dan <H>Semua Waktu</H> — untuk menyaring daftar berdasarkan waktu. Karena Minggu ini
-          dan Bulan ini adalah rentang, nilainya berupa <H>DateRange</H>. Rentang lain dipilih langsung di
+          Satu kalender dengan lima pintasan — <Hl>Hari ini</Hl>, <Hl>Minggu ini</Hl>, <Hl>Bulan ini</Hl>,{' '}
+          <Hl>Hapus</Hl>, dan <Hl>Semua Waktu</Hl> — untuk menyaring daftar berdasarkan waktu. Karena Minggu ini
+          dan Bulan ini adalah rentang, nilainya berupa <Hl>DateRange</Hl>. Rentang lain dipilih langsung di
           kalendernya dengan dua klik: klik pertama mengisi tanggal mulai, klik kedua tanggal selesai, dan
           panel baru tertutup setelah klik kedua.
         </Lead>
@@ -176,8 +176,8 @@ export function DatepickerPage() {
         <Lead>
           Dua kotak — tanggal mulai dan tanggal selesai — dengan dua kalender berdampingan. Seperti period,
           klik pertama mengisi tanggal mulai dan klik kedua tanggal selesai, baru panelnya tertutup; tanggal
-          di antaranya diberi latar abu. Seperti single, tombolnya hanya <H>Hari ini</H> dan <H>Hapus</H>;
-          prop <H>shortcuts</H> menambahkan <H>Minggu ini</H>, <H>Bulan ini</H>, dan <H>Semua Waktu</H>{' '}
+          di antaranya diberi latar abu. Seperti single, tombolnya hanya <Hl>Hari ini</Hl> dan <Hl>Hapus</Hl>;
+          prop <Hl>shortcuts</Hl> menambahkan <Hl>Minggu ini</Hl>, <Hl>Bulan ini</Hl>, dan <Hl>Semua Waktu</Hl>{' '}
           seperti pada period.
         </Lead>
         <div className="grid gap-5">
@@ -214,10 +214,10 @@ export function DatepickerPage() {
 
       <FlowSection id="batas" title="Batas data">
         <Lead>
-          Prop <H>min</H> dan <H>max</H> menandai dari mana data tersedia sampai di mana batas akhirnya —
+          Prop <Hl>min</Hl> dan <Hl>max</Hl> menandai dari mana data tersedia sampai di mana batas akhirnya —
           misalnya tiket pesawat yang bisa dipesan dari hari ini sampai tanggal yang sama tahun depan.
-          Tanggal di luarnya tidak bisa dipilih, dan <H>Semua Waktu</H> memilih seluruh rentang itu: dari{' '}
-          <H>min</H> sampai <H>max</H>.
+          Tanggal di luarnya tidak bisa dipilih, dan <Hl>Semua Waktu</Hl> memilih seluruh rentang itu: dari{' '}
+          <Hl>min</Hl> sampai <Hl>max</Hl>.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Period">
@@ -251,17 +251,17 @@ export function DatepickerPage() {
           {'// Semua Waktu → { start: hariIni, end: setahunLagi }'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Pintasan lain ikut dipotong ke batas itu: Minggu ini yang dimulai sebelum <H>min</H> hanya diambil
-          mulai <H>min</H>, sedangkan pintasan yang seluruh rentangnya di luar batas — misalnya Hari ini saat
+          Pintasan lain ikut dipotong ke batas itu: Minggu ini yang dimulai sebelum <Hl>min</Hl> hanya diambil
+          mulai <Hl>min</Hl>, sedangkan pintasan yang seluruh rentangnya di luar batas — misalnya Hari ini saat
           datanya baru mulai minggu depan — dimatikan. Panah bulan berhenti di bulan pertama dan terakhir yang
-          masih punya tanggal di dalam batas, begitu pula panah papan ketik. Tanpa <H>min</H> dan <H>max</H>,
-          Semua Waktu bernilai <H>{'{ start: null, end: null }'}</H> — rentang tanpa batas.
+          masih punya tanggal di dalam batas, begitu pula panah papan ketik. Tanpa <Hl>min</Hl> dan <Hl>max</Hl>,
+          Semua Waktu bernilai <Hl>{'{ start: null, end: null }'}</Hl> — rentang tanpa batas.
         </p>
       </FlowSection>
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti seluruh warnanya ke tampilan gelap: kotak dan panel gray-700,
+          Prop <Hl>darkMode</Hl> mengganti seluruh warnanya ke tampilan gelap: kotak dan panel gray-700,
           tanggal terpilih primary-600, dan tombol pintasan berisi.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -286,24 +286,24 @@ export function DatepickerPage() {
 
       <FlowSection id="nilai" title="Nilai & formulir">
         <Lead>
-          Single bernilai <H>Date</H>, sedangkan period dan multiple bernilai <H>DateRange</H> —{' '}
-          <H>{'{ start, end }'}</H>. Jamnya selalu dibuang, jadi dua tanggal cukup dibandingkan harinya.
+          Single bernilai <Hl>Date</Hl>, sedangkan period dan multiple bernilai <Hl>DateRange</Hl> —{' '}
+          <Hl>{'{ start, end }'}</Hl>. Jamnya selalu dibuang, jadi dua tanggal cukup dibandingkan harinya.
         </Lead>
         <ul className="max-w-2xl space-y-2 text-body-sm text-gray-600">
           <li>
-            <H>null</H> — belum diisi, atau setelah <H>Hapus</H>.
+            <Hl>null</Hl> — belum diisi, atau setelah <Hl>Hapus</Hl>.
           </li>
           <li>
-            <H>{'{ start: Date, end: Date }'}</H> — rentang. Hari ini, Minggu ini (Minggu–Sabtu, mengikuti
+            <Hl>{'{ start: Date, end: Date }'}</Hl> — rentang. Hari ini, Minggu ini (Minggu–Sabtu, mengikuti
             urutan hari di kalender), dan Bulan ini (tanggal 1 sampai terakhir) menghasilkan bentuk ini —
-            dipotong ke <H>min</H> dan <H>max</H> bila ada.
+            dipotong ke <Hl>min</Hl> dan <Hl>max</Hl> bila ada.
           </li>
           <li>
-            <H>{'{ start: Date, end: null }'}</H> — period atau multiple yang baru terisi tanggal mulainya.
+            <Hl>{'{ start: Date, end: null }'}</Hl> — period atau multiple yang baru terisi tanggal mulainya.
           </li>
           <li>
-            <H>{'{ start: min, end: max }'}</H> — Semua Waktu: seluruh rentang data. Sisi yang tidak diberi
-            batas bernilai <H>null</H>, jadi tanpa keduanya hasilnya <H>{'{ start: null, end: null }'}</H> —
+            <Hl>{'{ start: min, end: max }'}</Hl> — Semua Waktu: seluruh rentang data. Sisi yang tidak diberi
+            batas bernilai <Hl>null</Hl>, jadi tanpa keduanya hasilnya <Hl>{'{ start: null, end: null }'}</Hl> —
             rentang tanpa batas, berbeda dari belum diisi.
           </li>
         </ul>
@@ -318,8 +318,8 @@ export function DatepickerPage() {
           {'// terkirim: periode[start]=2021-06-25 & periode[end]=2021-07-12'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Dengan <H>name</H>, tanggalnya ikut terkirim bersama formulir dalam format <H>YYYY-MM-DD</H>. Semua
-          Waktu terkirim sebagai <H>min</H> dan <H>max</H>-nya; sisi yang tidak berbatas terkirim kosong.
+          Dengan <Hl>name</Hl>, tanggalnya ikut terkirim bersama formulir dalam format <Hl>YYYY-MM-DD</Hl>. Semua
+          Waktu terkirim sebagai <Hl>min</Hl> dan <Hl>max</Hl>-nya; sisi yang tidak berbatas terkirim kosong.
         </p>
       </FlowSection>
 
@@ -330,18 +330,18 @@ export function DatepickerPage() {
         </Lead>
         <ul className="max-w-2xl space-y-2 text-body-sm text-gray-600">
           <li>
-            <H>←</H> <H>→</H> hari sebelumnya dan berikutnya; <H>↑</H> <H>↓</H> minggu sebelumnya dan
+            <Hl>←</Hl> <Hl>→</Hl> hari sebelumnya dan berikutnya; <Hl>↑</Hl> <Hl>↓</Hl> minggu sebelumnya dan
             berikutnya.
           </li>
           <li>
-            <H>Home</H> dan <H>End</H> ke awal dan akhir minggu.
+            <Hl>Home</Hl> dan <Hl>End</Hl> ke awal dan akhir minggu.
           </li>
           <li>
-            <H>PageUp</H> dan <H>PageDown</H> ke bulan sebelumnya dan berikutnya; bersama <H>Shift</H>, ke
+            <Hl>PageUp</Hl> dan <Hl>PageDown</Hl> ke bulan sebelumnya dan berikutnya; bersama <Hl>Shift</Hl>, ke
             tahun sebelumnya dan berikutnya.
           </li>
           <li>
-            <H>Enter</H> atau <H>Spasi</H> memilih tanggal; <H>Escape</H> atau klik di luar panel menutupnya,
+            <Hl>Enter</Hl> atau <Hl>Spasi</Hl> memilih tanggal; <Hl>Escape</Hl> atau klik di luar panel menutupnya,
             dan fokus kembali ke kotak tanggalnya.
           </li>
         </ul>
@@ -378,7 +378,7 @@ export function DatepickerPage() {
         </Stage>
 
         <p className="mt-4 text-body-sm text-gray-500">
-          Nilai terakhir dari <H>onChange</H>: <H>{nilaiTerakhir}</H>
+          Nilai terakhir dari <Hl>onChange</Hl>: <Hl>{nilaiTerakhir}</Hl>
         </p>
 
         <Controls>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Upload, type UploadApplication, type UploadPlatform, type UploadType } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -80,16 +80,16 @@ export function UploadPage() {
           {'/>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Yang dibungkus komponen ini <H>&lt;input type="file"&gt;</H> sungguhan — ia hanya
-          disembunyikan secara visual, bukan diganti tombol tiruan. Cukup beri <H>name</H> seperti
-          isian lain lalu kirim formulirnya seperti biasa; <H>onFilesChange</H> baru diperlukan kalau
+          Yang dibungkus komponen ini <Hl>&lt;input type="file"&gt;</Hl> sungguhan — ia hanya
+          disembunyikan secara visual, bukan diganti tombol tiruan. Cukup beri <Hl>name</Hl> seperti
+          isian lain lalu kirim formulirnya seperti biasa; <Hl>onFilesChange</Hl> baru diperlukan kalau
           Anda memang ingin membaca berkasnya di sisi klien, misalnya untuk pratinjau.
         </p>
       </FlowSection>
 
       <FlowSection id="platform" title="Platform">
         <Lead>
-          Dua ukuran untuk bentuk ini. <H>default</H> setinggi 44px dengan teks 14px; <H>mobile</H>{' '}
+          Dua ukuran untuk bentuk ini. <Hl>default</Hl> setinggi 44px dengan teks 14px; <Hl>mobile</Hl>{' '}
           setinggi 40px dengan teks 12px. Label dan captionnya tidak ikut mengecil, jadi yang berubah
           hanya barisnya sendiri.
         </Lead>
@@ -153,14 +153,14 @@ export function UploadPage() {
           Berkas yang dijatuhkan dititipkan ke input aslinya, bukan sekadar disimpan di state, jadi ia
           ikut terkirim saat formulirnya di-submit. Begitu ada berkas terpilih, namanya menggantikan
           baris ajakan supaya jelas bahwa areanya sudah terpakai. Dua baris teks di dalamnya bisa
-          diganti lewat <H>attachLabel</H> dan <H>attachHint</H>.
+          diganti lewat <Hl>attachLabel</Hl> dan <Hl>attachHint</Hl>.
         </p>
       </FlowSection>
 
       <FlowSection id="application" title="Application">
         <Lead>
-          Warna tombol mengikuti aplikasi yang memakainya: <H>primary-700</H> untuk default dan{' '}
-          <H>purple-500</H> untuk simaya. Pilih sekali di tingkat halaman, lalu biarkan sama untuk
+          Warna tombol mengikuti aplikasi yang memakainya: <Hl>primary-700</Hl> untuk default dan{' '}
+          <Hl>purple-500</Hl> untuk simaya. Pilih sekali di tingkat halaman, lalu biarkan sama untuk
           seluruh form di aplikasi itu.
         </Lead>
         <div className="grid gap-5">
@@ -200,7 +200,7 @@ export function UploadPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual. Komponen secara otomatis menyesuaikan warna latar, batas, dan teks.
+          Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual. Komponen secara otomatis menyesuaikan warna latar, batas, dan teks.
         </Lead>
         <div className="grid gap-5">
           <Demo label="Upload" dark>
@@ -394,7 +394,7 @@ export function UploadPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;input type="file"&gt;</H> standar juga diteruskan apa adanya.
+          <Hl>&lt;input type="file"&gt;</Hl> standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={uploadProps} minWidth="52rem" />
       </FlowSection>
