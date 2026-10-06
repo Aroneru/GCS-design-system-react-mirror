@@ -1,7 +1,7 @@
 {
   "name": "@ceplok-ui/design-kit-react",
   "private": false,
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Design tokens, tipografi, dan komponen React (Tailwind v4) untuk Ceplok Design System",
   "keywords": [
     "design-system",
