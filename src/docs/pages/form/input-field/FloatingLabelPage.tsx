@@ -7,7 +7,7 @@ import {
   type FloatingLabelState,
 } from '../../../../lib'
 import { PropsTable, type PropRow } from '../../../PropsTable'
-import { Demo, H, Segmented } from '../../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../../pageKit'
 import {
   Control,
   Controls,
@@ -128,9 +128,9 @@ export function FloatingLabelPage() {
 
       <FlowSection id="states" title="States">
         <Lead>
-          Tiga kondisi visual field. Klik salah satu field untuk melihat label naik sendiri — <H>state</H>{' '}
-          hanya perlu diisi untuk mengunci tampilan atau menandai kesalahan. State <H>error</H> memasang{' '}
-          <H>aria-invalid</H> pada input.
+          Tiga kondisi visual field. Klik salah satu field untuk melihat label naik sendiri — <Hl>state</Hl>{' '}
+          hanya perlu diisi untuk mengunci tampilan atau menandai kesalahan. State <Hl>error</Hl> memasang{' '}
+          <Hl>aria-invalid</Hl> pada input.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
@@ -191,9 +191,9 @@ export function FloatingLabelPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti kotak ke gray-800 dengan teks, ikon, dan tombol hapus gray-400. Garis
+          Prop <Hl>darkMode</Hl> mengganti kotak ke gray-800 dengan teks, ikon, dan tombol hapus gray-400. Garis
           aksen tetap sama, tetapi label yang naik satu tingkat lebih terang — primary-500 — supaya terbaca
-          di latar gelap. Pada <H>error</H>, hanya garis dan label yang berubah merah.
+          di latar gelap. Pada <Hl>error</Hl>, hanya garis dan label yang berubah merah.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
@@ -386,7 +386,7 @@ export function FloatingLabelPage() {
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <H>&lt;input&gt;</H>{' '}
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <Hl>&lt;input&gt;</Hl>{' '}
           standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={floatingProps} minWidth="48rem" />

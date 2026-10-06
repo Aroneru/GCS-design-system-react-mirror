@@ -6,7 +6,7 @@ import {
   type SearchPlatform,
 } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -101,8 +101,8 @@ export function SearchPage() {
 
       <FlowSection id="platform" title="Platform">
         <Lead>
-          Dua ukuran, sama seperti Input Field. <H>default</H> setinggi 54px dengan ikon 18px dan teks
-          16px; <H>mobile</H> setinggi 50px dengan ikon 14px dan teks 14px. Tombolnya ikut mengecil
+          Dua ukuran, sama seperti Input Field. <Hl>default</Hl> setinggi 54px dengan ikon 18px dan teks
+          16px; <Hl>mobile</Hl> setinggi 50px dengan ikon 14px dan teks 14px. Tombolnya ikut mengecil
           dari 38px ke 34px.
         </Lead>
         <div className="grid gap-5">
@@ -124,7 +124,7 @@ export function SearchPage() {
 
       <FlowSection id="kategori" title="Dengan kategori">
         <Lead>
-          Begitu prop <H>categories</H> diisi, komponen berpindah bentuk: dropdown kategori di kiri,
+          Begitu prop <Hl>categories</Hl> diisi, komponen berpindah bentuk: dropdown kategori di kiri,
           isian di tengah, dan tombol ikon di kanan. Variannya dibuat implisit karena varian kategori
           tanpa daftar kategori tidak punya arti.
         </Lead>
@@ -160,13 +160,13 @@ export function SearchPage() {
         <p className="mt-4 text-body-sm text-gray-500">
           Kedua ukuran di atas isinya sama persis: tinggi 39px, ruas kategori 113px, dan tombol
           44px. Yang berbeda cuma isian di tengah — ia memanjang mengikuti wadahnya, dari 382px di
-          ponsel sampai 882px di layar lebar. Karena itu prop <H>platform</H> tidak dipakai bentuk
+          ponsel sampai 882px di layar lebar. Karena itu prop <Hl>platform</Hl> tidak dipakai bentuk
           ini; cukup atur lebar wadahnya.
         </p>
         <p className="mt-2 text-body-sm text-gray-500">
           Daftar kategorinya panel Dropdown, sama dengan daftar pilihan Regular Select Form. Nilai
-          kategorinya dibawa elemen <H>&lt;select&gt;</H> di belakang tombolnya, dan itulah yang
-          diteruskan ke <H>onCategoryChange</H> serta argumen kedua <H>onSearch</H>.
+          kategorinya dibawa elemen <Hl>&lt;select&gt;</Hl> di belakang tombolnya, dan itulah yang
+          diteruskan ke <Hl>onCategoryChange</Hl> serta argumen kedua <Hl>onSearch</Hl>.
         </p>
       </FlowSection>
 
@@ -196,7 +196,7 @@ export function SearchPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, dan batas.
+          Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, dan batas.
         </Lead>
         <div className="grid gap-5">
           <Demo label="Default" dark>
@@ -222,7 +222,7 @@ export function SearchPage() {
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Tekan tombolnya atau Enter di
-          dalam field untuk melihat nilai yang diteruskan ke <H>onSearch</H>.
+          dalam field untuk melihat nilai yang diteruskan ke <Hl>onSearch</Hl>.
         </Lead>
 
         <Stage
@@ -321,7 +321,7 @@ export function SearchPage() {
           {terakhir === null ? (
             <em>belum ada</em>
           ) : (
-            <code className="text-xs font-bold text-gray-700">{terakhir}</code>
+            <Hl>{terakhir}</Hl>
           )}
 . Saat kategori dinyalakan, <em>Platform</em> hanya mengganti lebar wadah pratinjaunya — 882px
           atau 382px — sedangkan tinggi dan isi ruasnya tetap sama.
@@ -390,7 +390,7 @@ export function SearchPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;input&gt;</H> standar juga diteruskan apa adanya.
+          <Hl>&lt;input&gt;</Hl> standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={searchProps} minWidth="52rem" />
       </FlowSection>

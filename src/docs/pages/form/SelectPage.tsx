@@ -6,7 +6,7 @@ import {
   type SelectState,
 } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -74,7 +74,7 @@ export function SelectPage() {
       <FlowSection id="select-input" title="Select Input">
         <Lead>
           Label di atas field, kotak setinggi 37px berlatar abu muda dengan panah di sisi kanan, lalu
-          caption opsional di bawahnya. Ikon info di samping label muncul begitu prop <H>info</H> diisi.
+          caption opsional di bawahnya. Ikon info di samping label muncul begitu prop <Hl>info</Hl> diisi.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Belum dipilih">
@@ -121,7 +121,7 @@ export function SelectPage() {
 
       <FlowSection id="state" title="State">
         <Lead>
-          State <H>inactive</H> memakai latar gray-100 dengan teks gray-300, dan sekaligus menonaktifkan
+          State <Hl>inactive</Hl> memakai latar gray-100 dengan teks gray-300, dan sekaligus menonaktifkan
           kontrolnya — jadi tampilan dan perilakunya tak mungkin berbeda.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -218,17 +218,17 @@ export function SelectPage() {
           {'</Select>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Di balik panelnya tetap ada elemen <H>&lt;select&gt;</H> yang membawa nilainya, jadi{' '}
-          <H>value</H>, <H>onChange</H>, <H>name</H>, <H>ref</H>, dan pengiriman formulir bekerja seperti
-          pada <H>&lt;select&gt;</H> biasa. <H>&lt;option&gt;</H> yang Anda tulis sendiri dibaca komponen
-          dan tampil di panel yang sama; label <H>&lt;optgroup&gt;</H> menjadi judul kelompoknya.
+          Di balik panelnya tetap ada elemen <Hl>&lt;select&gt;</Hl> yang membawa nilainya, jadi{' '}
+          <Hl>value</Hl>, <Hl>onChange</Hl>, <Hl>name</Hl>, <Hl>ref</Hl>, dan pengiriman formulir bekerja seperti
+          pada <Hl>&lt;select&gt;</Hl> biasa. <Hl>&lt;option&gt;</Hl> yang Anda tulis sendiri dibaca komponen
+          dan tampil di panel yang sama; label <Hl>&lt;optgroup&gt;</Hl> menjadi judul kelompoknya.
         </p>
       </FlowSection>
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti field ke gray-800 dengan label terang. Pada state default garisnya
-          menyatu dengan latar dan baru terlihat saat difokus (warna aplikasi); pada <H>inactive</H> garisnya
+          Prop <Hl>darkMode</Hl> mengganti field ke gray-800 dengan label terang. Pada state default garisnya
+          menyatu dengan latar dan baru terlihat saat difokus (warna aplikasi); pada <Hl>inactive</Hl> garisnya
           gray-300, dengan teks dan panah gray-500. Panel daftar pilihannya untuk saat ini tetap terang.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -378,7 +378,7 @@ export function SelectPage() {
         <p className="mt-4 text-body-sm text-gray-500">
           Kontrol <em>Lebar wadah</em> tidak mengubah prop apa pun — varian Mobile hanya menyempitkan
           wadahnya (340px, dari 348px), sedangkan tinggi, jarak, dan ukuran teksnya sama persis. Karena itu
-          Select tidak punya prop <H>platform</H>.
+          Select tidak punya prop <Hl>platform</Hl>.
         </p>
       </FlowSection>
 
@@ -436,7 +436,7 @@ export function SelectPage() {
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <H>&lt;select&gt;</H>{' '}
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <Hl>&lt;select&gt;</Hl>{' '}
           standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={selectProps} minWidth="48rem" />
