@@ -2,12 +2,14 @@ import {
   forwardRef,
   useId,
   useRef,
+  useState,
   type InputHTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
 } from 'react'
 import { Search as SearchIcon } from 'flowbite-react-icons/outline'
 import { cn } from '../utils/cn'
+import { Dropdown, type DropdownItem } from './Dropdown'
 
 /** Ukuran kotak: `default` 54px (desktop), `mobile` 50px. */
 export type SearchPlatform = 'default' | 'mobile'
@@ -116,6 +118,8 @@ export interface SearchProps
   onCategoryChange?: (value: string) => void
   /** Kelas untuk pembungkus terluar (label + field + caption). */
   className?: string
+  /** Tampilan gelap: field gray-800 dengan label putih dan teks abu-abu. Pada mode kategori, tombol kategori berlatar gray-700. */
+  darkMode?: boolean
 }
 
 /**
@@ -123,7 +127,8 @@ export interface SearchProps
  *
  * Punya dua bentuk. Tanpa prop `categories` ia jadi satu kotak berisi ikon
  * kaca pembesar, isian, dan tombol berlabel. Dengan `categories` ia jadi tiga
- * ruas menyatu: dropdown kategori, isian, lalu tombol ikon.
+ * ruas menyatu: dropdown kategori, isian, lalu tombol ikon. Daftar kategorinya
+ * panel Dropdown, sama dengan daftar pilihan Select.
  *
  * Pembungkusnya `<div role="search">`, bukan `<form>`. Kolom pencarian sering
  * dipasang di dalam formulir lain — halaman pengajuan, misalnya — dan `<form>`
@@ -147,6 +152,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
     id,
     disabled,
     onKeyDown,
+    darkMode = false,
     ...props
   },
   ref,
@@ -162,6 +168,18 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   const accent = accents[application]
   const withCategory = Boolean(categories?.length)
 
+  // Tombol kategori perlu tahu kategori mana yang sedang aktif untuk menulis
+  // labelnya; pada dropdown tak terkendali itu tidak ada di prop, jadi
+  // dicatat sendiri persis seperti yang dilakukan Select.
+  const [kategoriDipilih, setKategoriDipilih] = useState(() => String(defaultCategory ?? ""))
+  const kategoriKini = category !== undefined ? String(category) : kategoriDipilih
+
+  // Placeholder ikut jadi baris pilihan biasa, sama seperti ia jadi
+  // <option value=""> pertama di <select>.
+  const opsiKategori = [{ value: "", label: categoryPlaceholder }, ...(categories ?? [])]
+  const labelKategori =
+    opsiKategori.find((option) => option.value === kategoriKini)?.label ?? categoryPlaceholder
+
   // Ref internal dipakai untuk membaca isi field saat pencarian dijalankan;
   // ref dari luar tetap diteruskan supaya pemakai masih bisa memfokuskan field.
   const attachInput = (node: HTMLInputElement | null) => {
@@ -171,6 +189,27 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   }
 
   const submit = () => onSearch?.(inputRef.current?.value ?? '', categoryRef.current?.value ?? '')
+
+  // <select> di belakang tombol kategori dikendalikan state ini, jadi memilih
+  // cukup memperbarui state: nilai yang dibaca `onSearch` lewat `categoryRef`
+  // ikut tersetel oleh React. Bandingkan dengan Select, yang harus menyetel
+  // <select>-nya sendiri karena `onChange` di sana menjanjikan sebuah
+  // ChangeEvent, dan itu hanya bisa datang dari elemennya.
+  const pilihKategori = (nilai: string) => {
+    setKategoriDipilih(nilai)
+    onCategoryChange?.(nilai)
+  }
+
+  // `selected` inilah yang membuat panel Dropdown berpindah peran jadi
+  // daftar pilihan; penempatan, papan ketik, dan penutupannya sudah jadi
+  // urusan Dropdown, jadi tidak ada panel kedua di kit ini.
+  const itemKategori: DropdownItem[] = opsiKategori.map((option) => ({
+    id: `kategori-${option.value}`,
+    label: option.label,
+    disabled: option.disabled,
+    selected: option.value === kategoriKini,
+    onClick: () => pilihKategori(option.value),
+  }))
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     onKeyDown?.(event)
@@ -189,8 +228,10 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
       aria-describedby={helperText ? helperId : undefined}
       onKeyDown={handleKeyDown}
       className={cn(
-        'min-w-0 flex-1 bg-transparent text-gray-900 outline-none placeholder:text-gray-500',
-        'disabled:cursor-not-allowed disabled:text-gray-400',
+        'min-w-0 flex-1 bg-transparent outline-none',
+        darkMode ? 'text-white placeholder:text-gray-400' : 'text-gray-900 placeholder:text-gray-500',
+        'disabled:cursor-not-allowed',
+        darkMode ? 'disabled:text-gray-500' : 'disabled:text-gray-400',
         // Safari dan Chrome menambahkan tombol silang sendiri pada type="search";
         // ia bukan bagian dari rancangan ini dan tidak bisa diberi gaya, jadi dimatikan.
         '[&::-webkit-search-cancel-button]:appearance-none',
@@ -202,7 +243,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   return (
     <div className={cn('w-full', className)}>
       {label && (
-        <label htmlFor={fieldId} className="mb-2 block text-sm font-bold text-gray-900">
+        <label htmlFor={fieldId} className={cn("mb-2 block text-sm font-bold", darkMode ? "text-white" : "text-gray-900")}>
           {label}
         </label>
       )}
@@ -214,22 +255,24 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
         <div role="search" className="group flex h-[39px] items-stretch">
           <div
             className={cn(
-              'relative flex shrink-0 items-center rounded-l-lg border border-gray-300 bg-gray-100 transition-colors',
+              'relative flex shrink-0 items-center rounded-l-lg border transition-colors',
+              darkMode ? 'border-gray-700 bg-gray-700' : 'border-gray-300 bg-gray-100',
               !disabled && accent.groupFocus,
             )}
           >
             <select
               ref={categoryRef}
-              value={category}
-              defaultValue={defaultCategory}
+              value={kategoriKini}
               disabled={disabled}
-              aria-label={categoryPlaceholder}
-              onChange={(event) => onCategoryChange?.(event.target.value)}
-              className={cn(
-                'h-full appearance-none bg-transparent pr-10 pl-5 text-sm outline-none',
-                'disabled:cursor-not-allowed disabled:text-gray-400',
-                'text-gray-900',
-              )}
+              aria-hidden="true"
+              tabIndex={-1}
+              onChange={(event) => pilihKategori(event.target.value)}
+              // Pembawa nilai saja, tapi tetap di alur: lebar ruas kategori
+              // ditentukan pilihan terpanjangnya, bukan yang sedang aktif —
+              // kalau ia dicabut, kotaknya melebar-menyempit tiap kali memilih.
+              // Karena itu kelas ukurannya dipertahankan, sementara ia sendiri
+              // tak terlihat dan tak bisa disentuh.
+              className="pointer-events-none h-full appearance-none pr-10 pl-5 text-sm opacity-0"
             >
               <option value="">{categoryPlaceholder}</option>
               {categories?.map((option) => (
@@ -239,11 +282,32 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               ))}
             </select>
 
+            <Dropdown
+              attached
+              contentLabel={categoryPlaceholder}
+              items={itemKategori}
+              darkMode={darkMode}
+              trigger={
+                <button
+                  type="button"
+                  disabled={disabled}
+                  aria-label={categoryPlaceholder}
+                  className={cn(
+                    'absolute inset-0 flex items-center pr-10 pl-5 text-left text-sm outline-none',
+                    'disabled:cursor-not-allowed',
+                    darkMode ? 'text-white disabled:text-gray-500' : 'text-gray-900 disabled:text-gray-400',
+                  )}
+                >
+                  <span className="truncate">{labelKategori}</span>
+                </button>
+              }
+            />
+
             <span
               aria-hidden="true"
               className={cn(
                 'pointer-events-none absolute right-5 flex items-center',
-                disabled ? 'text-gray-400' : 'text-gray-900',
+                disabled ? (darkMode ? 'text-gray-500' : 'text-gray-400') : (darkMode ? 'text-white' : 'text-gray-900'),
               )}
             >
               <ChevronIcon />
@@ -252,7 +316,8 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
 
           <div
             className={cn(
-              'flex min-w-0 flex-1 items-center border-y border-gray-300 bg-gray-50 px-2.5 text-sm transition-colors',
+              'flex min-w-0 flex-1 items-center border-y px-2.5 text-sm transition-colors',
+              darkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-300 bg-gray-50',
               !disabled && accent.groupFocus,
             )}
           >
@@ -278,7 +343,8 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
         <div
           role="search"
           className={cn(
-            'flex items-center gap-2 rounded-lg border border-gray-300 bg-gray-50 px-2.5 transition-colors',
+            'flex items-center gap-2 rounded-lg border px-2.5 transition-colors',
+            darkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-300 bg-gray-50',
             size.field,
             size.text,
             !disabled && accent.focus,
@@ -287,7 +353,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
           <span
             className={cn(
               'flex shrink-0 items-center',
-              disabled ? 'text-gray-400' : 'text-gray-500',
+              disabled ? (darkMode ? 'text-gray-500' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'),
             )}
           >
             <SearchIcon className={size.icon} />
@@ -313,7 +379,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
       )}
 
       {helperText && (
-        <p id={helperId} className={cn('mt-2 text-sm', disabled ? 'text-gray-400' : 'text-gray-500')}>
+        <p id={helperId} className={cn('mt-2 text-sm', disabled ? (darkMode ? 'text-gray-500' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
           {helperText}
         </p>
       )}

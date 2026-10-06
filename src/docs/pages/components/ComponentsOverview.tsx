@@ -1,3 +1,4 @@
+import { InfoCircle } from "flowbite-react-icons/outline";
 import {
   Alert,
   Avatar,
@@ -7,22 +8,24 @@ import {
   Card,
   Footer,
   Hero,
+  Icon,
   Navbar,
   Pagination,
-  Popover,
   Sidebar,
   Spinner,
   Toast,
+  Drawer,
 } from "../../../lib";
-import { NotReadyPreview, OverviewCard, OverviewPage } from "../../pageKit";
+import { OverviewCard, OverviewPage } from "../../pageKit";
 import { asset } from "../../asset";
+import { FacebookIcon, InstagramIcon, XIcon } from "../../socialIcons";
 
 export function ComponentsOverview() {
   return (
     <OverviewPage
       eyebrow="Components · Overview"
       title="Components"
-      description="Komponen React siap pakai dari package @stasi/design-kit-react. Dipakai lewat import { Nama } from '@stasi/design-kit-react' setelah package terpasang."
+      description="Komponen React siap pakai dari package @ceplok-ui/design-kit-react. Dipakai lewat import { Nama } from '@ceplok-ui/design-kit-react' setelah package terpasang."
     >
       <OverviewCard
         route="/components/container"
@@ -49,6 +52,20 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/clipboard"
+        name="Clipboard"
+        desc="Teks hanya-baca dengan tombol salin, label, dan keterangan opsional."
+      >
+        <div aria-hidden="true" className="rounded-xl bg-surface-subtle p-5">
+          <div className="mb-2 text-sm font-medium text-content">Nomor referensi</div>
+          <div className="flex items-center gap-2">
+            <div className="flex h-10.5 min-w-0 flex-1 items-center rounded-lg border border-gray-300 bg-surface-subtle px-3 text-sm text-content"><span className="truncate">INV-2026-001</span></div>
+            <span className="inline-flex h-10.5 shrink-0 items-center rounded-lg bg-primary-700 px-4 text-sm font-medium text-white">Copy</span>
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/badge"
         name="Badge"
         desc="Label status ringkas dengan lima variant warna semantik."
@@ -67,7 +84,7 @@ export function ComponentsOverview() {
       >
         <div className="rounded-xl bg-surface-subtle p-5">
           <Alert variant="success" heading="Ini adalah Alert" dismissible={false}>
-            Ini merupakan Design system Stasi berupa component alert.
+            Ini merupakan Design system Ceplok berupa component alert.
           </Alert>
         </div>
       </OverviewCard>
@@ -97,12 +114,67 @@ export function ComponentsOverview() {
       <OverviewCard
         route="/components/popover"
         name="Popover"
-        desc="Panel informasi ringkas dengan arrow pada empat pilihan sisi."
+        desc="Menampilkan informasi kontekstual secara ringkas di dekat elemen yang memicunya."
       >
-        <div className="flex items-center justify-center rounded-xl bg-surface-subtle p-5">
-          <Popover title="Popover" side="bottom">
-            Popover Body Text, Popover Body Text, Popover Body Text
-          </Popover>
+        <div className="flex items-center justify-center rounded-xl bg-surface-subtle p-5" aria-hidden="true">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex size-8 shrink-0 items-center justify-center text-gray-500">
+              <Icon className="size-5">
+                <InfoCircle />
+              </Icon>
+            </span>
+            <div className="relative w-56 shrink-0 [filter:drop-shadow(0_1px_2px_rgb(0_0_0/0.08))]">
+              <span className="pointer-events-none absolute top-1/2 left-[-8px] z-30 size-4 -translate-y-1/2 -rotate-90">
+                <span className="absolute top-[3.25px] left-[3px] size-2.5 rotate-45 border-t border-l border-border bg-surface" />
+              </span>
+              <div className="relative z-10 overflow-hidden rounded-md bg-surface">
+                <div className="border-b border-border bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-900">
+                  Informasi
+                </div>
+                <div className="bg-surface px-3 py-2 text-xs font-medium text-gray-500">
+                  <span className="whitespace-nowrap">Informasi tambahan yang relevan</span>
+                  <br />
+                  <span className="whitespace-nowrap">untuk membantu memahami konteks.</span>
+                </div>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 z-20 rounded-md border border-border"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/dropdown"
+        name="Dropdown"
+        desc="Kumpulan aksi atau pilihan tambahan yang dibuka dari sebuah trigger."
+      >
+        <div className="rounded-xl bg-surface-subtle p-5">
+          <div className="mx-auto flex w-fit max-w-full flex-col items-center gap-2">
+            <div className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary-700 px-4 text-base font-medium text-white">
+              Dropdown button
+              <svg
+                aria-hidden="true"
+                className="size-3.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
+            <div className="w-full rounded-lg bg-surface py-1 shadow-md" aria-hidden="true">
+              <div className="px-4 py-2 text-sm font-medium text-gray-700">Profil</div>
+              <div className="px-4 py-2 text-sm font-medium text-gray-700">Pengaturan</div>
+              <div className="my-1 border-t border-border" />
+              <div className="px-4 py-2 text-sm font-medium text-red-600">Keluar</div>
+            </div>
+          </div>
         </div>
       </OverviewCard>
 
@@ -124,6 +196,39 @@ export function ComponentsOverview() {
             <div className="border-t border-border px-4 py-3">
               <div className="h-6 w-20 rounded-lg bg-primary-700" />
             </div>
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/drawer"
+        name="Drawer"
+        desc="Panel kontekstual di tepi layar (Side Sheet / Off-canvas) untuk form, filter, atau detail data."
+      >
+        <div className="relative flex h-[264px] flex-col overflow-hidden rounded-xl bg-surface-subtle p-5">
+          {/* Latar skeleton agar selaras dengan Toast */}
+          <div className="space-y-3 opacity-60" aria-hidden="true">
+            <div className="h-2 w-2/5 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-5/6 rounded bg-gray-200" />
+            <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-4/6 rounded bg-gray-200" />
+            <div className="mt-6 h-2 w-2/5 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+          </div>
+
+          {/* Overlay / Backdrop */}
+          <div className="absolute inset-0 bg-gray-900/40" />
+
+          {/* Drawer Panel Menggunakan Sub-komponen Asli */}
+          <div className="absolute bottom-0 right-0 top-0 flex w-48 flex-col border-l-[0.5px] border-gray-200 bg-white shadow-2xl [&_a]:!py-2 [&_a]:!text-sm [&_button]:!py-2 [&_button]:!text-sm">
+            <Drawer.Header eyebrow="MENU" showCloseButton={false} className="!px-4 !pb-3 !pt-5 [&_span]:!text-xs" />
+            <Drawer.Body className="space-y-1 !p-3">
+              <Drawer.NavItem label="Beranda" active theme="primary" />
+              <Drawer.NavItem label="Layanan" />
+              <Drawer.NavItem label="Laporan" />
+            </Drawer.Body>
           </div>
         </div>
       </OverviewCard>
@@ -173,6 +278,47 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/sidebar"
+        name="Sidebar"
+        desc="Navigasi samping dengan grup menu, submenu, profil akun, dan mode ringkas."
+      >
+        <div className="relative flex h-[264px] flex-col overflow-hidden rounded-xl bg-surface-subtle p-5">
+          {/* Skeleton Konten Halaman */}
+          <div className="ml-56 hidden space-y-3 opacity-60 sm:block" aria-hidden="true">
+            <div className="h-2 w-2/5 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-5/6 rounded bg-gray-200" />
+            <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-4/6 rounded bg-gray-200" />
+          </div>
+
+          {/* Sidebar Asli Full */}
+          <div className="absolute bottom-0 left-0 top-0 flex w-56 flex-col overflow-hidden border-r-[0.5px] border-gray-200 bg-white shadow-sm [&>aside]:min-h-full [&>aside]:w-full [&>aside]:border-none [&_nav]:!overflow-hidden">
+            <Sidebar
+              logo={
+                <div className="flex items-center gap-2">
+                  <div className="grid size-8 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5">
+                    <div className="rounded-sm bg-white" />
+                    <div className="rounded-sm bg-primary-300" />
+                    <div className="rounded-sm bg-primary-300" />
+                    <div className="rounded-sm bg-white" />
+                  </div>
+                  <span className="text-sm font-black tracking-tight">CEPLOK</span>
+                </div>
+              }
+              items={[
+                { label: "Beranda", active: true },
+                { label: "Layanan" },
+                { label: "Laporan" },
+                { label: "Pengaturan" },
+              ]}
+            />
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/navbar"
         name="Navbar"
         desc="Navigasi responsif dengan search, menu, guest actions, dan account controls."
@@ -180,8 +326,8 @@ export function ComponentsOverview() {
       >
         <div className="overflow-hidden rounded-xl bg-surface-subtle p-2">
           <Navbar
-            brand={<span className="text-sm font-black text-content">STASI</span>}
-            brandLabel="STASI — Beranda"
+            brand={<span className="text-sm font-black text-content">CEPLOK</span>}
+            brandLabel="CEPLOK — Beranda"
             items={[
               { id: "menu-1", label: "Menu 1", href: "#/menu-1" },
               { id: "menu-2", label: "Menu 2", href: "#/menu-2" },
@@ -226,15 +372,20 @@ export function ComponentsOverview() {
         */}
         <div className="overflow-hidden rounded-xl">
           <Footer
-            logo={asset("/images/stasi-logo.svg")}
-            logoAlt="STASI — Ministerium Fur Staatssicherheit"
+            logo={asset("/images/footer-logo.svg")}
+            logoAlt="Ceplok Design System"
             menus={[
               { label: "Menu 1" },
               { label: "Menu 2" },
               { label: "Menu 3" },
               { label: "Menu 4" },
             ]}
-            copyright={`© ${new Date().getFullYear()} STASI`}
+            copyright={`© ${new Date().getFullYear()} CEPLOK Design System`}
+            socials={[
+              { label: "Facebook", icon: FacebookIcon, url: "#" },
+              { label: "Twitter", icon: XIcon, url: "#" },
+              { label: "Instagram", icon: InstagramIcon, url: "#" },
+            ]}
           />
         </div>
       </OverviewCard>
@@ -264,41 +415,64 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
-        route="/components/sidebar"
-        name="Sidebar"
-        desc="Navigasi samping dengan grup menu, submenu, profil akun, dan mode ringkas."
-      >
-        {/*
-          Sidebar asli, tapi dipotong pembungkus bertinggi tetap: komponennya
-          memakai min-h-screen, dan cn() di library ini clsx murni tanpa
-          tailwind-merge — jadi tingginya tidak bisa ditimpa lewat className.
-          Yang tampil bagian atasnya, cukup untuk memperlihatkan menu aktif.
-
-          Sama seperti Footer, Sidebar tetap merender <a href="#"> untuk tiap
-          item walau `href` dikosongkan.
-        */}
-        <div className="rounded-xl bg-surface-subtle p-5">
-          <div className="h-56 w-70 max-w-full overflow-hidden rounded-lg border border-border">
-            <Sidebar
-              items={[
-                { label: "Beranda", active: true },
-                { label: "Layanan" },
-                { label: "Laporan" },
-                { label: "Pengaturan" },
-              ]}
-            />
-          </div>
-        </div>
-      </OverviewCard>
-
-      <OverviewCard
         route="/components/table"
         name="Table"
-        desc="Tabel data dengan header, baris berselang, dan aksi per baris."
+        desc="Tabel data dengan pencarian, filter kolom, pengurutan, pagination, dan aksi per baris."
         wide
-        soon
       >
-        <NotReadyPreview name="Table" />
+        {/*
+          Skeleton, bukan Table asli — sama seperti kartu Modal dan Drawer.
+          Kotak cari, sort, aksi, dan pagination Table asli merender <button>,
+          sedangkan kartu ini sendiri sudah berupa <a>.
+
+          Lima kolom (nomor, pemohon, layanan, status, aksi) hanya mulai sm;
+          di bawahnya kolom layanan dan aksi disembunyikan supaya tetap muat.
+        */}
+        <div className="rounded-xl bg-surface-subtle p-5" aria-hidden="true">
+          <div className="overflow-hidden rounded-lg border border-border bg-white shadow-sm">
+            {/* Toolbar: kotak cari, tombol filter, aksi di kanan */}
+            <div className="flex items-center gap-3 p-4">
+              <div className="h-7 w-40 max-w-full rounded-md border border-gray-200 bg-gray-50 sm:w-56" />
+              <div className="h-7 w-20 shrink-0 rounded-md border border-gray-300" />
+              <div className="ml-auto hidden h-7 w-24 rounded-md bg-primary-700 sm:block" />
+            </div>
+            {/* Header */}
+            <div className="grid grid-cols-[1fr_1.4fr_1fr] items-center gap-4 border-y border-gray-200 bg-gray-50 px-4 py-3 sm:grid-cols-[1fr_1.4fr_1.4fr_1fr_0.8fr]">
+              <div className="h-1.5 w-10 rounded bg-gray-300" />
+              <div className="h-1.5 w-14 rounded bg-gray-300" />
+              <div className="hidden h-1.5 w-14 rounded bg-gray-300 sm:block" />
+              <div className="h-1.5 w-10 rounded bg-gray-300" />
+              <div className="hidden h-1.5 w-8 rounded bg-gray-300 sm:block" />
+            </div>
+            {/* Baris: nomor, nama tebal, layanan, pill status, tombol aksi */}
+            {["bg-green-100", "bg-primary-100", "bg-yellow-100"].map((pill, i) => (
+              <div
+                key={pill}
+                className={`grid grid-cols-[1fr_1.4fr_1fr] items-center gap-4 px-4 py-3.5 sm:grid-cols-[1fr_1.4fr_1.4fr_1fr_0.8fr] ${i < 2 ? "border-b border-gray-200" : ""
+                  }`}
+              >
+                <div className="h-1.5 w-12 rounded bg-gray-200" />
+                <div className="h-2 w-24 max-w-full rounded bg-gray-300" />
+                <div className="hidden h-1.5 w-28 max-w-full rounded bg-gray-200 sm:block" />
+                <div className={`h-4 w-14 rounded-full ${pill}`} />
+                <div className="hidden gap-1.5 sm:flex">
+                  <div className="size-4 rounded bg-primary-700" />
+                  <div className="size-4 rounded border border-gray-300" />
+                </div>
+              </div>
+            ))}
+            {/* Ringkasan dan pagination */}
+            <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+              <div className="h-1.5 w-28 rounded bg-gray-200" />
+              <div className="flex gap-1">
+                <div className="size-5 rounded bg-gray-200" />
+                <div className="size-5 rounded bg-primary-700" />
+                <div className="size-5 rounded bg-gray-200" />
+                <div className="size-5 rounded bg-gray-200" />
+              </div>
+            </div>
+          </div>
+        </div>
       </OverviewCard>
     </OverviewPage>
   );

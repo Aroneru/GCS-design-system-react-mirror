@@ -1,7 +1,7 @@
-# @stasi/design-kit-react
+# @ceplok-ui/design-kit-react
 
-Design tokens, tipografi, dan komponen **React (Tailwind v4)** untuk produk Stasi —
-State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
+Design tokens, tipografi, dan komponen **React (Tailwind v4)** untuk
+Ceplok Design System. Dipindahkan 1:1 dari versi Laravel/Blade
 (`tpl/design-kit`) ke komponen React yang bisa dipublish lewat NPM.
 
 ## Isi
@@ -20,7 +20,7 @@ State Security Service Design System. Dipindahkan 1:1 dari versi Laravel/Blade
 ## Install
 
 ```bash
-npm install @stasi/design-kit-react
+npm install @ceplok-ui/design-kit-react
 ```
 
 Peer deps: `react >=18`, `react-dom >=18`, `tailwindcss ^4`. Ketiganya disediakan
@@ -34,8 +34,8 @@ kamu:
 
 ```css
 /* src/index.css */
-@import '@stasi/design-kit-react/styles.css';
-@source '../node_modules/@stasi/design-kit-react/dist/**/*.js';
+@import '@ceplok-ui/design-kit-react/styles.css';
+@source '../node_modules/@ceplok-ui/design-kit-react/dist/**/*.js';
 ```
 
 Jangan menambahkan `@import 'tailwindcss'` lagi — `styles.css` sudah memanggilnya
@@ -44,8 +44,8 @@ berikut token `@theme`, font Lato, base layer, dan class `.ds-*`.
 ```tsx
 // main.tsx
 import './index.css'
-import { Button, Card, InputField } from '@stasi/design-kit-react'
-import { User } from '@stasi/design-kit-react/icons/outline'
+import { Button, Card, InputField } from '@ceplok-ui/design-kit-react'
+import { User } from '@ceplok-ui/design-kit-react/icons/outline'
 
 export default function App() {
   return (
@@ -75,13 +75,13 @@ Kalau project kamu sudah punya base style sendiri dan hanya butuh token:
 
 ```css
 @import 'tailwindcss';
-@import '@stasi/design-kit-react/tokens.css';
-@source '../node_modules/@stasi/design-kit-react/dist/**/*.js';
+@import '@ceplok-ui/design-kit-react/tokens.css';
+@source '../node_modules/@ceplok-ui/design-kit-react/dist/**/*.js';
 ```
 
 Token dan seluruh utility komponen tetap ter-generate, tapi kamu **kehilangan**
 font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
-`.ds-eyebrow` / `.ds-nav-link`.
+`.ds-eyebrow` / `.ds-nav-link` / `.ds-scroll-x` / `.ds-scroll-y`.
 
 ## Komponen & props
 
@@ -92,12 +92,15 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | `Button`    | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `iconOnly`, `as` |
 | `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`                |
 | `Avatar`    | `src`, `alt`, `initials`, `size`: `small \| default \| large`             |
-| `Alert`     | `variant`, `heading`, `icon`, `dismissible`, `actions`                    |
-| `Toast`     | `variant`, `heading`, `icon`, `dismissible`, `actions`                    |
+| `Alert`     | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`        |
+| `Toast`     | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`        |
 | `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`           |
 | `Container` | `as` (default `div`), `padded` (default `true`)                           |
 | `Icon`      | `children` (SVG dengan `currentColor`)                                    |
+| `Breadcrumb`| `items`, `darkMode`                                                       |
+| `Pagination`| `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`  |
 | `Navbar`    | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`        |
+| `Sidebar`   | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `darkMode` |
 | `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`                     |
 
 Warna Button diatur `theme` (`primary \| green \| gray \| purple \| orange \|
@@ -110,17 +113,18 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 `name`, `required`, …) dan mengaitkan `label` ke `id` serta caption ke
 `aria-describedby` secara otomatis.
 
-| Komponen        | Props khas                                                                                                          | Ukuran (desktop / mobile) |
-| --------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `InputField`    | `label`, `helperText`, `icon`, `onClear`, `state`: `default \| typing \| inactive \| failed`                        | 52 / 40 px                |
-| `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `state`: `default \| active \| error`                                     | 58 / 50 px                |
-| `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit` | 162 / 120 px              |
-| `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`                                                             | 37 px                     |
-| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`                                   | 54 / 50 px                |
-| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`                    | 44 / 40 px                |
-| `Radio`         | `label`, `helperText`                                                                                               | 16 / 14 px                |
-| `Toggle`        | `label`, `helperText`                                                                                               | 40×20 / 36×18 px          |
-| `Checkbox`      | `label`, `helperText`                                                                                               | 16 / 14 px                |
+| Komponen        | Props khas                                                                                                                      | Ukuran (desktop / mobile) |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `InputField`    | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| typing \| inactive \| failed`                        | 52 / 40 px                |
+| `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| active \| error`                                     | 58 / 50 px                |
+| `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit`, `darkMode` | 162 / 120 px              |
+| `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`, `darkMode`                                                             | 37 px                     |
+| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`, `darkMode`                                  | 54 / 50 px                |
+| `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 px                     |
+| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode`                               | 44 / 40 px                |
+| `Radio`         | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
+| `Toggle`        | `label`, `helperText`, `darkMode`                                                                                               | 40×20 / 36×18 px          |
+| `Checkbox`      | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
 
 Prop yang dipakai bersama seluruh komponen form:
 
@@ -141,11 +145,11 @@ Prop yang dipakai bersama seluruh komponen form:
 ### Navbar
 
 ```tsx
-import { Navbar } from '@stasi/design-kit-react'
+import { Navbar } from '@ceplok-ui/design-kit-react'
 
 <Navbar
   brand={<img src="/logo.svg" alt="" />}
-  brandLabel="STASI — Beranda"
+  brandLabel="CEPLOK — Beranda"
   items={[
     {
       id: 'menu-1',
@@ -174,10 +178,10 @@ API/config Navbar yang dapat dipakai bersama authenticated state:
 ```tsx
 <Navbar
   brand={<Logo />}
-  brandLabel="STASI — Beranda"
+  brandLabel="CEPLOK — Beranda"
   items={items}
   search={{ onSubmit: (query) => console.log(query) }}
-  user={{ name: 'User STASI', avatarSrc: '/avatar.jpg' }}
+  user={{ name: 'User CEPLOK', avatarSrc: '/avatar.jpg' }}
   notification={{ unread: true, href: '/notifications' }}
 />
 ```
@@ -196,9 +200,9 @@ bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.
 ## Ikon
 
 ```tsx
-import { Github, Instagram } from '@stasi/design-kit-react'          // logo brand & sosial
-import { User, Envelope } from '@stasi/design-kit-react/icons/outline'
-import { User as UserSolid } from '@stasi/design-kit-react/icons/solid'
+import { Github, Instagram } from '@ceplok-ui/design-kit-react'          // logo brand & sosial
+import { User, Envelope } from '@ceplok-ui/design-kit-react/icons/outline'
+import { User as UserSolid } from '@ceplok-ui/design-kit-react/icons/solid'
 ```
 
 Outline dan solid sengaja dipisah ke subpath berbeda: banyak nama ikon sama
@@ -267,10 +271,10 @@ dan memicu "invalid hook call".
 ```bash
 # di package ini
 npm run build:lib      # `npm pack` TIDAK menjalankan prepublishOnly, jadi build manual
-npm pack               # -> stasi-design-kit-react-<versi>.tgz
+npm pack               # -> ceplok-ui-design-kit-react-<versi>.tgz
 
 # di project consumer
-npm install ../react-design-system/stasi-design-kit-react-0.1.0.tgz
+npm install ../react-design-system/ceplok-ui-design-kit-react-0.1.0.tgz
 ```
 
 Dependency `clsx` dan `flowbite-react-icons` ikut terpasang otomatis. Tarball

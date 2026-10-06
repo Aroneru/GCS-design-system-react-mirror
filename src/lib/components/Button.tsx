@@ -7,7 +7,7 @@ export type ButtonVariant = "filled" | "outline";
 
 export type ButtonSize = "xs" | "s" | "base" | "l" | "xl";
 
-export type ButtonTheme = "primary" | "green" | "gray" | "purple" | "orange" | "yellow";
+export type ButtonTheme = "primary" | "green" | "gray" | "simaya" | "orange" | "yellow";
 
 export type ButtonTone = "light" | "dark";
 
@@ -28,7 +28,7 @@ type AsButton = CommonProps & {
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof CommonProps>;
 
 type AsAnchor = CommonProps & {
-  as: "a";
+  as: "anchor";
 } & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof CommonProps>;
 
 export type ButtonProps = AsButton | AsAnchor;
@@ -98,17 +98,17 @@ const colorClasses: Record<ButtonTheme, Record<ButtonTone, Record<ButtonVariant,
     // Gray light menggunakan 500
     light: {
       filled: "bg-gray-500 text-white hover:bg-gray-700",
-      outline: "border border-gray-500 text-gray-500 hover:bg-gray-50",
+      outline: "border border-gray-500 text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:border-gray-700",
     },
 
     // Gray dark menggunakan 700
     dark: {
       filled: "bg-gray-700 text-white hover:bg-gray-500",
-      outline: "border border-gray-700 text-gray-700 hover:bg-gray-50",
+      outline: "border border-gray-700 text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-900",
     },
   },
 
-  purple: {
+  simaya: {
     light: {
       filled: "bg-purple-700 text-white hover:bg-purple-800",
       outline: "border border-purple-700 text-purple-700 hover:bg-purple-50",
@@ -197,7 +197,7 @@ export function Button({
     </>
   );
 
-  if (props.as === "a") {
+  if (props.as === "anchor") {
     const { as: _as, ...anchorProps } = props;
 
     return (

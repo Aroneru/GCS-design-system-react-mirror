@@ -19,21 +19,24 @@ import { FloatingLabelPage } from "./docs/pages/form/input-field/FloatingLabelPa
 import { TextAreaPage } from "./docs/pages/form/input-field/TextAreaPage";
 import { SelectPage } from "./docs/pages/form/SelectPage";
 import { SearchPage } from "./docs/pages/form/SearchPage";
+import { DatepickerPage } from "./docs/pages/form/DatepickerPage";
 import { UploadPage } from "./docs/pages/form/UploadPage";
 import { RadioPage } from "./docs/pages/form/RadioPage";
 import { TogglePage } from "./docs/pages/form/TogglePage";
 import { CheckboxPage } from "./docs/pages/form/CheckboxPage";
 
-import { PlaceholderPage } from "./docs/pages/PlaceholderPage";
 
 import { ComponentsOverview } from "./docs/pages/components/ComponentsOverview";
 import { ContainerPage } from "./docs/pages/components/ContainerPage";
 import { ButtonPage } from "./docs/pages/components/ButtonPage";
+import { ClipboardPage } from "./docs/pages/components/ClipboardPage";
 import { AvatarPage } from "./docs/pages/components/AvatarPage";
 import { BadgePage } from "./docs/pages/components/BadgePage";
 import { SpinnerPage } from "./docs/pages/components/SpinnerPage";
 import { PopoverPage } from "./docs/pages/components/PopoverPage";
+import { DropdownPage } from "./docs/pages/components/DropdownPage";
 import { ModalPage } from "./docs/pages/components/ModalPage";
+import { DrawerPage } from "./docs/pages/components/DrawerPage";
 import { AlertPage } from "./docs/pages/components/AlertPage";
 import { ToastPage } from "./docs/pages/components/ToastPage";
 import { CardPage } from "./docs/pages/components/CardPage";
@@ -47,6 +50,7 @@ import {
 } from "./docs/pages/components/NavbarPage";
 import { BreadcrumbPage } from "./docs/pages/components/BreadcrumbPage";
 import { PaginationPage } from "./docs/pages/components/PaginationPage";
+import { TablePage } from "./docs/pages/components/TablePage";
 
 const routes: Record<string, () => React.ReactElement> = {
   "/": HomePage,
@@ -67,6 +71,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/form/input-field/text-area": TextAreaPage,
   "/form/select": SelectPage,
   "/form/search": SearchPage,
+  "/form/datepicker": DatepickerPage,
   "/form/upload": UploadPage,
   "/form/radio": RadioPage,
   "/form/toggle": TogglePage,
@@ -75,11 +80,14 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components": ComponentsOverview,
   "/components/container": ContainerPage,
   "/components/button": ButtonPage,
+  "/components/clipboard": ClipboardPage,
   "/components/avatar": AvatarPage,
   "/components/badge": BadgePage,
   "/components/spinner": SpinnerPage,
   "/components/popover": PopoverPage,
+  "/components/dropdown": DropdownPage,
   "/components/modal": ModalPage,
+  "/components/drawer": DrawerPage,
   "/components/alert": AlertPage,
   "/components/toast": ToastPage,
   "/components/card": CardPage,
@@ -90,7 +98,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/pagination": PaginationPage,
   "/components/sidebar": SidebarPage,
   // Komponen Table belum ada, jadi halamannya masih placeholder.
-  "/components/table": () => <PlaceholderPage eyebrow="Components" title="Table" />,
+  "/components/table": TablePage,
 };
 
 function renderNavbarPreview(path: string) {

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Messages } from "../../../lib/icons/solid";
 import { Button, type ButtonTheme, type ButtonVariant } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { Demo, H, Segmented } from "../../pageKit";
+import { Demo, H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -27,7 +27,7 @@ const themeOptions: { value: ButtonTheme; label: string }[] = [
   { value: "primary", label: "Primary" },
   { value: "green", label: "Green" },
   { value: "gray", label: "Gray" },
-  { value: "purple", label: "Purple" },
+  { value: "simaya", label: "Simaya" },
   { value: "orange", label: "Orange" },
   { value: "yellow", label: "Yellow" },
 ];
@@ -38,7 +38,7 @@ const typeOptions = [
 ];
 
 const buttonProps: PropRow[] = [
-  ["as", '"button" | "a"', "button", "Menentukan elemen yang dirender. Bisa jadi anchor."],
+  ["as", '"button" | "anchor"', "button", "Menentukan elemen yang dirender. Bisa jadi anchor."],
   ["type", '"button" | "iconOnly"', "button", "Menentukan tipe tombol."],
   ["size", '"xs" | "s" | "base" | "l" | "xl"', "base", "Menentukan ukuran tombol."],
   ["variant", '"filled" | "outline"', "filled", "Gaya utama tombol: solid atau outline."],
@@ -66,7 +66,7 @@ export function ButtonPage() {
   const [type, setType] = useState<"button" | "iconOnly">("button");
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
-  const [asLink, setAsLink] = useState<"button" | "a">("button");
+  const [asLink, setAsLink] = useState<"button" | "anchor">("button");
 
   return (
     <UsulanPage
@@ -77,7 +77,7 @@ export function ButtonPage() {
     >
       <FlowSection id="button" title="Button & Sizes">
         <p className="mb-4 text-body-sm text-gray-500">
-          Tombol default dalam berbagai ukuran untuk membantu memilih <H>size</H> yang sesuai dengan
+          Tombol default dalam berbagai ukuran untuk membantu memilih <Hl>size</Hl> yang sesuai dengan
           ruang layout. Tombol ditampilkan menggunakan ikon untuk memberikan gambaran untuk tombol
           dengan ikon saat dipakai sebagai aksi utama.
         </p>
@@ -161,8 +161,8 @@ export function ButtonPage() {
 
       <FlowSection id="variants" title="Variants">
         <p className="mb-4 text-body-sm text-gray-500">
-          Variasi tombol yang itentukan oleh <H>variant</H>. Gunakan <H>filled</H> untuk aksi utama
-          yang perlu mendapat perhatian lebih, dan <H>outline</H> untuk tindakan pendukung yang
+          Variasi tombol yang itentukan oleh <Hl>variant</Hl>. Gunakan <Hl>filled</Hl> untuk aksi utama
+          yang perlu mendapat perhatian lebih, dan <Hl>outline</Hl> untuk tindakan pendukung yang
           tetap terlihat, namun tidak terlalu dominan.
         </p>
 
@@ -204,7 +204,7 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Primary</H> digunakan untuk tindakan utama atau aksi yang paling penting dalam
+              <Hl>Primary</Hl> digunakan untuk tindakan utama atau aksi yang paling penting dalam
               suatu halaman.
             </p>
           </div>
@@ -215,7 +215,7 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Green</H> digunakan untuk tindakan yang menunjukkan keberhasilan, konfirmasi, atau
+              <Hl>Green</Hl> digunakan untuk tindakan yang menunjukkan keberhasilan, konfirmasi, atau
               penyelesaian.
             </p>
           </div>
@@ -226,18 +226,18 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Gray</H> digunakan untuk tindakan sekunder atau aksi dengan tingkat prioritas
+              <Hl>Gray</Hl> digunakan untuk tindakan sekunder atau aksi dengan tingkat prioritas
               rendah.
             </p>
           </div>
 
           <div>
-            <Button variant="filled" theme="purple" tone="light">
-              Purple
+            <Button variant="filled" theme="simaya" tone="light">
+              Simaya
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Purple</H> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
+              <Hl>Simaya</Hl> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
               visual berbeda.
             </p>
           </div>
@@ -248,7 +248,7 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Orange</H> digunakan untuk tindakan yang membutuhkan perhatian atau bersifat
+              <Hl>Orange</Hl> digunakan untuk tindakan yang membutuhkan perhatian atau bersifat
               peringatan.
             </p>
           </div>
@@ -259,7 +259,7 @@ export function ButtonPage() {
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <H>Yellow</H> digunakan untuk informasi yang perlu diperhatikan tanpa menunjukkan
+              <Hl>Yellow</Hl> digunakan untuk informasi yang perlu diperhatikan tanpa menunjukkan
               kondisi kritis.
             </p>
           </div>
@@ -291,7 +291,7 @@ export function ButtonPage() {
             <Button
               type={type === "iconOnly" ? "iconOnly" : "button"}
               as={asLink}
-              href={asLink === "a" ? "/foundations/colors" : undefined}
+              href={asLink === "anchor" ? "/foundations/colors" : undefined}
               size={selectedSize}
               variant={variant}
               theme={theme}
@@ -309,10 +309,10 @@ export function ButtonPage() {
             <Segmented
               label="Pilih render"
               value={asLink}
-              onChange={(value) => setAsLink(value as "button" | "a")}
+              onChange={(value) => setAsLink(value as "button" | "anchor")}
               options={[
                 { value: "button", label: "Button" },
-                { value: "a", label: "Link" },
+                { value: "anchor", label: "Link" },
               ]}
             />
           </Control>
@@ -339,7 +339,7 @@ export function ButtonPage() {
             <Segmented
               label="Pilih ukuran"
               value={selectedSize}
-              onChange={setSelectedSize}
+              onChange={(value) => setSelectedSize(value as ButtonSize)}
               options={sizeOptions}
               wrap
             />
@@ -349,7 +349,7 @@ export function ButtonPage() {
             <Segmented
               label="Pilih variant"
               value={variant}
-              onChange={setVariant}
+              onChange={(value) => setVariant(value as ButtonVariant)}
               options={variantOptions}
             />
           </Control>
@@ -399,7 +399,7 @@ export function ButtonPage() {
             <Segmented
               label="Pilih theme"
               value={theme}
-              onChange={setTheme}
+              onChange={(value) => setTheme(value as ButtonTheme)}
               options={themeOptions}
               wrap
               itemClassName="basis-1/3 justify-center"
@@ -414,8 +414,8 @@ export function ButtonPage() {
           yang tampil di sini adalah kode yang siap diimplementasikan ke aplikasi.
         </p>
         <SectionCode flush>
-          {"import { Button } from '@stasi/design-kit-react'\n"}
-          {"import { Messages } from '@stasi/design-kit-react/icons/solid'\n"}
+          {"import { Button } from '@ceplok-ui/design-kit-react'\n"}
+          {"import { Messages } from '@ceplok-ui/design-kit-react/icons/solid'\n"}
           {"\n"}
           {"<Button\n"}
 

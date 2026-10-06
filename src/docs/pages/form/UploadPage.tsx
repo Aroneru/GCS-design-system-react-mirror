@@ -30,6 +30,7 @@ const uploadProps: PropRow[] = [
   ['attachLabel', 'ReactNode', 'Click to upload or drag and drop', 'Baris ajakan di dalam area seret-lepas.'],
   ['attachHint', 'ReactNode', 'SVG, PNG, JPG or GIF (MAX. 800x400px)', 'Baris keterangan format di dalam area seret-lepas.'],
   ['onFilesChange', '(files: FileList | null) => void', 'undefined', 'Dipanggil setiap berkas berganti, lewat dialog maupun seret-lepas.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: warna latar gray-800 dan teks putih/abu-abu.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="file"> diteruskan (accept, multiple, required, name, …).'],
 ]
 
@@ -38,6 +39,7 @@ const toc: TocEntry[] = [
   { id: 'platform', label: 'Platform' },
   { id: 'attach-form', label: 'Attach Form' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -50,6 +52,7 @@ export function UploadPage() {
   const [withLabel, setWithLabel] = useState(true)
   const [withHelper, setWithHelper] = useState(true)
   const [banyak, setBanyak] = useState(false)
+  const [theme, setTheme] = useState('light')
 
   return (
     <UsulanPage
@@ -68,7 +71,7 @@ export function UploadPage() {
           <Upload label="Unggah dokumen" helperText="PDF atau JPG, maksimal 2 MB." />
         </Demo>
         <SectionCode>
-          {"import { Upload } from '@stasi/design-kit-react'\n\n"}
+          {"import { Upload } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Upload\n'}
           {'    label="Unggah dokumen"\n'}
           {'    helperText="PDF atau JPG, maksimal 2 MB."\n'}
@@ -195,13 +198,43 @@ export function UploadPage() {
         </p>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual. Komponen secara otomatis menyesuaikan warna latar, batas, dan teks.
+        </Lead>
+        <div className="grid gap-5">
+          <Demo label="Upload" dark>
+            <Upload label="Upload File" helperText="PDF atau JPG, maksimal 2 MB." darkMode />
+          </Demo>
+          <Demo label="Attach — 538px" dark>
+            <div className="max-w-[538px]">
+              <Upload type="attach" darkMode />
+            </div>
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Upload\n'}
+          {'    '}
+          <H>label</H>
+          {'="Upload File"\n'}
+          {'    '}
+          <H>helperText</H>
+          {'="PDF atau JPG, maksimal 2 MB."\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n/>\n\n<Upload type="attach" '}
+          <H>darkMode</H>
+          {' />'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Pilih berkas, atau seret
           satu ke area attach, untuk melihat namanya muncul.
         </Lead>
 
-        <Stage maxWidth={platform === 'mobile' ? 'max-w-[382px]' : 'max-w-[538px]'}>
+        <Stage dark={theme === 'dark'} maxWidth={platform === 'mobile' ? 'max-w-[382px]' : 'max-w-[538px]'}>
           <Upload
             type={type}
             platform={platform}
@@ -209,6 +242,7 @@ export function UploadPage() {
             multiple={banyak}
             label={withLabel ? 'Unggah dokumen' : undefined}
             helperText={withHelper ? 'PDF atau JPG, maksimal 2 MB.' : undefined}
+            darkMode={theme === 'dark'}
           />
         </Stage>
 
@@ -217,7 +251,7 @@ export function UploadPage() {
             <Segmented
               label="Pilih bentuk"
               value={type}
-              onChange={setType}
+              onChange={(v) => setType(v as UploadType)}
               options={[
                 { value: 'default', label: 'Upload' },
                 { value: 'attach', label: 'Attach' },
@@ -229,7 +263,7 @@ export function UploadPage() {
             <Segmented
               label="Pilih aplikasi"
               value={application}
-              onChange={setApplication}
+              onChange={(v) => setApplication(v as UploadApplication)}
               itemClassName="px-2.5"
               options={applications.map((a) => ({ value: a.value, label: a.label }))}
             />
@@ -239,7 +273,7 @@ export function UploadPage() {
             <Segmented
               label="Pilih platform"
               value={platform}
-              onChange={setPlatform}
+              onChange={(v) => setPlatform(v as UploadPlatform)}
               options={[
                 { value: 'default', label: 'Default' },
                 { value: 'mobile', label: 'Mobile' },
@@ -251,7 +285,7 @@ export function UploadPage() {
             <Segmented
               label="Izinkan banyak berkas"
               value={banyak}
-              onChange={setBanyak}
+              onChange={(v) => setBanyak(v as boolean)}
               options={adaTidakAda}
             />
           </Control>
@@ -260,7 +294,7 @@ export function UploadPage() {
             <Segmented
               label="Tampilkan label"
               value={withLabel}
-              onChange={setWithLabel}
+              onChange={(v) => setWithLabel(v as boolean)}
               options={adaTidakAda}
             />
           </Control>
@@ -269,8 +303,20 @@ export function UploadPage() {
             <Segmented
               label="Tampilkan helper text"
               value={withHelper}
-              onChange={setWithHelper}
+              onChange={(v) => setWithHelper(v as boolean)}
               options={adaTidakAda}
+            />
+          </Control>
+
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={theme}
+              onChange={(v) => setTheme(v as string)}
+              options={[
+                { value: 'light', label: 'Light' },
+                { value: 'dark', label: 'Dark' },
+              ]}
             />
           </Control>
         </Controls>
@@ -288,7 +334,7 @@ export function UploadPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Upload } from '@stasi/design-kit-react'\n\n"}
+          {"import { Upload } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Upload\n'}
           {type !== 'default' && (
             <>
@@ -330,6 +376,13 @@ export function UploadPage() {
               {'    '}
               <H>helperText</H>
               {'="PDF atau JPG, maksimal 2 MB."\n'}
+            </>
+          )}
+          {theme === 'dark' && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'    name="dokumen"\n'}

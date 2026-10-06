@@ -88,11 +88,20 @@ export function Section({ title, children }: { title: string; children: ReactNod
 }
 
 /** Kartu contoh: label kecil di atas, lalu isi di dalam kotak berlatar netral. */
-export function Demo({ children, label }: { children: ReactNode; label?: string }) {
+export function Demo({ children, label, dark }: { children: ReactNode; label?: string; dark?: boolean }) {
   return (
     <div>
       {label && <p className="mb-2 text-sm font-black text-gray-900">{label}</p>}
-      <div className="rounded-xl border border-border bg-surface-subtle p-5">{children}</div>
+      {/* `dark` untuk komponen yang punya tampilan gelap — latarnya ikut gelap. */}
+      <div
+        className={
+          dark
+            ? 'rounded-xl border border-gray-800 bg-gray-900 p-5'
+            : 'rounded-xl border border-border bg-surface-subtle p-5'
+        }
+      >
+        {children}
+      </div>
     </div>
   )
 }
@@ -130,6 +139,14 @@ export function CodeBlock({ children }: { children: ReactNode }) {
 /** Potongan kode inline di dalam paragraf. */
 export const C = ({ children }: { children: ReactNode }) => (
   <code className="text-xs font-bold text-gray-700">{children}</code>
+)
+
+/**
+ * Penyorot di paragraf berlatar terang — nama prop, nilai, atau istilah kode
+ * yang disebut di luar blok kode. `H` yang primary-300 terlalu pucat di sini.
+ */
+export const Hl = ({ children }: { children: ReactNode }) => (
+  <span className="text-primary-500">{children}</span>
 )
 
 /** Penyorot potongan kode, menggantikan <span class="text-primary-300"> di Blade. */

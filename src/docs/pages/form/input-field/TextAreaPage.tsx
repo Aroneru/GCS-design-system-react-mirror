@@ -32,9 +32,10 @@ const textAreaProps: PropRow[] = [
   ['platform', "'default' | 'mobile'", 'default', 'Tinggi kotak type default: 162px atau 120px.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna garis saat difokus dan tombol kirim.'],
   ['toolbar', 'ReactNode', 'undefined', 'Mengganti isi toolbar editor dengan elemen sendiri.'],
-  ['onToolbarAction', '(action) => void', 'undefined', 'Dipanggil saat tombol toolbar bawaan ditekan.'],
+  ['onToolbarAction', '(action) => void', 'undefined', 'Dipanggil saat tombol toolbar bawaan ditekan, dengan nama aksinya: attachment, code, emoji, list, settings, date, atau download.'],
   ['submitLabel', 'ReactNode', 'undefined', 'Label tombol kirim; tombol hanya muncul bila diisi.'],
   ['onSubmit', '() => void', 'undefined', 'Aksi tombol kirim.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak dan toolbar gray-800, label putih.'],
   ['…props', 'TextareaHTMLAttributes', '—', 'Seluruh atribut <textarea> standar diteruskan (rows, maxLength, value, onChange, …).'],
 ]
 
@@ -42,6 +43,7 @@ const toc: TocEntry[] = [
   { id: 'text-area', label: 'Text Area' },
   { id: 'editor', label: 'Editor' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -64,6 +66,7 @@ export function TextAreaPage() {
   const [withHelper, setWithHelper] = useState(true)
   const [withSubmit, setWithSubmit] = useState(true)
   const [value, setValue] = useState('')
+  const [dark, setDark] = useState(false)
 
   const isEditor = type === 'editor'
   const hint =
@@ -73,7 +76,7 @@ export function TextAreaPage() {
     <UsulanPage
       eyebrow="Form · Input Field Form"
       title="Text Area"
-      description="Isian teks banyak baris. Tersedia sebagai kotak polos atau sebagai editor dengan toolbar dan tombol kirim, memakai token warna, radius, dan jarak yang sama dengan Foundations."
+      description="Isian teks banyak baris. Tersedia sebagai kotak polos atau sebagai editor dengan toolbar dan tombol kirim, memakai token warna, radius, dan jarak yang sama dengan Foundations. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="text-area" title="Text Area">
@@ -99,7 +102,7 @@ export function TextAreaPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { TextArea } from '@stasi/design-kit-react'\n\n"}
+          {"import { TextArea } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<TextArea\n'}
           {'    label="Keterangan"\n'}
           {'    placeholder="Tulis keterangan tambahan…"\n'}
@@ -175,17 +178,57 @@ export function TextAreaPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti kotak, toolbar, dan area isian ke gray-800, dengan label dan teks
+          yang diketik putih. Kotak polos tidak lagi bergaris, sedangkan bingkai editor dan garis pemisah
+          toolbarnya tetap gray-300. Tombol kirim memakai -600 (hover -700), satu tingkat lebih terang dari
+          tampilan terang.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Default" dark>
+            <TextArea
+              darkMode
+              label="Keterangan"
+              placeholder="Tulis keterangan tambahan…"
+              helperText="Maksimal 500 karakter."
+            />
+          </Demo>
+          <Demo label="Editor" dark>
+            <TextArea
+              darkMode
+              type="editor"
+              label="Isi pesan"
+              hint="Opsional"
+              placeholder="Tulis pesan Anda…"
+              submitLabel="Submit Text"
+            />
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<TextArea\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    type="editor"\n'}
+          {'    label="Isi pesan"\n'}
+          {'    submitLabel="Submit Text"\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth={platform === 'mobile' && !isEditor ? 'max-w-[380px]' : 'max-w-[494px]'}>
+        <Stage maxWidth={platform === 'mobile' && !isEditor ? 'max-w-[380px]' : 'max-w-[494px]'} dark={dark}>
           <TextArea
             type={type}
             platform={platform}
             application={application}
+            darkMode={dark}
             label="Isi pesan"
             hint={hint}
             placeholder="Tulis pesan Anda…"
@@ -261,6 +304,18 @@ export function TextAreaPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -283,7 +338,7 @@ export function TextAreaPage() {
           yang terlihat.
         */}
         <SectionCode flush>
-          {"import { TextArea } from '@stasi/design-kit-react'\n\n"}
+          {"import { TextArea } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<TextArea\n'}
           {isEditor && (
             <>
@@ -304,6 +359,13 @@ export function TextAreaPage() {
               {'    '}
               <H>application</H>
               {`="${application}"\n`}
+            </>
+          )}
+          {dark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'    label="Isi pesan"\n'}

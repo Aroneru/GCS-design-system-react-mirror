@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Hero, type HeroImageOrientation, type HeroType } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { C, Mark, Segmented } from "../../pageKit";
+import { Hl, Mark, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -28,10 +28,10 @@ import { asset } from "../../asset";
  */
 
 /** Isi contoh diambil apa adanya dari frame Hero di Figma. */
-const heroText = "Hero Design system Stasi";
-const heroSubHeading = "Hero Design system Stasi";
+const heroText = "Hero Design system Ceplok";
+const heroSubHeading = "Hero Design system Ceplok";
 const heroDesc =
-  "Design System Stasi adalah sebuah kumpulan standar desain terpadu yang digunakan untuk memastikan seluruh produk digital di lingkungan Kementerian Komunikasi dan Informatika (Stasi)";
+  "Design System Ceplok adalah sebuah kumpulan standar desain terpadu yang digunakan untuk memastikan seluruh produk digital di lingkungan Kementerian Komunikasi dan Informatika (Ceplok)";
 
 const heroImage = asset("/images/hero-sample.svg");
 const heroImageLandscape = asset("/images/hero-sample-landscape.svg");
@@ -122,6 +122,12 @@ const heroProps: PropRow[] = [
     "Gambar berupa elemen — ilustrasi <svg> inline atau komposisi sendiri. Dipakai hanya bila prop image kosong.",
   ],
   [
+    "darkMode",
+    "boolean",
+    "false",
+    "Tampilan gelap: latar gray-900 untuk ketiga tipe (termasuk centered), judul putih, sub heading primary-500, deskripsi gray-400. Tombol tetap primary-700. Susunan dan ukurannya tidak berubah.",
+  ],
+  [
     "className",
     "string",
     "undefined",
@@ -186,6 +192,7 @@ const toc: TocEntry[] = [
   { id: "teks", label: "heading · subHeading · description" },
   { id: "tombol", label: "showButton · buttonLabel · buttonHref" },
   { id: "gambar", label: "image · imageOrientation · imageContent" },
+  { id: "dark-mode", label: "Dark mode" },
   { id: "ukuran", label: "Ukuran & jarak" },
   { id: "responsif", label: "Perilaku responsif" },
   // Playground di urutan belakang: variasi dan penjelasan propnya dibaca dulu,
@@ -199,18 +206,44 @@ const toc: TocEntry[] = [
  * Bingkai pratinjau: Hero selalu selebar wadahnya, jadi sudutnya dirapikan.
  * `label` dipakai di bagian Variasi supaya tiap frame Figma punya namanya.
  */
-function Preview({ label, children }: { label?: string; children: ReactNode }) {
+function Preview({
+  label,
+  dark,
+  children,
+}: {
+  label?: string;
+  /** Bingkai gelap untuk hero `darkMode`, supaya tepinya tidak kontras putih. */
+  dark?: boolean;
+  children: ReactNode;
+}) {
   return (
     <div>
       {label && (
         <p className="mb-2 text-sm font-black text-gray-900">{label}</p>
       )}
-      <div className="rounded-2xl border border-border bg-surface-subtle p-4 sm:p-5">
-        <div className="overflow-hidden rounded-xl shadow-soft">{children}</div>
+      <div
+        className={`rounded-2xl border p-4 sm:p-5 ${
+          dark ? "border-gray-800 bg-gray-950" : "border-border bg-surface-subtle"
+        }`}
+      >
+        <div className={heroFrame(dark)}>{children}</div>
       </div>
     </div>
   );
 }
+
+/**
+ * Bingkai hero di pratinjau. Hero gelap berlatar gray-900, sama dengan panggung
+ * gelap, jadi tanpa garis tepi ia menyatu dengan latarnya. Garis gray-700 dan
+ * bayangan yang lebih pekat membuatnya tetap terbaca sebagai kartu, seperti
+ * hero terang di atas panggung abu-abu.
+ */
+const heroFrame = (dark?: boolean) =>
+  `overflow-hidden rounded-xl ${
+    dark
+      ? "ring-1 ring-gray-700 shadow-[0_16px_40px_-8px_rgb(0_0_0/0.6)]"
+      : "shadow-soft"
+  }`;
 
 /** Ilustrasi inline untuk bagian imageContent — bukan berkas gambar. */
 const InlineIllustration = () => (
@@ -226,6 +259,7 @@ export function HeroPage() {
     useState<HeroImageOrientation>("portrait");
   const [withSubHeading, setWithSubHeading] = useState(true);
   const [withButton, setWithButton] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
 
   // Turunan untuk cuplikan kode di bagian Penggunaan — satu sumber dengan Playground.
   const ind = view === "mobile" ? "    " : "";
@@ -235,6 +269,7 @@ export function HeroPage() {
     type === "centered" ? "tanpa gambar" : `gambar ${orientation}`,
     withSubHeading ? "dengan sub heading" : "tanpa sub heading",
     withButton ? "dengan tombol" : "tanpa tombol",
+    darkMode ? "gelap" : "terang",
   ].join(" · ");
 
   return (
@@ -246,9 +281,9 @@ export function HeroPage() {
     >
       <FlowSection id="dasar" title="Tampilan dasar">
         <Lead>
-          Susunan bawaan <C>horizontal-image-left</C>: gambar di kiri, teks di
+          Susunan bawaan <Hl>horizontal-image-left</Hl>: gambar di kiri, teks di
           kanan. Isi contoh di bawah diambil apa adanya dari frame Hero di Figma
-          — <C>Hero Text</C>, <C>Hero sub heading</C>, <C>Hero Desc</C>, dan
+          — <Hl>Hero Text</Hl>, <Hl>Hero sub heading</Hl>, <Hl>Hero Desc</Hl>, dan
           tombol <em>Lihat Lebih Lanjut</em>. Semua bagiannya opsional: yang
           tidak diisi tidak dirender, bukan disembunyikan lewat CSS.
         </Lead>
@@ -266,11 +301,11 @@ export function HeroPage() {
         </Preview>
 
         <SectionCode>
-          {"import { Hero } from '@stasi/design-kit-react'\n\n"}
+          {"import { Hero } from '@ceplok-ui/design-kit-react'\n\n"}
           {"<Hero\n"}
           {'    type="horizontal-image-left"\n'}
-          {'    heading="Hero Design system Stasi"\n'}
-          {'    subHeading="Hero Design system Stasi"\n'}
+          {'    heading="Hero Design system Ceplok"\n'}
+          {'    subHeading="Hero Design system Ceplok"\n'}
           {`    description="${heroDesc}"\n`}
           {'    image="/images/hero-sample.svg"\n'}
           {'    buttonHref="/design-system"\n'}
@@ -280,14 +315,14 @@ export function HeroPage() {
 
       <FlowSection id="variasi" title="Variasi">
         <Lead>
-          Ketiga nilai <C>type</C> memakai bagian isi yang sama; yang berbeda
+          Ketiga nilai <Hl>type</Hl> memakai bagian isi yang sama; yang berbeda
           hanya letak gambar dan perataan teksnya. Nama tiap variasi di bawah
           sengaja disamakan dengan nama frame di Figma agar mudah dicocokkan.
           Dua tipe horizontal masing-masing punya versi gambar potret dan
-          lanskap lewat <C>imageOrientation</C> — yang berubah hanya lebar kolom
-          gambarnya, bukan rasio gambarnya. <C>centered</C> melepas gambar
-          sepenuhnya — <C>image</C> dan <C>imageContent</C> diabaikan — lalu
-          memusatkan teks di atas latar <C>primary-50</C>.
+          lanskap lewat <Hl>imageOrientation</Hl> — yang berubah hanya lebar kolom
+          gambarnya, bukan rasio gambarnya. <Hl>centered</Hl> melepas gambar
+          sepenuhnya — <Hl>image</Hl> dan <Hl>imageContent</Hl> diabaikan — lalu
+          memusatkan teks di atas latar <Hl>primary-50</Hl>.
         </Lead>
 
         <div className="space-y-6">
@@ -366,13 +401,13 @@ export function HeroPage() {
 
       <FlowSection id="platform" title="platform">
         <Lead>
-          <C>desktop</C> — bawaannya — membiarkan susunannya ditentukan lebar
-          hero lewat <C>@container</C>: dua kolom mulai 768px, bertumpuk di
-          bawahnya. <C>platform="mobile"</C> memaksa susunan bertumpuk itu
+          <Hl>desktop</Hl> — bawaannya — membiarkan susunannya ditentukan lebar
+          hero lewat <Hl>@container</Hl>: dua kolom mulai 768px, bertumpuk di
+          bawahnya. <Hl>platform="mobile"</Hl> memaksa susunan bertumpuk itu
           berapa pun lebar ruangnya, sekaligus menahan judul di ukuran{" "}
-          <C>heading-1</C> supaya tidak melompat ke <C>display</C>. Dipakai saat
+          <Hl>heading-1</Hl> supaya tidak melompat ke <Hl>display</Hl>. Dipakai saat
           hero dirender di kerangka aplikasi mobile — bukan sekadar di jendela
-          yang disempitkan, karena untuk kasus itu ambang <C>@container</C>{" "}
+          yang disempitkan, karena untuk kasus itu ambang <Hl>@container</Hl>{" "}
           sudah menanganinya sendiri.
         </Lead>
 
@@ -401,21 +436,21 @@ export function HeroPage() {
 
       <FlowSection id="teks" title="heading · subHeading · description">
         <Lead>
-          <C>heading</C> dirender sebagai <C>{"<h1>"}</C>, jadi satu halaman
-          sebaiknya hanya memuat satu Hero ber-<C>heading</C>; hero kedua di
-          halaman yang sama lebih baik dikosongkan judulnya. <C>subHeading</C>{" "}
-          adalah baris kecil berwarna <C>primary-600</C> di bawahnya, dan{" "}
-          <C>showHeading={"{false}"}</C> — namanya mengikuti properti{" "}
-          <C>Show Heading</C> di Figma — melepas baris itu. Judul utamanya
+          <Hl>heading</Hl> dirender sebagai <Hl>{"<h1>"}</Hl>, jadi satu halaman
+          sebaiknya hanya memuat satu Hero ber-<Hl>heading</Hl>; hero kedua di
+          halaman yang sama lebih baik dikosongkan judulnya. <Hl>subHeading</Hl>{" "}
+          adalah baris kecil berwarna <Hl>primary-600</Hl> di bawahnya, dan{" "}
+          <Hl>showHeading={"{false}"}</Hl> — namanya mengikuti properti{" "}
+          <Hl>Show Heading</Hl> di Figma — melepas baris itu. Judul utamanya
           sendiri tidak pernah bisa disembunyikan: hero tanpa judul membuat
           halaman kehilangan penanda utamanya bagi pembaca layar dan mesin
           pencari.
         </Lead>
         <Lead>
-          <C>description</C> ditahan <C>max-w-2xl</C> (672px) agar barisnya
+          <Hl>description</Hl> ditahan <Hl>max-w-2xl</Hl> (672px) agar barisnya
           tidak terlalu panjang untuk dibaca; di kolom yang lebih sempit — dua
           kolom pada tipe horizontal — batas itu tidak pernah aktif. Ketiganya
-          bertipe <C>ReactNode</C>, jadi sebagian katanya boleh diberi warna
+          bertipe <Hl>ReactNode</Hl>, jadi sebagian katanya boleh diberi warna
           lain atau disisipi tautan.
         </Lead>
 
@@ -425,7 +460,7 @@ export function HeroPage() {
             heading={
               <>
                 Hero <span className="text-primary-700">Design system</span>{" "}
-                Stasi
+                Ceplok
               </>
             }
             subHeading={heroSubHeading}
@@ -453,7 +488,7 @@ export function HeroPage() {
           <Mark>heading</Mark>
           {"={\n"}
           {
-            '        <>Hero <span className="text-primary-700">Design system</span> Stasi</>\n'
+            '        <>Hero <span className="text-primary-700">Design system</span> Ceplok</>\n'
           }
           {"    }\n"}
           {"    "}
@@ -463,7 +498,7 @@ export function HeroPage() {
           <Mark>description</Mark>
           {"={\n"}
           {
-            '        <>Design System Stasi … <a href="/foundations">halaman Foundations</a>.</>\n'
+            '        <>Design System Ceplok … <a href="/foundations">halaman Foundations</a>.</>\n'
           }
           {"    }\n"}
           {"/>"}
@@ -473,12 +508,12 @@ export function HeroPage() {
       <FlowSection id="tombol" title="showButton · buttonLabel · buttonHref">
         <Lead>
           Satu tombol saja — hero dengan dua tombol bersaing membuat pembaca
-          ragu mana yang utama. <C>buttonLabel</C> bawaannya{" "}
-          <C>"Lihat Lebih Lanjut"</C> dan panah kanannya ditambahkan otomatis.
-          Isi <C>buttonHref</C> bila tombolnya berpindah halaman — komponennya
-          jadi merender <C>{"<a href>"}</C> sehingga alamatnya bisa disalin dan
-          dibuka di tab baru; kalau kosong, tombolnya <C>{"<button>"}</C> yang
-          memanggil <C>onButtonClick</C>. <C>showButton={"{false}"}</C> melepas
+          ragu mana yang utama. <Hl>buttonLabel</Hl> bawaannya{" "}
+          <Hl>"Lihat Lebih Lanjut"</Hl> dan panah kanannya ditambahkan otomatis.
+          Isi <Hl>buttonHref</Hl> bila tombolnya berpindah halaman — komponennya
+          jadi merender <Hl>{"<a href>"}</Hl> sehingga alamatnya bisa disalin dan
+          dibuka di tab baru; kalau kosong, tombolnya <Hl>{"<button>"}</Hl> yang
+          memanggil <Hl>onButtonClick</Hl>. <Hl>showButton={"{false}"}</Hl> melepas
           tombol beserta jarak atasnya.
         </Lead>
 
@@ -524,24 +559,24 @@ export function HeroPage() {
 
       <FlowSection id="gambar" title="image · imageOrientation · imageContent">
         <Lead>
-          <C>image</C> menerima URL berkas dan dirender{" "}
+          <Hl>image</Hl> menerima URL berkas dan dirender{" "}
           <strong className="text-gray-900">tanpa kunci rasio</strong>:
           tingginya mengikuti rasio asli berkasnya. Ini disengaja — mengunci{" "}
-          <C>aspect-ratio</C> di sini membuat ilustrasi potret ikut dipipihkan
+          <Hl>aspect-ratio</Hl> di sini membuat ilustrasi potret ikut dipipihkan
           dan teks di dalamnya jadi gepeng. Karena itu{" "}
-          <C>imageOrientation</C> pun tidak menyentuh rasio gambarnya sama
-          sekali; yang diaturnya hanya lebar kolom — potret <C>386px</C>,
-          lanskap <C>435px</C> — jadi kirim berkas yang orientasinya memang
+          <Hl>imageOrientation</Hl> pun tidak menyentuh rasio gambarnya sama
+          sekali; yang diaturnya hanya lebar kolom — potret <Hl>386px</Hl>,
+          lanskap <Hl>435px</Hl> — jadi kirim berkas yang orientasinya memang
           cocok.
         </Lead>
         <Lead>
-          <C>imageAlt</C> diisi hanya bila gambarnya membawa informasi; kalau
+          <Hl>imageAlt</Hl> diisi hanya bila gambarnya membawa informasi; kalau
           cuma hiasan, biarkan kosong supaya tidak dibacakan dua kali bersama
           judul. Bila pendampingnya bukan berkas gambar — ilustrasi{" "}
-          <C>{"<svg>"}</C> inline, kartu statistik, komposisi sendiri — pakai{" "}
-          <C>imageContent</C>; prop itu hanya berlaku saat <C>image</C> kosong,
-          dan bila keduanya diisi <C>image</C> yang menang. Ketiganya diabaikan
-          pada <C>type="centered"</C>.
+          <Hl>{"<svg>"}</Hl> inline, kartu statistik, komposisi sendiri — pakai{" "}
+          <Hl>imageContent</Hl>; prop itu hanya berlaku saat <Hl>image</Hl> kosong,
+          dan bila keduanya diisi <Hl>image</Hl> yang menang. Ketiganya diabaikan
+          pada <Hl>type="centered"</Hl>.
         </Lead>
 
         <Preview label="imageContent — ilustrasi inline, bukan berkas">
@@ -574,10 +609,125 @@ export function HeroPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Isi <Hl>darkMode</Hl> untuk halaman berlatar gelap. Ketiga tipe memakai
+          latar <Hl>gray-900</Hl>, termasuk <Hl>centered</Hl> yang di tampilan
+          terang berlatar <Hl>primary-50</Hl>. Judul jadi putih, sub heading{" "}
+          <Hl>primary-500</Hl>, dan deskripsi <Hl>gray-400</Hl>. Tombolnya tetap{" "}
+          <Hl>primary-700</Hl>. Susunan, ukuran, dan perilaku responsifnya sama
+          persis dengan tampilan terang, termasuk gambar di kiri atau kanan.
+        </Lead>
+
+        <div className="space-y-6">
+          <Preview label="Image Left — gelap" dark>
+            <Hero
+              darkMode
+              type="horizontal-image-left"
+              heading={heroText}
+              subHeading={heroSubHeading}
+              description={heroDesc}
+              image={heroImage}
+              buttonHref="#/components/hero"
+            />
+          </Preview>
+
+          <Preview label="Image Right — gelap" dark>
+            <Hero
+              darkMode
+              type="horizontal-image-right"
+              heading={heroText}
+              subHeading={heroSubHeading}
+              description={heroDesc}
+              image={heroImage}
+              buttonHref="#/components/hero"
+            />
+          </Preview>
+
+          <Preview label="Image Left — gambar lanskap, gelap" dark>
+            <Hero
+              darkMode
+              type="horizontal-image-left"
+              imageOrientation="landscape"
+              heading={heroText}
+              subHeading={heroSubHeading}
+              description={heroDesc}
+              image={heroImageLandscape}
+              buttonHref="#/components/hero"
+            />
+          </Preview>
+
+          <Preview label="Image Right — gambar lanskap, gelap" dark>
+            <Hero
+              darkMode
+              type="horizontal-image-right"
+              imageOrientation="landscape"
+              heading={heroText}
+              subHeading={heroSubHeading}
+              description={heroDesc}
+              image={heroImageLandscape}
+              buttonHref="#/components/hero"
+            />
+          </Preview>
+
+          <Preview label="Centered — gelap" dark>
+            <Hero
+              darkMode
+              type="centered"
+              heading={heroText}
+              showHeading={false}
+              description={heroDesc}
+              buttonHref="#/components/hero"
+            />
+          </Preview>
+        </div>
+
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          <Stage maxWidth="max-w-[390px]" dark>
+            <div className={heroFrame(true)}>
+              <Hero
+                darkMode
+                platform="mobile"
+                heading={heroText}
+                subHeading={heroSubHeading}
+                description={heroDesc}
+                image={heroImage}
+                buttonHref="#/components/hero"
+              />
+            </div>
+          </Stage>
+          <Stage maxWidth="max-w-[390px]" dark>
+            <div className={heroFrame(true)}>
+              <Hero
+                darkMode
+                type="centered"
+                platform="mobile"
+                heading={heroText}
+                showHeading={false}
+                description={heroDesc}
+                buttonHref="#/components/hero"
+              />
+            </div>
+          </Stage>
+        </div>
+
+        <SectionCode>
+          {"<Hero\n"}
+          {"    "}
+          <Mark>darkMode</Mark>
+          {"\n"}
+          {'    type="horizontal-image-right"\n'}
+          {'    heading="Hero Design system Ceplok"\n'}
+          {'    image="/images/hero-sample.svg"\n'}
+          {"    …\n"}
+          {"/>"}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="ukuran" title="Ukuran & jarak">
         <Lead>
           Diambil dari panel <em>Layout</em> di Figma. Satu angka sengaja tidak
-          diturunkan apa adanya: <C>padding kiri-kanan 0</C>. Di Figma isinya
+          diturunkan apa adanya: <Hl>padding kiri-kanan 0</Hl>. Di Figma isinya
           ditahan wadah selebar 1290px yang dipusatkan, dan wadah itu kehilangan
           artinya begitu layarnya lebih sempit dari 1290px — teks akan menempel
           ke tepi. Jadi jarak tepi yang sama (76px pada bingkai 1440px) dipasang
@@ -605,10 +755,10 @@ export function HeroPage() {
         <Lead>
           Ambang di bawah ini diukur dari{" "}
           <strong className="text-gray-900">lebar hero itu sendiri</strong>,
-          bukan lebar layar — elemen <C>{"<section>"}</C> dipasangi{" "}
-          <C>@container</C>. Jadi hero yang ditaruh di kolom sempit pada layar
+          bukan lebar layar — elemen <Hl>{"<section>"}</Hl> dipasangi{" "}
+          <Hl>@container</Hl>. Jadi hero yang ditaruh di kolom sempit pada layar
           desktop tetap tampil bertumpuk seperti di ponsel. Prop{" "}
-          <C>platform="mobile"</C> memaksa susunan bertumpuk itu tanpa menunggu
+          <Hl>platform="mobile"</Hl> memaksa susunan bertumpuk itu tanpa menunggu
           ambang lebarnya.
         </Lead>
 
@@ -625,26 +775,30 @@ export function HeroPage() {
 
         <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500">
           Yang tidak berubah di ukuran mana pun: jarak atas-bawah 24px, judul{" "}
-          <C>font-black</C>, sub heading <C>primary-600</C>, deskripsi ditahan{" "}
-          <C>max-w-2xl</C>, dan teks selalu ditulis lebih dulu di DOM — letak
-          gambar diatur arah barisnya, sehingga <C>{"<h1>"}</C> tetap jadi hal
+          <Hl>font-black</Hl>, sub heading <Hl>primary-600</Hl>, deskripsi ditahan{" "}
+          <Hl>max-w-2xl</Hl>, dan teks selalu ditulis lebih dulu di DOM — letak
+          gambar diatur arah barisnya, sehingga <Hl>{"<h1>"}</Hl> tetap jadi hal
           pertama yang dibacakan pembaca layar pada kedua tipe horizontal.
         </p>
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
-          Kelima kontrol di bawah panggung menggabungkan prop-prop di atas dalam
+          Keenam kontrol di bawah panggung menggabungkan prop-prop di atas dalam
           satu tampilan, dan bagian Penggunaan menuliskan kodenya. Kontrol{" "}
-          <em>Platform</em> mengubah dua hal sekaligus: prop <C>platform</C>{" "}
-          pada hero dan lebar pembungkus pratinjaunya. Pada <C>centered</C>{" "}
-          gambar memang tidak muncul walau <C>image</C> tetap diisi — itu bagian
+          <em>Platform</em> mengubah dua hal sekaligus: prop <Hl>platform</Hl>{" "}
+          pada hero dan lebar pembungkus pratinjaunya. Pada <Hl>centered</Hl>{" "}
+          gambar memang tidak muncul walau <Hl>image</Hl> tetap diisi — itu bagian
           dari tipenya, bukan kekeliruan.
         </Lead>
 
-        <Stage maxWidth={view === "mobile" ? "max-w-[390px]" : "max-w-full"}>
-          <div className="overflow-hidden rounded-xl shadow-soft">
+        <Stage
+          maxWidth={view === "mobile" ? "max-w-[390px]" : "max-w-full"}
+          dark={darkMode}
+        >
+          <div className={heroFrame(darkMode)}>
             <Hero
+              darkMode={darkMode}
               type={type}
               platform={view}
               heading={heroText}
@@ -726,18 +880,30 @@ export function HeroPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={darkMode}
+              onChange={setDarkMode}
+              options={[
+                { value: false, label: "Terang" },
+                { value: true, label: "Gelap" },
+              ]}
+            />
+          </Control>
         </Controls>
       </FlowSection>
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Mengikuti kelima kontrol di Playground — tipe, platform, orientasi
-          gambar, sub heading, dan tombol. Nama prop yang sedang dikendalikan
+          Mengikuti keenam kontrol di Playground — tipe, platform, orientasi
+          gambar, sub heading, tombol, dan mode. Nama prop yang sedang dikendalikan
           kontrol ditandai dengan warna biru, dan tombol <em>Salin</em> selalu
           menyalin persis yang sedang tampil.
         </Lead>
         <SectionCode flush>
-          {"import { Hero } from '@stasi/design-kit-react'\n\n"}
+          {"import { Hero } from '@ceplok-ui/design-kit-react'\n\n"}
           {`{/* ${summary} */}\n`}
           {view === "mobile" && (
             <>
@@ -755,6 +921,13 @@ export function HeroPage() {
           {`${ind}    `}
           <Mark>platform</Mark>
           {`="${view}"\n`}
+          {darkMode && (
+            <>
+              {`${ind}    `}
+              <Mark>darkMode</Mark>
+              {"\n"}
+            </>
+          )}
           {`${ind}    heading="${heroText}"\n`}
           {withSubHeading && `${ind}    subHeading="${heroSubHeading}"\n`}
           {!withSubHeading && (
@@ -792,9 +965,9 @@ export function HeroPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Rangkuman seluruh prop, termasuk yang tidak diberi bagian sendiri di
-          atas. Semuanya opsional — <C>{"<Hero />"}</C> tanpa prop tetap
+          atas. Semuanya opsional — <Hl>{"<Hero />"}</Hl> tanpa prop tetap
           merender kerangkanya beserta tombol bawaannya. Atribut HTML di luar
-          daftar ini tidak diteruskan ke elemen <C>{"<section>"}</C>.
+          daftar ini tidak diteruskan ke elemen <Hl>{"<section>"}</Hl>.
         </Lead>
         <PropsTable rows={heroProps} minWidth="52rem" />
       </FlowSection>

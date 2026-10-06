@@ -1,10 +1,10 @@
 import { forwardRef, useId, type InputHTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../utils/cn'
 
-/** Platform mengikuti varian Figma: Default = desktop (52px), Mobile = 40px. */
+/** Platform mengikuti varian desain: Default = desktop (52px), Mobile = 40px. */
 export type InputFieldPlatform = 'default' | 'mobile'
 
-/** State mengikuti varian Figma. `typing` = tampilan saat field difokus. */
+/** State mengikuti varian desain. `typing` = tampilan saat field difokus. */
 export type InputFieldState = 'default' | 'typing' | 'inactive' | 'failed'
 
 /** Warna aksen per aplikasi — dipakai untuk garis saat field aktif. */
@@ -28,31 +28,89 @@ const surfaces: Record<InputFieldState, string> = {
   failed: 'border-red-600 bg-red-100',
 }
 
+/** Tampilan gelap: garis menyatu dengan latar, kecuali saat typing dan failed. */
+const surfacesDark: Record<InputFieldState, string> = {
+  default: 'border-gray-800 bg-gray-800',
+  typing: 'bg-gray-800',
+  inactive: 'border-gray-800 bg-gray-800',
+  failed: 'border-red-500 bg-gray-800',
+}
+
+interface Ink {
+  label: string
+  field: string
+  helper: string
+  icon: string
+  /** Tombol hapus (×) — pada tampilan gelap warnanya berbeda dari ikon kiri. */
+  clear: string
+}
+
 /** Warna teks per state — label, isi field, ikon, dan caption punya tingkat kontras berbeda. */
-const inks: Record<InputFieldState, { label: string; field: string; helper: string; icon: string }> = {
+const inks: Record<InputFieldState, Ink> = {
   default: {
     label: 'text-gray-900',
     field: 'text-gray-900 placeholder:text-gray-500',
     helper: 'text-gray-500',
     icon: 'text-gray-500',
+    clear: 'text-gray-500',
   },
   typing: {
     label: 'text-gray-900',
     field: 'text-gray-900 placeholder:text-gray-500',
     helper: 'text-gray-500',
     icon: 'text-gray-500',
+    clear: 'text-gray-500',
   },
   inactive: {
     label: 'text-gray-400',
     field: 'text-gray-400 placeholder:text-gray-400',
     helper: 'text-gray-400',
     icon: 'text-gray-400',
+    clear: 'text-gray-400',
   },
   failed: {
     label: 'text-gray-900',
     field: 'text-red-700 placeholder:text-red-600',
     helper: 'text-red-600',
     icon: 'text-red-600',
+    clear: 'text-red-600',
+  },
+}
+
+/**
+ * Warna tampilan gelap, dari desain. Desain hanya menggambar placeholder, jadi
+ * teks yang diketik mengikuti label (putih) — sama seperti Datepicker gelap —
+ * dan pada failed satu tingkat lebih terang dari placeholder-nya, kebalikan
+ * dari tampilan terang yang satu tingkat lebih gelap.
+ */
+const inksDark: Record<InputFieldState, Ink> = {
+  default: {
+    label: 'text-white',
+    field: 'text-white placeholder:text-gray-400',
+    helper: 'text-gray-400',
+    icon: 'text-gray-400',
+    clear: 'text-gray-600',
+  },
+  typing: {
+    label: 'text-white',
+    field: 'text-white placeholder:text-gray-500',
+    helper: 'text-gray-400',
+    icon: 'text-gray-500',
+    clear: 'text-gray-500',
+  },
+  inactive: {
+    label: 'text-gray-50',
+    field: 'text-gray-500 placeholder:text-gray-500',
+    helper: 'text-gray-500',
+    icon: 'text-gray-500',
+    clear: 'text-gray-400',
+  },
+  failed: {
+    label: 'text-white',
+    field: 'text-red-500 placeholder:text-red-600',
+    helper: 'text-red-600',
+    icon: 'text-red-600',
+    clear: 'text-red-600',
   },
 }
 
@@ -74,6 +132,8 @@ export interface InputFieldProps extends Omit<InputHTMLAttributes<HTMLInputEleme
   application?: InputFieldApplication
   /** Bila diisi, tombol hapus (×) muncul di sisi kanan field. */
   onClear?: () => void
+  /** Tampilan gelap: field gray-800 dengan label putih dan teks abu-abu. */
+  darkMode?: boolean
   /** Kelas untuk pembungkus terluar (label + field + caption). */
   className?: string
 }
@@ -83,7 +143,8 @@ export interface InputFieldProps extends Omit<InputHTMLAttributes<HTMLInputEleme
  *
  * State `inactive` otomatis menonaktifkan input dan `failed` menandainya
  * `aria-invalid`, sehingga tampilan visual dan makna aksesibilitasnya selalu
- * sejalan. Garis aksen saat difokus mengikuti prop `application`.
+ * sejalan. Garis aksen saat difokus mengikuti prop `application`, juga pada
+ * tampilan gelap (`darkMode`).
  */
 export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(function InputField(
   {
@@ -94,6 +155,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(function
     state = 'default',
     application = 'default',
     onClear,
+    darkMode = false,
     className,
     id,
     disabled,
@@ -105,7 +167,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(function
   const fieldId = id ?? autoId
   const helperId = `${fieldId}-helper`
 
-  const ink = inks[state]
+  const ink = (darkMode ? inksDark : inks)[state]
   const accent = accents[application]
   const isDisabled = disabled || state === 'inactive'
 
@@ -121,7 +183,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(function
         className={cn(
           'flex items-center gap-3 rounded-lg border px-4 transition-colors',
           platforms[platform],
-          surfaces[state],
+          (darkMode ? surfacesDark : surfaces)[state],
           // `typing` mengunci garis aksen; state lain tetap berubah saat difokus,
           // kecuali failed yang mempertahankan garis merahnya.
           state === 'typing' && accent.border,
@@ -151,7 +213,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(function
             aria-label="Kosongkan isian"
             className={cn(
               'shrink-0 rounded-sm transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current disabled:cursor-not-allowed',
-              ink.icon,
+              ink.clear,
             )}
           >
             <ClearIcon />

@@ -1,10 +1,10 @@
 import { forwardRef, useId, type InputHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../utils/cn";
 
-/** Platform mengikuti varian Figma: Default = 16px, Mobile = 14px. */
+/** Platform mengikuti varian desain: Default = 16px, Mobile = 14px. */
 export type CheckboxPlatform = "default" | "mobile";
 
-/** State mengikuti varian Figma. `inactive` sekaligus menonaktifkan kontrol. */
+/** State mengikuti varian desain. `inactive` sekaligus menonaktifkan kontrol. */
 export type CheckboxState = "default" | "inactive";
 
 /** Warna aksen per aplikasi — dipakai kotak saat tercentang. */
@@ -19,12 +19,42 @@ const platforms: Record<CheckboxPlatform, { box: string; offset: string; label: 
   mobile: { box: "size-3.5", offset: "mt-px", label: "text-xs" },
 };
 
+/** Warna kotak tercentang sama di tampilan terang dan gelap. */
 const accents: Record<CheckboxApplication, string> = {
   default: "checked:border-primary-700 checked:bg-primary-700 focus-visible:outline-primary-700",
   simaya: "checked:border-purple-500 checked:bg-purple-500 focus-visible:outline-purple-500",
 };
 
-/** Centang 10px, digambar sendiri agar titik sudutnya persis seperti Figma. */
+/** Warna kotak dan teks per tampilan, untuk state aktif dan `inactive`. */
+const themes = {
+  light: {
+    box: "border-gray-300 bg-gray-50",
+    boxInactive: "checked:border-gray-400 checked:bg-gray-400",
+    label: "text-gray-900",
+    labelInactive: "text-gray-400",
+    helper: "text-gray-500",
+    helperInactive: "text-gray-400",
+  },
+  /**
+   * Dari desain gelap: kotak gray-700 bergaris gray-600, label putih, caption
+   * gray-400; inactive meredupkan label dan caption ke gray-500. Kotak inactive
+   * yang tercentang tidak digambar desain; gray-500 menyamai teksnya, seperti
+   * gray-400 pada tampilan terang.
+   */
+  dark: {
+    box: "border-gray-600 bg-gray-700",
+    boxInactive: "checked:border-gray-500 checked:bg-gray-500",
+    label: "text-white",
+    labelInactive: "text-gray-500",
+    helper: "text-gray-400",
+    helperInactive: "text-gray-500",
+  },
+};
+
+/**
+ * Centang 10px, digambar sendiri agar titik sudutnya persis seperti desain.
+ * Warnanya putih di tampilan terang maupun gelap.
+ */
 const CheckIcon = () => (
   <svg
     className="pointer-events-none relative size-2.5 text-white opacity-0 transition-opacity peer-checked:opacity-100"
@@ -49,6 +79,8 @@ export interface CheckboxProps extends Omit<
   platform?: CheckboxPlatform;
   state?: CheckboxState;
   application?: CheckboxApplication;
+  /** Tampilan gelap: kotak gray-700 bergaris gray-600, label putih, caption gray-400. */
+  darkMode?: boolean;
   /** Kelas untuk pembungkus terluar (kotak + label + caption). */
   className?: string;
 }
@@ -59,8 +91,9 @@ export interface CheckboxProps extends Omit<
  * Kotaknya adalah `<input type="checkbox">` yang digambar ulang, dengan centang
  * menumpang di atasnya lewat varian `peer` — jadi tak ada state di React dan
  * elemen bawaannya tetap utuh untuk keyboard maupun pembaca layar. State
- * tercentang di Figma sama dengan `checked`, jadi ia dikendalikan lewat
- * `checked`/`defaultChecked` biasa, bukan prop tersendiri.
+ * tercentang di desain sama dengan `checked`, jadi ia dikendalikan lewat
+ * `checked`/`defaultChecked` biasa, bukan prop tersendiri. `darkMode` mengganti
+ * warnanya ke tampilan gelap.
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
   {
@@ -69,6 +102,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
     platform = "default",
     state = "default",
     application = "default",
+    darkMode = false,
     className,
     id,
     disabled,
@@ -82,6 +116,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
 
   const isInactive = disabled || state === "inactive";
   const { box, offset, label: labelText } = platforms[platform];
+  const t = darkMode ? themes.dark : themes.light;
 
   const control = (
     <span
@@ -98,13 +133,12 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         disabled={isInactive}
         aria-describedby={helperText ? helperId : undefined}
         className={cn(
-          "peer absolute inset-0 size-full appearance-none rounded border border-gray-300 bg-gray-50 transition-colors",
+          "peer absolute inset-0 size-full appearance-none rounded border transition-colors",
           "focus-visible:outline-2 focus-visible:outline-offset-2",
           "disabled:cursor-not-allowed",
-          // Figma tidak meredupkan kotaknya saat inactive — hanya teksnya.
-          isInactive
-            ? "checked:border-gray-400 checked:bg-gray-400"
-            : cn("cursor-pointer", accents[application]),
+          t.box,
+          // Desain tidak meredupkan kotaknya saat inactive — hanya teksnya.
+          isInactive ? t.boxInactive : cn("cursor-pointer", accents[application]),
         )}
         {...props}
       />
@@ -128,7 +162,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
             className={cn(
               "block font-bold",
               labelText,
-              isInactive ? "cursor-not-allowed text-gray-400" : "cursor-pointer text-gray-900",
+              isInactive ? cn("cursor-not-allowed", t.labelInactive) : cn("cursor-pointer", t.label),
             )}
           >
             {label}
@@ -138,7 +172,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         {helperText && (
           <p
             id={helperId}
-            className={cn("mt-0.5 text-xs", isInactive ? "text-gray-400" : "text-gray-500")}
+            className={cn("mt-0.5 text-xs", isInactive ? t.helperInactive : t.helper)}
           >
             {helperText}
           </p>

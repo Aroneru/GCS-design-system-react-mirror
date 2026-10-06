@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Button, Card } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { C, Demo, Mark, Segmented } from "../../pageKit";
+import { Demo, Hl, Mark, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -25,7 +25,8 @@ import { asset } from "../../asset";
  * sendiri: gambar, teks, tautan, aksi.
  */
 
-const cardTitle = "Ministerium Fur Staatssicherheit Card Desktop";
+const cardTitle = "Ceplok Design System Card Desktop";
+const cardTitleMobile = "Ceplok Design System Card Mobile";
 const cardDesc =
   "Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.";
 
@@ -61,6 +62,12 @@ const cardProps: PropRow[] = [
     "Teks tautan, dipakai bersama href.",
   ],
   ["actions", "ReactNode", "—", "Slot untuk satu atau beberapa tombol."],
+  [
+    "darkMode",
+    "boolean",
+    "false",
+    "Tampilan gelap: kartu gray-800, judul putih, deskripsi gray-400, tautan primary-500. Tombol di actions tidak ikut diubah.",
+  ],
 ];
 
 const toc: TocEntry[] = [
@@ -69,6 +76,7 @@ const toc: TocEntry[] = [
   { id: "title", label: "title · description" },
   { id: "href", label: "href · linkLabel" },
   { id: "actions", label: "actions" },
+  { id: "dark-mode", label: "Dark mode" },
   { id: "lebar", label: "Lebar kartu" },
   // Playground di urutan belakang: tiap prop dan penjelasannya dibaca dulu,
   // baru pembaca menggabungkannya sendiri.
@@ -77,10 +85,31 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
-const SampleButton = ({ variant }: { variant: "primary" | "secondary" }) => {
+/**
+ * Tombol outline di kartu gelap. Outline bawaan Button memakai primary-700 yang
+ * nyaris hilang di atas gray-800, jadi warnanya ditimpa ke primary-500 seperti
+ * desain. Pakai `!` karena `cn` tidak menggabungkan kelas yang bentrok.
+ */
+const darkOutlineClass = "border-primary-500! text-primary-500! hover:bg-primary-500/10!";
+
+const SampleButton = ({
+  variant,
+  dark = false,
+}: {
+  variant: "primary" | "secondary";
+  dark?: boolean;
+}) => {
   if (variant === "primary") {
     return (
       <Button variant="filled" theme="primary" tone="light" size="s">
+        Button text
+      </Button>
+    );
+  }
+
+  if (dark) {
+    return (
+      <Button variant="outline" theme="primary" tone="light" size="s" className={darkOutlineClass}>
         Button text
       </Button>
     );
@@ -93,11 +122,11 @@ const SampleButton = ({ variant }: { variant: "primary" | "secondary" }) => {
   );
 };
 
-function cardActions(action: CardAction): ReactNode {
+function cardActions(action: CardAction, dark = false): ReactNode {
   if (action === "two")
     return (
       <>
-        <SampleButton variant="secondary" />
+        <SampleButton variant="secondary" dark={dark} />
         <SampleButton variant="primary" />
       </>
     );
@@ -114,6 +143,7 @@ export function CardPage() {
   const [view, setView] = useState<"mobile" | "desktop">("desktop");
   const [hasImage, setHasImage] = useState(true);
   const [action, setAction] = useState<CardAction>("two");
+  const [darkMode, setDarkMode] = useState(false);
 
   // Turunan untuk cuplikan kode di bagian Penggunaan — satu sumber dengan Playground.
   const widthClass = view === "mobile" ? "max-w-[238px]" : "max-w-[384px]";
@@ -122,6 +152,7 @@ export function CardPage() {
     view === "mobile" ? "Mobile 238px" : "Desktop 384px",
     hasImage ? "dengan gambar" : "tanpa gambar",
     actionChoices.find((a) => a.value === action)?.label.toLowerCase(),
+    darkMode ? "gelap" : "terang",
   ].join(" · ");
 
   return (
@@ -134,9 +165,9 @@ export function CardPage() {
       <FlowSection id="varian" title="Varian">
         <Lead>
           Keempatnya komponen yang sama — tidak ada prop varian sama sekali. Yang
-          membedakan hanya bagian mana yang diisi: lepas <C>image</C> untuk kartu
-          tanpa gambar, lepas <C>actions</C> untuk kartu tanpa tombol, isi{" "}
-          <C>href</C> untuk mengganti tombol dengan satu tautan. Bagian yang
+          membedakan hanya bagian mana yang diisi: lepas <Hl>image</Hl> untuk kartu
+          tanpa gambar, lepas <Hl>actions</Hl> untuk kartu tanpa tombol, isi{" "}
+          <Hl>href</Hl> untuk mengganti tombol dengan satu tautan. Bagian yang
           tidak diisi tidak dirender, bukan disembunyikan lewat CSS.
         </Lead>
 
@@ -181,7 +212,7 @@ export function CardPage() {
         </div>
 
         <SectionCode>
-          {"import { Card } from '@stasi/design-kit-react'\n\n"}
+          {"import { Card } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Card image="…" title="…" description="…" actions={<Button … />} />\n'}
           {'<Card             title="…" description="…" actions={<Button … />} />\n'}
           {'<Card image="…" title="…" description="…" />\n'}
@@ -191,10 +222,10 @@ export function CardPage() {
 
       <FlowSection id="image" title="image · imageAlt">
         <Lead>
-          <C>image</C> berisi URL gambar yang mengisi bagian atas kartu; rasionya
+          <Hl>image</Hl> berisi URL gambar yang mengisi bagian atas kartu; rasionya
           mengikuti lebar kartu — 16:9 di kolom lebar, 5:4 di bawah 320px.{" "}
-          <C>imageAlt</C> jadi teks alternatifnya, dan boleh string kosong bila
-          gambarnya murni dekoratif. Tanpa <C>image</C>, kartu langsung dimulai
+          <Hl>imageAlt</Hl> jadi teks alternatifnya, dan boleh string kosong bila
+          gambarnya murni dekoratif. Tanpa <Hl>image</Hl>, kartu langsung dimulai
           dari judul.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -224,7 +255,7 @@ export function CardPage() {
 
       <FlowSection id="title" title="title · description">
         <Lead>
-          Dua-duanya <C>ReactNode</C>, jadi boleh disisipi elemen. Ukuran judul
+          Dua-duanya <Hl>ReactNode</Hl>, jadi boleh disisipi elemen. Ukuran judul
           mengikuti lebar kartu: 20px di kolom lebar, turun ke 16px di kolom
           sempit. Deskripsi bersifat opsional — kartu dengan judul saja tetap
           rapi karena jaraknya diatur per bagian, bukan lewat margin tetap.
@@ -243,7 +274,7 @@ export function CardPage() {
           {"<Card\n"}
           {"    "}
           <Mark>title</Mark>
-          {'="Ministerium Fur Staatssicherheit Card Desktop"\n'}
+          {'="Ceplok Design System Card Desktop"\n'}
           {"    "}
           <Mark>description</Mark>
           {'="Here are the biggest enterprise technology acquisitions of 2021."\n'}
@@ -253,10 +284,10 @@ export function CardPage() {
 
       <FlowSection id="href" title="href · linkLabel">
         <Lead>
-          Mengisi <C>href</C> mengubah bagian bawah kartu jadi satu tautan, bukan
-          deretan tombol. <C>linkLabel</C> menentukan teksnya dan berlaku hanya
-          bersama <C>href</C>; bila dikosongkan, teksnya jatuh ke bawaan{" "}
-          <C>Selengkapnya</C>.
+          Mengisi <Hl>href</Hl> mengubah bagian bawah kartu jadi satu tautan, bukan
+          deretan tombol. <Hl>linkLabel</Hl> menentukan teksnya dan berlaku hanya
+          bersama <Hl>href</Hl>; bila dikosongkan, teksnya jatuh ke bawaan{" "}
+          <Hl>Selengkapnya</Hl>.
         </Lead>
         <Demo>
           <Column>
@@ -310,13 +341,121 @@ export function CardPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { Card, Button } from '@stasi/design-kit-react'\n\n"}
+          {"import { Card, Button } from '@ceplok-ui/design-kit-react'\n\n"}
           {"<Card\n"}
           {"    "}
           <Mark>actions</Mark>
           {"={\n"}
           {"        <>\n"}
           {'            <Button variant="filled" size="s">Button text</Button>\n'}
+          {'            <Button variant="filled" size="s">Button text</Button>\n'}
+          {"        </>\n"}
+          {"    }\n"}
+          {"/>"}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Isi <Hl>darkMode</Hl> untuk halaman berlatar gelap. Kartu berubah ke
+          gray-800, judul jadi putih, deskripsi gray-400, dan tautan primary-500
+          supaya tetap terbaca. Gambar sedikit diredupkan. Semua varian di atas
+          tetap berlaku, termasuk ukuran mobile. Tombol di <Hl>actions</Hl> tidak
+          ikut diubah. Tombol outline perlu diberi warna primary-500 sendiri,
+          karena primary-700 bawaannya hampir tidak terlihat di kartu gelap.
+        </Lead>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Dua tombol" dark>
+            <Card
+              darkMode
+              image={asset("/images/card-sample.svg")}
+              imageAlt=""
+              title={cardTitle}
+              description={cardDesc}
+              actions={cardActions("two", true)}
+            />
+          </Demo>
+          <Demo label="Satu tombol" dark>
+            <Card
+              darkMode
+              image={asset("/images/card-sample.svg")}
+              imageAlt=""
+              title={cardTitle}
+              description={cardDesc}
+              actions={cardActions("one", true)}
+            />
+          </Demo>
+          <Demo label="Dengan tautan" dark>
+            <Card
+              darkMode
+              image={asset("/images/card-sample.svg")}
+              imageAlt=""
+              title={cardTitle}
+              description={cardDesc}
+              href="#"
+              linkLabel="See our guideline"
+            />
+          </Demo>
+          <Demo label="Tanpa gambar" dark>
+            <Card
+              darkMode
+              title={cardTitle}
+              description={cardDesc}
+              actions={cardActions("one", true)}
+            />
+          </Demo>
+          <Demo label="Tanpa tombol" dark>
+            <Card
+              darkMode
+              image={asset("/images/card-sample.svg")}
+              imageAlt=""
+              title={cardTitle}
+              description={cardDesc}
+            />
+          </Demo>
+        </div>
+
+        <Demo label="Mobile · kolom 238px" dark>
+          <div className="flex flex-wrap items-start justify-center gap-5">
+            {(
+              [
+                { image: true, action: "link" },
+                { image: false, action: "one" },
+                { image: true, action: "none" },
+                { image: false, action: "none" },
+              ] as const
+            ).map((v, i) => (
+              <div key={i} className="w-[238px] max-w-full">
+                <Card
+                  darkMode
+                  image={v.image ? asset("/images/card-sample.svg") : undefined}
+                  imageAlt=""
+                  title={cardTitleMobile}
+                  description={cardDesc}
+                  href={v.action === "link" ? "#" : undefined}
+                  linkLabel={v.action === "link" ? "See our guideline" : undefined}
+                  actions={cardActions(v.action, true)}
+                />
+              </div>
+            ))}
+          </div>
+        </Demo>
+
+        <SectionCode>
+          {"<Card\n"}
+          {"    "}
+          <Mark>darkMode</Mark>
+          {"\n"}
+          {'    image="…"\n'}
+          {'    title="…"\n'}
+          {'    description="…"\n'}
+          {"    actions={\n"}
+          {"        <>\n"}
+          {'            <Button variant="outline" size="s"\n'}
+          {'                className="border-primary-500! text-primary-500! hover:bg-primary-500/10!">\n'}
+          {"                Button text\n"}
+          {"            </Button>\n"}
           {'            <Button variant="filled" size="s">Button text</Button>\n'}
           {"        </>\n"}
           {"    }\n"}
@@ -369,15 +508,19 @@ export function CardPage() {
           saja.
         </Lead>
 
-        <Stage maxWidth={view === "mobile" ? "max-w-[238px]" : "max-w-[384px]"}>
+        <Stage
+          maxWidth={view === "mobile" ? "max-w-[238px]" : "max-w-[384px]"}
+          dark={darkMode}
+        >
           <Card
+            darkMode={darkMode}
             image={hasImage ? asset("/images/card-sample.svg") : undefined}
             imageAlt="Suasana kerja tim"
             title={cardTitle}
             description={cardDesc}
             href={action === "link" ? "#" : undefined}
             linkLabel={action === "link" ? "See our guideline" : undefined}
-            actions={cardActions(action)}
+            actions={cardActions(action, darkMode)}
           />
         </Stage>
 
@@ -413,6 +556,18 @@ export function CardPage() {
               wrap
             />
           </Control>
+
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={darkMode}
+              onChange={setDarkMode}
+              options={[
+                { value: false, label: "Terang" },
+                { value: true, label: "Gelap" },
+              ]}
+            />
+          </Control>
         </Controls>
       </FlowSection>
 
@@ -425,7 +580,7 @@ export function CardPage() {
         <SectionCode flush>
           {"import { Card"}
           {withButton && ", Button"}
-          {" } from '@stasi/design-kit-react'\n\n"}
+          {" } from '@ceplok-ui/design-kit-react'\n\n"}
           {`{/* ${summary} */}\n`}
           {"{/* Kartu tidak punya prop ukuran — lebarnya mengikuti kolom\n"}
           {"    tempatnya berada. Yang berubah cuma kolomnya. */}\n"}
@@ -433,6 +588,13 @@ export function CardPage() {
           <Mark>{widthClass}</Mark>
           {'">\n'}
           {"    <Card\n"}
+          {darkMode && (
+            <>
+              {"        "}
+              <Mark>darkMode</Mark>
+              {"\n"}
+            </>
+          )}
           {hasImage && (
             <>
               {"        "}
@@ -443,7 +605,7 @@ export function CardPage() {
               {'="Suasana kerja tim"\n'}
             </>
           )}
-          {'        title="STASI Card Desktop"\n'}
+          {'        title="CEPLOK Card Desktop"\n'}
           {'        description="Here are the biggest enterprise technology acquisitions of 2021."\n'}
           {action === "link" && (
             <>
@@ -461,7 +623,16 @@ export function CardPage() {
               <Mark>actions</Mark>
               {"={\n"}
               {"            <>\n"}
-              {'                <Button variant="filled" size="s">Button text</Button>\n'}
+              {darkMode ? (
+                <>
+                  {'                <Button variant="outline" size="s"\n'}
+                  {'                    className="border-primary-500! text-primary-500! hover:bg-primary-500/10!">\n'}
+                  {"                    Button text\n"}
+                  {"                </Button>\n"}
+                </>
+              ) : (
+                '                <Button variant="filled" size="s">Button text</Button>\n'
+              )}
               {'                <Button variant="filled" size="s">Button text</Button>\n'}
               {"            </>\n"}
               {"        }\n"}

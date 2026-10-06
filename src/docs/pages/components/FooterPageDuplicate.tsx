@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Footer } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { FacebookIcon, InstagramIcon, XIcon } from '../../socialIcons'
-import { C, CodeBlock, ComponentPage, Mark, Section, Segmented } from '../../pageKit'
+import { CodeBlock, ComponentPage, Hl, Mark, Section, Segmented } from '../../pageKit'
 import { Control, Controls } from '../../usulanKit'
 import { adaTidakAda } from '../../usulanOptions'
 import { asset } from "../../asset";
@@ -10,8 +10,8 @@ import { asset } from "../../asset";
 const allMenus = Array.from({ length: 8 }, (_, i) => ({ label: `Menu ${i + 1}`, url: '#' }))
 
 const footerSocials = [
-  { label: 'Instagram', url: 'https://www.instagram.com/stasi/', icon: InstagramIcon },
-  { label: 'X', url: 'https://x.com/stasi', icon: XIcon },
+  { label: 'Instagram', url: 'https://www.instagram.com/ceplok/', icon: InstagramIcon },
+  { label: 'X', url: 'https://x.com/ceplok', icon: XIcon },
   { label: 'Facebook', url: '', icon: FacebookIcon },
 ]
 
@@ -20,7 +20,7 @@ const footerProps: PropRow[] = [
     'logo',
     'string',
     'undefined',
-    'URL berkas gambar logo, dirender sebagai <img> setinggi 40px (44px saat footer ≥ 768px) dengan lebar mengikuti rasio aslinya. Bila diisi, logoContent diabaikan.',
+    'URL berkas gambar logo, dirender sebagai <img> setinggi 64px (80px saat footer ≥ 768px) dengan lebar mengikuti rasio aslinya. Bila diisi, logoContent diabaikan.',
   ],
   [
     'logoAlt',
@@ -109,15 +109,15 @@ export function FooterPage() {
             }`}
           >
             <Footer
-              logo={logoMode === 'image' ? asset('/images/stasi-logo.svg') : undefined}
-              logoAlt="STASI — Ministerium Fur Staatssicherheit"
+              logo={logoMode === 'image' ? asset('/images/footer-logo.svg') : undefined}
+              logoAlt="Ceplok Design System"
               logoContent={
                 logoMode === 'text' ? (
-                  <span className="text-xl font-black text-white">STASI</span>
+                  <span className="text-xl font-black text-white">CEPLOK</span>
                 ) : undefined
               }
               menus={allMenus.slice(0, menuCount)}
-              copyright="© 2025 Ministerium Fur Staatssicherheit"
+              copyright="© 2025 Ceplok Design System"
               socials={withSocials ? footerSocials : []}
             />
           </div>
@@ -183,7 +183,7 @@ export function FooterPage() {
         </p>
 
         <CodeBlock>
-          {"import { Footer } from '@stasi/design-kit-react'\n"}
+          {"import { Footer } from '@ceplok-ui/design-kit-react'\n"}
           {withSocials && "import { Instagram, X, Facebook } from './socialIcons'\n"}
           {'\n'}
           {`{/* ${summary} */}\n`}
@@ -201,17 +201,17 @@ export function FooterPage() {
             <>
               {`${ind}    `}
               <Mark>logo</Mark>
-              {'="/images/stasi-logo.svg"\n'}
+              {'="/images/footer-logo.svg"\n'}
               {`${ind}    `}
               <Mark>logoAlt</Mark>
-              {'="STASI"\n'}
+              {'="CEPLOK"\n'}
             </>
           )}
           {logoMode === 'text' && (
             <>
               {`${ind}    `}
               <Mark>logoContent</Mark>
-              {'={<span className="text-xl font-black text-white">STASI</span>}\n'}
+              {'={<span className="text-xl font-black text-white">CEPLOK</span>}\n'}
             </>
           )}
           {`${ind}    `}
@@ -219,14 +219,14 @@ export function FooterPage() {
           {'={[\n'}
           {menuLines.map((line) => `${ind}        ${line}\n`).join('')}
           {`${ind}    ]}\n`}
-          {`${ind}    copyright="© 2025 Ministerium Fur Staatssicherheit"\n`}
+          {`${ind}    copyright="© 2025 Ceplok Design System"\n`}
           {withSocials && (
             <>
               {`${ind}    `}
               <Mark>socials</Mark>
               {'={[\n'}
-              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/stasi', icon: <Instagram /> },\n`}
-              {`${ind}        { label: 'X',         url: 'https://x.com/stasi',         icon: <X /> },\n`}
+              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/ceplok', icon: <Instagram /> },\n`}
+              {`${ind}        { label: 'X',         url: 'https://x.com/ceplok',         icon: <X /> },\n`}
               {`${ind}        { label: 'Facebook',  url: '#',                            icon: <Facebook /> },\n`}
               {`${ind}    ]}\n`}
             </>
@@ -236,16 +236,16 @@ export function FooterPage() {
         </CodeBlock>
 
         <p className="mt-3 text-body-sm text-gray-500">
-          Elemen <code className="text-xs font-bold text-gray-700">&lt;svg&gt;</code> disisipkan langsung,
+          Elemen <Hl>&lt;svg&gt;</Hl> disisipkan langsung,
           sehingga warnanya mengikuti{' '}
-          <code className="text-xs font-bold text-gray-700">currentColor</code> dan bisa berubah saat hover.
+          <Hl>currentColor</Hl> dan bisa berubah saat hover.
         </p>
       </section>
 
       <Section title="Perilaku responsif">
         <p className="mb-4 max-w-5xl text-body-sm leading-6 text-gray-500">
           Ambang di bawah ini diukur dari <strong className="text-gray-900">lebar footer itu sendiri</strong>,
-          bukan lebar layar — elemen <C>{'<footer>'}</C> dipasangi <C>@container</C>. Jadi footer yang ditaruh
+          bukan lebar layar — elemen <Hl>{'<footer>'}</Hl> dipasangi <Hl>@container</Hl>. Jadi footer yang ditaruh
           di kolom sempit pada layar desktop tetap tampil bertumpuk seperti di ponsel, dan sebaliknya. Cara
           mengeceknya: ganti kontrol <em>Tampilan</em> di Preview, atau perkecil jendela.
         </p>
@@ -260,17 +260,17 @@ export function FooterPage() {
         </div>
 
         <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500">
-          Yang tidak berubah di ukuran mana pun: latar <C>bg-gray-800</C>, jarak atas-bawah 64px, lebar isi
-          dibatasi <C>max-w-7xl</C> lalu dipusatkan, dan garis pemisah tipis di atas baris hak cipta.
+          Yang tidak berubah di ukuran mana pun: latar <Hl>bg-gray-800</Hl>, jarak atas-bawah 64px, lebar isi
+          dibatasi <Hl>max-w-7xl</Hl> lalu dipusatkan, dan garis pemisah tipis di atas baris hak cipta.
         </p>
       </Section>
 
       <Section title="Properties">
         <p className="mb-4  text-body-sm leading-6 text-gray-500">
-          Semua prop opsional — <C>{'<Footer />'}</C> tanpa prop tetap merender kerangkanya. Dua tipe
-          pendukungnya: <C>FooterMenu</C> = <C>{'{ label: string; url?: string }'}</C> dan{' '}
-          <C>FooterSocial</C> = <C>{'{ label?: string; url?: string; icon: ReactNode }'}</C>. Atribut HTML di
-          luar daftar ini tidak diteruskan ke elemen <C>{'<footer>'}</C>.
+          Semua prop opsional — <Hl>{'<Footer />'}</Hl> tanpa prop tetap merender kerangkanya. Dua tipe
+          pendukungnya: <Hl>FooterMenu</Hl> = <Hl>{'{ label: string; url?: string }'}</Hl> dan{' '}
+          <Hl>FooterSocial</Hl> = <Hl>{'{ label?: string; url?: string; icon: ReactNode }'}</Hl>. Atribut HTML di
+          luar daftar ini tidak diteruskan ke elemen <Hl>{'<footer>'}</Hl>.
         </p>
         <PropsTable rows={footerProps} minWidth="48rem" />
       </Section>

@@ -1,11 +1,11 @@
 /*
- * Entry stylesheet @stasi/design-kit-react.
- * Consumer cukup: import '@stasi/design-kit-react/styles.css'
+ * Entry stylesheet @ceplok-ui/design-kit-react.
+ * Consumer cukup: import '@ceplok-ui/design-kit-react/styles.css'
  *
  * CATATAN untuk consumer memakai Tailwind v4:
  * Supaya class utility yang dipakai komponen ikut ter-generate, scan file
  * package ini di CSS Tailwind kamu:
- *   @source '../node_modules/@stasi/design-kit-react/dist/**\/*.js';
+ *   @source '../node_modules/@ceplok-ui/design-kit-react/dist/**\/*.js';
  */
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,400&display=swap');
 @import 'tailwindcss';
@@ -69,5 +69,41 @@
     .ds-scroll-x::-webkit-scrollbar-thumb {
         border-radius: 9999px;
         background-color: var(--color-gray-300);
+    }
+
+    /*
+     * Scroll vertikal tipis untuk panel navigasi: batang 6px membulat, tanpa
+     * tombol panah. Chrome mengabaikan ::-webkit-scrollbar begitu
+     * scrollbar-width atau scrollbar-color diisi, dan versi standarnya masih
+     * menyisakan tombol panah di Windows — jadi properti standar hanya dipasang
+     * untuk browser yang tidak mengenal pseudo-element ini (Firefox).
+     */
+    .ds-scroll-y::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .ds-scroll-y::-webkit-scrollbar-track {
+        margin-block: 8px;
+        background: transparent;
+    }
+
+    /* Border transparan + padding-box: batangnya tidak menempel di tepi panel. */
+    .ds-scroll-y::-webkit-scrollbar-thumb {
+        border: 2px solid transparent;
+        border-radius: 9999px;
+        background-color: var(--color-gray-300);
+        background-clip: padding-box;
+    }
+
+    .ds-scroll-y::-webkit-scrollbar-thumb:hover,
+    .ds-scroll-y::-webkit-scrollbar-thumb:active {
+        background-color: var(--color-gray-400);
+    }
+
+    @supports not selector(::-webkit-scrollbar) {
+        .ds-scroll-y {
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-gray-300) transparent;
+        }
     }
 }

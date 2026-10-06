@@ -1,12 +1,29 @@
-import { Alert, Badge, Button, Icon } from '../../../../lib'
+import { Alert, Badge, Button, Icon, Table } from '../../../../lib'
+import type { TableColumn } from '../../../../lib'
 import { CheckCircle, ChevronRight, FileLines, UsersGroup } from '../../../../lib/icons/outline'
-import { PENGAJUAN, VARIAN_STATUS } from '../data'
-import { BelumAda } from '../BelumAda'
+import { PENGAJUAN, VARIAN_STATUS, type Pengajuan } from '../data'
 
 const STATISTIK = [
   { label: 'Pengajuan masuk', nilai: '1.284', delta: '+12%', Ikon: FileLines },
   { label: 'Selesai bulan ini', nilai: '976', delta: '+8%', Ikon: CheckCircle },
   { label: 'Pemohon aktif', nilai: '342', delta: '+3%', Ikon: UsersGroup },
+]
+
+const KOLOM: TableColumn<Pengajuan>[] = [
+  {
+    key: 'id',
+    header: 'Nomor',
+    align: 'left',
+    cell: (p) => <span className="font-mono text-xs">{p.id}</span>,
+  },
+  { key: 'nama', header: 'Pemohon', align: 'left', emphasis: true },
+  { key: 'layanan', header: 'Layanan', align: 'left' },
+  {
+    key: 'status',
+    header: 'Status',
+    align: 'left',
+    cell: (p) => <Badge variant={VARIAN_STATUS[p.status]}>{p.status}</Badge>,
+  },
 ]
 
 export function Dasbor() {
@@ -32,11 +49,11 @@ export function Dasbor() {
         ))}
       </div>
 
-      <section className="ds-card overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-5">
+      <section>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-heading-4 font-black text-gray-900">Pengajuan terbaru</h2>
           <Button
-            as="a"
+            as="anchor"
             href="#/example/app/pengajuan"
             size="xs"
             variant="outline"
@@ -47,32 +64,9 @@ export function Dasbor() {
           </Button>
         </div>
 
-        <BelumAda>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[34rem] text-left text-body-sm">
-              <thead className="bg-surface-subtle text-caption font-bold tracking-wide text-gray-500 uppercase">
-                <tr>
-                  <th className="px-5 py-3">Nomor</th>
-                  <th className="px-5 py-3">Pemohon</th>
-                  <th className="px-5 py-3">Layanan</th>
-                  <th className="px-5 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {PENGAJUAN.slice(0, 5).map((p) => (
-                  <tr key={p.id} className="transition-colors hover:bg-surface-subtle">
-                    <td className="px-5 py-3 font-mono text-xs text-gray-500">{p.id}</td>
-                    <td className="px-5 py-3 font-bold text-gray-900">{p.nama}</td>
-                    <td className="px-5 py-3 text-gray-600">{p.layanan}</td>
-                    <td className="px-5 py-3">
-                      <Badge variant={VARIAN_STATUS[p.status]}>{p.status}</Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </BelumAda>
+        {/* Ringkasan saja: lima baris terbaru, tanpa toolbar dan pagination.
+            Daftar lengkap dengan pencarian ada di halaman Pengajuan. */}
+        <Table columns={KOLOM} data={PENGAJUAN.slice(0, 5)} rowKey="id" />
       </section>
     </div>
   )

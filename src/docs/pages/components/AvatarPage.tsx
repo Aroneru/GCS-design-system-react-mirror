@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Avatar, type AvatarSize } from '../../../lib'
 import { asset } from '../../asset'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -29,6 +29,7 @@ const avatarProps: PropRow[] = [
   ['alt', 'string', "''", 'Nama pemiliknya. Jadi alt gambar, atau nama aksesibilitas saat yang tampil hanya inisial.'],
   ['initials', 'ReactNode', 'undefined', 'Isi lingkaran saat tidak ada gambar — umumnya satu atau dua huruf.'],
   ['size', "'small' | 'default' | 'large'", 'default', 'Diameter lingkaran: 24px, 32px, atau 80px.'],
+  ['darkMode', 'boolean', 'false', 'Menggunakan warna fallback Avatar untuk permukaan gelap.'],
   ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut <div> standar diteruskan (className, onClick, title, …).'],
 ]
 
@@ -36,6 +37,7 @@ const toc: TocEntry[] = [
   { id: 'avatar', label: 'Avatar' },
   { id: 'inisial', label: 'Inisial' },
   { id: 'sizes', label: 'Sizes' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -45,6 +47,7 @@ export function AvatarPage() {
   const [size, setSize] = useState<AvatarSize>('default')
   const [withFoto, setWithFoto] = useState(true)
   const [withNama, setWithNama] = useState(true)
+  const [darkMode, setDarkMode] = useState(false)
 
   return (
     <UsulanPage
@@ -55,7 +58,7 @@ export function AvatarPage() {
     >
       <FlowSection id="avatar" title="Avatar">
         <Lead>
-          Isinya yang menentukan bentuknya, bukan prop terpisah: begitu <H>src</H> diisi, avatarnya
+          Isinya yang menentukan bentuknya, bukan prop terpisah: begitu <Hl>src</Hl> diisi, avatarnya
           menampilkan foto; tanpa itu ia jatuh ke inisial. Fotonya selalu dipotong ke lingkaran dan
           diratakan di tengah, jadi gambar apa pun bisa masuk tanpa disiapkan lebih dulu.
         </Lead>
@@ -67,11 +70,15 @@ export function AvatarPage() {
           </div>
         </Demo>
         <SectionCode>
-          {"import { Avatar } from '@stasi/design-kit-react'\n\n"}
-          {'<Avatar src="/foto/putri.jpg" alt="Putri Handayani" />'}
+          {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
+          {'<Avatar '}
+          <H>src</H>
+          {'="/foto/putri.jpg" '}
+          <H>alt</H>
+          {'="Putri Handayani" />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Beri <H>alt</H> berisi nama pemiliknya. Kalau namanya sudah tertulis persis di sebelah
+          Beri <Hl>alt</Hl> berisi nama pemiliknya. Kalau namanya sudah tertulis persis di sebelah
           avatar — seperti pada daftar anggota atau menu profil — kosongkan saja: avatarnya akan
           terbaca sebagai hiasan dan pembaca layar tidak menyebut nama yang sama dua kali.
         </p>
@@ -79,7 +86,7 @@ export function AvatarPage() {
 
       <FlowSection id="inisial" title="Inisial">
         <Lead>
-          Tanpa <H>src</H>, lingkarannya diisi teks yang Anda beri lewat <H>initials</H> di atas latar
+          Tanpa <Hl>src</Hl>, lingkarannya diisi teks yang Anda beri lewat <Hl>initials</Hl> di atas latar
           abu-abu. Satu atau dua huruf adalah takaran yang aman; lebih dari itu mulai berdesakan di
           ukuran kecil.
         </Lead>
@@ -93,10 +100,12 @@ export function AvatarPage() {
         <SectionCode>
           {'<Avatar '}
           <H>initials</H>
-          {'="PH" alt="Putri Handayani" />'}
+          {'="PH" '}
+          <H>alt</H>
+          {'="Putri Handayani" />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Inisial juga jadi jaring pengaman: bila <H>src</H> diisi tapi gambarnya gagal dimuat,
+          Inisial juga jadi jaring pengaman: bila <Hl>src</Hl> diisi tapi gambarnya gagal dimuat,
           avatarnya berpindah sendiri ke inisial. Alamat foto profil biasanya datang dari sistem lain
           dan bisa mati kapan saja — tanpa ini yang tersisa di halaman hanya ikon gambar rusak.
         </p>
@@ -112,8 +121,8 @@ export function AvatarPage() {
       <FlowSection id="sizes" title="Sizes">
         <Lead>
           Tiga ukuran, dan teks inisialnya ikut naik bersamanya supaya porsi isian di dalam lingkaran
-          tetap terasa sama. <H>small</H> untuk baris daftar yang padat, <H>default</H> untuk navbar
-          dan menu profil, <H>large</H> untuk kepala halaman profil.
+          tetap terasa sama. <Hl>small</Hl> untuk baris daftar yang padat, <Hl>default</Hl> untuk navbar
+          dan menu profil, <Hl>large</Hl> untuk kepala halaman profil.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-3">
           {ukuran.map((u) => (
@@ -128,19 +137,47 @@ export function AvatarPage() {
         <SectionCode>
           {'<Avatar '}
           <H>size</H>
-          {'="large" src="/foto/putri.jpg" alt="Putri Handayani" />'}
+          {'="large" '}
+          <H>src</H>
+          {'="/foto/putri.jpg" '}
+          <H>alt</H>
+          {'="Putri Handayani" />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
           Ukuran teks inisialnya berturut-turut{' '}
           {ukuran.map((u, i) => (
             <span key={u.value}>
               {i > 0 ? ', ' : ''}
-              <H>{u.teks}</H>
+              <Hl>{u.teks}</Hl>
             </span>
           ))}
           . Avatar tidak pernah ikut menyusut oleh flexbox, jadi aman diletakkan di samping teks
           panjang tanpa takut gepeng.
         </p>
+      </FlowSection>
+
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengubah fallback menjadi gray-800 dengan inisial gray-100. Foto
+          profil tetap tampil apa adanya; bila foto gagal dimuat, fallback gelap ini yang mengambil
+          alih.
+        </Lead>
+        <Demo label="Fallback di permukaan gelap" dark>
+          <div className="flex items-center gap-4">
+            <Avatar darkMode initials="PH" alt="Putri Handayani" size="large" />
+            <Avatar darkMode initials="PH" alt="Putri Handayani" />
+            <Avatar darkMode initials="PH" alt="Putri Handayani" size="small" />
+          </div>
+        </Demo>
+        <SectionCode>
+          {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n<Avatar "}
+          <H>darkMode</H>
+          {' '}
+          <H>initials</H>
+          {'="PH" '}
+          <H>alt</H>
+          {'="Putri Handayani" />'}
+        </SectionCode>
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
@@ -153,15 +190,18 @@ export function AvatarPage() {
           Tinggi minimumnya dikunci supaya kotaknya tidak ikut naik-turun saat
           ukuran avatar diganti — 120px cukup untuk melapangi yang 80px.
         */}
-        <Stage maxWidth="max-w-[320px]">
+        <Stage maxWidth="max-w-[320px]" dark={darkMode}>
           <div className="flex min-h-30 items-center justify-center gap-3">
             <Avatar
               size={size}
               src={withFoto ? FOTO : undefined}
               initials="PH"
               alt={withNama ? 'Putri Handayani' : ''}
+              darkMode={darkMode}
             />
-            <span className="text-sm text-gray-900">Putri Handayani</span>
+            <span className={darkMode ? 'text-sm text-gray-100' : 'text-sm text-gray-900'}>
+              Putri Handayani
+            </span>
           </div>
         </Stage>
 
@@ -192,6 +232,18 @@ export function AvatarPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={darkMode}
+              onChange={setDarkMode}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -207,8 +259,15 @@ export function AvatarPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Avatar } from '@stasi/design-kit-react'\n\n"}
+          {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Avatar\n'}
+          {darkMode && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
+            </>
+          )}
           {size !== 'default' && (
             <>
               {'    '}
@@ -223,7 +282,9 @@ export function AvatarPage() {
               {'="/foto/putri.jpg"\n'}
             </>
           )}
-          {'    initials="PH"\n'}
+          {'    '}
+          <H>initials</H>
+          {'="PH"\n'}
           {withNama && (
             <>
               {'    '}
@@ -238,7 +299,7 @@ export function AvatarPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;div&gt;</H> standar juga diteruskan apa adanya.
+          <Hl>&lt;div&gt;</Hl> standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={avatarProps} minWidth="48rem" />
       </FlowSection>

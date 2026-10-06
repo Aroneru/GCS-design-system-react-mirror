@@ -19,7 +19,7 @@ import { JUDUL_HALAMAN, type HalamanDemo } from './data'
  *
  * Semua yang bergantung pada GSAP dikumpulkan di sini, di luar `DemoApp`.
  * Batas itu disengaja: aplikasi demonya harus murni memakai
- * `@stasi/design-kit-react` supaya benar-benar menunjukkan kemampuan paket,
+ * `@ceplok-ui/design-kit-react` supaya benar-benar menunjukkan kemampuan paket,
  * sementara transisi antar-rute adalah urusan situs dokumentasi.
  */
 
@@ -39,6 +39,16 @@ export function ExampleAppFrame({ path }: { path: string }) {
   // /example/app langsung dari URL atau me-refresh di sini harus tampil apa
   // adanya — tanpa gelembung biru yang mengempis entah kenapa.
   const [masuk] = useState(() => ambilAsal() === 'docs')
+
+  /*
+   * Tombol pulang mati begitu ditekan sekali — kembarannya di ExamplePage
+   * dijaga dengan cara yang sama.
+   *
+   * `tutupKeAtas` membuat timeline baru tiap dipanggil dan yang lama tidak
+   * dimatikan, jadi klik kedua menyeret panel balik ke bawah layar lalu
+   * menaikkannya lagi, sambil menitipkan satu `navigate` tambahan.
+   */
+  const [berangkat, setBerangkat] = useState(false)
 
   // Dipakai useLayoutEffect, bukan useGsap: hook itu melewatkan callback-nya
   // sama sekali saat gerak diminta dikurangi, padahal gelembungnya tetap wajib
@@ -64,13 +74,18 @@ export function ExampleAppFrame({ path }: { path: string }) {
         <Magnetic>
           <button
             type="button"
+            disabled={berangkat}
             onClick={() => {
+              // Klik yang dikirim skrip bisa tiba dua kali dalam satu tick,
+              // sebelum render ulang sempat memasang `disabled`.
+              if (berangkat) return
+              setBerangkat(true)
               // Ditandai di handler, bukan di efek — lihat catatan pada
               // `pulangDariApp` di transition.ts.
               tandaiAsal('app')
               tutupKeAtas(panel.current, isi.current, () => navigate('/example'))
             }}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-lg transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-lg transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:cursor-default disabled:hover:text-gray-700"
           >
             <ArrowLeft className="size-4" />
             Kembali ke dokumentasi

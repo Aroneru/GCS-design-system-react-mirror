@@ -1,8 +1,8 @@
 {
-  "name": "@stasi/design-kit-react",
+  "name": "@ceplok-ui/design-kit-react",
   "private": false,
   "version": "0.2.0",
-  "description": "Design tokens, tipografi, dan komponen React (Tailwind v4) untuk produk Stasi — State Security Service Design System",
+  "description": "Design tokens, tipografi, dan komponen React (Tailwind v4) untuk Ceplok Design System",
   "keywords": [
     "design-system",
     "design-tokens",
@@ -10,7 +10,7 @@
     "react-components",
     "tailwind",
     "tailwindcss",
-    "stasi"
+    "ceplok"
   ],
   "homepage": "https://aroneru.github.io/GCS-design-system-react-mirror/",
   "repository": {

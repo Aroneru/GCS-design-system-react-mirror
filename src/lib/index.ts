@@ -1,5 +1,5 @@
-// @stasi/design-kit-react — entry point library.
-// Import token/CSS terpisah: import '@stasi/design-kit-react/styles.css'
+// @ceplok-ui/design-kit-react — entry point library.
+// Import token/CSS terpisah: import '@ceplok-ui/design-kit-react/styles.css'
 
 export { Button } from "./components/Button";
 
@@ -10,6 +10,9 @@ export type {
   ButtonTheme,
   ButtonTone,
 } from "./components/Button";
+
+export { Clipboard } from "./components/Clipboard";
+export type { ClipboardProps, ClipboardVariant, ClipboardPlatform } from "./components/Clipboard";
 
 export { Avatar } from "./components/Avatar";
 export type { AvatarProps, AvatarSize } from "./components/Avatar";
@@ -23,14 +26,44 @@ export type { SpinnerProps, SpinnerSize } from "./components/Spinner";
 export { Popover } from "./components/Popover";
 export type { PopoverProps, PopoverSide } from "./components/Popover";
 
-export { Modal, ModalHeader, ModalBody, ModalFooter } from "./components/Modal";
+export { Dropdown } from "./components/Dropdown";
 export type {
-  ModalProps,
-  ModalSize,
-  ModalHeaderProps,
-  ModalBodyProps,
-  ModalFooterProps,
-} from "./components/Modal";
+  DropdownProps,
+  DropdownItem,
+  DropdownGroup,
+  DropdownItemTone,
+} from "./components/Dropdown";
+
+export { Modal } from "./components/Modal";
+export type { ModalProps, ModalSize, ModalVariant } from "./components/Modal";
+
+export {
+  Drawer,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerBody,
+  DrawerFooter,
+  DrawerNavItem,
+  DrawerSubItem,
+  DrawerTrigger,
+} from "./components/Drawer";
+export type {
+  DrawerProps,
+  DrawerPosition,
+  DrawerSize,
+  DrawerNavItemTheme,
+  DrawerHeaderProps,
+  DrawerTitleProps,
+  DrawerDescriptionProps,
+  DrawerBodyProps,
+  DrawerFooterProps,
+  DrawerNavItemProps,
+  DrawerSubItemProps,
+  DrawerTriggerProps,
+  DrawerMenuItem,
+  DrawerMenuSubItem,
+} from "./components/Drawer";
 
 export { Alert } from "./components/Alert";
 export type { AlertProps, AlertVariant } from "./components/Alert";
@@ -87,6 +120,15 @@ export type {
   SearchPlatform,
   SearchApplication,
 } from "./components/Search";
+
+export { Datepicker } from "./components/Datepicker";
+export type {
+  DatepickerProps,
+  DatepickerSingleProps,
+  DatepickerRangeProps,
+  DatepickerType,
+  DateRange,
+} from "./components/Datepicker";
 
 export { Upload } from "./components/Upload";
 export type {
@@ -149,7 +191,30 @@ export type {
 } from "./components/Breadcrumb";
 
 export { Pagination } from "./components/Pagination";
-export type { PaginationProps, PaginationTheme } from "./components/Pagination";
+export type { PaginationProps, PaginationSize, PaginationTheme } from "./components/Pagination";
+
+export { Table, TableImage } from "./components/Table";
+export type {
+  TableProps,
+  TableColumn,
+  TableColumnImage,
+  TableImageProps,
+  TableAlign,
+  TableSort,
+  TableSortDirection,
+  TableSortIcon,
+  TableRowAction,
+  TableActionTheme,
+  TableActionVariant,
+  TableActionTone,
+  TableActionIconSize,
+  TableActionRadius,
+  TableSize,
+  TableSticky,
+  TableSearchConfig,
+  TableFilterConfig,
+  TablePaginationConfig,
+} from "./components/Table";
 
 export { Sidebar } from "./components/sidebar/Sidebar";
 export type {

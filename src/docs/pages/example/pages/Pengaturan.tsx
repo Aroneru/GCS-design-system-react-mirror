@@ -8,9 +8,6 @@ import {
   Icon,
   InputField,
   Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
   Radio,
   Select,
   TextArea,
@@ -21,8 +18,8 @@ import { Envelope, ExclamationCircle, InfoCircle, User } from '../../../../lib/i
 import { inisial, JENIS_LAYANAN } from '../data'
 
 export function Pengaturan() {
-  const [nama, setNama] = useState('Yermi Rachman')
-  const [surel, setSurel] = useState('yermi@contoh.id')
+  const [nama, setNama] = useState('Rafli Arandhana')
+  const [surel, setSurel] = useState('rafli@contoh.id')
   const [telepon, setTelepon] = useState('')
   const [jenis, setJenis] = useState('perizinan')
   const [prioritas, setPrioritas] = useState('normal')
@@ -31,7 +28,6 @@ export function Pengaturan() {
   const [surelMasuk, setSurelMasuk] = useState(true)
   const [ringkasan, setRingkasan] = useState(false)
 
-  const [konfirmasi, setKonfirmasi] = useState(false)
   const [tersimpan, setTersimpan] = useState(false)
 
   return (
@@ -40,7 +36,8 @@ export function Pengaturan() {
         Nomor telepon belum diisi. Petugas memakainya untuk mengonfirmasi jadwal layanan.
       </Alert>
 
-      <section className="ds-card p-6 sm:p-8">
+      {/* 20px di ponsel agar toolbar editor Text Area (234px) muat di layar 320px. */}
+      <section className="ds-card p-5 sm:p-8">
         <div className="flex items-center gap-5">
           {/*
             Inisialnya diturunkan dari kolom Nama lengkap di bawah, jadi
@@ -123,7 +120,7 @@ export function Pengaturan() {
         </div>
       </section>
 
-      <section className="ds-card p-6 sm:p-8">
+      <section className="ds-card p-5 sm:p-8">
         <h2 className="text-heading-3 font-black text-gray-900">Pemberitahuan</h2>
 
         <div className="mt-6 space-y-4">
@@ -148,57 +145,53 @@ export function Pengaturan() {
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Button onClick={() => setKonfirmasi(true)}>Simpan perubahan</Button>
+          <Modal
+            trigger={<Button>Simpan perubahan</Button>}
+            title="Simpan perubahan?"
+            footer={({ close }) => (
+              <>
+                <Button variant="outline" theme="gray" size="xs" onClick={close}>
+                  Batal
+                </Button>
+                <Button
+                  size="xs"
+                  onClick={() => {
+                    setTersimpan(true)
+                    close()
+                  }}
+                >
+                  Ya, simpan
+                </Button>
+              </>
+            )}
+          >
+            <div className="flex gap-3">
+              <Icon className="mt-0.5 shrink-0 text-primary-700">
+                <InfoCircle />
+              </Icon>
+              <p>
+                Pengaturan ini akan dipakai pada seluruh pengajuan berikutnya. Pengajuan yang sedang
+                berjalan tidak ikut berubah.
+              </p>
+            </div>
+
+            {!setuju && (
+              <div className="mt-4 flex gap-2 rounded-lg bg-yellow-50 p-3 text-yellow-800">
+                <Icon className="mt-0.5 size-4 shrink-0">
+                  <ExclamationCircle />
+                </Icon>
+                <span className="text-xs">
+                  Pernyataan kebenaran data belum dicentang — ini hanya contoh, penyimpanan tetap
+                  diizinkan.
+                </span>
+              </div>
+            )}
+          </Modal>
           <Button variant="outline" theme="gray">
             Batalkan
           </Button>
         </div>
       </section>
-
-      <Modal
-        open={konfirmasi}
-        onClose={() => setKonfirmasi(false)}
-        aria-label="Konfirmasi penyimpanan pengaturan"
-      >
-        <ModalHeader>Simpan perubahan?</ModalHeader>
-        <ModalBody>
-          <div className="flex gap-3">
-            <Icon className="mt-0.5 shrink-0 text-primary-700">
-              <InfoCircle />
-            </Icon>
-            <p>
-              Pengaturan ini akan dipakai pada seluruh pengajuan berikutnya. Pengajuan yang sedang
-              berjalan tidak ikut berubah.
-            </p>
-          </div>
-
-          {!setuju && (
-            <div className="mt-4 flex gap-2 rounded-lg bg-yellow-50 p-3 text-yellow-800">
-              <Icon className="mt-0.5 size-4 shrink-0">
-                <ExclamationCircle />
-              </Icon>
-              <span className="text-xs">
-                Pernyataan kebenaran data belum dicentang — ini hanya contoh, penyimpanan tetap
-                diizinkan.
-              </span>
-            </div>
-          )}
-        </ModalBody>
-        <ModalFooter>
-          <Button variant="outline" theme="gray" size="xs" onClick={() => setKonfirmasi(false)}>
-            Batal
-          </Button>
-          <Button
-            size="xs"
-            onClick={() => {
-              setKonfirmasi(false)
-              setTersimpan(true)
-            }}
-          >
-            Ya, simpan
-          </Button>
-        </ModalFooter>
-      </Modal>
 
       {tersimpan && (
         <div className="fixed bottom-4 left-4 z-50">

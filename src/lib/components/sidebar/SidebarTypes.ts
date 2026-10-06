@@ -1,4 +1,4 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import type { HTMLAttributes, MouseEvent, ReactNode } from "react";
 
 /** Tautan pada submenu Sidebar. */
 export interface SidebarSubItem {
@@ -8,6 +8,7 @@ export interface SidebarSubItem {
   icon?: ReactNode;
   active?: boolean;
   disabled?: boolean;
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
 /** Satu item navigasi utama Sidebar. */
@@ -22,6 +23,7 @@ export interface SidebarItem {
   defaultOpen?: boolean;
   /** Menonaktifkan tombol buka/tutup submenu tanpa menonaktifkan item menu. */
   submenuToggleDisabled?: boolean;
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
   children?: SidebarSubItem[];
 }
 
@@ -39,6 +41,7 @@ export interface SidebarUser {
   profileLabel?: string;
   avatar?: string;
   href?: string;
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export interface SidebarProps extends HTMLAttributes<HTMLElement> {
@@ -66,4 +69,5 @@ export interface SidebarProps extends HTMLAttributes<HTMLElement> {
    * yang dititipkan ke sini harus menyiapkan bentuk ringkasnya sendiri.
    */
   footer?: ReactNode;
+  darkMode?: boolean;
 }

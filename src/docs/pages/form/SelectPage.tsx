@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { Select, type SelectApplication, type SelectOption, type SelectState } from '../../../lib'
+import {
+  Select,
+  type SelectApplication,
+  type SelectOption,
+  type SelectState,
+} from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Segmented } from '../../pageKit'
 import {
@@ -32,9 +37,10 @@ const selectProps: PropRow[] = [
   ['info', 'string', 'undefined', 'Keterangan pada ikon info di samping label; ikon muncul bila diisi.'],
   ['helperText', 'ReactNode', 'undefined', 'Caption di bawah field.'],
   ['placeholder', 'string', 'undefined', 'Teks saat belum ada pilihan, mis. "Pilih Apapun Itu".'],
-  ['options', 'SelectOption[]', 'undefined', 'Daftar pilihan { value, label, disabled }. Bila kosong, children yang dipakai.'],
+  ['options', 'SelectOption[]', 'undefined', 'Daftar pilihan { value, label, disabled }. Bila kosong, <option> dan <optgroup> di children yang dipakai.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna ikon info dan garis saat difokus.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: field gray-800 dengan label terang; garisnya hanya terlihat saat inactive dan saat difokus. Panel daftar pilihannya tetap terang.'],
   ['…props', 'SelectHTMLAttributes', '—', 'Seluruh atribut <select> standar diteruskan (value, onChange, required, name, …).'],
 ]
 
@@ -42,6 +48,8 @@ const toc: TocEntry[] = [
   { id: 'select-input', label: 'Select Input' },
   { id: 'state', label: 'State' },
   { id: 'application', label: 'Application' },
+  { id: 'daftar', label: 'Daftar pilihan' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -53,13 +61,14 @@ export function SelectPage() {
   const [withInfo, setWithInfo] = useState(true)
   const [withHelper, setWithHelper] = useState(true)
   const [narrow, setNarrow] = useState(false)
+  const [dark, setDark] = useState(false)
   const [value, setValue] = useState('')
 
   return (
     <UsulanPage
       eyebrow="Form"
       title="Regular Select Form"
-      description="Dropdown satu pilihan dengan label, ikon info, dan caption. Dibangun di atas elemen <select> bawaan supaya keyboard dan pembaca layar tetap berfungsi, dengan warna, radius, dan jarak dari Foundations."
+      description="Dropdown satu pilihan dengan label, ikon info, dan caption. Daftar pilihannya panel Dropdown yang sama dengan menu lain di kit ini, sedangkan nilainya tetap dibawa elemen <select> — jadi formulir, keyboard, dan pembaca layar bekerja apa adanya. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="select-input" title="Select Input">
@@ -89,7 +98,7 @@ export function SelectPage() {
           </Demo>
         </div>
         <SectionCode>
-          {"import { Select } from '@stasi/design-kit-react'\n\n"}
+          {"import { Select } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Select\n'}
           {'    label="Label"\n'}
           {'    '}
@@ -171,16 +180,125 @@ export function SelectPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="daftar" title="Daftar pilihan">
+        <Lead>
+          Daftar pilihannya panel Dropdown — rupanya sama persis dengan menu Dropdown di kit ini, bukan
+          popup milik sistem operasi. Pilihan ditelusuri dengan panah, Home/End, atau dengan mengetik
+          huruf awalnya.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Lewat options">
+            <Select label="Provinsi" placeholder="Pilih provinsi" options={provinsi} />
+          </Demo>
+          <Demo label="Lewat <option> dan <optgroup>">
+            <Select label="Provinsi" placeholder="Pilih provinsi">
+              <optgroup label="Jawa">
+                <option value="jabar">Jawa Barat</option>
+                <option value="jateng">Jawa Tengah</option>
+                <option value="jatim">Jawa Timur</option>
+              </optgroup>
+              <optgroup label="Sumatra">
+                <option value="sumut">Sumatra Utara</option>
+                <option value="sumbar">Sumatra Barat</option>
+              </optgroup>
+            </Select>
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Select label="Provinsi" placeholder="Pilih provinsi">\n'}
+          {'    '}
+          <H>{'<optgroup label="Jawa">'}</H>
+          {'\n'}
+          {'        <option value="jabar">Jawa Barat</option>\n'}
+          {'        <option value="jateng">Jawa Tengah</option>\n'}
+          {'    '}
+          <H>{'</optgroup>'}</H>
+          {'\n'}
+          {'    …\n'}
+          {'</Select>'}
+        </SectionCode>
+        <p className="mt-4 text-body-sm text-gray-500">
+          Di balik panelnya tetap ada elemen <H>&lt;select&gt;</H> yang membawa nilainya, jadi{' '}
+          <H>value</H>, <H>onChange</H>, <H>name</H>, <H>ref</H>, dan pengiriman formulir bekerja seperti
+          pada <H>&lt;select&gt;</H> biasa. <H>&lt;option&gt;</H> yang Anda tulis sendiri dibaca komponen
+          dan tampil di panel yang sama; label <H>&lt;optgroup&gt;</H> menjadi judul kelompoknya.
+        </p>
+      </FlowSection>
+
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti field ke gray-800 dengan label terang. Pada state default garisnya
+          menyatu dengan latar dan baru terlihat saat difokus (warna aplikasi); pada <H>inactive</H> garisnya
+          gray-300, dengan teks dan panah gray-500. Panel daftar pilihannya untuk saat ini tetap terang.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Default" dark>
+            <Select
+              darkMode
+              label="Label"
+              info="Keterangan singkat."
+              placeholder="Pilih Apapun Itu"
+              options={provinsi}
+              helperText="Wajib diisi."
+            />
+          </Demo>
+          <Demo label="Inactive" dark>
+            <Select
+              darkMode
+              state="inactive"
+              label="Label"
+              info="Keterangan singkat."
+              placeholder="Pilih Apapun Itu"
+              options={provinsi}
+              helperText="Wajib diisi."
+            />
+          </Demo>
+          <Demo label="Sudah dipilih" dark>
+            <Select
+              darkMode
+              label="Label"
+              info="Keterangan singkat."
+              placeholder="Pilih Apapun Itu"
+              options={provinsi}
+              defaultValue="jabar"
+              helperText="Wajib diisi."
+            />
+          </Demo>
+          <Demo label="simaya" dark>
+            <Select
+              darkMode
+              application="simaya"
+              label="Label"
+              info="Keterangan singkat."
+              placeholder="Pilih Apapun Itu"
+              options={provinsi}
+              helperText="Wajib diisi."
+            />
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Select\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    label="Label"\n'}
+          {'    placeholder="Pilih Apapun Itu"\n'}
+          {'    options={provinsi}\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Setiap perubahan langsung
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth={narrow ? 'max-w-[340px]' : 'max-w-[348px]'}>
+        <Stage maxWidth={narrow ? 'max-w-[340px]' : 'max-w-[348px]'} dark={dark}>
           <Select
             application={application}
             state={state}
+            darkMode={dark}
             label="Label"
             info={withInfo ? 'Keterangan singkat tentang isian ini.' : undefined}
             placeholder="Pilih Apapun Itu"
@@ -243,6 +361,18 @@ export function SelectPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -258,7 +388,7 @@ export function SelectPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Select } from '@stasi/design-kit-react'\n\n"}
+          {"import { Select } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Select\n'}
           {state !== 'default' && (
             <>
@@ -272,6 +402,13 @@ export function SelectPage() {
               {'    '}
               <H>application</H>
               {`="${application}"\n`}
+            </>
+          )}
+          {dark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
             </>
           )}
           {'    label="Label"\n'}

@@ -30,6 +30,7 @@ const radioProps: PropRow[] = [
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran lingkaran: 16px atau 14px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna cincin saat pilihan dipilih.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: lingkaran gray-300 bergaris gray-400 dengan label terang; inactive gray-800 dengan teks gray-600.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="radio"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
 
@@ -38,6 +39,7 @@ const toc: TocEntry[] = [
   { id: 'caption', label: 'Dengan caption' },
   { id: 'platform', label: 'Platform' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -48,13 +50,14 @@ export function RadioPage() {
   const [state, setState] = useState<RadioState>('default')
   const [application, setApplication] = useState<RadioApplication>('default')
   const [withCaption, setWithCaption] = useState(false)
+  const [dark, setDark] = useState(false)
   const [pilihan, setPilihan] = useState('wni')
 
   return (
     <UsulanPage
       eyebrow="Form"
       title="Radio Button"
-      description="Pilihan tunggal dari beberapa opsi yang saling meniadakan. Dibangun di atas <input type='radio'> bawaan supaya navigasi panah dan pembaca layar tetap berfungsi, dengan warna, ukuran, dan jarak dari Foundations."
+      description="Pilihan tunggal dari beberapa opsi yang saling meniadakan. Dibangun di atas <input type='radio'> bawaan supaya navigasi panah dan pembaca layar tetap berfungsi, dengan warna, ukuran, dan jarak dari Foundations. Tersedia juga dalam tampilan gelap."
       toc={toc}
     >
       <FlowSection id="radio-button" title="Radio Button">
@@ -77,18 +80,21 @@ export function RadioPage() {
           </div>
         </Demo>
         <SectionCode>
-          {"import { Radio } from '@stasi/design-kit-react'\n\n"}
+          {"import { Radio } from '@ceplok-ui/design-kit-react'\n\n"}
           {'{/* Sekelompok pilihan: samakan name-nya */}\n'}
           {'<Radio '}
           <H>name</H>
-          {'="kewarganegaraan" label="Warga negara Indonesia" defaultChecked />\n'}
+          {'="pilihan" label="Belum dipilih" />\n'}
           {'<Radio '}
           <H>name</H>
-          {'="kewarganegaraan" label="Warga negara asing" />\n\n'}
+          {'="pilihan" label="Sedang dipilih" defaultChecked />\n\n'}
           {'{/* Inactive — meredup sekaligus nonaktif */}\n'}
-          {'<Radio '}
+          {'<Radio name="pilihan-nonaktif" '}
           <H>state</H>
-          {'="inactive" label="Tidak tersedia" />'}
+          {'="inactive" label="Tidak aktif" />\n'}
+          {'<Radio name="pilihan-nonaktif" '}
+          <H>state</H>
+          {'="inactive" label="Tidak aktif, terpilih" defaultChecked />'}
         </SectionCode>
       </FlowSection>
 
@@ -113,6 +119,14 @@ export function RadioPage() {
           </div>
         </Demo>
         <SectionCode>
+          {'<Radio\n'}
+          {'    name="kewarganegaraan"\n'}
+          {'    label="Warga negara Indonesia"\n'}
+          {'    '}
+          <H>helperText</H>
+          {'="Wajib melampirkan KTP elektronik yang masih berlaku."\n'}
+          {'    defaultChecked\n'}
+          {'/>\n'}
           {'<Radio\n'}
           {'    name="kewarganegaraan"\n'}
           {'    label="Warga negara asing"\n'}
@@ -155,15 +169,23 @@ export function RadioPage() {
           </Demo>
         </div>
         <SectionCode>
+          {'{/* Desktop — platform bawaan, tanpa prop */}\n'}
+          {'<Radio name="wn-desktop" label="Warga negara Indonesia" defaultChecked />\n'}
+          {'<Radio name="wn-desktop" label="Warga negara asing" />\n\n'}
+          {'{/* Mobile */}\n'}
           {'<Radio '}
           <H>platform</H>
-          {'="mobile" name="kewarganegaraan" label="Warga negara Indonesia" />'}
+          {'="mobile" name="wn-mobile" label="Warga negara Indonesia" defaultChecked />\n'}
+          {'<Radio '}
+          <H>platform</H>
+          {'="mobile" name="wn-mobile" label="Warga negara asing" />'}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="application" title="Application">
         <Lead>
-          Warna cincin saat dipilih mengikuti aplikasi yang memakainya; state lain memakai abu yang sama.
+          Warna cincin saat dipilih mengikuti aplikasi yang memakainya. Lingkaran yang belum dipilih —
+          gray-50 bergaris gray-300 — sama di kedua aplikasi.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {applications.map((a) => (
@@ -182,9 +204,91 @@ export function RadioPage() {
           ))}
         </div>
         <SectionCode>
-          {'<Radio '}
+          {'{/* Default — tanpa prop application */}\n'}
+          {'<Radio name="pilihan-default" label="Dipilih" helperText="border-primary-700" defaultChecked />\n'}
+          {'<Radio name="pilihan-default" label="Belum dipilih" />\n\n'}
+          {'{/* simaya */}\n'}
+          {'<Radio\n'}
+          {'    name="pilihan-simaya"\n'}
+          {'    '}
           <H>application</H>
-          {'="simaya" name="kewarganegaraan" label="Warga negara Indonesia" />'}
+          {'="simaya"\n'}
+          {'    label="Dipilih"\n'}
+          {'    helperText="border-purple-500"\n'}
+          {'    defaultChecked\n'}
+          {'/>\n'}
+          {'<Radio name="pilihan-simaya" '}
+          <H>application</H>
+          {'="simaya" label="Belum dipilih" />'}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <H>darkMode</H> mengganti lingkaran ke gray-300 bergaris gray-400, dengan label terang dan
+          caption gray-400. Cincin pilihan aktif tetap memakai warna aplikasi. State <H>inactive</H> memakai
+          lingkaran gray-800 dengan teks gray-600.
+        </Lead>
+        <Demo dark>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <Radio darkMode name="ds-radio-gelap" label="Belum dipilih" helperText="Keterangan singkat." />
+            <Radio
+              darkMode
+              name="ds-radio-gelap"
+              label="Sedang dipilih"
+              helperText="Keterangan singkat."
+              defaultChecked
+            />
+            <Radio
+              darkMode
+              name="ds-radio-gelap-nonaktif"
+              state="inactive"
+              label="Tidak aktif"
+              helperText="Keterangan singkat."
+            />
+            <Radio
+              darkMode
+              name="ds-radio-gelap-nonaktif-terpilih"
+              state="inactive"
+              label="Tidak aktif, terpilih"
+              helperText="Keterangan singkat."
+              defaultChecked
+            />
+          </div>
+        </Demo>
+        <SectionCode>
+          {'<Radio '}
+          <H>darkMode</H>
+          {' name="pilihan-gelap" label="Belum dipilih" helperText="Keterangan singkat." />\n'}
+          {'<Radio\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    name="pilihan-gelap"\n'}
+          {'    label="Sedang dipilih"\n'}
+          {'    helperText="Keterangan singkat."\n'}
+          {'    defaultChecked\n'}
+          {'/>\n\n'}
+          {'{/* Inactive */}\n'}
+          {'<Radio\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    name="pilihan-gelap-nonaktif"\n'}
+          {'    state="inactive"\n'}
+          {'    label="Tidak aktif"\n'}
+          {'    helperText="Keterangan singkat."\n'}
+          {'/>\n'}
+          {'<Radio\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
+          {'    name="pilihan-gelap-nonaktif"\n'}
+          {'    state="inactive"\n'}
+          {'    label="Tidak aktif, terpilih"\n'}
+          {'    helperText="Keterangan singkat."\n'}
+          {'    defaultChecked\n'}
+          {'/>'}
         </SectionCode>
       </FlowSection>
 
@@ -200,7 +304,7 @@ export function RadioPage() {
           Dengan fit-content, blok menyusut seukuran isinya lalu mx-auto
           benar-benar memusatkannya.
         */}
-        <Stage maxWidth="max-w-fit">
+        <Stage maxWidth="max-w-fit" dark={dark}>
           <div className="space-y-4">
             {kewarganegaraan.map((o) => (
               <Radio
@@ -209,6 +313,7 @@ export function RadioPage() {
                 platform={platform}
                 state={state}
                 application={application}
+                darkMode={dark}
                 label={o.label}
                 helperText={withCaption ? 'Keterangan singkat tentang pilihan ini.' : undefined}
                 checked={pilihan === o.value}
@@ -261,6 +366,18 @@ export function RadioPage() {
               options={adaTidakAda}
             />
           </Control>
+
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
@@ -275,41 +392,52 @@ export function RadioPage() {
           nilainya masih bawaan sengaja tidak ditulis.
         </Lead>
         <SectionCode flush>
-          {"import { Radio } from '@stasi/design-kit-react'\n\n"}
-          {'<Radio\n'}
-          {'    name="kewarganegaraan"\n'}
+          {"import { Radio } from '@ceplok-ui/design-kit-react'\n\n"}
+          {'{/* kewarganegaraan = [{ value: "wni", label: "Warga negara Indonesia" }, …] */}\n'}
+          {'{kewarganegaraan.map((o) => (\n'}
+          {'    <Radio\n'}
+          {'        key={o.value}\n'}
+          {'        name="kewarganegaraan"\n'}
           {platform === 'mobile' && (
             <>
-              {'    '}
+              {'        '}
               <H>platform</H>
               {'="mobile"\n'}
             </>
           )}
           {state !== 'default' && (
             <>
-              {'    '}
+              {'        '}
               <H>state</H>
               {'="inactive"\n'}
             </>
           )}
           {application !== 'default' && (
             <>
-              {'    '}
+              {'        '}
               <H>application</H>
               {`="${application}"\n`}
             </>
           )}
-          {'    label="Warga negara Indonesia"\n'}
+          {dark && (
+            <>
+              {'        '}
+              <H>darkMode</H>
+              {'\n'}
+            </>
+          )}
+          {'        label={o.label}\n'}
           {withCaption && (
             <>
-              {'    '}
+              {'        '}
               <H>helperText</H>
               {'="Keterangan singkat tentang pilihan ini."\n'}
             </>
           )}
-          {'    checked={pilihan === "wni"}\n'}
-          {'    onChange={() => setPilihan("wni")}\n'}
-          {'/>'}
+          {'        checked={pilihan === o.value}\n'}
+          {'        onChange={() => setPilihan(o.value)}\n'}
+          {'    />\n'}
+          {'))}'}
         </SectionCode>
       </FlowSection>
 

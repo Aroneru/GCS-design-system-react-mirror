@@ -2,11 +2,12 @@ import { type ReactNode, useState } from "react";
 import { ChartPie, Clipboard, Inbox, Layers, Lock, Cart } from "flowbite-react-icons/solid";
 import { Sidebar, type SidebarGroup, type SidebarItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { H, Segmented } from "../../pageKit";
+import { H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
   FlowSection,
+  Lead,
   SectionCode,
   Stage,
   UsulanPage,
@@ -81,6 +82,7 @@ const sidebarProps: PropRow[] = [
     "undefined",
     "Area di kaki Sidebar, di bawah daftar menu — versi aplikasi, tautan bantuan, atau catatan status.",
   ],
+  ["darkMode", "boolean", "false", "Mengaktifkan tampilan mode gelap pada Sidebar secara manual."],
 ];
 
 const sidebarItemProps: PropRow[] = [
@@ -106,6 +108,7 @@ const toc: TocEntry[] = [
   { id: "menu", label: "Menu" },
   { id: "badge", label: "Badge" },
   { id: "separator", label: "Content Separator" },
+  { id: "dark-mode", label: "Dark mode" },
   { id: "playground", label: "Playground" },
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
@@ -115,16 +118,16 @@ const baseItems = [
   {
     label: "Menu 1",
     href: "#",
-    icon: <ChartPie className="size-4" />,
+    icon: <ChartPie className="size-5" />,
   },
   {
     label: "Menu 2",
     href: "#",
-    icon: <Clipboard className="size-4" />,
+    icon: <Clipboard className="size-5" />,
   },
   {
     label: "Menu 3",
-    icon: <Cart className="size-4" />,
+    icon: <Cart className="size-5" />,
     defaultOpen: true,
     children: [
       { label: "Sub - Menu 1", href: "#" },
@@ -135,28 +138,28 @@ const baseItems = [
   {
     label: "Menu 4",
     href: "#",
-    icon: <Inbox className="size-4" />,
+    icon: <Inbox className="size-5" />,
     badge: 1,
   },
   {
     label: "Menu 5",
     href: "#",
-    icon: <Lock className="size-4" />,
+    icon: <Lock className="size-5" />,
   },
   {
     label: "Menu 6",
     href: "#",
-    icon: <Clipboard className="size-4" />,
+    icon: <Clipboard className="size-5" />,
   },
   {
     label: "Menu 7",
     href: "#",
-    icon: <Layers className="size-4" />,
+    icon: <Layers className="size-5" />,
   },
   {
     label: "Menu 8",
     href: "#",
-    icon: <ChartPie className="size-4" />,
+    icon: <ChartPie className="size-5" />,
   },
 ];
 
@@ -197,17 +200,17 @@ const separatorGroups: SidebarGroup[] = [
   {
     id: "primary",
     items: [
-      { label: "Menu 4", href: "#", icon: <Inbox className="size-4" />, badge: 1 },
-      { label: "Menu 5", icon: <Lock className="size-4" /> },
+      { label: "Menu 4", href: "#", icon: <Inbox className="size-5" />, badge: 1 },
+      { label: "Menu 5", icon: <Lock className="size-5" /> },
     ],
   },
   {
     id: "secondary",
     separator: true,
     items: [
-      { label: "Menu 6", href: "#", icon: <Clipboard className="size-4" /> },
-      { label: "Menu 7", href: "#", icon: <Layers className="size-4" /> },
-      { label: "Menu 8", href: "#", icon: <ChartPie className="size-4" /> },
+      { label: "Menu 6", href: "#", icon: <Clipboard className="size-5" /> },
+      { label: "Menu 7", href: "#", icon: <Layers className="size-5" /> },
+      { label: "Menu 8", href: "#", icon: <ChartPie className="size-5" /> },
     ],
   },
 ];
@@ -221,7 +224,7 @@ function SidebarBrand({ collapsed = false }: { collapsed?: boolean }) {
         <span className="rounded-sm bg-primary-300" />
         <span className="rounded-sm bg-white" />
       </span>
-      {!collapsed && <span className="text-sm font-black tracking-tight text-content">STASI</span>}
+      {!collapsed && <span className="text-sm font-black tracking-tight">CEPLOK</span>}
     </span>
   );
 }
@@ -246,10 +249,12 @@ function VariantPreview({
   title,
   description,
   children,
+  dark = false,
 }: {
   title: string;
   description: string;
   children: ReactNode;
+  dark?: boolean;
 }) {
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -257,7 +262,7 @@ function VariantPreview({
         <h3 className="text-sm font-bold text-gray-900">{title}</h3>
         <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
       </div>
-      <div className="h-[440px] overflow-y-auto overscroll-contain bg-gray-50">{children}</div>
+      <div className={`h-[440px] overflow-y-auto overscroll-contain ${dark ? "bg-gray-900" : "bg-gray-50"}`}>{children}</div>
     </article>
   );
 }
@@ -266,15 +271,18 @@ function SidebarVariant({
   items,
   groups,
   collapsed = false,
+  darkMode = false,
 }: {
   items?: SidebarItem[];
   groups?: SidebarGroup[];
   collapsed?: boolean;
+  darkMode?: boolean;
 }) {
   return (
     <Sidebar
       collapsed={collapsed}
       showCollapseButton
+      darkMode={darkMode}
       logo={<SidebarBrand />}
       collapsedLogo={<SidebarBrand collapsed />}
       user={{ name: "Nama User", profileLabel: "Lihat Profil", href: "#" }}
@@ -292,8 +300,12 @@ export function SidebarPage() {
   const [userInfo, setUserInfo] = useState<VisibilityOption>("show");
   const [logoWeb, setLogoWeb] = useState<VisibilityOption>("show");
   const [collapseButton, setCollapseButton] = useState<VisibilityOption>("show");
+  const [theme, setTheme] = useState("light");
 
-  const collapsed = collapse === "collapsed";
+  const resolvedCollapse = menuIcon === "hide" ? "expanded" : collapse;
+  const collapsed = resolvedCollapse === "collapsed";
+
+  const resolvedCollapseButton = menuIcon === "hide" ? "hide" : collapseButton;
 
   const playgroundItems = baseItems.map((item) => ({
     ...item,
@@ -304,13 +316,13 @@ export function SidebarPage() {
   const playgroundGroups: SidebarGroup[] | undefined =
     separator === "show"
       ? [
-          { id: "main", items: playgroundItems.slice(0, 5) },
-          { id: "secondary", separator: true, items: playgroundItems.slice(5) },
-        ]
+        { id: "main", items: playgroundItems.slice(0, 5) },
+        { id: "secondary", separator: true, items: playgroundItems.slice(5) },
+      ]
       : undefined;
 
   const iconProperty = (icon: string) =>
-    menuIcon === "show" ? `, icon: <${icon} className="size-4" />` : "";
+    menuIcon === "show" ? `, icon: <${icon} className="size-5" />` : "";
   const usageItems = `const items = [
   { label: "Menu 1", href: "#"${iconProperty("ChartPie")} },
   { label: "Menu 2", href: "#"${iconProperty("Clipboard")} },
@@ -330,26 +342,27 @@ export function SidebarPage() {
   { label: "Menu 8", href: "#"${iconProperty("ChartPie")} },
 ]`;
   const usageCode = [
-    "import { Sidebar } from '@tpl/design-kit-react'",
+    "import { Sidebar } from '@ceplok-ui/design-kit-react'",
     ...(menuIcon === "show"
       ? [
-          "import { Cart, ChartPie, Clipboard, Inbox, Layers, Lock } from 'flowbite-react-icons/solid'",
-        ]
+        "import { Cart, ChartPie, Clipboard, Inbox, Layers, Lock } from 'flowbite-react-icons/solid'",
+      ]
       : []),
     "",
     "// Logo dan tombol collapse dikonfigurasi secara independen.",
     usageItems,
     ...(separator === "show"
       ? [
-          "",
-          "const groups = [",
-          "  { id: 'main', items: items.slice(0, 5) },",
-          "  { id: 'secondary', separator: true, items: items.slice(5) },",
-          "]",
-        ]
+        "",
+        "const groups = [",
+        "  { id: 'main', items: items.slice(0, 5) },",
+        "  { id: 'secondary', separator: true, items: items.slice(5) },",
+        "]",
+      ]
       : []),
     "",
     "<Sidebar",
+    ...(theme === "dark" ? ["  darkMode"] : []),
     ...(logoWeb === "show" ? ["  logo={<Logo />}", "  collapsedLogo={<LogoMark />}"] : []),
     ...(userInfo === "show"
       ? ["  user={{ name: 'Nama User', profileLabel: 'Lihat Profil', href: '#' }}"]
@@ -357,7 +370,7 @@ export function SidebarPage() {
     `  ${separator === "show" ? "groups={groups}" : "items={items}"}`,
     "  sticky",
     `  collapsed={${collapsed}}`,
-    ...(collapseButton === "show"
+    ...(resolvedCollapseButton === "show"
       ? ["  onCollapse={() => setCollapsed((current) => !current)}"]
       : []),
     "/>",
@@ -367,9 +380,10 @@ export function SidebarPage() {
     "sticky",
     ...(menuIcon === "show" ? ["icon"] : []),
     ...(badge === "show" ? ["badge"] : []),
+    ...(theme === "dark" ? ["darkMode"] : []),
     ...(userInfo === "show" ? ["user"] : []),
     ...(logoWeb === "show" ? ["collapsedLogo", "logo"] : []),
-    ...(collapseButton === "show" ? ["onCollapse"] : []),
+    ...(resolvedCollapseButton === "show" ? ["onCollapse"] : []),
     ...(separator === "show" ? ["separator: true", "groups"] : []),
   ];
 
@@ -436,17 +450,17 @@ export function SidebarPage() {
             <div className="mb-4 max-w-[280px] rounded-xl border border-gray-200 bg-white p-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-                  <ChartPie className="size-4" />
+                  <ChartPie className="size-5" />
                   <span>Menu 1</span>
                 </div>
 
                 <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-                  <Clipboard className="size-4" />
+                  <Clipboard className="size-5" />
                   <span>Menu 2</span>
                 </div>
 
                 <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-                  <Inbox className="size-4" />
+                  <Inbox className="size-5" />
                   <span>Menu 3</span>
                 </div>
               </div>
@@ -481,7 +495,7 @@ export function SidebarPage() {
                 items={[
                   {
                     label: "Menu 3",
-                    icon: <Cart className="size-4" />,
+                    icon: <Cart className="size-5" />,
                     active: true,
                     defaultOpen: true,
                     submenuToggleDisabled: true,
@@ -524,7 +538,7 @@ export function SidebarPage() {
 
         <div className="mb-4 max-w-[280px] rounded-xl border border-gray-200 bg-white p-4">
           <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
-            <Inbox className="size-4" />
+            <Inbox className="size-5" />
 
             <span className="flex-1">Menu 4</span>
 
@@ -550,10 +564,7 @@ export function SidebarPage() {
       <FlowSection id="separator" title="Content Separator">
         <p className="mb-6 text-body-sm text-gray-500">
           Separator memisahkan kelompok menu yang berbeda. Tambahkan{" "}
-          <H>
-            <code>separator: true </code>
-          </H>
-          pada group yang ingin diberi garis pemisah di bagian atas.
+          <Hl>separator: true</Hl> pada group yang ingin diberi garis pemisah di bagian atas.
         </p>
 
         <div className="mb-4 max-w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -578,21 +589,47 @@ export function SidebarPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <p className="mb-6 text-body-sm text-gray-500">
+          Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Sidebar.
+          Komponen secara otomatis menyesuaikan warna ikon, teks aktif/inaktif, badge, profil, dan border untuk menjaga rasio kontras.
+        </p>
+
+        <div className="mb-4 grid gap-4 lg:grid-cols-2">
+          <VariantPreview
+            title="1. Multi-level menu + icon, user info, logo web"
+            description="Menu berikon dikelompokkan; separator membedakan area konten."
+            dark
+          >
+            <SidebarVariant groups={iconGroups} darkMode />
+          </VariantPreview>
+
+          <VariantPreview
+            title="2. Collapsed"
+            description="Konfigurasi varian 1 dalam kondisi tertutup: icon, user, dan logo terlihat."
+            dark
+          >
+            <SidebarVariant groups={iconGroups} collapsed darkMode />
+          </VariantPreview>
+        </div>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <p className="mb-6 text-body-sm text-gray-500">
           Coba konfigurasi Sidebar melalui kontrol di bawah ini untuk melihat perubahan mode
           collapse, badge, separator, logo, user info, dan tombol collapse.
         </p>
 
-        <Stage maxWidth="max-w-[520px]">
+        <Stage maxWidth="max-w-[520px]" dark={theme === "dark"}>
           <div className="flex min-h-[760px] justify-center">
             <Sidebar
               key={separator}
               collapsed={collapsed}
+              darkMode={theme === "dark"}
               onCollapse={
-                collapseButton === "show"
+                resolvedCollapseButton === "show"
                   ? () =>
-                      setCollapse((current) => (current === "expanded" ? "collapsed" : "expanded"))
+                    setCollapse((current) => (current === "expanded" ? "collapsed" : "expanded"))
                   : undefined
               }
               logo={logoWeb === "show" ? <SidebarBrand /> : undefined}
@@ -612,9 +649,22 @@ export function SidebarPage() {
           <Control label="Sidebar">
             <Segmented
               label="Pilih kondisi Sidebar"
-              value={collapse}
+              value={resolvedCollapse}
               onChange={(value) => setCollapse(value as CollapseOption)}
               options={collapseOptions}
+              disabled={menuIcon === "hide"}
+            />
+          </Control>
+
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={theme}
+              onChange={(v) => setTheme(String(v))}
+              options={[
+                { value: "light", label: "Light" },
+                { value: "dark", label: "Dark" },
+              ]}
             />
           </Control>
 
@@ -657,9 +707,10 @@ export function SidebarPage() {
           <Control label="Button collapse">
             <Segmented
               label="Tampilkan tombol collapse"
-              value={collapseButton}
+              value={resolvedCollapseButton}
               onChange={(value) => setCollapseButton(value as VisibilityOption)}
               options={visibilityOptions}
+              disabled={menuIcon === "hide"}
             />
           </Control>
 
@@ -684,15 +735,22 @@ export function SidebarPage() {
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Referensi seluruh prop Sidebar, termasuk state container serta state per-item
           menu/submenu.
-        </p>
+        </Lead>
 
-        <PropsTable rows={sidebarProps} minWidth="46rem" />
+        <div className="space-y-6">
+          <div>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Sidebar Props</h3>
+            <PropsTable rows={sidebarProps} minWidth="46rem" />
+          </div>
 
-        <h3 className="mt-8 mb-3 text-sm font-bold text-gray-900">SidebarItem</h3>
-        <PropsTable rows={sidebarItemProps} minWidth="46rem" />
+          <div>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">SidebarItem Props</h3>
+            <PropsTable rows={sidebarItemProps} minWidth="46rem" />
+          </div>
+        </div>
       </FlowSection>
     </UsulanPage>
   );

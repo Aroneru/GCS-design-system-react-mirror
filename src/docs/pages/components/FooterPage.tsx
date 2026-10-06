@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Footer } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { FacebookIcon, InstagramIcon, XIcon } from '../../socialIcons'
-import { C, Mark, Segmented } from '../../pageKit'
+import { Hl, Mark, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -31,19 +31,19 @@ import { asset } from "../../asset";
 const allMenus = Array.from({ length: 8 }, (_, i) => ({ label: `Menu ${i + 1}`, url: '#' }))
 
 const footerSocials = [
-  { label: 'Instagram', url: 'https://www.instagram.com/stasi/', icon: InstagramIcon },
-  { label: 'X', url: 'https://x.com/stasi', icon: XIcon },
+  { label: 'Instagram', url: 'https://www.instagram.com/ceplok/', icon: InstagramIcon },
+  { label: 'X', url: 'https://x.com/ceplok', icon: XIcon },
   { label: 'Facebook', url: '#', icon: FacebookIcon },
 ]
 
-const copyrightText = '© 2025 Ministerium Fur Staatssicherheit'
+const copyrightText = '© 2025 Ceplok Design System'
 
 const footerProps: PropRow[] = [
   [
     'logo',
     'string',
     'undefined',
-    'URL berkas gambar logo, dirender sebagai <img> setinggi 40px (44px saat footer ≥ 768px) dengan lebar mengikuti rasio aslinya. Bila diisi, logoContent diabaikan.',
+    'URL berkas gambar logo, dirender sebagai <img> setinggi 64px (80px saat footer ≥ 768px) dengan lebar mengikuti rasio aslinya. Bila diisi, logoContent diabaikan.',
   ],
   [
     'logoAlt',
@@ -133,7 +133,7 @@ function Preview({ label, children }: { label?: string; children: ReactNode }) {
   )
 }
 
-const TextLogo = () => <span className="text-xl font-black text-white">STASI</span>
+const TextLogo = () => <span className="text-xl font-black text-white">CEPLOK</span>
 
 export function FooterPage() {
   const [view, setView] = useState<'mobile' | 'desktop'>('desktop')
@@ -162,15 +162,15 @@ export function FooterPage() {
     >
       <FlowSection id="dasar" title="Tampilan dasar">
         <Lead>
-          Satu blok utuh berlatar <C>gray-800</C>: baris atas berisi logo dan menu, lalu garis tipis,
+          Satu blok utuh berlatar <Hl>gray-800</Hl>: baris atas berisi logo dan menu, lalu garis tipis,
           lalu baris bawah berisi hak cipta dan ikon sosial. Semua bagiannya opsional — yang tidak
           diisi tidak dirender, bukan disembunyikan lewat CSS.
         </Lead>
 
         <Preview>
           <Footer
-            logo={asset("/images/stasi-logo.svg")}
-            logoAlt="STASI — Ministerium Fur Staatssicherheit"
+            logo={asset("/images/footer-logo.svg")}
+            logoAlt="Ceplok Design System"
             menus={allMenus.slice(0, 4)}
             copyright={copyrightText}
             socials={footerSocials}
@@ -178,10 +178,10 @@ export function FooterPage() {
         </Preview>
 
         <SectionCode>
-          {"import { Footer } from '@stasi/design-kit-react'\n\n"}
+          {"import { Footer } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Footer\n'}
-          {'    logo="/images/stasi-logo.svg"\n'}
-          {'    logoAlt="STASI — Ministerium Fur Staatssicherheit"\n'}
+          {'    logo="/images/footer-logo.svg"\n'}
+          {'    logoAlt="Ceplok Design System"\n'}
           {"    menus={[{ label: 'Menu 1', url: '/menu-1' }, …]}\n"}
           {`    copyright="${copyrightText}"\n`}
           {'    socials={socials}\n'}
@@ -191,22 +191,22 @@ export function FooterPage() {
 
       <FlowSection id="logo" title="logo · logoAlt · logoContent">
         <Lead>
-          <C>logo</C> menerima URL berkas gambar dan dirender sebagai <C>{'<img>'}</C> setinggi 40px —
-          44px saat footer selebar ≥ 768px — dengan lebar mengikuti rasio aslinya. <C>logoAlt</C> jadi
+          <Hl>logo</Hl> menerima URL berkas gambar dan dirender sebagai <Hl>{'<img>'}</Hl> setinggi 64px —
+          80px saat footer selebar ≥ 768px — dengan lebar mengikuti rasio aslinya. <Hl>logoAlt</Hl> jadi
           teks alternatifnya; isi dengan nama instansi, bukan kata "logo", supaya wajar dibacakan
           pembaca layar.
         </Lead>
         <Lead>
-          Bila logonya bukan berkas gambar — logo teks, <C>{'<svg>'}</C> inline, atau gabungan keduanya
-          — pakai <C>logoContent</C>. Prop itu hanya berlaku saat <C>logo</C> kosong: kalau dua-duanya
-          diisi, <C>logo</C> yang menang. Karena latarnya gelap, warnanya harus ditentukan sendiri.
+          Bila logonya bukan berkas gambar — logo teks, <Hl>{'<svg>'}</Hl> inline, atau gabungan keduanya
+          — pakai <Hl>logoContent</Hl>. Prop itu hanya berlaku saat <Hl>logo</Hl> kosong: kalau dua-duanya
+          diisi, <Hl>logo</Hl> yang menang. Karena latarnya gelap, warnanya harus ditentukan sendiri.
         </Lead>
 
         <div className="space-y-6">
           <Preview label="logo — berkas gambar">
             <Footer
-              logo={asset("/images/stasi-logo.svg")}
-              logoAlt="STASI — Ministerium Fur Staatssicherheit"
+              logo={asset("/images/footer-logo.svg")}
+              logoAlt="Ceplok Design System"
               menus={allMenus.slice(0, 4)}
               copyright={copyrightText}
             />
@@ -221,31 +221,31 @@ export function FooterPage() {
           {'<Footer\n'}
           {'    '}
           <Mark>logo</Mark>
-          {'="/images/stasi-logo.svg"\n'}
+          {'="/images/footer-logo.svg"\n'}
           {'    '}
           <Mark>logoAlt</Mark>
-          {'="STASI — Ministerium Fur Staatssicherheit"\n'}
+          {'="Ceplok Design System"\n'}
           {'/>\n\n'}
           {'{/* Bukan berkas gambar — hanya dipakai bila logo kosong */}\n'}
           {'<Footer '}
           <Mark>logoContent</Mark>
-          {'={<span className="text-xl font-black text-white">STASI</span>} … />'}
+          {'={<span className="text-xl font-black text-white">CEPLOK</span>} … />'}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="menus" title="menus">
         <Lead>
-          Daftar tautan navigasi. <C>url</C> boleh dikosongkan dan otomatis jadi <C>"#"</C>. Saat footer
+          Daftar tautan navigasi. <Hl>url</Hl> boleh dikosongkan dan otomatis jadi <Hl>"#"</Hl>. Saat footer
           selebar ≥ 768px satu baris memuat paling banyak lima menu; menu keenam dan seterusnya turun ke
-          baris berikutnya dan tetap sejajar kolom di atasnya. Bila <C>menus</C> kosong, blok navigasinya
+          baris berikutnya dan tetap sejajar kolom di atasnya. Bila <Hl>menus</Hl> kosong, blok navigasinya
           tidak dirender sama sekali.
         </Lead>
 
         <div className="space-y-6">
           <Preview label="Lima menu — masih satu baris">
             <Footer
-              logo={asset("/images/stasi-logo.svg")}
-              logoAlt="STASI"
+              logo={asset("/images/footer-logo.svg")}
+              logoAlt="CEPLOK"
               menus={allMenus.slice(0, 5)}
               copyright={copyrightText}
             />
@@ -253,8 +253,8 @@ export function FooterPage() {
 
           <Preview label="Delapan menu — tiga sisanya turun">
             <Footer
-              logo={asset("/images/stasi-logo.svg")}
-              logoAlt="STASI"
+              logo={asset("/images/footer-logo.svg")}
+              logoAlt="CEPLOK"
               menus={allMenus}
               copyright={copyrightText}
             />
@@ -275,22 +275,22 @@ export function FooterPage() {
 
       <FlowSection id="baris-bawah" title="copyright · socials">
         <Lead>
-          Keduanya mengisi baris bawah — <C>copyright</C> di kiri, <C>socials</C> di ujung kanan.{' '}
-          <C>copyright</C> bertipe <C>ReactNode</C>, jadi tidak harus teks: boleh disisipi tautan
+          Keduanya mengisi baris bawah — <Hl>copyright</Hl> di kiri, <Hl>socials</Hl> di ujung kanan.{' '}
+          <Hl>copyright</Hl> bertipe <Hl>ReactNode</Hl>, jadi tidak harus teks: boleh disisipi tautan
           kebijakan privasi atau nomor versi. Bila kosong, barisnya tidak dirender dan ikon sosial
           bergeser ke kiri.
         </Lead>
         <Lead>
-          Pada <C>socials</C>, <C>icon</C> disisipkan sebagai elemen <C>{'<svg>'}</C> apa adanya —
-          warnanya mengikuti <C>currentColor</C> sehingga ikut berubah saat hover. <C>label</C> menjadi{' '}
-          <C>aria-label</C> tautannya, dan url selain <C>"#"</C> dibuka di tab baru dengan{' '}
-          <C>rel="noopener noreferrer"</C>.
+          Pada <Hl>socials</Hl>, <Hl>icon</Hl> disisipkan sebagai elemen <Hl>{'<svg>'}</Hl> apa adanya —
+          warnanya mengikuti <Hl>currentColor</Hl> sehingga ikut berubah saat hover. <Hl>label</Hl> menjadi{' '}
+          <Hl>aria-label</Hl> tautannya, dan url selain <Hl>"#"</Hl> dibuka di tab baru dengan{' '}
+          <Hl>rel="noopener noreferrer"</Hl>.
         </Lead>
 
         <Preview>
           <Footer
-            logo={asset("/images/stasi-logo.svg")}
-            logoAlt="STASI"
+            logo={asset("/images/footer-logo.svg")}
+            logoAlt="CEPLOK"
             menus={allMenus.slice(0, 4)}
             copyright={
               <>
@@ -311,15 +311,15 @@ export function FooterPage() {
           <Mark>copyright</Mark>
           {'={\n'}
           {'        <>\n'}
-          {'            © 2025 Ministerium Fur Staatssicherheit ·{" "}\n'}
+          {'            © 2025 Ceplok Design System ·{" "}\n'}
           {'            <a href="/privasi">Kebijakan privasi</a>\n'}
           {'        </>\n'}
           {'    }\n'}
           {'    '}
           <Mark>socials</Mark>
           {'={[\n'}
-          {"        { label: 'Instagram', url: 'https://instagram.com/stasi', icon: <Instagram /> },\n"}
-          {"        { label: 'X',         url: 'https://x.com/stasi',         icon: <X /> },\n"}
+          {"        { label: 'Instagram', url: 'https://instagram.com/ceplok', icon: <Instagram /> },\n"}
+          {"        { label: 'X',         url: 'https://x.com/ceplok',         icon: <X /> },\n"}
           {"        { label: 'Facebook',  url: '#',                            icon: <Facebook /> },\n"}
           {'    ]}\n'}
           {'/>'}
@@ -328,8 +328,8 @@ export function FooterPage() {
 
       <FlowSection id="fluid" title="fluid">
         <Lead>
-          Bawaannya isi footer dibatasi <C>max-w-7xl</C> (1280px) lalu dipusatkan, jadi di layar lebar
-          logo dan menu berhenti sebelum tepi. <C>fluid</C> melepas batas itu: isinya melebar penuh
+          Bawaannya isi footer dibatasi <Hl>max-w-7xl</Hl> (1280px) lalu dipusatkan, jadi di layar lebar
+          logo dan menu berhenti sebelum tepi. <Hl>fluid</Hl> melepas batas itu: isinya melebar penuh
           mengikuti lebar footer, menyisakan padding kiri-kanan saja. Latar dan tinggi footernya sendiri
           tidak berubah — yang bergeser hanya letak isinya.
         </Lead>
@@ -337,8 +337,8 @@ export function FooterPage() {
         <Preview label="fluid — isi menempel ke tepi footer">
           <Footer
             fluid
-            logo={asset("/images/stasi-logo.svg")}
-            logoAlt="STASI"
+            logo={asset("/images/footer-logo.svg")}
+            logoAlt="CEPLOK"
             menus={allMenus.slice(0, 4)}
             copyright={copyrightText}
             socials={footerSocials}
@@ -356,7 +356,7 @@ export function FooterPage() {
         <Lead>
           Ambang di bawah ini diukur dari{' '}
           <strong className="text-gray-900">lebar footer itu sendiri</strong>, bukan lebar layar —
-          elemen <C>{'<footer>'}</C> dipasangi <C>@container</C>. Jadi footer yang ditaruh di kolom
+          elemen <Hl>{'<footer>'}</Hl> dipasangi <Hl>@container</Hl>. Jadi footer yang ditaruh di kolom
           sempit pada layar desktop tetap tampil bertumpuk seperti di ponsel, dan sebaliknya. Cara
           mengeceknya: ganti kontrol <em>Tampilan</em> di Playground, atau perkecil jendela.
         </Lead>
@@ -371,8 +371,8 @@ export function FooterPage() {
         </div>
 
         <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500">
-          Yang tidak berubah di ukuran mana pun: latar <C>bg-gray-800</C>, jarak atas-bawah 64px, lebar
-          isi dibatasi <C>max-w-7xl</C> lalu dipusatkan — kecuali bila <C>fluid</C> diisi — dan garis
+          Yang tidak berubah di ukuran mana pun: latar <Hl>bg-gray-800</Hl>, jarak atas-bawah 64px, lebar
+          isi dibatasi <Hl>max-w-7xl</Hl> lalu dipusatkan — kecuali bila <Hl>fluid</Hl> diisi — dan garis
           pemisah tipis di atas baris hak cipta.
         </p>
       </FlowSection>
@@ -387,8 +387,8 @@ export function FooterPage() {
         <Stage maxWidth={view === 'mobile' ? 'max-w-[390px]' : 'max-w-full'}>
           <div className="overflow-hidden rounded-xl shadow-soft">
             <Footer
-              logo={logoMode === 'image' ? asset('/images/stasi-logo.svg') : undefined}
-              logoAlt="STASI — Ministerium Fur Staatssicherheit"
+              logo={logoMode === 'image' ? asset('/images/footer-logo.svg') : undefined}
+              logoAlt="Ceplok Design System"
               logoContent={logoMode === 'text' ? <TextLogo /> : undefined}
               menus={allMenus.slice(0, menuCount)}
               copyright={copyrightText}
@@ -454,7 +454,7 @@ export function FooterPage() {
           biru, dan tombol <em>Salin</em> selalu menyalin persis yang sedang tampil.
         </Lead>
         <SectionCode flush>
-          {"import { Footer } from '@stasi/design-kit-react'\n"}
+          {"import { Footer } from '@ceplok-ui/design-kit-react'\n"}
           {withSocials && "import { Instagram, X, Facebook } from './socialIcons'\n"}
           {'\n'}
           {`{/* ${summary} */}\n`}
@@ -472,17 +472,17 @@ export function FooterPage() {
             <>
               {`${ind}    `}
               <Mark>logo</Mark>
-              {'="/images/stasi-logo.svg"\n'}
+              {'="/images/footer-logo.svg"\n'}
               {`${ind}    `}
               <Mark>logoAlt</Mark>
-              {'="STASI"\n'}
+              {'="CEPLOK"\n'}
             </>
           )}
           {logoMode === 'text' && (
             <>
               {`${ind}    `}
               <Mark>logoContent</Mark>
-              {'={<span className="text-xl font-black text-white">STASI</span>}\n'}
+              {'={<span className="text-xl font-black text-white">CEPLOK</span>}\n'}
             </>
           )}
           {`${ind}    `}
@@ -496,8 +496,8 @@ export function FooterPage() {
               {`${ind}    `}
               <Mark>socials</Mark>
               {'={[\n'}
-              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/stasi', icon: <Instagram /> },\n`}
-              {`${ind}        { label: 'X',         url: 'https://x.com/stasi',         icon: <X /> },\n`}
+              {`${ind}        { label: 'Instagram', url: 'https://instagram.com/ceplok', icon: <Instagram /> },\n`}
+              {`${ind}        { label: 'X',         url: 'https://x.com/ceplok',         icon: <X /> },\n`}
               {`${ind}        { label: 'Facebook',  url: '#',                            icon: <Facebook /> },\n`}
               {`${ind}    ]}\n`}
             </>
@@ -510,10 +510,10 @@ export function FooterPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Rangkuman seluruh prop, termasuk yang tidak diberi bagian sendiri di atas. Semuanya opsional —{' '}
-          <C>{'<Footer />'}</C> tanpa prop tetap merender kerangkanya. Dua tipe pendukungnya:{' '}
-          <C>FooterMenu</C> = <C>{'{ label: string; url?: string }'}</C> dan <C>FooterSocial</C> ={' '}
-          <C>{'{ label?: string; url?: string; icon: ReactNode }'}</C>. Atribut HTML di luar daftar ini
-          tidak diteruskan ke elemen <C>{'<footer>'}</C>.
+          <Hl>{'<Footer />'}</Hl> tanpa prop tetap merender kerangkanya. Dua tipe pendukungnya:{' '}
+          <Hl>FooterMenu</Hl> = <Hl>{'{ label: string; url?: string }'}</Hl> dan <Hl>FooterSocial</Hl> ={' '}
+          <Hl>{'{ label?: string; url?: string; icon: ReactNode }'}</Hl>. Atribut HTML di luar daftar ini
+          tidak diteruskan ke elemen <Hl>{'<footer>'}</Hl>.
         </Lead>
         <PropsTable rows={footerProps} minWidth="48rem" />
       </FlowSection>
