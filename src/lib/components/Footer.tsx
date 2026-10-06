@@ -58,7 +58,7 @@ export function Footer({
         <div className="flex flex-col gap-7 @3xl:flex-row @3xl:items-center @3xl:gap-12">
           <div className="shrink-0">
             {logo ? (
-              // 64px, naik jadi 80px saat footer melebar. Tingginya dipatok dari
+              // 48px, naik jadi 60px saat footer melebar. Tingginya dipatok dari
               // logo lockup — mark plus wordmark plus baris nama instansi — dan
               // baris terakhir itulah yang menentukan batas bawahnya: di 44px ia
               // jatuh ke sekitar 6px dan berhenti terbaca.
@@ -79,7 +79,7 @@ export function Footer({
                 {menuRows.map((row, rowIndex) => (
                   <ul
                     key={rowIndex}
-                    className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-md"
+                    className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-base"
                   >
                     {row.map((menu, i) => (
                       <li key={i}>
@@ -103,7 +103,7 @@ export function Footer({
         <hr className="border-white/15" />
 
         <div className="flex flex-col gap-6 @xl:flex-row @xl:items-center @xl:justify-between">
-          {copyright && <p className="text-md">{copyright}</p>}
+          {copyright && <p className="text-base">{copyright}</p>}
 
           {socials.length > 0 && (
             <ul className="flex items-center gap-5">
