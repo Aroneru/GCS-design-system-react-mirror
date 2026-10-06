@@ -11,6 +11,19 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+## [0.3.1] - 2026-10-06
+
+Rilis perbaikan kecil. README di halaman npm ikut diperbarui: kini ada bagian
+Table, dan baris props Button sudah dibetulkan (`type="iconOnly"`,
+`as="anchor"`).
+
+### Diperbaiki
+
+- **`Footer`: ukuran teks menu dan hak cipta kini dipatok 16px.** Di 0.3.0
+  keduanya memakai kelas `text-md`, yang tidak dikenal Tailwind, sehingga tidak
+  menghasilkan CSS apa pun dan ukurannya ikut elemen induk: 16px di halaman
+  biasa, tetapi bisa lain di dalam wadah yang mengatur ukuran teksnya sendiri.
+
 ## [0.3.0] - 2026-10-06
 
 Rilis pertama dengan nama `@ceplok-ui/design-kit-react`. Sebelumnya paket ini
