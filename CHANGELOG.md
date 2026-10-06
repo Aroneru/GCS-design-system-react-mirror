@@ -11,9 +11,15 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
-Perubahan di bawah ini sudah ada di kode tetapi belum diterbitkan ke npm.
-Isinya menjadikan rilis berikutnya `0.2.0`, bukan `0.1.1`: ada sembilan komponen
-publik baru, dan dua perubahan yang memutus.
+## [0.3.0] - 2026-10-06
+
+Rilis pertama dengan nama `@ceplok-ui/design-kit-react`. Sebelumnya paket ini
+terbit sebagai `@stasi/design-kit-react`, yang kini ditandai deprecated.
+
+Versi 0.2.0 sempat terbit tanpa catatan di berkas ini, jadi daftar di bawah
+dihitung dari 0.1.0: ada dua belas komponen publik baru — `Modal`, `Popover`,
+`Sidebar`, dan `Spinner` di antaranya sudah ikut di 0.2.0 — dan tiga perubahan
+yang memutus, termasuk nama paketnya.
 
 ### Diubah
 
@@ -46,6 +52,12 @@ publik baru, dan dua perubahan yang memutus.
   gray-700 bergaris gray-600, label putih, dan caption gray-400. Kotak yang
   tercentang tetap memakai warna aplikasi. `inactive` meredupkan label dan
   caption ke gray-500.
+- **`Clipboard`** — nilai hanya-baca dengan tombol salin. Dua bentuk lewat
+  `variant`: `default` dan `segmented`, yang menambahkan `prefix` di depan nilai
+  (hanya tampilan, tidak ikut tersalin). Dua ukuran lewat `platform`, tampilan
+  gelap lewat `darkMode`, serta `onCopySuccess` dan `onCopyError` untuk
+  menanggapi hasil salin. Tipe pendukung `ClipboardVariant` dan
+  `ClipboardPlatform` ikut diekspor.
 - **`Datepicker`** — pemilih tanggal dengan kalender di panel melayang, dalam
   tiga bentuk lewat `type`: `single` (satu tanggal, dengan tombol Hari ini dan
   Hapus), `period` (satu kalender dengan pintasan Hari ini, Minggu ini, Bulan
@@ -69,12 +81,19 @@ publik baru, dan dua perubahan yang memutus.
   ditelusuri dengan panah, Home/End, serta PageUp/PageDown. Dengan `name`,
   tanggalnya ikut terkirim bersama formulir sebagai `YYYY-MM-DD`.
 
-  Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert, Breadcrumb, Checkbox,
-  Datepicker, FloatingLabel, InputField, Pagination, Radio, Search, Select, Sidebar, TextArea, Toast, Toggle, dan Upload
-  yang memilikinya; komponen lain menyusul.
+  Prop `darkMode` memberinya tampilan gelap.
 
   Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
   `DatepickerRangeProps` ikut diekspor.
+- **`Drawer`** — panel yang meluncur dari tepi layar, dikendalikan lewat
+  `open` + `onClose`; klik latar dan Esc menutupnya, kecuali dimatikan lewat
+  `closeOnOverlayClick` dan `closeOnEsc`. Sisinya dipilih lewat `position`
+  (`right`, `left`, `top`, `bottom`) dan ukurannya lewat `size` (`s`, `m`, `l`,
+  `xl`, `full`). Isinya menu navigasi lewat `items` — lengkap dengan submenu dan
+  `badge` — atau susunan sendiri dari `DrawerHeader`, `DrawerTitle`,
+  `DrawerDescription`, `DrawerBody`, dan `DrawerFooter`. Komponen pendukung
+  `DrawerTrigger`, `DrawerNavItem`, dan `DrawerSubItem` serta tipe-tipenya ikut
+  diekspor.
 - **`Dropdown`** — panel yang dibuka dari sebuah tombol (`trigger`), memakai
   HTML Popover API sehingga browser yang mengurus penutupan, top layer, dan
   urutan fokus. Barisnya diisi lewat `items`, atau `groups` bila perlu dipisah
@@ -130,6 +149,14 @@ publik baru, dan dua perubahan yang memutus.
   (`collapsed` + `onCollapse`). Dilengkapi dengan prop `darkMode` untuk tampilan gelap (latar belakang gray-800, menu aktif & profil gray-700, teks menu & ikon aktif gray-50, serta ikon inaktif gray-400). Tipe pendukung `SidebarItem`, `SidebarSubItem`,
   `SidebarGroup`, dan `SidebarUser` ikut diekspor.
 - **`Spinner`** — indikator proses dalam ukuran `default` dan `large`.
+- **`Table`** — tabel data dari `columns` dan `data`, dengan `rowKey` sebagai
+  kunci tiap baris. Toolbar-nya bisa memuat pencarian (`search`), filter
+  (`filter`), dan tombol aksi (`actions`). Mendukung seleksi baris
+  (`selectable`), pengurutan kolom (`sort`), pagination (`pagination`), kolom
+  yang menempel saat digulir ke samping (`sticky`), dua kerapatan baris lewat
+  `size`, serta keadaan `loading` dan `emptyText`. Sel bisa berisi tombol aksi
+  per baris dan gambar dengan pratinjau (`TableImage`). Tipe pendukungnya ikut
+  diekspor.
 - **`TextArea`: prop `darkMode`** — tampilan gelap sesuai desain: kotak,
   toolbar, dan area isian gray-800 dengan label putih. Bingkai editor dan garis
   pemisah toolbar tetap gray-300; tombol kirim memakai -600 (hover -700).
@@ -146,6 +173,11 @@ publik baru, dan dua perubahan yang memutus.
   `attach` (area seret-lepas bergaris putus-putus setinggi 230px). Tampilan gelap menyesuaikan warna latar (`gray-800`), teks, batas komponen (`gray-700`), serta status interaksi `drag`. Membungkus
   `<input type="file">` sungguhan, jadi dialog berkas dan pengiriman formulir
   bekerja apa adanya.
+- **Prop `darkMode` pada `Avatar`, `Card`, `Container`, `Dropdown`, `Hero`, dan
+  `Popover`** — tampilan gelap untuk masing-masing. Avatar hanya mengganti warna
+  latar inisial (foto tidak diubah), dan Dropdown hanya mengganti panel serta
+  baris bawaannya — isi `children` mengatur warnanya sendiri. Bawaannya `false`,
+  jadi tampilan yang sudah ada tetap terang.
 - Tipe **`NavbarContextItem`**, dipakai sebagai bentuk dasar item kontekstual
   pada Navbar.
 - Kelas **`.ds-scroll-y`** — scrollbar vertikal tipis untuk panel yang digulir:
@@ -153,6 +185,32 @@ publik baru, dan dua perubahan yang memutus.
   tanpa tombol panah. Pasangan `.ds-scroll-x`.
 
 ### Diubah
+
+- **Memutus — nama paket kini `@ceplok-ui/design-kit-react`.** Sebelumnya
+  `@stasi/design-kit-react`. Pasang paket baru, hapus yang lama, lalu ganti
+  namanya di setiap import — termasuk subpath ikon — dan di CSS:
+
+  ```sh
+  npm install @ceplok-ui/design-kit-react
+  npm uninstall @stasi/design-kit-react
+  ```
+
+  ```diff
+  - import { Button } from '@stasi/design-kit-react'
+  - import { User } from '@stasi/design-kit-react/icons/outline'
+  + import { Button } from '@ceplok-ui/design-kit-react'
+  + import { User } from '@ceplok-ui/design-kit-react/icons/outline'
+  ```
+
+  ```diff
+  - @import '@stasi/design-kit-react/styles.css';
+  - @source '../node_modules/@stasi/design-kit-react/dist/**/*.js';
+  + @import '@ceplok-ui/design-kit-react/styles.css';
+  + @source '../node_modules/@ceplok-ui/design-kit-react/dist/**/*.js';
+  ```
+
+  Jangan lupa baris `@source`: kalau masih menunjuk folder lama, Tailwind tidak
+  menemukan kelas milik komponen, sehingga tampilannya berantakan.
 
 - **Memutus — `contextualItems` pada Navbar tidak lagi menerima `false`.**
 
