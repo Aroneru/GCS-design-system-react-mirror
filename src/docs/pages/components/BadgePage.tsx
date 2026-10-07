@@ -1,17 +1,43 @@
-import { Badge } from '../../../lib'
+import { Clock } from 'flowbite-react-icons/solid'
+import { Badge, type BadgeSize, type BadgeVariant } from '../../../lib'
 import { DocExample } from '../../DocExample'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { ComponentPage, G, Section } from '../../pageKit'
 
 const badgeProps: PropRow[] = [
-  ['variant', 'string', 'gray', 'gray · brand · danger · warning · success'],
+  ['variant', 'string', 'gray', 'gray · danger · warning · success · brand'],
+  ['size', 'string', 'sm', 'sm · lg'],
+  ['icon', 'ReactNode', '-', 'Ikon di kiri label'],
+  ['dismissible', 'boolean', 'false', 'Tampilkan tombol tutup (×)'],
+  ['onDismiss', '() => void', '-', 'Dipanggil saat tombol tutup diklik'],
+  ['open', 'boolean', '-', 'Kendalikan tampil/sembunyi dari luar'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap'],
 ]
+
+const VARIANTS: BadgeVariant[] = ['gray', 'danger', 'warning', 'success', 'brand']
+const SIZES: BadgeSize[] = ['sm', 'lg']
+
+function Grid({ darkMode = false }: { darkMode?: boolean }) {
+  return (
+    <div className={darkMode ? 'flex flex-col gap-4 rounded-lg bg-gray-900 p-6' : 'flex flex-col gap-4'}>
+      {SIZES.map((size) => (
+        <div key={size} className="flex flex-wrap items-center gap-4">
+          {VARIANTS.map((v) => (
+            <Badge key={v} variant={v} size={size} icon={<Clock />} dismissible darkMode={darkMode}>
+              Badge
+            </Badge>
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export function BadgePage() {
   return (
     <ComponentPage
       title="Badge"
-      description="Label status ringkas untuk menandai kondisi sebuah entitas. Lima variant warna dengan makna semantik."
+      description="Label status ringkas untuk menandai kondisi sebuah entitas. Lima variant warna, dua ukuran, ikon dan tombol tutup opsional."
     >
       <Section title="Variants">
         <DocExample
@@ -26,10 +52,38 @@ export function BadgePage() {
           }
         >
           <Badge variant="gray">Draft</Badge>
-          <Badge variant="brand">Baru</Badge>
-          <Badge variant="success">Aktif</Badge>
-          <Badge variant="warning">Menunggu</Badge>
           <Badge variant="danger">Ditolak</Badge>
+          <Badge variant="warning">Menunggu</Badge>
+          <Badge variant="success">Aktif</Badge>
+          <Badge variant="brand">Baru</Badge>
+        </DocExample>
+      </Section>
+
+      <Section title="Ikon, ukuran, dan tombol tutup">
+        <DocExample
+          code={
+            <>
+              {'<Badge size="'}
+              <G>lg</G>
+              {'" icon={<Clock />} dismissible>Badge</Badge>'}
+            </>
+          }
+        >
+          <Grid />
+        </DocExample>
+      </Section>
+
+      <Section title="Dark mode">
+        <DocExample
+          code={
+            <>
+              {'<Badge variant="success" icon={<Clock />} dismissible '}
+              <G>darkMode</G>
+              {'>Badge</Badge>'}
+            </>
+          }
+        >
+          <Grid darkMode />
         </DocExample>
       </Section>
 

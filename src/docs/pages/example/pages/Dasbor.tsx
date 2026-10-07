@@ -1,7 +1,8 @@
 import { Alert, Badge, Button, Icon, Table } from '../../../../lib'
 import type { TableColumn } from '../../../../lib'
-import { CheckCircle, ChevronRight, FileLines, UsersGroup } from '../../../../lib/icons/outline'
-import { PENGAJUAN, VARIAN_STATUS, type Pengajuan } from '../data'
+import { ArrowUp, CheckCircle, ChevronRight, FileLines, UsersGroup } from '../../../../lib/icons/outline'
+import { PENGAJUAN, type Pengajuan } from '../data'
+import { StatusBadge } from '../StatusBadge'
 
 const STATISTIK = [
   { label: 'Pengajuan masuk', nilai: '1.284', delta: '+12%', Ikon: FileLines },
@@ -22,7 +23,7 @@ const KOLOM: TableColumn<Pengajuan>[] = [
     key: 'status',
     header: 'Status',
     align: 'left',
-    cell: (p) => <Badge variant={VARIAN_STATUS[p.status]}>{p.status}</Badge>,
+    cell: (p) => <StatusBadge status={p.status} />,
   },
 ]
 
@@ -41,7 +42,9 @@ export function Dasbor() {
               <Icon className="text-primary-700">
                 <Ikon />
               </Icon>
-              <Badge variant="success">{delta}</Badge>
+              <Badge variant="success" icon={<ArrowUp />}>
+                {delta}
+              </Badge>
             </div>
             <p className="mt-5 text-heading-2 font-black text-gray-900">{nilai}</p>
             <p className="mt-1 text-body-sm text-gray-500">{label}</p>
