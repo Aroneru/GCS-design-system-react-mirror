@@ -98,7 +98,6 @@ const dropdownProps: PropRow[] = [
   ['items', 'DropdownItem[]', 'undefined', 'Daftar aksi tanpa pengelompokan.'],
   ['groups', 'DropdownGroup[]', 'undefined', 'Aksi terkelompok, lengkap dengan label dan pemisah antar-kelompok.'],
   ['children', 'ReactNode', 'undefined', 'Isi panel bila bukan daftar aksi. Diabaikan selama items atau groups terisi.'],
-  ['attached', 'boolean', 'false', 'Mengaktifkan positioning panel relatif terhadap trigger dengan penyesuaian batas viewport, termasuk flip dan pembatasan tinggi saat ruang terbatas.'],
   ['darkMode', 'boolean', 'false', 'Menggunakan tampilan gelap pada panel dan konten yang dihasilkan Dropdown.'],
   ['className', 'string', 'undefined', 'Class tambahan pada pembungkus terluar.'],
   ['contentLabel', 'string', 'undefined', 'Nama panel bagi pembaca layar; hanya terpasang pada bentuk daftar pilihan.'],
@@ -211,7 +210,6 @@ interface ContohProps extends VariationOptions {
   example: DropdownExample
   groupName: string
   label?: string
-  attached?: boolean
   darkMode?: boolean
 }
 
@@ -228,7 +226,6 @@ function ContohDropdown({
   withSeparator,
   withDescription,
   withDisabled,
-  attached,
   darkMode,
 }: ContohProps) {
   const opsi = { withSeparator, withDescription, withDisabled }
@@ -237,15 +234,15 @@ function ContohDropdown({
   if (example === 'actions' || example === 'icons') {
     const withIcons = example === 'icons'
     return withSeparator ? (
-      <Dropdown darkMode={darkMode} attached={attached} trigger={trigger()} groups={kelompokAksi(opsi, withIcons)} aria-label="Daftar aksi" />
+      <Dropdown darkMode={darkMode} trigger={trigger()} groups={kelompokAksi(opsi, withIcons)} aria-label="Daftar aksi" />
     ) : (
-      <Dropdown darkMode={darkMode} attached={attached} trigger={trigger()} items={aksi(opsi, withIcons)} aria-label="Daftar aksi" />
+      <Dropdown darkMode={darkMode} trigger={trigger()} items={aksi(opsi, withIcons)} aria-label="Daftar aksi" />
     )
   }
 
   if (example === 'scroll') {
     return (
-      <Dropdown darkMode={darkMode} attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
+      <Dropdown darkMode={darkMode} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
         <div className={`flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain ${darkMode ? darkScrollClassName : ''}`}>
           <ScrollContentItems {...opsi} darkMode={darkMode} />
         </div>
@@ -255,7 +252,7 @@ function ContohDropdown({
 
   if (example === 'radio') {
     return (
-      <Dropdown darkMode={darkMode} attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih akses">
+      <Dropdown darkMode={darkMode} trigger={trigger()} contentClassName="p-4" aria-label="Pilih akses">
         <div className="flex flex-col gap-4">
           <Radio darkMode={darkMode} className={rowClassName} name={groupName} value="viewer" label="Viewer" />
           <Radio darkMode={darkMode} className={rowClassName} name={groupName} value="editor" label="Editor" helperText={withDescription ? 'Dapat mengubah konten.' : undefined} defaultChecked />
@@ -274,7 +271,7 @@ function ContohDropdown({
   }
 
   return (
-    <Dropdown darkMode={darkMode} attached={attached} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi">
+    <Dropdown darkMode={darkMode} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi">
       <div className="flex flex-col gap-4">
         <Checkbox darkMode={darkMode} className={rowClassName} label="Email" helperText={withDescription ? 'Kirim pembaruan melalui email.' : undefined} />
         <Checkbox darkMode={darkMode} className={rowClassName} label="Push notification" helperText={withDescription ? 'Tampilkan pada perangkat.' : undefined} defaultChecked />
@@ -320,7 +317,6 @@ function SelectionDemo({ darkMode = false }: { darkMode?: boolean }) {
   return (
     <Dropdown
       darkMode={darkMode}
-      attached
       contentLabel="Urutan hasil"
       trigger={trigger(`Urutkan: ${selected}`)}
       items={options.map((label) => ({
@@ -339,12 +335,10 @@ function SelectionPlayground({
   withSeparator,
   withDescription,
   withDisabled,
-  attached,
   darkMode,
 }: VariationOptions & {
   selected: string
   onSelectedChange: (value: string) => void
-  attached: boolean
   darkMode: boolean
 }) {
   const items: DropdownItem[] = [
@@ -374,7 +368,6 @@ function SelectionPlayground({
   return (
     <Dropdown
       darkMode={darkMode}
-      attached={attached}
       contentLabel="Urutan hasil"
       trigger={trigger(`Urutkan: ${selected}`)}
       {...(withSeparator
@@ -433,9 +426,8 @@ function SelectionExampleCode({
   withSeparator,
   withDescription,
   withDisabled,
-  attached,
   darkMode,
-}: VariationOptions & { selected: string; attached: boolean; darkMode: boolean }) {
+}: VariationOptions & { selected: string; darkMode: boolean }) {
   const item = (label: string, description?: string, disabled?: boolean) => (
     <>
       {'        {\n          label: '}
@@ -487,7 +479,6 @@ function SelectionExampleCode({
       {'Dropdown'}
       {'\n'}
       {darkMode && <>{'      '}<H>darkMode</H>{'\n'}</>}
-      {attached && <>{'      '}<H>attached</H>{'\n'}</>}
       {'      '}
       <H>contentLabel</H>
       {'='}
@@ -524,13 +515,11 @@ function ExampleCode({
   withSeparator,
   withDescription,
   withDisabled,
-  attached,
   darkMode,
 }: VariationOptions & {
   mode: DropdownMode
   selected: string
   example: DropdownExample
-  attached: boolean
   darkMode: boolean
 }) {
   if (mode === 'selection') {
@@ -540,7 +529,6 @@ function ExampleCode({
         withSeparator={withSeparator}
         withDescription={withDescription}
         withDisabled={withDisabled}
-        attached={attached}
         darkMode={darkMode}
       />
     )
@@ -579,7 +567,6 @@ function ExampleCode({
           <>
             {'\n<Dropdown\n'}
             {darkMode && <>{'  '}<H>darkMode</H>{'\n'}</>}
-            {attached && <>{'  '}<H>attached</H>{'\n'}</>}
             {'  trigger={trigger}\n  '}
             <H>groups</H>
             {'={[\n    {\n      id: \'utama\',\n      items: [\n        '}
@@ -614,7 +601,6 @@ function ExampleCode({
           <>
             {'\n<Dropdown\n'}
             {darkMode && <>{'  '}<H>darkMode</H>{'\n'}</>}
-            {attached && <>{'  '}<H>attached</H>{'\n'}</>}
             {'  trigger={trigger}\n  items={[\n    '}
             <ItemCode
               label="Profil"
@@ -646,7 +632,6 @@ function ExampleCode({
         <>
           {'\nconst darkMode = '}{darkMode ? 'true' : 'false'}{'\n\n<Dropdown '}
           <H>darkMode</H>{'={darkMode} '}
-          {attached && <><H>attached</H>{' '}</>}
           {'trigger={trigger} '}
           <H>contentClassName</H>
           {'="p-4">\n'}
@@ -726,7 +711,6 @@ export function DropdownPage() {
   const [withSeparator, setWithSeparator] = useState(false)
   const [withDescription, setWithDescription] = useState(false)
   const [withDisabled, setWithDisabled] = useState(false)
-  const [attached, setAttached] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
   const [selected, setSelected] = useState('Terbaru')
   const separatorDataDriven =
@@ -928,13 +912,8 @@ export function DropdownPage() {
             <SelectionDemo />
           </div>
         </Stage>
-        <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-          Prop <Hl>attached</Hl> mengaktifkan positioning panel relatif terhadap trigger dengan penyesuaian batas viewport,
-          termasuk flip dan pembatasan tinggi saat ruang terbatas.
-        </p>
         <SectionCode>
           {"const [selected, setSelected] = useState('Terbaru')\n\n<Dropdown"}
-          {'\n  '}<H>attached</H>
           {'\n  '}<H>contentLabel</H>{'="Urutan hasil"'}
           {'\n  '}<H>trigger</H>{'={<button type="button">Urutkan: {selected}</button>}\n  '}
           <H>items</H>
@@ -1006,7 +985,6 @@ export function DropdownPage() {
                 withSeparator={withSeparator}
                 withDescription={withDescription}
                 withDisabled={withDisabled}
-                attached={attached}
                 darkMode={activeDarkMode}
               />
             ) : (
@@ -1016,7 +994,6 @@ export function DropdownPage() {
                 withSeparator={withSeparator}
                 withDescription={withDescription}
                 withDisabled={withDisabled}
-                attached={attached}
                 darkMode={activeDarkMode}
               />
             )}
@@ -1069,16 +1046,6 @@ export function DropdownPage() {
               />
             </div>
           </Control>
-          <Control label="Attached">
-            <div onPointerDownCapture={ingatKeadaan}>
-              <Segmented
-                label="Tempelkan panel pada trigger"
-                value={attached}
-                onChange={(value) => ubah(() => setAttached(value))}
-                options={booleanOptions}
-              />
-            </div>
-          </Control>
           <Control label="Tampilan">
             <div onPointerDownCapture={ingatKeadaan}>
               <Segmented
@@ -1127,6 +1094,10 @@ export function DropdownPage() {
           aksesibel, misalnya lewat <Hl>aria-label</Hl>. Anchor, div/span, Fragment, button yang
           dibungkus elemen lain, dan komponen yang menelan atribut trigger tidak didukung.
         </p>
+        <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+          Panel memiliki lebar minimum mengikuti trigger dan dapat melebar sesuai konten atau class
+          tambahan consumer melalui <Hl>contentClassName</Hl>, tetap dibatasi agar aman di viewport.
+        </p>
         <SectionCode flush>
           <ExampleCode
             mode={mode}
@@ -1135,7 +1106,6 @@ export function DropdownPage() {
             withSeparator={withSeparator}
             withDescription={withDescription}
             withDisabled={withDisabled}
-            attached={attached}
             darkMode={activeDarkMode}
           />
         </SectionCode>

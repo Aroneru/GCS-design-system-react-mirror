@@ -73,17 +73,6 @@ export interface DropdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chi
    */
   children?: ReactNode
   /**
-   * Menempelkan panel pada tombolnya. Lebar tombol menjadi batas minimum;
-   * panel dapat melebar mengikuti konten hingga batas aman viewport. Konten
-   * panjang, termasuk teks tanpa jeda, dibungkus di dalam batas tersebut.
-   *
-   * Dipakai bila panel harus terbaca sebagai bagian dari field di atasnya —
-   * begitulah Select dan Search memasang daftar pilihannya. Posisi panel tetap
-   * mengikuti tombol serta dapat dibalik vertikal dan dijepit horizontal agar
-   * aman di dalam viewport.
-   */
-  attached?: boolean
-  /**
    * Nama panel bagi pembaca layar. Hanya terpasang pada bentuk daftar
    * pilihan, karena menu aksi sudah cukup dikenali lewat tombolnya.
    */
@@ -144,7 +133,6 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     items,
     groups,
     children,
-    attached,
     darkMode = false,
     className,
     contentLabel,
@@ -179,32 +167,37 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     if (panel?.isConnected && panel.matches(':popover-open')) panel.hidePopover()
   }, [])
 
-  /**
-   * Panel berada di top layer, jadi posisinya tidak bisa diwariskan dari
-   * induknya. Dalam bentuk `attached` ia diukur sendiri dari kotak tombol,
-   * dan diukur ulang selama terbuka karena elemen `fixed` tidak ikut bergerak
-   * saat halaman digulir.
-   */
+  /** Panel top-layer diukur dari tombol dan selalu dijaga di dalam viewport. */
   const tempatkan = useCallback(() => {
     const panel = contentRef.current
     const tombol = pemicu()
     if (!panel || !tombol) return
 
     const kotak = tombol.getBoundingClientRect()
-    panel.style.minWidth = `${Math.min(kotak.width, window.innerWidth - JARAK * 2)}px`
+    const lebarAman = Math.max(0, window.innerWidth - JARAK * 2)
+    const lebarMinimum = Math.min(kotak.width, lebarAman)
+    const tulis = (property: 'left' | 'top' | 'minWidth' | 'maxWidth' | 'maxHeight', value: string) => {
+      if (panel.style[property] !== value) panel.style[property] = value
+    }
+
+    tulis('minWidth', `${lebarMinimum}px`)
+    tulis('maxWidth', `${lebarAman}px`)
 
     const lebar = panel.offsetWidth || kotak.width
-    panel.style.left = `${Math.max(JARAK, Math.min(kotak.left, window.innerWidth - lebar - JARAK))}px`
+    tulis('left', `${Math.max(JARAK, Math.min(kotak.left, window.innerWidth - lebar - JARAK))}px`)
 
-    // Dibalik ke atas hanya bila memang tidak muat di bawah sekaligus lebih
-    // lapang di atas; kalau dua-duanya sempit, tetap di bawah supaya arah
-    // bukanya tidak berubah-ubah.
-    const tinggi = panel.offsetHeight
-    const ruangBawah = window.innerHeight - kotak.bottom - JARAK
-    panel.style.top =
-      tinggi > ruangBawah && kotak.top - JARAK > ruangBawah
-        ? `${Math.max(JARAK, kotak.top - tinggi - JARAK)}px`
-        : `${kotak.bottom + JARAK}px`
+    const ruangBawah = Math.max(0, window.innerHeight - JARAK - (kotak.bottom + JARAK))
+    const ruangAtas = Math.max(0, kotak.top - JARAK - JARAK)
+    const tinggiAlami = Math.max(panel.scrollHeight, panel.offsetHeight)
+    const keAtas = tinggiAlami > ruangBawah && ruangAtas > ruangBawah
+    const ruangTerpilih = keAtas ? ruangAtas : ruangBawah
+
+    tulis('maxHeight', `${ruangTerpilih}px`)
+    const tinggiPanel = panel.offsetHeight
+    tulis(
+      'top',
+      keAtas ? `${Math.max(JARAK, kotak.top - JARAK - tinggiPanel)}px` : `${kotak.bottom + JARAK}px`,
+    )
   }, [])
 
   const batalkanPenempatan = useCallback(() => {
@@ -275,13 +268,13 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     const sebelum = (e: Event) => {
       const jadiBuka = (e as PeristiwaToggle).newState === 'open'
       setTerbuka(jadiBuka)
-      if (jadiBuka && attached) tempatkan()
+      if (jadiBuka) tempatkan()
       else if (!jadiBuka) batalkanPenempatan()
     }
 
     const sesudah = (e: Event) => {
       if ((e as PeristiwaToggle).newState === 'open') {
-        if (attached) tempatkan()
+        tempatkan()
         // Pada daftar pilihan, fokus jatuh ke baris yang sedang aktif supaya
         // panah bergerak dari sana — seperti perilaku `<select>` bawaan.
         if (pilihan) {
@@ -310,38 +303,31 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
       panel.removeEventListener('beforetoggle', sebelum)
       panel.removeEventListener('toggle', sesudah)
     }
-  }, [attached, batalkanPenempatan, pilihan, tempatkan])
-
-  useLayoutEffect(() => {
-    if (attached) return
-
-    batalkanPenempatan()
-    const panel = contentRef.current
-    if (!panel) return
-    panel.style.removeProperty('top')
-    panel.style.removeProperty('left')
-    panel.style.removeProperty('min-width')
-  }, [attached, batalkanPenempatan])
+  }, [batalkanPenempatan, pilihan, tempatkan])
 
   useEffect(() => {
-    if (!attached || !terbuka) return
-    const ikut = () => mintaPenempatan()
+    if (!terbuka) return
+    // Event scroll sudah dikirim selaras dengan pembaruan visual peramban.
+    // Tempatkan langsung agar panel tidak tertinggal satu frame dari tombol.
+    const ikutScroll = () => tempatkan()
+    const ikutResize = () => mintaPenempatan()
     // `true` supaya guliran pada pembungkus mana pun ikut terdengar, bukan
     // hanya guliran halaman.
-    window.addEventListener('scroll', ikut, true)
-    window.addEventListener('resize', ikut)
+    window.addEventListener('scroll', ikutScroll, true)
+    window.addEventListener('resize', ikutResize)
     return () => {
-      window.removeEventListener('scroll', ikut, true)
-      window.removeEventListener('resize', ikut)
+      window.removeEventListener('scroll', ikutScroll, true)
+      window.removeEventListener('resize', ikutResize)
       batalkanPenempatan()
     }
-  }, [attached, batalkanPenempatan, mintaPenempatan, terbuka])
+  }, [batalkanPenempatan, mintaPenempatan, tempatkan, terbuka])
 
   useEffect(() => {
-    if (!attached || !terbuka) return
+    if (!terbuka) return
 
     const tombol = pemicu()
-    if (!tombol) return
+    const panel = contentRef.current
+    if (!tombol || !panel) return
 
     // ResizeObserver menangkap perubahan ukuran tombol tanpa menunggu resize
     // jendela. Perpindahan posisi tidak punya observer DOM khusus, jadi selama
@@ -349,6 +335,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     // dihitung ulang bila benar-benar bergerak.
     const ukuran = new ResizeObserver(mintaPenempatan)
     ukuran.observe(tombol)
+    ukuran.observe(panel)
 
     let kotak = tombol.getBoundingClientRect()
     let frame = 0
@@ -356,7 +343,9 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
       const berikut = tombol.getBoundingClientRect()
       if (berikut.left !== kotak.left || berikut.top !== kotak.top) {
         kotak = berikut
-        mintaPenempatan()
+        // Pemeriksaan ini sendiri sudah berjalan di dalam RAF; menjadwalkan
+        // RAF kedua membuat panel tertinggal satu frame saat layout bergerak.
+        tempatkan()
       }
       frame = window.requestAnimationFrame(ikutiGerak)
     }
@@ -367,7 +356,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
       window.cancelAnimationFrame(frame)
       batalkanPenempatan()
     }
-  }, [attached, batalkanPenempatan, mintaPenempatan, terbuka])
+  }, [batalkanPenempatan, mintaPenempatan, tempatkan, terbuka])
 
   useEffect(() => {
     if (!terbuka) return
@@ -580,15 +569,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
   const polos = daftar.length === 1 && !daftar[0].label && !daftar[0].separator
 
   return (
-    <div
-      ref={pasangWrap}
-      // Dalam bentuk `attached` pembungkusnya sengaja tidak membentuk kotak:
-      // penempatan panel sudah dihitung sendiri, jadi induknya bebas menata
-      // tombolnya — sebagai isian yang memanjang, atau sebagai lapisan di atas
-      // field yang sudah ada.
-      className={cn(attached ? 'contents' : 'relative inline-block', className)}
-      {...props}
-    >
+    <div ref={pasangWrap} className={cn('inline-block', className)} {...props}>
       {cloneElement(trigger, {
         popoverTarget: contentId,
         popoverTargetAction: 'toggle',
@@ -610,11 +591,8 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
           }
         }}
         className={cn(
-          'fixed inset-auto max-w-[calc(100vw-1rem)] overflow-x-hidden rounded-lg shadow-md [overflow-wrap:anywhere]',
+          'fixed inset-auto m-0 overflow-x-hidden overflow-y-auto overscroll-contain rounded-lg shadow-md [overflow-wrap:anywhere]',
           darkMode ? 'bg-gray-800 text-gray-300' : 'bg-surface text-content',
-          attached
-            ? 'm-0 max-h-72 overflow-y-auto overscroll-contain'
-            : 'mt-2 mr-0 mb-0 ml-0 w-max min-w-[min(anchor-size(width),calc(100vw-1rem))] [position-area:bottom_center]',
           pakaiDaftar && 'py-1',
           contentClassName,
         )}

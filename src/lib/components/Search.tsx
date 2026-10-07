@@ -277,7 +277,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
             </select>
 
             <Dropdown
-              attached
+              className="absolute inset-0"
               contentLabel={categoryPlaceholder}
               items={itemKategori}
               trigger={
