@@ -11,23 +11,140 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+## [0.3.1] - 2026-10-06
+
+Rilis perbaikan kecil. README di halaman npm ikut diperbarui: kini ada bagian
+Table, dan baris props Button sudah dibetulkan (`type="iconOnly"`,
+`as="anchor"`).
+
+### Diperbaiki
+
+- **`Footer`: ukuran teks menu dan hak cipta kini dipatok 16px.** Di 0.3.0
+  keduanya memakai kelas `text-md`, yang tidak dikenal Tailwind, sehingga tidak
+  menghasilkan CSS apa pun dan ukurannya ikut elemen induk: 16px di halaman
+  biasa, tetapi bisa lain di dalam wadah yang mengatur ukuran teksnya sendiri.
+
 ## [0.3.0] - 2026-10-06
 
 Rilis pertama dengan nama `@ceplok-ui/design-kit-react`. Sebelumnya paket ini
 terbit sebagai `@stasi/design-kit-react`, yang kini ditandai deprecated.
-
-Versi 0.2.0 sempat terbit tanpa catatan di berkas ini, jadi daftar di bawah
-dihitung dari 0.1.0: ada dua belas komponen publik baru — `Modal`, `Popover`,
-`Sidebar`, dan `Spinner` di antaranya sudah ikut di 0.2.0 — dan tiga perubahan
-yang memutus, termasuk nama paketnya.
+Dibanding 0.2.0 ada enam perubahan yang memutus, termasuk nama paketnya.
 
 ### Diubah
 
-- **`Footer`: logo dibesarkan** dari 40px (44px saat footer ≥ 768px) jadi 64px
-  (80px). Ukuran lama dipatok untuk logo yang isinya cuma mark; begitu logonya
-  berupa lockup dengan baris nama instansi, baris itu jatuh ke sekitar 6px dan
-  berhenti terbaca. Consumer yang logonya mark polos akan melihatnya membesar —
-  pakai `logoContent` bila ukuran lamanya memang disengaja.
+- **Memutus — nama paket kini `@ceplok-ui/design-kit-react`.** Sebelumnya
+  `@stasi/design-kit-react`. Pasang paket baru, hapus yang lama, lalu ganti
+  namanya di setiap import — termasuk subpath ikon — dan di CSS:
+
+  ```sh
+  npm install @ceplok-ui/design-kit-react
+  npm uninstall @stasi/design-kit-react
+  ```
+
+  ```diff
+  - import { Button } from '@stasi/design-kit-react'
+  - import { User } from '@stasi/design-kit-react/icons/outline'
+  + import { Button } from '@ceplok-ui/design-kit-react'
+  + import { User } from '@ceplok-ui/design-kit-react/icons/outline'
+  ```
+
+  ```diff
+  - @import '@stasi/design-kit-react/styles.css';
+  - @source '../node_modules/@stasi/design-kit-react/dist/**/*.js';
+  + @import '@ceplok-ui/design-kit-react/styles.css';
+  + @source '../node_modules/@ceplok-ui/design-kit-react/dist/**/*.js';
+  ```
+
+  Jangan lupa baris `@source`: kalau masih menunjuk folder lama, Tailwind tidak
+  menemukan kelas milik komponen, sehingga tampilannya berantakan.
+
+- **Memutus — `Modal` kini dibuka oleh tombol `trigger`, tanpa `open` dan
+  `onClose`.** Modal mengurus sendiri buka-tutupnya: tombol yang diberikan lewat
+  `trigger` membukanya, sedangkan tombol tutup, klik latar, dan Esc menutupnya —
+  masing-masing bisa dimatikan lewat `showCloseButton`, `closeOnBackdrop`, dan
+  `closeOnEscape`. `ModalHeader`, `ModalBody`, dan `ModalFooter` dihapus;
+  isinya kini diisi lewat `title`, `children`, dan `footer`. `footer` boleh
+  berupa fungsi yang menerima `close`, untuk tombol yang menutup Modal.
+
+  ```diff
+  - <Button onClick={() => setOpen(true)}>Buka</Button>
+  - <Modal open={open} onClose={() => setOpen(false)}>
+  -   <ModalHeader>Ketentuan Layanan</ModalHeader>
+  -   <ModalBody>…</ModalBody>
+  -   <ModalFooter>
+  -     <Button onClick={() => setOpen(false)}>Setuju</Button>
+  -   </ModalFooter>
+  - </Modal>
+  + <Modal
+  +   trigger={<Button>Buka</Button>}
+  +   title="Ketentuan Layanan"
+  +   footer={({ close }) => <Button onClick={close}>Setuju</Button>}
+  + >
+  +   …
+  + </Modal>
+  ```
+
+  Tidak ada lagi prop untuk membukanya dari kode, jadi Modal selalu dibuka oleh
+  tombol `trigger`. Variant baru `popup` untuk konten ringkas: tanpa `title`
+  dan `size`, dengan footer tanpa garis pemisah. Tipe pendukung `ModalVariant`
+  ikut diekspor.
+
+- **Memutus — `Popover` kini menempel pada `trigger`.** Di 0.2.0 Popover hanya
+  panel diam yang ditempatkan sendiri; kini ia terbuka saat elemen `trigger`
+  diklik dan melayang di sisi yang dipilih lewat `side`. Prop `trigger` wajib,
+  jadi kode lama gagal dikompilasi. Buka-tutupnya bisa dikendalikan lewat
+  `open` + `onOpenChange`, atau diberi nilai awal lewat `defaultOpen`.
+
+  ```diff
+  - <Popover title="Info" side="top">…</Popover>
+  + <Popover trigger={<Button>Info</Button>} title="Info" side="top">
+  +   …
+  + </Popover>
+  ```
+
+- **Memutus — `theme="purple"` pada `Button` dan `Pagination` kini
+  `theme="simaya"`.** Namanya kini sama dengan nilai `application` pada komponen
+  form; warnanya tidak berubah.
+
+  ```diff
+  - <Button theme="purple">Kirim</Button>
+  + <Button theme="simaya">Kirim</Button>
+  ```
+
+- **Memutus — `as="a"` pada `Button` kini `as="anchor"`.** Nilai lama tidak
+  lagi dikenali. Di TypeScript kodenya gagal dikompilasi; di JavaScript Button
+  jatuh ke `<button>` biasa, jadi `href`-nya tidak lagi membuka apa pun.
+
+  ```diff
+  - <Button as="a" href="/daftar">Daftar</Button>
+  + <Button as="anchor" href="/daftar">Daftar</Button>
+  ```
+
+- **Memutus — aksi toolbar `upload` pada TextArea kini `download`.**
+
+  ```diff
+  - | 'upload'
+  + | 'download'
+  ```
+
+  Alat terakhir toolbar editor di desain adalah unduh (panah turun ke baki),
+  bukan unggah, jadi nama aksi dan labelnya ikut diganti (`Unduh`). Di
+  TypeScript, kode yang memeriksa `'upload'` di `onToolbarAction` akan gagal
+  dikompilasi; di JavaScript cabangnya tidak pernah terpanggil lagi. Ganti
+  dengan `'download'`.
+
+- **`Button`: hover varian `outline` bertema `gray` lebih tegas.** Latarnya kini
+  gray-100 (sebelumnya gray-50), dan teks serta garisnya ikut menggelap:
+  gray-700 pada `tone="light"`, gray-900 pada `tone="dark"`.
+- **`Footer`: logo, teks, dan ikon dibesarkan; menu dipusatkan.** Logo dari 40px
+  (44px saat footer ≥ 768px) jadi 48px (60px). Ukuran lama dipatok untuk logo
+  yang isinya cuma mark; begitu logonya berupa lockup dengan baris nama
+  instansi, baris itu jatuh ke sekitar 6px dan berhenti terbaca. Consumer yang
+  logonya mark polos akan melihatnya membesar — pakai `logoContent` bila ukuran
+  lamanya memang disengaja. Menu kini disusun per baris berisi paling banyak
+  lima, dan setiap baris dipusatkan, termasuk baris sisa yang lebih pendek dan
+  saat footer sempit. Teks menu dan hak cipta naik dari 14px ke 16px, ikon
+  media sosial dari 22px ke 26px.
 - **`Select`: daftar pilihannya kini panel Dropdown**, bukan popup milik sistem
   operasi, jadi rupanya seragam dengan menu lain di kit ini. API-nya tidak
   berubah: nilainya tetap dibawa elemen `<select>` yang dirender tersembunyi,
@@ -37,6 +154,14 @@ yang memutus, termasuk nama paketnya.
   ponsel tidak lagi muncul pemilih layar penuh milik sistem, dan `ref` masih
   menunjuk `<select>` yang kini tersembunyi — memanggil `.focus()` padanya tidak
   lagi memfokuskan field yang terlihat.
+- **`Sidebar`: rupa dan perilaku menu disesuaikan.** Latar menu aktif dan saat
+  di-hover kini gray-100 (sebelumnya gray-50). Ikon menu diwarnai Sidebar —
+  gray-500, lalu gray-900 saat aktif atau di-hover — dan dipatok 20px, termasuk
+  ikon submenu yang sebelumnya 16px. Panah tombol lipat dan panah submenu
+  membesar dari 16px ke 28px. Tombol lipat kini hanya muncul bila ada menu yang
+  memakai ikon, karena saat ringkas hanya ikonnya yang tersisa. Menu, submenu,
+  dan profil yang `href`-nya kosong atau `"#"` tidak lagi menavigasi saat
+  diklik.
 
 ### Ditambahkan
 
@@ -46,8 +171,17 @@ yang memutus, termasuk nama paketnya.
   gray-800. Bawaannya `false`, jadi Alert yang sudah ada tetap terang.
 - **`Avatar`** — lingkaran identitas berisi foto (`src`) atau inisial
   (`initials`) dalam tiga ukuran lewat `size` (`small` 24px, `default` 32px,
-  `large` 80px). Gambar yang gagal dimuat jatuh sendiri ke inisial.
-- **`Breadcrumb`: prop `darkMode`** — tampilan gelap: teks menu aktif menjadi gray-300, teks menu inaktif dan separator ikon menjadi gray-400, serta dukungan properti navigasi yang dinonaktifkan (`onClick` preventDefault) untuk dokumentasi.
+  `large` 80px). Gambar yang gagal dimuat jatuh sendiri ke inisial. Prop
+  `darkMode` hanya mengganti warna latar inisial; fotonya tidak diubah. Tipe
+  pendukung `AvatarSize` ikut diekspor.
+- **`Breadcrumb`: prop `darkMode`** — tampilan gelap: menu aktif gray-300, menu
+  lain dan ikon pemisah gray-400. `BreadcrumbItem` kini juga menerima `onClick`,
+  misalnya untuk menangani navigasi sendiri.
+- **`Card`, `Container`, dan `Hero`: prop `darkMode`** — tampilan gelap. Card
+  menjadi kartu gray-800 dengan judul putih, deskripsi gray-400, dan tautan
+  primary-500; Container memberi latar gray-800 dan teks gray-300 pada elemen
+  dalamnya; Hero hanya mengganti warna latar dan teks. Bawaannya `false`, jadi
+  tampilan yang sudah ada tetap terang.
 - **`Checkbox`: prop `darkMode`** — tampilan gelap sesuai desain: kotak
   gray-700 bergaris gray-600, label putih, dan caption gray-400. Kotak yang
   tercentang tetap memakai warna aplikasi. `inactive` meredupkan label dan
@@ -112,7 +246,11 @@ yang memutus, termasuk nama paketnya.
   itulah yang dipakai Select dan Search untuk daftar pilihannya, jadi panel
   melayang di seluruh kit ini hanya ada satu.
 
-  Tipe pendukung `DropdownItem` dan `DropdownGroup` ikut diekspor.
+  Baris berisiko diberi `tone: 'danger'` agar tampil merah. Prop `darkMode`
+  mengganti panel dan baris bawaannya; isi `children` mengatur warnanya sendiri.
+
+  Tipe pendukung `DropdownItem`, `DropdownGroup`, dan `DropdownItemTone` ikut
+  diekspor.
 - **`FloatingLabel`: prop `darkMode`** — tampilan gelap sesuai desain: kotak
   gray-800 dengan teks, ikon, dan tombol hapus gray-400. Garis aksen tidak
   berubah, tetapi label yang naik satu tingkat lebih terang (primary-500,
@@ -121,42 +259,52 @@ yang memutus, termasuk nama paketnya.
   gray-800 dengan label putih; garisnya menyatu dengan latar kecuali saat
   `typing` (warna aplikasi) dan `failed` (red-500). Teks yang diketik putih,
   placeholder dan caption abu-abu.
-- **`Modal`** — dialog berbasis elemen `<dialog>` native, jadi top layer,
-  penguncian fokus, dan latar inert diurus browser. Dikendalikan lewat `open` +
-  `onClose`. Susunannya diisi prop — `title` untuk header, `children` untuk
-  badannya, `footer` untuk kakinya — dengan pilihan ukuran lewat `size` dan
-  tombol tutup yang bisa dimatikan lewat `dismissible`.
-- **`Pagination`: prop `darkMode`** — tampilan gelap: latar navigasi gray-800, batas
-  pinggiran gray-700, teks inaktif dan panah gray-400. Item interaktif di-hover dengan latar gray-700,
-  serta item aktif menyesuaikan `theme` (default/primary/simaya) di atas latar gray-700.
-- **`Popover`** — panel informasi ringkas dengan arrow pada empat pilihan sisi
-  (`side`: `top`, `right`, `bottom`, `left`).
+- **`Pagination`: prop `darkMode` dan `size`** — tampilan gelap: latar navigasi
+  gray-800, garis tepi gray-700, teks dan panah yang tidak aktif gray-400; item
+  yang di-hover berlatar gray-700, dan item aktif mengikuti `theme` di atas
+  gray-700. `size` memilih kotak 40px (`base`, bawaan) atau 32px (`s`);
+  `responsive` memakai 32px lalu 40px saat container terdekat ≥ 512px, jadi
+  butuh induk ber-`@container` seperti di dalam Table. Tipe pendukung
+  `PaginationSize` ikut diekspor.
+- **`Popover`: prop `darkMode`** — tampilan gelap untuk panelnya.
 - **`Radio`: prop `darkMode`** — tampilan gelap sesuai desain: lingkaran
   gray-300 bergaris gray-400, label gray-50, dan caption gray-400. Cincin
   pilihan aktif tetap memakai warna aplikasi. `inactive` memakai lingkaran
   gray-800 dengan teks gray-600.
-- **`Search`: prop `darkMode`** — kolom pencarian dengan tombol cari. Tampilan gelap: field berlatar gray-800 dengan teks terang, sementara dropdown kategori menggunakan latar gray-700. Dua ukuran lewat
-  `platform` (`default` 54px, `mobile` 50px). Mengisi prop `categories` akan
-  mengubahnya jadi varian tiga ruas: dropdown kategori, isian, lalu tombol
-  ikon. Daftar kategorinya panel Dropdown, sama dengan daftar pilihan Select.
-  Tipe pendukung `SearchCategory` ikut diekspor.
+- **`Search`** — kolom pencarian dengan tombol cari. Dua ukuran lewat `platform`
+  (`default` 54px, `mobile` 50px) dan warna aksen lewat `application`. Mengisi
+  prop `categories` mengubahnya jadi varian tiga ruas setinggi 39px: dropdown
+  kategori, isian, lalu tombol ikon. Daftar kategorinya panel Dropdown, sama
+  dengan daftar pilihan Select. Prop `darkMode` memberinya tampilan gelap: field
+  gray-800 dengan teks terang, dan dropdown kategori berlatar gray-700. Tipe
+  pendukung `SearchCategory`, `SearchPlatform`, dan `SearchApplication` ikut
+  diekspor.
 - **`Select`: prop `darkMode`** — tampilan gelap sesuai desain: field gray-800
   dengan label terang dan placeholder gray-400. Garis state default menyatu
   dengan latar (baru terlihat saat difokus); `inactive` bergaris gray-300
   dengan teks dan panah gray-500. Panel daftar pilihannya tetap terang.
-- **`Sidebar`** — navigasi samping dengan menu tunggal (`items`) atau
-  terkelompok (`groups`), submenu, area profil (`user`), dan mode ringkas
-  (`collapsed` + `onCollapse`). Dilengkapi dengan prop `darkMode` untuk tampilan gelap (latar belakang gray-800, menu aktif & profil gray-700, teks menu & ikon aktif gray-50, serta ikon inaktif gray-400). Tipe pendukung `SidebarItem`, `SidebarSubItem`,
-  `SidebarGroup`, dan `SidebarUser` ikut diekspor.
-- **`Spinner`** — indikator proses dalam ukuran `default` dan `large`.
+- **`Sidebar`: prop `darkMode`, `sticky`, dan `footer`** — `darkMode` memberi
+  tampilan gelap: latar gray-800, menu aktif dan profil gray-700, teks menu dan
+  ikon aktif gray-50, ikon lain gray-400. `sticky` menempelkan Sidebar di atas
+  viewport setinggi satu layar. `footer` mengisi kaki Sidebar di bawah daftar
+  menu — versi aplikasi, tautan bantuan — dan tetap terlihat meski menunya
+  panjang dan digulir. `SidebarItem`, `SidebarSubItem`, dan `SidebarUser` kini
+  juga menerima `onClick`.
 - **`Table`** — tabel data dari `columns` dan `data`, dengan `rowKey` sebagai
-  kunci tiap baris. Toolbar-nya bisa memuat pencarian (`search`), filter
-  (`filter`), dan tombol aksi (`actions`). Mendukung seleksi baris
-  (`selectable`), pengurutan kolom (`sort`), pagination (`pagination`), kolom
-  yang menempel saat digulir ke samping (`sticky`), dua kerapatan baris lewat
-  `size`, serta keadaan `loading` dan `emptyText`. Sel bisa berisi tombol aksi
-  per baris dan gambar dengan pratinjau (`TableImage`). Tipe pendukungnya ikut
-  diekspor.
+  kunci tiap baris; tanpa `columns`, kolomnya dibuat dari field baris pertama.
+  Toolbar-nya bisa memuat kotak pencarian (`search`, yang meneruskan atributnya
+  ke `<input>` — penyaringan `data` tetap urusan pemakai), tombol Filter Data
+  (`filter`) untuk memilih kolom yang tampil, dan isi bebas di kanan
+  (`actions`). Mendukung judul kolom bertingkat (`children` pada kolom), seleksi
+  baris (`selectable`), pengurutan (`sortable` pada kolom, `sort`), pagination
+  (`pagination`), kolom yang menempel saat digulir ke samping (`sticky`), dua
+  kerapatan baris lewat `size` (`normal`, `compact`), serta keadaan `loading`
+  dan `emptyText`. Pengurutan dan pembagian halaman dikerjakan tabel sendiri;
+  untuk data dari server pasang `manual`. Sel bisa berisi deretan tombol aksi
+  (`actions` pada kolom) dan gambar dengan pratinjau (`image` pada kolom, atau
+  komponen `TableImage`). Toolbar dan pagination-nya menyesuaikan lebar tabel,
+  bukan lebar layar. Tipe pendukungnya ikut diekspor, antara lain
+  `TableColumn`, `TableRowAction`, `TableSort`, dan `TablePaginationConfig`.
 - **`TextArea`: prop `darkMode`** — tampilan gelap sesuai desain: kotak,
   toolbar, dan area isian gray-800 dengan label putih. Bingkai editor dan garis
   pemisah toolbar tetap gray-300; tombol kirim memakai -600 (hover -700).
@@ -168,49 +316,55 @@ yang memutus, termasuk nama paketnya.
   dengan bulatan gray-400, label putih, dan caption gray-400. Saat menyala,
   jalurnya tetap memakai warna aplikasi dan bulatannya putih. `inactive` hanya
   meredupkan label ke gray-500.
-- **`Upload`: prop `darkMode`** — pemilih berkas dalam dua bentuk lewat `type`: `default`
-  (tombol pilih berkas + nama berkas terpilih, dua ukuran lewat `platform`) dan
-  `attach` (area seret-lepas bergaris putus-putus setinggi 230px). Tampilan gelap menyesuaikan warna latar (`gray-800`), teks, batas komponen (`gray-700`), serta status interaksi `drag`. Membungkus
-  `<input type="file">` sungguhan, jadi dialog berkas dan pengiriman formulir
-  bekerja apa adanya.
-- **Prop `darkMode` pada `Avatar`, `Card`, `Container`, `Dropdown`, `Hero`, dan
-  `Popover`** — tampilan gelap untuk masing-masing. Avatar hanya mengganti warna
-  latar inisial (foto tidak diubah), dan Dropdown hanya mengganti panel serta
-  baris bawaannya — isi `children` mengatur warnanya sendiri. Bawaannya `false`,
-  jadi tampilan yang sudah ada tetap terang.
-- Tipe **`NavbarContextItem`**, dipakai sebagai bentuk dasar item kontekstual
-  pada Navbar.
+- **`Upload`** — pemilih berkas dalam dua bentuk lewat `type`: `default` (tombol
+  pilih berkas + nama berkas terpilih, dua ukuran lewat `platform`) dan `attach`
+  (area seret-lepas bergaris putus-putus setinggi 230px). Warna tombolnya
+  mengikuti `application`; pada `attach` warna itu hanya terlihat saat berkas
+  sedang diseret. Membungkus `<input type="file">` sungguhan, jadi dialog berkas
+  dan pengiriman formulir bekerja apa adanya. Prop `darkMode` menyesuaikan latar
+  (gray-800), teks, garis (gray-700), dan tampilan saat berkas diseret. Tipe
+  pendukung `UploadType`, `UploadPlatform`, dan `UploadApplication` ikut
+  diekspor.
 - Kelas **`.ds-scroll-y`** — scrollbar vertikal tipis untuk panel yang digulir:
   batang 6px membulat berwarna gray-300 (gray-400 saat kursor di atasnya),
   tanpa tombol panah. Pasangan `.ds-scroll-x`.
 
+### Diperbaiki
+
+- **`FloatingLabel`: label field yang nonaktif kini gray-400.** Sebelumnya
+  kelas gray-500 bawaan ikut terpasang dan menang di urutan CSS, jadi labelnya
+  tidak ikut meredup bersama isiannya.
+- **`Sidebar`: logo tidak lagi meleset dari sumbu saat ringkas.** Pembungkus
+  logonya satu-satunya yang dirapatkan ke kanan di dalam kotak isi 40px, jadi
+  mark 32px duduk 4px di sebelah kanan tombol lipat dan avatar yang sudah di
+  tengah. Hanya berpengaruh pada keadaan `collapsed`.
+- **`TextArea`: ikon toolbar editor kini sesuai desain.** Sebelumnya ikon garis
+  dari pustaka yang lebih kecil di dalam kotak 16px-nya; kini ikon berisi yang
+  disalin dari desain, dengan jarak antarikon 15px.
+
+## [0.2.0] - 2026-09-01
+
+Terbit sebagai `@stasi/design-kit-react`. Catatannya disusun belakangan dari
+paket yang terbit.
+
+### Ditambahkan
+
+- **`Modal`** — dialog berbasis elemen `<dialog>` bawaan, jadi top layer,
+  penguncian fokus, dan latar inert diurus browser. Dikendalikan lewat `open` +
+  `onClose`, dengan dua ukuran lewat `size` (`s`, `m`) dan susunan
+  `ModalHeader`, `ModalBody`, `ModalFooter`. Bentuk ini diganti di 0.3.0.
+- **`Popover`** — panel informasi ringkas berjudul (`title`) dengan arrow pada
+  empat pilihan sisi (`side`: `top`, `right`, `bottom`, `left`).
+- **`Sidebar`** — navigasi samping dengan menu tunggal (`items`) atau
+  terkelompok (`groups`), submenu, logo (`logo`, `collapsedLogo`), area profil
+  (`user`), dan mode ringkas (`collapsed` + `onCollapse`). Tipe pendukung
+  `SidebarItem`, `SidebarSubItem`, `SidebarGroup`, dan `SidebarUser` ikut
+  diekspor.
+- **`Spinner`** — indikator proses dalam ukuran `default` dan `large`.
+- Tipe **`NavbarContextItem`**, dipakai sebagai bentuk dasar item kontekstual
+  pada Navbar.
+
 ### Diubah
-
-- **Memutus — nama paket kini `@ceplok-ui/design-kit-react`.** Sebelumnya
-  `@stasi/design-kit-react`. Pasang paket baru, hapus yang lama, lalu ganti
-  namanya di setiap import — termasuk subpath ikon — dan di CSS:
-
-  ```sh
-  npm install @ceplok-ui/design-kit-react
-  npm uninstall @stasi/design-kit-react
-  ```
-
-  ```diff
-  - import { Button } from '@stasi/design-kit-react'
-  - import { User } from '@stasi/design-kit-react/icons/outline'
-  + import { Button } from '@ceplok-ui/design-kit-react'
-  + import { User } from '@ceplok-ui/design-kit-react/icons/outline'
-  ```
-
-  ```diff
-  - @import '@stasi/design-kit-react/styles.css';
-  - @source '../node_modules/@stasi/design-kit-react/dist/**/*.js';
-  + @import '@ceplok-ui/design-kit-react/styles.css';
-  + @source '../node_modules/@ceplok-ui/design-kit-react/dist/**/*.js';
-  ```
-
-  Jangan lupa baris `@source`: kalau masih menunjuk folder lama, Tailwind tidak
-  menemukan kelas milik komponen, sehingga tampilannya berantakan.
 
 - **Memutus — `contextualItems` pada Navbar tidak lagi menerima `false`.**
 
@@ -226,32 +380,9 @@ yang memutus, termasuk nama paketnya.
   `NavbarSubItem` kini merupakan turunan `NavbarContextItem` dengan tambahan
   `contextualItems`, dan `onNavigate` menerima ketiga bentuk item tersebut.
 
-- **Memutus — aksi toolbar `upload` pada TextArea kini `download`.**
-
-  ```diff
-  - | 'upload'
-  + | 'download'
-  ```
-
-  Alat terakhir toolbar editor di desain adalah unduh (panah turun ke baki),
-  bukan unggah, jadi nama aksi dan labelnya ikut diganti (`Unduh`). Di
-  TypeScript, kode yang memeriksa `'upload'` di `onToolbarAction` akan gagal
-  dikompilasi; di JavaScript cabangnya tidak pernah terpanggil lagi. Ganti
-  dengan `'download'`.
-
-### Diperbaiki
-
-- **`Sidebar`: logo tidak lagi meleset dari sumbu saat ringkas.** Pembungkus
-  logonya satu-satunya yang dirapatkan ke kanan di dalam kotak isi 40px, jadi
-  mark 32px duduk 4px di sebelah kanan tombol lipat dan avatar yang sudah di
-  tengah. Hanya berpengaruh pada keadaan `collapsed`.
-- **`TextArea`: ikon toolbar editor kini sesuai desain.** Sebelumnya ikon garis
-  dari pustaka yang lebih kecil di dalam kotak 16px-nya; kini ikon berisi yang
-  disalin dari desain, dengan jarak antarikon 15px.
-
 ## [0.1.0] - 2026-09-01
 
-Rilis pertama ke npm.
+Rilis pertama ke npm, dengan nama `@stasi/design-kit-react`.
 
 ### Ditambahkan
 
@@ -259,10 +390,10 @@ Rilis pertama ke npm.
   `Checkbox`, `Container`, `FloatingLabel`, `Footer`, `Hero`, `Icon`,
   `InputField`, `Navbar`, `Pagination`, `Radio`, `Select`, `TextArea`, `Toast`,
   dan `Toggle`.
-- **Subpath ikon**: `@ceplok-ui/design-kit-react/icons/outline` dan
+- **Subpath ikon**: `@stasi/design-kit-react/icons/outline` dan
   `.../icons/solid`, meneruskan ikon `flowbite-react-icons` sebagai impor
   bernama yang tetap bisa di-tree-shake.
-- **CSS sumber**, bukan CSS terkompilasi: `@ceplok-ui/design-kit-react/styles.css`
+- **CSS sumber**, bukan CSS terkompilasi: `@stasi/design-kit-react/styles.css`
   (token `@theme`, font Lato, base layer, dan kelas `.ds-*`) serta
   `.../tokens.css` bila hanya tokennya yang dibutuhkan.
 - Utilitas `cn` dan kumpulan `brandIcons`.

@@ -736,12 +736,15 @@ function pengajuanColumns({
   const email: TableColumn<Pengajuan> = { key: "email", header: "Email", align: "left" };
 
   return [
-    ...(grouped ? [{ key: "pemohon", header: "Pemohon", children: [nama, email] }] : [nama, email]),
+    ...(grouped
+      ? [{ key: "pemohon", header: "Pemohon", headerAlign: "left" as const, children: [nama, email] }]
+      : [nama, email]),
     { key: "layanan", header: "Layanan", align: "left", sortable: true, sortResettable: false },
     { key: "tanggal", header: "Tanggal", align: "left", sortable: true, sortResettable: false, sortValue: (row) => new Date(row.tanggalIso).getTime() },
     {
       key: "dokumen",
       header: "Dokumen",
+      align: "left",
       image: {
         src: (row) => placeholderImage(row.id),
         alt: (row) => `Dokumen ${row.nama}`,
@@ -752,6 +755,7 @@ function pengajuanColumns({
     {
       key: "status",
       header: "Status",
+      align: "left",
       cell: (row) => <Badge variant={statusBadge[row.status]}>{row.status}</Badge>,
     },
     ...(withRowActions
