@@ -136,7 +136,9 @@ function ModalExampleCode({
 }
 
 const modalProps: PropRow[] = [
-  ['trigger', 'ReactElement', 'required', 'Tombol milik consumer yang membuka Modal.'],
+  ['trigger', 'ReactElement', 'required*', 'Tombol milik consumer yang membuka Modal. Wajib pada mode internal; opsional ketika open diberikan.'],
+  ['open', 'boolean', 'undefined', 'Visibilitas terkontrol. Jika diberikan, nilai ini menjadi sumber kebenaran dan trigger bersifat opsional.'],
+  ['onOpenChange', '(open: boolean) => void', 'undefined', 'Dipanggil ketika trigger atau interaksi penutupan meminta perubahan visibilitas.'],
   ['variant', "'default' | 'popup'", "'default'", 'Menentukan struktur Modal. Popup digunakan untuk dialog konfirmasi ringkas.'],
   ['size', "'s' | 'm'", "'s'", 'Ukuran Default Modal. Tidak tersedia untuk Popup.'],
   ['title', 'ReactNode', 'undefined', 'Judul Default Modal sekaligus nama aksesibel. Tidak tersedia untuk Popup.'],
@@ -151,7 +153,7 @@ const modalProps: PropRow[] = [
     '…props',
     "Omit<DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose' | 'onCancel' | 'title'>",
     '—',
-    'Atribut dialog native yang didukung diteruskan ke <dialog>. open, onClose, dan onCancel sengaja tidak tersedia sebagai API publik; title diatur khusus untuk Default.',
+    'Atribut dialog native yang didukung diteruskan ke <dialog>. Lifecycle native onClose dan onCancel dimiliki Modal; open tersedia sebagai state terkontrol, bukan atribut native langsung. title diatur khusus untuk Default.',
   ],
 ]
 
@@ -163,6 +165,28 @@ const toc: TocEntry[] = [
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
 ]
+
+function ControlledModalExample() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="mt-4">
+      <Button onClick={() => setOpen(true)}>Edit data</Button>
+      <Modal
+        open={open}
+        onOpenChange={setOpen}
+        title="Edit data"
+        footer={({ close }) => (
+          <Button size="xs" onClick={close}>
+            Simpan
+          </Button>
+        )}
+      >
+        <p>Form dan proses penyimpanan tetap dimiliki consumer.</p>
+      </Modal>
+    </div>
+  )
+}
 
 export function ModalPage() {
   const [playgroundVariant, setPlaygroundVariant] = useState<ModalVariant>('default')
@@ -480,55 +504,38 @@ export function ModalPage() {
           />
         </SectionCode>
 
-        <p className="mt-5 max-w-2xl text-body-sm text-gray-500">
-          Panggil <Hl>close()</Hl> hanya ketika aksi perlu menutup Modal. Untuk validasi atau
-          proses asinkron, panggil setelah proses berhasil. Ketiga kontrol penutupan bekerja
-          independen; <Hl>close()</Hl> tetap dapat menutup Modal apa pun nilainya.
-          Jika backdrop, Escape, dan tombol X dinonaktifkan, sediakan aksi eksplisit yang
-          memanggil <Hl>close()</Hl>, misalnya tombol Saya Mengerti di footer.
-        </p>
-
-        <h3 className="mt-8 text-sm font-black text-gray-900">State dan aksi</h3>
+        <h3 className="mt-8 text-sm font-black text-gray-900">Aksi footer</h3>
         <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
-          Modal mengelola visibilitasnya secara internal. State aplikasi atau form di dalam Modal,
-          validasi, dan pengiriman asinkron tetap menjadi tanggung jawab consumer. Modal tidak
-          mengambil alih event submit atau otomatis menutup setelah tombol aksi ditekan. Gunakan
-          fungsi <Hl>close()</Hl> dari render function footer setelah proses berhasil.
+          Modal tidak mengatur proses bisnis seperti validasi atau submit. Gunakan{' '}
+          <Hl>close()</Hl> dari render function <Hl>footer</Hl> ketika aksi memang perlu menutup
+          Modal, misalnya setelah proses simpan berhasil.
         </p>
         <SectionCode>
           {'<Modal\n  trigger={<Button>Edit data</Button>}\n  title="Edit data"\n  '}
           <H>footer</H>
-          {'={({ close }) => (\n    <>\n      <Button variant="outline" theme="gray" onClick={close}>Batal</Button>\n      <Button\n        onClick={async () => {\n          const success = await save()\n          if (success) close()\n        }}\n      >\n        Simpan\n      </Button>\n    </>\n  )}\n>\n  {/* Form milik consumer; save() menjalankan validasi dan penyimpanan. */}\n</Modal>'}
+          {'={({ close }) => (\n    <>\n      <Button variant="outline" theme="gray" onClick={close}>\n        Batal\n      </Button>\n      <Button\n        onClick={async () => {\n          const success = await save()\n\n          if (success) {\n            close()\n          }\n        }}\n      >\n        Simpan\n      </Button>\n    </>\n  )}\n>\n  {/* Form milik consumer */}\n</Modal>'}
         </SectionCode>
 
-        <p className="mt-5 max-w-2xl text-body-sm text-gray-500">
-          Gunakan <Hl>className</Hl> untuk gaya tambahan. Utility yang bertabrakan tetap
-          terpasang karena <Hl>cn()</Hl> memakai clsx; hasil override mengikuti urutan CSS,
-          bukan urutan class. Untuk pilihan lebar Default, utamakan <Hl>size="s"</Hl> atau{' '}
-          <Hl>size="m"</Hl>. Popup tidak menerima ukuran yang dapat dikonfigurasi.
+        <h3 className="mt-8 text-sm font-black text-gray-900">State Modal</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
+          Tanpa <Hl>open</Hl>, Modal mengelola visibilitas secara internal dan{' '}
+          <Hl>trigger</Hl> wajib tersedia.
         </p>
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+          Gunakan <Hl>open</Hl> dan <Hl>onOpenChange</Hl> ketika visibilitas perlu mengikuti state
+          aplikasi. Dalam mode terkontrol, <Hl>trigger</Hl> opsional dan nilai <Hl>open</Hl> tetap
+          menjadi sumber kebenaran.
+        </p>
+        <ControlledModalExample />
+        <SectionCode>
+          {"const [open, setOpen] = useState(false)\n\n<Button onClick={() => setOpen(true)}>Edit data</Button>\n\n<Modal\n  open={open}\n  onOpenChange={setOpen}\n  title=\"Edit data\"\n  footer={({ close }) => <Button onClick={close}>Simpan</Button>}\n>\n  {/* Form milik consumer */}\n</Modal>"}
+        </SectionCode>
 
         <h3 className="mt-8 text-sm font-black text-gray-900">Accessibility</h3>
         <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
-          {isPopup ? (
-            <>
-              Popup tidak memiliki judul visual. Berikan <Hl>aria-label</Hl> atau{' '}
-              <Hl>aria-labelledby</Hl> sebagai nama aksesibel Modal.
-            </>
-          ) : (
-            <>
-              Gunakan <Hl>title</Hl> khusus Default sebagai judul sekaligus nama aksesibel
-              Modal, kecuali Anda memberikan <Hl>aria-label</Hl> atau{' '}
-              <Hl>aria-labelledby</Hl> sendiri. Jika Modal
-              tidak memiliki judul visual, berikan <Hl>aria-label</Hl> atau{' '}
-              <Hl>aria-labelledby</Hl>.
-            </>
-          )}
-        </p>
-        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
-          Untuk nama eksplisit, gunakan <Hl>aria-label</Hl> atau arahkan{' '}
-          <Hl>aria-labelledby</Hl> ke ID elemen di dalam dialog yang memuat namanya.
-          Pastikan Popup selalu memiliki nama aksesibel.
+          <Hl>title</Hl> pada Default menjadi judul visual sekaligus nama aksesibel. Untuk Popup
+          atau Modal tanpa judul visual yang sesuai, berikan <Hl>aria-label</Hl> atau arahkan{' '}
+          <Hl>aria-labelledby</Hl> ke elemen yang memuat namanya.
         </p>
         <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
           Title Default sudah dirender sebagai <Hl>&lt;h2&gt;</Hl>; jangan membungkus isinya
@@ -545,9 +552,9 @@ export function ModalPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <Hl>&lt;dialog&gt;</Hl> yang didukung diteruskan, dengan pengecualian{' '}
-          <Hl>open</Hl>, <Hl>onClose</Hl>, dan <Hl>onCancel</Hl> dari API publik.
-          Prop <Hl>title</Hl> diatur khusus untuk Default.
+          <Hl>&lt;dialog&gt;</Hl> yang didukung diteruskan. Modal memiliki kontrak state sendiri melalui{' '}
+          <Hl>open</Hl> dan <Hl>onOpenChange</Hl>; lifecycle native <Hl>onClose</Hl> dan{' '}
+          <Hl>onCancel</Hl> tetap dimiliki komponen. Prop <Hl>title</Hl> diatur khusus untuk Default.
         </Lead>
         <PropsTable rows={modalProps} minWidth="52rem" />
       </FlowSection>

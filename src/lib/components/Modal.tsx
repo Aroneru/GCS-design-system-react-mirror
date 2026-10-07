@@ -25,8 +25,6 @@ interface ModalCommonProps
     DialogHTMLAttributes<HTMLDialogElement>,
     'open' | 'onClose' | 'onCancel' | 'title'
   > {
-  /** Tombol milik consumer yang membuka Modal. */
-  trigger: ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>
   /** Nama aksesibel tombol tutup. */
   closeLabel?: string
   /** Tutup saat klik backdrop. Bawaan: true. */
@@ -40,6 +38,22 @@ interface ModalCommonProps
   /** Area aksi, atau render function yang menerima fungsi penutup Modal. */
   footer?: ReactNode | ((actions: { close: () => void }) => ReactNode)
 }
+
+type ModalTrigger = ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>
+
+type ModalVisibilityProps =
+  | {
+      /** Visibilitas dikelola internal; tombol pembuka wajib tersedia. */
+      open?: undefined
+      trigger: ModalTrigger
+      onOpenChange?: (open: boolean) => void
+    }
+  | {
+      /** Visibilitas terkontrol oleh consumer. */
+      open: boolean
+      trigger?: ModalTrigger
+      onOpenChange?: (open: boolean) => void
+    }
 
 interface ModalDefaultProps extends ModalCommonProps {
   variant?: 'default'
@@ -57,7 +71,7 @@ interface ModalPopupProps extends ModalCommonProps {
   title?: never
 }
 
-export type ModalProps = ModalDefaultProps | ModalPopupProps
+export type ModalProps = (ModalDefaultProps | ModalPopupProps) & ModalVisibilityProps
 
 const sizes: Record<ModalSize, string> = {
   s: 'max-w-[416px]',
@@ -71,12 +85,16 @@ const sizes: Record<ModalSize, string> = {
  * `footer` mengisi kakinya. Variant popup memakai `children` untuk konten
  * ringkas dan menampilkan footer tanpa divider.
  *
- * Modal mengurus visibilitas internal dan `trigger` membukanya. Peramban tetap
- * mengurus top layer, latar yang ikut mati, dan jebakan fokus.
+ * Tanpa `open`, Modal mengurus visibilitas internal dan `trigger` membukanya.
+ * Jika `open` diberikan, consumer menjadi sumber kebenaran dan `trigger` boleh
+ * dihilangkan. Peramban tetap mengurus top layer, latar yang ikut mati, dan
+ * jebakan fokus.
  */
 export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   {
     trigger,
+    open,
+    onOpenChange,
     variant = 'default',
     size,
     title,
@@ -97,14 +115,19 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   const internalRef = useRef<HTMLDialogElement | null>(null)
   const titleId = useId()
   const isPopup = variant === 'popup'
+  const controlled = open !== undefined
   const [internalOpen, setInternalOpen] = useState(false)
-  const requestOpen = useCallback(() => {
-    setInternalOpen(true)
-  }, [])
-
-  const requestClose = useCallback(() => {
-    setInternalOpen(false)
-  }, [])
+  const [nativeSyncRevision, setNativeSyncRevision] = useState(0)
+  const desiredOpen = controlled ? open : internalOpen
+  const desiredOpenRef = useRef(desiredOpen)
+  desiredOpenRef.current = desiredOpen
+  const requestOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      onOpenChange?.(nextOpen)
+      if (!controlled) setInternalOpen(nextOpen)
+    },
+    [controlled, onOpenChange],
+  )
 
   const setRef = useCallback(
     (node: HTMLDialogElement | null) => {
@@ -123,11 +146,16 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   // dan state internal selalu sinkron dengan elemen dialog native.
   const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     event.preventDefault()
-    if (closeOnEscape) requestClose()
+    if (closeOnEscape) requestOpenChange(false)
   }
 
   const handleNativeClose = () => {
-    if (internalOpen) requestClose()
+    setNativeSyncRevision((revision) => revision + 1)
+    // `dialog.close()` yang dipanggil sinkronisasi sudah didahului desired=false.
+    // Penutupan lain perlu kembali melalui kontrak React; controlled parent
+    // boleh menerima permintaan ini atau mempertahankan `open=true` sehingga
+    // effect di bawah membuka dialog kembali.
+    if (desiredOpen) requestOpenChange(false)
   }
 
   // Backdrop menargetkan dialog; abaikan bubbling dari children dan klik
@@ -143,7 +171,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
       event.clientY < rect.top ||
       event.clientY > rect.bottom
 
-    if (diLuarPanel) requestClose()
+    if (diLuarPanel) requestOpenChange(false)
   }
 
   const labelSendiri = ariaLabel?.trim() ? ariaLabel : undefined
@@ -155,24 +183,50 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
     const dialog = internalRef.current
     if (!dialog) return
 
-    if (internalOpen && !dialog.open) dialog.showModal()
-    else if (!internalOpen && dialog.open) dialog.close()
-  }, [internalOpen])
+    // `<dialog>` tidak mengirim event saat `showModal()` dipanggil langsung.
+    // Amati hanya atribut native `open` agar mutasi ref yang tidak didukung
+    // tetap dikembalikan ke state React tanpa dianggap permintaan consumer.
+    const observer = new MutationObserver(() => {
+      if (dialog.open && !desiredOpenRef.current) {
+        setNativeSyncRevision((revision) => revision + 1)
+      }
+    })
+    observer.observe(dialog, { attributes: true, attributeFilter: ['open'] })
 
-  if (!isValidElement<ButtonHTMLAttributes<HTMLButtonElement>>(trigger)) {
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const dialog = internalRef.current
+    if (!dialog) return
+
+    if (desiredOpen && !dialog.open) {
+      dialog.showModal()
+    } else if (!desiredOpen && dialog.open) {
+      dialog.close()
+    }
+  }, [desiredOpen, nativeSyncRevision])
+
+  if (
+    (!controlled || trigger !== undefined) &&
+    !isValidElement<ButtonHTMLAttributes<HTMLButtonElement>>(trigger)
+  ) {
     throw new Error('Modal memerlukan satu elemen <button> yang valid pada prop `trigger`.')
   }
 
-  const renderedTrigger = cloneElement(trigger, {
-    'aria-haspopup': 'dialog',
-    'aria-expanded': internalOpen,
-    onClick: (event: MouseEvent<HTMLButtonElement>) => {
-      trigger.props.onClick?.(event)
-      if (event.defaultPrevented || trigger.props.disabled) return
-      requestOpen()
-    },
-  })
-  const renderedFooter = typeof footer === 'function' ? footer({ close: requestClose }) : footer
+  const renderedTrigger = isValidElement<ButtonHTMLAttributes<HTMLButtonElement>>(trigger)
+    ? cloneElement(trigger, {
+        'aria-haspopup': 'dialog',
+        'aria-expanded': desiredOpen,
+        onClick: (event: MouseEvent<HTMLButtonElement>) => {
+          trigger.props.onClick?.(event)
+          if (event.defaultPrevented || trigger.props.disabled) return
+          requestOpenChange(true)
+        },
+      })
+    : null
+  const renderedFooter =
+    typeof footer === 'function' ? footer({ close: () => requestOpenChange(false) }) : footer
 
   return (
     <>
@@ -209,7 +263,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
           {showCloseButton && (
             <button
               type="button"
-              onClick={requestClose}
+              onClick={() => requestOpenChange(false)}
               aria-label={closeLabel}
               className={cn(
                 'ml-auto inline-flex shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
