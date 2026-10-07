@@ -18,13 +18,22 @@ import { Button } from './Button'
  * - `period` — satu kalender untuk memilih rentang, dengan pintasan periode:
  *   Hari ini, Minggu ini, Bulan ini, Hapus, dan Semua Waktu.
  * - `multiple` — rentang tanggal: dua kotak (mulai dan selesai) dengan dua
- *   kalender berdampingan, dengan tombol Hari ini dan Hapus. Dengan
- *   `shortcuts`, pintasan periode milik `period` ikut tampil.
+ *   kalender berdampingan — bertumpuk pada platform `mobile` — dengan tombol
+ *   Hari ini dan Hapus. Dengan `shortcuts`, pintasan periode milik `period`
+ *   ikut tampil.
  *
  * Pada `period` dan `multiple`, rentang dipilih dengan dua klik — tanggal
  * mulai, lalu tanggal selesai — dan panel baru tertutup setelah klik kedua.
  */
 export type DatepickerType = 'single' | 'period' | 'multiple'
+
+/**
+ * Tata letak per platform, mengikuti varian desain. Di `mobile` panel `period`
+ * dan `multiple` selebar kotaknya (325px secara bawaan): `period` memuat empat
+ * pintasannya dalam satu baris, dan `multiple` menumpuk kedua kotak dan kedua
+ * kalendernya. `single` sama di kedua platform.
+ */
+export type DatepickerPlatform = 'default' | 'mobile'
 
 /**
  * Rentang tanggal milik `period` dan `multiple`. Selama pengguna baru memilih
@@ -59,6 +68,14 @@ interface DatepickerBaseProps
    * `multiple`, Semua Waktu berakhir di sini.
    */
   max?: Date | null
+  /**
+   * Tata letak `mobile` untuk `period` dan `multiple`: lebar bawaannya 325px dan
+   * panelnya selebar kotak. `period` memuat Hari ini, Minggu ini, Bulan ini, dan
+   * Hapus dalam satu baris, dan `multiple` menumpuk kotak tanggal selesai di
+   * bawah kotak tanggal mulai serta kalender kedua di bawah kalender pertama.
+   * `single` sama di kedua platform.
+   */
+  platform?: DatepickerPlatform
   /** Tampilan gelap untuk kotak, panel, kalender, dan tombolnya. */
   darkMode?: boolean
   disabled?: boolean
@@ -252,15 +269,18 @@ const temaGelap: Tema = {
   hapusGanda: 'border-gray-500 bg-gray-600 text-gray-300 hover:bg-gray-500',
 }
 
-/** Lebar panel per bentuk: 7 kolom × 36px, 7 × ±42px, dan dua kalender berdampingan. */
+/**
+ * Lebar panel per bentuk: single dan period 325px — kisi single 7 × 36px di
+ * tengah, kisi period 7 × ±42px selebar panel — dan dua kalender berdampingan.
+ */
 const lebarPanel: Record<DatepickerType, string> = {
-  single: 'w-71',
+  single: 'w-81.25',
   period: 'w-81.25',
   multiple: 'w-150',
 }
 
 /** Angka yang sama dalam piksel, untuk menempatkan panel sebelum ia bisa diukur. */
-const lebarPanelPx: Record<DatepickerType, number> = { single: 284, period: 325, multiple: 600 }
+const lebarPanelPx: Record<DatepickerType, number> = { single: 325, period: 325, multiple: 600 }
 
 /**
  * Lebar bawaan komponennya: selebar panel, supaya tepi kotak dan kalender
@@ -268,9 +288,33 @@ const lebarPanelPx: Record<DatepickerType, number> = { single: 284, period: 325,
  * `className` melepas batas ini.
  */
 const lebarKotak: Record<DatepickerType, string> = {
-  single: 'max-w-71',
+  single: 'max-w-81.25',
   period: 'max-w-81.25',
   multiple: 'max-w-150',
+}
+
+/** Di mobile ketiga bentuk selebar desainnya, 325px. */
+const LEBAR_MOBILE = { panel: 'w-81.25', kotak: 'max-w-81.25' }
+
+/**
+ * Panel yang mengikuti lebar kotak — single, dan semua bentuk di mobile — tidak
+ * dibuat lebih sempit dari ini, supaya kisi 7 × 36px dan jarak 16px di kedua
+ * sisinya tetap muat.
+ */
+const LEBAR_MIN = 284
+
+/**
+ * Lebar kisi tanggal. `penuh` selebar kalendernya; `menjorok` diberi jarak 8px
+ * di kiri-kanan, untuk dua kalender berdampingan; `tengah` ditahan 7 × 36px di
+ * tengah kalender, untuk panel yang lebih lebar dari kisinya. Judul dan panahnya
+ * tetap selebar kalender.
+ */
+type LebarKisi = 'penuh' | 'menjorok' | 'tengah'
+
+const kelasKisi: Record<LebarKisi, string> = {
+  penuh: '',
+  menjorok: 'px-2',
+  tengah: 'mx-auto max-w-63',
 }
 
 /** Jarak panel dari kotak tanggal, dan dari tepi layar. */
@@ -317,8 +361,7 @@ interface KalenderProps {
   sasaran: Date
   tema: Tema
   idJudul: string
-  /** Kisi tanggal diberi jarak 8px di kiri-kanan, seperti pada bentuk `multiple`. */
-  menjorok?: boolean
+  kisi?: LebarKisi
   onPilih: (d: Date) => void
   onSebelum: () => void
   onSesudah: () => void
@@ -335,7 +378,7 @@ function Kalender({
   sasaran,
   tema,
   idJudul,
-  menjorok,
+  kisi = 'penuh',
   onPilih,
   onSebelum,
   onSesudah,
@@ -391,7 +434,7 @@ function Kalender({
         role="grid"
         aria-labelledby={idJudul}
         onKeyDown={onKeyDown}
-        className={cn('mt-2 grid grid-cols-7', menjorok && 'px-2')}
+        className={cn('mt-2 grid grid-cols-7', kelasKisi[kisi])}
       >
         <div role="row" className="contents">
           {HARI.map((hari) => (
@@ -474,6 +517,12 @@ function Kalender({
  *
  * Lebar bawaannya sama dengan panelnya, jadi tepi kotak dan kalender segaris.
  *
+ * Panel `single` selalu selebar kotaknya, 325px secara bawaan, dengan kisi
+ * tanggal di tengah. `platform="mobile"` memberi `period` dan `multiple` panel
+ * yang sama, mengikuti desain mobile-nya: `period` memuat empat pintasannya
+ * dalam satu baris, sedangkan `multiple` menumpuk kedua kotak dan kedua
+ * kalendernya.
+ *
  * `min` dan `max` menandai awal dan akhir data — misalnya tiket pesawat dari
  * hari ini sampai tanggal yang sama tahun depan. Tanggal di luarnya tidak bisa
  * dipilih, pintasan periode dipotong ke rentang itu, dan Semua Waktu memilih
@@ -495,6 +544,7 @@ export function Datepicker(props: DatepickerProps) {
     shortcuts = false,
     min,
     max,
+    platform = 'default',
     darkMode = false,
     disabled = false,
     name,
@@ -514,8 +564,12 @@ export function Datepicker(props: DatepickerProps) {
   const idSelesai = `${idDasar}-selesai`
 
   const tema = darkMode ? temaGelap : temaTerang
-  // Dua kotak dan dua kalender.
+  const mobile = platform === 'mobile'
+  // Dua kotak dan dua kalender — bertumpuk pada mobile.
   const ganda = type === 'multiple'
+  const tumpuk = ganda && mobile
+  // Panel selebar kotaknya: single di kedua platform, bentuk lain di mobile.
+  const ikutKotak = mobile || type === 'single'
   const pintasanPeriode = type === 'period' || (ganda && shortcuts)
   const batas: Batas = { awal: min ? polos(min) : null, akhir: max ? polos(max) : null }
 
@@ -553,7 +607,10 @@ export function Datepicker(props: DatepickerProps) {
   /**
    * Panel berada di top layer, jadi posisinya diukur sendiri dari kotak
    * tanggalnya: rata kiri, 8px di bawahnya, dan dibalik ke atas bila tidak
-   * muat di bawah sekaligus lebih lapang di atas.
+   * muat di bawah sekaligus lebih lapang di atas. Bila tidak muat di sisi mana
+   * pun — biasa terjadi di ponsel — tingginya dibatasi ruang di sisi itu dan
+   * isinya digulir di dalam panel, jadi tidak terpotong tepi layar dan tidak
+   * menutupi kotaknya.
    */
   const tempatkan = useCallback(() => {
     const panel = panelRef.current
@@ -561,16 +618,21 @@ export function Datepicker(props: DatepickerProps) {
     if (!panel || !jangkar) return
 
     const kotak = jangkar.getBoundingClientRect()
-    const lebar = panel.offsetWidth || Math.min(lebarPanelPx[type], window.innerWidth - JARAK * 2)
+    const lebarIkut = ikutKotak ? Math.max(kotak.width, LEBAR_MIN) : null
+    panel.style.width = lebarIkut ? `${lebarIkut}px` : ''
+    const lebar = panel.offsetWidth || Math.min(lebarIkut ?? lebarPanelPx[type], window.innerWidth - JARAK * 2)
     panel.style.left = `${Math.max(JARAK, Math.min(kotak.left, window.innerWidth - lebar - JARAK))}px`
 
-    const tinggi = panel.offsetHeight
-    const ruangBawah = window.innerHeight - kotak.bottom - JARAK
-    panel.style.top =
-      tinggi > ruangBawah && kotak.top - JARAK > ruangBawah
-        ? `${Math.max(JARAK, kotak.top - tinggi - JARAK)}px`
-        : `${kotak.bottom + JARAK}px`
-  }, [type])
+    // `scrollHeight`, bukan `offsetHeight`: tinggi isi seutuhnya, juga selagi
+    // panel sedang dibatasi dan digulir.
+    const tinggi = panel.scrollHeight
+    const ruangBawah = window.innerHeight - kotak.bottom - JARAK * 2
+    const ruangAtas = kotak.top - JARAK * 2
+    const keAtas = tinggi > ruangBawah && ruangAtas > ruangBawah
+    const ruang = Math.max(keAtas ? ruangAtas : ruangBawah, 0)
+    panel.style.maxHeight = tinggi > ruang ? `${ruang}px` : ''
+    panel.style.top = keAtas ? `${kotak.top - JARAK - Math.min(tinggi, ruang)}px` : `${kotak.bottom + JARAK}px`
+  }, [type, ikutKotak])
 
   useEffect(() => {
     const panel = panelRef.current
@@ -727,7 +789,8 @@ export function Datepicker(props: DatepickerProps) {
   /**
    * Pada `multiple` kedua kalender bisa digeser sendiri-sendiri, supaya rentang
    * yang panjang tetap bisa dipilih tanpa melewati setiap bulan di antaranya.
-   * Kalender kiri selalu dijaga lebih awal dari yang kanan.
+   * Kalender kiri — yang atas, pada mobile — selalu dijaga lebih awal dari
+   * yang kanan.
    */
   const geserKiri = (n: number) => {
     const kiri = awalBulan(tampil, n)
@@ -750,7 +813,9 @@ export function Datepicker(props: DatepickerProps) {
       sasaran={sasaran}
       tema={tema}
       idJudul={`${idDasar}-judul-${sisi}`}
-      menjorok={ganda}
+      // Period selebar panel di kedua platform, seperti desainnya; multiple
+      // desktop menjorok di antara dua kalender; sisanya di tengah panel.
+      kisi={type === 'period' ? 'penuh' : ganda && !mobile ? 'menjorok' : 'tengah'}
       onPilih={pilih}
       onSebelum={() => (sisi === 'kiri' ? geserKiri(-1) : geserKanan(-1))}
       onSesudah={() => (sisi === 'kiri' ? geserKiri(1) : geserKanan(1))}
@@ -758,12 +823,25 @@ export function Datepicker(props: DatepickerProps) {
     />
   )
 
-  const tombolPintasan = (p: Pintasan, teks: string) => (
+  // Pada period mobile empat pintasan berbagi satu baris, jadi tiap tombol hanya
+  // ±61px: padding sampingnya dilepas supaya "Minggu ini" tetap satu baris.
+  const sebaris = type === 'period' && mobile
+  // Empat pintasan dalam dua kolom, atau satu baris pada period mobile dan pada
+  // multiple desktop mulai layar `sm`.
+  const kisiPintasan = sebaris
+    ? 'grid-cols-4 gap-4'
+    : tumpuk
+      ? 'grid-cols-2 gap-x-4 gap-y-3'
+      : ganda
+        ? 'grid-cols-2 gap-4 sm:grid-cols-4'
+        : 'grid-cols-2 gap-4'
+
+  const tombolPintasan = (p: Pintasan, teks: string, rapat = false) => (
     <Button
       size="xs"
       // Tampilan gelap memakai tombol berisi; tampilan terang tombol bergaris.
       variant={darkMode ? 'filled' : 'outline'}
-      className="w-full"
+      className={cn('w-full', rapat && 'whitespace-nowrap px-0!')}
       // Mati bila seluruh rentangnya di luar batas data, mis. Hari ini sebelum `min`.
       disabled={rentangPintasan(p, hariIni, batas) === undefined}
       onClick={() => pakai(p)}
@@ -779,8 +857,9 @@ export function Datepicker(props: DatepickerProps) {
       type="button"
       onClick={() => pakai('hapus')}
       className={cn(
-        'inline-flex h-8.5 w-full items-center justify-center rounded-lg border px-4 text-xs font-medium',
+        'inline-flex h-8.5 w-full items-center justify-center rounded-lg border text-xs font-medium',
         'transition-colors duration-200 focus:ring-2 focus:ring-primary-400 focus:outline-none',
+        sebaris ? 'whitespace-nowrap' : 'px-4',
         ganda ? tema.hapusGanda : tema.hapus,
       )}
     >
@@ -840,7 +919,7 @@ export function Datepicker(props: DatepickerProps) {
           : mulai && tulis(mulai)
 
   return (
-    <div className={cn('w-full', lebarKotak[type], className)} {...rest}>
+    <div className={cn('w-full', mobile ? LEBAR_MOBILE.kotak : lebarKotak[type], className)} {...rest}>
       {label ? (
         <label htmlFor={idDasar} id={labelId} className={cn('mb-2 block text-sm font-bold', tema.label)}>
           {label}
@@ -855,7 +934,7 @@ export function Datepicker(props: DatepickerProps) {
       {ganda ? (
         // Kedua kotak bisa berteks sama ("Pilih Tanggal"); pembaca layar tetap
         // membedakannya lewat "mulai" dan "selesai" di nama aksesibelnya.
-        <div ref={jangkarRef} className="grid grid-cols-2 gap-2">
+        <div ref={jangkarRef} className={cn('grid gap-2', !tumpuk && 'grid-cols-2')}>
           {kotak('start', idDasar, semuaWaktu ? 'Semua Waktu' : mulai && tulis(mulai), placeholder)}
           {kotak('end', idSelesai, semuaWaktu ? 'Semua Waktu' : selesai && tulis(selesai), endPlaceholder)}
         </div>
@@ -882,12 +961,13 @@ export function Datepicker(props: DatepickerProps) {
         className={cn(
           'fixed inset-auto m-0 max-h-[calc(100dvh-1rem)] max-w-[calc(100vw-1rem)] overflow-y-auto rounded-lg p-4',
           'shadow-[0_4px_6px_rgb(0_0_0/0.05),0_10px_15px_-3px_rgb(0_0_0/0.1)]',
-          lebarPanel[type],
+          mobile ? LEBAR_MOBILE.panel : lebarPanel[type],
           tema.panel,
         )}
       >
         {ganda ? (
-          <div className="grid gap-8 sm:grid-cols-2">
+          // Berdampingan mulai layar `sm`. Pada mobile selalu bertumpuk, berjarak 24px.
+          <div className={cn('grid', tumpuk ? 'gap-6' : 'gap-8 sm:grid-cols-2')}>
             {kalender(tampil, 'kiri')}
             {kalender(tampilKanan, 'kanan')}
           </div>
@@ -895,13 +975,14 @@ export function Datepicker(props: DatepickerProps) {
           kalender(tampil, 'kiri')
         )}
 
-        {/* Pada multiple semua jaraknya 16px; pada satu kalender 8px. */}
+        {/* Pada multiple semua jaraknya 16px, kecuali antarbaris pintasan di
+            mobile yang 12px; pada satu kalender 8px. */}
         {pintasanPeriode ? (
           <>
-            <div className={cn('grid grid-cols-2 gap-4', ganda ? 'mt-4 sm:grid-cols-4' : 'mt-2')}>
-              {tombolPintasan('hari', 'Hari ini')}
-              {tombolPintasan('minggu', 'Minggu ini')}
-              {tombolPintasan('bulan', 'Bulan ini')}
+            <div className={cn('grid', kisiPintasan, ganda ? 'mt-4' : 'mt-2')}>
+              {tombolPintasan('hari', 'Hari ini', sebaris)}
+              {tombolPintasan('minggu', 'Minggu ini', sebaris)}
+              {tombolPintasan('bulan', 'Bulan ini', sebaris)}
               {tombolHapus}
             </div>
             <div className={ganda ? 'mt-4' : 'mt-2'}>{tombolPintasan('semua', 'Semua Waktu')}</div>

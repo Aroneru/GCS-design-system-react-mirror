@@ -127,6 +127,7 @@ export type {
   DatepickerSingleProps,
   DatepickerRangeProps,
   DatepickerType,
+  DatepickerPlatform,
   DateRange,
 } from "./components/Datepicker";
 

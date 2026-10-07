@@ -128,12 +128,12 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 
 | Komponen        | Props khas                                                                                                                      | Ukuran (desktop / mobile) |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `InputField`    | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| typing \| inactive \| failed`                        | 52 / 40 px                |
+| `InputField`    | `label`, `helperText`, `icon`, `onClear`, `type="password"`, `darkMode`, `state`: `default \| typing \| inactive \| failed`     | 52 / 40 px                |
 | `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| active \| error`                                     | 58 / 50 px                |
 | `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit`, `darkMode` | 162 / 120 px              |
 | `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`, `darkMode`                                                             | 37 px                     |
 | `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`, `darkMode`                                  | 54 / 50 px                |
-| `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 px                     |
+| `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 / 42 px                |
 | `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode`                   | 44 / 40 px                |
 | `Radio`         | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
 | `Toggle`        | `label`, `helperText`, `darkMode`                                                                                               | 40×20 / 36×18 px          |
@@ -141,9 +141,12 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 
 Prop yang dipakai bersama seluruh komponen form:
 
-- `platform`: `default | mobile` — hanya mengubah ukuran. Pada `Select`, varian
-  Mobile cuma menyempitkan wadahnya, jadi prop ini memang tidak ada; pada
-  `Upload` ia tidak berpengaruh untuk `type="attach"`, karena alasan yang sama.
+- `platform`: `default | mobile` — mengubah ukuran. Pada `Datepicker` ia juga
+  mengubah tata letak `period` dan `multiple`: panelnya selebar kotak,
+  `period` memuat empat pintasannya dalam satu baris, dan `multiple` menumpuk
+  kotak serta kalendernya. Pada `Select`, varian Mobile cuma menyempitkan
+  wadahnya, jadi prop ini memang tidak ada; pada `Upload` ia tidak berpengaruh
+  untuk `type="attach"`, karena alasan yang sama.
 - `application`: `default | simaya` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.
