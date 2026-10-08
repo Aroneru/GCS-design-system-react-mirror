@@ -50,6 +50,14 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   `icon={null}`. Mengikuti desainnya, di platform `mobile` label, isian, dan
   caption-nya 12px, dan saat `failed` di tampilan gelap ikon, placeholder, serta
   caption memakai red-500. Keduanya berbeda dari type teks.
+- **`Hero`: prop `centeredContent`** — isi hero `type="centered"`: `text`
+  (bawaan, sama seperti sebelumnya) atau `image`. Dengan `image`, hanya
+  `image`/`imageContent` yang dirender, selebar hero tanpa padding, dan
+  tingginya mengikuti rasio gambarnya. Sub heading, deskripsi, dan tombol tidak
+  dirender. `heading` tetap ada sebagai `<h1>` yang hanya dibaca pembaca layar.
+  Bagian gambar yang transparan menampilkan latar hero (primary-50, atau
+  gray-900 saat `darkMode`). Prop ini diabaikan pada tipe horizontal. Tipe
+  `HeroCenteredContent` ikut diekspor.
 
 ### Diperbaiki
 
