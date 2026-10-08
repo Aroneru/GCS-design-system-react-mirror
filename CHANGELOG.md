@@ -41,7 +41,10 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   bawahnya terpotong sampai halaman digulir, atau, saat dibalik ke atas,
   panelnya menutupi kotak tanggal. Paling terasa di ponsel: panel `multiple`
   mobile tingginya 566–662px.
-
+  
+- **`Badges`: Mengikuti desain pada figma.** Menyesuaikan padding, border
+  radius, dark-mode dengan mengganti model menjadi dark.
+  mobile tingginya 566–662px.
 ## [0.3.1] - 2026-10-06
 
 Rilis perbaikan kecil. README di halaman npm ikut diperbarui: kini ada bagian

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { InfoCircle } from 'flowbite-react-icons/outline'
+import { CheckCircle, CloseCircle, InfoCircle } from 'flowbite-react-icons/outline'
 import { Avatar, Badge, Button, Icon, Popover, Toggle } from '../../../../lib'
 import { Envelope } from '../../../../lib/icons/outline'
 import { inisial, PEMOHON } from '../data'
@@ -56,7 +56,10 @@ export function Pemohon() {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-body font-black text-gray-900">{p.nama}</h3>
-                  <Badge variant={aktif[p.surel] ? 'success' : 'gray'}>
+                  <Badge
+                    variant={aktif[p.surel] ? 'success' : 'gray'}
+                    icon={aktif[p.surel] ? <CheckCircle /> : <CloseCircle />}
+                  >
                     {aktif[p.surel] ? 'Aktif' : 'Nonaktif'}
                   </Badge>
                 </div>
