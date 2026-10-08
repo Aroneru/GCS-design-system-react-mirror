@@ -51,7 +51,6 @@ export function UploadPage() {
   const [type, setType] = useState<UploadType>('default')
   const [withLabel, setWithLabel] = useState(true)
   const [withHelper, setWithHelper] = useState(true)
-  const [banyak, setBanyak] = useState(false)
   const [theme, setTheme] = useState('light')
 
   return (
@@ -239,7 +238,6 @@ export function UploadPage() {
             type={type}
             platform={platform}
             application={application}
-            multiple={banyak}
             label={withLabel ? 'Unggah dokumen' : undefined}
             helperText={withHelper ? 'PDF atau JPG, maksimal 2 MB.' : undefined}
             darkMode={theme === 'dark'}
@@ -281,14 +279,7 @@ export function UploadPage() {
             />
           </Control>
 
-          <Control label="Banyak berkas">
-            <Segmented
-              label="Izinkan banyak berkas"
-              value={banyak}
-              onChange={(v) => setBanyak(v as boolean)}
-              options={adaTidakAda}
-            />
-          </Control>
+
 
           <Control label="Label">
             <Segmented
@@ -357,13 +348,7 @@ export function UploadPage() {
               {'="mobile"\n'}
             </>
           )}
-          {banyak && (
-            <>
-              {'    '}
-              <H>multiple</H>
-              {'\n'}
-            </>
-          )}
+
           {withLabel && (
             <>
               {'    '}
