@@ -66,7 +66,18 @@ export function Simaya() {
           </Badge>
         </div>
 
+        {/* Tiap baris memasangkan kontrol yang tingginya sama: FloatingLabel tanpa
+            label di atas berdiri sendiri, InputField berdampingan, dan Select
+            (37px) dipasangkan dengan grup radio. */}
         <div className="mt-7 grid gap-5 sm:grid-cols-2">
+          <FloatingLabel
+            application="simaya"
+            label="Unit tujuan"
+            icon={<User className="size-4" />}
+            value={tujuan}
+            onChange={(e) => setTujuan(e.target.value)}
+            className="sm:col-span-2"
+          />
           <InputField
             application="simaya"
             label="Perihal"
@@ -75,12 +86,11 @@ export function Simaya() {
             value={perihal}
             onChange={(e) => setPerihal(e.target.value)}
           />
-          <FloatingLabel
+          <InputField
             application="simaya"
-            label="Unit tujuan"
-            icon={<User className="size-4" />}
-            value={tujuan}
-            onChange={(e) => setTujuan(e.target.value)}
+            label="Nomor agenda"
+            placeholder="Otomatis bila dikosongkan"
+            helperText="Diisi sistem saat naskah disetujui."
           />
           <Select
             application="simaya"
@@ -89,42 +99,33 @@ export function Simaya() {
             value={klasifikasi}
             onChange={(e) => setKlasifikasi(e.target.value)}
           />
-          <InputField
-            application="simaya"
-            label="Nomor agenda"
-            placeholder="Otomatis bila dikosongkan"
-            helperText="Diisi sistem saat naskah disetujui."
-          />
+          <fieldset>
+            <legend className="mb-2 text-sm font-bold text-gray-900">Sifat naskah</legend>
+            <div className="flex min-h-9.25 flex-wrap items-center gap-x-6 gap-y-2">
+              <Radio
+                application="simaya"
+                name="sifat"
+                label="Biasa"
+                checked={sifat === 'biasa'}
+                onChange={() => setSifat('biasa')}
+              />
+              <Radio
+                application="simaya"
+                name="sifat"
+                label="Segera"
+                checked={sifat === 'segera'}
+                onChange={() => setSifat('segera')}
+              />
+              <Radio
+                application="simaya"
+                name="sifat"
+                label="Sangat segera"
+                checked={sifat === 'sangat'}
+                onChange={() => setSifat('sangat')}
+              />
+            </div>
+          </fieldset>
         </div>
-
-        <fieldset className="mt-6">
-          <legend className="text-caption font-bold tracking-wide text-gray-500 uppercase">
-            Sifat naskah
-          </legend>
-          <div className="mt-3 flex flex-wrap gap-6">
-            <Radio
-              application="simaya"
-              name="sifat"
-              label="Biasa"
-              checked={sifat === 'biasa'}
-              onChange={() => setSifat('biasa')}
-            />
-            <Radio
-              application="simaya"
-              name="sifat"
-              label="Segera"
-              checked={sifat === 'segera'}
-              onChange={() => setSifat('segera')}
-            />
-            <Radio
-              application="simaya"
-              name="sifat"
-              label="Sangat segera"
-              checked={sifat === 'sangat'}
-              onChange={() => setSifat('sangat')}
-            />
-          </div>
-        </fieldset>
 
         <div className="mt-6">
           <TextArea
