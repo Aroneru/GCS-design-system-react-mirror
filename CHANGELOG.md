@@ -11,6 +11,13 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+## [0.3.1] - 2026-10-08
+
+Tidak ada perubahan API yang memutus, tetapi beberapa komponen yang sudah ada
+kini tampil berbeda — baca bagian **Diubah**. README di halaman npm ikut
+diperbarui: kini ada bagian Table, baris props Button sudah dibetulkan
+(`type="iconOnly"`, `as="anchor"`), dan props baru di rilis ini ikut tercantum.
+
 ### Diubah
 
 - **Kotak `Datepicker` `single` kini selebar 325px, juga di desktop.** Desain
@@ -22,6 +29,15 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   (-800/-900, sebelumnya -700), dan latar `brand` kini primary-100 (sebelumnya
   primary-50). API lama tetap berlaku, tetapi Badge yang sudah ada akan terlihat
   berbeda.
+- **`Upload` `type="default"`: setelah berkas dipilih, muncul tombol hapus dan
+  ukuran berkas.** Tombol pilih berganti label menjadi `replaceLabel` (bawaan
+  "Replace file"), tombol `removeLabel` (bawaan "Remove") di kanannya
+  mengosongkan pilihan — `onFilesChange` dipanggil dengan `null` — dan total
+  ukuran berkas tampil di bawah baris, di atas `helperText`.
+- **`Drawer`: latar redup di belakang panel tidak lagi diburamkan.** Warnanya
+  tetap gray-900/50; hanya efek blur-nya yang dihapus, juga di tampilan terang.
+- **`Sidebar`: daftar menu yang meluap kini memakai scrollbar tipis
+  `.ds-scroll-y`**, bukan scrollbar bawaan browser.
 
 ### Ditambahkan
 
@@ -36,7 +52,6 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   (`left`, `center`, `right`). `headerAlign` di kolom tetap menang. Bila
   kosong, perilakunya sama seperti sebelumnya: judul ikut `align` kolomnya,
   dan judul induk kolom bertingkat di tengah.
-
 - **`Datepicker`: `platform="mobile"`** — tata letak mobile sesuai desainnya.
   Ketiga bentuk selebar 325px dan panelnya selebar kotak. `single` menaruh
   kisi tanggalnya di tengah panel, `period` memuat Hari ini, Minggu ini, Bulan
@@ -58,6 +73,12 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   Bagian gambar yang transparan menampilkan latar hero (primary-50, atau
   gray-900 saat `darkMode`). Prop ini diabaikan pada tipe horizontal. Tipe
   `HeroCenteredContent` ikut diekspor.
+- **`Drawer`: prop `darkMode`** — tampilan gelap sesuai desain: panel gray-800
+  dengan garis gray-700, teks menu inaktif gray-50 dengan ikon gray-400, dan
+  menu aktif berlatar gray-700 (gray-600 saat disorot).
+- **`Search`: `platform="compact"`** — kotak setinggi 37px dengan tombol cari
+  25px, untuk dipasang di navbar. `SearchPlatform` kini `default | mobile |
+  compact`.
 
 ### Diperbaiki
 
@@ -67,15 +88,6 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   bawahnya terpotong sampai halaman digulir, atau, saat dibalik ke atas,
   panelnya menutupi kotak tanggal. Paling terasa di ponsel: panel `multiple`
   mobile tingginya 566–662px.
-
-## [0.3.1] - 2026-10-06
-
-Rilis perbaikan kecil. README di halaman npm ikut diperbarui: kini ada bagian
-Table, dan baris props Button sudah dibetulkan (`type="iconOnly"`,
-`as="anchor"`).
-
-### Diperbaiki
-
 - **`Footer`: ukuran teks menu dan hak cipta kini dipatok 16px.** Di 0.3.0
   keduanya memakai kelas `text-md`, yang tidak dikenal Tailwind, sehingga tidak
   menghasilkan CSS apa pun dan ukurannya ikut elemen induk: 16px di halaman
@@ -282,12 +294,9 @@ Dibanding 0.2.0 ada enam perubahan yang memutus, termasuk nama paketnya.
   (`right`, `left`, `top`, `bottom`) dan ukurannya lewat `size` (`s`, `m`, `l`,
   `xl`, `full`). Isinya menu navigasi lewat `items` — lengkap dengan submenu dan
   `badge` — atau susunan sendiri dari `DrawerHeader`, `DrawerTitle`,
-  `DrawerDescription`, `DrawerBody`, dan `DrawerFooter`. Prop `darkMode` memberinya
-  tampilan gelap sesuai desain: latar panel gray-800, teks menu inaktif gray-50
-  dengan ikon gray-400, dan status menu aktif/hover menggunakan latar gray-600.
-  Latar redup (backdrop) kini memakai warna pekat transparan (gray-900/50) tanpa 
-  efek blur. Komponen pendukung `DrawerTrigger`, `DrawerNavItem`, dan `DrawerSubItem`
-  serta tipe-tipenya ikut diekspor.
+  `DrawerDescription`, `DrawerBody`, dan `DrawerFooter`. Komponen pendukung
+  `DrawerTrigger`, `DrawerNavItem`, dan `DrawerSubItem` serta tipe-tipenya ikut
+  diekspor.
 - **`Dropdown`** — panel yang dibuka dari sebuah tombol (`trigger`), memakai
   HTML Popover API sehingga browser yang mengurus penutupan, top layer, dan
   urutan fokus. Barisnya diisi lewat `items`, atau `groups` bila perlu dipisah
@@ -349,8 +358,7 @@ Dibanding 0.2.0 ada enam perubahan yang memutus, termasuk nama paketnya.
   viewport setinggi satu layar. `footer` mengisi kaki Sidebar di bawah daftar
   menu — versi aplikasi, tautan bantuan — dan tetap terlihat meski menunya
   panjang dan digulir. `SidebarItem`, `SidebarSubItem`, dan `SidebarUser` kini
-  juga menerima `onClick`. Selain itu, saat daftar menu meluap ke bawah, navigasi
-  secara otomatis digulir menggunakan scrollbar khusus `.ds-scroll-y`.
+  juga menerima `onClick`.
 - **`Table`** — tabel data dari `columns` dan `data`, dengan `rowKey` sebagai
   kunci tiap baris; tanpa `columns`, kolomnya dibuat dari field baris pertama.
   Toolbar-nya bisa memuat kotak pencarian (`search`, yang meneruskan atributnya
