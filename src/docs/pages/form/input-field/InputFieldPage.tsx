@@ -7,7 +7,7 @@ import {
   type InputFieldState,
 } from '../../../../lib'
 import { PropsTable, type PropRow } from '../../../PropsTable'
-import { Demo, H, Segmented } from '../../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../../pageKit'
 import {
   Control,
   Controls,
@@ -32,22 +32,54 @@ const applications: { value: InputFieldApplication; label: string; token: string
   { value: 'simaya', label: 'simaya', token: 'purple-500' },
 ]
 
+/** Contoh password: desktop dan mobile, lalu failed. Bagian Dark mode memakai daftar yang sama, tanpa mobile. */
+const passwordDemos: { label: string; platform: InputFieldPlatform; state: InputFieldState }[] = [
+  { label: 'Desktop', platform: 'default', state: 'default' },
+  { label: 'Mobile', platform: 'mobile', state: 'default' },
+  { label: 'Failed', platform: 'default', state: 'failed' },
+]
+
+function PasswordDemoField({
+  platform,
+  state,
+  dark = false,
+}: {
+  platform: InputFieldPlatform
+  state: InputFieldState
+  dark?: boolean
+}) {
+  return (
+    <InputField
+      type="password"
+      platform={platform}
+      state={state}
+      darkMode={dark}
+      label="Kata sandi"
+      placeholder="••••••••"
+      helperText={state === 'failed' ? 'Kata sandi minimal 8 karakter.' : 'Gunakan minimal 8 karakter.'}
+      autoComplete="current-password"
+    />
+  )
+}
+
 const inputProps: PropRow[] = [
   ['label', 'ReactNode', 'undefined', 'Teks label di atas field.'],
   ['helperText', 'ReactNode', 'undefined', 'Caption di bawah field; jadi pesan error saat state failed.'],
-  ['icon', 'ReactNode', 'undefined', 'Ikon di sisi kiri field.'],
+  ['icon', 'ReactNode', 'undefined', 'Ikon di sisi kiri field. Pada type password bawaannya gembok; null menghilangkannya.'],
+  ['type', "'text' | 'password' | …", 'text', "'password' menyamarkan isian, memasang ikon gembok, dan menambahkan tombol mata untuk menampilkannya."],
   ['platform', "'default' | 'mobile'", 'default', 'Tinggi field: 52px (default) atau 40px (mobile).'],
   ['state', "'default' | 'typing' | 'inactive' | 'failed'", 'default', 'Kondisi visual field.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna garis aksen saat field aktif.'],
   ['onClear', '() => void', 'undefined', 'Bila diisi, tombol hapus (×) muncul di kanan field.'],
   ['darkMode', 'boolean', 'false', 'Tampilan gelap: field gray-800, label putih, garis baru terlihat saat typing dan failed.'],
-  ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (type, value, onChange, …).'],
+  ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (value, onChange, autoComplete, …).'],
 ]
 
 const toc: TocEntry[] = [
   { id: 'input-field', label: 'Input Field' },
   { id: 'states', label: 'States' },
   { id: 'application', label: 'Application' },
+  { id: 'password', label: 'Password' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
@@ -63,15 +95,28 @@ export function InputFieldPage() {
   const [withClear, setWithClear] = useState(true)
   const [value, setValue] = useState('')
   const [dark, setDark] = useState(false)
+  const [kind, setKind] = useState<'text' | 'password'>('text')
 
-  const isFailed = state === 'failed'
-  const helper = isFailed ? 'Nama lengkap wajib diisi.' : 'Sesuai yang tertera pada KTP.'
+  const isPassword = kind === 'password'
+  // Password tidak memakai state inactive: pilihannya dimatikan, dan selama
+  // tipe password field tampil default. Kembali ke teks, pilihan semula berlaku lagi.
+  const fieldState = isPassword && state === 'inactive' ? 'default' : state
+  const isFailed = fieldState === 'failed'
+  const fieldLabel = isPassword ? 'Kata sandi' : 'Nama lengkap'
+  const fieldPlaceholder = isPassword ? '••••••••' : 'Masukkan nama lengkap'
+  const helper = isPassword
+    ? isFailed
+      ? 'Kata sandi minimal 8 karakter.'
+      : 'Gunakan minimal 8 karakter.'
+    : isFailed
+      ? 'Nama lengkap wajib diisi.'
+      : 'Sesuai yang tertera pada KTP.'
 
   return (
     <UsulanPage
       eyebrow="Form · Input Field Form"
       title="Input Field"
-      description="Isian teks satu baris dengan label di atas field. Tinggi, warna, dan jaraknya memakai token yang sama dengan Foundations. Tersedia juga dalam tampilan gelap."
+      description="Isian teks satu baris dengan label di atas field. Tinggi, warna, dan jaraknya memakai token yang sama dengan Foundations. Tersedia juga versi kata sandi dan tampilan gelap."
       toc={toc}
     >
       <FlowSection id="input-field" title="Input Field">
@@ -116,8 +161,8 @@ export function InputFieldPage() {
 
       <FlowSection id="states" title="States">
         <Lead>
-          Empat kondisi visual field. <H>inactive</H> otomatis menonaktifkan input dan <H>failed</H>{' '}
-          menandainya <H>aria-invalid</H>, jadi tampilan dan makna aksesibilitasnya selalu sejalan.
+          Empat kondisi visual field. <Hl>inactive</Hl> otomatis menonaktifkan input dan <Hl>failed</Hl>{' '}
+          menandainya <Hl>aria-invalid</Hl>, jadi tampilan dan makna aksesibilitasnya selalu sejalan.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
@@ -174,11 +219,42 @@ export function InputFieldPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="password" title="Password">
+        <Lead>
+          Dengan <Hl>type="password"</Hl> isiannya disamarkan, ikon gembok tampil di kiri, dan tombol mata di
+          kanan menampilkan atau menyembunyikan kata sandi. Gembok bisa diganti lewat <Hl>icon</Hl>, atau
+          dihilangkan dengan <Hl>{'icon={null}'}</Hl>. Sesuai desainnya, di mobile label, isian, dan caption-nya
+          12px. Saat <Hl>failed</Hl>, garis, latar, gembok, dan caption-nya memerah seperti type teks, tetapi
+          tombol matanya tetap abu-abu. Isi <Hl>autoComplete</Hl> sesuai pemakaiannya —{' '}
+          <Hl>current-password</Hl> untuk masuk, <Hl>new-password</Hl> untuk mendaftar — supaya pengelola kata
+          sandi browser ikut bekerja.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          {passwordDemos.map((d) => (
+            <Demo key={d.label} label={d.label}>
+              <PasswordDemoField platform={d.platform} state={d.state} />
+            </Demo>
+          ))}
+        </div>
+        <SectionCode>
+          {'<InputField\n'}
+          {'    '}
+          <H>type</H>
+          {'="password"\n'}
+          {'    label="Kata sandi"\n'}
+          {'    placeholder="••••••••"\n'}
+          {'    helperText="Gunakan minimal 8 karakter."\n'}
+          {'    autoComplete="current-password"\n'}
+          {'/>'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti field ke gray-800 dengan label putih. Garisnya menyatu dengan latar
-          dan baru terlihat saat <H>typing</H> (warna aplikasi) atau <H>failed</H> (red-500). Teks yang
-          diketik putih, sedangkan placeholder, ikon, dan caption abu-abu.
+          Prop <Hl>darkMode</Hl> mengganti field ke gray-800 dengan label putih. Garisnya menyatu dengan latar
+          dan baru terlihat saat <Hl>typing</Hl> (warna aplikasi) atau <Hl>failed</Hl> (red-500). Teks yang
+          diketik putih, sedangkan placeholder, ikon, dan caption abu-abu. Pada type password, tombol matanya
+          gray-600, dan saat <Hl>failed</Hl> gembok, placeholder, serta caption-nya red-500.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
@@ -194,6 +270,13 @@ export function InputFieldPage() {
               />
             </Demo>
           ))}
+          {passwordDemos
+            .filter((d) => d.platform !== 'mobile')
+            .map((d) => (
+              <Demo key={`password-${d.label}`} label={`Password · ${d.label}`} dark>
+                <PasswordDemoField platform={d.platform} state={d.state} dark />
+              </Demo>
+            ))}
         </div>
         <SectionCode>
           {'<InputField\n'}
@@ -214,21 +297,35 @@ export function InputFieldPage() {
 
         <Stage maxWidth={platform === 'mobile' ? 'max-w-[326px]' : 'max-w-[364px]'} dark={dark}>
           <InputField
+            type={isPassword ? 'password' : undefined}
             platform={platform}
-            state={state}
+            state={fieldState}
             application={application}
             darkMode={dark}
-            label="Nama lengkap"
-            placeholder="Masukkan nama lengkap"
+            label={fieldLabel}
+            placeholder={fieldPlaceholder}
             helperText={withHelper ? helper : undefined}
-            icon={withIcon ? <User className="size-4" /> : undefined}
+            // Password selalu memakai gembok bawaannya dan tidak pernah bertombol hapus.
+            icon={isPassword ? undefined : withIcon ? <User className="size-4" /> : null}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            onClear={withClear ? () => setValue('') : undefined}
+            onClear={withClear && !isPassword ? () => setValue('') : undefined}
           />
         </Stage>
 
         <Controls>
+          <Control label="Tipe">
+            <Segmented
+              label="Pilih tipe"
+              value={kind}
+              onChange={setKind}
+              options={[
+                { value: 'text', label: 'Teks' },
+                { value: 'password', label: 'Password' },
+              ]}
+            />
+          </Control>
+
           <Control label="Platform">
             <Segmented
               label="Pilih platform"
@@ -244,11 +341,15 @@ export function InputFieldPage() {
           <Control label="State">
             <Segmented
               label="Pilih state"
-              value={state}
+              value={fieldState}
               onChange={setState}
               itemClassName="px-2.5"
               wrap
-              options={states.map((s) => ({ value: s.value, label: s.label }))}
+              options={states.map((s) => ({
+                value: s.value,
+                label: s.label,
+                disabled: isPassword && s.value === 'inactive',
+              }))}
             />
           </Control>
 
@@ -263,10 +364,12 @@ export function InputFieldPage() {
           </Control>
 
           <Control label="Ikon kiri">
+            {/* Mati pada password: gemboknya selalu ada, sesuai desain. */}
             <Segmented
               label="Tampilkan ikon kiri"
-              value={withIcon}
+              value={isPassword || withIcon}
               onChange={setWithIcon}
+              disabled={isPassword}
               options={adaTidakAda}
             />
           </Control>
@@ -281,12 +384,13 @@ export function InputFieldPage() {
           </Control>
 
           <Control label="Tombol hapus">
-            {/* Mati saat inactive: field yang tidak bisa diisi tidak perlu tombol hapus. */}
+            {/* Mati saat inactive — field yang tidak bisa diisi tidak perlu tombol hapus — dan pada
+                password, yang selalu tanpa tombol hapus karena sisi kanannya dipakai tombol mata. */}
             <Segmented
               label="Tampilkan tombol hapus"
-              value={withClear}
+              value={withClear && !isPassword}
               onChange={setWithClear}
-              disabled={state === 'inactive'}
+              disabled={isPassword || fieldState === 'inactive'}
               options={adaTidakAda}
             />
           </Control>
@@ -306,7 +410,7 @@ export function InputFieldPage() {
 
         <p className="mt-4 text-body-sm text-gray-500">
           Ketik pada field di atas untuk melihat state <em>typing</em> yang sesungguhnya — garisnya berubah
-          lewat <H>focus-within</H>, tanpa perlu mengubah prop. Pada state <em>failed</em>, helper text
+          lewat <Hl>focus-within</Hl>, tanpa perlu mengubah prop. Pada state <em>failed</em>, helper text
           otomatis berganti jadi pesan kesalahan.
         </p>
       </FlowSection>
@@ -318,9 +422,16 @@ export function InputFieldPage() {
         </Lead>
         <SectionCode flush>
           {"import { InputField } from '@ceplok-ui/design-kit-react'\n"}
-          {withIcon && "import { User } from '@ceplok-ui/design-kit-react/icons/solid'\n"}
+          {withIcon && !isPassword && "import { User } from '@ceplok-ui/design-kit-react/icons/solid'\n"}
           {'\n'}
           {'<InputField\n'}
+          {isPassword && (
+            <>
+              {'    '}
+              <H>type</H>
+              {'="password"\n'}
+            </>
+          )}
           {platform === 'mobile' && (
             <>
               {'    '}
@@ -328,11 +439,11 @@ export function InputFieldPage() {
               {'="mobile"\n'}
             </>
           )}
-          {state !== 'default' && (
+          {fieldState !== 'default' && (
             <>
               {'    '}
               <H>state</H>
-              {`="${state}"\n`}
+              {`="${fieldState}"\n`}
             </>
           )}
           {application !== 'default' && (
@@ -349,8 +460,8 @@ export function InputFieldPage() {
               {'\n'}
             </>
           )}
-          {'    label="Nama lengkap"\n'}
-          {'    placeholder="Masukkan nama lengkap"\n'}
+          {`    label="${fieldLabel}"\n`}
+          {`    placeholder="${fieldPlaceholder}"\n`}
           {withHelper && (
             <>
               {'    '}
@@ -358,7 +469,7 @@ export function InputFieldPage() {
               {`="${helper}"\n`}
             </>
           )}
-          {withIcon && (
+          {withIcon && !isPassword && (
             <>
               {'    '}
               <H>icon</H>
@@ -367,7 +478,7 @@ export function InputFieldPage() {
           )}
           {'    value={value}\n'}
           {'    onChange={(e) => setValue(e.target.value)}\n'}
-          {withClear && state !== 'inactive' && (
+          {withClear && !isPassword && fieldState !== 'inactive' && (
             <>
               {'    '}
               <H>onClear</H>
@@ -380,7 +491,7 @@ export function InputFieldPage() {
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <H>&lt;input&gt;</H>{' '}
+          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut <Hl>&lt;input&gt;</Hl>{' '}
           standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={inputProps} minWidth="46rem" />

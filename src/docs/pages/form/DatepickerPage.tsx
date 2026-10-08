@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Datepicker, type DateRange, type DatepickerType } from '../../../lib'
+import { Datepicker, type DateRange, type DatepickerPlatform, type DatepickerType } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -40,7 +40,7 @@ const namaState: Record<DatepickerType, [string, string]> = {
 
 /** Lebar panggung Playground — sama dengan lebar bawaan tiap bentuk. */
 const lebarStage: Record<DatepickerType, string> = {
-  single: 'max-w-[284px]',
+  single: 'max-w-[325px]',
   period: 'max-w-[325px]',
   multiple: 'max-w-[600px]',
 }
@@ -52,6 +52,7 @@ const iso = (d: Date | null) =>
 const datepickerProps: PropRow[] = [
   ['type', "'single' | 'period' | 'multiple'", 'single', 'Bentuk pemilih: satu tanggal, satu kalender dengan pintasan periode, atau rentang dengan dua kalender.'],
   ['shortcuts', 'boolean', 'false', 'Khusus multiple: menambahkan Minggu ini, Bulan ini, dan Semua Waktu di samping Hari ini dan Hapus. Period selalu memilikinya.'],
+  ['platform', "'default' | 'mobile'", 'default', 'Tata letak mobile: lebar bawaan 325px dan panel selebar kotak. Single menaruh kisinya di tengah, period memuat empat pintasannya dalam satu baris, dan multiple menumpuk kotak serta kalendernya.'],
   ['min', 'Date | null', 'undefined', 'Awal data: tanggal sebelumnya tidak bisa dipilih, pintasan dipotong ke sini, dan Semua Waktu dimulai dari sini.'],
   ['max', 'Date | null', 'undefined', 'Akhir data: tanggal sesudahnya tidak bisa dipilih, pintasan dipotong ke sini, dan Semua Waktu berakhir di sini.'],
   ['label', 'ReactNode', 'undefined', 'Teks label di atas kotak tanggal.'],
@@ -71,6 +72,7 @@ const toc: TocEntry[] = [
   { id: 'single', label: 'Single' },
   { id: 'period', label: 'Period' },
   { id: 'multiple', label: 'Multiple' },
+  { id: 'mobile', label: 'Mobile' },
   { id: 'batas', label: 'Batas data' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'nilai', label: 'Nilai & formulir' },
@@ -82,6 +84,7 @@ const toc: TocEntry[] = [
 
 export function DatepickerPage() {
   const [type, setType] = useState<DatepickerType>('single')
+  const [platform, setPlatform] = useState<DatepickerPlatform>('default')
   const [dark, setDark] = useState(false)
   const [withLabel, setWithLabel] = useState(true)
   const [disabled, setDisabled] = useState(false)
@@ -101,18 +104,19 @@ export function DatepickerPage() {
         ? `{ start: ${iso(rentang.start)}, end: ${iso(rentang.end)} }`
         : 'null'
   const [namaNilai, namaSetel] = namaState[type]
+  const mobile = platform === 'mobile'
 
   return (
     <UsulanPage
       eyebrow="Form"
       title="Datepicker"
-      description="Pemilih tanggal dengan kalender di panel melayang — satu tanggal, satu kalender dengan pintasan periode, atau rentang dengan dua kalender. Tersedia juga dalam tampilan gelap."
+      description="Pemilih tanggal dengan kalender di panel melayang — satu tanggal, satu kalender dengan pintasan periode, atau rentang dengan dua kalender. Tersedia juga tata letak mobile dan tampilan gelap."
       toc={toc}
     >
       <FlowSection id="single" title="Single">
         <Lead>
           Kotak setinggi 42px dengan ikon kalender di kiri. Menekannya membuka kalender tepat di bawah kotak,
-          lengkap dengan tombol <H>Hari ini</H> dan <H>Hapus</H>. Memilih tanggal langsung menutup panelnya.
+          lengkap dengan tombol <Hl>Hari ini</Hl> dan <Hl>Hapus</Hl>. Memilih tanggal langsung menutup panelnya.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Belum dipilih">
@@ -136,17 +140,18 @@ export function DatepickerPage() {
           {'/>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Lebar bawaannya sama dengan panelnya — 284px untuk single, 325px untuk period, dan 600px untuk
-          multiple — supaya tepi kotak dan kalendernya segaris. Di wadah yang lebih sempit ia ikut menyusut;{' '}
-          <H>className="max-w-none"</H> melepas batas itu.
+          Kotak single selebar 325px, sama dengan di mobile, sedangkan panelnya 284px — seperti desainnya.
+          Bentuk lain selebar panelnya, 325px untuk period dan 600px untuk multiple (325px di mobile), supaya
+          tepi kotak dan kalendernya segaris. Di wadah yang lebih sempit ia ikut menyusut;{' '}
+          <Hl>className="max-w-none"</Hl> melepas batas itu.
         </p>
       </FlowSection>
 
       <FlowSection id="period" title="Period">
         <Lead>
-          Satu kalender dengan lima pintasan — <H>Hari ini</H>, <H>Minggu ini</H>, <H>Bulan ini</H>,{' '}
-          <H>Hapus</H>, dan <H>Semua Waktu</H> — untuk menyaring daftar berdasarkan waktu. Karena Minggu ini
-          dan Bulan ini adalah rentang, nilainya berupa <H>DateRange</H>. Rentang lain dipilih langsung di
+          Satu kalender dengan lima pintasan — <Hl>Hari ini</Hl>, <Hl>Minggu ini</Hl>, <Hl>Bulan ini</Hl>,{' '}
+          <Hl>Hapus</Hl>, dan <Hl>Semua Waktu</Hl> — untuk menyaring daftar berdasarkan waktu. Karena Minggu ini
+          dan Bulan ini adalah rentang, nilainya berupa <Hl>DateRange</Hl>. Rentang lain dipilih langsung di
           kalendernya dengan dua klik: klik pertama mengisi tanggal mulai, klik kedua tanggal selesai, dan
           panel baru tertutup setelah klik kedua.
         </Lead>
@@ -176,8 +181,8 @@ export function DatepickerPage() {
         <Lead>
           Dua kotak — tanggal mulai dan tanggal selesai — dengan dua kalender berdampingan. Seperti period,
           klik pertama mengisi tanggal mulai dan klik kedua tanggal selesai, baru panelnya tertutup; tanggal
-          di antaranya diberi latar abu. Seperti single, tombolnya hanya <H>Hari ini</H> dan <H>Hapus</H>;
-          prop <H>shortcuts</H> menambahkan <H>Minggu ini</H>, <H>Bulan ini</H>, dan <H>Semua Waktu</H>{' '}
+          di antaranya diberi latar abu. Seperti single, tombolnya hanya <Hl>Hari ini</Hl> dan <Hl>Hapus</Hl>;
+          prop <Hl>shortcuts</Hl> menambahkan <Hl>Minggu ini</Hl>, <Hl>Bulan ini</Hl>, dan <Hl>Semua Waktu</Hl>{' '}
           seperti pada period.
         </Lead>
         <div className="grid gap-5">
@@ -208,16 +213,56 @@ export function DatepickerPage() {
           selesai yang jatuh sebelum tanggal mulai dianggap memulai rentang baru. Tanggal bulan sebelah yang
           ikut tampil di tepi kalender — misalnya 27–30 September di kalender Oktober — tidak disorot bila
           bulannya sudah tampil di kalender sebelah: sorotannya cukup di sana, tetapi tanggal itu tetap bisa
-          ditekan. Di layar sempit kedua kalender bertumpuk.
+          ditekan. Di layar sempit kedua kalender bertumpuk, tetapi kotaknya tetap berdampingan — untuk
+          ponsel, pakai tata letak mobile di bawah.
+        </p>
+      </FlowSection>
+
+      <FlowSection id="mobile" title="Mobile">
+        <Lead>
+          Untuk ponsel, <Hl>platform="mobile"</Hl> memakai tata letak dari desain mobile: ketiga bentuk
+          selebar 325px, dan panelnya selebar kotak. Single menaruh kisi tanggalnya di tengah panel, period
+          memuat <Hl>Hari ini</Hl>, <Hl>Minggu ini</Hl>, <Hl>Bulan ini</Hl>, dan <Hl>Hapus</Hl> dalam satu
+          baris, dan multiple menumpuk kotak tanggal selesai di bawah kotak tanggal mulai serta kalender
+          kedua di bawah yang pertama.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Single">
+            <Datepicker platform="mobile" label="Nama Tanggal" defaultValue={TANGGAL} />
+          </Demo>
+          <Demo label="Period">
+            <Datepicker type="period" platform="mobile" label="Nama Tanggal" defaultValue={SEPEKAN} />
+          </Demo>
+          <Demo label="Multiple">
+            <Datepicker type="multiple" platform="mobile" label="Nama Tanggal" defaultValue={RENTANG} />
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Datepicker\n'}
+          {'    type="multiple"\n'}
+          {'    '}
+          <H>platform</H>
+          {'="mobile"\n'}
+          {'    label="Nama Tanggal"\n'}
+          {'    value={rentang}\n'}
+          {'    onChange={setRentang}\n'}
+          {'/>'}
+        </SectionCode>
+        <p className="mt-4 text-body-sm text-gray-500">
+          Dengan <Hl>className="max-w-none"</Hl> ia memenuhi wadahnya dan panelnya ikut melebar. Panel
+          multiple setinggi ini jarang muat di layar ponsel, jadi bila tidak muat di bawah maupun di atas
+          kotak, tingginya dibatasi ruang yang tersedia dan isinya digulir di dalam panel. Selebihnya sama
+          dengan desktop: cara memilih, papan ketik, dan nilainya. Kedua kalender multiple juga tetap bisa
+          digeser sendiri-sendiri — yang atas selalu lebih awal dari yang bawah.
         </p>
       </FlowSection>
 
       <FlowSection id="batas" title="Batas data">
         <Lead>
-          Prop <H>min</H> dan <H>max</H> menandai dari mana data tersedia sampai di mana batas akhirnya —
+          Prop <Hl>min</Hl> dan <Hl>max</Hl> menandai dari mana data tersedia sampai di mana batas akhirnya —
           misalnya tiket pesawat yang bisa dipesan dari hari ini sampai tanggal yang sama tahun depan.
-          Tanggal di luarnya tidak bisa dipilih, dan <H>Semua Waktu</H> memilih seluruh rentang itu: dari{' '}
-          <H>min</H> sampai <H>max</H>.
+          Tanggal di luarnya tidak bisa dipilih, dan <Hl>Semua Waktu</Hl> memilih seluruh rentang itu: dari{' '}
+          <Hl>min</Hl> sampai <Hl>max</Hl>.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Period">
@@ -251,20 +296,18 @@ export function DatepickerPage() {
           {'// Semua Waktu → { start: hariIni, end: setahunLagi }'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Pintasan lain ikut dipotong ke batas itu: Minggu ini yang dimulai sebelum <H>min</H> hanya diambil
-          mulai <H>min</H>, sedangkan pintasan yang seluruh rentangnya di luar batas — misalnya Hari ini saat
+          Pintasan lain ikut dipotong ke batas itu: Minggu ini yang dimulai sebelum <Hl>min</Hl> hanya diambil
+          mulai <Hl>min</Hl>, sedangkan pintasan yang seluruh rentangnya di luar batas — misalnya Hari ini saat
           datanya baru mulai minggu depan — dimatikan. Panah bulan berhenti di bulan pertama dan terakhir yang
-          masih punya tanggal di dalam batas, begitu pula panah papan ketik. Tanpa <H>min</H> dan <H>max</H>,
-          Semua Waktu bernilai <H>{'{ start: null, end: null }'}</H> — rentang tanpa batas.
+          masih punya tanggal di dalam batas, begitu pula panah papan ketik. Tanpa <Hl>min</Hl> dan <Hl>max</Hl>,
+          Semua Waktu bernilai <Hl>{'{ start: null, end: null }'}</Hl> — rentang tanpa batas.
         </p>
       </FlowSection>
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti seluruh warnanya ke tampilan gelap: kotak dan panel gray-700,
-          tanggal terpilih primary-600, dan tombol pintasan berisi. Untuk saat ini baru Alert, Checkbox,
-          Datepicker, Floating Label, Input Field, Radio Button, Regular Select, Text Area, Toast, dan Toggle
-          Button yang memilikinya.
+          Prop <Hl>darkMode</Hl> mengganti seluruh warnanya ke tampilan gelap: kotak dan panel gray-700,
+          tanggal terpilih primary-600, dan tombol pintasan berisi. Tata letak mobile memakai warna yang sama.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Single" dark>
@@ -278,6 +321,16 @@ export function DatepickerPage() {
               <Datepicker darkMode type="multiple" label="Nama Tanggal" defaultValue={RENTANG} />
             </Demo>
           </div>
+          <Demo label="Multiple · Mobile dengan shortcuts" dark>
+            <Datepicker
+              darkMode
+              type="multiple"
+              platform="mobile"
+              shortcuts
+              label="Nama Tanggal"
+              defaultValue={RENTANG}
+            />
+          </Demo>
         </div>
         <SectionCode>
           {'<Datepicker '}
@@ -288,24 +341,24 @@ export function DatepickerPage() {
 
       <FlowSection id="nilai" title="Nilai & formulir">
         <Lead>
-          Single bernilai <H>Date</H>, sedangkan period dan multiple bernilai <H>DateRange</H> —{' '}
-          <H>{'{ start, end }'}</H>. Jamnya selalu dibuang, jadi dua tanggal cukup dibandingkan harinya.
+          Single bernilai <Hl>Date</Hl>, sedangkan period dan multiple bernilai <Hl>DateRange</Hl> —{' '}
+          <Hl>{'{ start, end }'}</Hl>. Jamnya selalu dibuang, jadi dua tanggal cukup dibandingkan harinya.
         </Lead>
         <ul className="max-w-2xl space-y-2 text-body-sm text-gray-600">
           <li>
-            <H>null</H> — belum diisi, atau setelah <H>Hapus</H>.
+            <Hl>null</Hl> — belum diisi, atau setelah <Hl>Hapus</Hl>.
           </li>
           <li>
-            <H>{'{ start: Date, end: Date }'}</H> — rentang. Hari ini, Minggu ini (Minggu–Sabtu, mengikuti
+            <Hl>{'{ start: Date, end: Date }'}</Hl> — rentang. Hari ini, Minggu ini (Minggu–Sabtu, mengikuti
             urutan hari di kalender), dan Bulan ini (tanggal 1 sampai terakhir) menghasilkan bentuk ini —
-            dipotong ke <H>min</H> dan <H>max</H> bila ada.
+            dipotong ke <Hl>min</Hl> dan <Hl>max</Hl> bila ada.
           </li>
           <li>
-            <H>{'{ start: Date, end: null }'}</H> — period atau multiple yang baru terisi tanggal mulainya.
+            <Hl>{'{ start: Date, end: null }'}</Hl> — period atau multiple yang baru terisi tanggal mulainya.
           </li>
           <li>
-            <H>{'{ start: min, end: max }'}</H> — Semua Waktu: seluruh rentang data. Sisi yang tidak diberi
-            batas bernilai <H>null</H>, jadi tanpa keduanya hasilnya <H>{'{ start: null, end: null }'}</H> —
+            <Hl>{'{ start: min, end: max }'}</Hl> — Semua Waktu: seluruh rentang data. Sisi yang tidak diberi
+            batas bernilai <Hl>null</Hl>, jadi tanpa keduanya hasilnya <Hl>{'{ start: null, end: null }'}</Hl> —
             rentang tanpa batas, berbeda dari belum diisi.
           </li>
         </ul>
@@ -320,8 +373,8 @@ export function DatepickerPage() {
           {'// terkirim: periode[start]=2021-06-25 & periode[end]=2021-07-12'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Dengan <H>name</H>, tanggalnya ikut terkirim bersama formulir dalam format <H>YYYY-MM-DD</H>. Semua
-          Waktu terkirim sebagai <H>min</H> dan <H>max</H>-nya; sisi yang tidak berbatas terkirim kosong.
+          Dengan <Hl>name</Hl>, tanggalnya ikut terkirim bersama formulir dalam format <Hl>YYYY-MM-DD</Hl>. Semua
+          Waktu terkirim sebagai <Hl>min</Hl> dan <Hl>max</Hl>-nya; sisi yang tidak berbatas terkirim kosong.
         </p>
       </FlowSection>
 
@@ -332,18 +385,18 @@ export function DatepickerPage() {
         </Lead>
         <ul className="max-w-2xl space-y-2 text-body-sm text-gray-600">
           <li>
-            <H>←</H> <H>→</H> hari sebelumnya dan berikutnya; <H>↑</H> <H>↓</H> minggu sebelumnya dan
+            <Hl>←</Hl> <Hl>→</Hl> hari sebelumnya dan berikutnya; <Hl>↑</Hl> <Hl>↓</Hl> minggu sebelumnya dan
             berikutnya.
           </li>
           <li>
-            <H>Home</H> dan <H>End</H> ke awal dan akhir minggu.
+            <Hl>Home</Hl> dan <Hl>End</Hl> ke awal dan akhir minggu.
           </li>
           <li>
-            <H>PageUp</H> dan <H>PageDown</H> ke bulan sebelumnya dan berikutnya; bersama <H>Shift</H>, ke
+            <Hl>PageUp</Hl> dan <Hl>PageDown</Hl> ke bulan sebelumnya dan berikutnya; bersama <Hl>Shift</Hl>, ke
             tahun sebelumnya dan berikutnya.
           </li>
           <li>
-            <H>Enter</H> atau <H>Spasi</H> memilih tanggal; <H>Escape</H> atau klik di luar panel menutupnya,
+            <Hl>Enter</Hl> atau <Hl>Spasi</Hl> memilih tanggal; <Hl>Escape</Hl> atau klik di luar panel menutupnya,
             dan fokus kembali ke kotak tanggalnya.
           </li>
         </ul>
@@ -355,11 +408,12 @@ export function DatepickerPage() {
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth={lebarStage[type]} dark={dark}>
+        <Stage maxWidth={mobile ? 'max-w-[325px]' : lebarStage[type]} dark={dark}>
           {type === 'single' ? (
             <Datepicker
               {...namaLabel}
               {...batasData}
+              platform={platform}
               darkMode={dark}
               disabled={disabled}
               value={tunggal}
@@ -370,6 +424,7 @@ export function DatepickerPage() {
               {...namaLabel}
               {...batasData}
               type={type}
+              platform={platform}
               shortcuts={shortcuts}
               darkMode={dark}
               disabled={disabled}
@@ -380,12 +435,24 @@ export function DatepickerPage() {
         </Stage>
 
         <p className="mt-4 text-body-sm text-gray-500">
-          Nilai terakhir dari <H>onChange</H>: <H>{nilaiTerakhir}</H>
+          Nilai terakhir dari <Hl>onChange</Hl>: <Hl>{nilaiTerakhir}</Hl>
         </p>
 
         <Controls>
           <Control label="Type">
             <Segmented label="Pilih bentuk" value={type} onChange={setType} options={types} />
+          </Control>
+
+          <Control label="Platform">
+            <Segmented
+              label="Pilih platform"
+              value={platform}
+              onChange={setPlatform}
+              options={[
+                { value: 'mobile', label: 'Mobile' },
+                { value: 'default', label: 'Desktop' },
+              ]}
+            />
           </Control>
 
           <Control label="Shortcuts">
@@ -463,6 +530,13 @@ export function DatepickerPage() {
               {'    '}
               <H>type</H>
               {`="${type}"\n`}
+            </>
+          )}
+          {mobile && (
+            <>
+              {'    '}
+              <H>platform</H>
+              {'="mobile"\n'}
             </>
           )}
           {type === 'multiple' && shortcuts && (

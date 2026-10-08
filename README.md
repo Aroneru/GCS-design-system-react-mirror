@@ -10,10 +10,12 @@ Ceplok Design System. Dipindahkan 1:1 dari versi Laravel/Blade
   purple), semantic aliases (`brand`, `feedback-*`, `content`,
   `surface`, `border`), skala tipografi (`display` → `caption`), spacing, radius,
   shadow, font Lato.
-- **Komponen umum**: `Button`, `Badge`, `Alert`, `Toast`, `Card`, `Container`,
-  `Icon`, `Navbar`, `Footer`.
+- **Komponen umum**: `Alert`, `Avatar`, `Badge`, `Breadcrumb`, `Button`, `Card`,
+  `Clipboard`, `Container`, `Drawer`, `Dropdown`, `Footer`, `Hero`, `Icon`,
+  `Modal`, `Navbar`, `Pagination`, `Popover`, `Sidebar`, `Spinner`, `Table`,
+  `Toast`.
 - **Komponen form**: `InputField`, `FloatingLabel`, `TextArea`, `Select`,
-  `Radio`, `Toggle`, `Checkbox`.
+  `Search`, `Datepicker`, `Upload`, `Radio`, `Toggle`, `Checkbox`.
 - **Ikon**: logo brand & sosial (`Github`, `Instagram`, …) dari barrel utama,
   plus ikon UI lewat subpath `icons/outline` dan `icons/solid`.
 
@@ -87,26 +89,36 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 
 ### Umum
 
-| Komponen    | Props utama                                                               |
-| ----------- | ------------------------------------------------------------------------- |
-| `Button`    | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `iconOnly`, `as` |
-| `Badge`     | `variant`: `gray \| brand \| danger \| warning \| success`                |
-| `Avatar`    | `src`, `alt`, `initials`, `size`: `small \| default \| large`             |
-| `Alert`     | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`        |
-| `Toast`     | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`        |
-| `Card`      | `image`, `title`, `description`, `href`, `linkLabel`, `actions`           |
-| `Container` | `as` (default `div`), `padded` (default `true`)                           |
-| `Icon`      | `children` (SVG dengan `currentColor`)                                    |
-| `Breadcrumb`| `items`, `darkMode`                                                       |
-| `Pagination`| `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`  |
-| `Navbar`    | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`        |
-| `Sidebar`   | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `darkMode` |
-| `Drawer`    | `open`, `onClose`, `position`, `size`, `header`, `items`, `darkMode`      |
-| `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`                     |
+| Komponen     | Props utama                                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| iconOnly`, `as`: `button \| anchor`      |
+| `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`                                                           |
+| `Avatar`     | `src`, `alt`, `initials`, `size`: `small \| default \| large`, `darkMode`                                            |
+| `Spinner`    | `size`: `default \| large`                                                                                           |
+| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `onCopySuccess`, `darkMode` |
+| `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
+| `Toast`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
+| `Card`       | `image`, `title`, `description`, `href`, `linkLabel`, `actions`, `darkMode`                                          |
+| `Container`  | `as` (default `div`), `padded` (default `true`), `darkMode`                                                          |
+| `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
+| `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode`                                          |
+| `Dropdown`   | `trigger`, `items`/`groups`, `attached`, `contentLabel`, `darkMode`                                                  |
+| `Modal`      | `trigger`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape`    |
+| `Drawer`     | `open`, `onClose`, `position`, `size`, `header`, `items`, `theme`, `darkMode`                                        |
+| `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
+| `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
+| `Navbar`     | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`                                                   |
+| `Hero`       | `type`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`                       |
+| `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `sticky`, `footer`, `darkMode`        |
+| `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
+| `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `pagination`, `sticky`, `size`, `loading`     |
 
-Warna Button diatur `theme` (`primary \| green \| gray \| purple \| orange \|
-yellow`) dan `tone` (`light \| dark`), bukan lewat `variant` — `variant` hanya
-memilih terisi atau bergaris. Ukuran: `xs \| s \| base \| l \| xl`.
+Warna Button diatur `theme` (`primary | green | gray | simaya | orange |
+yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya
+memilih terisi atau bergaris. Ukuran: `xs | s | base | l | xl`. Ikon di kiri
+atau kanan teks lewat `leftIcon`/`rightIcon`; `type="iconOnly"` membuat tombol
+bundar berisi ikon saja. Untuk tautan pakai `as="anchor"` bersama `href`, maka
+Button dirender sebagai `<a>`.
 
 ### Form
 
@@ -116,22 +128,25 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 
 | Komponen        | Props khas                                                                                                                      | Ukuran (desktop / mobile) |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `InputField`    | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| typing \| inactive \| failed`                        | 52 / 40 px                |
+| `InputField`    | `label`, `helperText`, `icon`, `onClear`, `type="password"`, `darkMode`, `state`: `default \| typing \| inactive \| failed`     | 52 / 40 px                |
 | `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| active \| error`                                     | 58 / 50 px                |
 | `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit`, `darkMode` | 162 / 120 px              |
 | `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`, `darkMode`                                                             | 37 px                     |
 | `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`, `darkMode`                                  | 54 / 50 px                |
-| `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 px                     |
-| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode`                               | 44 / 40 px                |
+| `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 / 42 px                |
+| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode`                   | 44 / 40 px                |
 | `Radio`         | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
 | `Toggle`        | `label`, `helperText`, `darkMode`                                                                                               | 40×20 / 36×18 px          |
 | `Checkbox`      | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
 
 Prop yang dipakai bersama seluruh komponen form:
 
-- `platform`: `default | mobile` — hanya mengubah ukuran. Pada `Select`, varian
-  Mobile cuma menyempitkan wadahnya, jadi prop ini memang tidak ada; pada
-  `Upload` ia tidak berpengaruh untuk `type="attach"`, karena alasan yang sama.
+- `platform`: `default | mobile` — mengubah ukuran. Pada `Datepicker` ia juga
+  mengubah tata letak: panelnya selebar kotak, `single` menaruh kisinya di
+  tengah, `period` memuat empat pintasannya dalam satu baris, dan `multiple`
+  menumpuk kotak serta kalendernya. Pada `Select`, varian Mobile cuma
+  menyempitkan wadahnya, jadi prop ini memang tidak ada; pada `Upload` ia tidak
+  berpengaruh untuk `type="attach"`, karena alasan yang sama.
 - `application`: `default | simaya` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.
@@ -198,6 +213,41 @@ dan `NavbarMenuPosition`.
 Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
 bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.
 
+### Table
+
+```tsx
+import { useState } from 'react'
+import { Table, type TableColumn } from '@ceplok-ui/design-kit-react'
+
+type Pemohon = { id: number; nama: string; layanan: string; tanggal: string }
+
+const columns: TableColumn<Pemohon>[] = [
+  { key: 'nama', header: 'Nama', emphasis: true, hideable: false, sortable: true },
+  { key: 'layanan', header: 'Layanan' },
+  { key: 'tanggal', header: 'Tanggal', sortable: true, sortDirections: ['desc', 'asc'] },
+]
+
+const [kata, setKata] = useState('')
+const hasilCari = pemohon.filter((p) => p.nama.toLowerCase().includes(kata.toLowerCase()))
+
+<Table
+  columns={columns}
+  data={hasilCari}
+  rowKey="id"
+  search={{ value: kata, onChange: (e) => setKata(e.target.value) }}
+  filter={{}}
+  selectable
+  pagination={{ pageSize: 10 }}
+/>
+```
+
+`search` hanya menyediakan kotaknya: atributnya diteruskan ke `<input>`, dan
+`data` disaring sendiri seperti di atas. `filter` memunculkan tombol Filter Data
+untuk memilih kolom yang tampil; kolom ber-`hideable: false` selalu tampil.
+Pengurutan dan pembagian halaman dikerjakan tabel. Untuk data dari server pasang
+`manual`: kirim baris halaman aktif saja beserta `pagination.total`, lalu
+tangani `onSortChange` dan `pagination.onPageChange`.
+
 ## Ikon
 
 ```tsx
@@ -219,8 +269,9 @@ npm run lint       # eslint
 ```
 
 Situs dokumentasinya berisi `/foundations/*` (token), `/components/*`,
-`/form/*` (tiap komponen form beserta playground-nya), dan `/example` — satu
-halaman formulir layanan yang memakai seluruh komponen kit sekaligus.
+`/form/*` (tiap komponen form beserta playground-nya), dan `/example` — contoh
+aplikasi tujuh halaman (Dasbor, Layanan, Pengajuan, Pemohon, Modifikasi,
+Pengaturan, dan Simaya) yang memakai komponen kit bersama-sama.
 
 Seluruh halaman komponen dan form memakai susunan yang sama: judul ber-anchor,
 blok kode menempel di tiap bagian, dan daftar isi "On this page" di kanan.
@@ -275,19 +326,57 @@ npm run build:lib      # `npm pack` TIDAK menjalankan prepublishOnly, jadi build
 npm pack               # -> ceplok-ui-design-kit-react-<versi>.tgz
 
 # di project consumer
-npm install ../react-design-system/ceplok-ui-design-kit-react-0.1.0.tgz
+npm install ../react-design-system/ceplok-ui-design-kit-react-<versi>.tgz
 ```
 
 Dependency `clsx` dan `flowbite-react-icons` ikut terpasang otomatis. Tarball
 adalah snapshot: setiap kali package berubah, ulangi `build:lib` + `pack`, lalu
 `npm install` lagi di consumer.
 
-## Publish
+## Rilis & publish
 
-`prepublishOnly` otomatis menjalankan `build:lib`, jadi cukup:
+Versi mengikuti semver: selama masih di bawah `1.0.0`, perubahan yang memutus
+menaikkan versi **minor**. Semua langkah di bawah dijalankan manual oleh
+maintainer, berurutan.
 
-```bash
-npm publish        # atau --dry-run untuk cek isi tarball
-```
+1. Pastikan `staging` sudah di-merge ke `main`, lalu cek dari `main`:
 
-Versi mengikuti semver — lihat catatan versioning di repo Laravel (`packages/README.md`).
+   ```bash
+   npm run build        # tsc -b + build situs dokumentasi
+   npm run build:lib    # build paket
+   npm pack --dry-run   # isi tarball: hanya dist/, README, LICENSE, package.json
+   ```
+
+2. Di `CHANGELOG.md`, ganti judul `## [Belum dirilis]` menjadi
+   `## [x.y.z] - YYYY-MM-DD`, lalu tambahkan `## [Belum dirilis]` kosong di
+   atasnya.
+3. Naikkan versi tanpa membuat commit; `package.json` dan `package-lock.json`
+   ikut berubah:
+
+   ```bash
+   npm version x.y.z --no-git-tag-version
+   ```
+
+4. Commit, beri tag, push `main` beserta tag-nya, lalu samakan `staging` agar
+   CHANGELOG-nya tidak tertinggal:
+
+   ```bash
+   git commit -am "x.y.z"
+   git tag -a vx.y.z -m "x.y.z"
+   git push origin main vx.y.z
+   git push origin main:staging   # fast-forward; bila ditolak, merge main ke staging
+   ```
+
+5. Publish. `prepublishOnly` otomatis menjalankan `build:lib`, dan npm akan
+   meminta OTP atau persetujuan lewat browser:
+
+   ```bash
+   npm login                     # bila sesi npm sudah kedaluwarsa
+   npm publish --access public
+   ```
+
+6. Cek hasilnya. Versi baru bisa butuh satu-dua menit sebelum terlihat:
+
+   ```bash
+   npm view @ceplok-ui/design-kit-react version dist-tags
+   ```

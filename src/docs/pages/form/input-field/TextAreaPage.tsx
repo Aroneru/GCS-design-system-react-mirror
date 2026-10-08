@@ -6,7 +6,7 @@ import {
   type TextAreaType,
 } from '../../../../lib'
 import { PropsTable, type PropRow } from '../../../PropsTable'
-import { Demo, H, Segmented } from '../../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../../pageKit'
 import {
   Control,
   Controls,
@@ -117,9 +117,9 @@ export function TextAreaPage() {
 
       <FlowSection id="editor" title="Editor">
         <Lead>
-          Type <H>editor</H> menambahkan toolbar setinggi 40px di atas area isian — tujuh alat dengan garis
+          Type <Hl>editor</Hl> menambahkan toolbar setinggi 40px di atas area isian — tujuh alat dengan garis
           pemisah setelah alat ketiga. Teks di kanan label bisa dipakai sebagai penghitung karakter, dan
-          tombol kirim muncul begitu <H>submitLabel</H> diisi.
+          tombol kirim muncul begitu <Hl>submitLabel</Hl> diisi.
         </Lead>
         <Demo>
           <TextArea
@@ -180,7 +180,7 @@ export function TextAreaPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti kotak, toolbar, dan area isian ke gray-800, dengan label dan teks
+          Prop <Hl>darkMode</Hl> mengganti kotak, toolbar, dan area isian ke gray-800, dengan label dan teks
           yang diketik putih. Kotak polos tidak lagi bergaris, sedangkan bingkai editor dan garis pemisah
           toolbarnya tetap gray-300. Tombol kirim memakai -600 (hover -700), satu tingkat lebih terang dari
           tampilan terang.
@@ -321,7 +321,7 @@ export function TextAreaPage() {
         <p className="mt-4 text-body-sm text-gray-500">
           Tombol kirim hanya dirender pada type <em>editor</em>, jadi kontrolnya ikut mati saat type{' '}
           <em>default</em>. Hint dan helper text berlaku di kedua type; platform hanya mengubah tinggi kotak
-          pada type <em>default</em>. Isi <H>hint</H> bebas — penghitung karakter perlu diikat ke nilai
+          pada type <em>default</em>. Isi <Hl>hint</Hl> bebas — penghitung karakter perlu diikat ke nilai
           isian, sedangkan penanda seperti <em>Opsional</em> cukup teks tetap.
         </p>
       </FlowSection>
@@ -402,7 +402,7 @@ export function TextAreaPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;textarea&gt;</H> standar juga diteruskan apa adanya.
+          <Hl>&lt;textarea&gt;</Hl> standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={textAreaProps} minWidth="48rem" />
       </FlowSection>

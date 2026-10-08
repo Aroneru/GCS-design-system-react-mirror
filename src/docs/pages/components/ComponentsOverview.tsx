@@ -1,4 +1,4 @@
-import { InfoCircle } from "flowbite-react-icons/outline";
+import { CheckCircle, CloseCircle, Hourglass, InfoCircle } from "flowbite-react-icons/outline";
 import {
   Alert,
   Avatar,
@@ -71,9 +71,9 @@ export function ComponentsOverview() {
         desc="Label status ringkas dengan lima variant warna semantik."
       >
         <div className="flex flex-wrap items-center gap-2 rounded-xl bg-surface-subtle p-5">
-          <Badge variant="success">Aktif</Badge>
-          <Badge variant="warning">Menunggu</Badge>
-          <Badge variant="danger">Ditolak</Badge>
+          <Badge variant="success" icon={<CheckCircle />}>Aktif</Badge>
+          <Badge variant="warning" icon={<Hourglass />}>Menunggu</Badge>
+          <Badge variant="danger" icon={<CloseCircle />}>Ditolak</Badge>
         </div>
       </OverviewCard>
 

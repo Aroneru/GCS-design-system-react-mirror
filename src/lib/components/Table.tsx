@@ -1057,6 +1057,9 @@ export function Table<T>({
                       className={cn(
                         common,
                         "border-b",
+                        // Judul yang membentang beberapa baris turun ke bawah,
+                        // sebaris dengan judul daun di bawah judul induk.
+                        rowSpan > 1 && "align-bottom",
                         density.border,
                         isSorted ? "text-gray-900" : "text-gray-500",
                         stickyClass(leafIndex, true),
