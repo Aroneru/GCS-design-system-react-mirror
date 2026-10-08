@@ -8,6 +8,7 @@ import {
   type BadgeVariant,
   type PaginationTheme,
   type TableActionIconSize,
+  type TableAlign,
   type TableColumn,
   type TableRowAction,
   type TableSize,
@@ -334,6 +335,11 @@ const actionIconSizeOptions: { value: TableActionIconSize; label: string }[] = [
   { value: "xl", label: "XL" },
 ];
 
+const headerAlignOptions: { value: TableAlign; label: string }[] = [
+  { value: "left", label: "Left" },
+  { value: "center", label: "Center" },
+  { value: "right", label: "Right" },
+];
 
 const onOff = [
   { value: true, label: "On" },
@@ -356,6 +362,7 @@ const tableProps: PropRow[] = [
   ["defaultSort", "{ key, direction } | null", "null", "Urutan saat tabel pertama tampil."],
   ["onSortChange", "(sort) => void", "undefined", "Dipanggil saat judul kolom diklik."],
   ["sortIcon", "(direction | null) => ReactNode", "panah", "Ganti ikon sort untuk semua kolom."],
+  ["headerAlign", '"left" | "center" | "right"', "undefined", "Posisi semua judul kolom sekaligus. `headerAlign` di kolom tetap menang. Kalau kosong, judul ikut `align` kolomnya."],
   ["pagination", "TablePaginationConfig", "undefined", "Membagi data per halaman. Tanpa ini semua baris tampil."],
   ["manual", "boolean", "false", "Pasang kalau urutan dan halaman diurus server."],
   ["loading", "boolean", "false", "Menampilkan ikon memuat sebagai ganti isi tabel."],
@@ -737,7 +744,7 @@ function pengajuanColumns({
 
   return [
     ...(grouped
-      ? [{ key: "pemohon", header: "Pemohon", headerAlign: "left" as const, children: [nama, email] }]
+      ? [{ key: "pemohon", header: "Pemohon", children: [nama, email] }]
       : [nama, email]),
     { key: "layanan", header: "Layanan", align: "left", sortable: true, sortResettable: false },
     { key: "tanggal", header: "Tanggal", align: "left", sortable: true, sortResettable: false, sortValue: (row) => new Date(row.tanggalIso).getTime() },
@@ -776,6 +783,7 @@ function PlaygroundTable({
   actionStyle,
   preview,
   grouped,
+  headerAlign,
 }: {
   count: number;
   selectable: boolean;
@@ -788,6 +796,7 @@ function PlaygroundTable({
   actionStyle: ActionStyle;
   preview: boolean;
   grouped: boolean;
+  headerAlign: TableAlign;
 }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Key[]>([]);
@@ -806,6 +815,7 @@ function PlaygroundTable({
       data={rows}
       rowKey="id"
       size={size}
+      headerAlign={headerAlign}
       selectable={selectable}
       selectedKeys={selected}
       onSelectionChange={setSelected}
@@ -881,6 +891,7 @@ export function TablePage() {
     .join("");
   const [withPreview, setWithPreview] = useState(true);
   const [grouped, setGrouped] = useState(false);
+  const [headerAlign, setHeaderAlign] = useState<TableAlign>("left");
   const [count, setCount] = useState(50);
 
   return (
@@ -1585,6 +1596,7 @@ export function TablePage() {
             actionStyle={actionStyle}
             preview={withPreview}
             grouped={grouped}
+            headerAlign={headerAlign}
           />
         </Stage>
 
@@ -1594,6 +1606,9 @@ export function TablePage() {
           </Control>
           <Control label="Size">
             <Segmented label="Pilih size" value={size} onChange={setSize} options={sizeOptions} />
+          </Control>
+          <Control label="Rata judul">
+            <Segmented label="Rata judul kolom" value={headerAlign} onChange={setHeaderAlign} options={headerAlignOptions} />
           </Control>
           <Control label="Checkbox baris">
             <Segmented label="Checkbox baris" value={selectable} onChange={setSelectable} options={adaTidakAda} />
@@ -1697,6 +1712,14 @@ export function TablePage() {
               {"    "}
               <H>size</H>
               {`="${size}"\n`}
+            </>
+          )}
+          {/* Judul induk kolom bertingkat bawaannya di tengah, jadi "left" perlu ditulis. */}
+          {(headerAlign !== "left" || grouped) && (
+            <>
+              {"    "}
+              <H>headerAlign</H>
+              {`="${headerAlign}"\n`}
             </>
           )}
           {selectable && (
