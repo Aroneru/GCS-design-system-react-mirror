@@ -101,6 +101,7 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | `Pagination`| `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`  |
 | `Navbar`    | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`        |
 | `Sidebar`   | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `darkMode` |
+| `Drawer`    | `open`, `onClose`, `position`, `size`, `header`, `items`, `darkMode`      |
 | `Footer`    | `logo`/`logoContent`, `menus`, `copyright`, `socials`                     |
 
 Warna Button diatur `theme` (`primary \| green \| gray \| purple \| orange \|

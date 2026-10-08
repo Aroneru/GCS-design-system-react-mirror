@@ -70,11 +70,12 @@ publik baru, dan dua perubahan yang memutus.
   tanggalnya ikut terkirim bersama formulir sebagai `YYYY-MM-DD`.
 
   Prop `darkMode` memberinya tampilan gelap. Untuk saat ini baru Alert, Breadcrumb, Checkbox,
-  Datepicker, FloatingLabel, InputField, Pagination, Radio, Search, Select, Sidebar, TextArea, Toast, Toggle, dan Upload
+  Datepicker, Drawer, FloatingLabel, InputField, Pagination, Radio, Search, Select, Sidebar, TextArea, Toast, Toggle, dan Upload
   yang memilikinya; komponen lain menyusul.
 
   Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
   `DatepickerRangeProps` ikut diekspor.
+- **`Drawer`: prop `darkMode`** — tampilan gelap sesuai desain: latar panel gray-800, teks menu inaktif gray-50 dengan ikon gray-400, dan status menu aktif/hover menggunakan latar gray-600. Latar redup (backdrop) kini memakai warna pekat transparan (gray-900/50) tanpa efek blur.
 - **`Dropdown`** — panel yang dibuka dari sebuah tombol (`trigger`), memakai
   HTML Popover API sehingga browser yang mengurus penutupan, top layer, dan
   urutan fokus. Barisnya diisi lewat `items`, atau `groups` bila perlu dipisah
