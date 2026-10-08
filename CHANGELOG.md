@@ -11,6 +11,37 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+### Diubah
+
+- **Kotak `Datepicker` `single` kini selebar 325px, juga di desktop.** Desain
+  desktop dan mobile-nya memakai kotak yang sama lebarnya. Panel desktopnya
+  tetap 284px; sebelumnya kotaknya ikut 284px, selebar panel.
+
+### Ditambahkan
+
+- **`Datepicker`: `platform="mobile"`** — tata letak mobile sesuai desainnya.
+  Ketiga bentuk selebar 325px dan panelnya selebar kotak. `single` menaruh
+  kisi tanggalnya di tengah panel, `period` memuat Hari ini, Minggu ini, Bulan
+  ini, dan Hapus dalam satu baris, dan `multiple` menumpuk kotak tanggal
+  selesai di bawah kotak tanggal mulai serta kalender kedua di bawah yang
+  pertama, dengan tombol dua kolom. Tipe `DatepickerPlatform` ikut diekspor.
+- **`InputField`: `type="password"`** — isian kata sandi sesuai desain:
+  isiannya disamarkan, ikon gembok tampil di kiri, dan tombol mata di kanan
+  menampilkan atau menyembunyikan kata sandi (`aria-pressed` mengikuti
+  keadaannya). Gembok bisa diganti lewat `icon`, atau dihilangkan dengan
+  `icon={null}`. Mengikuti desainnya, di platform `mobile` label, isian, dan
+  caption-nya 12px, dan saat `failed` di tampilan gelap ikon, placeholder, serta
+  caption memakai red-500. Keduanya berbeda dari type teks.
+
+### Diperbaiki
+
+- **`Datepicker`: panel tidak lagi terpotong tepi layar.** Bila panel tidak
+  muat di bawah maupun di atas kotaknya, tingginya kini dibatasi ruang di sisi
+  yang lebih lapang dan isinya digulir di dalam panel. Sebelumnya bagian
+  bawahnya terpotong sampai halaman digulir, atau, saat dibalik ke atas,
+  panelnya menutupi kotak tanggal. Paling terasa di ponsel: panel `multiple`
+  mobile tingginya 566–662px.
+
 ## [0.3.1] - 2026-10-06
 
 Rilis perbaikan kecil. README di halaman npm ikut diperbarui: kini ada bagian
