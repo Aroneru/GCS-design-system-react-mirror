@@ -28,10 +28,10 @@ import { Button } from './Button'
 export type DatepickerType = 'single' | 'period' | 'multiple'
 
 /**
- * Tata letak per platform, mengikuti varian desain. Di `mobile` panel `period`
- * dan `multiple` selebar kotaknya (325px secara bawaan): `period` memuat empat
- * pintasannya dalam satu baris, dan `multiple` menumpuk kedua kotak dan kedua
- * kalendernya. `single` sama di kedua platform.
+ * Tata letak per platform, mengikuti varian desain. Di `mobile` ketiga bentuk
+ * selebar 325px dan panelnya selebar kotak: `single` menaruh kisi tanggalnya di
+ * tengah panel, `period` memuat empat pintasannya dalam satu baris, dan
+ * `multiple` menumpuk kedua kotak dan kedua kalendernya.
  */
 export type DatepickerPlatform = 'default' | 'mobile'
 
@@ -69,11 +69,11 @@ interface DatepickerBaseProps
    */
   max?: Date | null
   /**
-   * Tata letak `mobile` untuk `period` dan `multiple`: lebar bawaannya 325px dan
-   * panelnya selebar kotak. `period` memuat Hari ini, Minggu ini, Bulan ini, dan
-   * Hapus dalam satu baris, dan `multiple` menumpuk kotak tanggal selesai di
-   * bawah kotak tanggal mulai serta kalender kedua di bawah kalender pertama.
-   * `single` sama di kedua platform.
+   * Tata letak `mobile`: lebar bawaannya 325px dan panelnya selebar kotak.
+   * `single` menaruh kisi tanggalnya di tengah panel, `period` memuat Hari ini,
+   * Minggu ini, Bulan ini, dan Hapus dalam satu baris, dan `multiple` menumpuk
+   * kotak tanggal selesai di bawah kotak tanggal mulai serta kalender kedua di
+   * bawah kalender pertama.
    */
   platform?: DatepickerPlatform
   /** Tampilan gelap untuk kotak, panel, kalender, dan tombolnya. */
@@ -269,23 +269,21 @@ const temaGelap: Tema = {
   hapusGanda: 'border-gray-500 bg-gray-600 text-gray-300 hover:bg-gray-500',
 }
 
-/**
- * Lebar panel per bentuk: single dan period 325px — kisi single 7 × 36px di
- * tengah, kisi period 7 × ±42px selebar panel — dan dua kalender berdampingan.
- */
+/** Lebar panel per bentuk: 7 kolom × 36px, 7 × ±42px, dan dua kalender berdampingan. */
 const lebarPanel: Record<DatepickerType, string> = {
-  single: 'w-81.25',
+  single: 'w-71',
   period: 'w-81.25',
   multiple: 'w-150',
 }
 
 /** Angka yang sama dalam piksel, untuk menempatkan panel sebelum ia bisa diukur. */
-const lebarPanelPx: Record<DatepickerType, number> = { single: 325, period: 325, multiple: 600 }
+const lebarPanelPx: Record<DatepickerType, number> = { single: 284, period: 325, multiple: 600 }
 
 /**
  * Lebar bawaan komponennya: selebar panel, supaya tepi kotak dan kalender
- * segaris. Di wadah yang lebih sempit ia ikut menyusut; `max-w-none` di
- * `className` melepas batas ini.
+ * segaris — kecuali single, yang menurut desainnya selebar 325px di kedua
+ * platform, lebih lebar dari panel desktopnya. Di wadah yang lebih sempit ia
+ * ikut menyusut; `max-w-none` di `className` melepas batas ini.
  */
 const lebarKotak: Record<DatepickerType, string> = {
   single: 'max-w-81.25',
@@ -293,21 +291,18 @@ const lebarKotak: Record<DatepickerType, string> = {
   multiple: 'max-w-150',
 }
 
-/** Di mobile ketiga bentuk selebar desainnya, 325px. */
-const LEBAR_MOBILE = { panel: 'w-81.25', kotak: 'max-w-81.25' }
-
 /**
- * Panel yang mengikuti lebar kotak — single, dan semua bentuk di mobile — tidak
- * dibuat lebih sempit dari ini, supaya kisi 7 × 36px dan jarak 16px di kedua
- * sisinya tetap muat.
+ * Di mobile ketiga bentuk selebar desainnya, 325px. Panelnya mengikuti lebar
+ * kotak — lihat `tempatkan` — tetapi tidak lebih sempit dari panel single,
+ * supaya kisi 7 × 36px tetap muat.
  */
-const LEBAR_MIN = 284
+const LEBAR_MOBILE = { panel: 'w-81.25', kotak: 'max-w-81.25' }
 
 /**
  * Lebar kisi tanggal. `penuh` selebar kalendernya; `menjorok` diberi jarak 8px
  * di kiri-kanan, untuk dua kalender berdampingan; `tengah` ditahan 7 × 36px di
- * tengah kalender, untuk panel yang lebih lebar dari kisinya. Judul dan panahnya
- * tetap selebar kalender.
+ * tengah kalender, untuk panel mobile yang lebih lebar dari kisinya. Judul dan
+ * panahnya tetap selebar kalender.
  */
 type LebarKisi = 'penuh' | 'menjorok' | 'tengah'
 
@@ -516,12 +511,13 @@ function Kalender({
  * rentang dengan dua klik, dan panelnya baru tertutup setelah tanggal selesai.
  *
  * Lebar bawaannya sama dengan panelnya, jadi tepi kotak dan kalender segaris.
+ * Pengecualiannya `single` di desktop: seperti desainnya, kotaknya 325px — sama
+ * dengan di mobile — sedangkan panelnya 284px.
  *
- * Panel `single` selalu selebar kotaknya, 325px secara bawaan, dengan kisi
- * tanggal di tengah. `platform="mobile"` memberi `period` dan `multiple` panel
- * yang sama, mengikuti desain mobile-nya: `period` memuat empat pintasannya
- * dalam satu baris, sedangkan `multiple` menumpuk kedua kotak dan kedua
- * kalendernya.
+ * `platform="mobile"` mengikuti desain mobile-nya: lebar bawaan ketiga bentuk
+ * 325px dan panelnya selebar kotak. `single` menaruh kisi tanggalnya di tengah
+ * panel, `period` memuat empat pintasannya dalam satu baris, sedangkan
+ * `multiple` menumpuk kedua kotak dan kedua kalendernya.
  *
  * `min` dan `max` menandai awal dan akhir data — misalnya tiket pesawat dari
  * hari ini sampai tanggal yang sama tahun depan. Tanggal di luarnya tidak bisa
@@ -568,8 +564,6 @@ export function Datepicker(props: DatepickerProps) {
   // Dua kotak dan dua kalender — bertumpuk pada mobile.
   const ganda = type === 'multiple'
   const tumpuk = ganda && mobile
-  // Panel selebar kotaknya: single di kedua platform, bentuk lain di mobile.
-  const ikutKotak = mobile || type === 'single'
   const pintasanPeriode = type === 'period' || (ganda && shortcuts)
   const batas: Batas = { awal: min ? polos(min) : null, akhir: max ? polos(max) : null }
 
@@ -618,7 +612,9 @@ export function Datepicker(props: DatepickerProps) {
     if (!panel || !jangkar) return
 
     const kotak = jangkar.getBoundingClientRect()
-    const lebarIkut = ikutKotak ? Math.max(kotak.width, LEBAR_MIN) : null
+    // Pada mobile panel selebar kotaknya, tetapi tidak lebih sempit dari panel
+    // single, supaya kisi 7 × 36px tetap muat.
+    const lebarIkut = mobile ? Math.max(kotak.width, lebarPanelPx.single) : null
     panel.style.width = lebarIkut ? `${lebarIkut}px` : ''
     const lebar = panel.offsetWidth || Math.min(lebarIkut ?? lebarPanelPx[type], window.innerWidth - JARAK * 2)
     panel.style.left = `${Math.max(JARAK, Math.min(kotak.left, window.innerWidth - lebar - JARAK))}px`
@@ -632,7 +628,7 @@ export function Datepicker(props: DatepickerProps) {
     const ruang = Math.max(keAtas ? ruangAtas : ruangBawah, 0)
     panel.style.maxHeight = tinggi > ruang ? `${ruang}px` : ''
     panel.style.top = keAtas ? `${kotak.top - JARAK - Math.min(tinggi, ruang)}px` : `${kotak.bottom + JARAK}px`
-  }, [type, ikutKotak])
+  }, [type, mobile])
 
   useEffect(() => {
     const panel = panelRef.current
@@ -813,9 +809,8 @@ export function Datepicker(props: DatepickerProps) {
       sasaran={sasaran}
       tema={tema}
       idJudul={`${idDasar}-judul-${sisi}`}
-      // Period selebar panel di kedua platform, seperti desainnya; multiple
-      // desktop menjorok di antara dua kalender; sisanya di tengah panel.
-      kisi={type === 'period' ? 'penuh' : ganda && !mobile ? 'menjorok' : 'tengah'}
+      // Period selebar panel di kedua platform, seperti desainnya.
+      kisi={type === 'period' ? 'penuh' : mobile ? 'tengah' : ganda ? 'menjorok' : 'penuh'}
       onPilih={pilih}
       onSebelum={() => (sisi === 'kiri' ? geserKiri(-1) : geserKanan(-1))}
       onSesudah={() => (sisi === 'kiri' ? geserKiri(1) : geserKanan(1))}

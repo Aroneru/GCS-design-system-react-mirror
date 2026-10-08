@@ -13,19 +13,18 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ### Diubah
 
-- **`Datepicker` `single` kini selebar 325px, dengan panel selebar kotaknya.**
-  Kisi tanggalnya tetap 7 × 36px dan kini berada di tengah panel, sama seperti
-  desain mobile-nya, jadi single tampil sama di desktop dan mobile. Sebelumnya
-  kotak dan panelnya 284px.
+- **Kotak `Datepicker` `single` kini selebar 325px, juga di desktop.** Desain
+  desktop dan mobile-nya memakai kotak yang sama lebarnya. Panel desktopnya
+  tetap 284px; sebelumnya kotaknya ikut 284px, selebar panel.
 
 ### Ditambahkan
 
-- **`Datepicker`: `platform="mobile"`** — tata letak mobile sesuai desainnya
-  untuk `period` dan `multiple`: lebar bawaannya 325px dan panelnya selebar
-  kotak. `period` memuat Hari ini, Minggu ini, Bulan ini, dan Hapus dalam satu
-  baris, dan `multiple` menumpuk kotak tanggal selesai di bawah kotak tanggal
-  mulai serta kalender kedua di bawah yang pertama, dengan tombol dua kolom.
-  `single` sama di kedua platform. Tipe `DatepickerPlatform` ikut diekspor.
+- **`Datepicker`: `platform="mobile"`** — tata letak mobile sesuai desainnya.
+  Ketiga bentuk selebar 325px dan panelnya selebar kotak. `single` menaruh
+  kisi tanggalnya di tengah panel, `period` memuat Hari ini, Minggu ini, Bulan
+  ini, dan Hapus dalam satu baris, dan `multiple` menumpuk kotak tanggal
+  selesai di bawah kotak tanggal mulai serta kalender kedua di bawah yang
+  pertama, dengan tombol dua kolom. Tipe `DatepickerPlatform` ikut diekspor.
 - **`InputField`: `type="password"`** — isian kata sandi sesuai desain:
   isiannya disamarkan, ikon gembok tampil di kiri, dan tombol mata di kanan
   menampilkan atau menyembunyikan kata sandi (`aria-pressed` mengikuti

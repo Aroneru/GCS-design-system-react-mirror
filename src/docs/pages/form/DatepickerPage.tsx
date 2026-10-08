@@ -52,7 +52,7 @@ const iso = (d: Date | null) =>
 const datepickerProps: PropRow[] = [
   ['type', "'single' | 'period' | 'multiple'", 'single', 'Bentuk pemilih: satu tanggal, satu kalender dengan pintasan periode, atau rentang dengan dua kalender.'],
   ['shortcuts', 'boolean', 'false', 'Khusus multiple: menambahkan Minggu ini, Bulan ini, dan Semua Waktu di samping Hari ini dan Hapus. Period selalu memilikinya.'],
-  ['platform', "'default' | 'mobile'", 'default', 'Tata letak mobile untuk period dan multiple: lebar bawaan 325px dan panel selebar kotak; period memuat empat pintasannya dalam satu baris, dan multiple menumpuk kotak serta kalendernya. Single sama di kedua platform.'],
+  ['platform', "'default' | 'mobile'", 'default', 'Tata letak mobile: lebar bawaan 325px dan panel selebar kotak. Single menaruh kisinya di tengah, period memuat empat pintasannya dalam satu baris, dan multiple menumpuk kotak serta kalendernya.'],
   ['min', 'Date | null', 'undefined', 'Awal data: tanggal sebelumnya tidak bisa dipilih, pintasan dipotong ke sini, dan Semua Waktu dimulai dari sini.'],
   ['max', 'Date | null', 'undefined', 'Akhir data: tanggal sesudahnya tidak bisa dipilih, pintasan dipotong ke sini, dan Semua Waktu berakhir di sini.'],
   ['label', 'ReactNode', 'undefined', 'Teks label di atas kotak tanggal.'],
@@ -104,8 +104,7 @@ export function DatepickerPage() {
         ? `{ start: ${iso(rentang.start)}, end: ${iso(rentang.end)} }`
         : 'null'
   const [namaNilai, namaSetel] = namaState[type]
-  // Single sama di kedua platform, jadi pilihan platform hanya berlaku untuk period dan multiple.
-  const mobile = type !== 'single' && platform === 'mobile'
+  const mobile = platform === 'mobile'
 
   return (
     <UsulanPage
@@ -141,10 +140,10 @@ export function DatepickerPage() {
           {'/>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Lebar bawaannya sama dengan panelnya — 325px untuk single dan period, dan 600px untuk multiple
-          (325px di mobile) — supaya tepi kotak dan kalendernya segaris. Panel single selalu selebar kotaknya,
-          dengan kisi tanggal di tengah, jadi tampilannya sama di desktop dan mobile. Di wadah yang lebih
-          sempit ia ikut menyusut; <Hl>className="max-w-none"</Hl> melepas batas itu.
+          Kotak single selebar 325px, sama dengan di mobile, sedangkan panelnya 284px — seperti desainnya.
+          Bentuk lain selebar panelnya, 325px untuk period dan 600px untuk multiple (325px di mobile), supaya
+          tepi kotak dan kalendernya segaris. Di wadah yang lebih sempit ia ikut menyusut;{' '}
+          <Hl>className="max-w-none"</Hl> melepas batas itu.
         </p>
       </FlowSection>
 
@@ -221,13 +220,16 @@ export function DatepickerPage() {
 
       <FlowSection id="mobile" title="Mobile">
         <Lead>
-          Untuk ponsel, <Hl>platform="mobile"</Hl> memakai tata letak dari desain mobile: period dan multiple
-          selebar 325px, dengan panel selebar kotak. Period memuat <Hl>Hari ini</Hl>, <Hl>Minggu ini</Hl>,{' '}
-          <Hl>Bulan ini</Hl>, dan <Hl>Hapus</Hl> dalam satu baris, dan multiple menumpuk kotak tanggal selesai
-          di bawah kotak tanggal mulai serta kalender kedua di bawah yang pertama. Single tidak berubah:
-          panelnya sudah selebar kotak di kedua platform.
+          Untuk ponsel, <Hl>platform="mobile"</Hl> memakai tata letak dari desain mobile: ketiga bentuk
+          selebar 325px, dan panelnya selebar kotak. Single menaruh kisi tanggalnya di tengah panel, period
+          memuat <Hl>Hari ini</Hl>, <Hl>Minggu ini</Hl>, <Hl>Bulan ini</Hl>, dan <Hl>Hapus</Hl> dalam satu
+          baris, dan multiple menumpuk kotak tanggal selesai di bawah kotak tanggal mulai serta kalender
+          kedua di bawah yang pertama.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Single">
+            <Datepicker platform="mobile" label="Nama Tanggal" defaultValue={TANGGAL} />
+          </Demo>
           <Demo label="Period">
             <Datepicker type="period" platform="mobile" label="Nama Tanggal" defaultValue={SEPEKAN} />
           </Demo>
@@ -411,6 +413,7 @@ export function DatepickerPage() {
             <Datepicker
               {...namaLabel}
               {...batasData}
+              platform={platform}
               darkMode={dark}
               disabled={disabled}
               value={tunggal}
@@ -443,9 +446,8 @@ export function DatepickerPage() {
           <Control label="Platform">
             <Segmented
               label="Pilih platform"
-              value={type === 'single' ? 'default' : platform}
+              value={platform}
               onChange={setPlatform}
-              disabled={type === 'single'}
               options={[
                 { value: 'mobile', label: 'Mobile' },
                 { value: 'default', label: 'Desktop' },

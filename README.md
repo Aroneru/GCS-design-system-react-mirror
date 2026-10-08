@@ -142,11 +142,11 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 Prop yang dipakai bersama seluruh komponen form:
 
 - `platform`: `default | mobile` — mengubah ukuran. Pada `Datepicker` ia juga
-  mengubah tata letak `period` dan `multiple`: panelnya selebar kotak,
-  `period` memuat empat pintasannya dalam satu baris, dan `multiple` menumpuk
-  kotak serta kalendernya. Pada `Select`, varian Mobile cuma menyempitkan
-  wadahnya, jadi prop ini memang tidak ada; pada `Upload` ia tidak berpengaruh
-  untuk `type="attach"`, karena alasan yang sama.
+  mengubah tata letak: panelnya selebar kotak, `single` menaruh kisinya di
+  tengah, `period` memuat empat pintasannya dalam satu baris, dan `multiple`
+  menumpuk kotak serta kalendernya. Pada `Select`, varian Mobile cuma
+  menyempitkan wadahnya, jadi prop ini memang tidak ada; pada `Upload` ia tidak
+  berpengaruh untuk `type="attach"`, karena alasan yang sama.
 - `application`: `default | simaya` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.
