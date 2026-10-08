@@ -16,8 +16,26 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 - **Kotak `Datepicker` `single` kini selebar 325px, juga di desktop.** Desain
   desktop dan mobile-nya memakai kotak yang sama lebarnya. Panel desktopnya
   tetap 284px; sebelumnya kotaknya ikut 284px, selebar panel.
+- **`Badge`: rupa disesuaikan dengan desain.** Sudutnya kini membulat 6px
+  (`rounded-md`), bukan kapsul penuh. Padding samping naik ke 12px, teks naik
+  dari 12px ke 14px dan tidak lagi tebal. Warna teks satu tingkat lebih gelap
+  (-800/-900, sebelumnya -700), dan latar `brand` kini primary-100 (sebelumnya
+  primary-50). API lama tetap berlaku, tetapi Badge yang sudah ada akan terlihat
+  berbeda.
 
 ### Ditambahkan
+
+- **`Badge`: prop `size`, `icon`, `dismissible`, dan `darkMode`.** `size`
+  memilih `sm` (14px, bawaan) atau `lg` (16px). `icon` menaruh ikon di kiri
+  label dengan warna yang sama. `dismissible` menampilkan tombol tutup (×) di
+  kanan; Badge memudar lalu hilang saat diklik, dan `onDismiss` dipanggil.
+  Tampil/sembunyi bisa dikendalikan dari luar lewat `open`. `darkMode` memakai
+  latar -900 (gray-700 untuk `gray`) dengan teks -300. Tipe `BadgeSize` ikut
+  diekspor.
+- **`Table`: prop `headerAlign`** — mengatur posisi semua judul kolom sekaligus
+  (`left`, `center`, `right`). `headerAlign` di kolom tetap menang. Bila
+  kosong, perilakunya sama seperti sebelumnya: judul ikut `align` kolomnya,
+  dan judul induk kolom bertingkat di tengah.
 
 - **`Datepicker`: `platform="mobile"`** — tata letak mobile sesuai desainnya.
   Ketiga bentuk selebar 325px dan panelnya selebar kotak. `single` menaruh
@@ -41,10 +59,7 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   bawahnya terpotong sampai halaman digulir, atau, saat dibalik ke atas,
   panelnya menutupi kotak tanggal. Paling terasa di ponsel: panel `multiple`
   mobile tingginya 566–662px.
-  
-- **`Badges`: Mengikuti desain pada figma.** Menyesuaikan padding, border
-  radius, dark-mode dengan mengganti model menjadi dark.
-  mobile tingginya 566–662px.
+
 ## [0.3.1] - 2026-10-06
 
 Rilis perbaikan kecil. README di halaman npm ikut diperbarui: kini ada bagian

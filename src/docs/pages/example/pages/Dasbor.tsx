@@ -69,7 +69,7 @@ export function Dasbor() {
 
         {/* Ringkasan saja: lima baris terbaru, tanpa toolbar dan pagination.
             Daftar lengkap dengan pencarian ada di halaman Pengajuan. */}
-        <Table columns={KOLOM} data={PENGAJUAN.slice(0, 5)} rowKey="id" />
+        <Table columns={KOLOM} data={PENGAJUAN.slice(0, 5)} rowKey="id"  />
       </section>
     </div>
   )

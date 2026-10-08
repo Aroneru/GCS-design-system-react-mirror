@@ -243,6 +243,11 @@ export interface TableProps<T> extends Omit<HTMLAttributes<HTMLDivElement>, "chi
   onSortChange?: (sort: TableSort | null) => void;
   /** Ikon sort untuk semua kolom yang `sortable`. Bawaannya panah chevron. */
   sortIcon?: TableSortIcon;
+  /**
+   * Posisi semua judul kolom. Kalah dari `headerAlign` milik kolom. Bila
+   * kosong, tiap judul ikut `align` kolomnya, lalu kiri.
+   */
+  headerAlign?: TableAlign;
 
   /** Tanpa prop ini tabel tidak memakai pagination dan semua baris tampil. */
   pagination?: TablePaginationConfig;
@@ -406,11 +411,14 @@ const actionColors: Record<
 };
 
 /**
- * Posisi judul. Judul induk kolom bertingkat bawaannya di tengah, karena ia
- * menaungi kolom-kolom di bawahnya; judul biasa ikut `align`, lalu kiri.
+ * Posisi judul: `headerAlign` kolom, lalu `headerAlign` Table. Selebihnya
+ * judul induk kolom bertingkat di tengah, karena ia menaungi kolom-kolom di
+ * bawahnya; judul biasa ikut `align`, lalu kiri.
  */
-const headAlignOf = <T,>(column: TableColumn<T>): TableAlign =>
-  column.headerAlign ?? (hasChildren(column) ? "center" : (column.align ?? "left"));
+const headAlignOf = <T,>(column: TableColumn<T>, tableAlign?: TableAlign): TableAlign =>
+  column.headerAlign ??
+  tableAlign ??
+  (hasChildren(column) ? "center" : (column.align ?? "left"));
 
 /** Tombol sort compact selebar sel, jadi posisinya diatur lewat `justify`. */
 const compactSortJustify: Record<TableAlign, string> = {
@@ -692,6 +700,7 @@ export function Table<T>({
   defaultSort = null,
   onSortChange,
   sortIcon = defaultSortIcon,
+  headerAlign,
   pagination,
   manual,
   loading,
@@ -1020,7 +1029,7 @@ export function Table<T>({
                     density.headBg,
                     density.headText,
                     density.head,
-                    aligns[headAlignOf(headColumn)],
+                    aligns[headAlignOf(headColumn, headerAlign)],
                     level === 0 && cn("border-t", density.headTop),
                   );
 
@@ -1073,7 +1082,7 @@ export function Table<T>({
                             "items-center gap-1 transition-colors hover:text-gray-900",
                             // Compact rata kiri: ikon sort di ujung kanan judul, seperti di rancangan.
                             size === "compact"
-                              ? cn("flex w-full gap-2", compactSortJustify[headAlignOf(column)])
+                              ? cn("flex w-full gap-2", compactSortJustify[headAlignOf(column, headerAlign)])
                               : "inline-flex uppercase",
                             "rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
                           )}
