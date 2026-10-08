@@ -163,7 +163,13 @@ export * from "./brandIcons";
 export { brandIcons } from "./brandIconRegistry";
 
 export { Hero } from "./components/Hero";
-export type { HeroProps, HeroType, HeroPlatform, HeroImageOrientation } from "./components/Hero";
+export type {
+  HeroProps,
+  HeroType,
+  HeroPlatform,
+  HeroImageOrientation,
+  HeroCenteredContent,
+} from "./components/Hero";
 
 export { Footer } from "./components/Footer";
 export type { FooterProps, FooterMenu, FooterSocial } from "./components/Footer";
