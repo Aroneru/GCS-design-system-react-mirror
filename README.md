@@ -104,12 +104,12 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode`                                          |
 | `Dropdown`   | `trigger`, `items`/`groups`, `attached`, `contentLabel`, `darkMode`                                                  |
 | `Modal`      | `trigger`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape`    |
-| `Drawer`     | `open`, `onClose`, `position`, `size`, `header`, `items`, `theme`, `darkMode`                                        |
+| `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `theme`, `darkMode`   |
 | `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
 | `Navbar`     | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`                                                   |
 | `Hero`       | `type`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`                       |
-| `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `sticky`, `footer`, `darkMode`        |
+| `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
 | `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `pagination`, `sticky`, `size`, `loading`     |
 

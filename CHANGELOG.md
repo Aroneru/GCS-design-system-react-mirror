@@ -341,7 +341,8 @@ Dibanding 0.2.0 ada enam perubahan yang memutus, termasuk nama paketnya.
   viewport setinggi satu layar. `footer` mengisi kaki Sidebar di bawah daftar
   menu — versi aplikasi, tautan bantuan — dan tetap terlihat meski menunya
   panjang dan digulir. `SidebarItem`, `SidebarSubItem`, dan `SidebarUser` kini
-  juga menerima `onClick`.
+  juga menerima `onClick`. Selain itu, saat daftar menu meluap ke bawah, navigasi
+  secara otomatis digulir menggunakan scrollbar khusus `.ds-scroll-y`.
 - **`Table`** — tabel data dari `columns` dan `data`, dengan `rowKey` sebagai
   kunci tiap baris; tanpa `columns`, kolomnya dibuat dari field baris pertama.
   Toolbar-nya bisa memuat kotak pencarian (`search`, yang meneruskan atributnya

@@ -56,6 +56,7 @@ const drawerProps: PropRow[] = [
     ['header', 'ReactNode', 'optional', 'Elemen kustom untuk konten header.'],
     ['items', 'DrawerMenuItem[]', 'optional', 'Daftar konfigurasi menu item (otomatis merender DrawerHeader & DrawerNavItem jika tidak menggunakan children JSX).'],
     ['theme', "'simaya' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna item yang aktif.'],
+    ['darkMode', 'boolean', 'false', 'Mengaktifkan tema gelap (latar gray-800, teks gray-50).'],
     ['children', 'ReactNode', 'optional', 'Komponen anak opsional (DrawerHeader, DrawerBody, dll) untuk layout kustom.'],
 ]
 
@@ -70,10 +71,21 @@ const navItemProps: PropRow[] = [
     ['icon', 'ReactNode', 'optional', 'Ikon di sisi kiri label menu.'],
     ['label', 'ReactNode', 'required', 'Judul / teks item menu.'],
     ['active', 'boolean', 'false', 'Menandai status aktif dengan latar pill berwarna.'],
-    ['expanded', 'boolean', 'false', 'Menentukan apakah sub-menu sedang terbuka (menampilkan chevron atas/bawah).'],
+    ['expanded', 'boolean', 'false', 'Menentukan apakah sub-menu sedang terbuka (menampilkan chevron).'],
     ['collapsible', 'boolean', 'false', 'Menampilkan ikon chevron tanda dropdown jika tidak memiliki anak.'],
     ['theme', "'simaya' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna sorotan saat item status active.'],
+    ['href', 'string', 'optional', 'Link tujuan navigasi (mengubah elemen menjadi tag a).'],
+    ['badge', 'ReactNode', 'optional', 'Elemen badge di sisi kanan label.'],
+    ['onClick', '(e: MouseEvent) => void', 'optional', 'Handler saat menu item diklik.'],
     ['children', 'ReactNode', 'optional', 'Daftar DrawerSubItem ter-indentasi di bawah item.'],
+]
+
+const subItemProps: PropRow[] = [
+    ['label', 'ReactNode', 'required', 'Judul / teks sub-item menu.'],
+    ['active', 'boolean', 'false', 'Menandai status aktif.'],
+    ['theme', "'simaya' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna teks saat aktif.'],
+    ['href', 'string', 'optional', 'Link tujuan navigasi.'],
+    ['onClick', '(e: MouseEvent) => void', 'optional', 'Handler saat sub-item diklik.'],
 ]
 
 const triggerProps: PropRow[] = [
@@ -634,6 +646,11 @@ export function DrawerPage() {
                     <div>
                         <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DrawerNavItem Props</h3>
                         <PropsTable rows={navItemProps} />
+                    </div>
+
+                    <div>
+                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DrawerSubItem Props</h3>
+                        <PropsTable rows={subItemProps} />
                     </div>
 
                     <div>
