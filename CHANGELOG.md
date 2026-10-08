@@ -11,14 +11,83 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
-## [0.3.1] - 2026-10-06
+## [0.3.1] - 2026-10-08
 
-Rilis perbaikan kecil. README di halaman npm ikut diperbarui: kini ada bagian
-Table, dan baris props Button sudah dibetulkan (`type="iconOnly"`,
-`as="anchor"`).
+Tidak ada perubahan API yang memutus, tetapi beberapa komponen yang sudah ada
+kini tampil berbeda — baca bagian **Diubah**. README di halaman npm ikut
+diperbarui: kini ada bagian Table, baris props Button sudah dibetulkan
+(`type="iconOnly"`, `as="anchor"`), dan props baru di rilis ini ikut tercantum.
+
+### Diubah
+
+- **Kotak `Datepicker` `single` kini selebar 325px, juga di desktop.** Desain
+  desktop dan mobile-nya memakai kotak yang sama lebarnya. Panel desktopnya
+  tetap 284px; sebelumnya kotaknya ikut 284px, selebar panel.
+- **`Badge`: rupa disesuaikan dengan desain.** Sudutnya kini membulat 6px
+  (`rounded-md`), bukan kapsul penuh. Padding samping naik ke 12px, teks naik
+  dari 12px ke 14px dan tidak lagi tebal. Warna teks satu tingkat lebih gelap
+  (-800/-900, sebelumnya -700), dan latar `brand` kini primary-100 (sebelumnya
+  primary-50). API lama tetap berlaku, tetapi Badge yang sudah ada akan terlihat
+  berbeda.
+- **`Upload` `type="default"`: setelah berkas dipilih, muncul tombol hapus dan
+  ukuran berkas.** Tombol pilih berganti label menjadi `replaceLabel` (bawaan
+  "Replace file"), tombol `removeLabel` (bawaan "Remove") di kanannya
+  mengosongkan pilihan — `onFilesChange` dipanggil dengan `null` — dan total
+  ukuran berkas tampil di bawah baris, di atas `helperText`.
+- **`Drawer`: latar redup di belakang panel tidak lagi diburamkan.** Warnanya
+  tetap gray-900/50; hanya efek blur-nya yang dihapus, juga di tampilan terang.
+- **`Sidebar`: daftar menu yang meluap kini memakai scrollbar tipis
+  `.ds-scroll-y`**, bukan scrollbar bawaan browser.
+
+### Ditambahkan
+
+- **`Badge`: prop `size`, `icon`, `dismissible`, dan `darkMode`.** `size`
+  memilih `sm` (14px, bawaan) atau `lg` (16px). `icon` menaruh ikon di kiri
+  label dengan warna yang sama. `dismissible` menampilkan tombol tutup (×) di
+  kanan; Badge memudar lalu hilang saat diklik, dan `onDismiss` dipanggil.
+  Tampil/sembunyi bisa dikendalikan dari luar lewat `open`. `darkMode` memakai
+  latar -900 (gray-700 untuk `gray`) dengan teks -300. Tipe `BadgeSize` ikut
+  diekspor.
+- **`Table`: prop `headerAlign`** — mengatur posisi semua judul kolom sekaligus
+  (`left`, `center`, `right`). `headerAlign` di kolom tetap menang. Bila
+  kosong, perilakunya sama seperti sebelumnya: judul ikut `align` kolomnya,
+  dan judul induk kolom bertingkat di tengah.
+- **`Datepicker`: `platform="mobile"`** — tata letak mobile sesuai desainnya.
+  Ketiga bentuk selebar 325px dan panelnya selebar kotak. `single` menaruh
+  kisi tanggalnya di tengah panel, `period` memuat Hari ini, Minggu ini, Bulan
+  ini, dan Hapus dalam satu baris, dan `multiple` menumpuk kotak tanggal
+  selesai di bawah kotak tanggal mulai serta kalender kedua di bawah yang
+  pertama, dengan tombol dua kolom. Tipe `DatepickerPlatform` ikut diekspor.
+- **`InputField`: `type="password"`** — isian kata sandi sesuai desain:
+  isiannya disamarkan, ikon gembok tampil di kiri, dan tombol mata di kanan
+  menampilkan atau menyembunyikan kata sandi (`aria-pressed` mengikuti
+  keadaannya). Gembok bisa diganti lewat `icon`, atau dihilangkan dengan
+  `icon={null}`. Mengikuti desainnya, di platform `mobile` label, isian, dan
+  caption-nya 12px, dan saat `failed` di tampilan gelap ikon, placeholder, serta
+  caption memakai red-500. Keduanya berbeda dari type teks.
+- **`Hero`: prop `centeredContent`** — isi hero `type="centered"`: `text`
+  (bawaan, sama seperti sebelumnya) atau `image`. Dengan `image`, hanya
+  `image`/`imageContent` yang dirender, selebar hero tanpa padding, dan
+  tingginya mengikuti rasio gambarnya. Sub heading, deskripsi, dan tombol tidak
+  dirender. `heading` tetap ada sebagai `<h1>` yang hanya dibaca pembaca layar.
+  Bagian gambar yang transparan menampilkan latar hero (primary-50, atau
+  gray-900 saat `darkMode`). Prop ini diabaikan pada tipe horizontal. Tipe
+  `HeroCenteredContent` ikut diekspor.
+- **`Drawer`: prop `darkMode`** — tampilan gelap sesuai desain: panel gray-800
+  dengan garis gray-700, teks menu inaktif gray-50 dengan ikon gray-400, dan
+  menu aktif berlatar gray-700 (gray-600 saat disorot).
+- **`Search`: `platform="compact"`** — kotak setinggi 37px dengan tombol cari
+  25px, untuk dipasang di navbar. `SearchPlatform` kini `default | mobile |
+  compact`.
 
 ### Diperbaiki
 
+- **`Datepicker`: panel tidak lagi terpotong tepi layar.** Bila panel tidak
+  muat di bawah maupun di atas kotaknya, tingginya kini dibatasi ruang di sisi
+  yang lebih lapang dan isinya digulir di dalam panel. Sebelumnya bagian
+  bawahnya terpotong sampai halaman digulir, atau, saat dibalik ke atas,
+  panelnya menutupi kotak tanggal. Paling terasa di ponsel: panel `multiple`
+  mobile tingginya 566–662px.
 - **`Footer`: ukuran teks menu dan hak cipta kini dipatok 16px.** Di 0.3.0
   keduanya memakai kelas `text-md`, yang tidak dikenal Tailwind, sehingga tidak
   menghasilkan CSS apa pun dan ukurannya ikut elemen induk: 16px di halaman

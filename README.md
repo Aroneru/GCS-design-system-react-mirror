@@ -92,7 +92,7 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | Komponen     | Props utama                                                                                                          |
 | ------------ | -------------------------------------------------------------------------------------------------------------------- |
 | `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| iconOnly`, `as`: `button \| anchor`      |
-| `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`                                                           |
+| `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
 | `Avatar`     | `src`, `alt`, `initials`, `size`: `small \| default \| large`, `darkMode`                                            |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
 | `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `onCopySuccess`, `darkMode` |
@@ -104,14 +104,14 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode`                                          |
 | `Dropdown`   | `trigger`, `items`/`groups`, `attached`, `contentLabel`, `darkMode`                                                  |
 | `Modal`      | `trigger`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape`    |
-| `Drawer`     | `open`, `onClose`, `position`, `size`, `header`, `items`, `theme`                                                    |
+| `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `theme`, `darkMode`   |
 | `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
 | `Navbar`     | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`                                                   |
-| `Hero`       | `type`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`                       |
-| `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `sticky`, `footer`, `darkMode`        |
+| `Hero`       | `type`, `centeredContent`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`    |
+| `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
-| `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `pagination`, `sticky`, `size`, `loading`     |
+| `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `sticky`, `size`, `loading` |
 
 Warna Button diatur `theme` (`primary | green | gray | simaya | orange |
 yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya
@@ -128,22 +128,26 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 
 | Komponen        | Props khas                                                                                                                      | Ukuran (desktop / mobile) |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `InputField`    | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| typing \| inactive \| failed`                        | 52 / 40 px                |
+| `InputField`    | `label`, `helperText`, `icon`, `onClear`, `type="password"`, `darkMode`, `state`: `default \| typing \| inactive \| failed`     | 52 / 40 px                |
 | `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| active \| error`                                     | 58 / 50 px                |
 | `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit`, `darkMode` | 162 / 120 px              |
 | `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`, `darkMode`                                                             | 37 px                     |
 | `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`, `darkMode`                                  | 54 / 50 px                |
-| `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 px                     |
-| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode`                   | 44 / 40 px                |
+| `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 / 42 px                |
+| `Upload`        | `label`, `helperText`, `buttonLabel`, `replaceLabel`, `removeLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode` | 44 / 40 px                |
 | `Radio`         | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
 | `Toggle`        | `label`, `helperText`, `darkMode`                                                                                               | 40×20 / 36×18 px          |
 | `Checkbox`      | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
 
 Prop yang dipakai bersama seluruh komponen form:
 
-- `platform`: `default | mobile` — hanya mengubah ukuran. Pada `Select`, varian
-  Mobile cuma menyempitkan wadahnya, jadi prop ini memang tidak ada; pada
-  `Upload` ia tidak berpengaruh untuk `type="attach"`, karena alasan yang sama.
+- `platform`: `default | mobile` — mengubah ukuran. Pada `Datepicker` ia juga
+  mengubah tata letak: panelnya selebar kotak, `single` menaruh kisinya di
+  tengah, `period` memuat empat pintasannya dalam satu baris, dan `multiple`
+  menumpuk kotak serta kalendernya. Pada `Select`, varian Mobile cuma
+  menyempitkan wadahnya, jadi prop ini memang tidak ada; pada `Upload` ia tidak
+  berpengaruh untuk `type="attach"`, karena alasan yang sama. `Search` punya
+  ukuran ketiga, `compact` (37px), untuk dipasang di navbar.
 - `application`: `default | simaya` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.

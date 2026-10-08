@@ -13,6 +13,7 @@ import {
   UsulanPage,
   type TocEntry,
 } from "../../usulanKit";
+import { cn } from "../../../lib/utils/cn";
 
 type CollapseOption = "expanded" | "collapsed";
 type BadgeOption = "show" | "hide";
@@ -75,7 +76,6 @@ const sidebarProps: PropRow[] = [
     "undefined",
     "Menampilkan tombol collapse aktif dan memperbarui state collapsed; independen dari prop logo.",
   ],
-  ["onCollapse", "() => void", "undefined", "Handler untuk memperbarui state collapsed."],
   [
     "footer",
     "ReactNode",
@@ -100,7 +100,7 @@ const sidebarItemProps: PropRow[] = [
     "false",
     "Menonaktifkan tombol buka/tutup submenu tanpa menonaktifkan menu.",
   ],
-  ["onCollapse", "() => void", "undefined", "Callback ketika tombol collapse Sidebar ditekan."],
+  ["onClick", "(e: MouseEvent) => void", "undefined", "Callback saat item menu diklik."],
 ];
 
 const toc: TocEntry[] = [
@@ -280,6 +280,7 @@ function SidebarVariant({
 }) {
   return (
     <Sidebar
+      className="!min-h-0 h-full"
       collapsed={collapsed}
       showCollapseButton
       darkMode={darkMode}
@@ -301,6 +302,7 @@ export function SidebarPage() {
   const [logoWeb, setLogoWeb] = useState<VisibilityOption>("show");
   const [collapseButton, setCollapseButton] = useState<VisibilityOption>("show");
   const [theme, setTheme] = useState("light");
+  const [activeMenu, setActiveMenu] = useState("Menu 1");
 
   const resolvedCollapse = menuIcon === "hide" ? "expanded" : collapse;
   const collapsed = resolvedCollapse === "collapsed";
@@ -309,8 +311,21 @@ export function SidebarPage() {
 
   const playgroundItems = baseItems.map((item) => ({
     ...item,
+    active: activeMenu === item.label,
+    onClick: (e: any) => {
+      e.preventDefault();
+      setActiveMenu(item.label as string);
+    },
     icon: menuIcon === "show" ? item.icon : undefined,
     ...(item.label === "Menu 4" ? { badge: badge === "show" ? 1 : undefined } : {}),
+    children: item.children?.map((sub) => ({
+      ...sub,
+      active: activeMenu === sub.label,
+      onClick: (e: any) => {
+        e.preventDefault();
+        setActiveMenu(sub.label as string);
+      },
+    })),
   }));
 
   const playgroundGroups: SidebarGroup[] | undefined =
@@ -620,8 +635,13 @@ export function SidebarPage() {
           collapse, badge, separator, logo, user info, dan tombol collapse.
         </p>
 
-        <Stage maxWidth="max-w-[520px]" dark={theme === "dark"}>
-          <div className="flex min-h-[760px] justify-center">
+        <Stage maxWidth="max-w-[768px]" dark={theme === "dark"}>
+          <div
+            className={cn(
+              "flex min-h-[760px] w-full items-stretch overflow-hidden border",
+              theme === "dark" ? "border-gray-700 bg-gray-900" : "border-gray-200 bg-white"
+            )}
+          >
             <Sidebar
               key={separator}
               collapsed={collapsed}
@@ -642,6 +662,27 @@ export function SidebarPage() {
               groups={playgroundGroups}
               items={playgroundGroups ? undefined : playgroundItems}
             />
+
+            <div className="flex w-full flex-col gap-6 p-6">
+              <div className="flex flex-col gap-2">
+                <h1
+                  className={cn(
+                    "text-xl font-bold",
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  )}
+                >
+                  {activeMenu}
+                </h1>
+                <p
+                  className={cn(
+                    "text-sm",
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  )}
+                >
+                  Ini adalah simulasi konten untuk halaman {activeMenu}. Anda bisa menaruh konten aplikasi yang sebenarnya di sini.
+                </p>
+              </div>
+            </div>
           </div>
         </Stage>
 

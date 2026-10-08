@@ -21,9 +21,26 @@ export type HeroPlatform = 'desktop' | 'mobile'
  */
 export type HeroImageOrientation = 'portrait' | 'landscape'
 
+/**
+ * Isi hero tipe centered: blok teks (judul, deskripsi, tombol) atau satu gambar
+ * saja — misal banner atau logo yang sudah memuat tulisannya sendiri.
+ */
+export type HeroCenteredContent = 'text' | 'image'
+
 export interface HeroProps {
   /** Susunan hero (default: `horizontal-image-left`). */
   type?: HeroType
+  /**
+   * Isi tipe centered (default: `text`). `image` merender `image`/`imageContent`
+   * saja di tengah; sub heading, deskripsi, dan tombol tidak dirender, sedangkan
+   * `heading` tetap ada sebagai <h1> yang hanya dibacakan pembaca layar.
+   *
+   * Gambarnya mengisi penuh hero tanpa padding, dan tingginya mengikuti rasio
+   * berkasnya. Bagian yang transparan menampilkan latar hero (primary-50, atau
+   * gray-900 pada `darkMode`), jadi pastikan gambarnya kontras dengan latar itu.
+   * Diabaikan pada tipe horizontal.
+   */
+  centeredContent?: HeroCenteredContent
   /** Paksa susunan bertumpuk lewat `mobile` (default: `desktop`). */
   platform?: HeroPlatform
   /** Judul utama — Figma: "Hero Text". Dirender sebagai <h1>. */
@@ -44,7 +61,7 @@ export interface HeroProps {
   /** Bila diisi, tombolnya dirender sebagai <a>; kalau tidak, sebagai <button>. */
   buttonHref?: string
   onButtonClick?: () => void
-  /** URL gambar. Diabaikan pada `type="centered"`. */
+  /** URL gambar. Pada `type="centered"` hanya dipakai bila `centeredContent="image"`. */
   image?: string
   imageAlt?: string
   /**
@@ -127,6 +144,7 @@ const ArrowRight = () => (
  */
 export function Hero({
   type = 'horizontal-image-left',
+  centeredContent = 'text',
   platform = 'desktop',
   heading,
   subHeading,
@@ -147,6 +165,7 @@ export function Hero({
   const centered = type === 'centered'
   const stacked = platform === 'mobile'
   const hasMedia = !centered && Boolean(image || imageContent)
+  const centeredImage = centered && centeredContent === 'image' && Boolean(image || imageContent)
 
   /**
    * Saat bertumpuk, tombol tipe horizontal melebar penuh: sasaran sentuh selebar
@@ -249,6 +268,29 @@ export function Hero({
           stacked: 'mx-auto w-full max-w-[270px]',
           wide: '@[768px]:mx-0 @[768px]:w-[320px] @[768px]:max-w-none @[1024px]:w-[386px]',
         }
+
+  /**
+   * Centered versi gambar: gambarnya mengisi penuh hero, tanpa padding bingkai
+   * dan tanpa rongga atas-bawah — hero jadi banner selebar halaman, dan
+   * tingginya mengikuti rasio asli berkasnya. Sengaja tanpa rounded dan
+   * bayangan. Latar hero hanya terlihat lewat bagian gambar yang transparan,
+   * jadi kontras bagian itu terhadap latar tanggung jawab berkasnya sendiri.
+   *
+   * Judul tetap dirender sebagai <h1> tersembunyi agar halaman tidak kehilangan
+   * penanda utamanya bagi pembaca layar.
+   */
+  if (centeredImage) {
+    return (
+      <section className={cn('w-full', theme.section(centered), className)}>
+        {heading && <h1 className="sr-only">{heading}</h1>}
+        {image ? (
+          <img src={image} alt={imageAlt} className="block h-auto w-full" />
+        ) : (
+          imageContent
+        )}
+      </section>
+    )
+  }
 
   const media = hasMedia && (
     <div className={cn('shrink-0', mediaWidth.stacked, !stacked && mediaWidth.wide)}>

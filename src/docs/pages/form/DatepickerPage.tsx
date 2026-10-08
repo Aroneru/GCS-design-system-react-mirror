@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Datepicker, type DateRange, type DatepickerType } from '../../../lib'
+import { Datepicker, type DateRange, type DatepickerPlatform, type DatepickerType } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -40,7 +40,7 @@ const namaState: Record<DatepickerType, [string, string]> = {
 
 /** Lebar panggung Playground — sama dengan lebar bawaan tiap bentuk. */
 const lebarStage: Record<DatepickerType, string> = {
-  single: 'max-w-[284px]',
+  single: 'max-w-[325px]',
   period: 'max-w-[325px]',
   multiple: 'max-w-[600px]',
 }
@@ -52,6 +52,7 @@ const iso = (d: Date | null) =>
 const datepickerProps: PropRow[] = [
   ['type', "'single' | 'period' | 'multiple'", 'single', 'Bentuk pemilih: satu tanggal, satu kalender dengan pintasan periode, atau rentang dengan dua kalender.'],
   ['shortcuts', 'boolean', 'false', 'Khusus multiple: menambahkan Minggu ini, Bulan ini, dan Semua Waktu di samping Hari ini dan Hapus. Period selalu memilikinya.'],
+  ['platform', "'default' | 'mobile'", 'default', 'Tata letak mobile: lebar bawaan 325px dan panel selebar kotak. Single menaruh kisinya di tengah, period memuat empat pintasannya dalam satu baris, dan multiple menumpuk kotak serta kalendernya.'],
   ['min', 'Date | null', 'undefined', 'Awal data: tanggal sebelumnya tidak bisa dipilih, pintasan dipotong ke sini, dan Semua Waktu dimulai dari sini.'],
   ['max', 'Date | null', 'undefined', 'Akhir data: tanggal sesudahnya tidak bisa dipilih, pintasan dipotong ke sini, dan Semua Waktu berakhir di sini.'],
   ['label', 'ReactNode', 'undefined', 'Teks label di atas kotak tanggal.'],
@@ -71,6 +72,7 @@ const toc: TocEntry[] = [
   { id: 'single', label: 'Single' },
   { id: 'period', label: 'Period' },
   { id: 'multiple', label: 'Multiple' },
+  { id: 'mobile', label: 'Mobile' },
   { id: 'batas', label: 'Batas data' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'nilai', label: 'Nilai & formulir' },
@@ -82,6 +84,7 @@ const toc: TocEntry[] = [
 
 export function DatepickerPage() {
   const [type, setType] = useState<DatepickerType>('single')
+  const [platform, setPlatform] = useState<DatepickerPlatform>('default')
   const [dark, setDark] = useState(false)
   const [withLabel, setWithLabel] = useState(true)
   const [disabled, setDisabled] = useState(false)
@@ -101,12 +104,13 @@ export function DatepickerPage() {
         ? `{ start: ${iso(rentang.start)}, end: ${iso(rentang.end)} }`
         : 'null'
   const [namaNilai, namaSetel] = namaState[type]
+  const mobile = platform === 'mobile'
 
   return (
     <UsulanPage
       eyebrow="Form"
       title="Datepicker"
-      description="Pemilih tanggal dengan kalender di panel melayang — satu tanggal, satu kalender dengan pintasan periode, atau rentang dengan dua kalender. Tersedia juga dalam tampilan gelap."
+      description="Pemilih tanggal dengan kalender di panel melayang — satu tanggal, satu kalender dengan pintasan periode, atau rentang dengan dua kalender. Tersedia juga tata letak mobile dan tampilan gelap."
       toc={toc}
     >
       <FlowSection id="single" title="Single">
@@ -136,8 +140,9 @@ export function DatepickerPage() {
           {'/>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Lebar bawaannya sama dengan panelnya — 284px untuk single, 325px untuk period, dan 600px untuk
-          multiple — supaya tepi kotak dan kalendernya segaris. Di wadah yang lebih sempit ia ikut menyusut;{' '}
+          Kotak single selebar 325px, sama dengan di mobile, sedangkan panelnya 284px — seperti desainnya.
+          Bentuk lain selebar panelnya, 325px untuk period dan 600px untuk multiple (325px di mobile), supaya
+          tepi kotak dan kalendernya segaris. Di wadah yang lebih sempit ia ikut menyusut;{' '}
           <Hl>className="max-w-none"</Hl> melepas batas itu.
         </p>
       </FlowSection>
@@ -208,7 +213,47 @@ export function DatepickerPage() {
           selesai yang jatuh sebelum tanggal mulai dianggap memulai rentang baru. Tanggal bulan sebelah yang
           ikut tampil di tepi kalender — misalnya 27–30 September di kalender Oktober — tidak disorot bila
           bulannya sudah tampil di kalender sebelah: sorotannya cukup di sana, tetapi tanggal itu tetap bisa
-          ditekan. Di layar sempit kedua kalender bertumpuk.
+          ditekan. Di layar sempit kedua kalender bertumpuk, tetapi kotaknya tetap berdampingan — untuk
+          ponsel, pakai tata letak mobile di bawah.
+        </p>
+      </FlowSection>
+
+      <FlowSection id="mobile" title="Mobile">
+        <Lead>
+          Untuk ponsel, <Hl>platform="mobile"</Hl> memakai tata letak dari desain mobile: ketiga bentuk
+          selebar 325px, dan panelnya selebar kotak. Single menaruh kisi tanggalnya di tengah panel, period
+          memuat <Hl>Hari ini</Hl>, <Hl>Minggu ini</Hl>, <Hl>Bulan ini</Hl>, dan <Hl>Hapus</Hl> dalam satu
+          baris, dan multiple menumpuk kotak tanggal selesai di bawah kotak tanggal mulai serta kalender
+          kedua di bawah yang pertama.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Single">
+            <Datepicker platform="mobile" label="Nama Tanggal" defaultValue={TANGGAL} />
+          </Demo>
+          <Demo label="Period">
+            <Datepicker type="period" platform="mobile" label="Nama Tanggal" defaultValue={SEPEKAN} />
+          </Demo>
+          <Demo label="Multiple">
+            <Datepicker type="multiple" platform="mobile" label="Nama Tanggal" defaultValue={RENTANG} />
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Datepicker\n'}
+          {'    type="multiple"\n'}
+          {'    '}
+          <H>platform</H>
+          {'="mobile"\n'}
+          {'    label="Nama Tanggal"\n'}
+          {'    value={rentang}\n'}
+          {'    onChange={setRentang}\n'}
+          {'/>'}
+        </SectionCode>
+        <p className="mt-4 text-body-sm text-gray-500">
+          Dengan <Hl>className="max-w-none"</Hl> ia memenuhi wadahnya dan panelnya ikut melebar. Panel
+          multiple setinggi ini jarang muat di layar ponsel, jadi bila tidak muat di bawah maupun di atas
+          kotak, tingginya dibatasi ruang yang tersedia dan isinya digulir di dalam panel. Selebihnya sama
+          dengan desktop: cara memilih, papan ketik, dan nilainya. Kedua kalender multiple juga tetap bisa
+          digeser sendiri-sendiri — yang atas selalu lebih awal dari yang bawah.
         </p>
       </FlowSection>
 
@@ -262,7 +307,7 @@ export function DatepickerPage() {
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
           Prop <Hl>darkMode</Hl> mengganti seluruh warnanya ke tampilan gelap: kotak dan panel gray-700,
-          tanggal terpilih primary-600, dan tombol pintasan berisi.
+          tanggal terpilih primary-600, dan tombol pintasan berisi. Tata letak mobile memakai warna yang sama.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Single" dark>
@@ -276,6 +321,16 @@ export function DatepickerPage() {
               <Datepicker darkMode type="multiple" label="Nama Tanggal" defaultValue={RENTANG} />
             </Demo>
           </div>
+          <Demo label="Multiple · Mobile dengan shortcuts" dark>
+            <Datepicker
+              darkMode
+              type="multiple"
+              platform="mobile"
+              shortcuts
+              label="Nama Tanggal"
+              defaultValue={RENTANG}
+            />
+          </Demo>
         </div>
         <SectionCode>
           {'<Datepicker '}
@@ -353,11 +408,12 @@ export function DatepickerPage() {
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth={lebarStage[type]} dark={dark}>
+        <Stage maxWidth={mobile ? 'max-w-[325px]' : lebarStage[type]} dark={dark}>
           {type === 'single' ? (
             <Datepicker
               {...namaLabel}
               {...batasData}
+              platform={platform}
               darkMode={dark}
               disabled={disabled}
               value={tunggal}
@@ -368,6 +424,7 @@ export function DatepickerPage() {
               {...namaLabel}
               {...batasData}
               type={type}
+              platform={platform}
               shortcuts={shortcuts}
               darkMode={dark}
               disabled={disabled}
@@ -384,6 +441,18 @@ export function DatepickerPage() {
         <Controls>
           <Control label="Type">
             <Segmented label="Pilih bentuk" value={type} onChange={setType} options={types} />
+          </Control>
+
+          <Control label="Platform">
+            <Segmented
+              label="Pilih platform"
+              value={platform}
+              onChange={setPlatform}
+              options={[
+                { value: 'mobile', label: 'Mobile' },
+                { value: 'default', label: 'Desktop' },
+              ]}
+            />
           </Control>
 
           <Control label="Shortcuts">
@@ -461,6 +530,13 @@ export function DatepickerPage() {
               {'    '}
               <H>type</H>
               {`="${type}"\n`}
+            </>
+          )}
+          {mobile && (
+            <>
+              {'    '}
+              <H>platform</H>
+              {'="mobile"\n'}
             </>
           )}
           {type === 'multiple' && shortcuts && (

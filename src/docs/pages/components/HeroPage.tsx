@@ -35,13 +35,19 @@ const heroDesc =
 
 const heroImage = asset("/images/hero-sample.svg");
 const heroImageLandscape = asset("/images/hero-sample-landscape.svg");
-
+const heroImageSaja= asset("/images/Placeholder/hero.png");
 const heroProps: PropRow[] = [
   [
     "type",
     "'horizontal-image-left' | 'horizontal-image-right' | 'centered'",
     "'horizontal-image-left'",
     'Susunan hero, sama dengan properti "Hero Type" di Figma. Dua tipe horizontal menaruh gambar di kiri atau di kanan teks; centered melepas gambar, memusatkan teks, dan memakai latar primary-50.',
+  ],
+  [
+    "centeredContent",
+    "'text' | 'image'",
+    "'text'",
+    'Isi tipe centered. image menampilkan image atau imageContent saja di tengah; sub heading, deskripsi, dan tombol tidak dirender. heading tetap ada sebagai <h1> yang hanya dibacakan pembaca layar. Gambar harus kontras dengan latar hero (primary-50, atau gray-900 saat darkMode). Diabaikan pada tipe horizontal.',
   ],
   [
     "platform",
@@ -101,7 +107,7 @@ const heroProps: PropRow[] = [
     "image",
     "string",
     "undefined",
-    'URL gambar pendamping. Tingginya mengikuti rasio asli berkasnya — tidak dikunci aspect-ratio — dan lebarnya 320px saat hero ≥ 768px, melebar ke 386px saat ≥ 1024px. Diabaikan pada type="centered".',
+    'URL gambar pendamping. Tingginya mengikuti rasio asli berkasnya — tidak dikunci aspect-ratio — dan lebarnya 320px saat hero ≥ 768px, melebar ke 386px saat ≥ 1024px. Pada type="centered" hanya dipakai bila centeredContent="image".',
   ],
   [
     "imageOrientation",
@@ -245,6 +251,73 @@ const heroFrame = (dark?: boolean) =>
       : "shadow-soft"
   }`;
 
+/**
+ * Mockup halaman untuk centered versi gambar: navbar skeleton di atas, hero di
+ * tengah, lalu baris skeleton konten di bawah. Tujuannya menunjukkan hero
+ * gambar di konteks halaman, bukan berdiri sendiri. Warna skeleton mengikuti
+ * mode terang atau gelap hero-nya.
+ */
+function PageMockup({ dark, children }: { dark?: boolean; children: ReactNode }) {
+  const bar = dark ? "bg-gray-700" : "bg-gray-200";
+  return (
+    <div className={dark ? "bg-gray-900" : "bg-surface"}>
+      <div
+        aria-hidden="true"
+        className={`flex items-center justify-between gap-4 border-b px-5 py-4 sm:px-8 ${
+          dark ? "border-gray-800" : "border-border"
+        }`}
+      >
+        <div className="flex items-center gap-2.5">
+          <span className={`size-8 rounded-lg ${dark ? "bg-gray-600" : "bg-gray-300"}`} />
+          <span className={`h-3 w-24 rounded-full ${bar}`} />
+        </div>
+        <div className="hidden items-center gap-6 sm:flex">
+          <span className={`h-2.5 w-14 rounded-full ${bar}`} />
+          <span className={`h-2.5 w-16 rounded-full ${bar}`} />
+          <span className={`h-2.5 w-12 rounded-full ${bar}`} />
+          <span className={`h-2.5 w-14 rounded-full ${bar}`} />
+        </div>
+        <span className="h-8 w-20 rounded-lg bg-primary-700/80" />
+      </div>
+
+      {children}
+
+      <div aria-hidden="true" className="grid gap-4 px-5 py-8 sm:grid-cols-3 sm:px-8">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="space-y-2.5">
+            <span className={`block aspect-video rounded-lg ${bar}`} />
+            <span className={`block h-3 w-3/4 rounded-full ${bar}`} />
+            <span className={`block h-2.5 w-1/2 rounded-full ${bar}`} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Catatan kontras untuk centered versi gambar. */
+const ContrastNote = () => (
+  <div className="ds-card mt-4 p-5">
+    <h3 className="text-sm font-black text-gray-900">Catatan: gambar harus terlihat jelas di atas latar</h3>
+    <ul className="mt-1.5 list-disc space-y-1 pl-5 text-body-sm leading-6 text-gray-500">
+      <li>Gambar tampil memenuhi hero. Tinggi hero mengikuti ukuran gambar.</li>
+      <li>
+        Bagian gambar yang transparan akan menampilkan warna latar: biru muda
+        (mode terang) atau abu gelap (mode gelap). Pastikan gambar tetap jelas
+        di atas warna itu.
+      </li>
+      <li>
+        Kalau ada tulisan di gambar, pastikan mudah dibaca, dengan kontras
+        minimal 4.5:1.
+      </li>
+      <li>
+        Kalau satu gambar tidak cocok untuk dua mode, pakai gambar berbeda untuk
+        mode terang dan gelap.
+      </li>
+    </ul>
+  </div>
+);
+
 /** Ilustrasi inline untuk bagian imageContent — bukan berkas gambar. */
 const InlineIllustration = () => (
   <div className="flex aspect-[3/4] w-full items-center justify-center rounded-xl border-2 border-dashed border-primary-300 bg-primary-50">
@@ -320,9 +393,9 @@ export function HeroPage() {
           sengaja disamakan dengan nama frame di Figma agar mudah dicocokkan.
           Dua tipe horizontal masing-masing punya versi gambar potret dan
           lanskap lewat <Hl>imageOrientation</Hl> — yang berubah hanya lebar kolom
-          gambarnya, bukan rasio gambarnya. <Hl>centered</Hl> melepas gambar
-          sepenuhnya — <Hl>image</Hl> dan <Hl>imageContent</Hl> diabaikan — lalu
-          memusatkan teks di atas latar <Hl>primary-50</Hl>.
+          gambarnya, bukan rasio gambarnya. <Hl>centered</Hl> memusatkan isinya di
+          atas latar <Hl>primary-50</Hl>. Isinya teks (bawaan) atau satu gambar
+          saja lewat <Hl>centeredContent="image"</Hl>.
         </Lead>
 
         <div className="space-y-6">
@@ -381,6 +454,21 @@ export function HeroPage() {
               buttonHref="#/components/hero"
             />
           </Preview>
+
+          <div>
+            <Preview label="Hero Centered — image saja, di dalam mockup halaman">
+              <PageMockup>
+                <Hero
+                  type="centered"
+                  centeredContent="image"
+                  heading={heroText}
+                  image={heroImageSaja}
+                  imageAlt={heroText}
+                />
+              </PageMockup>
+            </Preview>
+            <ContrastNote />
+          </div>
         </div>
 
         <SectionCode>
@@ -395,7 +483,19 @@ export function HeroPage() {
           {"{/* Tanpa gambar, teks terpusat, latar primary-50 */}\n"}
           {"<Hero "}
           <Mark>type</Mark>
-          {'="centered"               showHeading={false} … />'}
+          {'="centered"               showHeading={false} … />\n\n'}
+          {"{/* Centered, isinya satu gambar saja */}\n"}
+          {"<Hero\n"}
+          {"    "}
+          <Mark>type</Mark>
+          {'="centered"\n'}
+          {"    "}
+          <Mark>centeredContent</Mark>
+          {'="image"\n'}
+          {'    heading="Hero Design system Ceplok"   {/* jadi <h1> tersembunyi */}\n'}
+          {'    image="/images/banner.svg"\n'}
+          {'    imageAlt="Hero Design system Ceplok"\n'}
+          {"/>"}
         </SectionCode>
       </FlowSection>
 
@@ -575,8 +675,9 @@ export function HeroPage() {
           judul. Bila pendampingnya bukan berkas gambar — ilustrasi{" "}
           <Hl>{"<svg>"}</Hl> inline, kartu statistik, komposisi sendiri — pakai{" "}
           <Hl>imageContent</Hl>; prop itu hanya berlaku saat <Hl>image</Hl> kosong,
-          dan bila keduanya diisi <Hl>image</Hl> yang menang. Ketiganya diabaikan
-          pada <Hl>type="centered"</Hl>.
+          dan bila keduanya diisi <Hl>image</Hl> yang menang. Pada{" "}
+          <Hl>type="centered"</Hl> gambar hanya dipakai bila{" "}
+          <Hl>centeredContent="image"</Hl>.
         </Lead>
 
         <Preview label="imageContent — ilustrasi inline, bukan berkas">
@@ -679,6 +780,19 @@ export function HeroPage() {
               description={heroDesc}
               buttonHref="#/components/hero"
             />
+          </Preview>
+
+          <Preview label="Centered image saja — gelap, di dalam mockup halaman" dark>
+            <PageMockup dark>
+              <Hero
+                darkMode
+                type="centered"
+                centeredContent="image"
+                heading={heroText}
+                image={heroImageSaja}
+                imageAlt={heroText}
+              />
+            </PageMockup>
           </Preview>
         </div>
 

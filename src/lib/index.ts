@@ -18,7 +18,7 @@ export { Avatar } from "./components/Avatar";
 export type { AvatarProps, AvatarSize } from "./components/Avatar";
 
 export { Badge } from "./components/Badge";
-export type { BadgeProps, BadgeVariant } from "./components/Badge";
+export type { BadgeProps, BadgeSize, BadgeVariant } from "./components/Badge";
 
 export { Spinner } from "./components/Spinner";
 export type { SpinnerProps, SpinnerSize } from "./components/Spinner";
@@ -127,6 +127,7 @@ export type {
   DatepickerSingleProps,
   DatepickerRangeProps,
   DatepickerType,
+  DatepickerPlatform,
   DateRange,
 } from "./components/Datepicker";
 
@@ -162,7 +163,13 @@ export * from "./brandIcons";
 export { brandIcons } from "./brandIconRegistry";
 
 export { Hero } from "./components/Hero";
-export type { HeroProps, HeroType, HeroPlatform, HeroImageOrientation } from "./components/Hero";
+export type {
+  HeroProps,
+  HeroType,
+  HeroPlatform,
+  HeroImageOrientation,
+  HeroCenteredContent,
+} from "./components/Hero";
 
 export { Footer } from "./components/Footer";
 export type { FooterProps, FooterMenu, FooterSocial } from "./components/Footer";
