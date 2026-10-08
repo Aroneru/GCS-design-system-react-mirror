@@ -60,6 +60,10 @@ export interface UploadProps
   buttonLabel?: string
   /** Teks kolom nama berkas saat belum ada yang dipilih. */
   placeholder?: string
+  /** Label tombol pilih berkas saat sudah ada berkas terpilih (hanya type `default`). */
+  replaceLabel?: string
+  /** Label tombol hapus berkas saat sudah ada berkas terpilih (hanya type `default`). */
+  removeLabel?: string
   type?: UploadType
   /**
    * Ukuran baris pemilih berkas. Tidak berpengaruh pada type `attach`: isinya
@@ -97,6 +101,8 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
     label,
     helperText,
     buttonLabel = 'Pilih File',
+    replaceLabel = 'Replace file',
+    removeLabel = 'Remove',
     placeholder = 'Belum ada file yang dipilih',
     type = 'default',
     platform = 'default',
@@ -118,7 +124,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
   const helperId = `${fieldId}-helper`
 
   const inputRef = useRef<HTMLInputElement>(null)
-  const [nama, setNama] = useState<string[]>([])
+  const [fileList, setFileList] = useState<File[]>([])
   const [seret, setSeret] = useState(false)
 
   const size = platforms[platform]
@@ -133,8 +139,17 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
   }
 
   const catat = (files: FileList | null) => {
-    setNama(files ? Array.from(files, (f) => f.name) : [])
+    setFileList(files ? Array.from(files) : [])
     onFilesChange?.(files)
+  }
+
+  const totalSize = fileList.reduce((acc, file) => acc + file.size, 0)
+  const formatSize = (bytes: number) => {
+    if (bytes === 0) return '0 B'
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -168,7 +183,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
   return (
     <div className={cn('w-full', className)}>
       {label && (
-        <label htmlFor={fieldId} className={cn("mb-2 block text-sm font-bold", darkMode ? "text-white" : "text-gray-900")}>
+        <label htmlFor={fieldId} className={cn("mb-2 block text-sm font-bold transition-colors", darkMode ? "text-white" : "text-gray-900")}>
           {label}
         </label>
       )}
@@ -201,60 +216,89 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
             akan terbaca sebagai keluar dari area dan sorotannya berkedip.
           */}
           <div className="pointer-events-none flex flex-col items-center">
-            <UploadIcon className={cn('size-5', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-300') : 'text-gray-400')} />
-            <span className={cn('mt-2 text-sm', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
-              {nama.length > 0 ? nama.join(', ') : attachLabel}
+            <UploadIcon className={cn('size-5 transition-colors', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-300') : 'text-gray-400')} />
+            <span className={cn('mt-2 text-sm transition-colors', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
+              {fileList.length > 0 ? fileList.map(f => f.name).join(', ') : attachLabel}
             </span>
-            <span className={cn('mt-2 text-xs', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
+            <span className={cn('mt-2 text-xs transition-colors', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
               {attachHint}
             </span>
           </div>
         </label>
       ) : (
-        <div
-          className={cn(
-            'flex items-stretch overflow-hidden rounded-lg border',
-            darkMode ? 'border-gray-700' : 'border-gray-300',
-            size.field,
-          )}
-        >
-          {input}
-
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            disabled={disabled}
+        <div className="flex items-stretch gap-2">
+          <div
             className={cn(
-              'shrink-0 border-r font-medium text-white transition-colors',
+              'flex flex-1 items-stretch overflow-hidden rounded-lg border transition-colors',
               darkMode ? 'border-gray-700' : 'border-gray-300',
-              'focus-visible:outline-2 focus-visible:-outline-offset-2',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-              size.button,
-              accent.solid,
+              size.field,
             )}
           >
-            {buttonLabel}
-          </button>
+            {input}
 
-          <p
-            className={cn(
-              'flex min-w-0 flex-1 items-center px-4',
-              darkMode ? 'bg-gray-800' : 'bg-gray-50',
-              size.text,
-              disabled
-                ? (darkMode ? 'text-gray-500' : 'text-gray-400')
-                : (darkMode ? (nama.length > 0 ? 'text-white' : 'text-gray-400') : 'text-gray-900'),
-            )}
-          >
-            <span className="truncate">{nama.length > 0 ? nama.join(', ') : placeholder}</span>
-          </p>
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={disabled}
+              className={cn(
+                'shrink-0 border-r font-medium text-white transition-colors',
+                darkMode ? 'border-gray-700' : 'border-gray-300',
+                'focus-visible:outline-2 focus-visible:-outline-offset-2',
+                'disabled:cursor-not-allowed disabled:opacity-50',
+                size.button,
+                accent.solid,
+              )}
+            >
+              {fileList.length > 0 ? replaceLabel : buttonLabel}
+            </button>
+
+            <p
+              className={cn(
+                'flex min-w-0 flex-1 items-center px-4 transition-colors',
+                darkMode ? 'bg-gray-800' : 'bg-gray-50',
+                size.text,
+                disabled
+                  ? (darkMode ? 'text-gray-500' : 'text-gray-400')
+                  : (darkMode ? (fileList.length > 0 ? 'text-white' : 'text-gray-400') : 'text-gray-900'),
+              )}
+            >
+              <span className="truncate">{fileList.length > 0 ? fileList.map(f => f.name).join(', ') : placeholder}</span>
+            </p>
+          </div>
+
+          {fileList.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                if (inputRef.current) inputRef.current.value = ''
+                catat(null)
+              }}
+              disabled={disabled}
+              className={cn(
+                'shrink-0 rounded-lg border px-4 font-medium transition-colors',
+                darkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white' : 'border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+                size.text,
+              )}
+            >
+              {removeLabel}
+            </button>
+          )}
         </div>
       )}
 
-      {helperText && (
-        <p id={helperId} className={cn('mt-2 text-xs', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
-          {helperText}
-        </p>
+      {(helperText || (fileList.length > 0 && type === 'default')) && (
+        <div className="mt-2 flex flex-col space-y-1">
+          {fileList.length > 0 && type === 'default' && (
+            <span className={cn('text-xs transition-colors', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
+              {formatSize(totalSize)}
+            </span>
+          )}
+          {helperText && (
+            <p id={helperId} className={cn('text-xs transition-colors', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
+              {helperText}
+            </p>
+          )}
+        </div>
       )}
     </div>
   )

@@ -11,8 +11,8 @@ import { Search as SearchIcon } from 'flowbite-react-icons/outline'
 import { cn } from '../utils/cn'
 import { Dropdown, type DropdownItem } from './Dropdown'
 
-/** Ukuran kotak: `default` 54px (desktop), `mobile` 50px. */
-export type SearchPlatform = 'default' | 'mobile'
+/** Ukuran kotak: `default` 54px (desktop), `mobile` 50px, `compact` 37px. */
+export type SearchPlatform = 'default' | 'mobile' | 'compact'
 
 /** Warna aksen per aplikasi — dipakai tombol cari dan garis saat field difokus. */
 export type SearchApplication = 'default' | 'simaya'
@@ -49,6 +49,12 @@ const platforms: Record<
     icon: 'size-3.5',
     text: 'text-sm',
     button: 'h-[34px] px-[13px] text-xs',
+  },
+  compact: {
+    field: 'h-[37px]',
+    icon: 'size-3.5',
+    text: 'text-sm',
+    button: 'h-[25px] px-[10px] text-xs',
   },
 }
 

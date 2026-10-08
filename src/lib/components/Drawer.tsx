@@ -61,6 +61,7 @@ export interface DrawerProps
   header?: ReactNode
   items?: DrawerMenuItem[]
   theme?: DrawerNavItemTheme
+  darkMode?: boolean
   children?: ReactNode
 }
 
@@ -103,9 +104,10 @@ interface DrawerContextValue {
   descriptionId: string
   registerTitle: (id: string, isMounted: boolean) => void
   registerDescription: (id: string, isMounted: boolean) => void
+  darkMode?: boolean
 }
 
-const DrawerContext = createContext<DrawerContextValue | null>(null)
+export const DrawerContext = createContext<DrawerContextValue | null>(null)
 
 const sideSizes: Record<DrawerSize, string> = {
   s: 'w-[320px] max-w-[calc(100vw-2rem)]',
@@ -123,25 +125,29 @@ const verticalSizes: Record<DrawerSize, string> = {
   full: 'h-screen max-h-full',
 }
 
-const positionClasses: Record<DrawerPosition, (size: DrawerSize) => string> = {
-  right: (size) =>
+const positionClasses: Record<DrawerPosition, (size: DrawerSize, darkMode?: boolean) => string> = {
+  right: (size, darkMode) =>
     cn(
-      'fixed inset-y-0 right-0 left-auto h-full max-h-full border-l border-border rounded-none',
+      'fixed inset-y-0 right-0 left-auto h-full max-h-full border-l rounded-none',
+      darkMode ? 'border-gray-700' : 'border-border',
       sideSizes[size],
     ),
-  left: (size) =>
+  left: (size, darkMode) =>
     cn(
-      'fixed inset-y-0 left-0 right-auto h-full max-h-full border-r border-border rounded-none',
+      'fixed inset-y-0 left-0 right-auto h-full max-h-full border-r rounded-none',
+      darkMode ? 'border-gray-700' : 'border-border',
       sideSizes[size],
     ),
-  top: (size) =>
+  top: (size, darkMode) =>
     cn(
-      'fixed inset-x-0 top-0 bottom-auto w-full max-w-full border-b border-border rounded-none',
+      'fixed inset-x-0 top-0 bottom-auto w-full max-w-full border-b rounded-none',
+      darkMode ? 'border-gray-700' : 'border-border',
       verticalSizes[size],
     ),
-  bottom: (size) =>
+  bottom: (size, darkMode) =>
     cn(
-      'fixed inset-x-0 bottom-0 top-auto w-full max-w-full border-t border-border rounded-none',
+      'fixed inset-x-0 bottom-0 top-auto w-full max-w-full border-t rounded-none',
+      darkMode ? 'border-gray-700' : 'border-border',
       verticalSizes[size],
     ),
 }
@@ -242,6 +248,7 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
     header,
     items,
     theme = 'primary',
+    darkMode = false,
     className,
     children,
     'aria-label': ariaLabel,
@@ -355,7 +362,7 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
 
   return (
     <DrawerContext.Provider
-      value={{ onClose, titleId, descriptionId, registerTitle, registerDescription }}
+      value={{ onClose, titleId, descriptionId, registerTitle, registerDescription, darkMode }}
     >
       <dialog
         ref={setRef}
@@ -366,8 +373,9 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
         onClose={handleNativeClose}
         onClick={handleClick}
         className={cn(
-          'm-0 p-0 text-left text-content shadow-2xl bg-surface backdrop:bg-gray-900/50 backdrop:backdrop-blur-xs open:flex open:flex-col overflow-hidden',
-          positionClasses[position](size),
+          'm-0 p-0 text-left shadow-2xl backdrop:bg-gray-900/50 open:flex open:flex-col overflow-hidden',
+          darkMode ? 'bg-gray-800 text-gray-300' : 'bg-surface text-content',
+          positionClasses[position](size, darkMode),
           className,
         )}
         {...props}
@@ -415,7 +423,7 @@ export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(functi
     >
       <div className="min-w-0 flex-1 space-y-1">
         {eyebrow && (
-          <span className="block text-base font-semibold tracking-wider text-gray-500 uppercase">
+          <span className={cn("block text-base font-semibold tracking-wider uppercase", context?.darkMode ? "text-gray-500" : "text-gray-500")}>
             {eyebrow}
           </span>
         )}
@@ -427,7 +435,10 @@ export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(functi
           type="button"
           onClick={handleClose}
           aria-label={closeLabel}
-          className="-mr-2 ml-auto inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+          className={cn(
+            "-mr-2 ml-auto inline-flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
+            context?.darkMode ? "text-gray-500 hover:bg-gray-700 hover:text-white" : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          )}
         >
           <Close className="w-[18px] h-[18px]" aria-hidden="true" />
         </button>
@@ -458,7 +469,7 @@ export const DrawerTitle = forwardRef<HTMLHeadingElement, DrawerTitleProps>(func
     <h2
       ref={forwardedRef}
       id={id}
-      className={cn('text-base font-bold text-gray-900', className)}
+      className={cn('text-base font-bold', context?.darkMode ? 'text-white' : 'text-gray-900', className)}
       {...props}
     >
       {children}
@@ -483,7 +494,7 @@ export const DrawerDescription = forwardRef<HTMLParagraphElement, DrawerDescript
     }, [context])
 
     return (
-      <p ref={forwardedRef} id={id} className={cn('text-xs text-gray-500', className)} {...props}>
+      <p ref={forwardedRef} id={id} className={cn('text-xs', context?.darkMode ? 'text-gray-400' : 'text-gray-500', className)} {...props}>
         {children}
       </p>
     )
@@ -496,11 +507,13 @@ export const DrawerBody = forwardRef<HTMLDivElement, DrawerBodyProps>(function D
   { className, ...props },
   ref,
 ) {
+  const context = useContext(DrawerContext)
   return (
     <div
       ref={ref}
       className={cn(
-        'min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-5 text-xs text-gray-600',
+        'min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-5 text-xs',
+        context?.darkMode ? 'text-gray-400' : 'text-gray-600',
         className,
       )}
       {...props}
@@ -514,10 +527,15 @@ export const DrawerFooter = forwardRef<HTMLDivElement, DrawerFooterProps>(functi
   { className, ...props },
   ref,
 ) {
+  const context = useContext(DrawerContext)
   return (
     <div
       ref={ref}
-      className={cn('flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-border px-5 py-3', className)}
+      className={cn(
+        'flex shrink-0 flex-wrap items-center justify-end gap-2 border-t px-5 py-3',
+        context?.darkMode ? 'border-gray-700' : 'border-border',
+        className
+      )}
       {...props}
     />
   )
@@ -545,8 +563,10 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
   },
   ref,
 ) {
+  const context = useContext(DrawerContext)
   const isExpandable = collapsible || Boolean(children)
   const Component = href ? 'a' : 'button'
+  const isDark = context?.darkMode
 
   return (
     <div ref={ref} className={cn('w-full', className)} {...props}>
@@ -557,8 +577,8 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
         className={cn(
           'group flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-base transition-all text-left font-medium',
           active
-            ? activeThemeClasses[theme]
-            : cn('text-gray-900', hoverThemeClasses[theme]),
+            ? (isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : activeThemeClasses[theme])
+            : (isDark ? 'text-gray-50 hover:bg-gray-700 hover:text-white' : cn('text-gray-900', hoverThemeClasses[theme])),
         )}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -566,7 +586,9 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
             <span
               className={cn(
                 'flex w-[18px] h-[18px] shrink-0 items-center justify-center transition-colors',
-                active ? activeIconClasses[theme] : cn('text-gray-500', hoverIconClasses[theme]),
+                active
+                  ? (isDark ? 'text-white' : activeIconClasses[theme])
+                  : (isDark ? 'text-gray-400 group-hover:text-white' : cn('text-gray-500', hoverIconClasses[theme])),
               )}
             >
               {icon}
@@ -581,7 +603,9 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
             <span
               className={cn(
                 'flex w-[18px] h-[18px] items-center justify-center transition-all',
-                active ? activeIconClasses[theme] : cn('text-gray-500', hoverIconClasses[theme]),
+                active
+                  ? (isDark ? 'text-white' : activeIconClasses[theme])
+                  : (isDark ? 'text-gray-400 group-hover:text-white' : cn('text-gray-500', hoverIconClasses[theme])),
               )}
             >
               {expanded ? <ChevronUp className="w-[18px] h-[18px]" /> : <ChevronDown className="w-[18px] h-[18px]" />}
@@ -613,7 +637,10 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
   { label, active = false, theme = 'primary', href, onClick, className, ...props },
   ref,
 ) {
+  const context = useContext(DrawerContext)
   const Component = (href ? 'a' : 'button') as any
+  const isDark = context?.darkMode
+
   const handleClick = (e: MouseEvent<HTMLElement>) => {
     if (!href) {
       e.preventDefault()
@@ -628,15 +655,19 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
       type={href ? undefined : 'button'}
       onClick={handleClick}
       className={cn(
-        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-base text-left transition-colors font-medium text-gray-900',
-        subItemHoverClasses[theme],
-        active
-          ? theme === 'simaya'
-            ? 'font-medium text-purple-700 bg-purple-50/70'
-            : theme === 'gray'
-              ? 'font-medium text-gray-900 bg-gray-100'
-              : 'font-medium text-blue-600 bg-blue-50/70'
-          : 'text-gray-900',
+        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-base text-left transition-colors font-medium',
+        isDark
+          ? (active ? 'bg-gray-700/50 hover:bg-gray-600 text-white' : 'text-gray-50 hover:bg-gray-700 hover:text-white')
+          : cn(
+              subItemHoverClasses[theme],
+              active
+                ? theme === 'simaya'
+                  ? 'text-purple-700 bg-purple-50/70'
+                  : theme === 'gray'
+                    ? 'text-gray-900 bg-gray-100'
+                    : 'text-blue-600 bg-blue-50/70'
+                : 'text-gray-900'
+            ),
         className,
       )}
       {...props}
@@ -650,25 +681,27 @@ DrawerSubItem.displayName = 'DrawerSubItem'
 
 export interface DrawerTriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode
+  darkMode?: boolean
 }
 
 /**
  * Subkomponen pemicu (tombol hamburger menu) untuk membuka Drawer.
  */
 export const DrawerTrigger = forwardRef<HTMLButtonElement, DrawerTriggerProps>(
-  function DrawerTrigger({ className, icon, children, ...props }, ref) {
+  function DrawerTrigger({ className, icon, children, darkMode = false, ...props }, ref) {
     return (
       <button
         ref={ref}
         type="button"
         aria-label="Buka menu drawer"
         className={cn(
-          'inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+          'inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+          darkMode ? 'text-gray-200 hover:bg-gray-700 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700',
           className,
         )}
         {...props}
       >
-        {children ?? icon ?? <BarsFromLeft className="w-6 h-6 text-gray-500" />}
+        {children ?? icon ?? <BarsFromLeft className="w-6 h-6" />}
       </button>
     )
   },

@@ -160,7 +160,10 @@ export function SidebarNavigation({ groups, items, collapsed, darkMode }: Sideba
     : [{ id: "default", items: items ?? [] }];
 
   return (
-    <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-3" aria-label="Navigasi sidebar">
+    <nav
+      className="ds-scroll-y min-h-0 flex-1 overflow-y-auto px-3 py-3"
+      aria-label="Navigasi sidebar"
+    >
       {resolvedGroups.map((group) => (
         <section
           key={group.id}

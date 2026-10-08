@@ -282,9 +282,12 @@ Dibanding 0.2.0 ada enam perubahan yang memutus, termasuk nama paketnya.
   (`right`, `left`, `top`, `bottom`) dan ukurannya lewat `size` (`s`, `m`, `l`,
   `xl`, `full`). Isinya menu navigasi lewat `items` — lengkap dengan submenu dan
   `badge` — atau susunan sendiri dari `DrawerHeader`, `DrawerTitle`,
-  `DrawerDescription`, `DrawerBody`, dan `DrawerFooter`. Komponen pendukung
-  `DrawerTrigger`, `DrawerNavItem`, dan `DrawerSubItem` serta tipe-tipenya ikut
-  diekspor.
+  `DrawerDescription`, `DrawerBody`, dan `DrawerFooter`. Prop `darkMode` memberinya
+  tampilan gelap sesuai desain: latar panel gray-800, teks menu inaktif gray-50
+  dengan ikon gray-400, dan status menu aktif/hover menggunakan latar gray-600.
+  Latar redup (backdrop) kini memakai warna pekat transparan (gray-900/50) tanpa 
+  efek blur. Komponen pendukung `DrawerTrigger`, `DrawerNavItem`, dan `DrawerSubItem`
+  serta tipe-tipenya ikut diekspor.
 - **`Dropdown`** — panel yang dibuka dari sebuah tombol (`trigger`), memakai
   HTML Popover API sehingga browser yang mengurus penutupan, top layer, dan
   urutan fokus. Barisnya diisi lewat `items`, atau `groups` bila perlu dipisah
@@ -346,7 +349,8 @@ Dibanding 0.2.0 ada enam perubahan yang memutus, termasuk nama paketnya.
   viewport setinggi satu layar. `footer` mengisi kaki Sidebar di bawah daftar
   menu — versi aplikasi, tautan bantuan — dan tetap terlihat meski menunya
   panjang dan digulir. `SidebarItem`, `SidebarSubItem`, dan `SidebarUser` kini
-  juga menerima `onClick`.
+  juga menerima `onClick`. Selain itu, saat daftar menu meluap ke bawah, navigasi
+  secara otomatis digulir menggunakan scrollbar khusus `.ds-scroll-y`.
 - **`Table`** — tabel data dari `columns` dan `data`, dengan `rowKey` sebagai
   kunci tiap baris; tanpa `columns`, kolomnya dibuat dari field baris pertama.
   Toolbar-nya bisa memuat kotak pencarian (`search`, yang meneruskan atributnya
