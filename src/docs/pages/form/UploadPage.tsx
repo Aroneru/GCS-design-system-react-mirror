@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Upload, type UploadApplication, type UploadPlatform, type UploadType } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -30,6 +30,7 @@ const uploadProps: PropRow[] = [
   ['attachLabel', 'ReactNode', 'Click to upload or drag and drop', 'Baris ajakan di dalam area seret-lepas.'],
   ['attachHint', 'ReactNode', 'SVG, PNG, JPG or GIF (MAX. 800x400px)', 'Baris keterangan format di dalam area seret-lepas.'],
   ['onFilesChange', '(files: FileList | null) => void', 'undefined', 'Dipanggil setiap berkas berganti, lewat dialog maupun seret-lepas.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: warna latar gray-800 dan teks putih/abu-abu.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="file"> diteruskan (accept, multiple, required, name, …).'],
 ]
 
@@ -38,6 +39,7 @@ const toc: TocEntry[] = [
   { id: 'platform', label: 'Platform' },
   { id: 'attach-form', label: 'Attach Form' },
   { id: 'application', label: 'Application' },
+  { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
@@ -50,6 +52,7 @@ export function UploadPage() {
   const [withLabel, setWithLabel] = useState(true)
   const [withHelper, setWithHelper] = useState(true)
   const [banyak, setBanyak] = useState(false)
+  const [theme, setTheme] = useState('light')
 
   return (
     <UsulanPage
@@ -77,16 +80,16 @@ export function UploadPage() {
           {'/>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Yang dibungkus komponen ini <H>&lt;input type="file"&gt;</H> sungguhan — ia hanya
-          disembunyikan secara visual, bukan diganti tombol tiruan. Cukup beri <H>name</H> seperti
-          isian lain lalu kirim formulirnya seperti biasa; <H>onFilesChange</H> baru diperlukan kalau
+          Yang dibungkus komponen ini <Hl>&lt;input type="file"&gt;</Hl> sungguhan — ia hanya
+          disembunyikan secara visual, bukan diganti tombol tiruan. Cukup beri <Hl>name</Hl> seperti
+          isian lain lalu kirim formulirnya seperti biasa; <Hl>onFilesChange</Hl> baru diperlukan kalau
           Anda memang ingin membaca berkasnya di sisi klien, misalnya untuk pratinjau.
         </p>
       </FlowSection>
 
       <FlowSection id="platform" title="Platform">
         <Lead>
-          Dua ukuran untuk bentuk ini. <H>default</H> setinggi 44px dengan teks 14px; <H>mobile</H>{' '}
+          Dua ukuran untuk bentuk ini. <Hl>default</Hl> setinggi 44px dengan teks 14px; <Hl>mobile</Hl>{' '}
           setinggi 40px dengan teks 12px. Label dan captionnya tidak ikut mengecil, jadi yang berubah
           hanya barisnya sendiri.
         </Lead>
@@ -150,14 +153,14 @@ export function UploadPage() {
           Berkas yang dijatuhkan dititipkan ke input aslinya, bukan sekadar disimpan di state, jadi ia
           ikut terkirim saat formulirnya di-submit. Begitu ada berkas terpilih, namanya menggantikan
           baris ajakan supaya jelas bahwa areanya sudah terpakai. Dua baris teks di dalamnya bisa
-          diganti lewat <H>attachLabel</H> dan <H>attachHint</H>.
+          diganti lewat <Hl>attachLabel</Hl> dan <Hl>attachHint</Hl>.
         </p>
       </FlowSection>
 
       <FlowSection id="application" title="Application">
         <Lead>
-          Warna tombol mengikuti aplikasi yang memakainya: <H>primary-700</H> untuk default dan{' '}
-          <H>purple-500</H> untuk simaya. Pilih sekali di tingkat halaman, lalu biarkan sama untuk
+          Warna tombol mengikuti aplikasi yang memakainya: <Hl>primary-700</Hl> untuk default dan{' '}
+          <Hl>purple-500</Hl> untuk simaya. Pilih sekali di tingkat halaman, lalu biarkan sama untuk
           seluruh form di aplikasi itu.
         </Lead>
         <div className="grid gap-5">
@@ -195,13 +198,43 @@ export function UploadPage() {
         </p>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <Lead>
+          Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual. Komponen secara otomatis menyesuaikan warna latar, batas, dan teks.
+        </Lead>
+        <div className="grid gap-5">
+          <Demo label="Upload" dark>
+            <Upload label="Upload File" helperText="PDF atau JPG, maksimal 2 MB." darkMode />
+          </Demo>
+          <Demo label="Attach — 538px" dark>
+            <div className="max-w-[538px]">
+              <Upload type="attach" darkMode />
+            </div>
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Upload\n'}
+          {'    '}
+          <H>label</H>
+          {'="Upload File"\n'}
+          {'    '}
+          <H>helperText</H>
+          {'="PDF atau JPG, maksimal 2 MB."\n'}
+          {'    '}
+          <H>darkMode</H>
+          {'\n/>\n\n<Upload type="attach" '}
+          <H>darkMode</H>
+          {' />'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <Lead>
           Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Pilih berkas, atau seret
           satu ke area attach, untuk melihat namanya muncul.
         </Lead>
 
-        <Stage maxWidth={platform === 'mobile' ? 'max-w-[382px]' : 'max-w-[538px]'}>
+        <Stage dark={theme === 'dark'} maxWidth={platform === 'mobile' ? 'max-w-[382px]' : 'max-w-[538px]'}>
           <Upload
             type={type}
             platform={platform}
@@ -209,6 +242,7 @@ export function UploadPage() {
             multiple={banyak}
             label={withLabel ? 'Unggah dokumen' : undefined}
             helperText={withHelper ? 'PDF atau JPG, maksimal 2 MB.' : undefined}
+            darkMode={theme === 'dark'}
           />
         </Stage>
 
@@ -217,7 +251,7 @@ export function UploadPage() {
             <Segmented
               label="Pilih bentuk"
               value={type}
-              onChange={setType}
+              onChange={(v) => setType(v as UploadType)}
               options={[
                 { value: 'default', label: 'Upload' },
                 { value: 'attach', label: 'Attach' },
@@ -229,7 +263,7 @@ export function UploadPage() {
             <Segmented
               label="Pilih aplikasi"
               value={application}
-              onChange={setApplication}
+              onChange={(v) => setApplication(v as UploadApplication)}
               itemClassName="px-2.5"
               options={applications.map((a) => ({ value: a.value, label: a.label }))}
             />
@@ -239,7 +273,7 @@ export function UploadPage() {
             <Segmented
               label="Pilih platform"
               value={platform}
-              onChange={setPlatform}
+              onChange={(v) => setPlatform(v as UploadPlatform)}
               options={[
                 { value: 'default', label: 'Default' },
                 { value: 'mobile', label: 'Mobile' },
@@ -251,7 +285,7 @@ export function UploadPage() {
             <Segmented
               label="Izinkan banyak berkas"
               value={banyak}
-              onChange={setBanyak}
+              onChange={(v) => setBanyak(v as boolean)}
               options={adaTidakAda}
             />
           </Control>
@@ -260,7 +294,7 @@ export function UploadPage() {
             <Segmented
               label="Tampilkan label"
               value={withLabel}
-              onChange={setWithLabel}
+              onChange={(v) => setWithLabel(v as boolean)}
               options={adaTidakAda}
             />
           </Control>
@@ -269,8 +303,20 @@ export function UploadPage() {
             <Segmented
               label="Tampilkan helper text"
               value={withHelper}
-              onChange={setWithHelper}
+              onChange={(v) => setWithHelper(v as boolean)}
               options={adaTidakAda}
+            />
+          </Control>
+
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={theme}
+              onChange={(v) => setTheme(v as string)}
+              options={[
+                { value: 'light', label: 'Light' },
+                { value: 'dark', label: 'Dark' },
+              ]}
             />
           </Control>
         </Controls>
@@ -332,6 +378,13 @@ export function UploadPage() {
               {'="PDF atau JPG, maksimal 2 MB."\n'}
             </>
           )}
+          {theme === 'dark' && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
+            </>
+          )}
           {'    name="dokumen"\n'}
           {'    onFilesChange={(files) => simpan(files)}\n'}
           {'/>'}
@@ -341,7 +394,7 @@ export function UploadPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;input type="file"&gt;</H> standar juga diteruskan apa adanya.
+          <Hl>&lt;input type="file"&gt;</Hl> standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={uploadProps} minWidth="52rem" />
       </FlowSection>

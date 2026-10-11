@@ -6,6 +6,7 @@ import {
   Modal,
   Toast,
 } from '../../../../lib'
+import { Clock } from '../../../../lib/icons/outline'
 import { asset } from '../../../asset'
 import { LAYANAN } from '../data'
 
@@ -31,7 +32,9 @@ export function Layanan() {
             description={l.deskripsi}
             actions={
               <div className="flex w-full flex-wrap items-center justify-between gap-3">
-                <Badge variant="brand">{l.durasi}</Badge>
+                <Badge variant="brand" icon={<Clock />}>
+                  {l.durasi}
+                </Badge>
                 <Modal
                   trigger={<Button size="xs">Ajukan</Button>}
                   title={l.judul}

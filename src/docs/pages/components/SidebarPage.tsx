@@ -7,11 +7,13 @@ import {
   Control,
   Controls,
   FlowSection,
+  Lead,
   SectionCode,
   Stage,
   UsulanPage,
   type TocEntry,
 } from "../../usulanKit";
+import { cn } from "../../../lib/utils/cn";
 
 type CollapseOption = "expanded" | "collapsed";
 type BadgeOption = "show" | "hide";
@@ -74,13 +76,13 @@ const sidebarProps: PropRow[] = [
     "undefined",
     "Menampilkan tombol collapse aktif dan memperbarui state collapsed; independen dari prop logo.",
   ],
-  ["onCollapse", "() => void", "undefined", "Handler untuk memperbarui state collapsed."],
   [
     "footer",
     "ReactNode",
     "undefined",
     "Area di kaki Sidebar, di bawah daftar menu — versi aplikasi, tautan bantuan, atau catatan status.",
   ],
+  ["darkMode", "boolean", "false", "Mengaktifkan tampilan mode gelap pada Sidebar secara manual."],
 ];
 
 const sidebarItemProps: PropRow[] = [
@@ -98,7 +100,7 @@ const sidebarItemProps: PropRow[] = [
     "false",
     "Menonaktifkan tombol buka/tutup submenu tanpa menonaktifkan menu.",
   ],
-  ["onCollapse", "() => void", "undefined", "Callback ketika tombol collapse Sidebar ditekan."],
+  ["onClick", "(e: MouseEvent) => void", "undefined", "Callback saat item menu diklik."],
 ];
 
 const toc: TocEntry[] = [
@@ -106,6 +108,7 @@ const toc: TocEntry[] = [
   { id: "menu", label: "Menu" },
   { id: "badge", label: "Badge" },
   { id: "separator", label: "Content Separator" },
+  { id: "dark-mode", label: "Dark mode" },
   { id: "playground", label: "Playground" },
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
@@ -221,7 +224,7 @@ function SidebarBrand({ collapsed = false }: { collapsed?: boolean }) {
         <span className="rounded-sm bg-primary-300" />
         <span className="rounded-sm bg-white" />
       </span>
-      {!collapsed && <span className="text-sm font-black tracking-tight text-content">CEPLOK</span>}
+      {!collapsed && <span className="text-sm font-black tracking-tight">CEPLOK</span>}
     </span>
   );
 }
@@ -246,10 +249,12 @@ function VariantPreview({
   title,
   description,
   children,
+  dark = false,
 }: {
   title: string;
   description: string;
   children: ReactNode;
+  dark?: boolean;
 }) {
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -257,7 +262,7 @@ function VariantPreview({
         <h3 className="text-sm font-bold text-gray-900">{title}</h3>
         <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
       </div>
-      <div className="h-[440px] overflow-y-auto overscroll-contain bg-gray-50">{children}</div>
+      <div className={`h-[440px] overflow-y-auto overscroll-contain ${dark ? "bg-gray-900" : "bg-gray-50"}`}>{children}</div>
     </article>
   );
 }
@@ -266,15 +271,19 @@ function SidebarVariant({
   items,
   groups,
   collapsed = false,
+  darkMode = false,
 }: {
   items?: SidebarItem[];
   groups?: SidebarGroup[];
   collapsed?: boolean;
+  darkMode?: boolean;
 }) {
   return (
     <Sidebar
+      className="!min-h-0 h-full"
       collapsed={collapsed}
       showCollapseButton
+      darkMode={darkMode}
       logo={<SidebarBrand />}
       collapsedLogo={<SidebarBrand collapsed />}
       user={{ name: "Nama User", profileLabel: "Lihat Profil", href: "#" }}
@@ -292,21 +301,39 @@ export function SidebarPage() {
   const [userInfo, setUserInfo] = useState<VisibilityOption>("show");
   const [logoWeb, setLogoWeb] = useState<VisibilityOption>("show");
   const [collapseButton, setCollapseButton] = useState<VisibilityOption>("show");
+  const [theme, setTheme] = useState("light");
+  const [activeMenu, setActiveMenu] = useState("Menu 1");
 
-  const collapsed = collapse === "collapsed";
+  const resolvedCollapse = menuIcon === "hide" ? "expanded" : collapse;
+  const collapsed = resolvedCollapse === "collapsed";
+
+  const resolvedCollapseButton = menuIcon === "hide" ? "hide" : collapseButton;
 
   const playgroundItems = baseItems.map((item) => ({
     ...item,
+    active: activeMenu === item.label,
+    onClick: (e: any) => {
+      e.preventDefault();
+      setActiveMenu(item.label as string);
+    },
     icon: menuIcon === "show" ? item.icon : undefined,
     ...(item.label === "Menu 4" ? { badge: badge === "show" ? 1 : undefined } : {}),
+    children: item.children?.map((sub) => ({
+      ...sub,
+      active: activeMenu === sub.label,
+      onClick: (e: any) => {
+        e.preventDefault();
+        setActiveMenu(sub.label as string);
+      },
+    })),
   }));
 
   const playgroundGroups: SidebarGroup[] | undefined =
     separator === "show"
       ? [
-          { id: "main", items: playgroundItems.slice(0, 5) },
-          { id: "secondary", separator: true, items: playgroundItems.slice(5) },
-        ]
+        { id: "main", items: playgroundItems.slice(0, 5) },
+        { id: "secondary", separator: true, items: playgroundItems.slice(5) },
+      ]
       : undefined;
 
   const iconProperty = (icon: string) =>
@@ -333,23 +360,24 @@ export function SidebarPage() {
     "import { Sidebar } from '@ceplok-ui/design-kit-react'",
     ...(menuIcon === "show"
       ? [
-          "import { Cart, ChartPie, Clipboard, Inbox, Layers, Lock } from 'flowbite-react-icons/solid'",
-        ]
+        "import { Cart, ChartPie, Clipboard, Inbox, Layers, Lock } from 'flowbite-react-icons/solid'",
+      ]
       : []),
     "",
     "// Logo dan tombol collapse dikonfigurasi secara independen.",
     usageItems,
     ...(separator === "show"
       ? [
-          "",
-          "const groups = [",
-          "  { id: 'main', items: items.slice(0, 5) },",
-          "  { id: 'secondary', separator: true, items: items.slice(5) },",
-          "]",
-        ]
+        "",
+        "const groups = [",
+        "  { id: 'main', items: items.slice(0, 5) },",
+        "  { id: 'secondary', separator: true, items: items.slice(5) },",
+        "]",
+      ]
       : []),
     "",
     "<Sidebar",
+    ...(theme === "dark" ? ["  darkMode"] : []),
     ...(logoWeb === "show" ? ["  logo={<Logo />}", "  collapsedLogo={<LogoMark />}"] : []),
     ...(userInfo === "show"
       ? ["  user={{ name: 'Nama User', profileLabel: 'Lihat Profil', href: '#' }}"]
@@ -357,7 +385,7 @@ export function SidebarPage() {
     `  ${separator === "show" ? "groups={groups}" : "items={items}"}`,
     "  sticky",
     `  collapsed={${collapsed}}`,
-    ...(collapseButton === "show"
+    ...(resolvedCollapseButton === "show"
       ? ["  onCollapse={() => setCollapsed((current) => !current)}"]
       : []),
     "/>",
@@ -367,9 +395,10 @@ export function SidebarPage() {
     "sticky",
     ...(menuIcon === "show" ? ["icon"] : []),
     ...(badge === "show" ? ["badge"] : []),
+    ...(theme === "dark" ? ["darkMode"] : []),
     ...(userInfo === "show" ? ["user"] : []),
     ...(logoWeb === "show" ? ["collapsedLogo", "logo"] : []),
-    ...(collapseButton === "show" ? ["onCollapse"] : []),
+    ...(resolvedCollapseButton === "show" ? ["onCollapse"] : []),
     ...(separator === "show" ? ["separator: true", "groups"] : []),
   ];
 
@@ -575,21 +604,52 @@ export function SidebarPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="dark-mode" title="Dark mode">
+        <p className="mb-6 text-body-sm text-gray-500">
+          Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Sidebar.
+          Komponen secara otomatis menyesuaikan warna ikon, teks aktif/inaktif, badge, profil, dan border untuk menjaga rasio kontras.
+        </p>
+
+        <div className="mb-4 grid gap-4 lg:grid-cols-2">
+          <VariantPreview
+            title="1. Multi-level menu + icon, user info, logo web"
+            description="Menu berikon dikelompokkan; separator membedakan area konten."
+            dark
+          >
+            <SidebarVariant groups={iconGroups} darkMode />
+          </VariantPreview>
+
+          <VariantPreview
+            title="2. Collapsed"
+            description="Konfigurasi varian 1 dalam kondisi tertutup: icon, user, dan logo terlihat."
+            dark
+          >
+            <SidebarVariant groups={iconGroups} collapsed darkMode />
+          </VariantPreview>
+        </div>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <p className="mb-6 text-body-sm text-gray-500">
           Coba konfigurasi Sidebar melalui kontrol di bawah ini untuk melihat perubahan mode
           collapse, badge, separator, logo, user info, dan tombol collapse.
         </p>
 
-        <Stage maxWidth="max-w-[520px]">
-          <div className="flex min-h-[760px] justify-center">
+        <Stage maxWidth="max-w-[768px]" dark={theme === "dark"}>
+          <div
+            className={cn(
+              "flex min-h-[760px] w-full items-stretch overflow-hidden border",
+              theme === "dark" ? "border-gray-700 bg-gray-900" : "border-gray-200 bg-white"
+            )}
+          >
             <Sidebar
               key={separator}
               collapsed={collapsed}
+              darkMode={theme === "dark"}
               onCollapse={
-                collapseButton === "show"
+                resolvedCollapseButton === "show"
                   ? () =>
-                      setCollapse((current) => (current === "expanded" ? "collapsed" : "expanded"))
+                    setCollapse((current) => (current === "expanded" ? "collapsed" : "expanded"))
                   : undefined
               }
               logo={logoWeb === "show" ? <SidebarBrand /> : undefined}
@@ -602,6 +662,27 @@ export function SidebarPage() {
               groups={playgroundGroups}
               items={playgroundGroups ? undefined : playgroundItems}
             />
+
+            <div className="flex w-full flex-col gap-6 p-6">
+              <div className="flex flex-col gap-2">
+                <h1
+                  className={cn(
+                    "text-xl font-bold",
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  )}
+                >
+                  {activeMenu}
+                </h1>
+                <p
+                  className={cn(
+                    "text-sm",
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  )}
+                >
+                  Ini adalah simulasi konten untuk halaman {activeMenu}. Anda bisa menaruh konten aplikasi yang sebenarnya di sini.
+                </p>
+              </div>
+            </div>
           </div>
         </Stage>
 
@@ -609,9 +690,22 @@ export function SidebarPage() {
           <Control label="Sidebar">
             <Segmented
               label="Pilih kondisi Sidebar"
-              value={collapse}
+              value={resolvedCollapse}
               onChange={(value) => setCollapse(value as CollapseOption)}
               options={collapseOptions}
+              disabled={menuIcon === "hide"}
+            />
+          </Control>
+
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={theme}
+              onChange={(v) => setTheme(String(v))}
+              options={[
+                { value: "light", label: "Light" },
+                { value: "dark", label: "Dark" },
+              ]}
             />
           </Control>
 
@@ -654,9 +748,10 @@ export function SidebarPage() {
           <Control label="Button collapse">
             <Segmented
               label="Tampilkan tombol collapse"
-              value={collapseButton}
+              value={resolvedCollapseButton}
               onChange={(value) => setCollapseButton(value as VisibilityOption)}
               options={visibilityOptions}
+              disabled={menuIcon === "hide"}
             />
           </Control>
 
@@ -681,15 +776,22 @@ export function SidebarPage() {
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Referensi seluruh prop Sidebar, termasuk state container serta state per-item
           menu/submenu.
-        </p>
+        </Lead>
 
-        <PropsTable rows={sidebarProps} minWidth="46rem" />
+        <div className="space-y-6">
+          <div>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Sidebar Props</h3>
+            <PropsTable rows={sidebarProps} minWidth="46rem" />
+          </div>
 
-        <h3 className="mt-8 mb-3 text-sm font-bold text-gray-900">SidebarItem</h3>
-        <PropsTable rows={sidebarItemProps} minWidth="46rem" />
+          <div>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">SidebarItem Props</h3>
+            <PropsTable rows={sidebarItemProps} minWidth="46rem" />
+          </div>
+        </div>
       </FlowSection>
     </UsulanPage>
   );

@@ -6,6 +6,7 @@ import { cn } from "../utils/cn";
 export interface BreadcrumbItem {
   label: string;
   href?: string;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   icon?: ReactNode;
 }
 
@@ -18,6 +19,7 @@ export interface BreadcrumbProps extends HTMLAttributes<HTMLElement> {
   separator?: ReactNode;
   size?: BreadcrumbSize;
   background?: BreadcrumbBackground;
+  darkMode?: boolean;
 }
 
 const sizeClasses: Record<
@@ -42,6 +44,7 @@ export function Breadcrumb({
   separator = <ChevronRight />,
   size = "base",
   background = "none",
+  darkMode = false,
   className,
   ...props
 }: BreadcrumbProps) {
@@ -52,7 +55,8 @@ export function Breadcrumb({
       aria-label="Breadcrumb"
       className={cn(
         "flex items-center",
-        background === "bg" && "rounded-lg bg-gray-100 px-4 py-3",
+        background === "bg" &&
+          (darkMode ? "rounded-lg bg-gray-800 px-4 py-3" : "rounded-lg bg-gray-100 px-4 py-3"),
         className,
       )}
       {...props}
@@ -68,10 +72,13 @@ export function Breadcrumb({
               {!isLast && item.href ? (
                 <a
                   href={item.href}
+                  onClick={item.onClick}
                   className={cn(
                     "flex items-center gap-2",
                     currentSize.text,
-                    "text-gray-500 transition-colors hover:text-primary-700",
+                    darkMode
+                      ? "text-gray-400 transition-colors hover:text-white"
+                      : "text-gray-500 transition-colors hover:text-primary-700",
                   )}
                 >
                   {itemIcon && (
@@ -85,7 +92,13 @@ export function Breadcrumb({
                   aria-current={isLast ? "page" : undefined}
                   className={cn(
                     currentSize.text,
-                    isLast ? "font-medium text-gray-900" : "text-gray-500",
+                    isLast
+                      ? darkMode
+                        ? "font-medium text-gray-300"
+                        : "font-medium text-gray-900"
+                      : darkMode
+                        ? "text-gray-400"
+                        : "text-gray-500",
                   )}
                 >
                   {itemIcon && (

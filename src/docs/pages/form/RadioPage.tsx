@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Radio, type RadioApplication, type RadioPlatform, type RadioState } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -64,7 +64,7 @@ export function RadioPage() {
         <Lead>
           Lingkaran 16px berlatar gray-50 dengan garis gray-300. Saat dipilih, garisnya menebal jadi 3,5px
           berwarna aksen — sisa ruang di tengah (9px) itulah yang tampak sebagai titik. State{' '}
-          <H>inactive</H> memakai latar gray-100 dan cincin gray-400, sekaligus mematikan kontrolnya.
+          <Hl>inactive</Hl> memakai latar gray-100 dan cincin gray-400, sekaligus mematikan kontrolnya.
         </Lead>
         <Demo>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -100,7 +100,7 @@ export function RadioPage() {
 
       <FlowSection id="caption" title="Dengan caption">
         <Lead>
-          Isi <H>helperText</H> untuk menambahkan keterangan 12px di bawah label — berguna saat pilihannya
+          Isi <Hl>helperText</Hl> untuk menambahkan keterangan 12px di bawah label — berguna saat pilihannya
           perlu penjelasan. Lingkaran tetap sejajar dengan baris pertama label.
         </Lead>
         <Demo>
@@ -225,8 +225,8 @@ export function RadioPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti lingkaran ke gray-300 bergaris gray-400, dengan label terang dan
-          caption gray-400. Cincin pilihan aktif tetap memakai warna aplikasi. State <H>inactive</H> memakai
+          Prop <Hl>darkMode</Hl> mengganti lingkaran ke gray-300 bergaris gray-400, dengan label terang dan
+          caption gray-400. Cincin pilihan aktif tetap memakai warna aplikasi. State <Hl>inactive</Hl> memakai
           lingkaran gray-800 dengan teks gray-600.
         </Lead>
         <Demo dark>
@@ -381,7 +381,7 @@ export function RadioPage() {
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
-          Satu kelompok pilihan dibentuk dengan memberi <H>name</H> yang sama pada tiap Radio — sama seperti
+          Satu kelompok pilihan dibentuk dengan memberi <Hl>name</Hl> yang sama pada tiap Radio — sama seperti
           formulir HTML biasa, jadi panah atas/bawah otomatis berpindah antar-opsi.
         </p>
       </FlowSection>
@@ -444,7 +444,7 @@ export function RadioPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;input type=&quot;radio&quot;&gt;</H> standar juga diteruskan apa adanya.
+          <Hl>&lt;input type=&quot;radio&quot;&gt;</Hl> standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={radioProps} minWidth="48rem" />
       </FlowSection>

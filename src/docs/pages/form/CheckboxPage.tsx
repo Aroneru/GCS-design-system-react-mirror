@@ -6,7 +6,7 @@ import {
   type CheckboxState,
 } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -100,7 +100,7 @@ export function CheckboxPage() {
 
       <FlowSection id="caption" title="Dengan caption">
         <Lead>
-          Isi <H>helperText</H> untuk menerangkan pilihan — berguna saat satu centang punya konsekuensi yang
+          Isi <Hl>helperText</Hl> untuk menerangkan pilihan — berguna saat satu centang punya konsekuensi yang
           perlu dijelaskan. Kotak tetap sejajar dengan baris pertama label.
         </Lead>
         <Demo>
@@ -213,8 +213,8 @@ export function CheckboxPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti kotak ke gray-700 bergaris gray-600, dengan label putih dan caption
-          gray-400. Kotak yang tercentang tetap memakai warna aplikasi. State <H>inactive</H> meredupkan
+          Prop <Hl>darkMode</Hl> mengganti kotak ke gray-700 bergaris gray-600, dengan label putih dan caption
+          gray-400. Kotak yang tercentang tetap memakai warna aplikasi. State <Hl>inactive</Hl> meredupkan
           label dan caption ke gray-500; kotaknya tetap, kecuali saat tercentang yang terisi gray-500.
         </Lead>
         <Demo dark>
@@ -337,7 +337,7 @@ export function CheckboxPage() {
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
-          Berbeda dengan Radio, tiap Checkbox berdiri sendiri — pakai <H>name</H> yang sama hanya bila
+          Berbeda dengan Radio, tiap Checkbox berdiri sendiri — pakai <Hl>name</Hl> yang sama hanya bila
           server Anda memang mengharapkan satu daftar nilai dari satu nama.
         </p>
       </FlowSection>
@@ -399,7 +399,7 @@ export function CheckboxPage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;input type=&quot;checkbox&quot;&gt;</H> standar juga diteruskan apa adanya.
+          <Hl>&lt;input type=&quot;checkbox&quot;&gt;</Hl> standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={checkboxProps} minWidth="48rem" />
       </FlowSection>

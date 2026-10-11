@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Toggle, type ToggleApplication, type TogglePlatform, type ToggleState } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
-import { Demo, H, Segmented } from '../../pageKit'
+import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
   Control,
   Controls,
@@ -87,7 +87,7 @@ export function TogglePage() {
 
       <FlowSection id="caption" title="Dengan caption">
         <Lead>
-          Isi <H>helperText</H> untuk menerangkan akibat dari menyalakan pengaturan — berguna karena sakelar
+          Isi <Hl>helperText</Hl> untuk menerangkan akibat dari menyalakan pengaturan — berguna karena sakelar
           berlaku langsung tanpa konfirmasi.
         </Lead>
         <Demo>
@@ -184,9 +184,9 @@ export function TogglePage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengganti jalur yang mati ke gray-600 dengan bulatan gray-400, label putih, dan
+          Prop <Hl>darkMode</Hl> mengganti jalur yang mati ke gray-600 dengan bulatan gray-400, label putih, dan
           caption gray-400. Saat menyala, jalurnya tetap memakai warna aplikasi dan bulatannya berubah
-          putih. State <H>inactive</H> hanya meredupkan label ke gray-500 — jalur dan bulatannya tetap
+          putih. State <Hl>inactive</Hl> hanya meredupkan label ke gray-500 — jalur dan bulatannya tetap
           seperti saat mati, meski sakelarnya menyala.
         </Lead>
         <Demo dark>
@@ -304,8 +304,8 @@ export function TogglePage() {
         </Controls>
 
         <p className="mt-4 text-body-sm text-gray-500">
-          Kondisi mati dan menyala diatur lewat <H>checked</H> seperti checkbox biasa — bukan lewat prop{' '}
-          <H>state</H>, yang hanya menangani <em>inactive</em>.
+          Kondisi mati dan menyala diatur lewat <Hl>checked</Hl> seperti checkbox biasa — bukan lewat prop{' '}
+          <Hl>state</Hl>, yang hanya menangani <em>inactive</em>.
         </p>
       </FlowSection>
 
@@ -362,7 +362,7 @@ export function TogglePage() {
       <FlowSection id="properties" title="Properties">
         <Lead>
           Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <H>&lt;input type=&quot;checkbox&quot;&gt;</H> standar juga diteruskan apa adanya.
+          <Hl>&lt;input type=&quot;checkbox&quot;&gt;</Hl> standar juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={toggleProps} minWidth="48rem" />
       </FlowSection>

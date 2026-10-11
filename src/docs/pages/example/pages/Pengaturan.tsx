@@ -52,22 +52,41 @@ export function Pengaturan() {
           </div>
         </div>
 
-        <div className="mt-7 grid gap-5 sm:grid-cols-2">
+        {/*
+          InputField versi mobile (40px) dipakai agar tingginya mendekati
+          Select (37px); versi default 52px terlihat jomplang di baris yang sama.
+          items-start menjaga helper text tidak menggeser kolom sebelahnya.
+        */}
+        <div className="mt-7 grid items-start gap-5 sm:grid-cols-2">
           <InputField
+            platform="mobile"
             label="Nama lengkap"
             placeholder="Sesuai dokumen identitas"
             icon={<User className="size-4" />}
             value={nama}
             onChange={(e) => setNama(e.target.value)}
           />
+          {/*
+            FloatingLabel tidak punya label di atas kotak, jadi di dua kolom
+            diberi jarak atas 28px — setinggi label InputField (20px) plus
+            jaraknya (8px) — supaya garis atas kotaknya sebaris dengan kolom
+            Nama lengkap. Di satu kolom jarak itu tidak perlu.
+
+            Tinggi kotaknya (50px) juga ditimpa jadi 40px lewat selektor anak,
+            karena FloatingLabel belum punya prop untuk itu — supaya garis
+            bawahnya ikut sebaris dengan InputField di sebelahnya.
+          */}
           <FloatingLabel
+            platform="mobile"
             label="Alamat surel"
             type="email"
             icon={<Envelope className="size-4" />}
             value={surel}
             onChange={(e) => setSurel(e.target.value)}
+            className="sm:pt-7 [&>div>div]:h-10"
           />
           <InputField
+            platform="mobile"
             label="Nomor telepon"
             placeholder="08xx-xxxx-xxxx"
             helperText="Dipakai hanya untuk konfirmasi jadwal."

@@ -2,7 +2,14 @@ import { useEffect, useState } from 'react'
 import { Badge, Button, Select, Table } from '../../../../lib'
 import type { TableColumn } from '../../../../lib'
 import { Download, Eye, Filter, Plus } from '../../../../lib/icons/outline'
-import { BARIS_PER_HALAMAN, PENGAJUAN, VARIAN_STATUS, type Pengajuan as DataPengajuan } from '../data'
+import {
+  BARIS_PER_HALAMAN,
+  PENGAJUAN,
+  VARIAN_STATUS,
+  type Pengajuan as DataPengajuan,
+  type StatusPengajuan,
+} from '../data'
+import { StatusBadge } from '../StatusBadge'
 
 const SARINGAN_STATUS = [
   { value: 'semua', label: 'Semua status' },
@@ -37,7 +44,7 @@ const KOLOM: TableColumn<DataPengajuan>[] = [
     key: 'status',
     header: 'Status',
     align: 'left',
-    cell: (p) => <Badge variant={VARIAN_STATUS[p.status]}>{p.status}</Badge>,
+    cell: (p) => <StatusBadge status={p.status} />,
   },
   {
     key: 'aksi',
@@ -117,13 +124,26 @@ export function Pengajuan() {
         }}
         filter={{}}
         actions={
-          <Select
-            aria-label="Saring status"
-            options={SARINGAN_STATUS}
-            value={status}
-            onChange={(e) => saring(() => setStatus(e.target.value))}
-            className="w-44"
-          />
+          <>
+            {/* Chip saringan aktif; tombol × mengembalikan ke "Semua status". */}
+            {status !== 'semua' && (
+              <Badge
+                key={status}
+                variant={VARIAN_STATUS[status as StatusPengajuan]}
+                dismissible
+                onDismiss={() => saring(() => setStatus('semua'))}
+              >
+                Status: {status}
+              </Badge>
+            )}
+            <Select
+              aria-label="Saring status"
+              options={SARINGAN_STATUS}
+              value={status}
+              onChange={(e) => saring(() => setStatus(e.target.value))}
+              className="w-44"
+            />
+          </>
         }
         pagination={{
           pageSize: BARIS_PER_HALAMAN,
