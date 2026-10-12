@@ -269,9 +269,24 @@ export interface TableProps<T> extends Omit<HTMLAttributes<HTMLDivElement>, "chi
    */
   manual?: boolean;
 
+  /**
+   * Baris zebra: baris genap diberi latar gray-50 supaya baris panjang mudah
+   * diikuti mata. Hover jadi gray-100 agar tetap terlihat di baris genap.
+   */
+  striped?: boolean;
+
   loading?: boolean;
   emptyText?: ReactNode;
 }
+
+/** Latar baris dan sel menempel, dengan dan tanpa zebra. */
+const rowBg = {
+  plain: { row: "hover:bg-gray-50", cell: "bg-white group-hover:bg-gray-50" },
+  striped: {
+    row: "even:bg-gray-50 hover:bg-gray-100",
+    cell: "bg-white group-even:bg-gray-50 group-hover:bg-gray-100",
+  },
+};
 
 const aligns: Record<TableAlign, string> = {
   left: "text-left",
@@ -789,6 +804,7 @@ export function Table<T>({
   headerAlign,
   pagination,
   manual,
+  striped = false,
   loading,
   emptyText = "Tidak ada data",
   className,
@@ -1017,13 +1033,16 @@ export function Table<T>({
    * kolom data pertama cukup digeser `left-12`. Latarnya wajib ada — sel
    * sticky yang transparan memperlihatkan isi yang lewat di bawahnya.
    */
+  const bg = striped ? rowBg.striped : rowBg.plain;
+
   const stickyClass = (index: number, head: boolean) => {
     const isStart = sticky?.start && index === 0;
     const isEnd = sticky?.end && index === columns.length - 1 && columns.length > 1;
     if (!isStart && !isEnd) return undefined;
     return cn(
       "sticky z-10",
-      head ? density.headBg : "bg-white transition-colors group-hover:bg-gray-50",
+      // Sel menempel butuh latar sendiri supaya isi yang tergulir tidak tembus.
+      head ? density.headBg : cn("transition-colors", bg.cell),
       isStart && (selectable ? "left-12" : "left-0"),
       isStart && "shadow-[inset_-1px_0_0_var(--color-gray-200)]",
       isEnd && "right-0 shadow-[inset_1px_0_0_var(--color-gray-200)]",
@@ -1238,7 +1257,7 @@ export function Table<T>({
                   <tr
                     key={key}
                     aria-selected={selectable ? isSelected : undefined}
-                    className="group transition-colors hover:bg-gray-50"
+                    className={cn("group transition-colors", bg.row)}
                   >
                     {selectable && (
                       <td
@@ -1246,8 +1265,7 @@ export function Table<T>({
                           "w-12",
                           cellBorder,
                           density.cell,
-                          sticky?.start &&
-                            "sticky left-0 z-10 bg-white transition-colors group-hover:bg-gray-50",
+                          sticky?.start && cn("sticky left-0 z-10 transition-colors", bg.cell),
                         )}
                       >
                         <Checkbox

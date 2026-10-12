@@ -365,6 +365,7 @@ const tableProps: PropRow[] = [
   ["headerAlign", '"left" | "center" | "right"', "undefined", "Posisi semua judul kolom sekaligus. `headerAlign` di kolom tetap menang. Kalau kosong, judul ikut `align` kolomnya."],
   ["pagination", "TablePaginationConfig", "undefined", "Membagi data per halaman. Tanpa ini semua baris tampil."],
   ["manual", "boolean", "false", "Pasang kalau urutan dan halaman diurus server."],
+  ["striped", "boolean", "false", "Baris zebra: baris genap diberi latar abu-abu muda."],
   ["loading", "boolean", "false", "Menampilkan ikon memuat sebagai ganti isi tabel."],
   ["emptyText", "ReactNode", "Tidak ada data", "Tulisan yang tampil kalau data kosong."],
 ];
@@ -461,6 +462,7 @@ const toc: TocEntry[] = [
   { id: "table", label: "Table" },
   { id: "states", label: "States" },
   { id: "size", label: "Size" },
+  { id: "zebra", label: "Baris zebra" },
   { id: "aksi", label: "Tombol aksi" },
   { id: "posisi", label: "Posisi judul" },
   { id: "gambar", label: "Gambar" },
@@ -787,11 +789,15 @@ function PlaygroundTable({
   preview,
   grouped,
   headerAlign,
+  striped,
+  withToolbarActions,
 }: {
   count: number;
   selectable: boolean;
   withSearch: boolean;
   withFilter: boolean;
+  striped: boolean;
+  withToolbarActions: boolean;
   theme: PaginationTheme;
   size: TableSize;
   withPagination: boolean;
@@ -819,26 +825,29 @@ function PlaygroundTable({
       rowKey="id"
       size={size}
       headerAlign={headerAlign}
+      striped={striped}
       selectable={selectable}
       selectedKeys={selected}
       onSelectionChange={setSelected}
       search={withSearch ? { value: query, onChange: (e) => setQuery(e.target.value), placeholder: "Cari nama, email, atau layanan" } : undefined}
       filter={withFilter ? {} : undefined}
       actions={
-        <>
-          <Button size="s" leftIcon={<Plus />}>
-            Tambah Data
-          </Button>
-          <Button
-            size="s"
-            theme="orange"
-            leftIcon={<TrashBin />}
-            disabled={selected.length === 0}
-            onClick={() => setSelected([])}
-          >
-            Hapus Data
-          </Button>
-        </>
+        withToolbarActions ? (
+          <>
+            <Button size="s" leftIcon={<Plus />}>
+              Tambah Data
+            </Button>
+            <Button
+              size="s"
+              theme="orange"
+              leftIcon={<TrashBin />}
+              disabled={selected.length === 0}
+              onClick={() => setSelected([])}
+            >
+              Hapus Data
+            </Button>
+          </>
+        ) : undefined
       }
       pagination={withPagination ? { pageSizeOptions: [5, 10, 25, 50, 100], theme } : undefined}
     />
@@ -877,13 +886,17 @@ function OrderTable({ hiddenColumns = [] }: { hiddenColumns?: string[] }) {
 }
 
 export function TablePage() {
-  const [selectable, setSelectable] = useState(true);
-  const [withSearch, setWithSearch] = useState(true);
-  const [withFilter, setWithFilter] = useState(true);
+  // Playground mulai dari tabel dasar: hanya data, zebra, dan pagination.
+  // Fitur lain dinyalakan sendiri lewat pengaturan di bawah tabel.
+  const [selectable, setSelectable] = useState(false);
+  const [withSearch, setWithSearch] = useState(false);
+  const [withFilter, setWithFilter] = useState(false);
+  const [withToolbarActions, setWithToolbarActions] = useState(false);
+  const [striped, setStriped] = useState(true);
   const [theme, setTheme] = useState<PaginationTheme>("primary");
   const [size, setSize] = useState<TableSize>("normal");
   const [withPagination, setWithPagination] = useState(true);
-  const [withRowActions, setWithRowActions] = useState(true);
+  const [withRowActions, setWithRowActions] = useState(false);
   const [actionIconSize, setActionIconSize] = useState<TableActionIconSize>("base");
   // Hanya nilai yang bukan bawaan, supaya kode di Penggunaan tetap ringkas.
   const actionStyle: ActionStyle = {
@@ -1013,6 +1026,24 @@ export function TablePage() {
           {'="compact" />\n\n'}
           {"// Gambar di compact otomatis kotak 32px, caption hanya tampil di pratinjau\n"}
           {"{ key: 'gambar', header: 'Gambar', image: { src: (row) => row.fotoUrl } }"}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="zebra" title="Baris zebra">
+        <Lead>
+          Isi <Hl>striped</Hl> supaya baris genap berlatar abu-abu muda. Cocok untuk tabel dengan
+          banyak kolom, karena mata lebih mudah mengikuti satu baris dari kiri ke kanan. Warna hover
+          dibuat sedikit lebih gelap supaya tetap terlihat di baris genap.
+        </Lead>
+
+        <Demo label="Normal">
+          <Table columns={columns} data={allRows.slice(0, 6)} rowKey="id" selectable striped />
+        </Demo>
+
+        <SectionCode>
+          {"<Table columns={columns} data={rows} rowKey=\"id\" "}
+          <H>striped</H>
+          {" />"}
         </SectionCode>
       </FlowSection>
 
@@ -1600,6 +1631,8 @@ export function TablePage() {
             preview={withPreview}
             grouped={grouped}
             headerAlign={headerAlign}
+            striped={striped}
+            withToolbarActions={withToolbarActions}
           />
         </Stage>
 
@@ -1613,6 +1646,9 @@ export function TablePage() {
           <Control label="Rata judul">
             <Segmented label="Rata judul kolom" value={headerAlign} onChange={setHeaderAlign} options={headerAlignOptions} />
           </Control>
+          <Control label="Baris zebra">
+            <Segmented label="Baris zebra" value={striped} onChange={setStriped} options={onOff} />
+          </Control>
           <Control label="Checkbox baris">
             <Segmented label="Checkbox baris" value={selectable} onChange={setSelectable} options={adaTidakAda} />
           </Control>
@@ -1621,6 +1657,14 @@ export function TablePage() {
           </Control>
           <Control label="Filter">
             <Segmented label="Filter" value={withFilter} onChange={setWithFilter} options={adaTidakAda} />
+          </Control>
+          <Control label="Tombol Tambah & Hapus">
+            <Segmented
+              label="Tombol Tambah dan Hapus Data"
+              value={withToolbarActions}
+              onChange={setWithToolbarActions}
+              options={adaTidakAda}
+            />
           </Control>
           <Control label="Kolom aksi">
             <Segmented label="Kolom aksi" value={withRowActions} onChange={setWithRowActions} options={adaTidakAda} />
@@ -1662,7 +1706,7 @@ export function TablePage() {
         </Lead>
         <SectionCode flush>
           {"import { Badge, Button, Table, type TableColumn } from '@ceplok-ui/design-kit-react'\n"}
-          {"import { Plus } from 'flowbite-react-icons/outline'\n"}
+          {withToolbarActions && "import { Plus, TrashBin } from 'flowbite-react-icons/outline'\n"}
           {withRowActions && "import { Download, Edit, Printer } from 'flowbite-react-icons/solid'\n"}
           {"\n"}
           {"const columns: TableColumn<Pengajuan>[] = [\n"}
@@ -1748,14 +1792,30 @@ export function TablePage() {
               {"={{}}\n"}
             </>
           )}
-          {"    actions={<Button size=\"s\" leftIcon={<Plus />}>Tambah Data</Button>}\n"}
+          {striped && (
+            <>
+              {"    "}
+              <H>striped</H>
+              {"\n"}
+            </>
+          )}
+          {withToolbarActions && (
+            <>
+              {"    "}
+              <H>actions</H>
+              {"={<>\n"}
+              {"        <Button size=\"s\" leftIcon={<Plus />}>Tambah Data</Button>\n"}
+              {"        <Button size=\"s\" theme=\"orange\" leftIcon={<TrashBin />}>Hapus Data</Button>\n"}
+              {"    </>}\n"}
+            </>
+          )}
           {withPagination && (
             <>
               {"    "}
               <H>pagination</H>
               {theme === "primary"
-                ? "={{ pageSize: 10 }}\n"
-                : `={{ pageSize: 10, theme: '${theme}' }}\n`}
+                ? "={{ pageSizeOptions: [5, 10, 25, 50, 100] }}\n"
+                : `={{ pageSizeOptions: [5, 10, 25, 50, 100], theme: '${theme}' }}\n`}
             </>
           )}
           {"/>"}
