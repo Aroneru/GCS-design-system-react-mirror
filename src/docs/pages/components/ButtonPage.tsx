@@ -39,7 +39,8 @@ const typeOptions = [
 
 const buttonProps: PropRow[] = [
   ["as", '"button" | "anchor"', "button", "Menentukan elemen yang dirender. Bisa jadi anchor."],
-  ["type", '"button" | "iconOnly"', "button", "Menentukan tipe tombol."],
+  ["type", '"button" | "submit" | "reset"', "button", "Menentukan tipe tombol bawaan HTML."],
+  ["iconOnly", "boolean", "false", "Jika true, gaya tombol disesuaikan menjadi khusus ikon."],
   ["size", '"xs" | "s" | "base" | "l" | "xl"', "base", "Menentukan ukuran tombol."],
   ["variant", '"filled" | "outline"', "filled", "Gaya utama tombol: solid atau outline."],
   ["tone", '"light" | "dark"', "light", "Menyetel kontras warna untuk variant atau theme."],
@@ -63,7 +64,7 @@ export function ButtonPage() {
   const [variant, setVariant] = useState<ButtonVariant>("filled");
   const [theme, setTheme] = useState<ButtonTheme>("primary");
   const [tone, setTone] = useState<"light" | "dark">("light");
-  const [type, setType] = useState<"button" | "iconOnly">("button");
+  const [iconOnly, setIconOnly] = useState(false);
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
   const [asLink, setAsLink] = useState<"button" | "anchor">("button");
@@ -104,10 +105,7 @@ export function ButtonPage() {
         </div>
         <SectionCode>
           {"<Button\n"}
-          {"    "}
-          <H>type</H>
-          {'="button"\n'}
-          {"    "}
+
           <H>size</H>
           {'="base"\n'}
           {'    leftIcon={<Messages className="size-3.5" />}\n'}
@@ -133,7 +131,7 @@ export function ButtonPage() {
                 variant="filled"
                 theme="primary"
                 tone="light"
-                type="iconOnly"
+                iconOnly
                 aria-label={`Icon ${size}`}
               >
                 <Messages className="size-4" />
@@ -148,8 +146,8 @@ export function ButtonPage() {
         <SectionCode>
           {"<Button\n"}
           {"    "}
-          <H>type</H>
-          {'="iconOnly"\n'}
+          <H>iconOnly</H>
+          {"\n"}
           {"    "}
           <H>size</H>
           {'="base"\n'}
@@ -181,7 +179,6 @@ export function ButtonPage() {
         </div>
         <SectionCode>
           {"<Button\n"}
-          {'    type="button"\n'}
           {'    size="base"\n'}
           {"    "}
           <H>variant</H>
@@ -289,7 +286,7 @@ export function ButtonPage() {
         <Stage maxWidth="max-w-[380px]">
           <div className="mx-auto flex min-h-[180px] items-center justify-center">
             <Button
-              type={type === "iconOnly" ? "iconOnly" : "button"}
+              iconOnly={iconOnly}
               as={asLink}
               href={asLink === "anchor" ? "/foundations/colors" : undefined}
               size={selectedSize}
@@ -299,7 +296,7 @@ export function ButtonPage() {
               leftIcon={showLeftIcon ? <Messages className="size-4" /> : undefined}
               rightIcon={showRightIcon ? <Messages className="size-4" /> : undefined}
             >
-              {type === "iconOnly" ? <Messages className="size-4" /> : "Button"}
+              {iconOnly ? <Messages className="size-4" /> : "Button"}
             </Button>
           </div>
         </Stage>
@@ -320,13 +317,12 @@ export function ButtonPage() {
           <Control label="Type">
             <Segmented
               label="Pilih type"
-              value={type}
+              value={iconOnly ? "iconOnly" : "button"}
               onChange={(value) => {
-                const newType = value as "button" | "iconOnly";
+                const isIconOnly = value === "iconOnly";
+                setIconOnly(isIconOnly);
 
-                setType(newType);
-
-                if (newType === "iconOnly") {
+                if (isIconOnly) {
                   setShowLeftIcon(false);
                   setShowRightIcon(false);
                 }
@@ -370,7 +366,7 @@ export function ButtonPage() {
             <Segmented
               label="Pilih posisi ikon"
               value={
-                type === "iconOnly"
+                iconOnly
                   ? "none"
                   : showLeftIcon && showRightIcon
                     ? "both"
@@ -381,7 +377,7 @@ export function ButtonPage() {
                         : "none"
               }
               onChange={(value) => {
-                if (type === "iconOnly") return;
+                if (iconOnly) return;
 
                 setShowLeftIcon(value === "left" || value === "both");
                 setShowRightIcon(value === "right" || value === "both");
@@ -425,11 +421,13 @@ export function ButtonPage() {
             {`="${asLink}"\n`}
           </>
 
-          <>
-            {"    "}
-            <H>type</H>
-            {`="${type}"\n`}
-          </>
+          {iconOnly && (
+            <>
+              {"    "}
+              <H>iconOnly</H>
+              {"\n"}
+            </>
+          )}
 
           <>
             {"    "}
@@ -455,7 +453,7 @@ export function ButtonPage() {
             {`="${selectedSize}"\n`}
           </>
 
-          {showLeftIcon && type !== "iconOnly" && (
+          {showLeftIcon && !iconOnly && (
             <>
               {"    "}
               <H>leftIcon</H>
@@ -463,7 +461,7 @@ export function ButtonPage() {
             </>
           )}
 
-          {showRightIcon && type !== "iconOnly" && (
+          {showRightIcon && !iconOnly && (
             <>
               {"    "}
               <H>rightIcon</H>
@@ -473,7 +471,7 @@ export function ButtonPage() {
 
           {"    >\n"}
 
-          {type === "iconOnly" ? (
+          {iconOnly ? (
             <>
               {"    "}
               {'<Messages className="size-4" />\n'}

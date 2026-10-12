@@ -165,7 +165,7 @@ export function Pengaturan() {
 
         <div className="mt-7 flex flex-wrap gap-3">
           <Modal
-            trigger={<Button>Simpan perubahan</Button>}
+            trigger={<Button type="submit">Simpan perubahan</Button>}
             title="Simpan perubahan?"
             footer={({ close }) => (
               <>
@@ -173,6 +173,7 @@ export function Pengaturan() {
                   Batal
                 </Button>
                 <Button
+                  type="submit"
                   size="xs"
                   onClick={() => {
                     setTersimpan(true)

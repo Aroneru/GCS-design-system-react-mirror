@@ -1,8 +1,6 @@
 import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../utils/cn";
 
-export type ButtonType = "button" | "iconOnly";
-
 export type ButtonVariant = "filled" | "outline";
 
 export type ButtonSize = "xs" | "s" | "base" | "l" | "xl";
@@ -13,7 +11,7 @@ export type ButtonTone = "light" | "dark";
 
 interface CommonProps {
   children?: ReactNode;
-  type?: ButtonType;
+  iconOnly?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
   leftIcon?: ReactNode;
@@ -25,7 +23,8 @@ interface CommonProps {
 
 type AsButton = CommonProps & {
   as?: "button";
-} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof CommonProps>;
+  type?: "button" | "submit" | "reset";
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, keyof CommonProps | "type">;
 
 type AsAnchor = CommonProps & {
   as: "anchor";
@@ -146,7 +145,7 @@ const colorClasses: Record<ButtonTheme, Record<ButtonTone, Record<ButtonVariant,
 
 export function Button({
   children,
-  type = "button",
+  iconOnly = false,
   variant = "filled",
   size = "base",
   theme = "primary",
@@ -158,8 +157,6 @@ export function Button({
 }: ButtonProps) {
   const currentSize = sizeClasses[size];
 
-  const isIconOnly = type === "iconOnly";
-
   const classes = cn(
     "inline-flex items-center justify-center",
     "font-medium",
@@ -168,28 +165,28 @@ export function Button({
     "focus:ring-2 focus:ring-primary-400",
     "disabled:pointer-events-none disabled:opacity-50",
     colorClasses[theme][tone][variant],
-    isIconOnly ? currentSize.iconOnly : currentSize.button,
+    iconOnly ? currentSize.iconOnly : currentSize.button,
     className,
   );
 
   const content = (
     <>
       {/* Left Icon */}
-      {!isIconOnly && leftIcon && (
+      {!iconOnly && leftIcon && (
         <span className={cn("flex shrink-0 items-center justify-center", currentSize.icon)}>
           {leftIcon}
         </span>
       )}
 
       {/* Content / Icon Only */}
-      {isIconOnly ? (
+      {iconOnly ? (
         <span className={cn("flex items-center justify-center", currentSize.icon)}>{children}</span>
       ) : (
         children
       )}
 
       {/* Right Icon */}
-      {!isIconOnly && rightIcon && (
+      {!iconOnly && rightIcon && (
         <span className={cn("flex shrink-0 items-center justify-center", currentSize.icon)}>
           {rightIcon}
         </span>
@@ -207,10 +204,10 @@ export function Button({
     );
   }
 
-  const { as: _as, type: _type, ...buttonProps } = props as AsButton;
+  const { as: _as, type = "button", ...buttonProps } = props as AsButton;
 
   return (
-    <button type="button" className={classes} {...buttonProps}>
+    <button type={type} className={classes} {...buttonProps}>
       {content}
     </button>
   );
