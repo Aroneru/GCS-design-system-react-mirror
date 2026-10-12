@@ -1,5 +1,6 @@
 import {
   Fragment,
+  useId,
   useMemo,
   useState,
   type HTMLAttributeAnchorTarget,
@@ -11,6 +12,7 @@ import {
 import { createPortal } from "react-dom";
 import {
   AdjustmentsHorizontal,
+  Check,
   ChevronDown,
   ChevronUp,
   Close,
@@ -199,8 +201,17 @@ export interface TableFilterConfig {
 }
 
 export interface TablePaginationConfig {
-  /** Jumlah baris per halaman. */
+  /** Jumlah baris per halaman. Bila diisi, nilainya dikendalikan pemakai. */
   pageSize?: number;
+  /** Jumlah baris awal bila `pageSize` tidak diisi. Bawaannya 10. */
+  defaultPageSize?: number;
+  /**
+   * Pilihan jumlah baris per halaman, mis. `[5, 10, 25, 50, 100]`. Bila diisi,
+   * muncul pemilih "Baris per halaman" di samping pagination.
+   */
+  pageSizeOptions?: number[];
+  /** Dipanggil saat jumlah baris diganti. Halaman kembali ke 1. */
+  onPageSizeChange?: (pageSize: number) => void;
   page?: number;
   defaultPage?: number;
   onPageChange?: (page: number) => void;
@@ -473,16 +484,91 @@ function TableSearch({
 }
 
 /** Nilai aksi yang boleh statis atau per baris. */
+/**
+ * Checkbox "pilih semua" di judul kolom seleksi. Dibuat sendiri, tidak memakai
+ * <Checkbox>, karena butuh status sebagian terpilih (garis datar). Ukuran dan
+ * warnanya disamakan dengan checkbox baris.
+ */
+function SelectAllBox({
+  small,
+  checked,
+  indeterminate,
+  disabled,
+  onChange,
+}: {
+  small: boolean;
+  checked: boolean;
+  indeterminate: boolean;
+  disabled: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  const filled = checked || indeterminate;
+  const hint = checked ? "Batalkan pilihan di halaman ini" : "Pilih semua di halaman ini";
+  return (
+    <span
+      className={cn(
+        "group/all relative inline-flex shrink-0 items-center justify-center",
+        small ? "size-3.5" : "size-4",
+      )}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        // Sebagian terpilih: klik berikutnya memilih semua.
+        onChange={() => onChange(!checked)}
+        aria-checked={indeterminate ? "mixed" : checked}
+        aria-label={hint}
+        className={cn(
+          "peer/all absolute inset-0 size-full cursor-pointer appearance-none rounded border transition-colors",
+          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700",
+          "disabled:cursor-not-allowed disabled:opacity-50",
+          filled ? "border-primary-700 bg-primary-700" : "border-gray-300 bg-gray-50",
+        )}
+      />
+      {filled && (
+        <svg
+          className="pointer-events-none relative size-2.5 text-white"
+          viewBox="0 0 10 10"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.6}
+          aria-hidden="true"
+        >
+          {indeterminate ? (
+            <path strokeLinecap="round" d="M2 5h6" />
+          ) : (
+            <path strokeLinecap="round" strokeLinejoin="round" d="M1 5 3.6 8.2 9 1.8" />
+          )}
+        </svg>
+      )}
+      {/* Tooltip di bawah kotak, bukan di atas: wadah tabel ber-overflow,
+          jadi tooltip di atas judul akan terpotong. Muncul saat hover dan
+          saat fokus keyboard; pembaca layar sudah dapat `aria-label`. */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute top-full left-0 z-20 mt-2 rounded-md bg-gray-900 px-2.5 py-1.5",
+          "text-xs font-medium whitespace-nowrap text-white normal-case opacity-0 shadow-lg transition-opacity",
+          "group-hover/all:opacity-100 peer-focus-visible/all:opacity-100 peer-disabled/all:hidden",
+        )}
+      >
+        {hint}
+      </span>
+    </span>
+  );
+}
+
 const resolve = <T, V>(value: V | ((row: T) => V), row: T): V =>
   typeof value === "function" ? (value as (row: T) => V)(row) : value;
 
 const defaultSummary = ({ from, to, total }: { from: number; to: number; total: number }) => (
   <>
-    Memperlihatkan{" "}
+    Menampilkan{" "}
     <span className="font-bold text-gray-900">
-      {from}-{to}
+      {from}–{to}
     </span>{" "}
-    of <span className="font-bold text-gray-900">{total} Data</span>
+    dari <span className="font-bold text-gray-900">{total}</span> data
   </>
 );
 
@@ -746,7 +832,9 @@ export function Table<T>({
   const selected = selectedKeys ?? selectedState;
 
   const [pageState, setPageState] = useState(pagination?.defaultPage ?? 1);
-  const pageSize = pagination?.pageSize ?? 10;
+  const [pageSizeState, setPageSizeState] = useState(pagination?.defaultPageSize ?? 10);
+  const pageSize = pagination?.pageSize ?? pageSizeState;
+  const pageSizeId = useId();
   const total = manual ? (pagination?.total ?? data.length) : data.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   // Dijepit supaya halaman tidak menunjuk ke luar data setelah data menyusut,
@@ -788,9 +876,28 @@ export function Table<T>({
     onSelectionChange?.(next);
   };
 
+  // "Pilih semua" hanya mencakup baris di halaman yang sedang tampil.
+  const pageKeys = rows.map(getKey);
+  const pageSelectedCount = pageKeys.filter((k) => selected.includes(k)).length;
+  const allPageSelected = pageKeys.length > 0 && pageSelectedCount === pageKeys.length;
+
+  const toggleAll = (checked: boolean) => {
+    const next = checked
+      ? [...selected, ...pageKeys.filter((k) => !selected.includes(k))]
+      : selected.filter((k) => !pageKeys.includes(k));
+    setSelectedState(next);
+    onSelectionChange?.(next);
+  };
+
   const changePage = (next: number) => {
     setPageState(next);
     pagination?.onPageChange?.(next);
+  };
+
+  const changePageSize = (next: number) => {
+    setPageSizeState(next);
+    pagination?.onPageSizeChange?.(next);
+    changePage(1);
   };
 
   const renderActions = (actionList: TableRowAction<T>[], row: T, index: number) => (
@@ -1020,7 +1127,15 @@ export function Table<T>({
                       sticky?.start && "sticky left-0 z-10",
                     )}
                   >
-                    <span className="sr-only">Pilih baris</span>
+                    <SelectAllBox
+                      small={density.check === "mobile"}
+                      checked={allPageSelected}
+                      // Satu baris tercentang belum dianggap "sebagian", jadi
+                      // garis datarnya baru muncul mulai dua baris.
+                      indeterminate={pageSelectedCount > 1 && !allPageSelected}
+                      disabled={loading || pageKeys.length === 0}
+                      onChange={toggleAll}
+                    />
                   </th>
                 )}
                 {headRow.map(({ column: headColumn, group, colSpan, rowSpan, leafIndex }) => {
@@ -1168,19 +1283,57 @@ export function Table<T>({
       </div>
 
       {pagination && (
-        // Sempit: pagination di atas, ringkasan di bawahnya, rata kiri (rancangan
-        // mobile). Mulai 512px: ringkasan kiri, pagination kanan.
+        // Kiri hanya info (ringkasan), kanan semua kontrol (jumlah baris +
+        // halaman). Sempit: kontrol di atas, ringkasan di bawahnya, rata kiri.
         <div className="flex flex-col-reverse items-start gap-3 border-t border-gray-200 p-4 @lg:flex-row @lg:items-center @lg:justify-between">
           <p className="text-sm text-gray-500">
             {(pagination.summary ?? defaultSummary)({ from, to, total })}
           </p>
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={changePage}
-            theme={pagination.theme}
-            size="responsive"
-          />
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            {pagination.pageSizeOptions && (
+              <div className="inline-flex items-center gap-2 text-sm whitespace-nowrap text-gray-500">
+                <span id={`${pageSizeId}-label`}>Baris per halaman</span>
+                {/* Daftar pilihan memakai Dropdown (mode listbox) supaya rupanya
+                    sama dengan Dropdown lain; <select> bawaan tidak bisa diberi gaya.
+                    Tinggi, sudut, dan garis tombolnya disamakan dengan Pagination. */}
+                <Dropdown
+                  attached
+                  contentLabel="Baris per halaman"
+                  trigger={
+                    <button
+                      type="button"
+                      disabled={loading}
+                      aria-labelledby={`${pageSizeId}-label ${pageSizeId}-value`}
+                      className="inline-flex h-8 min-w-[4.5rem] items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white pr-2 pl-3 text-sm text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:opacity-50 @lg:h-10"
+                    >
+                      <span id={`${pageSizeId}-value`}>{pageSize}</span>
+                      <ChevronDown className="size-4 text-gray-500" aria-hidden="true" />
+                    </button>
+                  }
+                  items={pagination.pageSizeOptions.map((n) => ({
+                    id: String(n),
+                    label: (
+                      <span className="flex items-center justify-between gap-3">
+                        {n}
+                        {n === pageSize && (
+                          <Check className="size-4 text-primary-700" aria-hidden="true" />
+                        )}
+                      </span>
+                    ),
+                    selected: n === pageSize,
+                    onClick: () => changePageSize(n),
+                  }))}
+                />
+              </div>
+            )}
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={changePage}
+              theme={pagination.theme}
+              size="responsive"
+            />
+          </div>
         </div>
       )}
     </div>

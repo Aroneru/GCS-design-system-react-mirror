@@ -10,29 +10,11 @@ export interface CardProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
   linkLabel?: string
   /** Deretan tombol/aksi di bagian bawah kartu. */
   actions?: ReactNode
-  /** Tampilan gelap: kartu gray-800, judul putih, deskripsi gray-400, tautan primary-500. */
+  /**
+   * Memaksa kartu ini bertema gelap. Tanpa prop ini kartu ikut tema elemen
+   * pembungkusnya, mis. `<section data-theme="dark">`.
+   */
   darkMode?: boolean
-}
-
-/** Warna kartu, teks, dan tautan untuk tampilan terang dan gelap. */
-const themes = {
-  light: {
-    card: 'border-border bg-surface',
-    image: '',
-    title: 'text-content',
-    description: 'text-content-subtle',
-    link: 'text-brand hover:text-brand-hover focus-visible:outline-primary-600',
-  },
-  dark: {
-    card: 'border-gray-800 bg-gray-800',
-    // Gambar sedikit diredupkan supaya tidak menyilaukan di atas kartu gelap.
-    image: 'brightness-90',
-    title: 'text-white',
-    description: 'text-gray-400',
-    // Mengikuti desain: primary-500 (~4,1:1 di atas gray-800). primary-700 bawaan
-    // terang hanya ~2,3:1, jadi tidak terbaca di kartu gelap.
-    link: 'text-primary-500 hover:text-primary-400 focus-visible:outline-primary-400',
-  },
 }
 
 /**
@@ -40,7 +22,9 @@ const themes = {
  * bagian yang sama; cukup hilangkan bagian yang tidak dipakai.
  * @container: ukuran teks & jarak mengikuti lebar kartu, bukan lebar layar.
  *
- * `darkMode` mengganti kartu, teks, dan tautan ke tampilan gelap. Tombol di
+ * Warnanya hanya dari token semantik (`surface`, `content`, `brand`), jadi
+ * tema gelap cukup mengganti nilai token lewat `data-theme`, bukan class.
+ * `darkMode` sekadar memasang `data-theme="dark"` di kartu ini. Tombol di
  * `actions` tidak ikut diubah — warnanya tetap urusan halaman pemakai.
  */
 export function Card({
@@ -56,13 +40,11 @@ export function Card({
   children,
   ...props
 }: CardProps) {
-  const theme = darkMode ? themes.dark : themes.light
-
   return (
     <article
+      data-theme={darkMode ? 'dark' : undefined}
       className={cn(
-        '@container flex flex-col overflow-hidden rounded-lg border shadow-soft',
-        theme.card,
+        '@container flex flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-soft',
         className,
       )}
       {...props}
@@ -71,26 +53,22 @@ export function Card({
         <img
           src={image}
           alt={imageAlt}
-          className={cn('aspect-[5/4] w-full object-cover @xs:aspect-video', theme.image)}
+          // Di tema gelap gambar sedikit diredupkan supaya tidak menyilaukan.
+          className="aspect-[5/4] w-full object-cover in-data-[theme=dark]:brightness-90 @xs:aspect-video"
         />
       )}
 
       <div className="flex flex-1 flex-col gap-3 p-4 @xs:p-6">
         {title && (
-          <h3 className={cn('text-base leading-snug font-bold @xs:text-xl', theme.title)}>
-            {title}
-          </h3>
+          <h3 className="text-base leading-snug font-bold text-content @xs:text-xl">{title}</h3>
         )}
 
-        {description && <p className={cn('text-sm leading-6', theme.description)}>{description}</p>}
+        {description && <p className="text-sm leading-6 text-content-subtle">{description}</p>}
 
         {href && (
           <a
             href={href}
-            className={cn(
-              'inline-flex w-fit items-center gap-1.5 rounded text-sm font-bold transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-2',
-              theme.link,
-            )}
+            className="inline-flex w-fit items-center gap-1.5 rounded text-sm font-bold text-brand transition-colors hover:text-brand-hover hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
             {linkLabel ?? 'Selengkapnya'}
             <svg

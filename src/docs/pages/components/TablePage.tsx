@@ -424,13 +424,16 @@ const filterProps: PropRow[] = [
 ];
 
 const paginationProps: PropRow[] = [
-  ["pageSize", "number", "10", "Jumlah baris per halaman."],
+  ["pageSize", "number", "undefined", "Jumlah baris per halaman, kalau kamu ingin menyimpannya sendiri."],
+  ["defaultPageSize", "number", "10", "Jumlah baris per halaman saat tabel pertama tampil."],
+  ["pageSizeOptions", "number[]", "undefined", "Pilihan jumlah baris, mis. `[5, 10, 25, 50, 100]`. Kalau diisi, muncul pilihan \"Baris per halaman\" di samping pagination."],
+  ["onPageSizeChange", "(pageSize) => void", "undefined", "Dipanggil saat user mengganti jumlah baris. Halaman kembali ke 1."],
   ["page", "number", "undefined", "Halaman yang sedang tampil, kalau kamu ingin menyimpannya sendiri."],
   ["defaultPage", "number", "1", "Halaman saat tabel pertama tampil."],
   ["onPageChange", "(page) => void", "undefined", "Dipanggil saat user pindah halaman."],
   ["total", "number", "data.length", "Jumlah seluruh data. Wajib diisi kalau memakai `manual`."],
   ["theme", "PaginationTheme", "primary", "Warna tombol halaman yang aktif."],
-  ["summary", "({ from, to, total }) => ReactNode", "Memperlihatkan …", "Ganti tulisan \"Memperlihatkan 1-10 of 1000 Data\"."],
+  ["summary", "({ from, to, total }) => ReactNode", "Menampilkan …", "Ganti tulisan \"Menampilkan 1–10 dari 50 data\"."],
 ];
 
 /** Daftar poin pendek di bawah Lead — lebih mudah dipindai daripada paragraf panjang. */
@@ -667,7 +670,7 @@ function DataTable({ cols = columns }: { cols?: TableColumn<Row>[] }) {
           </Button>
         </>
       }
-      pagination={{ pageSize: 10 }}
+      pagination={{ pageSizeOptions: [5, 10, 25, 50, 100] }}
     />
   );
 }
@@ -837,7 +840,7 @@ function PlaygroundTable({
           </Button>
         </>
       }
-      pagination={withPagination ? { pageSize: 10, theme } : undefined}
+      pagination={withPagination ? { pageSizeOptions: [5, 10, 25, 50, 100], theme } : undefined}
     />
   );
 }
@@ -868,7 +871,7 @@ function OrderTable({ hiddenColumns = [] }: { hiddenColumns?: string[] }) {
           </Button>
         </>
       }
-      pagination={{ pageSize: 10 }}
+      pagination={{ pageSizeOptions: [5, 10, 25, 50, 100] }}
     />
   );
 }
@@ -911,8 +914,8 @@ export function TablePage() {
             <><Hl>search</Hl> menampilkan kotak pencarian di kiri atas.</>,
             <><Hl>filter</Hl> menampilkan tombol "Filter Data" untuk memilih kolom yang tampil.</>,
             <><Hl>actions</Hl> diisi tombol di kanan atas, mis. "Tambah Data".</>,
-            <><Hl>selectable</Hl> menambahkan checkbox di tiap baris.</>,
-            <><Hl>pagination</Hl> membagi data per halaman.</>,
+            <><Hl>selectable</Hl> menambahkan checkbox di tiap baris, plus checkbox "pilih semua" di judul untuk baris di halaman yang tampil.</>,
+            <><Hl>pagination</Hl> membagi data per halaman. Isi <Hl>pageSizeOptions</Hl> supaya user bisa memilih jumlah baris.</>,
             <>Klik judul kolom yang <Hl>sortable</Hl> untuk mengurutkan.</>,
           ]}
         />
@@ -955,7 +958,7 @@ export function TablePage() {
           {"={<Button size=\"s\" leftIcon={<Plus />}>Tambah Data</Button>}\n"}
           {"  "}
           <H>pagination</H>
-          {"={{ pageSize: 10 }}\n"}
+          {"={{ pageSizeOptions: [5, 10, 25, 50, 100] }}\n"}
           {"/>"}
         </SectionCode>
       </FlowSection>
