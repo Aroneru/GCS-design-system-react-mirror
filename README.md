@@ -92,7 +92,7 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | Komponen     | Props utama                                                                                                          |
 | ------------ | -------------------------------------------------------------------------------------------------------------------- |
 | `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| iconOnly`, `as`: `button \| anchor`      |
-| `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`                                                           |
+| `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
 | `Avatar`     | `src`, `alt`, `initials`, `size`: `small \| default \| large`, `darkMode`                                            |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
 | `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `onCopySuccess`, `darkMode` |
@@ -108,10 +108,10 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
 | `Navbar`     | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`                                                   |
-| `Hero`       | `type`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`                       |
+| `Hero`       | `type`, `centeredContent`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`    |
 | `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
-| `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `pagination`, `sticky`, `size`, `loading`     |
+| `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `sticky`, `size`, `loading` |
 
 Warna Button diatur `theme` (`primary | green | gray | simaya | orange |
 yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya
@@ -134,7 +134,7 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 | `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`, `darkMode`                                                             | 37 px                     |
 | `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`, `darkMode`                                  | 54 / 50 px                |
 | `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 / 42 px                |
-| `Upload`        | `label`, `helperText`, `buttonLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode`                   | 44 / 40 px                |
+| `Upload`        | `label`, `helperText`, `buttonLabel`, `replaceLabel`, `removeLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode` | 44 / 40 px                |
 | `Radio`         | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
 | `Toggle`        | `label`, `helperText`, `darkMode`                                                                                               | 40×20 / 36×18 px          |
 | `Checkbox`      | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
@@ -146,7 +146,8 @@ Prop yang dipakai bersama seluruh komponen form:
   tengah, `period` memuat empat pintasannya dalam satu baris, dan `multiple`
   menumpuk kotak serta kalendernya. Pada `Select`, varian Mobile cuma
   menyempitkan wadahnya, jadi prop ini memang tidak ada; pada `Upload` ia tidak
-  berpengaruh untuk `type="attach"`, karena alasan yang sama.
+  berpengaruh untuk `type="attach"`, karena alasan yang sama. `Search` punya
+  ukuran ketiga, `compact` (37px), untuk dipasang di navbar.
 - `application`: `default | simaya` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.

@@ -297,24 +297,22 @@ function PageMockup({ dark, children }: { dark?: boolean; children: ReactNode })
 
 /** Catatan kontras untuk centered versi gambar. */
 const ContrastNote = () => (
-  <div className="mt-6 rounded-xl border border-yellow-200 bg-yellow-50 px-5 py-4 text-body-sm leading-6 text-gray-700">
-    <p className="font-black text-gray-900">Catatan: gambar harus kontras dengan latar</p>
-    <ul className="mt-1.5 list-disc space-y-1 pl-5">
+  <div className="ds-card mt-4 p-5">
+    <h3 className="text-sm font-black text-gray-900">Catatan: gambar harus terlihat jelas di atas latar</h3>
+    <ul className="mt-1.5 list-disc space-y-1 pl-5 text-body-sm leading-6 text-gray-500">
+      <li>Gambar tampil memenuhi hero. Tinggi hero mengikuti ukuran gambar.</li>
       <li>
-        Pada <Hl>centeredContent="image"</Hl>, gambar mengisi penuh hero tanpa
-        padding, bingkai, dan bayangan. Tingginya mengikuti rasio berkasnya.
+        Bagian gambar yang transparan akan menampilkan warna latar: biru muda
+        (mode terang) atau abu gelap (mode gelap). Pastikan gambar tetap jelas
+        di atas warna itu.
       </li>
       <li>
-        Latarnya <Hl>primary-50</Hl> (terang) atau <Hl>gray-900</Hl> (
-        <Hl>darkMode</Hl>). Warna itu terlihat lewat bagian gambar yang
-        transparan, jadi pastikan gambar tetap jelas di atasnya.
+        Kalau ada tulisan di gambar, pastikan mudah dibaca, dengan kontras
+        minimal 4.5:1.
       </li>
       <li>
-        Bila gambar memuat tulisan, kontrasnya minimal 4.5:1 terhadap latar.
-      </li>
-      <li>
-        Siapkan berkas terpisah untuk mode terang dan gelap bila satu gambar
-        tidak cukup kontras di keduanya.
+        Kalau satu gambar tidak cocok untuk dua mode, pakai gambar berbeda untuk
+        mode terang dan gelap.
       </li>
     </ul>
   </div>
@@ -457,20 +455,21 @@ export function HeroPage() {
             />
           </Preview>
 
-          <Preview label="Hero Centered — image saja, di dalam mockup halaman">
-            <PageMockup>
-              <Hero
-                type="centered"
-                centeredContent="image"
-                heading={heroText}
-                image={heroImageSaja}
-                imageAlt={heroText}
-              />
-            </PageMockup>
-          </Preview>
+          <div>
+            <Preview label="Hero Centered — image saja, di dalam mockup halaman">
+              <PageMockup>
+                <Hero
+                  type="centered"
+                  centeredContent="image"
+                  heading={heroText}
+                  image={heroImageSaja}
+                  imageAlt={heroText}
+                />
+              </PageMockup>
+            </Preview>
+            <ContrastNote />
+          </div>
         </div>
-
-        <ContrastNote />
 
         <SectionCode>
           {"{/* Gambar di kiri teks — nilai bawaan type */}\n"}
