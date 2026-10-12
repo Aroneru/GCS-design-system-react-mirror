@@ -165,11 +165,11 @@ export function Pengaturan() {
 
         <div className="mt-7 flex flex-wrap gap-3">
           <Modal
-            trigger={<Button type="submit">Simpan perubahan</Button>}
+            trigger={<Button type="button">Simpan perubahan</Button>}
             title="Simpan perubahan?"
             footer={({ close }) => (
               <>
-                <Button variant="outline" theme="gray" size="xs" onClick={close}>
+                <Button type="button" variant="outline" theme="gray" size="xs" onClick={close}>
                   Batal
                 </Button>
                 <Button
@@ -207,7 +207,7 @@ export function Pengaturan() {
               </div>
             )}
           </Modal>
-          <Button variant="outline" theme="gray">
+          <Button type="button" variant="outline" theme="gray">
             Batalkan
           </Button>
         </div>

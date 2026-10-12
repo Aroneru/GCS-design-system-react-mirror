@@ -32,9 +32,9 @@ const themeOptions: { value: ButtonTheme; label: string }[] = [
   { value: "yellow", label: "Yellow" },
 ];
 
-const typeOptions = [
-  { value: "button", label: "Button" },
-  { value: "iconOnly", label: "Icon Only" },
+const iconOnlyOptions = [
+  { value: true, label: "Ya" },
+  { value: false, label: "Tidak" },
 ];
 
 const buttonProps: PropRow[] = [
@@ -314,20 +314,19 @@ export function ButtonPage() {
             />
           </Control>
 
-          <Control label="Type">
+          <Control label="Icon Only">
             <Segmented
-              label="Pilih type"
-              value={iconOnly ? "iconOnly" : "button"}
+              label="Pilih icon only"
+              value={iconOnly}
               onChange={(value) => {
-                const isIconOnly = value === "iconOnly";
-                setIconOnly(isIconOnly);
+                setIconOnly(value);
 
-                if (isIconOnly) {
+                if (value) {
                   setShowLeftIcon(false);
                   setShowRightIcon(false);
                 }
               }}
-              options={typeOptions}
+              options={iconOnlyOptions}
             />
           </Control>
 
@@ -365,6 +364,7 @@ export function ButtonPage() {
           <Control label="Icons">
             <Segmented
               label="Pilih posisi ikon"
+              disabled={iconOnly}
               value={
                 iconOnly
                   ? "none"

@@ -91,7 +91,7 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 
 | Komponen     | Props utama                                                                                                          |
 | ------------ | -------------------------------------------------------------------------------------------------------------------- |
-| `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| iconOnly`, `as`: `button \| anchor`      |
+| `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| submit \| reset`, `iconOnly`, `as`: `button \| anchor` |
 | `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
 | `Avatar`     | `src`, `alt`, `initials`, `size`: `small \| default \| large`, `darkMode`                                            |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
@@ -116,8 +116,10 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 Warna Button diatur `theme` (`primary | green | gray | simaya | orange |
 yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya
 memilih terisi atau bergaris. Ukuran: `xs | s | base | l | xl`. Ikon di kiri
-atau kanan teks lewat `leftIcon`/`rightIcon`; `type="iconOnly"` membuat tombol
-bundar berisi ikon saja. Untuk tautan pakai `as="anchor"` bersama `href`, maka
+atau kanan teks lewat `leftIcon`/`rightIcon`; `iconOnly` membuat tombol
+persegi berisi ikon saja. Prop `type` (`button | submit | reset`, bawaan `button`)
+meneruskan atribut HTML native ke elemen `<button>`, memungkinkan tombol dipakai
+untuk submit form. Untuk tautan pakai `as="anchor"` bersama `href`, maka
 Button dirender sebagai `<a>`.
 
 ### Form

@@ -11,6 +11,45 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+Ada perubahan API yang memutus pada komponen `Button` — baca bagian
+**Diubah**. Komponen `Button` kini mendukung pengiriman formulir native lewat
+prop `type`, dan tombol khusus ikon dipisahkan ke prop boolean `iconOnly`.
+README di halaman npm dan situs dokumentasi ikut diperbarui.
+
+### Diubah
+
+- **Memutus — `type="iconOnly"` pada `Button` kini digantikan prop boolean `iconOnly`.**
+  Nilai `"iconOnly"` dihapus dari prop `type`. Di TypeScript, kode yang masih
+  menulis `type="iconOnly"` akan gagal dikompilasi. Penggantinya: gunakan prop
+  boolean `iconOnly`. Tipe pembantu `ButtonType` yang sebelumnya mengekspor
+  `"button" | "iconOnly"` juga ikut dihapus.
+
+  ```diff
+  - <Button type="iconOnly" aria-label="Hapus">
+  -   <TrashBin />
+  - </Button>
+  + <Button iconOnly aria-label="Hapus">
+  +   <TrashBin />
+  + </Button>
+  ```
+
+- **`Button`: prop `type` kini meneruskan tipe HTML native (`button | submit | reset`).**
+  Bawaannya tetap `'button'`, tetapi nilainya kini diteruskan langsung ke elemen
+  `<button type={type}>` alih-alih di-hardcode. Tombol kini dapat memicu
+  pengiriman formulir secara native saat dipasang di dalam `<form>` lewat
+  `type="submit"`.
+
+### Ditambahkan
+
+- **`Button`: prop boolean `iconOnly`** — membuat tombol persegi proporsional
+  yang memuat ikon saja (`children`). Bawaannya `false`.
+
+### Diperbaiki
+
+- **`Button`: fungsionalitas pengiriman formulir native kini bekerja.**
+  Sebelumnya elemen `<button>` selalu meng-hardcode atribut `type="button"`,
+  sehingga tombol tidak dapat memicu aksi submit form.
+
 ## [0.3.1] - 2026-10-08
 
 Tidak ada perubahan API yang memutus, tetapi beberapa komponen yang sudah ada
