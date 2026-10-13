@@ -25,30 +25,20 @@ const accents: Record<CheckboxApplication, string> = {
   simaya: "checked:border-purple-500 checked:bg-purple-500 focus-visible:outline-purple-500",
 };
 
-/** Warna kotak dan teks per tampilan, untuk state aktif dan `inactive`. */
-const themes = {
-  light: {
-    box: "border-gray-300 bg-gray-50",
-    boxInactive: "checked:border-gray-400 checked:bg-gray-400",
-    label: "text-gray-900",
-    labelInactive: "text-gray-400",
-    helper: "text-gray-500",
-    helperInactive: "text-gray-400",
-  },
-  /**
-   * Dari desain gelap: kotak gray-700 bergaris gray-600, label putih, caption
-   * gray-400; inactive meredupkan label dan caption ke gray-500. Kotak inactive
-   * yang tercentang tidak digambar desain; gray-500 menyamai teksnya, seperti
-   * gray-400 pada tampilan terang.
-   */
-  dark: {
-    box: "border-gray-600 bg-gray-700",
-    boxInactive: "checked:border-gray-500 checked:bg-gray-500",
-    label: "text-white",
-    labelInactive: "text-gray-500",
-    helper: "text-gray-400",
-    helperInactive: "text-gray-500",
-  },
+/**
+ * Warna kotak dan teks, semuanya token semantik, jadi tema gelap cukup
+ * mengganti nilai token lewat `data-theme`. Desain gelap: kotak gray-700
+ * bergaris gray-600, label putih, caption gray-400; inactive meredupkan label
+ * dan caption ke gray-500. Kotak inactive yang tercentang tidak digambar
+ * desain; ia diisi warna teks nonaktif (gray-400 terang, gray-500 gelap).
+ */
+const colors = {
+  box: "border-border-strong bg-field",
+  boxInactive: "checked:border-content-disabled checked:bg-content-disabled",
+  label: "text-content",
+  labelInactive: "text-content-disabled",
+  helper: "text-content-muted",
+  helperInactive: "text-content-disabled",
 };
 
 /**
@@ -79,7 +69,11 @@ export interface CheckboxProps extends Omit<
   platform?: CheckboxPlatform;
   state?: CheckboxState;
   application?: CheckboxApplication;
-  /** Tampilan gelap: kotak gray-700 bergaris gray-600, label putih, caption gray-400. */
+  /**
+   * Memaksa checkbox ini bertema gelap: kotak gray-700 bergaris gray-600, label
+   * putih, caption gray-400. Tanpa prop ini ia ikut tema elemen pembungkusnya,
+   * mis. `<section data-theme="dark">`.
+   */
   darkMode?: boolean;
   /** Kelas untuk pembungkus terluar (kotak + label + caption). */
   className?: string;
@@ -92,8 +86,8 @@ export interface CheckboxProps extends Omit<
  * menumpang di atasnya lewat varian `peer` — jadi tak ada state di React dan
  * elemen bawaannya tetap utuh untuk keyboard maupun pembaca layar. State
  * tercentang di desain sama dengan `checked`, jadi ia dikendalikan lewat
- * `checked`/`defaultChecked` biasa, bukan prop tersendiri. `darkMode` mengganti
- * warnanya ke tampilan gelap.
+ * `checked`/`defaultChecked` biasa, bukan prop tersendiri. `darkMode` sekadar
+ * memasang `data-theme="dark"` di pembungkus terluarnya.
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
   {
@@ -116,7 +110,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
 
   const isInactive = disabled || state === "inactive";
   const { box, offset, label: labelText } = platforms[platform];
-  const t = darkMode ? themes.dark : themes.light;
+  const theme = darkMode ? "dark" : undefined;
 
   const control = (
     <span
@@ -136,9 +130,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           "peer absolute inset-0 size-full appearance-none rounded border transition-colors",
           "focus-visible:outline-2 focus-visible:outline-offset-2",
           "disabled:cursor-not-allowed",
-          t.box,
+          colors.box,
           // Desain tidak meredupkan kotaknya saat inactive — hanya teksnya.
-          isInactive ? t.boxInactive : cn("cursor-pointer", accents[application]),
+          isInactive ? colors.boxInactive : cn("cursor-pointer", accents[application]),
         )}
         {...props}
       />
@@ -148,11 +142,15 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   );
 
   if (!label && !helperText) {
-    return <span className={cn("inline-flex", className)}>{control}</span>;
+    return (
+      <span data-theme={theme} className={cn("inline-flex", className)}>
+        {control}
+      </span>
+    );
   }
 
   return (
-    <div className={cn("flex items-start gap-2", className)}>
+    <div data-theme={theme} className={cn("flex items-start gap-2", className)}>
       {control}
 
       <div className="min-w-0">
@@ -162,7 +160,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
             className={cn(
               "block font-bold",
               labelText,
-              isInactive ? cn("cursor-not-allowed", t.labelInactive) : cn("cursor-pointer", t.label),
+              isInactive ? cn("cursor-not-allowed", colors.labelInactive) : cn("cursor-pointer", colors.label),
             )}
           >
             {label}
@@ -172,7 +170,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         {helperText && (
           <p
             id={helperId}
-            className={cn("mt-0.5 text-xs", isInactive ? t.helperInactive : t.helper)}
+            className={cn("mt-0.5 text-xs", isInactive ? colors.helperInactive : colors.helper)}
           >
             {helperText}
           </p>

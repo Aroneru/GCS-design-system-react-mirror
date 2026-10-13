@@ -6,12 +6,17 @@
 
 export type Section = "home" | "components" | "form" | "foundations" | "example";
 
-export const rail: { key: Section; label: string; route: string; icon: string }[] = [
+/** Pintasan pencarian halaman untuk ditampilkan, mengikuti sistem operasi pembaca. */
+export const pintasanCari =
+  typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.userAgent) ? "⌘K" : "Ctrl K";
+
+export const rail: { key: Section; label: string; route: string; icon: string; keywords?: string }[] = [
   {
     key: "home",
     label: "Home",
     route: "/",
     icon: "M3 10.5 12 3l9 7.5M5.5 9.5V20h13V9.5M9.5 20v-6h5v6",
+    keywords: "beranda halaman utama",
   },
   {
     key: "components",
@@ -36,6 +41,7 @@ export const rail: { key: Section; label: string; route: string; icon: string }[
     label: "Example",
     route: "/example",
     icon: "M4 5.5h16v13H4v-13Zm0 4h16M7.5 13h5m-5 2.5h8",
+    keywords: "contoh aplikasi demo",
   },
 ];
 
@@ -57,67 +63,74 @@ export type NavItem = {
    * angka ringkas di halaman Home.
    */
   alt?: boolean;
+  /**
+   * Kata lain untuk pencarian halaman (Ctrl+K), dipisah spasi — terutama
+   * padanan bahasa Indonesia dari label yang berbahasa Inggris, mis. "tombol"
+   * untuk Button.
+   */
+  keywords?: string;
 };
 
 export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
   foundations: {
     title: "Foundations",
     items: [
-      { label: "Overview", route: "/foundations" },
-      { label: "Colors", route: "/foundations/colors" },
-      { label: "Typography", route: "/foundations/typography" },
-      { label: "Spacing", route: "/foundations/spacing" },
-      { label: "Border", route: "/foundations/border" },
-      { label: "Elevation", route: "/foundations/elevation" },
-      { label: "Icons", route: "/foundations/icons" },
+      { label: "Overview", route: "/foundations", keywords: "ikhtisar dasar" },
+      { label: "Colors", route: "/foundations/colors", keywords: "warna palet token" },
+      { label: "Typography", route: "/foundations/typography", keywords: "tipografi huruf font teks" },
+      { label: "Spacing", route: "/foundations/spacing", keywords: "jarak spasi" },
+      { label: "Border", route: "/foundations/border", keywords: "garis radius sudut" },
+      { label: "Elevation", route: "/foundations/elevation", keywords: "bayangan shadow" },
+      { label: "Icons", route: "/foundations/icons", keywords: "ikon" },
     ],
   },
   form: {
     title: "Form",
     items: [
-      { label: "Overview", route: "/form" },
+      { label: "Overview", route: "/form", keywords: "ikhtisar formulir" },
       {
         label: "Input Field Form",
         route: "/form/input-field",
+        keywords: "isian",
         children: [
-          { label: "Input Field", route: "/form/input-field/input" },
-          { label: "Floating Label", route: "/form/input-field/floating-label" },
-          { label: "Text Area", route: "/form/input-field/text-area" },
+          { label: "Input Field", route: "/form/input-field/input", keywords: "isian teks password kata sandi" },
+          { label: "Floating Label", route: "/form/input-field/floating-label", keywords: "label melayang" },
+          { label: "Text Area", route: "/form/input-field/text-area", keywords: "teks panjang editor" },
         ],
       },
-      { label: "Regular Select Form", route: "/form/select" },
-      { label: "Search Form", route: "/form/search" },
-      { label: "Datepicker", route: "/form/datepicker" },
-      { label: "Upload Form", route: "/form/upload" },
-      { label: "Radio Button", route: "/form/radio" },
-      { label: "Toggle Button", route: "/form/toggle" },
-      { label: "Checkbox", route: "/form/checkbox" },
+      { label: "Regular Select Form", route: "/form/select", keywords: "pilihan dropdown provinsi" },
+      { label: "Search Form", route: "/form/search", keywords: "cari pencarian" },
+      { label: "Datepicker", route: "/form/datepicker", keywords: "tanggal kalender" },
+      { label: "Upload Form", route: "/form/upload", keywords: "unggah berkas file" },
+      { label: "Radio Button", route: "/form/radio", keywords: "pilihan tunggal" },
+      { label: "Toggle Button", route: "/form/toggle", keywords: "sakelar switch" },
+      { label: "Checkbox", route: "/form/checkbox", keywords: "centang kotak" },
     ],
   },
   components: {
     title: "Components",
     items: [
-      { label: "Overview", route: "/components" },
-      { label: "Container", route: "/components/container" },
-      { label: "Button", route: "/components/button" },
-      { label: "Clipboard", route: "/components/clipboard" },
-      { label: "Badge", route: "/components/badge" },
-      { label: "Avatar", route: "/components/avatar" },
-      { label: "Spinner", route: "/components/spinner" },
-      { label: "Popover", route: "/components/popover" },
-      { label: "Dropdown", route: "/components/dropdown" },
-      { label: "Modal", route: "/components/modal" },
-      { label: "Drawer", route: "/components/drawer" },
-      { label: "Alert", route: "/components/alert" },
-      { label: "Toast", route: "/components/toast" },
-      { label: "Card", route: "/components/card" },
-      { label: "Navbar", route: "/components/navbar" },
-      { label: "Hero", route: "/components/hero" },
-      { label: "Footer", route: "/components/footer" },
-      { label: "Breadcrumb", route: "/components/breadcrumb" },
-      { label: "Pagination", route: "/components/pagination" },
-      { label: "Sidebar", route: "/components/sidebar" },
-      { label: "Table", route: "/components/table" },
+      { label: "Overview", route: "/components", keywords: "ikhtisar komponen" },
+      { label: "Container", route: "/components/container", keywords: "wadah" },
+      { label: "Button", route: "/components/button", keywords: "tombol" },
+      { label: "Clipboard", route: "/components/clipboard", keywords: "salin copy" },
+      { label: "Badge", route: "/components/badge", keywords: "lencana label" },
+      { label: "Avatar", route: "/components/avatar", keywords: "foto profil inisial" },
+      { label: "Spinner", route: "/components/spinner", keywords: "memuat loading" },
+      { label: "Popover", route: "/components/popover", keywords: "tooltip" },
+      { label: "Dropdown", route: "/components/dropdown", keywords: "menu" },
+      { label: "Modal", route: "/components/modal", keywords: "dialog" },
+      { label: "Drawer", route: "/components/drawer", keywords: "panel samping laci" },
+      { label: "Alert", route: "/components/alert", keywords: "peringatan pesan" },
+      { label: "Toast", route: "/components/toast", keywords: "notifikasi" },
+      { label: "Card", route: "/components/card", keywords: "kartu" },
+      { label: "Navbar", route: "/components/navbar", keywords: "navigasi header" },
+      { label: "Hero", route: "/components/hero", keywords: "banner" },
+      { label: "Footer", route: "/components/footer", keywords: "kaki halaman" },
+      { label: "Breadcrumb", route: "/components/breadcrumb", keywords: "jejak remah" },
+      { label: "Pagination", route: "/components/pagination", keywords: "halaman paginasi" },
+      { label: "Sidebar", route: "/components/sidebar", keywords: "menu samping" },
+      { label: "Table", route: "/components/table", keywords: "tabel data" },
     ],
   },
 };

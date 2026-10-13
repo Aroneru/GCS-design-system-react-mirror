@@ -2,8 +2,12 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Footer, type FooterMenu } from "../lib";
 import { FacebookIcon, InstagramIcon, XIcon } from "./socialIcons";
 import { asset } from "./asset";
-import { rail, sidebars, type NavItem, type Section } from "./navigation";
+import { pintasanCari, rail, sidebars, type NavItem, type Section } from "./navigation";
 import { Collapse, Drawer, prefersReducedMotion, SlideIn } from "./motion";
+import { DocsSearch } from "./DocsSearch";
+
+/** Ikon kaca pembesar untuk tombol Cari di rail dan top bar. */
+const ikonCari = "m20 20-4.5-4.5M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z";
 
 /**
  * Menu footer sama di seluruh halaman: kelima area utama, diturunkan dari
@@ -192,6 +196,7 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
   const sidebar = sidebars[section] ?? null;
   const [drawer, setDrawer] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [cari, setCari] = useState(false);
 
   /*
    * Area terakhir yang punya sub-navigasi, ditahan selama daftarnya menutup.
@@ -218,21 +223,38 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
           <Logo small />
           <span className="text-sm font-black tracking-tight text-gray-900">Design System</span>
         </a>
-        <button
-          onClick={() => setDrawer(true)}
-          className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
-          aria-label="Buka navigasi"
-        >
-          <svg
-            className="size-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setCari(true)}
+            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+            aria-label="Cari halaman"
           >
-            <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
-          </svg>
-        </button>
+            <svg
+              className="size-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" d={ikonCari} />
+            </svg>
+          </button>
+          <button
+            onClick={() => setDrawer(true)}
+            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+            aria-label="Buka navigasi"
+          >
+            <svg
+              className="size-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* ══ Drawer — mobile ══ */}
@@ -337,7 +359,26 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
           <a href="#/" aria-label="Beranda">
             <Logo />
           </a>
-          <nav className="mt-8 flex flex-col gap-2" aria-label="Area utama">
+          {/* Pencarian halaman — juga lewat Ctrl+K / ⌘K atau "/" dari halaman mana pun. */}
+          <button
+            onClick={() => setCari(true)}
+            className="mt-6 flex w-14 flex-col items-center gap-1 rounded-xl py-2 text-[10px] font-bold text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-800"
+            aria-label="Cari halaman"
+            aria-keyshortcuts="Control+K Meta+K /"
+            title={`Cari halaman (${pintasanCari})`}
+          >
+            <svg
+              className="size-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.8}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d={ikonCari} />
+            </svg>
+            Cari
+          </button>
+          <nav className="mt-2 flex flex-col gap-2" aria-label="Area utama">
             {rail.map((item) => (
               <a
                 key={item.key}
@@ -417,6 +458,8 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
           { label: "Facebook", url: "#", icon: FacebookIcon },
         ]}
       />
+
+      <DocsSearch open={cari} onOpenChange={setCari} />
     </div>
   );
 }
