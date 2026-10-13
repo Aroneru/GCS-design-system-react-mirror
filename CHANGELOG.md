@@ -17,8 +17,10 @@ prop `type`, dan tombol khusus ikon dipisahkan ke prop boolean `iconOnly`.
 Komponen `Sidebar` kini mendukung menu dropdown profil akun pengguna serta
 penanganan tautan eksternal (`external`). Komponen `Search` kini mendukung live
 search (`trigger="change"` / `"auto"`), jeda debounce, dan pengaturan
-visibilitas tombol cari (`showButton`). README di halaman npm dan situs
-dokumentasi ikut diperbarui.
+visibilitas tombol cari (`showButton`). Kedua komponen tersebut kini juga telah
+mengadopsi sistem token warna semantik dan atribut `data-theme` untuk tema gelap.
+Komponen `Upload` kini membatasi unggahan berkas tunggal secara ketat.
+README di halaman npm dan situs dokumentasi ikut diperbarui.
 
 ### Diubah
 
@@ -62,11 +64,22 @@ dokumentasi ikut diperbarui.
 - **`Radio` `darkMode` `inactive`: lingkaran kini gray-700 bergaris gray-800**,
   sebelumnya gray-800 seluruhnya.
 - **`Toggle`, `Checkbox`, `Radio`, `Select`, `InputField`, `FloatingLabel`,
-  `TextArea`, `Toast`, dan `Alert` kini memakai token warna, seperti `Card`.**
+  `TextArea`, `Toast`, `Alert`, `Sidebar`, dan `Search` kini memakai token warna, seperti `Card`.**
   `darkMode` cukup memasang `data-theme="dark"` di pembungkus terluarnya. Tanpa
   prop itu komponen ikut tema pembungkusnya, mis. `<section data-theme="dark">`,
   dan kembali terang di dalam `data-theme="light"`. Warna terang dan gelapnya
-  tidak berubah. Panel daftar pilihan `Select` tetap terang.
+  mengikuti token semantik. Panel daftar pilihan `Select` tetap terang.
+- **`Sidebar` dan `Search` kini memakai token warna komponen di `tokens.css`.**
+  `Sidebar` memakai token `--color-sidebar-surface` (putih di tema terang, gray-700
+  di tema gelap); wadah, menu profil, dan navigasi otomatis menyesuaikan kontras
+  yang sesuai. `Search` memakai token `--color-search-category-surface` (gray-100 di
+  tema terang, gray-700 di tema gelap) untuk tombol kategori dan
+  `--color-search-field-surface` (gray-50 di tema terang, gray-600 di tema gelap)
+  untuk kolom pencarian.
+- **`Upload`: pembatasan berkas tunggal secara ketat.** Prop `multiple` dihapus
+  dari `UploadProps` untuk memastikan pemenuhan kebutuhan berkas tunggal,
+  operasi drag-and-drop hanya mengambil item pertama, dan label serta ukuran
+  berkas kini menampilkan berkas tunggal.
 - **`--color-feedback-error` kini red-500 di tema gelap**, tetap red-600 di
   tema terang. Error Input Field dan Floating Label gelap memakainya.
 - **Mengetik di daftar pilihan `Select` kini melompat ke pilihan yang cocok
@@ -80,6 +93,8 @@ dokumentasi ikut diperbarui.
 
 ### Ditambahkan
 
+- **Token komponen `--color-sidebar-surface`, `--color-search-category-surface`, dan `--color-search-field-surface` di `tokens.css`.**
+  Menyediakan kontrol warna latar khusus untuk Sidebar serta kategori dan field Search pada tema terang dan gelap (`data-theme="dark"`).
 - **`Sidebar`: menu dropdown profil akun dan link eksternal.**
   `SidebarUser` kini mendukung `items?: SidebarUserItem[]` dan `groups?: SidebarUserGroup[]`
   untuk menampilkan menu dropdown akun/profil (misalnya profil, pengaturan, dan
@@ -106,7 +121,8 @@ dokumentasi ikut diperbarui.
 - **Token komponen** untuk warna yang hanya dipakai satu komponen:
   `--color-toggle-*`, `--color-radio-*`, `--color-select-*`,
   `--color-input-field-*`, `--color-floating-label-*`, `--color-text-area-*`,
-  `--color-toast-*`, dan `--color-alert-*`. Daftarnya ada di `COLOR.md`.
+  `--color-toast-*`, `--color-alert-*`, `--color-sidebar-surface`, dan
+  `--color-search-*`. Daftarnya ada di `COLOR.md`.
 - **Kelas `ds-theme-light`**, padanan `data-theme="light"` untuk elemen yang
   tidak bisa diberi atribut.
 - **`Datepicker`: tanggal bisa diketik saat kalender terbuka.** "17" ke tanggal

@@ -9,7 +9,7 @@ Ceplok Design System. Dipindahkan 1:1 dari versi Laravel/Blade
 - **Tokens** (`@theme`): palet warna (primary, gray, red, orange, yellow, green,
   purple), semantic aliases (`brand`, `feedback-*`, `content`,
   `surface`, `border`), skala tipografi (`display` → `caption`), spacing, radius,
-  shadow, font Lato.
+  shadow, font Lato. Panduan lengkap token dan tema gelap ada di [COLOR.md](COLOR.md).
 - **Komponen umum**: `Alert`, `Avatar`, `Badge`, `Breadcrumb`, `Button`, `Card`,
   `Clipboard`, `Container`, `Drawer`, `Dropdown`, `Footer`, `Hero`, `Icon`,
   `Modal`, `Navbar`, `Pagination`, `Popover`, `Sidebar`, `Spinner`, `Table`,
@@ -85,6 +85,28 @@ Token dan seluruh utility komponen tetap ter-generate, tapi kamu **kehilangan**
 font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 `.ds-eyebrow` / `.ds-nav-link` / `.ds-scroll-x` / `.ds-scroll-y`.
 
+## Tema gelap & token warna
+
+Komponen Ceplok Design Kit dirancang menggunakan sistem token warna semantik
+yang didefinisikan di `tokens.css`. Tema gelap diatur secara deklaratif lewat
+atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
+
+- **Prop `darkMode`**: Memasang `darkMode={true}` pada komponen akan menyetel
+  atribut `data-theme="dark"` pada elemen terluarnya.
+- **Pewarisan tema otomatis**: Jika sebuah elemen pembungkus memiliki atribut
+  `data-theme="dark"` (misalnya `<div data-theme="dark">`), semua komponen di
+  dalamnya otomatis beradaptasi ke tema gelap tanpa perlu memberikan prop
+  `darkMode` satu per satu.
+- **Kembali ke tema terang**: Bagian di dalam area gelap dapat dikembalikan ke
+  tema terang dengan `data-theme="light"` atau kelas `.ds-theme-light`.
+- **Komponen yang mendukung `data-theme`**: `Card`, `Sidebar`, `Search`,
+  `Alert`, `Toast`, `InputField`, `FloatingLabel`, `TextArea`, `Select`,
+  `Toggle`, `Radio`, dan `Checkbox`.
+- **Token komponen**: Warna latar khusus komponen disediakan melalui token yang
+  dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
+  serta `--color-search-category-surface` dan `--color-search-field-surface`
+  (Search). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
+
 ## Komponen & props
 
 ### Umum
@@ -150,6 +172,9 @@ Prop yang dipakai bersama seluruh komponen form:
   menyempitkan wadahnya, jadi prop ini memang tidak ada; pada `Upload` ia tidak
   berpengaruh untuk `type="attach"`, karena alasan yang sama. `Search` punya
   ukuran ketiga, `compact` (37px), untuk dipasang di navbar tanpa tombol cari (`showButton=false`).
+  Komponen ini juga mendukung live search via `trigger="change"` / `"auto"` dengan jeda `debounce`
+  (bawaan 300ms) serta tema gelap berbasis token (`--color-search-category-surface` dan `--color-search-field-surface`).
+- `Upload`: dibatasi khusus berkas tunggal (atribut `multiple` dinonaktifkan).
 - `application`: `default | simaya` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.
@@ -256,6 +281,11 @@ atau `groups` (dengan dukungan pemisah `separator`). Pilihan aksi seperti
 *Keluar* dapat diberi warna destruktif lewat `tone="danger"`. Menu item,
 subitem, dan profil juga mendukung `external: true` untuk membuka tautan keluar
 tab baru secara aman (`rel="noreferrer noopener"`).
+
+Tema gelap (`darkMode`): `Sidebar` mengadopsi sistem token semantik dan token
+komponen `--color-sidebar-surface` (putih di tema terang, gray-700 di tema
+gelap). Tema dapat diaktifkan lewat prop `darkMode` maupun otomatis mewarisi
+atribut `data-theme="dark"` dari kontainer pembungkusnya.
 
 Type publik utama meliputi `SidebarProps`, `SidebarItem`, `SidebarSubItem`,
 `SidebarGroup`, `SidebarUser`, `SidebarUserItem`, `SidebarUserGroup`, dan
