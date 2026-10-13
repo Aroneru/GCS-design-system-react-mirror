@@ -1,8 +1,10 @@
 import {
   forwardRef,
+  useEffect,
   useId,
   useRef,
   useState,
+  type ChangeEvent,
   type InputHTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
@@ -11,11 +13,11 @@ import { Search as SearchIcon } from 'flowbite-react-icons/outline'
 import { cn } from '../utils/cn'
 import { Dropdown, type DropdownItem } from './Dropdown'
 
-/** Ukuran kotak: `default` 54px (desktop), `mobile` 50px, `compact` 37px. */
+/** Ukuran kotak: `default` 54px (desktop), `mobile` 50px, `compact` 37px (navbar). */
 export type SearchPlatform = 'default' | 'mobile' | 'compact'
 
 /** Warna aksen per aplikasi — dipakai tombol cari dan garis saat field difokus. */
-export type SearchApplication = 'default' | 'simaya'
+export type SearchApplication = 'default' | 'purple' | 'simaya'
 
 /** Satu pilihan pada dropdown kategori. */
 export interface SearchCategory {
@@ -73,6 +75,11 @@ const accents: Record<
     focus: 'focus-within:border-primary-500',
     groupFocus: 'group-focus-within:border-primary-500',
   },
+  purple: {
+    solid: 'bg-purple-500 hover:bg-purple-600 focus-visible:outline-purple-500',
+    focus: 'focus-within:border-purple-500',
+    groupFocus: 'group-focus-within:border-purple-500',
+  },
   simaya: {
     solid: 'bg-purple-500 hover:bg-purple-600 focus-visible:outline-purple-500',
     focus: 'focus-within:border-purple-500',
@@ -102,8 +109,21 @@ export interface SearchProps
   helperText?: ReactNode
   /** Label tombol cari. Pada varian kategori ia jadi label aksesibilitas tombol ikon. */
   buttonLabel?: string
-  /** Dipanggil saat tombol ditekan atau Enter di dalam field. */
+  /** Dipanggil saat tombol ditekan, Enter di dalam field, atau otomatis saat mengetik (bila trigger='change' / 'auto'). */
   onSearch?: (value: string, category: string) => void
+  /**
+   * Pemicu pemanggilan onSearch:
+   * - `'enter'`: dipanggil saat tombol Cari diklik atau tombol Enter ditekan.
+   * - `'change'` | `'auto'`: dipanggil otomatis setiap kali isian berubah (dengan jeda debounce).
+   */
+  trigger?: 'enter' | 'change' | 'auto'
+  /** Jeda debounce (ms) untuk pemanggilan onSearch saat trigger='change' / 'auto'. Bawaannya 300ms. */
+  debounce?: number
+  /**
+   * Menampilkan tombol cari di kanan.
+   * Bawaannya `false` pada platform `compact` (untuk navbar), dan `true` pada platform lainnya.
+   */
+  showButton?: boolean
   /**
    * Hanya berlaku pada varian polos. Varian kategori tingginya tetap 39px di
    * lebar berapa pun — yang memanjang hanya isian di tengahnya.
@@ -147,6 +167,9 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
     helperText,
     buttonLabel = 'Cari',
     onSearch,
+    trigger = 'enter',
+    debounce = 300,
+    showButton,
     platform = 'default',
     application = 'default',
     categories,
@@ -158,6 +181,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
     id,
     disabled,
     onKeyDown,
+    onChange,
     darkMode = false,
     ...props
   },
@@ -169,10 +193,19 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
 
   const inputRef = useRef<HTMLInputElement>(null)
   const categoryRef = useRef<HTMLSelectElement>(null)
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const size = platforms[platform]
   const accent = accents[application]
   const withCategory = Boolean(categories?.length)
+  const hasButton = showButton ?? (platform !== 'compact')
+  const isLive = trigger === 'change' || trigger === 'auto'
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    }
+  }, [])
 
   // Tombol kategori perlu tahu kategori mana yang sedang aktif untuk menulis
   // labelnya; pada dropdown tak terkendali itu tidak ada di prop, jadi
@@ -194,7 +227,10 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
     else if (ref) ref.current = node
   }
 
-  const submit = () => onSearch?.(inputRef.current?.value ?? '', categoryRef.current?.value ?? '')
+  const submit = () => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    onSearch?.(inputRef.current?.value ?? '', categoryRef.current?.value ?? '')
+  }
 
   // <select> di belakang tombol kategori dikendalikan state ini, jadi memilih
   // cukup memperbarui state: nilai yang dibaca `onSearch` lewat `categoryRef`
@@ -204,6 +240,9 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   const pilihKategori = (nilai: string) => {
     setKategoriDipilih(nilai)
     onCategoryChange?.(nilai)
+    if (isLive) {
+      onSearch?.(inputRef.current?.value ?? '', nilai)
+    }
   }
 
   // `selected` inilah yang membuat panel Dropdown berpindah peran jadi
@@ -216,6 +255,22 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
     selected: option.value === kategoriKini,
     onClick: () => pilihKategori(option.value),
   }))
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onChange?.(event)
+    if (isLive) {
+      const val = event.target.value
+      const cat = categoryRef.current?.value ?? ''
+      if (debounce > 0) {
+        if (debounceTimer.current) clearTimeout(debounceTimer.current)
+        debounceTimer.current = setTimeout(() => {
+          onSearch?.(val, cat)
+        }, debounce)
+      } else {
+        onSearch?.(val, cat)
+      }
+    }
+  }
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     onKeyDown?.(event)
@@ -233,6 +288,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
       disabled={disabled}
       aria-describedby={helperText ? helperId : undefined}
       onKeyDown={handleKeyDown}
+      onChange={handleInputChange}
       className={cn(
         'min-w-0 flex-1 bg-transparent outline-none',
         darkMode ? 'text-white placeholder:text-gray-400' : 'text-gray-900 placeholder:text-gray-500',
@@ -247,7 +303,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   )
 
   return (
-    <div className={cn('w-full', className)}>
+    <div className={cn(!className?.includes('w-') && 'w-full', className)}>
       {label && (
         <label htmlFor={fieldId} className={cn("mb-2 block text-sm font-bold", darkMode ? "text-white" : "text-gray-900")}>
           {label}
@@ -325,25 +381,28 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               'flex min-w-0 flex-1 items-center border-y px-2.5 text-sm transition-colors',
               darkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-300 bg-gray-50',
               !disabled && accent.groupFocus,
+              !hasButton && 'rounded-r-lg border-r',
             )}
           >
             {input}
           </div>
 
-          <button
-            type="button"
-            onClick={submit}
-            disabled={disabled}
-            aria-label={buttonLabel}
-            className={cn(
-              'flex w-11 shrink-0 items-center justify-center rounded-r-lg text-white transition-colors',
-              'focus-visible:outline-2 focus-visible:outline-offset-2',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-              accent.solid,
-            )}
-          >
-            <SearchIcon className="size-4" />
-          </button>
+          {hasButton && (
+            <button
+              type="button"
+              onClick={submit}
+              disabled={disabled}
+              aria-label={buttonLabel}
+              className={cn(
+                'flex w-11 shrink-0 items-center justify-center rounded-r-lg text-white transition-colors',
+                'focus-visible:outline-2 focus-visible:outline-offset-2',
+                'disabled:cursor-not-allowed disabled:opacity-50',
+                accent.solid,
+              )}
+            >
+              <SearchIcon className="size-4" />
+            </button>
+          )}
         </div>
       ) : (
         <div
@@ -367,20 +426,22 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
 
           {input}
 
-          <button
-            type="button"
-            onClick={submit}
-            disabled={disabled}
-            className={cn(
-              'shrink-0 rounded-lg font-medium text-white transition-colors',
-              'focus-visible:outline-2 focus-visible:outline-offset-2',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-              size.button,
-              accent.solid,
-            )}
-          >
-            {buttonLabel}
-          </button>
+          {hasButton && (
+            <button
+              type="button"
+              onClick={submit}
+              disabled={disabled}
+              className={cn(
+                'shrink-0 rounded-lg font-medium text-white transition-colors',
+                'focus-visible:outline-2 focus-visible:outline-offset-2',
+                'disabled:cursor-not-allowed disabled:opacity-50',
+                size.button,
+                accent.solid,
+              )}
+            >
+              {buttonLabel}
+            </button>
+          )}
         </div>
       )}
 
