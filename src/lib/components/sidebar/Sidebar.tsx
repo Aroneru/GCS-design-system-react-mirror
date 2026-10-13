@@ -80,20 +80,17 @@ export function Sidebar({
       : [];
   const hasUserMenu = Boolean(user && userGroups.some((g) => g.items.length > 0));
 
-  useEffect(() => {
-    if (!hasUserMenu && userMenuOpen) {
-      setUserMenuOpen(false);
-    }
-  }, [hasUserMenu, userMenuOpen]);
+  // Reset dropdown state during render when collapsed changes to avoid cascading renders in effect
+  const [prevCollapsed, setPrevCollapsed] = useState(collapsed);
+  if (collapsed !== prevCollapsed) {
+    setPrevCollapsed(collapsed);
+    setUserMenuOpen(false);
+  }
+
+  const isMenuOpen = hasUserMenu && userMenuOpen;
 
   useEffect(() => {
-    if (userMenuOpen) {
-      setUserMenuOpen(false);
-    }
-  }, [collapsed]);
-
-  useEffect(() => {
-    if (!userMenuOpen || !hasUserMenu) return;
+    if (!isMenuOpen) return;
 
     const handlePointerDown = (event: PointerEvent) => {
       if (!userMenuRef.current?.contains(event.target as Node)) {
@@ -115,7 +112,7 @@ export function Sidebar({
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [hasUserMenu, userMenuOpen]);
+  }, [isMenuOpen]);
 
   return (
     <aside
@@ -208,7 +205,7 @@ export function Sidebar({
                   ref={userTriggerRef}
                   type="button"
                   aria-haspopup="true"
-                  aria-expanded={userMenuOpen}
+                  aria-expanded={isMenuOpen}
                   aria-label={`Menu profil ${user.name}`}
                   onClick={(e) => {
                     user.onClick?.(e);
@@ -243,14 +240,14 @@ export function Sidebar({
                         className={cn(
                           "size-4 shrink-0 transition-transform motion-reduce:transition-none",
                           darkMode ? "text-gray-400" : "text-gray-500",
-                          userMenuOpen && "rotate-180",
+                          isMenuOpen && "rotate-180",
                         )}
                       />
                     </>
                   )}
                 </button>
 
-                {userMenuOpen && (
+                {isMenuOpen && (
                   <div
                     role="menu"
                     aria-orientation="vertical"

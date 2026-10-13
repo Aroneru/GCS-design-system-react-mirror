@@ -213,6 +213,9 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   const [kategoriDipilih, setKategoriDipilih] = useState(() => String(defaultCategory ?? ""))
   const kategoriKini = category !== undefined ? String(category) : kategoriDipilih
 
+  const [internalValue, setInternalValue] = useState(() => String(props.defaultValue ?? props.value ?? ""))
+  const currentInputValue = props.value !== undefined ? String(props.value) : internalValue
+
   // Placeholder ikut jadi baris pilihan biasa, sama seperti ia jadi
   // <option value=""> pertama di <select>.
   const opsiKategori = [{ value: "", label: categoryPlaceholder }, ...(categories ?? [])]
@@ -229,7 +232,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
 
   const submit = () => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current)
-    onSearch?.(inputRef.current?.value ?? '', categoryRef.current?.value ?? '')
+    onSearch?.(inputRef.current?.value ?? currentInputValue, categoryRef.current?.value ?? '')
   }
 
   // <select> di belakang tombol kategori dikendalikan state ini, jadi memilih
@@ -241,7 +244,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
     setKategoriDipilih(nilai)
     onCategoryChange?.(nilai)
     if (isLive) {
-      onSearch?.(inputRef.current?.value ?? '', nilai)
+      onSearch?.(currentInputValue, nilai)
     }
   }
 
@@ -257,6 +260,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   }))
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setInternalValue(event.target.value)
     onChange?.(event)
     if (isLive) {
       const val = event.target.value

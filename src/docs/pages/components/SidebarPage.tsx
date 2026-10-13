@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type MouseEvent as ReactMouseEvent, type ReactNode, useState } from "react";
 import { ChartPie, Clipboard, Inbox, Layers, Lock, Cart } from "flowbite-react-icons/solid";
 import { Sidebar, type SidebarGroup, type SidebarItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
@@ -368,7 +368,7 @@ export function SidebarPage() {
   const playgroundItems = baseItems.map((item) => ({
     ...item,
     active: activeMenu === item.label,
-    onClick: (e: any) => {
+    onClick: (e: ReactMouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
       setActiveMenu(item.label as string);
     },
@@ -377,7 +377,7 @@ export function SidebarPage() {
     children: item.children?.map((sub) => ({
       ...sub,
       active: activeMenu === sub.label,
-      onClick: (e: any) => {
+      onClick: (e: ReactMouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         setActiveMenu(sub.label as string);
       },
