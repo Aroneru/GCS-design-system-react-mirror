@@ -199,12 +199,15 @@ export function UsulanPage({
   title,
   description,
   toc,
+  actions,
   children,
 }: {
   eyebrow: string
   title: string
   description: string
   toc: TocEntry[]
+  /** Kontrol tambahan di bawah deskripsi hero, misalnya pemilih font. */
+  actions?: ReactNode
   children: ReactNode
 }) {
   const active = useActiveSection(toc)
@@ -216,6 +219,7 @@ export function UsulanPage({
           <p className="ds-eyebrow">{eyebrow}</p>
           <h1 className="mt-2 text-heading-1 font-black tracking-tight text-gray-900">{title}</h1>
           <p className="mt-3 max-w-2xl text-body text-gray-500">{description}</p>
+          {actions && <div className="mt-6">{actions}</div>}
         </div>
       </header>
 

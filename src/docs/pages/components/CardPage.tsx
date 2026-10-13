@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { Button, Card } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Demo, Hl, Mark, Segmented } from "../../pageKit";
@@ -66,7 +66,7 @@ const cardProps: PropRow[] = [
     "darkMode",
     "boolean",
     "false",
-    "Tampilan gelap: kartu gray-800, judul putih, deskripsi gray-400, tautan primary-500. Tombol di actions tidak ikut diubah.",
+    "Tampilan gelap: kartu gray-700, judul putih, deskripsi gray-300, tautan primary-400. Tombol di actions tidak ikut diubah.",
   ],
 ];
 
@@ -87,10 +87,19 @@ const toc: TocEntry[] = [
 
 /**
  * Tombol outline di kartu gelap. Outline bawaan Button memakai primary-700 yang
- * nyaris hilang di atas gray-800, jadi warnanya ditimpa ke primary-500 seperti
+ * nyaris hilang di atas gray-700, jadi warnanya ditimpa ke primary-400 seperti
  * desain. Pakai `!` karena `cn` tidak menggabungkan kelas yang bentrok.
  */
-const darkOutlineClass = "border-primary-500! text-primary-500! hover:bg-primary-500/10!";
+const darkOutlineClass = "border-primary-400! text-primary-400! hover:bg-primary-400/10!";
+
+/**
+ * Contoh menimpa token dark mode. Di sini lewat `style` supaya hanya demo ini
+ * yang berubah; di project asli cukup ditulis di `:root`.
+ */
+const customDarkTokens = {
+  "--color-surface-dark": "#1e3a5f",
+  "--color-border-dark": "#2b4f7a",
+} as CSSProperties;
 
 const SampleButton = ({
   variant,
@@ -358,10 +367,10 @@ export function CardPage() {
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
           Isi <Hl>darkMode</Hl> untuk halaman berlatar gelap. Kartu berubah ke
-          gray-800, judul jadi putih, deskripsi gray-400, dan tautan primary-500
+          gray-700, judul jadi putih, deskripsi gray-300, dan tautan primary-400
           supaya tetap terbaca. Gambar sedikit diredupkan. Semua varian di atas
           tetap berlaku, termasuk ukuran mobile. Tombol di <Hl>actions</Hl> tidak
-          ikut diubah. Tombol outline perlu diberi warna primary-500 sendiri,
+          ikut diubah. Tombol outline perlu diberi warna primary-400 sendiri,
           karena primary-700 bawaannya hampir tidak terlihat di kartu gelap.
         </Lead>
 
@@ -453,13 +462,80 @@ export function CardPage() {
           {"    actions={\n"}
           {"        <>\n"}
           {'            <Button variant="outline" size="s"\n'}
-          {'                className="border-primary-500! text-primary-500! hover:bg-primary-500/10!">\n'}
+          {'                className="border-primary-400! text-primary-400! hover:bg-primary-400/10!">\n'}
           {"                Button text\n"}
           {"            </Button>\n"}
           {'            <Button variant="filled" size="s">Button text</Button>\n'}
           {"        </>\n"}
           {"    }\n"}
           {"/>"}
+        </SectionCode>
+
+        <h3 className="text-heading-4 font-bold text-gray-900">Ikut tema pembungkus</h3>
+        <Lead>
+          Tanpa <Hl>darkMode</Hl>, kartu mengikuti tema elemen di sekitarnya. Pasang{" "}
+          <Hl>data-theme="dark"</Hl> sekali di pembungkus, semua kartu di dalamnya ikut gelap.
+          Di dalam area gelap, <Hl>data-theme="light"</Hl> mengembalikan satu bagian ke terang.
+        </Lead>
+
+        <Demo label='Pembungkus data-theme="dark", kartu tanpa prop' dark>
+          <div data-theme="dark" className="grid gap-5 sm:grid-cols-3">
+            <Card title={cardTitle} description={cardDesc} href="#" linkLabel="See our guideline" />
+            <Card title={cardTitle} description={cardDesc} />
+            <div data-theme="light">
+              <Card title="Tetap terang" description='Dibungkus data-theme="light".' />
+            </div>
+          </div>
+        </Demo>
+
+        <SectionCode>
+          {"<section "}
+          <Mark>data-theme="dark"</Mark>
+          {">\n"}
+          {"    <Card title=\"…\" />       {/* gelap */}\n"}
+          {"    <Card title=\"…\" />       {/* gelap */}\n"}
+          {"    <div "}
+          <Mark>data-theme="light"</Mark>
+          {">\n"}
+          {"        <Card title=\"…\" />   {/* terang */}\n"}
+          {"    </div>\n"}
+          {"</section>"}
+        </SectionCode>
+
+        <h3 className="text-heading-4 font-bold text-gray-900">Mengganti warna gelap</h3>
+        <Lead>
+          Warna gelap Card diambil dari token global di <Hl>tokens.css</Hl>. Timpa
+          tokennya di CSS project kamu, semua komponen yang memakainya ikut berubah.
+          Contoh di bawah menimpa <Hl>--color-surface-dark</Hl> dan{" "}
+          <Hl>--color-border-dark</Hl> saja.
+        </Lead>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Bawaan" dark>
+            <Card darkMode title={cardTitle} description={cardDesc} href="#" linkLabel="See our guideline" />
+          </Demo>
+          <Demo label="Token ditimpa" dark>
+            <div style={customDarkTokens}>
+              <Card darkMode title={cardTitle} description={cardDesc} href="#" linkLabel="See our guideline" />
+            </div>
+          </Demo>
+        </div>
+
+        <SectionCode>
+          {"/* CSS project kamu */\n"}
+          {":root {\n"}
+          {"  "}
+          <Mark>--color-surface-dark</Mark>
+          {": #1e3a5f;\n"}
+          {"  "}
+          <Mark>--color-border-dark</Mark>
+          {": #2b4f7a;\n"}
+          {"}\n\n"}
+          {"/* Token lain yang tersedia */\n"}
+          {"--color-content-dark          /* judul */\n"}
+          {"--color-content-dark-subtle   /* deskripsi */\n"}
+          {"--color-brand-dark            /* tautan */\n"}
+          {"--color-brand-dark-hover      /* tautan saat hover */"}
         </SectionCode>
       </FlowSection>
 
@@ -626,7 +702,7 @@ export function CardPage() {
               {darkMode ? (
                 <>
                   {'                <Button variant="outline" size="s"\n'}
-                  {'                    className="border-primary-500! text-primary-500! hover:bg-primary-500/10!">\n'}
+                  {'                    className="border-primary-400! text-primary-400! hover:bg-primary-400/10!">\n'}
                   {"                    Button text\n"}
                   {"                </Button>\n"}
                 </>

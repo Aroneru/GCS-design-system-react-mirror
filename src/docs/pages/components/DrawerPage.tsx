@@ -104,7 +104,7 @@ const toc: TocEntry[] = [
 
 function DummyPageContent({ darkMode = false, activeTitle = "Halaman Beranda" }: { darkMode?: boolean, activeTitle?: string }) {
     return (
-        <div className={`flex-1 min-w-0 p-6 overflow-y-auto ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className={`flex-1 min-w-0 p-6 overflow-y-auto ${darkMode ? 'bg-gray-600' : 'bg-white'}`}>
             <h1 className={`text-xl font-bold tracking-tight mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{activeTitle}</h1>
             <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 Anda sedang berada di halaman utama {activeTitle}.
