@@ -71,7 +71,7 @@ const inputProps: PropRow[] = [
   ['state', "'default' | 'typing' | 'inactive' | 'failed'", 'default', 'Kondisi visual field.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna garis aksen saat field aktif.'],
   ['onClear', '() => void', 'undefined', 'Bila diisi, tombol hapus (×) muncul di kanan field.'],
-  ['darkMode', 'boolean', 'false', 'Tampilan gelap: field gray-800, label putih, garis baru terlihat saat typing dan failed.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: field gray-700, label putih, garis baru terlihat saat typing dan failed.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (value, onChange, autoComplete, …).'],
 ]
 
@@ -251,7 +251,7 @@ export function InputFieldPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <Hl>darkMode</Hl> mengganti field ke gray-800 dengan label putih. Garisnya menyatu dengan latar
+          Prop <Hl>darkMode</Hl> mengganti field ke gray-700 dengan label putih. Garisnya menyatu dengan latar
           dan baru terlihat saat <Hl>typing</Hl> (warna aplikasi) atau <Hl>failed</Hl> (red-500). Teks yang
           diketik putih, sedangkan placeholder, ikon, dan caption abu-abu. Pada type password, tombol matanya
           gray-600, dan saat <Hl>failed</Hl> gembok, placeholder, serta caption-nya red-500.

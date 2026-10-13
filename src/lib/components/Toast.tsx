@@ -12,54 +12,37 @@ export type ToastVariant = 'success' | 'danger' | 'warning' | 'info' | 'purple'
  * ikon yang membawa warna variant. Menjaga notifikasi tetap ringan saat
  * beberapa toast menumpuk di layar sekaligus.
  *
- * Nilai success, danger, dan info diambil persis dari desain — termasuk dua
- * ketidakseragamannya: danger memakai latar -50 (bukan -100 seperti dua
- * lainnya) dan info memakai ikon -600 (bukan -500). warning dan purple belum
- * ada di desain, jadi keduanya mengikuti pola mayoritas: latar -100, ikon -500.
+ * Warna badge per variant dari token `toast-*` di tokens.css, diambil persis
+ * dari desain — termasuk ketidakseragamannya. Terang: danger memakai latar -50
+ * (bukan -100 seperti dua lainnya) dan info memakai ikon -600 (bukan -500).
+ * Gelap: ikonnya selalu -400, tetapi latarnya success -900, danger dan info
+ * -800. warning dan purple belum ada di desain, jadi keduanya mengikuti pola
+ * mayoritas: latar -100 dengan ikon -500, dan -800 dengan ikon -400 saat gelap.
  */
 const variants: Record<
   ToastVariant,
   { badge: string; icon: ComponentType<{ className?: string }> }
 > = {
-  success: { badge: 'bg-green-100 text-green-500', icon: Check },
-  danger: { badge: 'bg-red-50 text-red-500', icon: Close },
-  warning: { badge: 'bg-yellow-100 text-yellow-500', icon: ExclamationCircle },
-  info: { badge: 'bg-primary-100 text-primary-600', icon: InfoCircle },
-  purple: { badge: 'bg-purple-100 text-purple-500', icon: InfoCircle },
+  success: { badge: 'bg-toast-success-surface text-toast-success-icon', icon: Check },
+  danger: { badge: 'bg-toast-danger-surface text-toast-danger-icon', icon: Close },
+  warning: { badge: 'bg-toast-warning-surface text-toast-warning-icon', icon: ExclamationCircle },
+  info: { badge: 'bg-toast-info-surface text-toast-info-icon', icon: InfoCircle },
+  purple: { badge: 'bg-toast-purple-surface text-toast-purple-icon', icon: InfoCircle },
 }
 
 /**
- * Badge ikon pada tampilan gelap, juga dari desain — ikonnya selalu -400, tetapi
- * latarnya lagi-lagi tidak seragam: success -900, danger dan info -800.
- * warning dan purple mengikuti mayoritas: latar -800.
+ * Warna kartu, teks, dan tombol tutup — token, jadi tema gelap cukup mengganti
+ * nilai token lewat `data-theme`. Pesan tunggal gray-500 (gelap gray-300,
+ * seperti heading), teks pendukung di bawah heading gray-600 (gelap gray-400).
+ * Cincin fokus memakai `brand`: primary-600 hanya 2:1 di atas kartu gelap,
+ * sedangkan nilai gelapnya, primary-400, lebih dari 4:1.
  */
-const badgeDark: Record<ToastVariant, string> = {
-  success: 'bg-green-900 text-green-400',
-  danger: 'bg-red-800 text-red-400',
-  warning: 'bg-yellow-800 text-yellow-400',
-  info: 'bg-primary-800 text-primary-400',
-  purple: 'bg-purple-800 text-purple-400',
-}
-
-/** Warna kartu, teks, dan tombol tutup untuk tampilan terang dan gelap. */
-const themes = {
-  light: {
-    card: 'bg-surface',
-    heading: 'text-gray-900',
-    // Pesan tunggal gray-500, teks pendukung di bawah heading gray-600.
-    message: 'text-gray-500',
-    body: 'text-gray-600',
-    close: 'hover:text-gray-600 focus-visible:text-gray-600 focus-visible:outline-primary-600',
-  },
-  dark: {
-    card: 'bg-gray-800',
-    heading: 'text-gray-300',
-    // Pesan tunggal dan teks pendukung sama-sama gray-400.
-    message: 'text-gray-400',
-    body: 'text-gray-400',
-    // Cincin fokus primary-600 hanya 2,9:1 di atas gray-800; primary-400 lebih dari 6:1.
-    close: 'hover:text-gray-200 focus-visible:text-gray-200 focus-visible:outline-primary-400',
-  },
+const colors = {
+  card: 'bg-surface',
+  heading: 'text-toast-heading',
+  message: 'text-content-subtle',
+  body: 'text-toast-body',
+  close: 'hover:text-toast-close-hover focus-visible:text-toast-close-hover focus-visible:outline-brand',
 }
 
 export interface ToastProps extends HTMLAttributes<HTMLDivElement> {
@@ -76,7 +59,11 @@ export interface ToastProps extends HTMLAttributes<HTMLDivElement> {
   open?: boolean
   /** Tombol tindak lanjut di bawah isi — umumnya dibuat `w-full`. */
   actions?: ReactNode
-  /** Tampilan gelap: kartu gray-800, teks lebih terang, dan badge ikon versi gelap. */
+  /**
+   * Memaksa toast ini bertema gelap: kartu gray-700, teks lebih terang, dan
+   * badge ikon versi gelap. Tanpa prop ini ia ikut tema elemen pembungkusnya,
+   * mis. `<section data-theme="dark">`.
+   */
   darkMode?: boolean
 }
 
@@ -91,8 +78,8 @@ export interface ToastProps extends HTMLAttributes<HTMLDivElement> {
  * `fixed` (mis. `fixed bottom-4 left-4 z-50 space-y-3`) supaya bisa ditumpuk
  * di sudut mana pun tanpa mengunci satu posisi ke dalam komponen.
  *
- * `darkMode` mengganti kartu, teks, dan badge ikonnya ke tampilan gelap. Tombol
- * di `actions` tidak ikut diubah — desainnya memakai primary-700 di kedua tampilan.
+ * `darkMode` sekadar memasang `data-theme="dark"` di kartunya. Tombol di
+ * `actions` tidak ikut diubah — desainnya memakai primary-700 di kedua tampilan.
  */
 export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
   {
@@ -112,7 +99,6 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
 ) {
   const { mounted, visible, close } = useDismissible(open)
   const v = variants[variant]
-  const theme = darkMode ? themes.dark : themes.light
   const DefaultIcon = v.icon
   const showIcon = icon !== false
 
@@ -132,11 +118,12 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
       ref={ref}
       role="status"
       aria-live="polite"
+      data-theme={darkMode ? 'dark' : undefined}
       className={cn(
         // `shadow` (bukan shadow-sm) — nilainya persis dua lapis dari desain;
         // --shadow-sm di tokens.css sudah dipakai untuk nilai lain.
         'relative w-full max-w-80 rounded-lg p-4 shadow',
-        theme.card,
+        colors.card,
         'transition ease-out',
         visible ? 'translate-y-0 opacity-100 duration-300' : 'translate-y-2 opacity-0 duration-200',
         className,
@@ -145,12 +132,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
     >
       <div className={cn('flex gap-3', multiline ? 'items-start' : 'items-center')}>
         {showIcon && (
-          <span
-            className={cn(
-              'grid size-8 shrink-0 place-items-center rounded-lg',
-              darkMode ? badgeDark[variant] : v.badge,
-            )}
-          >
+          <span className={cn('grid size-8 shrink-0 place-items-center rounded-lg', v.badge)}>
             <Icon className="size-5">{icon ?? <DefaultIcon />}</Icon>
           </span>
         )}
@@ -162,7 +144,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
         */}
         <div className="min-w-0 flex-1">
           {heading && (
-            <p className={cn('text-sm leading-normal font-bold', theme.heading, dismissible && 'pr-6')}>
+            <p className={cn('text-sm leading-normal font-bold', colors.heading, dismissible && 'pr-6')}>
               {heading}
             </p>
           )}
@@ -171,7 +153,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
             <div
               className={cn(
                 'text-sm leading-normal',
-                heading ? theme.body : theme.message,
+                heading ? colors.body : colors.message,
                 dismissible && 'pr-6',
               )}
             >
@@ -192,7 +174,7 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(function Toast(
             // sambil menyisakan area klik 20px. Ikonnya gray-400 di kedua
             // tampilan, sesuai desain.
             'absolute right-3 rounded-md p-1 text-gray-400 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
-            theme.close,
+            colors.close,
             multiline ? 'top-3' : 'top-1/2 -translate-y-1/2',
           )}
           aria-label="Tutup notifikasi"

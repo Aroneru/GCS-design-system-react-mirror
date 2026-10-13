@@ -29,45 +29,34 @@ const platforms: Record<FloatingLabelPlatform, { box: string; text: string }> = 
 
 /**
  * Garisnya sama di kedua tampilan; label yang naik satu tingkat lebih terang
- * pada tampilan gelap (desain: primary-500 di atas gray-800).
+ * pada tampilan gelap (desain: primary-500 di atas gray-700) — nilainya diatur
+ * token `floating-label-accent`.
  */
-const accents: Record<FloatingLabelApplication, { border: string; label: string; labelDark: string }> = {
-  default: { border: 'border-primary-600', label: 'text-primary-600', labelDark: 'text-primary-500' },
-  simaya: { border: 'border-purple-500', label: 'text-purple-500', labelDark: 'text-purple-400' },
+const accents: Record<FloatingLabelApplication, { border: string; label: string }> = {
+  default: { border: 'border-primary-600', label: 'text-floating-label-accent' },
+  simaya: { border: 'border-purple-500', label: 'text-floating-label-accent-simaya' },
 }
 
-/** Warna tiap bagian untuk tampilan terang dan gelap. */
-const themes = {
-  light: {
-    // Latar label harus sama dengan latar kotak, karena ia menutup garis atas.
-    surface: 'bg-surface',
-    border: 'border-gray-300',
-    icon: 'text-gray-800',
-    iconError: 'text-red-600',
-    field: 'text-gray-800 placeholder:text-gray-500 disabled:text-gray-400',
-    clear: 'text-gray-500',
-    clearError: 'text-red-600',
-    label: 'text-gray-500',
-    labelError: 'text-red-600',
-    labelDisabled: 'text-gray-400',
-    helper: 'text-gray-500',
-    helperError: 'text-red-600',
-  },
-  // Desain gelap: pada error hanya garis dan label yang merah; ikon tetap abu-abu.
-  dark: {
-    surface: 'bg-gray-800',
-    border: 'border-gray-800',
-    icon: 'text-gray-400',
-    iconError: 'text-gray-400',
-    field: 'text-gray-400 placeholder:text-gray-500 disabled:text-gray-500',
-    clear: 'text-gray-400',
-    clearError: 'text-gray-400',
-    label: 'text-gray-400',
-    labelError: 'text-red-500',
-    labelDisabled: 'text-gray-500',
-    helper: 'text-gray-400',
-    helperError: 'text-red-500',
-  },
+/**
+ * Warna tiap bagian dari token di tokens.css, jadi tema gelap cukup mengganti
+ * nilai token lewat `data-theme`. Desain gelap: pada error hanya garis dan
+ * label yang merah; ikon dan tombol hapus tetap abu-abu. Placeholder gray-500
+ * di kedua tampilan.
+ */
+const colors = {
+  // Latar label harus sama dengan latar kotak, karena ia menutup garis atas.
+  surface: 'bg-surface',
+  border: 'border-border-strong',
+  icon: 'text-floating-label-content',
+  iconError: 'text-floating-label-icon-error',
+  field: 'text-floating-label-content placeholder:text-gray-500 disabled:text-content-disabled',
+  clear: 'text-content-muted',
+  clearError: 'text-floating-label-icon-error',
+  label: 'text-content-muted',
+  labelError: 'text-feedback-error',
+  labelDisabled: 'text-content-disabled',
+  helper: 'text-content-muted',
+  helperError: 'text-feedback-error',
 }
 
 const ClearIcon = () => (
@@ -95,7 +84,11 @@ export interface FloatingLabelProps extends Omit<InputHTMLAttributes<HTMLInputEl
   application?: FloatingLabelApplication
   /** Bila diisi, tombol hapus (×) muncul di sisi kanan field. */
   onClear?: () => void
-  /** Tampilan gelap: kotak gray-800 dengan teks dan ikon abu-abu. */
+  /**
+   * Memaksa field ini bertema gelap: kotak gray-700 bergaris gray-600 dengan
+   * teks dan ikon abu-abu. Tanpa prop ini ia ikut tema elemen pembungkusnya,
+   * mis. `<section data-theme="dark">`.
+   */
   darkMode?: boolean
   /** Kelas untuk pembungkus terluar (field + caption). */
   className?: string
@@ -108,7 +101,7 @@ export interface FloatingLabelProps extends Omit<InputHTMLAttributes<HTMLInputEl
  * Label naik sendiri saat field difokus/berisi, jadi prop `state` hanya perlu
  * diisi untuk mengunci tampilan (`active` di dokumentasi) atau menandai
  * kesalahan (`error`, yang sekaligus memasang `aria-invalid`). `darkMode`
- * mengganti warnanya ke tampilan gelap.
+ * sekadar memasang `data-theme="dark"` di pembungkus terluarnya.
  */
 export const FloatingLabel = forwardRef<HTMLInputElement, FloatingLabelProps>(function FloatingLabel(
   {
@@ -149,7 +142,6 @@ export const FloatingLabel = forwardRef<HTMLInputElement, FloatingLabelProps>(fu
   const accented = focused || state === 'active'
 
   const accent = accents[application]
-  const t = darkMode ? themes.dark : themes.light
   const { box, text } = platforms[platform]
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -168,18 +160,18 @@ export const FloatingLabel = forwardRef<HTMLInputElement, FloatingLabelProps>(fu
   }
 
   return (
-    <div className={cn('w-full', className)}>
+    <div data-theme={darkMode ? 'dark' : undefined} className={cn('w-full', className)}>
       <div className="relative">
         <div
           className={cn(
             'flex items-center gap-3 rounded-lg border px-4 transition-colors',
-            t.surface,
+            colors.surface,
             box,
-            isError ? 'border-red-600' : accented ? accent.border : t.border,
+            isError ? 'border-red-600' : accented ? accent.border : colors.border,
           )}
         >
           {icon && (
-            <span className={cn('flex shrink-0 items-center', isError ? t.iconError : t.icon)}>{icon}</span>
+            <span className={cn('flex shrink-0 items-center', isError ? colors.iconError : colors.icon)}>{icon}</span>
           )}
 
           <input
@@ -197,7 +189,7 @@ export const FloatingLabel = forwardRef<HTMLInputElement, FloatingLabelProps>(fu
             onBlur={handleBlur}
             className={cn(
               'min-w-0 flex-1 bg-transparent outline-none disabled:cursor-not-allowed',
-              t.field,
+              colors.field,
               text,
             )}
             {...props}
@@ -214,7 +206,7 @@ export const FloatingLabel = forwardRef<HTMLInputElement, FloatingLabelProps>(fu
               aria-label="Kosongkan isian"
               className={cn(
                 'shrink-0 rounded-sm transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current disabled:cursor-not-allowed',
-                isError ? t.clearError : t.clear,
+                isError ? colors.clearError : colors.clear,
               )}
             >
               <ClearIcon />
@@ -232,19 +224,17 @@ export const FloatingLabel = forwardRef<HTMLInputElement, FloatingLabelProps>(fu
           htmlFor={fieldId}
           className={cn(
             'pointer-events-none absolute -translate-y-1/2 px-1 transition-all duration-150 ease-out',
-            t.surface,
+            colors.surface,
             floated ? 'top-0 left-3 text-xs' : cn('top-1/2', text, icon ? 'left-10' : 'left-3'),
             // Satu warna saja yang dipasang: dua kelas warna sekaligus akan
             // diputuskan oleh urutan CSS Tailwind, bukan oleh urutan di sini.
             isError
-              ? t.labelError
+              ? colors.labelError
               : accented
-                ? darkMode
-                  ? accent.labelDark
-                  : accent.label
+                ? accent.label
                 : disabled
-                  ? t.labelDisabled
-                  : t.label,
+                  ? colors.labelDisabled
+                  : colors.label,
           )}
         >
           {label}
@@ -252,7 +242,7 @@ export const FloatingLabel = forwardRef<HTMLInputElement, FloatingLabelProps>(fu
       </div>
 
       {helperText && (
-        <p id={helperId} className={cn('mt-2 text-sm', isError ? t.helperError : t.helper)}>
+        <p id={helperId} className={cn('mt-2 text-sm', isError ? colors.helperError : colors.helper)}>
           {helperText}
         </p>
       )}

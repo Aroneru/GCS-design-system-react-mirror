@@ -22,19 +22,17 @@ const accents: Record<InputFieldApplication, { border: string; focus: string }> 
   simaya: { border: 'border-purple-500', focus: 'focus-within:border-purple-500' },
 }
 
+/**
+ * Latar dan garis per state. Semua warnanya token, jadi tema gelap cukup
+ * mengganti nilai token lewat `data-theme`. Desain gelap: latar gray-700 dan
+ * garis default yang menyatu dengannya; inactive bergaris gray-800, sedikit
+ * lebih gelap dari latarnya; typing dan failed memakai garis berwarna.
+ */
 const surfaces: Record<InputFieldState, string> = {
-  default: 'border-gray-300 bg-gray-50',
-  typing: 'bg-gray-50',
-  inactive: 'border-gray-400 bg-gray-50',
-  failed: 'border-red-600 bg-red-100',
-}
-
-/** Tampilan gelap: garis menyatu dengan latar, kecuali saat typing dan failed. */
-const surfacesDark: Record<InputFieldState, string> = {
-  default: 'border-gray-800 bg-gray-800',
-  typing: 'bg-gray-800',
-  inactive: 'border-gray-800 bg-gray-800',
-  failed: 'border-red-500 bg-gray-800',
+  default: 'border-field-border bg-field',
+  typing: 'bg-field',
+  inactive: 'border-input-field-border-inactive bg-field',
+  failed: 'border-feedback-error bg-input-field-surface-failed',
 }
 
 interface Ink {
@@ -51,92 +49,60 @@ interface Ink {
   reveal: string
 }
 
-/** Warna teks per state — label, isi field, ikon, dan caption punya tingkat kontras berbeda. */
+/**
+ * Warna teks per state — label, isi field, ikon, dan caption punya tingkat
+ * kontras berbeda. Kelas yang memakai palet langsung (gray-500, gray-400,
+ * red-600) adalah warna yang sama di tampilan terang dan gelap.
+ *
+ * Desain gelap hanya menggambar placeholder, jadi teks yang diketik mengikuti
+ * label (putih) — sama seperti Datepicker gelap — dan pada failed satu tingkat
+ * lebih terang dari placeholder-nya (red-500), kebalikan dari tampilan terang
+ * yang satu tingkat lebih gelap (red-700).
+ */
 const inks: Record<InputFieldState, Ink> = {
   default: {
-    label: 'text-gray-900',
-    field: 'text-gray-900 placeholder:text-gray-500',
-    helper: 'text-gray-500',
-    icon: 'text-gray-500',
-    clear: 'text-gray-500',
-    reveal: 'text-gray-500',
+    label: 'text-content',
+    field: 'text-content placeholder:text-content-muted',
+    helper: 'text-content-muted',
+    icon: 'text-content-muted',
+    clear: 'text-input-field-action',
+    reveal: 'text-input-field-action',
   },
   typing: {
-    label: 'text-gray-900',
-    field: 'text-gray-900 placeholder:text-gray-500',
-    helper: 'text-gray-500',
+    label: 'text-content',
+    field: 'text-content placeholder:text-gray-500',
+    helper: 'text-content-muted',
     icon: 'text-gray-500',
     clear: 'text-gray-500',
-    reveal: 'text-gray-500',
+    reveal: 'text-input-field-action',
   },
   inactive: {
-    label: 'text-gray-400',
-    field: 'text-gray-400 placeholder:text-gray-400',
-    helper: 'text-gray-400',
-    icon: 'text-gray-400',
+    label: 'text-input-field-label-inactive',
+    field: 'text-content-disabled placeholder:text-content-disabled',
+    helper: 'text-content-disabled',
+    icon: 'text-content-disabled',
     clear: 'text-gray-400',
-    reveal: 'text-gray-400',
+    reveal: 'text-input-field-action-inactive',
   },
   failed: {
-    label: 'text-gray-900',
-    field: 'text-red-700 placeholder:text-red-600',
+    label: 'text-content',
+    field: 'text-input-field-content-failed placeholder:text-red-600',
     helper: 'text-red-600',
     icon: 'text-red-600',
     clear: 'text-red-600',
-    reveal: 'text-gray-500',
-  },
-}
-
-/**
- * Warna tampilan gelap, dari desain. Desain hanya menggambar placeholder, jadi
- * teks yang diketik mengikuti label (putih) — sama seperti Datepicker gelap —
- * dan pada failed satu tingkat lebih terang dari placeholder-nya, kebalikan
- * dari tampilan terang yang satu tingkat lebih gelap.
- */
-const inksDark: Record<InputFieldState, Ink> = {
-  default: {
-    label: 'text-white',
-    field: 'text-white placeholder:text-gray-400',
-    helper: 'text-gray-400',
-    icon: 'text-gray-400',
-    clear: 'text-gray-600',
-    reveal: 'text-gray-600',
-  },
-  typing: {
-    label: 'text-white',
-    field: 'text-white placeholder:text-gray-500',
-    helper: 'text-gray-400',
-    icon: 'text-gray-500',
-    clear: 'text-gray-500',
-    reveal: 'text-gray-600',
-  },
-  inactive: {
-    label: 'text-gray-50',
-    field: 'text-gray-500 placeholder:text-gray-500',
-    helper: 'text-gray-500',
-    icon: 'text-gray-500',
-    clear: 'text-gray-400',
-    reveal: 'text-gray-600',
-  },
-  failed: {
-    label: 'text-white',
-    field: 'text-red-500 placeholder:text-red-600',
-    helper: 'text-red-600',
-    icon: 'text-red-600',
-    clear: 'text-red-600',
-    reveal: 'text-gray-600',
+    reveal: 'text-input-field-action',
   },
 }
 
 /**
  * Desain password gelap saat failed memakai red-500 untuk ikon, placeholder, dan
- * caption, sedangkan desain type teks memakai red-600 untuk ketiganya. Isian yang
- * diketik tetap red-500 di keduanya.
+ * caption, sedangkan desain type teks memakai red-600 untuk ketiganya. Token
+ * `feedback-error` memberi keduanya: red-600 terang, red-500 gelap.
  */
-const passwordFailedDark: Pick<Ink, 'field' | 'helper' | 'icon'> = {
-  field: 'text-red-500 placeholder:text-red-500',
-  helper: 'text-red-500',
-  icon: 'text-red-500',
+const passwordFailed: Pick<Ink, 'field' | 'helper' | 'icon'> = {
+  field: 'text-input-field-content-failed placeholder:text-feedback-error',
+  helper: 'text-feedback-error',
+  icon: 'text-feedback-error',
 }
 
 const ClearIcon = () => (
@@ -175,7 +141,11 @@ export interface InputFieldProps extends Omit<InputHTMLAttributes<HTMLInputEleme
   application?: InputFieldApplication
   /** Bila diisi, tombol hapus (×) muncul di sisi kanan field. */
   onClear?: () => void
-  /** Tampilan gelap: field gray-800 dengan label putih dan teks abu-abu. */
+  /**
+   * Memaksa field ini bertema gelap: field gray-700 dengan label putih dan teks
+   * abu-abu. Tanpa prop ini ia ikut tema elemen pembungkusnya, mis.
+   * `<section data-theme="dark">`.
+   */
   darkMode?: boolean
   /** Kelas untuk pembungkus terluar (label + field + caption). */
   className?: string
@@ -216,8 +186,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(function
   const [revealed, setRevealed] = useState(false)
 
   const isPassword = type === 'password'
-  const baseInk = (darkMode ? inksDark : inks)[state]
-  const ink = isPassword && darkMode && state === 'failed' ? { ...baseInk, ...passwordFailedDark } : baseInk
+  const ink = isPassword && state === 'failed' ? { ...inks.failed, ...passwordFailed } : inks[state]
   const accent = accents[application]
   const isDisabled = disabled || state === 'inactive'
   // Desain password mobile memakai teks 12px; type teks tetap 14px di kedua platform.
@@ -225,7 +194,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(function
   const leadingIcon = isPassword && icon === undefined ? <LockIcon /> : icon
 
   return (
-    <div className={cn('w-full', className)}>
+    <div data-theme={darkMode ? 'dark' : undefined} className={cn('w-full', className)}>
       {label && (
         <label htmlFor={fieldId} className={cn('mb-2 block font-bold', textSize, ink.label)}>
           {label}
@@ -236,7 +205,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(function
         className={cn(
           'flex items-center gap-3 rounded-lg border px-4 transition-colors',
           platforms[platform],
-          (darkMode ? surfacesDark : surfaces)[state],
+          surfaces[state],
           // `typing` mengunci garis aksen; state lain tetap berubah saat difokus,
           // kecuali failed yang mempertahankan garis merahnya.
           state === 'typing' && accent.border,
