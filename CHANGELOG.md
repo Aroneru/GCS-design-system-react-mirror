@@ -14,7 +14,11 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 Ada perubahan API yang memutus pada komponen `Button` — baca bagian
 **Diubah**. Komponen `Button` kini mendukung pengiriman formulir native lewat
 prop `type`, dan tombol khusus ikon dipisahkan ke prop boolean `iconOnly`.
-README di halaman npm dan situs dokumentasi ikut diperbarui.
+Komponen `Sidebar` kini mendukung menu dropdown profil akun pengguna serta
+penanganan tautan eksternal (`external`). Komponen `Search` kini mendukung live
+search (`trigger="change"` / `"auto"`), jeda debounce, dan pengaturan
+visibilitas tombol cari (`showButton`). README di halaman npm dan situs
+dokumentasi ikut diperbarui.
 
 ### Diubah
 
@@ -41,6 +45,22 @@ README di halaman npm dan situs dokumentasi ikut diperbarui.
 
 ### Ditambahkan
 
+- **`Sidebar`: menu dropdown profil akun dan link eksternal.**
+  `SidebarUser` kini mendukung `items?: SidebarUserItem[]` dan `groups?: SidebarUserGroup[]`
+  untuk menampilkan menu dropdown akun/profil (misalnya profil, pengaturan, dan
+  keluar). Mendukung `tone="danger"` untuk aksi destruktif seperti Logout,
+  penutupan via klik luar (*pointerdown*) dan tombol `Escape`, rotasi chevron,
+  serta tata letak flyout yang rapi saat sidebar dalam kondisi `collapsed`.
+  Selain itu, `SidebarItem`, `SidebarSubItem`, dan `SidebarUser` kini mendukung
+  prop `external?: boolean` yang otomatis membuka tab baru dengan
+  `target="_blank" rel="noreferrer noopener"`. Tipe `SidebarUserItem`,
+  `SidebarUserGroup`, dan `SidebarUserItemTone` ikut diekspor.
+- **`Search`: live search (`trigger`), jeda `debounce`, dan visibilitas tombol `showButton`.**
+  Komponen `Search` kini mendukung pencarian otomatis saat mengetik lewat prop
+  `trigger="change" | "auto"` dengan jeda debounce via `debounce` (bawaan 300ms).
+  Prop `showButton?: boolean` memungkinkan tombol cari di sebelah kanan disembunyikan
+  (otomatis `false` secara default pada `platform="compact"` agar serasi dipasang di
+  Navbar). Kotak isian otomatis membulat rapi saat tombol disembunyikan.
 - **`Button`: prop boolean `iconOnly`** — membuat tombol persegi proporsional
   yang memuat ikon saja (`children`). Bawaannya `false`.
 

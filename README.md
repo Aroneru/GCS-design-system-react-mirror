@@ -109,7 +109,7 @@ font Lato, base layer (`body`, focus ring global), dan class `.ds-card` /
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
 | `Navbar`     | `brand`, `items`, `search`, `guestActions`, `menuPosition`, `user`                                                   |
 | `Hero`       | `type`, `centeredContent`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`    |
-| `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user`, `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
+| `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user` (profil + menu dropdown), `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
 | `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `sticky`, `size`, `loading` |
 
@@ -134,7 +134,7 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 | `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| active \| error`                                     | 58 / 50 px                |
 | `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit`, `darkMode` | 162 / 120 px              |
 | `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`, `darkMode`                                                             | 37 px                     |
-| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `categories`, `onCategoryChange`, `darkMode`                                  | 54 / 50 px                |
+| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `trigger`: `enter \| change \| auto`, `debounce`, `showButton`, `categories`, `onCategoryChange`, `darkMode` | 54 / 50 / 37 px           |
 | `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 / 42 px                |
 | `Upload`        | `label`, `helperText`, `buttonLabel`, `replaceLabel`, `removeLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode` | 44 / 40 px                |
 | `Radio`         | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
@@ -149,7 +149,7 @@ Prop yang dipakai bersama seluruh komponen form:
   menumpuk kotak serta kalendernya. Pada `Select`, varian Mobile cuma
   menyempitkan wadahnya, jadi prop ini memang tidak ada; pada `Upload` ia tidak
   berpengaruh untuk `type="attach"`, karena alasan yang sama. `Search` punya
-  ukuran ketiga, `compact` (37px), untuk dipasang di navbar.
+  ukuran ketiga, `compact` (37px), untuk dipasang di navbar tanpa tombol cari (`showButton=false`).
 - `application`: `default | simaya` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.
@@ -215,6 +215,51 @@ dan `NavbarMenuPosition`.
 
 Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
 bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.
+
+### Sidebar
+
+```tsx
+import { Sidebar } from '@ceplok-ui/design-kit-react'
+import { ChartPie, Inbox } from 'flowbite-react-icons/solid'
+
+<Sidebar
+  logo={<Logo />}
+  collapsedLogo={<LogoMark />}
+  user={{
+    name: 'John Doe',
+    profileLabel: 'Administrator',
+    items: [
+      { label: 'Profil Saya', href: '/profile' },
+      { label: 'Pengaturan Akun', href: '/settings' },
+      { label: 'Dokumentasi', href: 'https://docs.example.com', external: true },
+      { label: 'Keluar', tone: 'danger', onClick: () => handleLogout() },
+    ],
+  }}
+  items={[
+    { label: 'Dasbor', href: '/dashboard', icon: <ChartPie className="size-5" />, active: true },
+    { label: 'Pesan', href: '/messages', icon: <Inbox className="size-5" />, badge: 3 },
+    { label: 'Portal Eksternal', href: 'https://ipb.ac.id', external: true },
+  ]}
+  sticky
+  showCollapseButton
+  onCollapse={() => setCollapsed((v) => !v)}
+  collapsed={collapsed}
+/>
+```
+
+Sidebar menyediakan navigasi vertikal yang mendukung pengelompokan menu
+(`groups`), multi-level submenu accordion, indikator badge, dan mode rel ringkas
+(`collapsed`).
+
+Area profil (`user`) mendukung menu dropdown interaktif melalui prop `items`
+atau `groups` (dengan dukungan pemisah `separator`). Pilihan aksi seperti
+*Keluar* dapat diberi warna destruktif lewat `tone="danger"`. Menu item,
+subitem, dan profil juga mendukung `external: true` untuk membuka tautan keluar
+tab baru secara aman (`rel="noreferrer noopener"`).
+
+Type publik utama meliputi `SidebarProps`, `SidebarItem`, `SidebarSubItem`,
+`SidebarGroup`, `SidebarUser`, `SidebarUserItem`, `SidebarUserGroup`, dan
+`SidebarUserItemTone`.
 
 ### Table
 
