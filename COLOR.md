@@ -100,6 +100,8 @@ Warna yang hanya dipakai satu komponen dan tidak cocok dengan token semantik man
 | Text Area | `--color-text-area-tool-hover`, `-helper`, `-submit`, `-submit-hover`, `-submit-simaya`, `-submit-simaya-hover` |
 | Toast | `--color-toast-heading`, `-body`, `-close-hover`, lalu `-{variant}-surface` dan `-{variant}-icon` |
 | Alert | `--color-alert-{variant}-surface`, `-icon`, `-heading`, `-body`, `-close` |
+| Sidebar | `--color-sidebar-surface` |
+| Search | `--color-search-category-surface`, `--color-search-field-surface` |
 
 `{variant}` adalah `success`, `danger`, `warning`, `info`, atau `purple`.
 

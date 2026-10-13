@@ -36,7 +36,9 @@ function renderUserAvatar(user: SidebarUser, collapsed: boolean, darkMode?: bool
     <span
       className={cn(
         "flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition",
-        darkMode ? "bg-primary-900 text-primary-300" : "bg-primary-100 text-primary-700",
+        darkMode
+          ? "bg-primary-900 text-primary-300"
+          : "bg-primary-100 text-primary-700 in-data-[theme=dark]:bg-primary-900 in-data-[theme=dark]:text-primary-300",
         collapsed && "hover:ring-2 hover:ring-primary-500",
       )}
       aria-hidden="true"
@@ -116,9 +118,9 @@ export function Sidebar({
 
   return (
     <aside
+      data-theme={darkMode ? "dark" : undefined}
       className={cn(
-        "flex min-h-screen flex-col border-r",
-        darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200",
+        "flex min-h-screen flex-col border-r border-border bg-sidebar-surface text-content",
         "transition-all duration-200",
         sticky && "sticky top-0 h-screen self-start",
         collapsed ? "w-[72px]" : "w-[280px]",
@@ -136,8 +138,7 @@ export function Sidebar({
           {visibleLogo && (
             <div
               className={cn(
-                "flex min-w-0 items-center",
-                darkMode ? "text-gray-50" : "text-gray-900",
+                "flex min-w-0 items-center text-content",
                 collapsed && "order-2 w-full max-w-full justify-center",
               )}
             >
@@ -153,11 +154,11 @@ export function Sidebar({
               disabled={!onCollapse}
               className={cn(
                 "flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors disabled:cursor-default disabled:hover:bg-transparent",
-                darkMode ? "text-gray-400 hover:bg-gray-700" : "text-gray-600 hover:bg-gray-100",
+                "text-content-muted hover:bg-surface",
                 collapsed && "order-1",
               )}
             >
-              <ChevronLeft className={cn("w-[28px] h-[28px] shrink-0 text-gray-900 transition-transform", collapsed && "rotate-180")} />
+              <ChevronLeft className={cn("w-[28px] h-[28px] shrink-0 text-content transition-transform", collapsed && "rotate-180")} />
             </button>
           )}
         </header>
@@ -181,19 +182,16 @@ export function Sidebar({
                   "flex transition-colors",
                   collapsed
                     ? "justify-center"
-                    : cn(
-                        "items-center gap-3 rounded-lg px-3 py-2.5",
-                        darkMode ? "bg-gray-700 hover:bg-gray-600/80" : "bg-primary-50 hover:bg-primary-100/70",
-                      ),
+                    : "items-center gap-3 rounded-lg bg-primary-50 px-3 py-2.5 hover:bg-primary-100/70 in-data-[theme=dark]:bg-gray-600 in-data-[theme=dark]:hover:bg-gray-600/80",
                 )}
               >
                 {renderUserAvatar(user, collapsed, darkMode)}
 
                 {!collapsed && (
                   <div className="min-w-0 flex-1">
-                    <p className={cn("truncate text-sm font-medium", darkMode ? "text-gray-50" : "text-gray-900")}>{user.name}</p>
+                    <p className="truncate text-sm font-medium text-content">{user.name}</p>
 
-                    <p className={cn("mt-0.5 truncate text-xs", darkMode ? "text-primary-400" : "text-primary-700")}>
+                    <p className="mt-0.5 truncate text-xs text-brand">
                       {user.profileLabel ?? "Lihat Profil"}
                     </p>
                   </div>
@@ -215,12 +213,7 @@ export function Sidebar({
                     "flex w-full text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
                     collapsed
                       ? "justify-center p-0 rounded-full"
-                      : cn(
-                          "items-center gap-3 rounded-lg px-3 py-2.5",
-                          darkMode
-                            ? "bg-gray-700 hover:bg-gray-600/80 text-gray-50"
-                            : "bg-primary-50 hover:bg-primary-100/70 text-gray-900",
-                        ),
+                      : "items-center gap-3 rounded-lg bg-primary-50 px-3 py-2.5 hover:bg-primary-100/70 text-content in-data-[theme=dark]:bg-gray-600 in-data-[theme=dark]:hover:bg-gray-600/80",
                   )}
                 >
                   {renderUserAvatar(user, collapsed, darkMode)}
@@ -228,18 +221,17 @@ export function Sidebar({
                   {!collapsed && (
                     <>
                       <div className="min-w-0 flex-1">
-                        <p className={cn("truncate text-sm font-medium", darkMode ? "text-gray-50" : "text-gray-900")}>
+                        <p className="truncate text-sm font-medium text-content">
                           {user.name}
                         </p>
 
-                        <p className={cn("mt-0.5 truncate text-xs", darkMode ? "text-primary-400" : "text-primary-700")}>
+                        <p className="mt-0.5 truncate text-xs text-brand">
                           {user.profileLabel ?? "Lihat Profil"}
                         </p>
                       </div>
                       <ChevronDown
                         className={cn(
-                          "size-4 shrink-0 transition-transform motion-reduce:transition-none",
-                          darkMode ? "text-gray-400" : "text-gray-500",
+                          "size-4 shrink-0 transition-transform motion-reduce:transition-none text-content-muted",
                           isMenuOpen && "rotate-180",
                         )}
                       />
@@ -252,27 +244,19 @@ export function Sidebar({
                     role="menu"
                     aria-orientation="vertical"
                     className={cn(
-                      "absolute z-50 rounded-lg border py-1.5 shadow-lg",
-                      darkMode
-                        ? "bg-gray-800 border-gray-700 text-gray-200 shadow-black/40"
-                        : "bg-white border-gray-200 text-gray-800 shadow-gray-300/50",
+                      "absolute z-50 rounded-lg border border-border bg-sidebar-surface text-content py-1.5 shadow-lg shadow-gray-300/50 in-data-[theme=dark]:shadow-black/40",
                       collapsed
                         ? "left-[calc(100%+16px)] top-0 w-60"
                         : "left-0 right-0 top-full mt-1.5 w-full",
                     )}
                   >
                     {collapsed && (
-                      <div
-                        className={cn(
-                          "border-b px-3 py-2",
-                          darkMode ? "border-gray-700" : "border-gray-100",
-                        )}
-                      >
-                        <p className={cn("truncate text-sm font-semibold", darkMode ? "text-gray-50" : "text-gray-900")}>
+                      <div className="border-b border-border px-3 py-2">
+                        <p className="truncate text-sm font-semibold text-content">
                           {user.name}
                         </p>
                         {user.profileLabel && (
-                          <p className={cn("mt-0.5 truncate text-xs", darkMode ? "text-gray-400" : "text-gray-500")}>
+                          <p className="mt-0.5 truncate text-xs text-content-muted">
                             {user.profileLabel}
                           </p>
                         )}
@@ -283,20 +267,10 @@ export function Sidebar({
                       {userGroups.map((group, groupIdx) => (
                         <div key={group.id ?? groupIdx}>
                           {group.separator && (
-                            <hr
-                              className={cn(
-                                "my-1 border-t",
-                                darkMode ? "border-gray-700" : "border-gray-100",
-                              )}
-                            />
+                            <hr className="my-1 border-t border-border" />
                           )}
                           {group.label && (
-                            <div
-                              className={cn(
-                                "px-3 py-1 text-[11px] font-semibold uppercase tracking-wider",
-                                darkMode ? "text-gray-400" : "text-gray-500",
-                              )}
-                            >
+                            <div className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-content-muted">
                               {group.label}
                             </div>
                           )}
@@ -307,12 +281,8 @@ export function Sidebar({
                               item.disabled
                                 ? "cursor-not-allowed opacity-50 pointer-events-none"
                                 : isDanger
-                                ? darkMode
-                                  ? "text-red-400 hover:bg-red-950/40 hover:text-red-300 focus-visible:bg-red-950/40"
-                                  : "text-red-600 hover:bg-red-50 hover:text-red-700 focus-visible:bg-red-50"
-                                : darkMode
-                                ? "text-gray-200 hover:bg-gray-700 hover:text-white focus-visible:bg-gray-700"
-                                : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus-visible:bg-gray-100",
+                                ? "text-feedback-error hover:bg-red-50 hover:text-red-700 in-data-[theme=dark]:hover:bg-red-950/40 in-data-[theme=dark]:hover:text-red-300 focus-visible:bg-red-50 in-data-[theme=dark]:focus-visible:bg-red-950/40"
+                                : "text-content hover:bg-gray-100 in-data-[theme=dark]:hover:bg-surface focus-visible:bg-gray-100 in-data-[theme=dark]:focus-visible:bg-surface",
                             );
 
                             const content = (
@@ -322,8 +292,8 @@ export function Sidebar({
                                     className={cn(
                                       "flex size-5 shrink-0 items-center justify-center [&>svg]:size-4",
                                       isDanger
-                                        ? darkMode ? "text-red-400" : "text-red-600"
-                                        : darkMode ? "text-gray-400 group-hover:text-white" : "text-gray-500 group-hover:text-gray-900",
+                                        ? "text-feedback-error"
+                                        : "text-content-muted group-hover:text-content",
                                     )}
                                   >
                                     {item.icon}
@@ -332,12 +302,7 @@ export function Sidebar({
                                 <div className="min-w-0 flex-1">
                                   <span className="block truncate font-medium">{item.label}</span>
                                   {item.description && (
-                                    <span
-                                      className={cn(
-                                        "block truncate text-xs",
-                                        darkMode ? "text-gray-400" : "text-gray-500",
-                                      )}
-                                    >
+                                    <span className="block truncate text-xs text-content-muted">
                                       {item.description}
                                     </span>
                                   )}
@@ -401,7 +366,7 @@ export function Sidebar({
 
       {/* `shrink-0`: navigasi di atasnya `flex-1`, jadi tanpa ini footer yang
           ikut menyusut duluan saat menunya panjang. */}
-      {footer && <div className={cn("shrink-0 border-t", darkMode ? "border-gray-700" : "border-gray-200")}>{footer}</div>}
+      {footer && <div className="shrink-0 border-t border-border">{footer}</div>}
     </aside>
   );
 }

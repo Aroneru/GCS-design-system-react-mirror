@@ -100,5 +100,10 @@ export interface SidebarProps extends HTMLAttributes<HTMLElement> {
    * yang dititipkan ke sini harus menyiapkan bentuk ringkasnya sendiri.
    */
   footer?: ReactNode;
+  /**
+   * Memaksa sidebar ini bertema gelap: latar gray-800 dengan teks dan ikon yang
+   * disesuaikan. Tanpa prop ini ia ikut tema elemen pembungkusnya, mis.
+   * `<section data-theme="dark">`.
+   */
   darkMode?: boolean;
 }
