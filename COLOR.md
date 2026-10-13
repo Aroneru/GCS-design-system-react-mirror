@@ -73,6 +73,7 @@ Nilai yang dipakai token semantik saat tema gelap. Komponen tidak memakainya lan
 | `--color-brand-dark` | primary-400 |
 | `--color-brand-dark-hover` | primary-300 |
 
+
 ## Cara kerja tema gelap
 
 - Token semantik punya **nama yang sama** di tema terang dan gelap. Yang berubah hanya nilainya.
@@ -212,6 +213,6 @@ Atau lewat class:
 
 ## Status saat ini
 
-- **Sudah memakai cara ini:** Card.
-- **Belum:** komponen lain yang punya `darkMode` (Hero, Popover, Toast, InputField, Select, Drawer, dan lainnya) masih menulis warna gelapnya sendiri. Komponen ini akan dipindah bertahap.
+- **Sudah memakai cara ini:** Card, Container, Hero.
+- **Belum:** komponen lain yang punya `darkMode` (Popover, Toast, InputField, Select, Drawer, dan lainnya) masih menulis warna gelapnya sendiri. Komponen ini akan dipindah bertahap.
 - Selama belum dipindah, `data-theme="dark"` di pembungkus belum membuat komponen tersebut gelap. Pakai prop `darkMode` di komponennya.

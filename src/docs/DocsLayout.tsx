@@ -333,7 +333,9 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
        */}
       <div className="flex flex-1">
         {/* ══ Icon rail — desktop ══ */}
-        <aside className="sticky top-0 z-30 hidden h-screen w-[76px] shrink-0 flex-col items-center border-r border-border bg-white py-5 lg:flex">
+        {/* 88px = tombol 64px + jarak 12px di kiri-kanan, supaya latar tombol
+            aktif tidak mepet ke garis kanan rail. */}
+        <aside className="sticky top-0 z-30 hidden h-screen w-[88px] shrink-0 flex-col items-center border-r border-border bg-white px-3 py-5 lg:flex">
           <a href="#/" aria-label="Beranda">
             <Logo />
           </a>
@@ -342,7 +344,7 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
               <a
                 key={item.key}
                 href={`#${item.route}`}
-                className={`flex w-14 flex-col items-center gap-1 rounded-xl py-2 text-[10px] font-bold transition-colors ${
+                className={`flex w-16 flex-col items-center gap-1 rounded-xl px-1 py-2 text-[10px] font-bold transition-colors ${
                   section === item.key
                     ? "bg-primary-50 text-primary-700"
                     : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"

@@ -114,6 +114,16 @@
     --color-brand-dark: var(--color-primary-400);
     --color-brand-dark-hover: var(--color-primary-300);
 
+    /*
+     * Token komponen Hero. Latar hero adalah latar halaman, bukan kartu, jadi
+     * versi gelapnya lebih gelap dari `surface` (gray-900, bukan gray-700).
+     */
+    --color-hero: #ffffff;
+    --color-hero-centered: var(--color-primary-50);
+    --color-hero-dark: var(--color-gray-800);
+
+    --color-container: var(--color-gray-700);
+    
     --text-display: 3rem;
     --text-display--line-height: 1.15;
     --text-heading-1: 2.25rem;
@@ -156,6 +166,8 @@
     --color-content-subtle: var(--color-content-dark-subtle);
     --color-brand: var(--color-brand-dark);
     --color-brand-hover: var(--color-brand-dark-hover);
+    --color-hero: var(--color-hero-dark);
+    --color-hero-centered: var(--color-hero-dark);
     color-scheme: dark;
 }
 
@@ -168,6 +180,9 @@
     --color-content-subtle: var(--color-gray-500);
     --color-brand: var(--color-primary-600);
     --color-brand-hover: var(--color-primary-700);
+    --color-hero: #ffffff;
+    --color-hero-centered: var(--color-primary-50);
+    --color-container: var(--color-gray-700);
     color-scheme: light;
 }
 
