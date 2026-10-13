@@ -11,6 +11,68 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+### Diubah
+
+- **`Alert` `darkMode`: warna mengikuti desain gelap yang baru.** Latarnya kini
+  -900 dari variant itu sendiri, bukan lagi gray-800 untuk semua variant.
+  Ikonnya -500, heading dan isi pesan sama-sama -50, dan tombol tutup (×)
+  memakai warna per variant dari desain: success green-700, danger orange-800,
+  warning yellow-700, info primary-400, purple purple-500. Cincin fokus tombol
+  tutup kini ikut warna heading supaya tetap terlihat. Isi `actions` tetap
+  tidak diubah; desainnya memakai tombol -600, kecuali success dan warning yang
+  -500. Alert terang tidak berubah.
+- **Field gelap kini berlatar gray-700, bukan gray-800**, mengikuti desain gelap
+  yang baru: `InputField`, `Select`, `FloatingLabel`, serta kotak, toolbar, dan
+  area isian `TextArea`. Garis default `InputField`, `Select`, dan `TextArea`
+  ikut gray-700 sehingga tetap menyatu dengan latarnya; garis `InputField`
+  `inactive` tetap gray-800. `FloatingLabel` kini bergaris gray-600 yang
+  terlihat (sebelumnya gray-800, menyatu dengan latar).
+- **`Toast` `darkMode`: kartu kini gray-700, bukan gray-800.** Pesan singkat
+  tanpa heading naik ke gray-300, sama dengan heading; teks pendukung di bawah
+  heading tetap gray-400.
+- **`Radio` `darkMode` `inactive`: lingkaran kini gray-700 bergaris gray-800**,
+  sebelumnya gray-800 seluruhnya.
+- **`Toggle`, `Checkbox`, `Radio`, `Select`, `InputField`, `FloatingLabel`,
+  `TextArea`, `Toast`, dan `Alert` kini memakai token warna, seperti `Card`.**
+  `darkMode` cukup memasang `data-theme="dark"` di pembungkus terluarnya. Tanpa
+  prop itu komponen ikut tema pembungkusnya, mis. `<section data-theme="dark">`,
+  dan kembali terang di dalam `data-theme="light"`. Warna terang dan gelapnya
+  tidak berubah. Panel daftar pilihan `Select` tetap terang.
+- **`--color-feedback-error` kini red-500 di tema gelap**, tetap red-600 di
+  tema terang. Error Input Field dan Floating Label gelap memakainya.
+- **Mengetik di daftar pilihan `Select` kini melompat ke pilihan yang cocok
+  dengan lebih andal.** Spasi di tengah ketikan ikut jadi kata kunci ("jawa t"
+  → Jawa Tengah); sebelumnya spasi langsung memilih baris yang aktif dan
+  menutup panel. Jeda antar-ketikan dilonggarkan dari 0,5 ke 1 detik. Bila
+  tidak ada pilihan yang diawali ketikan itu, yang dicari awal salah satu
+  katanya ("jakarta" → DKI Jakarta). Huruf yang sama diketik berulang
+  berpindah ke pilihan berikutnya. Perilaku ini milik panel `Dropdown`, jadi
+  daftar kategori `Search` ikut mendapatkannya.
+
+### Ditambahkan
+
+- **Token semantik untuk field dan kontrol form:** `--color-content-muted`,
+  `--color-content-disabled`, `--color-field`, `--color-field-border`,
+  `--color-field-disabled`, dan `--color-border-strong`, masing-masing dengan
+  pasangan `-dark` untuk menimpa nilai gelapnya, serta
+  `--color-feedback-error-dark`.
+- **Token komponen** untuk warna yang hanya dipakai satu komponen:
+  `--color-toggle-*`, `--color-radio-*`, `--color-select-*`,
+  `--color-input-field-*`, `--color-floating-label-*`, `--color-text-area-*`,
+  `--color-toast-*`, dan `--color-alert-*`. Daftarnya ada di `COLOR.md`.
+- **Kelas `ds-theme-light`**, padanan `data-theme="light"` untuk elemen yang
+  tidak bisa diberi atribut.
+- **`Datepicker`: tanggal bisa diketik saat kalender terbuka.** "17" ke tanggal
+  17 bulan yang sedang difokus, "17 agu" ke 17 Agustus, "17/8/1945" atau
+  "17 agustus 1945" ke tanggal itu, dan "1945" ke tahunnya; Enter lalu
+  memilihnya. Nama bulan bisa bahasa Indonesia atau Inggris ("aug", "oct").
+  Ketikan dengan jeda di bawah satu detik digabung, Backspace menghapus huruf
+  terakhir, dan hasilnya berhenti di tepi `min`/`max` seperti panah.
+- **`Dropdown`: menu aksi kini bisa dicari dengan mengetik**, sama dengan daftar
+  pilihan. Ketikan pertama langsung setelah menu dibuka sudah dihitung, dan
+  hanya label yang dicocokkan, bukan keterangannya. Tab, Enter, dan Spasi tetap
+  bawaan tombolnya, kecuali spasi di tengah ketikan.
+
 ## [0.3.1] - 2026-10-08
 
 Tidak ada perubahan API yang memutus, tetapi beberapa komponen yang sudah ada
