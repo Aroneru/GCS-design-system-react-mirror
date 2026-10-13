@@ -200,12 +200,15 @@ export type {
 export { Pagination } from "./components/Pagination";
 export type { PaginationProps, PaginationSize, PaginationTheme } from "./components/Pagination";
 
-export { Table, TableImage } from "./components/Table";
+export { Table, TableImage, TableFile } from "./components/Table";
 export type {
   TableProps,
   TableColumn,
   TableColumnImage,
   TableImageProps,
+  TableColumnFile,
+  TableFileProps,
+  TableFileType,
   TableAlign,
   TableSort,
   TableSortDirection,
