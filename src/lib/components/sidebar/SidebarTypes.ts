@@ -5,6 +5,7 @@ export interface SidebarSubItem {
   id?: string;
   label: string;
   href?: string;
+  external?: boolean;
   icon?: ReactNode;
   active?: boolean;
   disabled?: boolean;
@@ -16,6 +17,7 @@ export interface SidebarItem {
   id?: string;
   label: string;
   href?: string;
+  external?: boolean;
   icon?: ReactNode;
   badge?: ReactNode;
   active?: boolean;
@@ -35,13 +37,42 @@ export interface SidebarGroup {
   items: SidebarItem[];
 }
 
+export type SidebarUserItemTone = "default" | "danger";
+
+/** Item dalam dropdown menu profil pengguna. */
+export interface SidebarUserItem {
+  id?: string;
+  label: ReactNode;
+  description?: ReactNode;
+  icon?: ReactNode;
+  href?: string;
+  external?: boolean;
+  tone?: SidebarUserItemTone;
+  disabled?: boolean;
+  onClick?: (e?: MouseEvent<HTMLElement>) => void;
+}
+
+/** Kelompok item dropdown profil pengguna. */
+export interface SidebarUserGroup {
+  id: string;
+  label?: string;
+  separator?: boolean;
+  items: SidebarUserItem[];
+}
+
 /** Informasi akun yang ditampilkan pada area profil Sidebar. */
 export interface SidebarUser {
   name: string;
   profileLabel?: string;
   avatar?: string;
+  avatarSrc?: string;
+  avatarAlt?: string;
+  initials?: string;
   href?: string;
-  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
+  external?: boolean;
+  onClick?: (e: MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLElement>) => void;
+  items?: SidebarUserItem[];
+  groups?: SidebarUserGroup[];
 }
 
 export interface SidebarProps extends HTMLAttributes<HTMLElement> {

@@ -37,6 +37,7 @@ function MenuItem({ item, collapsed, darkMode }: { item: SidebarItem; collapsed:
           }
           item.onClick?.(e);
         }}
+        {...(item.external ? { target: "_blank", rel: "noreferrer noopener" } : {})}
       >
         {item.icon && (
           <span
@@ -131,6 +132,7 @@ function MenuItem({ item, collapsed, darkMode }: { item: SidebarItem; collapsed:
                   }
                   child.onClick?.(e);
                 }}
+                {...(child.external ? { target: "_blank", rel: "noreferrer noopener" } : {})}
               >
                 {child.icon && (
                   <span
