@@ -26,36 +26,24 @@ const accents: Record<ToggleApplication, string> = {
 }
 
 /**
- * Warna jalur yang mati, bulatan, dan teks per tampilan. Saat inactive warna
+ * Warna jalur yang mati, bulatan, dan teks dari token di tokens.css, jadi tema
+ * gelap cukup mengganti nilai token lewat `data-theme`. Saat inactive warna
  * jalurnya tetap, menyala maupun mati — posisi bulatan yang membedakannya.
+ *
+ * Bulatan gelap gray-400 berubah putih saat menyala; di tampilan terang ia
+ * putih di kedua keadaan. Inactive yang menyala tidak digambar desain gelap:
+ * jalur dan bulatannya tetap seperti saat mati, hanya bulatannya bergeser.
+ * Caption inactive gray-400 di kedua tampilan.
  */
-const themes = {
-  light: {
-    track: 'bg-gray-200',
-    trackInactive: 'bg-gray-300',
-    knob: 'bg-white',
-    knobInactive: 'bg-white',
-    label: 'text-gray-900',
-    labelInactive: 'text-gray-400',
-    helper: 'text-gray-500',
-    helperInactive: 'text-gray-400',
-  },
-  /**
-   * Dari desain gelap: jalur gray-600 dengan bulatan gray-400 yang berubah putih
-   * saat menyala. Inactive hanya meredupkan label ke gray-500 — jalur, bulatan,
-   * dan captionnya sama dengan saat mati. Inactive yang menyala tidak digambar
-   * desain; jalur dan bulatannya tetap seperti saat mati, hanya bulatannya bergeser.
-   */
-  dark: {
-    track: 'bg-gray-600',
-    trackInactive: 'bg-gray-600',
-    knob: 'bg-gray-400 peer-checked:bg-white',
-    knobInactive: 'bg-gray-400',
-    label: 'text-white',
-    labelInactive: 'text-gray-500',
-    helper: 'text-gray-400',
-    helperInactive: 'text-gray-400',
-  },
+const colors = {
+  track: 'bg-toggle-track',
+  trackInactive: 'bg-toggle-track-inactive',
+  knob: 'bg-toggle-knob peer-checked:bg-white',
+  knobInactive: 'bg-toggle-knob',
+  label: 'text-content',
+  labelInactive: 'text-content-disabled',
+  helper: 'text-content-muted',
+  helperInactive: 'text-gray-400',
 }
 
 export interface ToggleProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
@@ -66,7 +54,11 @@ export interface ToggleProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
   platform?: TogglePlatform
   state?: ToggleState
   application?: ToggleApplication
-  /** Tampilan gelap: jalur gray-600 dengan bulatan gray-400, label putih, caption gray-400. */
+  /**
+   * Memaksa sakelar ini bertema gelap: jalur gray-600 dengan bulatan gray-400,
+   * label putih, caption gray-400. Tanpa prop ini ia ikut tema elemen
+   * pembungkusnya, mis. `<section data-theme="dark">`.
+   */
   darkMode?: boolean
   /** Kelas untuk pembungkus terluar (sakelar + label + caption). */
   className?: string
@@ -79,8 +71,8 @@ export interface ToggleProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
  * menutupi seluruh sakelar sehingga area kliknya penuh, sementara jalur dan
  * bulatannya digambar oleh dua elemen di belakangnya lewat varian `peer`.
  * State Off/Active di desain sama dengan `checked`, jadi ia dikendalikan lewat
- * `checked`/`defaultChecked` biasa, bukan prop tersendiri. `darkMode` mengganti
- * warnanya ke tampilan gelap.
+ * `checked`/`defaultChecked` biasa, bukan prop tersendiri. `darkMode` sekadar
+ * memasang `data-theme="dark"` di pembungkus terluarnya.
  */
 export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(function Toggle(
   {
@@ -103,7 +95,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(function Toggle(
 
   const isInactive = disabled || state === 'inactive'
   const { track, knob, shift, label: labelText } = platforms[platform]
-  const t = darkMode ? themes.dark : themes.light
+  const theme = darkMode ? 'dark' : undefined
 
   const control = (
     <span className={cn('relative inline-flex shrink-0', track)}>
@@ -126,7 +118,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(function Toggle(
         aria-hidden="true"
         className={cn(
           'block size-full rounded-full transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2',
-          isInactive ? t.trackInactive : cn(t.track, accents[application]),
+          isInactive ? colors.trackInactive : cn(colors.track, accents[application]),
         )}
       />
 
@@ -137,18 +129,22 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(function Toggle(
           'pointer-events-none absolute top-0.5 left-0.5 rounded-full transition',
           knob,
           shift,
-          isInactive ? t.knobInactive : t.knob,
+          isInactive ? colors.knobInactive : colors.knob,
         )}
       />
     </span>
   )
 
   if (!label && !helperText) {
-    return <span className={cn('inline-flex', className)}>{control}</span>
+    return (
+      <span data-theme={theme} className={cn('inline-flex', className)}>
+        {control}
+      </span>
+    )
   }
 
   return (
-    <div className={cn('flex items-start gap-2', className)}>
+    <div data-theme={theme} className={cn('flex items-start gap-2', className)}>
       {control}
 
       <div className="min-w-0">
@@ -158,7 +154,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(function Toggle(
             className={cn(
               'block font-bold',
               labelText,
-              isInactive ? cn('cursor-not-allowed', t.labelInactive) : cn('cursor-pointer', t.label),
+              isInactive ? cn('cursor-not-allowed', colors.labelInactive) : cn('cursor-pointer', colors.label),
             )}
           >
             {label}
@@ -166,7 +162,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(function Toggle(
         )}
 
         {helperText && (
-          <p id={helperId} className={cn('mt-0.5 text-xs', isInactive ? t.helperInactive : t.helper)}>
+          <p id={helperId} className={cn('mt-0.5 text-xs', isInactive ? colors.helperInactive : colors.helper)}>
             {helperText}
           </p>
         )}

@@ -396,10 +396,20 @@ export function DatepickerPage() {
             tahun sebelumnya dan berikutnya.
           </li>
           <li>
+            Ketik tanggalnya untuk melompat langsung ke sana: <Hl>17</Hl> ke tanggal 17 bulan itu,{' '}
+            <Hl>17 agu</Hl> ke 17 Agustus, <Hl>17/8/1945</Hl> atau <Hl>17 agustus 1945</Hl> ke tanggal itu, dan{' '}
+            <Hl>1945</Hl> ke tahunnya. Bagian yang tidak diketik tetap seperti tanggal yang sedang difokus.
+            Ketikan dengan jeda di bawah satu detik digabung, dan <Hl>Backspace</Hl> menghapus huruf terakhirnya.
+            Tanggal di luar <Hl>min</Hl>/<Hl>max</Hl> berhenti di tepinya, sama dengan panah.
+          </li>
+          <li>
             <Hl>Enter</Hl> atau <Hl>Spasi</Hl> memilih tanggal; <Hl>Escape</Hl> atau klik di luar panel menutupnya,
-            dan fokus kembali ke kotak tanggalnya.
+            dan fokus kembali ke kotak tanggalnya. Spasi di tengah ketikan tanggal ikut jadi bagian ketikan.
           </li>
         </ul>
+        <Demo label="Coba: buka, lalu ketik 17 agustus 1945 dan tekan Enter">
+          <Datepicker label="Tanggal lahir" placeholder="Pilih tanggal lahir" max={HARI_INI} />
+        </Demo>
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">

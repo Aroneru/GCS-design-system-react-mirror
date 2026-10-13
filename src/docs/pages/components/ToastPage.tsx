@@ -42,7 +42,7 @@ const toastProps: PropRow[] = [
   ['onDismiss', '() => void', 'undefined', 'Dipanggil saat tombol tutup diklik.'],
   ['open', 'boolean', 'undefined', 'Kendalikan tampil/sembunyi dari luar; tanpa ini Toast mengurusnya sendiri.'],
   ['actions', 'ReactNode', 'undefined', 'Tombol tindak lanjut di bawah isi — umumnya dibuat w-full.'],
-  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kartu gray-800, teks lebih terang, dan badge ikon versi gelap.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kartu gray-700, teks lebih terang, dan badge ikon versi gelap.'],
   ['children', 'ReactNode', 'undefined', 'Isi pesan.'],
   ['…props', 'HTMLAttributes', '—', 'Seluruh atribut <div> diteruskan (className, id, …).'],
 ]
@@ -153,9 +153,10 @@ export function ToastPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <Hl>darkMode</Hl> mengganti kartunya ke gray-800, heading ke gray-300, dan teks lainnya ke
-          gray-400. Badge ikon ikut memakai versi gelapnya — latar gelap dengan ikon -400 — sedangkan tombol
-          tutup tetap gray-400 dan tombol di <Hl>actions</Hl> tetap primary-700 di kedua tampilan.
+          Prop <Hl>darkMode</Hl> mengganti kartunya ke gray-700, heading dan pesan singkat ke gray-300, dan teks
+          pendukung di bawah heading ke gray-400. Badge ikon ikut memakai versi gelapnya — latar gelap dengan ikon
+          -400 — sedangkan tombol tutup tetap gray-400 dan tombol di <Hl>actions</Hl> tetap primary-700 di kedua
+          tampilan.
         </Lead>
         <div className="grid gap-5 lg:grid-cols-2">
           <Demo label="Pesan singkat" dark>

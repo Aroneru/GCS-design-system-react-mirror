@@ -23,13 +23,13 @@ import { adaTidakAda } from '../../usulanOptions'
  * Belum memakai <Button> dari kit: theme-nya belum punya merah untuk danger,
  * jadi kelima variant ditulis seragam sebagai <button> biasa.
  *
- * Pada tampilan gelap tombolnya -600 (hover -700): -800 nyaris tenggelam di
- * latar gray-800, sedangkan teks putih di atas -600 tetap di atas 4,5:1.
+ * Pada tampilan gelap warna tombolnya dari desain: -600, kecuali success dan
+ * warning yang -500. Hover-nya satu tingkat lebih gelap.
  */
 const variants: { value: AlertVariant; label: string; button: string; buttonDark: string }[] = [
-  { value: 'success', label: 'Success', button: 'bg-green-800 hover:bg-green-900', buttonDark: 'bg-green-600 hover:bg-green-700' },
+  { value: 'success', label: 'Success', button: 'bg-green-800 hover:bg-green-900', buttonDark: 'bg-green-500 hover:bg-green-600' },
   { value: 'danger', label: 'Danger', button: 'bg-red-800 hover:bg-red-900', buttonDark: 'bg-red-600 hover:bg-red-700' },
-  { value: 'warning', label: 'Warning', button: 'bg-yellow-800 hover:bg-yellow-900', buttonDark: 'bg-yellow-600 hover:bg-yellow-700' },
+  { value: 'warning', label: 'Warning', button: 'bg-yellow-800 hover:bg-yellow-900', buttonDark: 'bg-yellow-500 hover:bg-yellow-600' },
   { value: 'info', label: 'Info', button: 'bg-primary-800 hover:bg-primary-900', buttonDark: 'bg-primary-600 hover:bg-primary-700' },
   { value: 'purple', label: 'Purple', button: 'bg-purple-800 hover:bg-purple-900', buttonDark: 'bg-purple-600 hover:bg-purple-700' },
 ]
@@ -60,7 +60,7 @@ const alertProps: PropRow[] = [
   ['onDismiss', '() => void', 'undefined', 'Dipanggil saat tombol tutup diklik.'],
   ['open', 'boolean', 'undefined', 'Kendalikan tampil/sembunyi dari luar; tanpa ini Alert mengurusnya sendiri.'],
   ['actions', 'ReactNode', 'undefined', 'Baris tombol tindak lanjut di bawah isi.'],
-  ['darkMode', 'boolean', 'false', 'Tampilan gelap: latar gray-800 dengan teks dan ikon berwarna variant.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: latar -900 variant, ikon -500, heading dan isi pesan -50.'],
   ['children', 'ReactNode', 'undefined', 'Isi pesan.'],
   ['…props', 'HTMLAttributes', '—', 'Seluruh atribut <div> diteruskan (className, id, …).'],
 ]
@@ -166,9 +166,8 @@ export function AlertPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <Hl>darkMode</Hl> mengganti latarnya ke gray-800 untuk semua variant, seperti kartu Toast gelap,
-          lalu warna variant pindah ke teks dan ikonnya. Dua tingkatnya tetap ada tetapi dibalik: ikon, heading,
-          dan tombol tutup -300, isi pesan -400 — keduanya di atas 4,5:1 terhadap gray-800.
+          Prop <Hl>darkMode</Hl> mengganti latarnya ke warna -900 dari variant itu sendiri. Ikonnya -500,
+          sedangkan heading dan isi pesan sama-sama -50 sehingga tetap terang di atas latar gelap.
         </Lead>
         <Demo dark>
           <div className="space-y-4">
@@ -191,8 +190,8 @@ export function AlertPage() {
           {' variant="success" heading="Ini adalah Alert">…</Alert>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Isi <Hl>actions</Hl> tetap milik Anda, jadi warnanya tidak ikut diganti. Tombol contoh di atas memakai
-          -600 (hover -700) karena -800 dari tampilan terang nyaris tenggelam di latar gray-800.
+          Isi <Hl>actions</Hl> tetap milik Anda, jadi warnanya tidak ikut diganti. Tombol contoh di atas mengikuti
+          desain gelapnya: -600, kecuali success dan warning yang -500.
         </p>
       </FlowSection>
 

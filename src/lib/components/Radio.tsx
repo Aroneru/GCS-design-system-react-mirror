@@ -30,29 +30,20 @@ const accents: Record<RadioApplication, string> = {
   simaya: 'checked:border-purple-500 focus-visible:outline-purple-500',
 }
 
-/** Warna lingkaran dan teks per tampilan, untuk state aktif dan `inactive`. */
-const themes = {
-  light: {
-    control: 'border-gray-300 bg-gray-50',
-    controlInactive: 'border-gray-300 bg-gray-100 checked:border-gray-400',
-    label: 'text-gray-900',
-    labelInactive: 'text-gray-400',
-    helper: 'text-gray-500',
-    helperInactive: 'text-gray-400',
-  },
-  /**
-   * Dari desain gelap: lingkaran gray-300 bergaris gray-400, dan inactive
-   * gray-800 dengan teks gray-600. Cincin pilihan yang nonaktif tidak digambar
-   * desain; gray-600 menyamai teksnya, seperti gray-400 pada tampilan terang.
-   */
-  dark: {
-    control: 'border-gray-400 bg-gray-300',
-    controlInactive: 'border-gray-800 bg-gray-800 checked:border-gray-600',
-    label: 'text-gray-50',
-    labelInactive: 'text-gray-600',
-    helper: 'text-gray-400',
-    helperInactive: 'text-gray-600',
-  },
+/**
+ * Warna lingkaran dan teks dari token di tokens.css, jadi tema gelap cukup
+ * mengganti nilai token lewat `data-theme`. Desain gelap: lingkaran gray-300
+ * bergaris gray-400, dan inactive gray-700 bergaris gray-800 dengan teks
+ * gray-600. Cincin pilihan yang nonaktif tidak digambar desain; ia menyamai
+ * teksnya — gray-400 terang, gray-600 gelap.
+ */
+const colors = {
+  control: 'border-radio-border bg-radio-surface',
+  controlInactive: 'border-radio-border-inactive bg-field-disabled checked:border-radio-ring-inactive',
+  label: 'text-radio-label',
+  labelInactive: 'text-radio-content-inactive',
+  helper: 'text-content-muted',
+  helperInactive: 'text-radio-content-inactive',
 }
 
 export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
@@ -63,7 +54,11 @@ export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   platform?: RadioPlatform
   state?: RadioState
   application?: RadioApplication
-  /** Tampilan gelap: lingkaran gray-300, label terang, caption gray-400. */
+  /**
+   * Memaksa radio ini bertema gelap: lingkaran gray-300, label terang, caption
+   * gray-400. Tanpa prop ini ia ikut tema elemen pembungkusnya, mis.
+   * `<section data-theme="dark">`.
+   */
   darkMode?: boolean
   /** Kelas untuk pembungkus terluar (lingkaran + label + caption). */
   className?: string
@@ -75,8 +70,8 @@ export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
  * Memakai `<input type="radio">` bawaan supaya panah keyboard, atribut `name`,
  * dan pembaca layar tetap berfungsi; hanya tampilannya yang digambar ulang.
  * State aktif di desain sama dengan `checked`, jadi ia dikendalikan lewat
- * `checked`/`defaultChecked` biasa, bukan prop tersendiri. `darkMode` mengganti
- * warnanya ke tampilan gelap.
+ * `checked`/`defaultChecked` biasa, bukan prop tersendiri. `darkMode` sekadar
+ * memasang `data-theme="dark"` di pembungkus terluarnya.
  */
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
   {
@@ -99,7 +94,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
 
   const isInactive = disabled || state === 'inactive'
   const { control, offset, label: labelText } = platforms[platform]
-  const t = darkMode ? themes.dark : themes.light
+  const theme = darkMode ? 'dark' : undefined
 
   const input = (
     <input
@@ -115,8 +110,8 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
         control,
         // Kedua cabang tak pernah aktif bersamaan, jadi tak ada kelas yang saling menimpa.
         isInactive
-          ? cn('checked:border-[3.5px]', t.controlInactive)
-          : cn('cursor-pointer checked:border-[3.5px]', t.control, accents[application]),
+          ? cn('checked:border-[3.5px]', colors.controlInactive)
+          : cn('cursor-pointer checked:border-[3.5px]', colors.control, accents[application]),
         label || helperText ? offset : undefined,
       )}
       {...props}
@@ -124,11 +119,15 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
   )
 
   if (!label && !helperText) {
-    return <span className={cn('inline-flex', className)}>{input}</span>
+    return (
+      <span data-theme={theme} className={cn('inline-flex', className)}>
+        {input}
+      </span>
+    )
   }
 
   return (
-    <div className={cn('flex items-start gap-2', className)}>
+    <div data-theme={theme} className={cn('flex items-start gap-2', className)}>
       {input}
 
       <div className="min-w-0">
@@ -138,7 +137,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
             className={cn(
               'block font-bold',
               labelText,
-              isInactive ? cn('cursor-not-allowed', t.labelInactive) : cn('cursor-pointer', t.label),
+              isInactive ? cn('cursor-not-allowed', colors.labelInactive) : cn('cursor-pointer', colors.label),
             )}
           >
             {label}
@@ -146,7 +145,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
         )}
 
         {helperText && (
-          <p id={helperId} className={cn('mt-0.5 text-xs', isInactive ? t.helperInactive : t.helper)}>
+          <p id={helperId} className={cn('mt-0.5 text-xs', isInactive ? colors.helperInactive : colors.helper)}>
             {helperText}
           </p>
         )}

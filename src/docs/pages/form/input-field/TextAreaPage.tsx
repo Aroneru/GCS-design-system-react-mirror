@@ -35,7 +35,7 @@ const textAreaProps: PropRow[] = [
   ['onToolbarAction', '(action) => void', 'undefined', 'Dipanggil saat tombol toolbar bawaan ditekan, dengan nama aksinya: attachment, code, emoji, list, settings, date, atau download.'],
   ['submitLabel', 'ReactNode', 'undefined', 'Label tombol kirim; tombol hanya muncul bila diisi.'],
   ['onSubmit', '() => void', 'undefined', 'Aksi tombol kirim.'],
-  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak dan toolbar gray-800, label putih.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak dan toolbar gray-700, label putih.'],
   ['…props', 'TextareaHTMLAttributes', '—', 'Seluruh atribut <textarea> standar diteruskan (rows, maxLength, value, onChange, …).'],
 ]
 
@@ -180,7 +180,7 @@ export function TextAreaPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <Hl>darkMode</Hl> mengganti kotak, toolbar, dan area isian ke gray-800, dengan label dan teks
+          Prop <Hl>darkMode</Hl> mengganti kotak, toolbar, dan area isian ke gray-700, dengan label dan teks
           yang diketik putih. Kotak polos tidak lagi bergaris, sedangkan bingkai editor dan garis pemisah
           toolbarnya tetap gray-300. Tombol kirim memakai -600 (hover -700), satu tingkat lebih terang dari
           tampilan terang.
