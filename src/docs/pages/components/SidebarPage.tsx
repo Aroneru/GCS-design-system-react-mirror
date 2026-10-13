@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type MouseEvent as ReactMouseEvent, type ReactNode, useState } from "react";
 import { ChartPie, Clipboard, Inbox, Layers, Lock, Cart } from "flowbite-react-icons/solid";
 import { Sidebar, type SidebarGroup, type SidebarItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
@@ -88,6 +88,12 @@ const sidebarProps: PropRow[] = [
 const sidebarItemProps: PropRow[] = [
   ["label", "string", "—", "Teks menu yang ditampilkan."],
   ["href", "string", "undefined", "Tujuan tautan menu."],
+  [
+    "external",
+    "boolean",
+    "false",
+    "Menandai tautan eksternal; otomatis membuka tab baru dengan rel='noreferrer noopener'.",
+  ],
   ["icon", "ReactNode", "undefined", "Icon opsional di sebelah label menu."],
   ["badge", "ReactNode", "undefined", "Konten badge pada sisi kanan menu."],
   ["active", "boolean", "false", "Mengaktifkan tampilan state aktif."],
@@ -101,6 +107,56 @@ const sidebarItemProps: PropRow[] = [
     "Menonaktifkan tombol buka/tutup submenu tanpa menonaktifkan menu.",
   ],
   ["onClick", "(e: MouseEvent) => void", "undefined", "Callback saat item menu diklik."],
+];
+
+const sidebarUserProps: PropRow[] = [
+  ["name", "string", "—", "Nama pengguna yang ditampilkan pada area profil."],
+  ["profileLabel", "string", "'Lihat Profil'", "Label sekunder di bawah nama pengguna."],
+  ["avatar", "string", "undefined", "URL gambar avatar pengguna."],
+  ["avatarSrc", "string", "undefined", "Alias URL gambar avatar pengguna."],
+  ["avatarAlt", "string", "undefined", "Teks alternatif untuk gambar avatar."],
+  ["initials", "string", "undefined", "Inisial avatar fallback jika gambar tidak tersedia."],
+  ["href", "string", "undefined", "Tautan navigasi profil jika dropdown tidak digunakan."],
+  [
+    "external",
+    "boolean",
+    "false",
+    "Menandai tautan eksternal (target='_blank' rel='noreferrer noopener').",
+  ],
+  ["onClick", "(e: MouseEvent) => void", "undefined", "Callback saat area profil diklik."],
+  [
+    "items",
+    "SidebarUserItem[]",
+    "undefined",
+    "Daftar item dropdown profil pengguna (seperti Profil, Pengaturan, Keluar).",
+  ],
+  [
+    "groups",
+    "SidebarUserGroup[]",
+    "undefined",
+    "Kelompok item dropdown profil pengguna dengan dukungan pemisah dan label grup.",
+  ],
+];
+
+const sidebarUserItemProps: PropRow[] = [
+  ["label", "ReactNode", "—", "Teks atau label item dropdown profil."],
+  ["description", "ReactNode", "undefined", "Keterangan tambahan di bawah label item."],
+  ["icon", "ReactNode", "undefined", "Icon opsional pada sisi kiri item."],
+  ["href", "string", "undefined", "Tautan tujuan (jika item bertindak sebagai link)."],
+  [
+    "external",
+    "boolean",
+    "false",
+    "Menandai tautan eksternal; membuka tab baru dengan rel='noreferrer noopener'.",
+  ],
+  [
+    "tone",
+    "'default' | 'danger'",
+    "'default'",
+    "Variasi warna item (gunakan 'danger' untuk aksi destruktif seperti Keluar).",
+  ],
+  ["disabled", "boolean", "false", "Menonaktifkan item dropdown."],
+  ["onClick", "(e?: MouseEvent) => void", "undefined", "Callback saat item dropdown diklik."],
 ];
 
 const toc: TocEntry[] = [
@@ -312,7 +368,7 @@ export function SidebarPage() {
   const playgroundItems = baseItems.map((item) => ({
     ...item,
     active: activeMenu === item.label,
-    onClick: (e: any) => {
+    onClick: (e: ReactMouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
       setActiveMenu(item.label as string);
     },
@@ -321,7 +377,7 @@ export function SidebarPage() {
     children: item.children?.map((sub) => ({
       ...sub,
       active: activeMenu === sub.label,
-      onClick: (e: any) => {
+      onClick: (e: ReactMouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         setActiveMenu(sub.label as string);
       },
@@ -380,7 +436,18 @@ export function SidebarPage() {
     ...(theme === "dark" ? ["  darkMode"] : []),
     ...(logoWeb === "show" ? ["  logo={<Logo />}", "  collapsedLogo={<LogoMark />}"] : []),
     ...(userInfo === "show"
-      ? ["  user={{ name: 'Nama User', profileLabel: 'Lihat Profil', href: '#' }}"]
+      ? [
+        "  user={{",
+        "    name: 'Nama User',",
+        "    profileLabel: 'Lihat Profil',",
+        "    items: [",
+        "      { label: 'Profil Saya', href: '#profile' },",
+        "      { label: 'Pengaturan Akun', href: '#settings' },",
+        "      { label: 'Dokumentasi', href: 'https://example.com', external: true },",
+        "      { label: 'Keluar', tone: 'danger', onClick: () => console.log('Logout') },",
+        "    ],",
+        "  }}",
+      ]
       : []),
     `  ${separator === "show" ? "groups={groups}" : "items={items}"}`,
     "  sticky",
@@ -656,7 +723,20 @@ export function SidebarPage() {
               collapsedLogo={logoWeb === "show" ? <SidebarBrand collapsed /> : undefined}
               user={
                 userInfo === "show"
-                  ? { name: "Nama User", profileLabel: "Lihat Profil", href: "#" }
+                  ? {
+                      name: "Nama User",
+                      profileLabel: "Lihat Profil",
+                      items: [
+                        { label: "Profil Saya", href: "#profile" },
+                        { label: "Pengaturan Akun", href: "#settings" },
+                        { label: "Dokumentasi", href: "https://example.com", external: true },
+                        {
+                          label: "Keluar",
+                          tone: "danger",
+                          onClick: () => alert("Logout berhasil diklik"),
+                        },
+                      ],
+                    }
                   : undefined
               }
               groups={playgroundGroups}
@@ -790,6 +870,16 @@ export function SidebarPage() {
           <div>
             <h3 className="mb-3 text-heading-4 font-bold text-gray-900">SidebarItem Props</h3>
             <PropsTable rows={sidebarItemProps} minWidth="46rem" />
+          </div>
+
+          <div>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">SidebarUser Props</h3>
+            <PropsTable rows={sidebarUserProps} minWidth="46rem" />
+          </div>
+
+          <div>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">SidebarUserItem Props</h3>
+            <PropsTable rows={sidebarUserItemProps} minWidth="46rem" />
           </div>
         </div>
       </FlowSection>
