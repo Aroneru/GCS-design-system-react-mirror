@@ -51,7 +51,7 @@ const accents: Record<UploadApplication, { solid: string; drag: string; dragDark
 }
 
 export interface UploadProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'type' | 'value'> {
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'type' | 'value' | 'multiple'> {
   /** Teks label di atas kontrol. */
   label?: ReactNode
   /** Caption di bawah kontrol. */
@@ -124,7 +124,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
   const helperId = `${fieldId}-helper`
 
   const inputRef = useRef<HTMLInputElement>(null)
-  const [fileList, setFileList] = useState<File[]>([])
+  const [file, setFile] = useState<File | null>(null)
   const [seret, setSeret] = useState(false)
 
   const size = platforms[platform]
@@ -139,11 +139,11 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
   }
 
   const catat = (files: FileList | null) => {
-    setFileList(files ? Array.from(files) : [])
+    setFile(files && files.length > 0 ? files[0] : null)
     onFilesChange?.(files)
   }
 
-  const totalSize = fileList.reduce((acc, file) => acc + file.size, 0)
+  const totalSize = file ? file.size : 0
   const formatSize = (bytes: number) => {
     if (bytes === 0) return '0 B'
     const k = 1024
@@ -161,10 +161,13 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
     event.preventDefault()
     setSeret(false)
     if (disabled) return
-    // Berkas hasil seret dititipkan ke input aslinya, bukan hanya disimpan di
-    // state, supaya ikut terkirim saat formulirnya di-submit.
-    if (inputRef.current) inputRef.current.files = event.dataTransfer.files
-    catat(event.dataTransfer.files)
+    // Ambil hanya file pertama untuk memastikan ini selalu unggahan tunggal.
+    const dt = new DataTransfer()
+    if (event.dataTransfer.files.length > 0) {
+      dt.items.add(event.dataTransfer.files[0])
+    }
+    if (inputRef.current) inputRef.current.files = dt.files
+    catat(dt.files)
   }
 
   const input = (
@@ -218,7 +221,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
           <div className="pointer-events-none flex flex-col items-center">
             <UploadIcon className={cn('size-5 transition-colors', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-300') : 'text-gray-400')} />
             <span className={cn('mt-2 text-sm transition-colors', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
-              {fileList.length > 0 ? fileList.map(f => f.name).join(', ') : attachLabel}
+              {file ? file.name : attachLabel}
             </span>
             <span className={cn('mt-2 text-xs transition-colors', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
               {attachHint}
@@ -249,7 +252,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
                 accent.solid,
               )}
             >
-              {fileList.length > 0 ? replaceLabel : buttonLabel}
+              {file ? replaceLabel : buttonLabel}
             </button>
 
             <p
@@ -259,14 +262,14 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
                 size.text,
                 disabled
                   ? (darkMode ? 'text-gray-500' : 'text-gray-400')
-                  : (darkMode ? (fileList.length > 0 ? 'text-white' : 'text-gray-400') : 'text-gray-900'),
+                  : (darkMode ? (file ? 'text-white' : 'text-gray-400') : 'text-gray-900'),
               )}
             >
-              <span className="truncate">{fileList.length > 0 ? fileList.map(f => f.name).join(', ') : placeholder}</span>
+              <span className="truncate">{file ? file.name : placeholder}</span>
             </p>
           </div>
 
-          {fileList.length > 0 && (
+          {file && (
             <button
               type="button"
               onClick={() => {
@@ -286,9 +289,9 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
         </div>
       )}
 
-      {(helperText || (fileList.length > 0 && type === 'default')) && (
+      {(helperText || (file && type === 'default')) && (
         <div className="mt-2 flex flex-col space-y-1">
-          {fileList.length > 0 && type === 'default' && (
+          {file && type === 'default' && (
             <span className={cn('text-xs transition-colors', disabled ? (darkMode ? 'text-gray-600' : 'text-gray-400') : (darkMode ? 'text-gray-400' : 'text-gray-500'))}>
               {formatSize(totalSize)}
             </span>

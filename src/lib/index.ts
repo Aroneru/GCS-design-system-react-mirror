@@ -233,6 +233,9 @@ export type {
   SidebarProps,
   SidebarSubItem,
   SidebarUser,
+  SidebarUserGroup,
+  SidebarUserItem,
+  SidebarUserItemTone,
 } from "./components/sidebar/Sidebar";
 
 export { cn } from "./utils/cn";
