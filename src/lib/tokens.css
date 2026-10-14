@@ -297,12 +297,8 @@
     --color-select-label: var(--color-gray-900);
     --color-select-content-inactive: var(--color-gray-300);
 }
-<<<<<<< HEAD
-[data-theme='dark'], .ds-theme-dark {
-=======
 
-[data-theme='dark'] {
->>>>>>> 93638a78e38d9d0809ac592fd5ecbf3dcc745474
+[data-theme='dark'], .ds-theme-dark {
     --color-select-label: var(--color-gray-50);
     --color-select-content-inactive: var(--color-gray-500);
 }

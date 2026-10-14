@@ -105,7 +105,6 @@ README di halaman npm dan situs dokumentasi ikut diperbarui.
 
 ### Ditambahkan
 
-<<<<<<< HEAD
 - **`Table`: kolom berkas lewat `column.file`.** Sel menampilkan ikon jenis
   berkas lalu namanya; jenisnya ditebak dari ekstensi nama. Gambar (ikon biru)
   dan PDF (ikon merah) dibuka di pratinjau di atas halaman, PDF memakai
@@ -120,8 +119,6 @@ README di halaman npm dan situs dokumentasi ikut diperbarui.
   klik backdrop, dan `close` di footer memanggil `onOpenChange(false)`. Tanpa
   `open`, Modal tetap mengurus dirinya sendiri lewat `trigger` seperti biasa.
 - **Token `--color-container`** untuk latar `Container` di tema gelap.
-
-=======
 - **Token komponen `--color-sidebar-surface`, `--color-search-category-surface`, dan `--color-search-field-surface` di `tokens.css`.**
   Menyediakan kontrol warna latar khusus untuk Sidebar serta kategori dan field Search pada tema terang dan gelap (`data-theme="dark"`).
 - **`Sidebar`: menu dropdown profil akun dan link eksternal.**
@@ -142,7 +139,6 @@ README di halaman npm dan situs dokumentasi ikut diperbarui.
   Navbar). Kotak isian otomatis membulat rapi saat tombol disembunyikan.
 - **`Button`: prop boolean `iconOnly`** — membuat tombol persegi proporsional
   yang memuat ikon saja (`children`). Bawaannya `false`.
->>>>>>> 93638a78e38d9d0809ac592fd5ecbf3dcc745474
 - **Token semantik untuk field dan kontrol form:** `--color-content-muted`,
   `--color-content-disabled`, `--color-field`, `--color-field-border`,
   `--color-field-disabled`, dan `--color-border-strong`, masing-masing dengan
@@ -168,15 +164,12 @@ README di halaman npm dan situs dokumentasi ikut diperbarui.
 
 ### Diperbaiki
 
-<<<<<<< HEAD
 - **`Container` dengan `max-w-*` di `className` kini tetap di tengah.**
   Sebelumnya batas lebar menempel di elemen luar yang tidak dipusatkan, jadi
   Container menempel ke kiri.
-=======
 - **`Button`: fungsionalitas pengiriman formulir native kini bekerja.**
   Sebelumnya elemen `<button>` selalu meng-hardcode atribut `type="button"`,
   sehingga tombol tidak dapat memicu aksi submit form.
->>>>>>> 93638a78e38d9d0809ac592fd5ecbf3dcc745474
 
 ## [0.3.1] - 2026-10-08
 
