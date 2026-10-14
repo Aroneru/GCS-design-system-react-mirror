@@ -2,7 +2,6 @@ import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { Close } from 'flowbite-react-icons/outline'
 import { cn } from '../utils/cn'
 import { useDismissible } from '../utils/useDismissible'
-import { Icon } from './Icon'
 
 export type BadgeVariant = 'gray' | 'brand' | 'danger' | 'warning' | 'success'
 export type BadgeSize = 'sm' | 'lg'
@@ -27,10 +26,25 @@ const variants: Record<BadgeVariant, { light: string; dark: string; close?: stri
   success: { light: 'bg-green-100 text-green-900', dark: 'bg-green-900 text-green-300' },
 }
 
+/**
+ * Tinggi dikunci (24px / 28px, sama dengan sebelumnya) karena teksnya dipangkas
+ * ke tinggi huruf kapital (lihat `label` di bawah), jadi tinggi badge tidak lagi
+ * datang dari line-height. Jarak ikon–teks 6px / 8px; 4px terlalu rapat.
+ */
 const sizes: Record<BadgeSize, { root: string; icon: string; close: string }> = {
-  sm: { root: 'text-sm', icon: 'size-3.5', close: 'size-3.5' },
-  lg: { root: 'text-base', icon: 'size-5', close: 'size-4' },
+  sm: { root: 'h-6 gap-1.5 text-sm', icon: 'size-3.5', close: 'size-3.5' },
+  lg: { root: 'h-7 gap-2 text-base', icon: 'size-5', close: 'size-4' },
 }
+
+/**
+ * Pembungkus teks. `text-box: trim-both cap alphabetic` memangkas ruang
+ * ascender/descender sehingga yang ditengahkan `items-center` adalah huruf
+ * kapitalnya, bukan kotak barisnya. Tanpa ini teks Lato tampak lebih rendah
+ * dari ikon dan tombol ×, karena ascender Lato jauh lebih besar dari
+ * descender-nya. Peramban yang belum mendukung `text-box` (Firefox) tetap
+ * memakai perataan biasa.
+ */
+const label = 'leading-none [text-box:trim-both_cap_alphabetic]'
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant
@@ -78,7 +92,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
     <span
       ref={ref}
       className={cn(
-        'inline-flex items-center gap-1 rounded-md px-3 py-0.5',
+        'inline-flex items-center rounded-md px-3',
         s.root,
         darkMode ? v.dark : v.light,
         dismissible && 'transition-opacity duration-200',
@@ -87,8 +101,20 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
       )}
       {...props}
     >
-      {icon && <Icon className={cn('shrink-0', s.icon)}>{icon}</Icon>}
-      {children}
+      {/*
+        Bukan <Icon>: Icon membawa `size-5` bawaan, dan tanpa tailwind-merge
+        `size-5` mengalahkan `size-3.5`, sehingga ikon di badge kecil jadi
+        20px — lebih besar dari teksnya dan membuat badge terlihat berat.
+      */}
+      {icon && (
+        <span
+          aria-hidden="true"
+          className={cn('inline-flex shrink-0 items-center justify-center [&>svg]:size-full', s.icon)}
+        >
+          {icon}
+        </span>
+      )}
+      {children !== undefined && children !== null && <span className={label}>{children}</span>}
       {dismissible && (
         <button
           type="button"

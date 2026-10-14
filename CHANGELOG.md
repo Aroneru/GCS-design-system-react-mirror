@@ -48,8 +48,35 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   katanya ("jakarta" → DKI Jakarta). Huruf yang sama diketik berulang
   berpindah ke pilihan berikutnya. Perilaku ini milik panel `Dropdown`, jadi
   daftar kategori `Search` ikut mendapatkannya.
+- **`Hero` dan `Container` kini memakai token warna, seperti `Card`.**
+  `darkMode` cukup memasang `data-theme="dark"`; tanpa prop itu keduanya ikut
+  tema pembungkusnya, mis. `<section data-theme="dark">`.
+- **`Hero` `darkMode`: latar kini gray-800 (`--color-surface-subtle`), bukan
+  gray-900**, untuk ketiga tipe. Sub heading naik dari primary-500 ke
+  primary-400 dan deskripsi dari gray-400 ke gray-300, supaya kontrasnya lebih
+  tinggi. Hero terang tidak berubah: putih, atau primary-50 untuk `centered`.
+- **`Container` `darkMode`: latar elemen dalam kini gray-700
+  (`--color-container`), bukan gray-800.** Teksnya tetap gray-300.
+- **`Modal`: `trigger` kini opsional**, asalkan Modal dikendalikan lewat
+  `open`. Tanpa keduanya Modal melempar error yang menjelaskan prop mana yang
+  kurang.
 
 ### Ditambahkan
+
+- **`Table`: kolom berkas lewat `column.file`.** Sel menampilkan ikon jenis
+  berkas lalu namanya; jenisnya ditebak dari ekstensi nama. Gambar (ikon biru)
+  dan PDF (ikon merah) dibuka di pratinjau di atas halaman, PDF memakai
+  penampil bawaan peramban, lengkap dengan tautan "Buka di tab baru". Berkas
+  lain (ikon abu-abu) diunduh. Isiannya `name`, `href`, `type`, dan `preview`;
+  tanpa `href` nama tampil sebagai teks biasa.
+- **Komponen `TableFile`**, bentuk langsung kolom berkas untuk dipakai di
+  `cell` sendiri. Tipe `TableColumnFile`, `TableFileProps`, dan
+  `TableFileType` ikut diekspor.
+- **`Modal`: prop `open` dan `onOpenChange`** untuk membuka dan menutup Modal
+  dari kode, mis. dari tombol hapus di baris tabel. Tombol tutup, Escape,
+  klik backdrop, dan `close` di footer memanggil `onOpenChange(false)`. Tanpa
+  `open`, Modal tetap mengurus dirinya sendiri lewat `trigger` seperti biasa.
+- **Token `--color-container`** untuk latar `Container` di tema gelap.
 
 - **Token semantik untuk field dan kontrol form:** `--color-content-muted`,
   `--color-content-disabled`, `--color-field`, `--color-field-border`,
@@ -72,6 +99,12 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   pilihan. Ketikan pertama langsung setelah menu dibuka sudah dihitung, dan
   hanya label yang dicocokkan, bukan keterangannya. Tab, Enter, dan Spasi tetap
   bawaan tombolnya, kecuali spasi di tengah ketikan.
+
+### Diperbaiki
+
+- **`Container` dengan `max-w-*` di `className` kini tetap di tengah.**
+  Sebelumnya batas lebar menempel di elemen luar yang tidak dipusatkan, jadi
+  Container menempel ke kiri.
 
 ## [0.3.1] - 2026-10-08
 

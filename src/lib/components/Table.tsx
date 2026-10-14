@@ -471,7 +471,12 @@ const headAlignOf = <T,>(column: TableColumn<T>, tableAlign?: TableAlign): Table
   (hasChildren(column) ? "center" : (column.align ?? "left"));
 
 /** Tombol sort compact selebar sel, jadi posisinya diatur lewat `justify`. */
-const compactSortJustify: Record<TableAlign, string> = {
+/**
+ * Letak isi tombol sort per posisi judul. Rata kiri: teks di ujung kiri, ikon
+ * di ujung kanan kolom, supaya ikon di semua kolom berbaris rapi dan tidak
+ * menggantung tepat di belakang teks yang panjangnya beda-beda.
+ */
+const sortJustify: Record<TableAlign, string> = {
   left: "justify-between",
   center: "justify-center",
   right: "justify-end",
@@ -1393,11 +1398,10 @@ export function Table<T>({
                           type="button"
                           onClick={() => toggleSort(column)}
                           className={cn(
-                            "items-center gap-1 transition-colors hover:text-gray-900",
-                            // Compact rata kiri: ikon sort di ujung kanan judul, seperti di rancangan.
-                            size === "compact"
-                              ? cn("flex w-full gap-2", compactSortJustify[headAlignOf(column, headerAlign)])
-                              : "inline-flex uppercase",
+                            "flex w-full items-center gap-2 transition-colors hover:text-gray-900",
+                            // Rata kiri: ikon sort di ujung kanan judul, di kedua size.
+                            sortJustify[headAlignOf(column, headerAlign)],
+                            size !== "compact" && "uppercase",
                             "rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
                           )}
                         >
