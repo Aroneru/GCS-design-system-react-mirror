@@ -11,6 +11,21 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+Tidak ada perubahan API. Satu perbaikan token warna `Radio`. Situs
+dokumentasi ikut diperbarui: bagian Mulai cepat di beranda kini empat langkah,
+dengan langkah baru "Sambungkan Tailwind CSS ke Vite" (pasang `tailwindcss` dan
+`@tailwindcss/vite`, lalu daftarkan `tailwindcss()` di `vite.config.ts`).
+Tombol outline kini selalu di kiri tombol filled di halaman contoh, dan contoh
+kode footer di halaman Modal kini sama dengan demonya.
+
+### Diperbaiki
+
+- **Kelas `ds-theme-dark` kini ikut mengganti warna gelap `Radio`.**
+  Selector di `tokens.css` sebelumnya salah ketik (`.ds-theme-darkz`), jadi
+  token `Radio` tetap terang di dalam elemen berkelas `ds-theme-dark`, padahal
+  token `Select` dan `InputField` sudah ikut gelap. `data-theme="dark"` dan prop
+  `darkMode` tidak terdampak.
+
 ## [0.4.0] - 2026-10-15
 
 Ada perubahan API yang memutus pada `Button` dan `Upload`, dan banyak komponen
