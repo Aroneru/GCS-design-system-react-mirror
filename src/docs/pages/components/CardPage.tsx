@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Button, Card } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Demo, Hl, Mark, Segmented } from "../../pageKit";
@@ -91,15 +91,6 @@ const toc: TocEntry[] = [
  * desain. Pakai `!` karena `cn` tidak menggabungkan kelas yang bentrok.
  */
 const darkOutlineClass = "border-primary-400! text-primary-400! hover:bg-primary-400/10!";
-
-/**
- * Contoh menimpa token dark mode. Di sini lewat `style` supaya hanya demo ini
- * yang berubah; di project asli cukup ditulis di `:root`.
- */
-const customDarkTokens = {
-  "--color-surface-dark": "#1e3a5f",
-  "--color-border-dark": "#2b4f7a",
-} as CSSProperties;
 
 const SampleButton = ({
   variant,
@@ -425,31 +416,33 @@ export function CardPage() {
           </Demo>
         </div>
 
-        <Demo label="Mobile · kolom 238px" dark>
-          <div className="flex flex-wrap items-start justify-center gap-5">
-            {(
-              [
-                { image: true, action: "link" },
-                { image: false, action: "one" },
-                { image: true, action: "none" },
-                { image: false, action: "none" },
-              ] as const
-            ).map((v, i) => (
-              <div key={i} className="w-[238px] max-w-full">
-                <Card
-                  darkMode
-                  image={v.image ? asset("/images/card-sample.svg") : undefined}
-                  imageAlt=""
-                  title={cardTitleMobile}
-                  description={cardDesc}
-                  href={v.action === "link" ? "#" : undefined}
-                  linkLabel={v.action === "link" ? "See our guideline" : undefined}
-                  actions={cardActions(v.action, true)}
-                />
-              </div>
-            ))}
-          </div>
-        </Demo>
+        <div className="mt-5">
+          <Demo label="Mobile · kolom 238px" dark>
+            <div className="flex flex-wrap items-start justify-center gap-5">
+              {(
+                [
+                  { image: true, action: "link" },
+                  { image: false, action: "one" },
+                  { image: true, action: "none" },
+                  { image: false, action: "none" },
+                ] as const
+              ).map((v, i) => (
+                <div key={i} className="w-[238px] max-w-full">
+                  <Card
+                    darkMode
+                    image={v.image ? asset("/images/card-sample.svg") : undefined}
+                    imageAlt=""
+                    title={cardTitleMobile}
+                    description={cardDesc}
+                    href={v.action === "link" ? "#" : undefined}
+                    linkLabel={v.action === "link" ? "See our guideline" : undefined}
+                    actions={cardActions(v.action, true)}
+                  />
+                </div>
+              ))}
+            </div>
+          </Demo>
+        </div>
 
         <SectionCode>
           {"<Card\n"}
@@ -471,7 +464,7 @@ export function CardPage() {
           {"/>"}
         </SectionCode>
 
-        <h3 className="text-heading-4 font-bold text-gray-900">Ikut tema pembungkus</h3>
+        <h3 className="mt-10 mb-2 text-heading-4 font-bold text-gray-900">Ikut tema pembungkus</h3>
         <Lead>
           Tanpa <Hl>darkMode</Hl>, kartu mengikuti tema elemen di sekitarnya. Pasang{" "}
           <Hl>data-theme="dark"</Hl> sekali di pembungkus, semua kartu di dalamnya ikut gelap.
@@ -500,42 +493,6 @@ export function CardPage() {
           {"        <Card title=\"…\" />   {/* terang */}\n"}
           {"    </div>\n"}
           {"</section>"}
-        </SectionCode>
-
-        <h3 className="text-heading-4 font-bold text-gray-900">Mengganti warna gelap</h3>
-        <Lead>
-          Warna gelap Card diambil dari token global di <Hl>tokens.css</Hl>. Timpa
-          tokennya di CSS project kamu, semua komponen yang memakainya ikut berubah.
-          Contoh di bawah menimpa <Hl>--color-surface-dark</Hl> dan{" "}
-          <Hl>--color-border-dark</Hl> saja.
-        </Lead>
-
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Demo label="Bawaan" dark>
-            <Card darkMode title={cardTitle} description={cardDesc} href="#" linkLabel="See our guideline" />
-          </Demo>
-          <Demo label="Token ditimpa" dark>
-            <div style={customDarkTokens}>
-              <Card darkMode title={cardTitle} description={cardDesc} href="#" linkLabel="See our guideline" />
-            </div>
-          </Demo>
-        </div>
-
-        <SectionCode>
-          {"/* CSS project kamu */\n"}
-          {":root {\n"}
-          {"  "}
-          <Mark>--color-surface-dark</Mark>
-          {": #1e3a5f;\n"}
-          {"  "}
-          <Mark>--color-border-dark</Mark>
-          {": #2b4f7a;\n"}
-          {"}\n\n"}
-          {"/* Token lain yang tersedia */\n"}
-          {"--color-content-dark          /* judul */\n"}
-          {"--color-content-dark-subtle   /* deskripsi */\n"}
-          {"--color-brand-dark            /* tautan */\n"}
-          {"--color-brand-dark-hover      /* tautan saat hover */"}
         </SectionCode>
       </FlowSection>
 
@@ -568,7 +525,7 @@ export function CardPage() {
           </div>
         </div>
 
-        <p className="mt-3 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500">
           Di halaman formulir kartu perlu selebar kolomnya (lihat halaman{" "}
           <em>Example</em>), sementara di daftar ringkas ia perlu menyempit
           mengikuti grid. Menentukan lebar adalah tugas tata letak, bukan tugas

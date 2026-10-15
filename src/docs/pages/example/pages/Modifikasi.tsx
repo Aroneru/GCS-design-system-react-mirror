@@ -234,7 +234,7 @@ export function Modifikasi() {
                 Tambah data
               </Button>
               <Button
-                type="iconOnly"
+                iconOnly
                 theme={tema}
                 size={ukuran}
                 variant={outline ? 'outline' : 'filled'}
@@ -260,7 +260,7 @@ export function Modifikasi() {
 
             <pre className="overflow-x-auto rounded-xl bg-gray-900 p-5 font-mono text-xs leading-relaxed text-gray-100">
               {`import { Button } from '@ceplok-ui/design-kit-react'
-import { Plus } from '@ceplok-ui/design-kit-react/icons/outline'
+import { Edit, Plus } from '@ceplok-ui/design-kit-react/icons/outline'
 
 <Button
   theme="${tema}"
@@ -268,6 +268,15 @@ import { Plus } from '@ceplok-ui/design-kit-react/icons/outline'
   leftIcon={<Plus />}
 >
   Tambah data
+</Button>
+
+<Button
+  iconOnly
+  theme="${tema}"
+  size="${ukuran}"${outline ? '\n  variant="outline"' : ''}${gelap ? '\n  tone="dark"' : ''}
+  aria-label="Ubah data"
+>
+  <Edit />
 </Button>`}
             </pre>
           </div>
@@ -365,7 +374,7 @@ import { Plus } from '@ceplok-ui/design-kit-react/icons/outline'
                     Isi actions tidak harus tombol — badge, teks, atau apa pun boleh.
                   </span>
                 </div>
-                <Button type="iconOnly" size="xs" theme="gray" variant="outline" aria-label="Hapus">
+                <Button iconOnly size="xs" theme="gray" variant="outline" aria-label="Hapus">
                   <TrashBin />
                 </Button>
               </div>
@@ -388,7 +397,7 @@ import { TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
   actions={
     <div className="flex w-full items-center justify-between">
       <Badge variant="success">Aktif</Badge>
-      <Button type="iconOnly" size="xs" theme="gray" variant="outline" aria-label="Hapus">
+      <Button iconOnly size="xs" theme="gray" variant="outline" aria-label="Hapus">
         <TrashBin />
       </Button>
     </div>

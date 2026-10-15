@@ -32,6 +32,48 @@ const provinsi: SelectOption[] = [
   { value: 'jatim', label: 'Jawa Timur' },
 ]
 
+/** 38 provinsi, urut abjad — contoh daftar panjang untuk pencarian lewat ketikan. */
+const semuaProvinsi: SelectOption[] = [
+  { value: 'aceh', label: 'Aceh' },
+  { value: 'bali', label: 'Bali' },
+  { value: 'banten', label: 'Banten' },
+  { value: 'bengkulu', label: 'Bengkulu' },
+  { value: 'diy', label: 'DI Yogyakarta' },
+  { value: 'dki', label: 'DKI Jakarta' },
+  { value: 'gorontalo', label: 'Gorontalo' },
+  { value: 'jambi', label: 'Jambi' },
+  { value: 'jabar', label: 'Jawa Barat' },
+  { value: 'jateng', label: 'Jawa Tengah' },
+  { value: 'jatim', label: 'Jawa Timur' },
+  { value: 'kalbar', label: 'Kalimantan Barat' },
+  { value: 'kalsel', label: 'Kalimantan Selatan' },
+  { value: 'kalteng', label: 'Kalimantan Tengah' },
+  { value: 'kaltim', label: 'Kalimantan Timur' },
+  { value: 'kaltara', label: 'Kalimantan Utara' },
+  { value: 'babel', label: 'Kepulauan Bangka Belitung' },
+  { value: 'kepri', label: 'Kepulauan Riau' },
+  { value: 'lampung', label: 'Lampung' },
+  { value: 'maluku', label: 'Maluku' },
+  { value: 'malut', label: 'Maluku Utara' },
+  { value: 'ntb', label: 'Nusa Tenggara Barat' },
+  { value: 'ntt', label: 'Nusa Tenggara Timur' },
+  { value: 'papua', label: 'Papua' },
+  { value: 'pabar', label: 'Papua Barat' },
+  { value: 'pbd', label: 'Papua Barat Daya' },
+  { value: 'papeg', label: 'Papua Pegunungan' },
+  { value: 'pasel', label: 'Papua Selatan' },
+  { value: 'pateng', label: 'Papua Tengah' },
+  { value: 'riau', label: 'Riau' },
+  { value: 'sulbar', label: 'Sulawesi Barat' },
+  { value: 'sulsel', label: 'Sulawesi Selatan' },
+  { value: 'sulteng', label: 'Sulawesi Tengah' },
+  { value: 'sultra', label: 'Sulawesi Tenggara' },
+  { value: 'sulut', label: 'Sulawesi Utara' },
+  { value: 'sumbar', label: 'Sumatera Barat' },
+  { value: 'sumsel', label: 'Sumatera Selatan' },
+  { value: 'sumut', label: 'Sumatera Utara' },
+]
+
 const selectProps: PropRow[] = [
   ['label', 'ReactNode', 'undefined', 'Teks label di atas field.'],
   ['info', 'string', 'undefined', 'Keterangan pada ikon info di samping label; ikon muncul bila diisi.'],
@@ -40,7 +82,7 @@ const selectProps: PropRow[] = [
   ['options', 'SelectOption[]', 'undefined', 'Daftar pilihan { value, label, disabled }. Bila kosong, <option> dan <optgroup> di children yang dipakai.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna ikon info dan garis saat difokus.'],
-  ['darkMode', 'boolean', 'false', 'Tampilan gelap: field gray-800 dengan label terang; garisnya hanya terlihat saat inactive dan saat difokus. Panel daftar pilihannya tetap terang.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: field gray-700 dengan label terang; garisnya hanya terlihat saat inactive dan saat difokus. Panel daftar pilihannya tetap terang.'],
   ['…props', 'SelectHTMLAttributes', '—', 'Seluruh atribut <select> standar diteruskan (value, onChange, required, name, …).'],
 ]
 
@@ -49,6 +91,7 @@ const toc: TocEntry[] = [
   { id: 'state', label: 'State' },
   { id: 'application', label: 'Application' },
   { id: 'daftar', label: 'Daftar pilihan' },
+  { id: 'banyak-pilihan', label: 'Banyak pilihan' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
@@ -184,7 +227,7 @@ export function SelectPage() {
         <Lead>
           Daftar pilihannya panel Dropdown — rupanya sama persis dengan menu Dropdown di kit ini, bukan
           popup milik sistem operasi. Pilihan ditelusuri dengan panah, Home/End, atau dengan mengetik
-          huruf awalnya.
+          namanya — lihat <Hl>Banyak pilihan</Hl> di bawah.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Lewat options">
@@ -197,9 +240,9 @@ export function SelectPage() {
                 <option value="jateng">Jawa Tengah</option>
                 <option value="jatim">Jawa Timur</option>
               </optgroup>
-              <optgroup label="Sumatra">
-                <option value="sumut">Sumatra Utara</option>
-                <option value="sumbar">Sumatra Barat</option>
+              <optgroup label="Sumatera">
+                <option value="sumut">Sumatera Utara</option>
+                <option value="sumbar">Sumatera Barat</option>
               </optgroup>
             </Select>
           </Demo>
@@ -225,9 +268,56 @@ export function SelectPage() {
         </p>
       </FlowSection>
 
+      <FlowSection id="banyak-pilihan" title="Banyak pilihan">
+        <Lead>
+          Untuk daftar panjang, buka panelnya lalu langsung ketik — fokus melompat ke pilihan yang
+          diawali ketikan Anda, dan panel menggulir sendiri ke sana. Tekan Enter untuk memilihnya. Tidak
+          perlu prop tambahan; pencarian ini bawaan setiap Select.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="38 provinsi">
+            <Select
+              label="Provinsi"
+              placeholder="Pilih provinsi"
+              options={semuaProvinsi}
+              helperText="Buka, lalu ketik nama provinsinya."
+            />
+          </Demo>
+          <div className="space-y-3 text-body-sm text-gray-600">
+            <p className="font-bold text-gray-900">Coba ketik:</p>
+            <ul className="space-y-2">
+              <li>
+                <Hl>jawa t</Hl> → Jawa Tengah. Ketikan dengan jeda di bawah satu detik digabung jadi satu
+                kata kunci, spasinya ikut dihitung.
+              </li>
+              <li>
+                <Hl>jakarta</Hl> → DKI Jakarta. Bila tidak ada pilihan yang diawali ketikan itu, yang dicari
+                awal salah satu katanya.
+              </li>
+              <li>
+                <Hl>bangka</Hl> → Kepulauan Bangka Belitung, dengan cara yang sama.
+              </li>
+              <li>
+                <Hl>s</Hl> berulang-ulang → berpindah dari satu provinsi berawalan S ke berikutnya.
+              </li>
+            </ul>
+          </div>
+        </div>
+        <SectionCode>
+          {'const provinsi = [\n'}
+          {"    { value: 'aceh', label: 'Aceh' },\n"}
+          {"    { value: 'bali', label: 'Bali' },\n"}
+          {'    …\n'}
+          {']\n\n'}
+          {'<Select label="Provinsi" placeholder="Pilih provinsi" '}
+          <H>options</H>
+          {'={provinsi} />'}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <Hl>darkMode</Hl> mengganti field ke gray-800 dengan label terang. Pada state default garisnya
+          Prop <Hl>darkMode</Hl> mengganti field ke gray-700 dengan label terang. Pada state default garisnya
           menyatu dengan latar dan baru terlihat saat difokus (warna aplikasi); pada <Hl>inactive</Hl> garisnya
           gray-300, dengan teks dan panah gray-500. Panel daftar pilihannya untuk saat ini tetap terang.
         </Lead>

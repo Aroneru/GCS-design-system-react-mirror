@@ -30,6 +30,7 @@ dist-ssr
 /learning-records/
 /reference/
 /assets/
+/screenshots/
 
 # Hasil `npm pack` saat uji coba paket secara lokal
 *.tgz

@@ -87,8 +87,10 @@ const sizes: Record<ModalSize, string> = {
  *
  * Tanpa `open`, Modal mengurus visibilitas internal dan `trigger` membukanya.
  * Jika `open` diberikan, consumer menjadi sumber kebenaran dan `trigger` boleh
- * dihilangkan. Peramban tetap mengurus top layer, latar yang ikut mati, dan
- * jebakan fokus.
+ * dihilangkan, misalnya saat dialog dibuka dari aksi pada baris tabel. Pasangkan
+ * mode terkontrol dengan `onOpenChange` agar permintaan buka dan tutup diteruskan
+ * ke state consumer. Peramban tetap mengurus top layer, latar yang ikut mati,
+ * dan jebakan fokus.
  */
 export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   {

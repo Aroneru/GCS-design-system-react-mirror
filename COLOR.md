@@ -50,12 +50,18 @@ Nama token menjelaskan **fungsinya**, bukan warnanya.
 | `--color-content-subtle` | `text-content-subtle` | teks pendukung | gray-500 | gray-300 |
 | `--color-brand` | `text-brand`, `bg-brand` | tautan, aksen | primary-600 | primary-400 |
 | `--color-brand-hover` | `hover:text-brand-hover` | aksen saat hover | primary-700 | primary-300 |
+| `--color-content-muted` | `text-content-muted` | caption, placeholder, ikon field | gray-500 | gray-400 |
+| `--color-content-disabled` | `text-content-disabled` | teks dan isian nonaktif | gray-400 | gray-500 |
+| `--color-field` | `bg-field` | latar field dan kotak kontrol | gray-50 | gray-700 |
+| `--color-field-border` | `border-field-border` | garis field | gray-300 | gray-700 |
+| `--color-field-disabled` | `bg-field-disabled` | latar field nonaktif | gray-100 | gray-700 |
+| `--color-border-strong` | `border-border-strong` | garis yang tetap terlihat di tema gelap | gray-300 | gray-600 |
 
-Token feedback (sama di terang dan gelap):
+Token feedback (sama di terang dan gelap, kecuali error):
 
 | Token | Fungsi |
 |---|---|
-| `--color-feedback-error` | pesan error |
+| `--color-feedback-error` | pesan error; red-600, di tema gelap red-500 |
 | `--color-feedback-warning` | peringatan |
 | `--color-feedback-success` | sukses |
 
@@ -72,6 +78,49 @@ Nilai yang dipakai token semantik saat tema gelap. Komponen tidak memakainya lan
 | `--color-content-dark-subtle` | gray-300 |
 | `--color-brand-dark` | primary-400 |
 | `--color-brand-dark-hover` | primary-300 |
+| `--color-content-muted-dark` | gray-400 |
+| `--color-content-disabled-dark` | gray-500 |
+| `--color-field-dark` | gray-700 |
+| `--color-field-border-dark` | gray-700 |
+| `--color-field-disabled-dark` | gray-700 |
+| `--color-border-strong-dark` | gray-600 |
+| `--color-feedback-error-dark` | red-500 |
+
+### 4. Token komponen
+
+Warna yang hanya dipakai satu komponen dan tidak cocok dengan token semantik mana pun. Di `tokens.css` tiap komponen punya satu bagian berisi nilai terang dan gelapnya berdampingan.
+
+| Komponen | Token |
+|---|---|
+| Toggle | `--color-toggle-track`, `-track-inactive`, `-knob` |
+| Radio | `--color-radio-border`, `-surface`, `-border-inactive`, `-ring-inactive`, `-label`, `-content-inactive` |
+| Select | `--color-select-label`, `-content-inactive` |
+| Input Field | `--color-input-field-surface-failed`, `-border-inactive`, `-label-inactive`, `-content-failed`, `-action`, `-action-inactive` |
+| Floating Label | `--color-floating-label-content`, `-icon-error`, `-accent`, `-accent-simaya` |
+| Text Area | `--color-text-area-tool-hover`, `-helper`, `-submit`, `-submit-hover`, `-submit-simaya`, `-submit-simaya-hover` |
+| Toast | `--color-toast-heading`, `-body`, `-close-hover`, lalu `-{variant}-surface` dan `-{variant}-icon` |
+| Alert | `--color-alert-{variant}-surface`, `-icon`, `-heading`, `-body`, `-close` |
+| Hero | `--color-hero`, `-centered`, `-dark` |
+| Container | `--color-container` |
+| Sidebar | `--color-sidebar-surface` |
+| Search | `--color-search-category-surface`, `--color-search-field-surface` |
+
+`{variant}` adalah `success`, `danger`, `warning`, `info`, atau `purple`.
+
+Catatan Hero dan Container:
+
+- `--color-hero` adalah latar hero (putih). `--color-hero-centered` latar hero tipe centered (primary-50).
+- Di tema gelap keduanya memakai `--color-hero-dark` (gray-800). Ini satu-satunya token komponen yang punya pasangan `-dark`, jadi cukup timpa `--color-hero-dark` di `:root`.
+- `--color-container` adalah latar bagian dalam Container di tema gelap (gray-700). Di tema terang Container tidak berlatar.
+
+Token komponen lainnya tidak punya pasangan `-dark`. Untuk mengganti nilai gelapnya, timpa di blok `[data-theme='dark']` CSS project:
+
+```css
+[data-theme='dark'] {
+  --color-alert-danger-close: var(--color-red-300);
+}
+```
+
 
 ## Cara kerja tema gelap
 
@@ -123,6 +172,8 @@ Tidak perlu menulis `darkMode` di setiap komponen.
   </div>
 </section>
 ```
+
+Elemen yang tidak bisa diberi atribut boleh memakai kelas `ds-theme-light` sebagai gantinya. Select memakainya lewat `contentClassName` Dropdown, supaya panel daftar pilihannya tetap terang walau field-nya gelap.
 
 ### Seluruh aplikasi gelap
 
@@ -208,10 +259,11 @@ Atau lewat class:
 - Untuk efek khusus di tema gelap (misalnya meredupkan gambar), pakai variant `in-data-[theme=dark]:`, contoh `in-data-[theme=dark]:brightness-90`.
 - Butuh warna baru yang dipakai dua komponen atau lebih? Tambahkan token semantik baru di `tokens.css`, beserta nilai gelapnya di blok `[data-theme='dark']` dan nilai terangnya di blok `[data-theme='light']`.
 - Warna yang hanya dipakai satu komponen boleh jadi token komponen, misalnya `--color-hero-overlay`. Nilai bawaannya sebaiknya menunjuk ke token semantik.
+- Token yang nilainya berbeda di tema gelap wajib ditulis ulang di blok `[data-theme='dark']` dan `[data-theme='light']`, termasuk token komponen yang menunjuk ke token semantik. `var()` di sebuah token dihitung di elemen tempat token itu ditulis, lalu hasilnya yang diwarisi. Token yang hanya ditulis di `:root` akan tetap bernilai terang di area gelap.
 - Cek kontras teks minimal 4,5:1 terhadap latarnya, di tema terang dan gelap.
 
 ## Status saat ini
 
-- **Sudah memakai cara ini:** Card.
-- **Belum:** komponen lain yang punya `darkMode` (Hero, Popover, Toast, InputField, Select, Drawer, dan lainnya) masih menulis warna gelapnya sendiri. Komponen ini akan dipindah bertahap.
+- **Sudah memakai cara ini:** Card, Container, Hero, Toggle, Checkbox, Radio, Select, InputField, FloatingLabel, TextArea, Toast, Alert, Sidebar, dan Search.
+- **Belum:** komponen lain yang punya `darkMode` (Popover, Drawer, Datepicker, dan lainnya) masih menulis warna gelapnya sendiri. Komponen ini akan dipindah bertahap.
 - Selama belum dipindah, `data-theme="dark"` di pembungkus belum membuat komponen tersebut gelap. Pakai prop `darkMode` di komponennya.

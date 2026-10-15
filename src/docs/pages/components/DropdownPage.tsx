@@ -784,7 +784,9 @@ export function DropdownPage() {
           <Hl>trigger</Hl> menerima satu tombol milik Anda; <Hl>items</Hl> menerima daftar aksinya. Panel
           ditutup lewat trigger, klik di luar, atau Escape — semuanya diurus HTML Popover API, jadi
           tidak ada state buka/tutup yang bisa melenceng. Aksi menutup panel setelah ditekan;
-          kontrol seperti Radio dan Checkbox tetap terbuka saat pilihannya berubah.
+          kontrol seperti Radio dan Checkbox tetap terbuka saat pilihannya berubah. Setelah panel
+          terbuka, ketik nama aksinya untuk melompat ke sana — mis. <Hl>k</Hl> ke Keluar — lalu tekan
+          Enter.
         </Lead>
         <Stage maxWidth="max-w-xl">
           <div className="flex min-h-72 items-start justify-center pt-10">
@@ -902,7 +904,8 @@ export function DropdownPage() {
           Gunakan Selection ketika Dropdown dipakai untuk memilih nilai. Saat item menggunakan{' '}
           <Hl>selected</Hl>, koleksinya memakai pola <Hl>listbox</Hl>, setiap baris menjadi{' '}
           <Hl>option</Hl>, dan pilihan aktif menerima fokus saat dibuka. Option dapat ditelusuri
-          dengan tombol panah, Home, End, dan pencarian lewat ketikan. Gunakan{' '}
+          dengan tombol panah, Home, End, dan pencarian lewat ketikan — sama seperti daftar pilihan
+          Select. Gunakan{' '}
           <Hl>contentLabel</Hl> untuk menamai listbox tersebut. Action dan Selection tidak dapat
           dicampur dalam satu koleksi generated: koleksi yang memakai <Hl>selected</Hl> seluruhnya
           diperlakukan sebagai Selection, sedangkan <Hl>href</Hl> hanya untuk item Action.

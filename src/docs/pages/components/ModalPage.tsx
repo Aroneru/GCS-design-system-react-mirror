@@ -138,7 +138,7 @@ function ModalExampleCode({
 const modalProps: PropRow[] = [
   ['trigger', 'ReactElement', 'required*', 'Tombol milik consumer yang membuka Modal. Wajib pada mode internal; opsional ketika open diberikan.'],
   ['open', 'boolean', 'undefined', 'Visibilitas terkontrol. Jika diberikan, nilai ini menjadi sumber kebenaran dan trigger bersifat opsional.'],
-  ['onOpenChange', '(open: boolean) => void', 'undefined', 'Dipanggil ketika trigger atau interaksi penutupan meminta perubahan visibilitas.'],
+  ['onOpenChange', '(open: boolean) => void', 'undefined', 'Dipanggil saat Modal minta dibuka atau ditutup (tombol tutup, Escape, backdrop, atau close di footer).'],
   ['variant', "'default' | 'popup'", "'default'", 'Menentukan struktur Modal. Popup digunakan untuk dialog konfirmasi ringkas.'],
   ['size', "'s' | 'm'", "'s'", 'Ukuran Default Modal. Tidak tersedia untuk Popup.'],
   ['title', 'ReactNode', 'undefined', 'Judul Default Modal sekaligus nama aksesibel. Tidak tersedia untuk Popup.'],

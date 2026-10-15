@@ -52,51 +52,31 @@ interface Ink {
   helper: string
 }
 
+/**
+ * Warna dari token di tokens.css, jadi tema gelap cukup mengganti nilai token
+ * lewat `data-theme`. Desain gelap: garis state default menyatu dengan
+ * latarnya; justru `inactive` yang bergaris gray-300, di kedua tampilan. Teks
+ * pilihan dan caption tidak digambar desain: pilihan putih seperti teks isian
+ * Input Field gelap, caption mengikuti caption Input Field gelap.
+ */
 const inks: Record<SelectState, Ink> = {
   default: {
-    label: 'text-gray-900',
+    label: 'text-select-label',
     icon: null,
-    box: 'border-gray-300 bg-gray-50',
-    value: 'text-gray-900',
-    placeholder: 'text-gray-500',
-    chevron: 'text-gray-500',
-    helper: 'text-gray-500',
+    box: 'border-field-border bg-field',
+    value: 'text-content',
+    placeholder: 'text-content-muted',
+    chevron: 'text-content-muted',
+    helper: 'text-content-muted',
   },
   inactive: {
-    label: 'text-gray-900',
+    label: 'text-content',
     icon: 'text-gray-400',
-    box: 'border-gray-300 bg-gray-100',
-    value: 'text-gray-300',
-    placeholder: 'text-gray-300',
-    chevron: 'text-gray-300',
-    helper: 'text-gray-400',
-  },
-}
-
-/**
- * Tampilan gelap sesuai desain. Garis state default menyatu dengan latarnya;
- * justru `inactive` yang bergaris gray-300. Teks pilihan dan caption tidak
- * digambar desain: pilihan putih seperti teks isian Input Field gelap, caption
- * mengikuti caption Input Field gelap.
- */
-const inksDark: Record<SelectState, Ink> = {
-  default: {
-    label: 'text-gray-50',
-    icon: null,
-    box: 'border-gray-800 bg-gray-800',
-    value: 'text-white',
-    placeholder: 'text-gray-400',
-    chevron: 'text-gray-400',
-    helper: 'text-gray-400',
-  },
-  inactive: {
-    label: 'text-white',
-    icon: 'text-gray-400',
-    box: 'border-gray-300 bg-gray-800',
-    value: 'text-gray-500',
-    placeholder: 'text-gray-500',
-    chevron: 'text-gray-500',
-    helper: 'text-gray-500',
+    box: 'border-gray-300 bg-field-disabled',
+    value: 'text-select-content-inactive',
+    placeholder: 'text-select-content-inactive',
+    chevron: 'text-select-content-inactive',
+    helper: 'text-content-disabled',
   },
 }
 
@@ -202,7 +182,11 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
   options?: SelectOption[]
   application?: SelectApplication
   state?: SelectState
-  /** Tampilan gelap untuk field-nya. Panel daftar pilihannya tetap terang. */
+  /**
+   * Memaksa field ini bertema gelap. Tanpa prop ini ia ikut tema elemen
+   * pembungkusnya, mis. `<section data-theme="dark">`. Panel daftar pilihannya
+   * tetap terang di kedua cara.
+   */
   darkMode?: boolean
   /** Kelas untuk pembungkus terluar (label + field + caption). */
   className?: string
@@ -219,8 +203,8 @@ export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement
  *
  * State `inactive` menonaktifkan kontrol sekaligus meredupkan tampilannya, dan
  * warna ikon info serta garis saat difokus mengikuti prop `application`.
- * `darkMode` mengganti field ke tampilan gelap; panel daftar pilihannya tetap
- * terang.
+ * `darkMode` sekadar memasang `data-theme="dark"` di pembungkus terluarnya;
+ * panel daftar pilihannya tetap terang.
  */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   {
@@ -256,7 +240,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   const isInactive = disabled || state === 'inactive'
   const isPlaceholder = current === ''
   const accent = accents[application]
-  const ink = (darkMode ? inksDark : inks)[isInactive ? 'inactive' : 'default']
+  const ink = inks[isInactive ? 'inactive' : 'default']
 
   // Ref internal dipakai untuk menyetel nilai saat memilih dari panel; ref dari
   // luar tetap diteruskan supaya pemakai masih memegang `<select>` yang sama.
@@ -291,7 +275,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   }))
 
   return (
-    <div className={cn('w-full', className)}>
+    <div data-theme={darkMode ? 'dark' : undefined} className={cn('w-full', className)}>
       {label && (
         <div className="mb-2 flex items-center gap-2">
           <label htmlFor={fieldId} id={labelId} className={cn('text-sm font-bold', ink.label)}>
@@ -346,6 +330,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           className="w-full"
           contentLabel={typeof label === 'string' ? label : props['aria-label']}
           groups={menuGroups}
+          // Panel tinggal di dalam field ini (top layer tetap ikut pohon DOM),
+          // jadi tanpa kelas ini ia ikut gelap. Desainnya: panel tetap terang.
+          contentClassName="ds-theme-light"
           trigger={
             <button
               type="button"

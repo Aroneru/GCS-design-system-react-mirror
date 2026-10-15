@@ -40,7 +40,7 @@ const floatingProps: PropRow[] = [
   ['application', "'default' | 'simaya'", 'default', 'Warna garis dan label saat field aktif.'],
   ['placeholder', 'string', 'undefined', 'Hanya muncul setelah label naik, agar tak bertumpuk dengan label.'],
   ['onClear', '() => void', 'undefined', 'Bila diisi, tombol hapus (×) muncul di kanan field.'],
-  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak gray-800 dengan teks dan ikon gray-400.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak gray-700 bergaris gray-600 dengan teks dan ikon gray-400.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (type, value, onChange, …).'],
 ]
 
@@ -191,9 +191,9 @@ export function FloatingLabelPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <Hl>darkMode</Hl> mengganti kotak ke gray-800 dengan teks, ikon, dan tombol hapus gray-400. Garis
-          aksen tetap sama, tetapi label yang naik satu tingkat lebih terang — primary-500 — supaya terbaca
-          di latar gelap. Pada <Hl>error</Hl>, hanya garis dan label yang berubah merah.
+          Prop <Hl>darkMode</Hl> mengganti kotak ke gray-700 bergaris gray-600, dengan teks, ikon, dan tombol hapus
+          gray-400. Garis aksen tetap sama, tetapi label yang naik satu tingkat lebih terang — primary-500 —
+          supaya terbaca di latar gelap. Pada <Hl>error</Hl>, hanya garis dan label yang berubah merah.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (

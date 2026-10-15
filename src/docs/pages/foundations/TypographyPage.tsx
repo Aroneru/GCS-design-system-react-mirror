@@ -9,7 +9,7 @@ import {
   type TocEntry,
 } from '../../usulanKit'
 
-type FontKey = 'sans' | 'alt'
+type FontKey = 'sans' | 'alt' | 'alt2'
 
 /** Font yang bisa dipratinjau. `cls` dipasang ke seluruh isi halaman. */
 const fonts: Record<FontKey, { name: string; cls: string; role: string; description: string }> = {
@@ -27,20 +27,33 @@ const fonts: Record<FontKey, { name: string; cls: string; role: string; descript
     description:
       'Inter adalah font alternatif. Dirancang untuk layar, jelas di ukuran kecil, dan angkanya sama lebar. Skala dan token tetap sama dengan Lato.',
   },
+  alt2: {
+    name: 'Arial',
+    cls: 'font-alt-2',
+    role: 'Alternate typeface 2',
+    description:
+      'Arial adalah font alternatif kedua. Font sistem yang tersedia hampir di semua perangkat, jadi tidak perlu diunduh dan halaman tampil lebih cepat. Skala dan token tetap sama dengan Lato.',
+  },
 }
 
 /**
- * Pilihan font disimpan di query `?font=inter`, bukan di hash, karena hash
- * sudah dipakai router. Dengan begitu tautannya bisa dibagikan.
+ * Pilihan font disimpan di query `?font=inter` / `?font=arial`, bukan di hash,
+ * karena hash sudah dipakai router. Dengan begitu tautannya bisa dibagikan.
  */
+const fontParams: Record<Exclude<FontKey, 'sans'>, string> = { alt: 'inter', alt2: 'arial' }
+
 function readFont(): FontKey {
-  return new URLSearchParams(window.location.search).get('font') === 'inter' ? 'alt' : 'sans'
+  const param = new URLSearchParams(window.location.search).get('font')
+  const found = (Object.keys(fontParams) as Exclude<FontKey, 'sans'>[]).find(
+    (key) => fontParams[key] === param,
+  )
+  return found ?? 'sans'
 }
 
 function writeFont(font: FontKey) {
   const url = new URL(window.location.href)
-  if (font === 'alt') url.searchParams.set('font', 'inter')
-  else url.searchParams.delete('font')
+  if (font === 'sans') url.searchParams.delete('font')
+  else url.searchParams.set('font', fontParams[font])
   window.history.replaceState(null, '', url)
 }
 
@@ -100,7 +113,8 @@ const usage = {
   alt: `/* Ganti font alternatif di CSS project kamu.
    Muat file fontnya sendiri, misalnya lewat Google Fonts. */
 :root {
-  --font-alt: 'Plus Jakarta Sans', sans-serif;
+  --font-alt: 'Plus Jakarta Sans', sans-serif;   /* bawaan: Inter */
+  --font-alt-2: 'Verdana', sans-serif;           /* bawaan: Arial */
 }`,
   transform: `{/* Transform & decoration */}
 <p className="uppercase">huruf kapital semua</p>
@@ -108,16 +122,16 @@ const usage = {
 <a href="#" className="underline">Tautan bergaris bawah</a>`,
 }
 
-/** Snippet token semantik; saat Inter dipilih, tampilkan cara memakai `font-alt`. */
+/** Snippet token semantik; saat font alternatif dipilih, tampilkan cara memakainya. */
 const semanticUsage = (font: FontKey) =>
-  (font === 'alt'
-    ? `{/* Pasang font-alt di pembungkus, semua teks di dalamnya ikut Inter */}
-<main className="font-alt">
+  (font === 'sans'
+    ? ''
+    : `{/* Pasang ${fonts[font].cls} di pembungkus, semua teks di dalamnya ikut ${fonts[font].name} */}
+<main className="${fonts[font].cls}">
   ...
 </main>
 
-`
-    : '') + usage.semantic
+`) + usage.semantic
 
 /**
  * `id` di sini harus sama persis dengan `id` tiap <FlowSection> di bawah, dan
@@ -158,6 +172,7 @@ export function TypographyPage() {
           options={[
             { value: 'sans', label: 'Lato · utama' },
             { value: 'alt', label: 'Inter · alternatif' },
+            { value: 'alt2', label: 'Arial · alternatif 2' },
           ]}
         />
       }
@@ -296,9 +311,11 @@ export function TypographyPage() {
         <FlowSection id="font-alt" title="Mengganti font">
           <Lead>
             Lato dipakai lewat <code className="text-xs font-bold text-gray-700">font-sans</code>,
-            Inter lewat <code className="text-xs font-bold text-gray-700">font-alt</code>. Untuk
-            memakai font lain, timpa variabel{' '}
-            <code className="text-xs font-bold text-gray-700">--font-alt</code> di CSS project.
+            Inter lewat <code className="text-xs font-bold text-gray-700">font-alt</code>, dan Arial
+            lewat <code className="text-xs font-bold text-gray-700">font-alt-2</code>. Untuk memakai
+            font lain, timpa variabel{' '}
+            <code className="text-xs font-bold text-gray-700">--font-alt</code> atau{' '}
+            <code className="text-xs font-bold text-gray-700">--font-alt-2</code> di CSS project.
           </Lead>
 
           <SectionCode>{usage.alt}</SectionCode>

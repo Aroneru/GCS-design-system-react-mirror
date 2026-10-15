@@ -97,8 +97,30 @@ const tones: Record<'light' | 'dark', Record<DropdownItemTone, string>> = {
 /** Jarak panel dari tombol dan dari tepi layar, dalam piksel. */
 const JARAK = 4
 
-/** Jeda antar-ketikan yang masih dianggap satu kata saat melompat ke baris. */
-const JEDA_KETIK = 500
+/**
+ * Jeda antar-ketikan yang masih dianggap satu kata kunci saat melompat ke
+ * baris — satu detik, sama dengan `<select>` bawaan peramban.
+ */
+const JEDA_KETIK = 1000
+
+/** Teks yang dicocokkan dengan ketikan: huruf kecil, tanpa tanda diakritik, spasi dirapikan. */
+const rapikan = (teks: string) =>
+  teks.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').toLowerCase()
+
+/** Apakah `kunci` muncul di awal salah satu kata `teks`, mis. "jakarta" di "dki jakarta". */
+const diAwalKata = (teks: string, kunci: string) => {
+  for (let i = teks.indexOf(kunci); i !== -1; i = teks.indexOf(kunci, i + 1)) {
+    if (i === 0 || /[\s/(),.-]/.test(teks[i - 1])) return true
+  }
+  return false
+}
+
+/** Label sebuah baris untuk dicocokkan dengan ketikan — keterangan di bawahnya tidak ikut. */
+const namaBaris = (el: HTMLElement) => {
+  const semua = el.textContent ?? ''
+  const keterangan = el.querySelector('[data-keterangan]')?.textContent ?? ''
+  return rapikan(semua.slice(0, semua.length - keterangan.length)).trim()
+}
 
 const TRIGGER_CONTRACT_ERROR =
   '[Dropdown] `trigger` must render a native <button> as its direct DOM root and forward standard button attributes. Use a native <button>, the shared <Button> in button mode, or a custom button component that forwards ButtonHTMLAttributes<HTMLButtonElement>. Anchors, div/span elements, Fragments, wrapped buttons, and components that swallow trigger props are not supported.'
@@ -118,8 +140,9 @@ type PeristiwaToggle = Event & { newState?: string }
  * Punya dua peran. Bawaannya menu aksi: tiap baris sebuah tombol atau tautan,
  * ditelusuri dengan Tab. Begitu ada baris yang memakai `selected`, ia jadi
  * daftar pilihan — `listbox` berisi `option` yang ditelusuri dengan panah,
- * Home/End, atau dengan mengetik huruf awalnya. Peran kedua itulah yang
- * dipakai Select dan Search, jadi panel di seluruh kit hanya ada satu.
+ * Home/End, atau dengan mengetik namanya untuk melompat langsung ke sana.
+ * Peran kedua itulah yang dipakai Select dan Search, jadi panel di seluruh
+ * kit hanya ada satu.
  *
  * Visibilitasnya diurus HTML Popover API: peramban yang menutup panel saat
  * pengguna menekan di luar atau menekan Escape, mengangkatnya ke top layer,
@@ -147,6 +170,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
   const barisAktifRef = useRef<HTMLElement | null>(null)
   const framePosisiRef = useRef(0)
   const ketikan = useRef({ teks: '', waktu: 0 })
+  const spasiDitahanRef = useRef(false)
   const [terbuka, setTerbuka] = useState(false)
 
   const pasangWrap = (node: HTMLDivElement | null) => {
@@ -387,57 +411,121 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     }
   })
 
-  const panelKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    // Action dan konten bebas memakai perilaku keyboard native masing-masing;
-    // navigasi komposit di sini hanya untuk daftar pilihan.
-    if (!pilihan) return
+  /** Masih dalam satu rangkaian ketikan — jeda dari ketikan terakhir di bawah `JEDA_KETIK`? */
+  const sedangMengetik = () => ketikan.current.teks !== '' && Date.now() - ketikan.current.waktu < JEDA_KETIK
 
+  /**
+   * Mengetik melompat ke baris yang cocok, seperti `<select>` bawaan — di
+   * daftar pilihan maupun menu aksi. Ketikan yang berdekatan digabung jadi satu
+   * kata kunci, spasi termasuk, jadi "jawa t" sampai ke Jawa Tengah. Yang
+   * dicari dulu baris yang diawali kata kunci itu; bila tidak ada, baris yang
+   * salah satu katanya diawali kata kunci itu ("jakarta" → DKI Jakarta). Huruf
+   * yang sama diketik berulang berpindah ke baris berikutnya yang diawali
+   * huruf itu.
+   */
+  const lompatKetik = (huruf: string) => {
     const baris = barisHidup()
     if (!baris.length) return
     const kini = baris.indexOf(document.activeElement as HTMLElement)
-    const ke = (i: number) => {
-      e.preventDefault()
-      baris[i]?.focus()
-      barisAktifRef.current = baris[i] ?? null
+    const teks = rapikan((sedangMengetik() ? ketikan.current.teks : '') + huruf)
+    ketikan.current = { teks, waktu: Date.now() }
+
+    const ulang = [...teks].every((h) => h === teks[0])
+    const kunci = ulang ? teks[0] : teks
+    // Huruf baru atau huruf ulangan dicari mulai baris sesudah yang aktif;
+    // kata kunci yang bertambah panjang boleh tetap di baris yang aktif.
+    const mulai = ulang ? kini + 1 : Math.max(kini, 0)
+    const urut = [...baris.slice(mulai), ...baris.slice(0, mulai)]
+
+    const temu =
+      urut.find((el) => namaBaris(el).startsWith(kunci)) ??
+      urut.find((el) => diAwalKata(namaBaris(el), kunci))
+    if (temu) {
+      temu.focus()
+      barisAktifRef.current = temu
     }
+  }
 
-    switch (e.key) {
-      case 'ArrowDown':
-        return ke(kini < 0 ? 0 : (kini + 1) % baris.length)
-      case 'ArrowUp':
-        return ke(kini < 0 ? baris.length - 1 : (kini - 1 + baris.length) % baris.length)
-      case 'Home':
-        return ke(0)
-      case 'End':
-        return ke(baris.length - 1)
-      case 'Enter':
-      case ' ':
-        // Baris menu sudah berupa tombol, jadi peramban yang menanganinya.
-        // Yang perlu dibantu hanya `option`, yang bukan elemen interaktif.
-        if (pilihan && kini >= 0) {
-          e.preventDefault()
-          baris[kini].click()
-        }
-        return
-      case 'Tab':
-        return tutup()
-    }
+  /**
+   * Menangkap satu ketikan untuk pencarian. Spasi hanya ditangkap di tengah
+   * rangkaian ketikan; di luar itu ia tetap tombol memilih/menekan. Spasi yang
+   * ditangkap juga ditahan saat dilepas, karena tombol baru bereaksi pada
+   * `keyup` — tanpa itu, baris menu aksi yang sedang difokus ikut tertekan.
+   */
+  const tangkapKetikan = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return false
+    if (e.key === ' ' && !sedangMengetik()) return false
+    e.preventDefault()
+    if (e.key === ' ') spasiDitahanRef.current = true
+    lompatKetik(e.key)
+    return true
+  }
 
-    // Mengetik huruf melompat ke baris yang diawali huruf itu. Ketikan yang
-    // berdekatan digabung, jadi "ja" membedakan Jawa Barat dari Jakarta.
-    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      const sekarang = Date.now()
-      const lanjutan = sekarang - ketikan.current.waktu < JEDA_KETIK
-      const teks = (lanjutan ? ketikan.current.teks : '') + e.key.toLowerCase()
-      ketikan.current = { teks, waktu: sekarang }
+  const tahanSpasi = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key !== ' ' || !spasiDitahanRef.current) return
+    e.preventDefault()
+    spasiDitahanRef.current = false
+  }
 
-      const temu = baris.find((el) => (el.textContent ?? '').trim().toLowerCase().startsWith(teks))
-      if (temu) {
+  const panelKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const baris = barisHidup()
+    if (!baris.length) return
+
+    // Navigasi komposit — panah, Home/End, dan Enter/Spasi pada `option` —
+    // hanya untuk daftar pilihan. Menu aksi tetap memakai Tab dan Enter/Spasi
+    // bawaan tombolnya; yang ditambahkan di sana hanya pencarian lewat ketikan.
+    if (pilihan) {
+      const kini = baris.indexOf(document.activeElement as HTMLElement)
+      const ke = (i: number) => {
         e.preventDefault()
-        temu.focus()
-        barisAktifRef.current = temu
+        baris[i]?.focus()
+        barisAktifRef.current = baris[i] ?? null
+        // Bergerak dengan tombol memulai kata kunci baru pada ketikan berikutnya.
+        ketikan.current = { teks: '', waktu: 0 }
+      }
+
+      switch (e.key) {
+        case 'ArrowDown':
+          return ke(kini < 0 ? 0 : (kini + 1) % baris.length)
+        case 'ArrowUp':
+          return ke(kini < 0 ? baris.length - 1 : (kini - 1 + baris.length) % baris.length)
+        case 'Home':
+          return ke(0)
+        case 'End':
+          return ke(baris.length - 1)
+        case 'Enter':
+        case ' ':
+          // Spasi di tengah ketikan adalah bagian kata kunci ("jawa t"), bukan
+          // tanda memilih — jadi diteruskan ke pencarian di bawah.
+          if (e.key === ' ' && sedangMengetik()) break
+          // `option` bukan elemen interaktif, jadi pilihannya dijalankan di sini.
+          if (kini >= 0) {
+            e.preventDefault()
+            baris[kini].click()
+          }
+          return
+        case 'Tab':
+          return tutup()
       }
     }
+
+    tangkapKetikan(e)
+  }
+
+  /**
+   * Menu aksi yang baru dibuka belum memindahkan fokus dari tombolnya, jadi
+   * ketikan pertama ditangkap di tombol lalu dilanjutkan di panel — begitu ada
+   * baris yang cocok, fokus sudah pindah ke sana. Daftar pilihan tidak perlu:
+   * fokusnya langsung masuk ke panel saat dibuka.
+   */
+  const pemicuKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    trigger.props.onKeyDown?.(e)
+    if (!e.defaultPrevented && terbuka && !pilihan) tangkapKetikan(e)
+  }
+
+  const pemicuKeyUp = (e: KeyboardEvent<HTMLButtonElement>) => {
+    trigger.props.onKeyUp?.(e)
+    tahanSpasi(e)
   }
 
   const renderItem = (item: DropdownItem, key: Key) => {
@@ -466,6 +554,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
           <span className="min-w-0 flex-1">
             <span className="block">{item.label}</span>
             <span
+              data-keterangan=""
               className={cn(
                 'mt-0.5 block text-xs font-normal',
                 darkMode ? 'text-gray-400' : 'text-gray-500',
@@ -575,6 +664,8 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
         popoverTargetAction: 'toggle',
         'aria-expanded': terbuka,
         ...(pilihan ? { 'aria-haspopup': 'listbox' as const, 'aria-controls': contentId } : null),
+        onKeyDown: pemicuKeyDown,
+        onKeyUp: pemicuKeyUp,
       })}
 
       <div
@@ -584,6 +675,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
         role={pilihan ? 'listbox' : undefined}
         aria-label={pilihan ? contentLabel : undefined}
         onKeyDown={panelKeyDown}
+        onKeyUp={tahanSpasi}
         onFocusCapture={(event) => {
           const target = event.target
           if (target instanceof HTMLElement && target.matches('[data-baris]')) {

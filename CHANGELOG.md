@@ -11,6 +11,166 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+Ada perubahan API yang memutus pada komponen `Button` — baca bagian
+**Diubah**. Komponen `Button` kini mendukung pengiriman formulir native lewat
+prop `type`, dan tombol khusus ikon dipisahkan ke prop boolean `iconOnly`.
+Komponen `Sidebar` kini mendukung menu dropdown profil akun pengguna serta
+penanganan tautan eksternal (`external`). Komponen `Search` kini mendukung live
+search (`trigger="change"` / `"auto"`), jeda debounce, dan pengaturan
+visibilitas tombol cari (`showButton`). Kedua komponen tersebut kini juga telah
+mengadopsi sistem token warna semantik dan atribut `data-theme` untuk tema gelap.
+Komponen `Upload` kini membatasi unggahan berkas tunggal secara ketat.
+README di halaman npm dan situs dokumentasi ikut diperbarui.
+
+### Diubah
+
+- **Memutus — `type="iconOnly"` pada `Button` kini digantikan prop boolean `iconOnly`.**
+  Nilai `"iconOnly"` dihapus dari prop `type`. Di TypeScript, kode yang masih
+  menulis `type="iconOnly"` akan gagal dikompilasi. Penggantinya: gunakan prop
+  boolean `iconOnly`. Tipe pembantu `ButtonType` yang sebelumnya mengekspor
+  `"button" | "iconOnly"` juga ikut dihapus.
+
+  ```diff
+  - <Button type="iconOnly" aria-label="Hapus">
+  -   <TrashBin />
+  - </Button>
+  + <Button iconOnly aria-label="Hapus">
+  +   <TrashBin />
+  + </Button>
+  ```
+
+- **`Button`: prop `type` kini meneruskan tipe HTML native (`button | submit | reset`).**
+  Bawaannya tetap `'button'`, tetapi nilainya kini diteruskan langsung ke elemen
+  `<button type={type}>` alih-alih di-hardcode. Tombol kini dapat memicu
+  pengiriman formulir secara native saat dipasang di dalam `<form>` lewat
+  `type="submit"`.
+- **`Alert` `darkMode`: warna mengikuti desain gelap yang baru.** Latarnya kini
+  -900 dari variant itu sendiri, bukan lagi gray-800 untuk semua variant.
+  Ikonnya -500, heading dan isi pesan sama-sama -50, dan tombol tutup (×)
+  memakai warna per variant dari desain: success green-700, danger orange-800,
+  warning yellow-700, info primary-400, purple purple-500. Cincin fokus tombol
+  tutup kini ikut warna heading supaya tetap terlihat. Isi `actions` tetap
+  tidak diubah; desainnya memakai tombol -600, kecuali success dan warning yang
+  -500. Alert terang tidak berubah.
+- **Field gelap kini berlatar gray-700, bukan gray-800**, mengikuti desain gelap
+  yang baru: `InputField`, `Select`, `FloatingLabel`, serta kotak, toolbar, dan
+  area isian `TextArea`. Garis default `InputField`, `Select`, dan `TextArea`
+  ikut gray-700 sehingga tetap menyatu dengan latarnya; garis `InputField`
+  `inactive` tetap gray-800. `FloatingLabel` kini bergaris gray-600 yang
+  terlihat (sebelumnya gray-800, menyatu dengan latar).
+- **`Toast` `darkMode`: kartu kini gray-700, bukan gray-800.** Pesan singkat
+  tanpa heading naik ke gray-300, sama dengan heading; teks pendukung di bawah
+  heading tetap gray-400.
+- **`Radio` `darkMode` `inactive`: lingkaran kini gray-700 bergaris gray-800**,
+  sebelumnya gray-800 seluruhnya.
+- **`Toggle`, `Checkbox`, `Radio`, `Select`, `InputField`, `FloatingLabel`,
+  `TextArea`, `Toast`, `Alert`, `Sidebar`, dan `Search` kini memakai token warna, seperti `Card`.**
+  `darkMode` cukup memasang `data-theme="dark"` di pembungkus terluarnya. Tanpa
+  prop itu komponen ikut tema pembungkusnya, mis. `<section data-theme="dark">`,
+  dan kembali terang di dalam `data-theme="light"`. Warna terang dan gelapnya
+  mengikuti token semantik. Panel daftar pilihan `Select` tetap terang.
+- **`Sidebar` dan `Search` kini memakai token warna komponen di `tokens.css`.**
+  `Sidebar` memakai token `--color-sidebar-surface` (putih di tema terang, gray-700
+  di tema gelap); wadah, menu profil, dan navigasi otomatis menyesuaikan kontras
+  yang sesuai. `Search` memakai token `--color-search-category-surface` (gray-100 di
+  tema terang, gray-700 di tema gelap) untuk tombol kategori dan
+  `--color-search-field-surface` (gray-50 di tema terang, gray-600 di tema gelap)
+  untuk kolom pencarian.
+- **`Upload`: pembatasan berkas tunggal secara ketat.** Prop `multiple` dihapus
+  dari `UploadProps` untuk memastikan pemenuhan kebutuhan berkas tunggal,
+  operasi drag-and-drop hanya mengambil item pertama, dan label serta ukuran
+  berkas kini menampilkan berkas tunggal.
+- **`--color-feedback-error` kini red-500 di tema gelap**, tetap red-600 di
+  tema terang. Error Input Field dan Floating Label gelap memakainya.
+- **Mengetik di daftar pilihan `Select` kini melompat ke pilihan yang cocok
+  dengan lebih andal.** Spasi di tengah ketikan ikut jadi kata kunci ("jawa t"
+  → Jawa Tengah); sebelumnya spasi langsung memilih baris yang aktif dan
+  menutup panel. Jeda antar-ketikan dilonggarkan dari 0,5 ke 1 detik. Bila
+  tidak ada pilihan yang diawali ketikan itu, yang dicari awal salah satu
+  katanya ("jakarta" → DKI Jakarta). Huruf yang sama diketik berulang
+  berpindah ke pilihan berikutnya. Perilaku ini milik panel `Dropdown`, jadi
+  daftar kategori `Search` ikut mendapatkannya.
+- **`Hero` dan `Container` kini memakai token warna, seperti `Card`.**
+  `darkMode` cukup memasang `data-theme="dark"`; tanpa prop itu keduanya ikut
+  tema pembungkusnya, mis. `<section data-theme="dark">`.
+- **`Hero` `darkMode`: latar kini gray-800 (`--color-surface-subtle`), bukan
+  gray-900**, untuk ketiga tipe. Sub heading naik dari primary-500 ke
+  primary-400 dan deskripsi dari gray-400 ke gray-300, supaya kontrasnya lebih
+  tinggi. Hero terang tidak berubah: putih, atau primary-50 untuk `centered`.
+- **`Container` `darkMode`: latar elemen dalam kini gray-700
+  (`--color-container`), bukan gray-800.** Teksnya tetap gray-300.
+- **`Modal`: `trigger` kini opsional**, asalkan Modal dikendalikan lewat
+  `open`. Tanpa keduanya Modal melempar error yang menjelaskan prop mana yang
+  kurang.
+
+### Ditambahkan
+
+- **`Table`: kolom berkas lewat `column.file`.** Sel menampilkan ikon jenis
+  berkas lalu namanya; jenisnya ditebak dari ekstensi nama. Gambar (ikon biru)
+  dan PDF (ikon merah) dibuka di pratinjau di atas halaman, PDF memakai
+  penampil bawaan peramban, lengkap dengan tautan "Buka di tab baru". Berkas
+  lain (ikon abu-abu) diunduh. Isiannya `name`, `href`, `type`, dan `preview`;
+  tanpa `href` nama tampil sebagai teks biasa.
+- **Komponen `TableFile`**, bentuk langsung kolom berkas untuk dipakai di
+  `cell` sendiri. Tipe `TableColumnFile`, `TableFileProps`, dan
+  `TableFileType` ikut diekspor.
+- **`Modal`: prop `open` dan `onOpenChange`** untuk membuka dan menutup Modal
+  dari kode, mis. dari tombol hapus di baris tabel. Tombol tutup, Escape,
+  klik backdrop, dan `close` di footer memanggil `onOpenChange(false)`. Tanpa
+  `open`, Modal tetap mengurus dirinya sendiri lewat `trigger` seperti biasa.
+- **Token `--color-container`** untuk latar `Container` di tema gelap.
+- **Token komponen `--color-sidebar-surface`, `--color-search-category-surface`, dan `--color-search-field-surface` di `tokens.css`.**
+  Menyediakan kontrol warna latar khusus untuk Sidebar serta kategori dan field Search pada tema terang dan gelap (`data-theme="dark"`).
+- **`Sidebar`: menu dropdown profil akun dan link eksternal.**
+  `SidebarUser` kini mendukung `items?: SidebarUserItem[]` dan `groups?: SidebarUserGroup[]`
+  untuk menampilkan menu dropdown akun/profil (misalnya profil, pengaturan, dan
+  keluar). Mendukung `tone="danger"` untuk aksi destruktif seperti Logout,
+  penutupan via klik luar (*pointerdown*) dan tombol `Escape`, rotasi chevron,
+  serta tata letak flyout yang rapi saat sidebar dalam kondisi `collapsed`.
+  Selain itu, `SidebarItem`, `SidebarSubItem`, dan `SidebarUser` kini mendukung
+  prop `external?: boolean` yang otomatis membuka tab baru dengan
+  `target="_blank" rel="noreferrer noopener"`. Tipe `SidebarUserItem`,
+  `SidebarUserGroup`, dan `SidebarUserItemTone` ikut diekspor.
+- **`Search`: live search (`trigger`), jeda `debounce`, dan visibilitas tombol `showButton`.**
+  Komponen `Search` kini mendukung pencarian otomatis saat mengetik lewat prop
+  `trigger="change" | "auto"` dengan jeda debounce via `debounce` (bawaan 300ms).
+  Prop `showButton?: boolean` memungkinkan tombol cari di sebelah kanan disembunyikan
+  (otomatis `false` secara default pada `platform="compact"` agar serasi dipasang di
+  Navbar). Kotak isian otomatis membulat rapi saat tombol disembunyikan.
+- **`Button`: prop boolean `iconOnly`** — membuat tombol persegi proporsional
+  yang memuat ikon saja (`children`). Bawaannya `false`.
+- **Token semantik untuk field dan kontrol form:** `--color-content-muted`,
+  `--color-content-disabled`, `--color-field`, `--color-field-border`,
+  `--color-field-disabled`, dan `--color-border-strong`, masing-masing dengan
+  pasangan `-dark` untuk menimpa nilai gelapnya, serta
+  `--color-feedback-error-dark`.
+- **Token komponen** untuk warna yang hanya dipakai satu komponen:
+  `--color-toggle-*`, `--color-radio-*`, `--color-select-*`,
+  `--color-input-field-*`, `--color-floating-label-*`, `--color-text-area-*`,
+  `--color-toast-*`, `--color-alert-*`, `--color-sidebar-surface`, dan
+  `--color-search-*`. Daftarnya ada di `COLOR.md`.
+- **Kelas `ds-theme-light`**, padanan `data-theme="light"` untuk elemen yang
+  tidak bisa diberi atribut.
+- **`Datepicker`: tanggal bisa diketik saat kalender terbuka.** "17" ke tanggal
+  17 bulan yang sedang difokus, "17 agu" ke 17 Agustus, "17/8/1945" atau
+  "17 agustus 1945" ke tanggal itu, dan "1945" ke tahunnya; Enter lalu
+  memilihnya. Nama bulan bisa bahasa Indonesia atau Inggris ("aug", "oct").
+  Ketikan dengan jeda di bawah satu detik digabung, Backspace menghapus huruf
+  terakhir, dan hasilnya berhenti di tepi `min`/`max` seperti panah.
+- **`Dropdown`: menu aksi kini bisa dicari dengan mengetik**, sama dengan daftar
+  pilihan. Ketikan pertama langsung setelah menu dibuka sudah dihitung, dan
+  hanya label yang dicocokkan, bukan keterangannya. Tab, Enter, dan Spasi tetap
+  bawaan tombolnya, kecuali spasi di tengah ketikan.
+
+### Diperbaiki
+
+- **`Container` dengan `max-w-*` di `className` kini tetap di tengah.**
+  Sebelumnya batas lebar menempel di elemen luar yang tidak dipusatkan, jadi
+  Container menempel ke kiri.
+- **`Button`: fungsionalitas pengiriman formulir native kini bekerja.**
+  Sebelumnya elemen `<button>` selalu meng-hardcode atribut `type="button"`,
+  sehingga tombol tidak dapat memicu aksi submit form.
+
 ## [0.3.1] - 2026-10-08
 
 Tidak ada perubahan API yang memutus, tetapi beberapa komponen yang sudah ada

@@ -33,55 +33,42 @@ const boxes: Record<TextAreaPlatform, string> = {
 }
 
 /**
- * Tombol kirim gelap satu tingkat lebih terang (desain: primary-600). Button
- * sudah membawa `bg-primary-700 hover:bg-primary-800` sendiri, dan di antara
- * dua kelas untuk properti yang sama urutan CSS Tailwind yang menang — di sana
- * -700 jatuh setelah -600. Tanda `!` membuat warna gelap ini selalu menang.
+ * Tombol kirim gelap satu tingkat lebih terang (desain: primary-600) — nilainya
+ * diatur token `text-area-submit`. Button sudah membawa `bg-primary-700
+ * hover:bg-primary-800` sendiri, dan di antara dua kelas untuk properti yang
+ * sama urutan CSS Tailwind yang menang. Tanda `!` membuat warna token ini
+ * selalu menang.
  */
-const accents: Record<TextAreaApplication, { focus: string; submit: string; submitDark: string }> = {
+const accents: Record<TextAreaApplication, { focus: string; submit: string }> = {
   default: {
     focus: 'focus-within:border-primary-600',
-    submit: 'bg-primary-700 hover:bg-primary-800 focus-visible:outline-primary-700',
-    submitDark: 'bg-primary-600! hover:bg-primary-700! focus-visible:outline-primary-600',
+    submit: 'bg-text-area-submit! hover:bg-text-area-submit-hover! focus-visible:outline-text-area-submit',
   },
   simaya: {
     focus: 'focus-within:border-purple-700',
-    submit: 'bg-purple-700 hover:bg-purple-800 focus-visible:outline-purple-700',
-    submitDark: 'bg-purple-600! hover:bg-purple-700! focus-visible:outline-purple-600',
+    submit:
+      'bg-text-area-submit-simaya! hover:bg-text-area-submit-simaya-hover! focus-visible:outline-text-area-submit-simaya',
   },
 }
 
-/** Warna tiap bagian untuk tampilan terang dan gelap. */
-const themes = {
-  light: {
-    label: 'text-gray-900',
-    hint: 'text-gray-500',
-    field: 'text-gray-900 placeholder:text-gray-500 disabled:text-gray-400',
-    box: 'border-gray-300 bg-surface-subtle',
-    frame: 'border-gray-300',
-    toolbar: 'bg-surface-subtle',
-    tool: 'text-gray-500 hover:text-gray-800',
-    divider: 'bg-gray-300',
-    body: 'bg-surface',
-    helper: 'text-gray-500',
-  },
-  /**
-   * Dari desain gelap: kotak default tanpa garis yang terlihat, sedangkan
-   * bingkai editor dan pemisah toolbarnya tetap gray-300. Toolbar dan area
-   * isian editor sama-sama gray-800. Teks yang diketik putih seperti label.
-   */
-  dark: {
-    label: 'text-white',
-    hint: 'text-gray-500',
-    field: 'text-white placeholder:text-gray-400 disabled:text-gray-500',
-    box: 'border-gray-800 bg-gray-800',
-    frame: 'border-gray-300',
-    toolbar: 'bg-gray-800',
-    tool: 'text-gray-400 hover:text-gray-200',
-    divider: 'bg-gray-300',
-    body: 'bg-gray-800',
-    helper: 'text-gray-100',
-  },
+/**
+ * Warna tiap bagian dari token di tokens.css, jadi tema gelap cukup mengganti
+ * nilai token lewat `data-theme`. Desain gelap: kotak default tanpa garis yang
+ * terlihat, sedangkan bingkai editor dan pemisah toolbarnya tetap gray-300 di
+ * kedua tampilan. Toolbar dan area isian editor sama-sama gray-700. Teks yang
+ * diketik putih seperti label.
+ */
+const colors = {
+  label: 'text-content',
+  hint: 'text-gray-500',
+  field: 'text-content placeholder:text-content-muted disabled:text-content-disabled',
+  box: 'border-field-border bg-field',
+  frame: 'border-gray-300',
+  toolbar: 'bg-field',
+  tool: 'text-content-muted hover:text-text-area-tool-hover',
+  divider: 'bg-gray-300',
+  body: 'bg-surface',
+  helper: 'text-text-area-helper',
 }
 
 /** Tombol toolbar editor — dikirim ke `onToolbarAction` lewat namanya. */
@@ -121,7 +108,11 @@ export interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaE
   /** Label tombol kirim di bawah editor. Tombol hanya muncul bila prop ini diisi. */
   submitLabel?: ReactNode
   onSubmit?: () => void
-  /** Tampilan gelap: kotak dan toolbar gray-800, label putih. */
+  /**
+   * Memaksa kotak ini bertema gelap: kotak dan toolbar gray-700, label putih.
+   * Tanpa prop ini ia ikut tema elemen pembungkusnya, mis.
+   * `<section data-theme="dark">`.
+   */
   darkMode?: boolean
   /** Kelas untuk pembungkus terluar (label + kotak + caption + tombol). */
   className?: string
@@ -133,7 +124,8 @@ export interface TextAreaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaE
  * Type `default` menampilkan kotak polos setinggi 162px (120px di mobile),
  * sedangkan `editor` menambahkan toolbar 40px di atas area isian dan tombol
  * kirim opsional di bawahnya. Warna garis saat difokus dan tombol kirim
- * mengikuti prop `application`; `darkMode` mengganti sisanya ke tampilan gelap.
+ * mengikuti prop `application`; `darkMode` sekadar memasang
+ * `data-theme="dark"` di pembungkus terluarnya.
  */
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextArea(
   {
@@ -160,7 +152,6 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   const helperId = `${fieldId}-helper`
 
   const accent = accents[application]
-  const t = darkMode ? themes.dark : themes.light
   const isEditor = type === 'editor'
 
   const field = (
@@ -171,38 +162,40 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
       aria-describedby={helperText ? helperId : undefined}
       className={cn(
         'block w-full resize-none p-4 text-sm outline-none disabled:cursor-not-allowed',
-        t.field,
+        colors.field,
         // Editor: tinggi area isian 166px, di bawah toolbar 40px (total 206px).
-        isEditor ? cn('h-41.5', t.body) : cn('rounded-lg border transition-colors', t.box, boxes[platform], accent.focus),
+        isEditor
+          ? cn('h-41.5', colors.body)
+          : cn('rounded-lg border transition-colors', colors.box, boxes[platform], accent.focus),
       )}
       {...props}
     />
   )
 
   return (
-    <div className={cn('w-full', className)}>
+    <div data-theme={darkMode ? 'dark' : undefined} className={cn('w-full', className)}>
       {(label || hint) && (
         <div className="mb-2 flex items-baseline justify-between gap-3">
           {label && (
-            <label htmlFor={fieldId} className={cn('text-sm font-bold', t.label)}>
+            <label htmlFor={fieldId} className={cn('text-sm font-bold', colors.label)}>
               {label}
             </label>
           )}
-          {hint && <span className={cn('text-sm', t.hint)}>{hint}</span>}
+          {hint && <span className={cn('text-sm', colors.hint)}>{hint}</span>}
         </div>
       )}
 
       {isEditor ? (
-        <div className={cn('overflow-hidden rounded-lg border transition-colors', t.frame, accent.focus)}>
+        <div className={cn('overflow-hidden rounded-lg border transition-colors', colors.frame, accent.focus)}>
           {/* Jarak antarikon 15px, sesuai desain. */}
-          <div className={cn('flex h-10 items-center gap-3.75 px-4', t.toolbar)}>
+          <div className={cn('flex h-10 items-center gap-3.75 px-4', colors.toolbar)}>
             {toolbar ?? (
               <>
                 {toolbarItems.map(({ action, label: title, Icon }, i) => (
                   <Fragment key={action}>
                     {/* Garis pemisah memisahkan alat teks dari alat sisipan. Di desain ia
                         berjarak 16px dari ikon sebelumnya dan 15px dari ikon sesudahnya. */}
-                    {i === 3 && <span aria-hidden="true" className={cn('ml-px h-4 w-px', t.divider)} />}
+                    {i === 3 && <span aria-hidden="true" className={cn('ml-px h-4 w-px', colors.divider)} />}
                     <button
                       type="button"
                       onClick={() => onToolbarAction?.(action)}
@@ -211,7 +204,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
                       title={title}
                       className={cn(
                         'shrink-0 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current disabled:cursor-not-allowed disabled:opacity-50',
-                        t.tool,
+                        colors.tool,
                       )}
                     >
                       <Icon className="size-4" />
@@ -228,14 +221,14 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
       )}
 
       {helperText && (
-        <p id={helperId} className={cn('mt-2 text-xs', t.helper)}>
+        <p id={helperId} className={cn('mt-2 text-xs', colors.helper)}>
           {helperText}
         </p>
       )}
 
       {isEditor && submitLabel && (
         <div className="mt-2">
-          <Button onClick={onSubmit} disabled={disabled} className={darkMode ? accent.submitDark : accent.submit}>
+          <Button onClick={onSubmit} disabled={disabled} className={accent.submit}>
             {submitLabel}
           </Button>
         </div>
