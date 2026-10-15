@@ -135,7 +135,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
 | `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `sticky`, `size`, `loading` |
 
-Warna Button diatur `theme` (`primary | green | gray | simaya | orange |
+Warna Button diatur `theme` (`primary | green | gray | purple | orange |
 yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya
 memilih terisi atau bergaris. Ukuran: `xs | s | base | l | xl`. Ikon di kiri
 atau kanan teks lewat `leftIcon`/`rightIcon`; `iconOnly` membuat tombol
@@ -175,7 +175,7 @@ Prop yang dipakai bersama seluruh komponen form:
   Komponen ini juga mendukung live search via `trigger="change"` / `"auto"` dengan jeda `debounce`
   (bawaan 300ms) serta tema gelap berbasis token (`--color-search-category-surface` dan `--color-search-field-surface`).
 - `Upload`: dibatasi khusus berkas tunggal (atribut `multiple` dinonaktifkan).
-- `application`: `default | simaya` — warna aksen per aplikasi.
+- `application`: `default | purple` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.
 - Kondisi tercentang/menyala pada `Radio`, `Toggle`, dan `Checkbox` memakai

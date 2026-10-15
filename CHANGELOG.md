@@ -11,7 +11,8 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
-Ada perubahan API yang memutus pada komponen `Button` — baca bagian
+Ada perubahan API yang memutus pada komponen `Button` serta migrasi tema/aksen
+warna `simaya` ke `purple` pada seluruh komponen dan token — baca bagian
 **Diubah**. Komponen `Button` kini mendukung pengiriman formulir native lewat
 prop `type`, dan tombol khusus ikon dipisahkan ke prop boolean `iconOnly`.
 Komponen `Sidebar` kini mendukung menu dropdown profil akun pengguna serta
@@ -23,6 +24,26 @@ visibilitas tombol cari (`showButton`). Komponen `Sidebar`, `Search`, dan
 tunggal secara ketat. README di halaman npm dan situs dokumentasi ikut diperbarui.
 
 ### Diubah
+
+- **Memutus — Penyelarasan tema dan token `simaya` menjadi `purple`.**
+  Seluruh komponen dan token yang sebelumnya menerima nilai `"simaya"` kini distandarkan menjadi `"purple"` sebagai nama warna netral:
+  - Komponen Form (`InputField`, `FloatingLabel`, `TextArea`, `Select`, `Checkbox`, `Radio`, `Toggle`, `Upload`, `Search`): prop `application?: 'default' | 'simaya'` diubah menjadi `application?: 'default' | 'purple'`.
+  - Komponen General & Navigasi:
+    - `Button`: `ButtonTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+    - `Pagination`: `PaginationTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+    - `Drawer`: `DrawerNavItemTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+    - `Table`: `TableActionTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+  - Token CSS di `tokens.css`:
+    - `--color-floating-label-accent-simaya` diubah menjadi `--color-floating-label-accent-purple`.
+    - `--color-text-area-submit-simaya` dan `-hover` diubah menjadi `--color-text-area-submit-purple` dan `-hover`.
+
+  ```diff
+  - <Button theme="simaya">Kirim</Button>
+  + <Button theme="purple">Kirim</Button>
+
+  - <InputField application="simaya" label="Nama" />
+  + <InputField application="purple" label="Nama" />
+  ```
 
 - **Memutus — `type="iconOnly"` pada `Button` kini digantikan prop boolean `iconOnly`.**
   Nilai `"iconOnly"` dihapus dari prop `type`. Di TypeScript, kode yang masih

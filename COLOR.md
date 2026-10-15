@@ -31,7 +31,7 @@ Warna mentah dengan skala 50 sampai 900.
 | `orange` | peringatan, aksi berisiko |
 | `yellow` | peringatan ringan |
 | `green` | sukses |
-| `purple` | aksen aplikasi Simaya |
+| `purple` | aksen warna ungu (mis. aplikasi Simaya) |
 
 Contoh: `--color-primary-600`, `--color-gray-200`.
 
@@ -96,8 +96,8 @@ Warna yang hanya dipakai satu komponen dan tidak cocok dengan token semantik man
 | Radio | `--color-radio-border`, `-surface`, `-border-inactive`, `-ring-inactive`, `-label`, `-content-inactive` |
 | Select | `--color-select-label`, `-content-inactive` |
 | Input Field | `--color-input-field-surface-failed`, `-border-inactive`, `-label-inactive`, `-content-failed`, `-action`, `-action-inactive` |
-| Floating Label | `--color-floating-label-content`, `-icon-error`, `-accent`, `-accent-simaya` |
-| Text Area | `--color-text-area-tool-hover`, `-helper`, `-submit`, `-submit-hover`, `-submit-simaya`, `-submit-simaya-hover` |
+| Floating Label | `--color-floating-label-content`, `-icon-error`, `-accent`, `-accent-purple` |
+| Text Area | `--color-text-area-tool-hover`, `-helper`, `-submit`, `-submit-hover`, `-submit-purple`, `-submit-purple-hover` |
 | Toast | `--color-toast-heading`, `-body`, `-close-hover`, lalu `-{variant}-surface` dan `-{variant}-icon` |
 | Alert | `--color-alert-{variant}-surface`, `-icon`, `-heading`, `-body`, `-close` |
 | Sidebar | `--color-sidebar-surface` |
