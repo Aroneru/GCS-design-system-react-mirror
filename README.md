@@ -101,11 +101,11 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   tema terang dengan `data-theme="light"` atau kelas `.ds-theme-light`.
 - **Komponen yang mendukung `data-theme`**: `Card`, `Sidebar`, `Search`,
   `Alert`, `Toast`, `InputField`, `FloatingLabel`, `TextArea`, `Select`,
-  `Toggle`, `Radio`, dan `Checkbox`.
-- **Token komponen**: Warna latar khusus komponen disediakan melalui token yang
+  `Toggle`, `Radio`, `Checkbox`, dan `Breadcrumb`.
+- **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
-  serta `--color-search-category-surface` dan `--color-search-field-surface`
-  (Search). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
+  `--color-search-category-surface` dan `--color-search-field-surface` (Search),
+  serta `--color-breadcrumb-*` (Breadcrumb). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
 
 ## Komponen & props
 

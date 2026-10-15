@@ -540,6 +540,26 @@
     --color-search-field-surface: var(--color-gray-50);
 }
 
+/* Breadcrumb */
+@theme static {
+    --color-breadcrumb-surface: var(--color-gray-100);
+    --color-breadcrumb-active: var(--color-gray-900);
+    --color-breadcrumb-link-hover: var(--color-primary-700);
+}
+
+[data-theme='dark'] {
+    --color-breadcrumb-surface: var(--color-gray-700);
+    --color-breadcrumb-active: var(--color-gray-300);
+    --color-breadcrumb-link-hover: #ffffff;
+}
+
+[data-theme='light'],
+.ds-theme-light {
+    --color-breadcrumb-surface: var(--color-gray-100);
+    --color-breadcrumb-active: var(--color-gray-900);
+    --color-breadcrumb-link-hover: var(--color-primary-700);
+}
+
 @media (max-width: 639px) {
     :root {
         --text-display: 2.25rem;
