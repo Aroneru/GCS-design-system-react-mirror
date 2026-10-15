@@ -95,7 +95,7 @@ Warna yang hanya dipakai satu komponen dan tidak cocok dengan token semantik man
 | Toggle | `--color-toggle-track`, `-track-inactive`, `-knob` |
 | Radio | `--color-radio-border`, `-surface`, `-border-inactive`, `-ring-inactive`, `-label`, `-content-inactive` |
 | Select | `--color-select-label`, `-content-inactive` |
-| Input Field | `--color-input-field-surface-failed`, `-border-inactive`, `-label-inactive`, `-content-failed`, `-action`, `-action-inactive` |
+| Input Field | `--color-input-field-surface-failed`, `-border-inactive`, `-label-inactive`, `-content-failed`, `-action-inactive` |
 | Floating Label | `--color-floating-label-content`, `-icon-error`, `-accent`, `-accent-simaya` |
 | Text Area | `--color-text-area-tool-hover`, `-helper`, `-submit`, `-submit-hover`, `-submit-simaya`, `-submit-simaya-hover` |
 | Toast | `--color-toast-heading`, `-body`, `-close-hover`, lalu `-{variant}-surface` dan `-{variant}-icon` |

@@ -27,6 +27,11 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   ikut gray-700 sehingga tetap menyatu dengan latarnya; garis `InputField`
   `inactive` tetap gray-800. `FloatingLabel` kini bergaris gray-600 yang
   terlihat (sebelumnya gray-800, menyatu dengan latar).
+- **Tombol hapus (×) dan tombol mata `InputField` gelap kini gray-400**, sama
+  dengan × pada `FloatingLabel`. Sebelumnya gray-600 (× saat `typing`
+  gray-500), nyaris tak terlihat di latar gray-700. × saat `failed` tetap
+  red-600, mata saat `inactive` tetap gray-600, dan tampilan terang tidak
+  berubah.
 - **`Toast` `darkMode`: kartu kini gray-700, bukan gray-800.** Pesan singkat
   tanpa heading naik ke gray-300, sama dengan heading; teks pendukung di bawah
   heading tetap gray-400.
