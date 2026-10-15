@@ -273,7 +273,7 @@
     --color-radio-label: var(--color-gray-900);
     --color-radio-content-inactive: var(--color-gray-400);
 }
-[data-theme='dark'], .ds-theme-darkz {
+[data-theme='dark'], .ds-theme-dark {
     --color-radio-border: var(--color-gray-400);
     --color-radio-surface: var(--color-gray-300);
     --color-radio-border-inactive: var(--color-gray-800);

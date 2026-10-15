@@ -212,7 +212,7 @@ export function ModalPage() {
         </div>
 
         <SectionCode>
-          {'<Modal\n  trigger={<Button>Buka Modal</Button>}\n  title="Terms of Service"\n  footer={({ close }) => (\n    <>\n      <Button onClick={close}>Batal</Button>\n      <Button onClick={close}>Saya Setuju</Button>\n    </>\n  )}\n>\n  ...\n</Modal>'}
+          {'<Modal\n  trigger={<Button>Buka Modal</Button>}\n  title="Terms of Service"\n  footer={({ close }) => (\n    <>\n      <Button variant="outline" theme="gray" size="xs" onClick={close}>Batal</Button>\n      <Button size="xs" onClick={close}>Saya Setuju</Button>\n    </>\n  )}\n>\n  ...\n</Modal>'}
         </SectionCode>
       </FlowSection>
 
@@ -256,7 +256,7 @@ export function ModalPage() {
           <H>variant</H>
           {'="popup"\n  '}
           <H>aria-label</H>
-          {'="Konfirmasi hapus konten"\n  footer={({ close }) => (\n    <div className="flex w-full justify-center gap-4">\n      <Button onClick={close}>Tidak, Batalkan</Button>\n      <Button onClick={close}>Ya, hapus konten ini</Button>\n    </div>\n  )}\n>\n  ...\n</Modal>'}
+          {'="Konfirmasi hapus konten"\n  footer={({ close }) => (\n    <div className="flex w-full justify-center gap-4">\n      <Button variant="outline" theme="gray" size="xs" onClick={close}>Tidak, Batalkan</Button>\n      <Button theme="orange" size="xs" onClick={close}>Ya, hapus konten ini</Button>\n    </div>\n  )}\n>\n  ...\n</Modal>'}
         </SectionCode>
       </FlowSection>
 

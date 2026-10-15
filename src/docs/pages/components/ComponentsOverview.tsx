@@ -46,8 +46,8 @@ export function ComponentsOverview() {
         desc="Aksi utama dengan empat variant: primary, secondary, danger, ghost."
       >
         <div className="flex flex-wrap items-center gap-2 rounded-xl bg-surface-subtle p-5">
-          <Button variant="filled">Primary</Button>
           <Button variant="outline">Secondary</Button>
+          <Button variant="filled">Primary</Button>
         </div>
       </OverviewCard>
 
