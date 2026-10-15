@@ -177,7 +177,7 @@
     /* Skala spacing dasar — tiap langkah kelipatan 4px (0.25rem). */
     --spacing: 0.25rem;
 
-    /* Skala radius & shadow mengikuti penamaan Figma/v3. */
+    /* Skala radius & shadow mengikuti penamaan desain dan Tailwind v3. */
     --radius-sm: 0.125rem;
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.08);
 
@@ -315,16 +315,13 @@
     --color-input-field-border-inactive: var(--color-gray-400);
     --color-input-field-label-inactive: var(--color-gray-400);
     --color-input-field-content-failed: var(--color-red-700);
-    --color-input-field-action: var(--color-gray-500);
-    /* tombol hapus dan tombol mata */
-    --color-input-field-action-inactive: var(--color-gray-400);
+    --color-input-field-action-inactive: var(--color-gray-400); /* tombol mata saat inactive */
 }
 [data-theme='dark'], .ds-theme-dark {
     --color-input-field-surface-failed: var(--color-gray-700);
     --color-input-field-border-inactive: var(--color-gray-800);
     --color-input-field-label-inactive: var(--color-gray-50);
     --color-input-field-content-failed: var(--color-red-500);
-    --color-input-field-action: var(--color-gray-600);
     --color-input-field-action-inactive: var(--color-gray-600);
 }
 
@@ -334,7 +331,6 @@
     --color-input-field-border-inactive: var(--color-gray-400);
     --color-input-field-label-inactive: var(--color-gray-400);
     --color-input-field-content-failed: var(--color-red-700);
-    --color-input-field-action: var(--color-gray-500);
     --color-input-field-action-inactive: var(--color-gray-400);
 }
 
