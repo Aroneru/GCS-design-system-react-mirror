@@ -102,11 +102,11 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   tema terang dengan `data-theme="light"` atau kelas `.ds-theme-light`.
 - **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`,
   `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
-  `TextArea`, `Select`, `Toggle`, `Radio`, dan `Checkbox`.
-- **Token komponen**: Warna latar khusus komponen disediakan melalui token yang
+  `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, dan `Breadcrumb`.
+- **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
-  serta `--color-search-category-surface` dan `--color-search-field-surface`
-  (Search). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
+  `--color-search-category-surface` dan `--color-search-field-surface` (Search),
+  serta `--color-breadcrumb-*` (Breadcrumb). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
 
 ## Komponen & props
 
@@ -136,7 +136,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
 | `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `striped`, `sticky`, `size`, `loading` |
 
-Warna Button diatur `theme` (`primary | green | gray | simaya | orange |
+Warna Button diatur `theme` (`primary | green | gray | purple | orange |
 yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya
 memilih terisi atau bergaris. Ukuran: `xs | s | base | l | xl`. Ikon di kiri
 atau kanan teks lewat `leftIcon`/`rightIcon`; `iconOnly` membuat tombol
@@ -176,7 +176,7 @@ Prop yang dipakai bersama seluruh komponen form:
   Komponen ini juga mendukung live search via `trigger="change"` / `"auto"` dengan jeda `debounce`
   (bawaan 300ms) serta tema gelap berbasis token (`--color-search-category-surface` dan `--color-search-field-surface`).
 - `Upload`: dibatasi khusus berkas tunggal (atribut `multiple` dinonaktifkan).
-- `application`: `default | simaya` — warna aksen per aplikasi.
+- `application`: `default | purple` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.
 - Kondisi tercentang/menyala pada `Radio`, `Toggle`, dan `Checkbox` memakai

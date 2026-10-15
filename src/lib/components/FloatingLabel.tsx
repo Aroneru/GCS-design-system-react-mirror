@@ -16,7 +16,7 @@ export type FloatingLabelPlatform = 'default' | 'mobile'
 export type FloatingLabelState = 'default' | 'active' | 'error'
 
 /** Warna aksen per aplikasi — dipakai garis dan label saat field aktif. */
-export type FloatingLabelApplication = 'default' | 'simaya'
+export type FloatingLabelApplication = 'default' | 'purple'
 
 /**
  * Tinggi kotak dan ukuran teks isian per platform. Label yang sudah naik
@@ -34,7 +34,7 @@ const platforms: Record<FloatingLabelPlatform, { box: string; text: string }> = 
  */
 const accents: Record<FloatingLabelApplication, { border: string; label: string }> = {
   default: { border: 'border-primary-600', label: 'text-floating-label-accent' },
-  simaya: { border: 'border-purple-500', label: 'text-floating-label-accent-simaya' },
+  purple: { border: 'border-purple-500', label: 'text-floating-label-accent-purple' },
 }
 
 /**

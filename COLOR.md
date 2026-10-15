@@ -31,7 +31,7 @@ Warna mentah dengan skala 50 sampai 900.
 | `orange` | peringatan, aksi berisiko |
 | `yellow` | peringatan ringan |
 | `green` | sukses |
-| `purple` | aksen aplikasi Simaya |
+| `purple` | aksen warna ungu (mis. aplikasi Simaya) |
 
 Contoh: `--color-primary-600`, `--color-gray-200`.
 
@@ -95,15 +95,16 @@ Warna yang hanya dipakai satu komponen dan tidak cocok dengan token semantik man
 | Toggle | `--color-toggle-track`, `-track-inactive`, `-knob` |
 | Radio | `--color-radio-border`, `-surface`, `-border-inactive`, `-ring-inactive`, `-label`, `-content-inactive` |
 | Select | `--color-select-label`, `-content-inactive` |
-| Input Field | `--color-input-field-surface-failed`, `-border-inactive`, `-label-inactive`, `-content-failed`, `-action-inactive` |
-| Floating Label | `--color-floating-label-content`, `-icon-error`, `-accent`, `-accent-simaya` |
-| Text Area | `--color-text-area-tool-hover`, `-helper`, `-submit`, `-submit-hover`, `-submit-simaya`, `-submit-simaya-hover` |
+| Input Field | `--color-input-field-surface-failed`, `-border-inactive`, `-label-inactive`, `-content-failed`, `-action`, `-action-inactive` |
+| Floating Label | `--color-floating-label-content`, `-icon-error`, `-accent`, `-accent-purple` |
+| Text Area | `--color-text-area-tool-hover`, `-helper`, `-submit`, `-submit-hover`, `-submit-purple`, `-submit-purple-hover` |
 | Toast | `--color-toast-heading`, `-body`, `-close-hover`, lalu `-{variant}-surface` dan `-{variant}-icon` |
 | Alert | `--color-alert-{variant}-surface`, `-icon`, `-heading`, `-body`, `-close` |
 | Hero | `--color-hero`, `-centered`, `-dark` |
 | Container | `--color-container` |
 | Sidebar | `--color-sidebar-surface` |
 | Search | `--color-search-category-surface`, `--color-search-field-surface` |
+| Breadcrumb | `--color-breadcrumb-surface`, `--color-breadcrumb-active`, `--color-breadcrumb-link-hover` |
 
 `{variant}` adalah `success`, `danger`, `warning`, `info`, atau `purple`.
 
@@ -264,6 +265,6 @@ Atau lewat class:
 
 ## Status saat ini
 
-- **Sudah memakai cara ini:** Card, Container, Hero, Toggle, Checkbox, Radio, Select, InputField, FloatingLabel, TextArea, Toast, Alert, Sidebar, dan Search.
+- **Sudah memakai cara ini:** Card, Container, Hero, Toggle, Checkbox, Radio, Select, InputField, FloatingLabel, TextArea, Toast, Alert, Sidebar, Search, dan Breadcrumb.
 - **Belum:** komponen lain yang punya `darkMode` (Popover, Drawer, Datepicker, dan lainnya) masih menulis warna gelapnya sendiri. Komponen ini akan dipindah bertahap.
 - Selama belum dipindah, `data-theme="dark"` di pembungkus belum membuat komponen tersebut gelap. Pakai prop `darkMode` di komponennya.

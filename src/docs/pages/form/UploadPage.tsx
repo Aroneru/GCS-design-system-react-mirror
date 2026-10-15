@@ -16,7 +16,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: UploadApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'simaya', label: 'simaya', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 const uploadProps: PropRow[] = [
@@ -26,7 +26,7 @@ const uploadProps: PropRow[] = [
   ['placeholder', 'string', 'Belum ada file yang dipilih', 'Teks kolom nama berkas saat masih kosong.'],
   ['type', "'default' | 'attach'", 'default', 'Bentuk kontrol: satu baris tombol + nama berkas, atau area seret-lepas.'],
   ['platform', "'default' | 'mobile'", 'default', 'Tinggi dan ukuran teks baris pemilih berkas. Tidak berpengaruh pada type attach.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna tombol; pada type attach hanya terlihat saat berkas sedang diseret.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna tombol; pada type attach hanya terlihat saat berkas sedang diseret.'],
   ['attachLabel', 'ReactNode', 'Click to upload or drag and drop', 'Baris ajakan di dalam area seret-lepas.'],
   ['attachHint', 'ReactNode', 'SVG, PNG, JPG or GIF (MAX. 800x400px)', 'Baris keterangan format di dalam area seret-lepas.'],
   ['onFilesChange', '(files: FileList | null) => void', 'undefined', 'Dipanggil setiap berkas berganti, lewat dialog maupun seret-lepas.'],
@@ -159,7 +159,7 @@ export function UploadPage() {
       <FlowSection id="application" title="Application">
         <Lead>
           Warna tombol mengikuti aplikasi yang memakainya: <Hl>primary-700</Hl> untuk default dan{' '}
-          <Hl>purple-500</Hl> untuk simaya. Pilih sekali di tingkat halaman, lalu biarkan sama untuk
+          <Hl>purple-500</Hl> untuk purple. Pilih sekali di tingkat halaman, lalu biarkan sama untuk
           seluruh form di aplikasi itu.
         </Lead>
         <div className="grid gap-5">
@@ -187,7 +187,7 @@ export function UploadPage() {
         <SectionCode>
           {'<Upload '}
           <H>application</H>
-          {'="simaya" label="Unggah dokumen" />'}
+          {'="purple" label="Unggah dokumen" />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
           Kedua kotak attach di atas memang terlihat sama persis, dan itu bukan kekeliruan: dalam
