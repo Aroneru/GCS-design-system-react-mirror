@@ -17,7 +17,7 @@ import { Dropdown, type DropdownItem } from './Dropdown'
 export type SearchPlatform = 'default' | 'mobile' | 'compact'
 
 /** Warna aksen per aplikasi — dipakai tombol cari dan garis saat field difokus. */
-export type SearchApplication = 'default' | 'purple' | 'simaya'
+export type SearchApplication = 'default' | 'purple'
 
 /** Satu pilihan pada dropdown kategori. */
 export interface SearchCategory {
@@ -30,7 +30,7 @@ export interface SearchCategory {
  * Tinggi kotak, ukuran ikon, ukuran teks, dan ukuran tombol per platform.
  *
  * Tinggi dan ukuran teks tombolnya kebetulan sama dengan size `xs` dan `s`
- * milik Button, tapi Button tidak dipakai di sini: aksen simaya milik Button
+ * milik Button, tapi Button tidak dipakai di sini: aksen purple milik Button
  * purple-700 sedangkan tombol cari purple-500, dan jarak sampingnya `px-4`
  * sedangkan di sini 13px. Menimpa keduanya lewat `className` tidak bisa
  * diandalkan — `cn()` di sini clsx biasa, jadi kelas yang bertabrakan
@@ -76,11 +76,6 @@ const accents: Record<
     groupFocus: 'group-focus-within:border-primary-500',
   },
   purple: {
-    solid: 'bg-purple-500 hover:bg-purple-600 focus-visible:outline-purple-500',
-    focus: 'focus-within:border-purple-500',
-    groupFocus: 'group-focus-within:border-purple-500',
-  },
-  simaya: {
     solid: 'bg-purple-500 hover:bg-purple-600 focus-visible:outline-purple-500',
     focus: 'focus-within:border-purple-500',
     groupFocus: 'group-focus-within:border-purple-500',

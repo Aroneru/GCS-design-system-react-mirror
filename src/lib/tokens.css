@@ -325,14 +325,14 @@
     /* isian dan ikon kiri */
     --color-floating-label-icon-error: var(--color-red-600);
     --color-floating-label-accent: var(--color-primary-600);
-    --color-floating-label-accent-simaya: var(--color-purple-500);
+    --color-floating-label-accent-purple: var(--color-purple-500);
 }
 
 [data-theme='dark'] {
     --color-floating-label-content: var(--color-gray-400);
     --color-floating-label-icon-error: var(--color-gray-400);
     --color-floating-label-accent: var(--color-primary-500);
-    --color-floating-label-accent-simaya: var(--color-purple-400);
+    --color-floating-label-accent-purple: var(--color-purple-400);
 }
 
 [data-theme='light'],
@@ -340,7 +340,7 @@
     --color-floating-label-content: var(--color-gray-800);
     --color-floating-label-icon-error: var(--color-red-600);
     --color-floating-label-accent: var(--color-primary-600);
-    --color-floating-label-accent-simaya: var(--color-purple-500);
+    --color-floating-label-accent-purple: var(--color-purple-500);
 }
 
 /* Text Area */
@@ -349,8 +349,8 @@
     --color-text-area-helper: var(--color-gray-500);
     --color-text-area-submit: var(--color-primary-700);
     --color-text-area-submit-hover: var(--color-primary-800);
-    --color-text-area-submit-simaya: var(--color-purple-700);
-    --color-text-area-submit-simaya-hover: var(--color-purple-800);
+    --color-text-area-submit-purple: var(--color-purple-700);
+    --color-text-area-submit-purple-hover: var(--color-purple-800);
 }
 
 [data-theme='dark'] {
@@ -358,8 +358,8 @@
     --color-text-area-helper: var(--color-gray-100);
     --color-text-area-submit: var(--color-primary-600);
     --color-text-area-submit-hover: var(--color-primary-700);
-    --color-text-area-submit-simaya: var(--color-purple-600);
-    --color-text-area-submit-simaya-hover: var(--color-purple-700);
+    --color-text-area-submit-purple: var(--color-purple-600);
+    --color-text-area-submit-purple-hover: var(--color-purple-700);
 }
 
 [data-theme='light'],
@@ -368,8 +368,8 @@
     --color-text-area-helper: var(--color-gray-500);
     --color-text-area-submit: var(--color-primary-700);
     --color-text-area-submit-hover: var(--color-primary-800);
-    --color-text-area-submit-simaya: var(--color-purple-700);
-    --color-text-area-submit-simaya-hover: var(--color-purple-800);
+    --color-text-area-submit-purple: var(--color-purple-700);
+    --color-text-area-submit-purple-hover: var(--color-purple-800);
 }
 
 /* Toast */

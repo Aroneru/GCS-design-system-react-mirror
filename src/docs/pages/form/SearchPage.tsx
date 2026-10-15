@@ -21,7 +21,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: SearchApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'simaya', label: 'simaya', token: 'purple-500' },
+  { value: 'purple', label: 'purple', token: 'purple-500' },
 ]
 
 /** Placeholder dan daftar kategori yang dipakai contoh-contoh di halaman ini. */
@@ -40,7 +40,7 @@ const searchProps: PropRow[] = [
   ['buttonLabel', 'string', 'Cari', 'Label tombol; pada varian kategori jadi label aksesibilitas tombol ikon.'],
   ['onSearch', '(value, category) => void', 'undefined', 'Dipanggil saat tombol ditekan atau Enter di dalam field.'],
   ['platform', "'default' | 'mobile'", 'default', 'Tinggi, ukuran ikon, teks, dan tombol. Tidak berlaku pada varian kategori.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna tombol cari dan garis saat field difokus.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna tombol cari dan garis saat field difokus.'],
   ['categories', 'SearchCategory[]', 'undefined', 'Bila diisi, komponen berpindah ke varian dengan kategori.'],
   ['categoryPlaceholder', 'string', 'Kategori', 'Teks dropdown saat kategori belum dipilih.'],
   ['category / defaultCategory', 'string', 'undefined', 'Kategori terpilih, terkendali maupun tidak.'],
@@ -190,7 +190,7 @@ export function SearchPage() {
         <SectionCode>
           {'<Search '}
           <H>application</H>
-          {'="simaya" placeholder="Search Civitas, Organisasi…" />'}
+          {'="purple" placeholder="Search Civitas, Organisasi…" />'}
         </SectionCode>
       </FlowSection>
 

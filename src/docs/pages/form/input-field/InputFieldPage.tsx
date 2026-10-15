@@ -29,7 +29,7 @@ const states: { value: InputFieldState; label: string; desc: string }[] = [
 
 const applications: { value: InputFieldApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-500' },
-  { value: 'simaya', label: 'simaya', token: 'purple-500' },
+  { value: 'purple', label: 'purple', token: 'purple-500' },
 ]
 
 /** Contoh password: desktop dan mobile, lalu failed. Bagian Dark mode memakai daftar yang sama, tanpa mobile. */
@@ -69,7 +69,7 @@ const inputProps: PropRow[] = [
   ['type', "'text' | 'password' | …", 'text', "'password' menyamarkan isian, memasang ikon gembok, dan menambahkan tombol mata untuk menampilkannya."],
   ['platform', "'default' | 'mobile'", 'default', 'Tinggi field: 52px (default) atau 40px (mobile).'],
   ['state', "'default' | 'typing' | 'inactive' | 'failed'", 'default', 'Kondisi visual field.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna garis aksen saat field aktif.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna garis aksen saat field aktif.'],
   ['onClear', '() => void', 'undefined', 'Bila diisi, tombol hapus (×) muncul di kanan field.'],
   ['darkMode', 'boolean', 'false', 'Tampilan gelap: field gray-700, label putih, garis baru terlihat saat typing dan failed.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (value, onChange, autoComplete, …).'],
@@ -212,7 +212,7 @@ export function InputFieldPage() {
           {'<InputField\n'}
           {'    '}
           <H>application</H>
-          {'="simaya"\n'}
+          {'="purple"\n'}
           {'    state="typing"\n'}
           {'    label="Nama lengkap"\n'}
           {'/>'}

@@ -16,7 +16,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: RadioApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'simaya', label: 'simaya', token: 'purple-500' },
+  { value: 'purple', label: 'purple', token: 'purple-500' },
 ]
 
 const kewarganegaraan = [
@@ -29,7 +29,7 @@ const radioProps: PropRow[] = [
   ['helperText', 'ReactNode', 'undefined', 'Caption 12px di bawah label.'],
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran lingkaran: 16px atau 14px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna cincin saat pilihan dipilih.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna cincin saat pilihan dipilih.'],
   ['darkMode', 'boolean', 'false', 'Tampilan gelap: lingkaran gray-300 bergaris gray-400 dengan label terang; inactive gray-700 bergaris gray-800 dengan teks gray-600.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="radio"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
@@ -207,19 +207,19 @@ export function RadioPage() {
           {'{/* Default — tanpa prop application */}\n'}
           {'<Radio name="pilihan-default" label="Dipilih" helperText="border-primary-700" defaultChecked />\n'}
           {'<Radio name="pilihan-default" label="Belum dipilih" />\n\n'}
-          {'{/* simaya */}\n'}
+          {'{/* purple */}\n'}
           {'<Radio\n'}
-          {'    name="pilihan-simaya"\n'}
+          {'    name="pilihan-purple"\n'}
           {'    '}
           <H>application</H>
-          {'="simaya"\n'}
+          {'="purple"\n'}
           {'    label="Dipilih"\n'}
           {'    helperText="border-purple-500"\n'}
           {'    defaultChecked\n'}
           {'/>\n'}
-          {'<Radio name="pilihan-simaya" '}
+          {'<Radio name="pilihan-purple" '}
           <H>application</H>
-          {'="simaya" label="Belum dipilih" />'}
+          {'="purple" label="Belum dipilih" />'}
         </SectionCode>
       </FlowSection>
 

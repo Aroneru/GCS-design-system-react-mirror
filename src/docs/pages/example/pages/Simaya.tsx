@@ -47,7 +47,7 @@ export function Simaya() {
   return (
     <div className="space-y-8">
       <Alert variant="purple" heading="Mode Simaya aktif" dismissible={false}>
-        Seluruh kontrol di halaman ini memakai <code className="font-mono text-xs">application="simaya"</code>.
+        Seluruh kontrol di halaman ini memakai <code className="font-mono text-xs">application="purple"</code>.
         Bandingkan dengan halaman Pengaturan yang memakai nilai bawaan — strukturnya sama persis,
         hanya warna aksennya yang berbeda.
       </Alert>
@@ -71,7 +71,7 @@ export function Simaya() {
             (37px) dipasangkan dengan grup radio. */}
         <div className="mt-7 grid gap-5 sm:grid-cols-2">
           <FloatingLabel
-            application="simaya"
+            application="purple"
             label="Unit tujuan"
             icon={<User className="size-4" />}
             value={tujuan}
@@ -79,7 +79,7 @@ export function Simaya() {
             className="sm:col-span-2"
           />
           <InputField
-            application="simaya"
+            application="purple"
             label="Perihal"
             placeholder="Ringkasan isi naskah…"
             icon={<FileLines className="size-4" />}
@@ -87,13 +87,13 @@ export function Simaya() {
             onChange={(e) => setPerihal(e.target.value)}
           />
           <InputField
-            application="simaya"
+            application="purple"
             label="Nomor agenda"
             placeholder="Otomatis bila dikosongkan"
             helperText="Diisi sistem saat naskah disetujui."
           />
           <Select
-            application="simaya"
+            application="purple"
             label="Klasifikasi"
             options={KLASIFIKASI}
             value={klasifikasi}
@@ -103,21 +103,21 @@ export function Simaya() {
             <legend className="mb-2 text-sm font-bold text-gray-900">Sifat naskah</legend>
             <div className="flex min-h-9.25 flex-wrap items-center gap-x-6 gap-y-2">
               <Radio
-                application="simaya"
+                application="purple"
                 name="sifat"
                 label="Biasa"
                 checked={sifat === 'biasa'}
                 onChange={() => setSifat('biasa')}
               />
               <Radio
-                application="simaya"
+                application="purple"
                 name="sifat"
                 label="Segera"
                 checked={sifat === 'segera'}
                 onChange={() => setSifat('segera')}
               />
               <Radio
-                application="simaya"
+                application="purple"
                 name="sifat"
                 label="Sangat segera"
                 checked={sifat === 'sangat'}
@@ -129,7 +129,7 @@ export function Simaya() {
 
         <div className="mt-6">
           <TextArea
-            application="simaya"
+            application="purple"
             type="editor"
             label="Isi naskah"
             hint={`${isi.length}/500`}
@@ -144,14 +144,14 @@ export function Simaya() {
 
         <div className="mt-6 space-y-4">
           <Toggle
-            application="simaya"
+            application="purple"
             label="Bubuhkan tanda tangan elektronik"
             helperText="Memakai sertifikat elektronik yang terdaftar pada akun Anda."
             checked={ttd}
             onChange={(e) => setTtd(e.target.checked)}
           />
           <Checkbox
-            application="simaya"
+            application="purple"
             label="Kirim tembusan ke unit terkait"
             helperText="Tembusan tidak memerlukan persetujuan tambahan."
             checked={tembusan}
@@ -191,14 +191,14 @@ export function Simaya() {
           </div>
 
           <div className="space-y-4 rounded-xl bg-surface-subtle p-5">
-            <p className="text-caption font-bold tracking-wide text-purple-700 uppercase">simaya</p>
+            <p className="text-caption font-bold tracking-wide text-purple-700 uppercase">purple</p>
             <InputField
-              application="simaya"
+              application="purple"
               label="Perihal"
               placeholder="Klik untuk melihat garis fokus"
             />
-            <Toggle application="simaya" label="Tanda tangan elektronik" defaultChecked />
-            <Checkbox application="simaya" label="Kirim tembusan" defaultChecked />
+            <Toggle application="purple" label="Tanda tangan elektronik" defaultChecked />
+            <Checkbox application="purple" label="Kirim tembusan" defaultChecked />
           </div>
         </div>
       </section>

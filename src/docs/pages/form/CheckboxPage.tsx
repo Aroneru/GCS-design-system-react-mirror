@@ -21,7 +21,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: CheckboxApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'simaya', label: 'simaya', token: 'purple-500' },
+  { value: 'purple', label: 'purple', token: 'purple-500' },
 ]
 
 const berkas = [
@@ -35,7 +35,7 @@ const checkboxProps: PropRow[] = [
   ['helperText', 'ReactNode', 'undefined', 'Caption 12px di bawah label.'],
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran kotak: 16px atau 14px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan teks sekaligus menonaktifkan kontrol.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna kotak saat tercentang.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna kotak saat tercentang.'],
   ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak gray-700 bergaris gray-600 dengan label putih; inactive meredupkan teksnya ke gray-500.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="checkbox"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
@@ -201,13 +201,13 @@ export function CheckboxPage() {
           {'{/* Default — tanpa prop application */}\n'}
           {'<Checkbox label="Tercentang" helperText="bg-primary-700" defaultChecked />\n'}
           {'<Checkbox label="Kosong" />\n\n'}
-          {'{/* simaya */}\n'}
+          {'{/* purple */}\n'}
           {'<Checkbox '}
           <H>application</H>
-          {'="simaya" label="Tercentang" helperText="bg-purple-500" defaultChecked />\n'}
+          {'="purple" label="Tercentang" helperText="bg-purple-500" defaultChecked />\n'}
           {'<Checkbox '}
           <H>application</H>
-          {'="simaya" label="Kosong" />'}
+          {'="purple" label="Kosong" />'}
         </SectionCode>
       </FlowSection>
 
