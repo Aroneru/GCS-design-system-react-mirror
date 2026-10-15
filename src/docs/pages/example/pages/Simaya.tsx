@@ -25,7 +25,7 @@ import { FileLines, InfoCircle, User } from '../../../../lib/icons/outline'
  * primary ke ungu. Struktur, ukuran, dan jaraknya identik.
  *
  * Komponen non-form tidak punya prop itu. Untuk menyelaraskannya, Button
- * memakai `theme="simaya"` dan Badge memakai kelas token yang sama.
+ * memakai `theme="purple"` dan Badge memakai kelas token yang sama.
  */
 
 const KLASIFIKASI = [
@@ -160,10 +160,10 @@ export function Simaya() {
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Button type="submit" theme="simaya" onClick={() => setTerkirim(true)}>
+          <Button type="submit" theme="purple" onClick={() => setTerkirim(true)}>
             Kirim naskah
           </Button>
-          <Button variant="outline" theme="simaya">
+          <Button variant="outline" theme="purple">
             Simpan konsep
           </Button>
         </div>

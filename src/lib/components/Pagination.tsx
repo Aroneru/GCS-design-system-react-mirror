@@ -2,7 +2,7 @@ import { type HTMLAttributes } from "react";
 import { ChevronLeft, ChevronRight } from "../icons/outline";
 import { cn } from "../utils/cn";
 
-export type PaginationTheme = "default" | "primary" | "simaya";
+export type PaginationTheme = "default" | "primary" | "purple";
 
 /**
  * `base` kotak 40px, `s` kotak 32px untuk layar sempit. `responsive` memakai `s`
@@ -56,7 +56,7 @@ const themeClasses: Record<
     darkActiveText: "text-primary-500",
   },
 
-  simaya: {
+  purple: {
     active: "bg-purple-50",
     activeText: "text-purple-500",
     darkActive: "bg-gray-700",

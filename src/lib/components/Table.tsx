@@ -50,7 +50,7 @@ export type TableActionTheme =
   | "primary"
   | "green"
   | "gray"
-  | "simaya"
+  | "purple"
   | "orange"
   | "yellow"
   | "red";
@@ -393,7 +393,7 @@ const actionColors: Record<
       outline: "border border-gray-700 text-gray-700 hover:bg-gray-100 hover:text-gray-900",
     },
   },
-  simaya: {
+  purple: {
     light: {
       filled: "bg-purple-700 text-white hover:bg-purple-800",
       outline: "border border-purple-700 text-purple-700 hover:bg-purple-50",

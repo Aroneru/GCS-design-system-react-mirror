@@ -37,7 +37,7 @@ import {
 
 const menuThemes: { value: DrawerNavItemTheme; label: string }[] = [
     { value: 'primary', label: 'Primary' },
-    { value: 'simaya', label: 'Simaya' },
+    { value: 'purple', label: 'Purple' },
 ]
 
 const iconOptions = [
@@ -55,7 +55,7 @@ const drawerProps: PropRow[] = [
     ['eyebrow', 'string', 'optional', 'Label kapital bagian atas header (mis. "MENU").'],
     ['header', 'ReactNode', 'optional', 'Elemen kustom untuk konten header.'],
     ['items', 'DrawerMenuItem[]', 'optional', 'Daftar konfigurasi menu item (otomatis merender DrawerHeader & DrawerNavItem jika tidak menggunakan children JSX).'],
-    ['theme', "'simaya' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna item yang aktif.'],
+    ['theme', "'primary' | 'purple' | 'blue' | 'gray'", "'primary'", 'Skema warna item yang aktif.'],
     ['darkMode', 'boolean', 'false', 'Mengaktifkan tema gelap (latar gray-800, teks gray-50).'],
     ['children', 'ReactNode', 'optional', 'Komponen anak opsional (DrawerHeader, DrawerBody, dll) untuk layout kustom.'],
 ]
@@ -73,7 +73,7 @@ const navItemProps: PropRow[] = [
     ['active', 'boolean', 'false', 'Menandai status aktif dengan latar pill berwarna.'],
     ['expanded', 'boolean', 'false', 'Menentukan apakah sub-menu sedang terbuka (menampilkan chevron).'],
     ['collapsible', 'boolean', 'false', 'Menampilkan ikon chevron tanda dropdown jika tidak memiliki anak.'],
-    ['theme', "'simaya' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna sorotan saat item status active.'],
+    ['theme', "'primary' | 'purple' | 'blue' | 'gray'", "'primary'", 'Skema warna sorotan saat item status active.'],
     ['href', 'string', 'optional', 'Link tujuan navigasi (mengubah elemen menjadi tag a).'],
     ['badge', 'ReactNode', 'optional', 'Elemen badge di sisi kanan label.'],
     ['onClick', '(e: MouseEvent) => void', 'optional', 'Handler saat menu item diklik.'],
@@ -83,7 +83,7 @@ const navItemProps: PropRow[] = [
 const subItemProps: PropRow[] = [
     ['label', 'ReactNode', 'required', 'Judul / teks sub-item menu.'],
     ['active', 'boolean', 'false', 'Menandai status aktif.'],
-    ['theme', "'simaya' | 'primary' | 'blue' | 'gray'", "'primary'", 'Skema warna teks saat aktif.'],
+    ['theme', "'primary' | 'purple' | 'blue' | 'gray'", "'primary'", 'Skema warna teks saat aktif.'],
     ['href', 'string', 'optional', 'Link tujuan navigasi.'],
     ['onClick', '(e: MouseEvent) => void', 'optional', 'Handler saat sub-item diklik.'],
 ]

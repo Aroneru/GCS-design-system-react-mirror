@@ -252,7 +252,7 @@ const SNIPPETS: Snippet[] = [
         { t: "={[" },
         { t: "'default'", cls: STR },
         { t: ", " },
-        { t: "'simaya'", cls: STR },
+        { t: "'purple'", cls: STR },
         { t: "]}" },
       ],
       [{ t: "/>", cls: KEY }],
