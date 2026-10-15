@@ -11,6 +11,12 @@
     --font-sans: 'Lato', ui-sans-serif, system-ui, sans-serif;
     /* Font alternatif (utility `font-alt`). Consumer boleh menimpa di :root. */
     --font-alt: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    /*
+     * Font alternatif kedua (utility `font-alt-2`). Arial font sistem, jadi
+     * tidak perlu diunduh. Cadangannya: Helvetica di macOS/iOS, Liberation Sans
+     * (ukurannya sama dengan Arial) di Linux, lalu sans-serif bawaan.
+     */
+    --font-alt-2: Arial, 'Helvetica Neue', Helvetica, 'Liberation Sans', sans-serif;
 
     --color-primary-50: #ebf5ff;
     --color-primary-100: #e1effe;
@@ -105,12 +111,18 @@
      * Token semantik field dan kontrol form (Input Field, Select, Text Area,
      * Checkbox, Radio, Toggle, Floating Label).
      */
-    --color-content-muted: var(--color-gray-500); /* caption, placeholder, ikon */
-    --color-content-disabled: var(--color-gray-400); /* teks dan isian nonaktif */
-    --color-field: var(--color-gray-50); /* latar field dan kotak kontrol */
-    --color-field-border: var(--color-gray-300); /* garis field */
-    --color-field-disabled: var(--color-gray-100); /* latar field nonaktif */
-    --color-border-strong: var(--color-gray-300); /* garis yang tetap terlihat di tema gelap */
+    --color-content-muted: var(--color-gray-500);
+    /* caption, placeholder, ikon */
+    --color-content-disabled: var(--color-gray-400);
+    /* teks dan isian nonaktif */
+    --color-field: var(--color-gray-50);
+    /* latar field dan kotak kontrol */
+    --color-field-border: var(--color-gray-300);
+    /* garis field */
+    --color-field-disabled: var(--color-gray-100);
+    /* latar field nonaktif */
+    --color-border-strong: var(--color-gray-300);
+    /* garis yang tetap terlihat di tema gelap */
 
     /*
      * Palet tema gelap. Di dalam `[data-theme='dark']` token semantik di atas
@@ -133,6 +145,16 @@
     /* Merah error dinaikkan satu tingkat supaya terbaca di latar gelap. */
     --color-feedback-error-dark: var(--color-red-500);
 
+    /*
+     * Token komponen Hero. Latar hero adalah latar halaman, bukan kartu, jadi
+     * versi gelapnya lebih gelap dari `surface` (gray-900, bukan gray-700).
+     */
+    --color-hero: #ffffff;
+    --color-hero-centered: var(--color-primary-50);
+    --color-hero-dark: var(--color-gray-800);
+
+    --color-container: var(--color-gray-700);
+    
     --text-display: 3rem;
     --text-display--line-height: 1.15;
     --text-heading-1: 2.25rem;
@@ -182,6 +204,8 @@
     --color-field-disabled: var(--color-field-disabled-dark);
     --color-border-strong: var(--color-border-strong-dark);
     --color-feedback-error: var(--color-feedback-error-dark);
+    --color-hero: var(--color-hero-dark);
+    --color-hero-centered: var(--color-hero-dark);
     color-scheme: dark;
 }
 
@@ -206,6 +230,9 @@
     --color-field-disabled: var(--color-gray-100);
     --color-border-strong: var(--color-gray-300);
     --color-feedback-error: var(--color-red-600);
+    --color-hero: #ffffff;
+    --color-hero-centered: var(--color-primary-50);
+    --color-container: var(--color-gray-700);
     color-scheme: light;
 }
 
@@ -223,11 +250,13 @@
     --color-toggle-track-inactive: var(--color-gray-300);
     --color-toggle-knob: #ffffff;
 }
+
 [data-theme='dark'] {
     --color-toggle-track: var(--color-gray-600);
     --color-toggle-track-inactive: var(--color-gray-600);
     --color-toggle-knob: var(--color-gray-400);
 }
+
 [data-theme='light'],
 .ds-theme-light {
     --color-toggle-track: var(--color-gray-200);
@@ -244,7 +273,7 @@
     --color-radio-label: var(--color-gray-900);
     --color-radio-content-inactive: var(--color-gray-400);
 }
-[data-theme='dark'] {
+[data-theme='dark'], .ds-theme-darkz {
     --color-radio-border: var(--color-gray-400);
     --color-radio-surface: var(--color-gray-300);
     --color-radio-border-inactive: var(--color-gray-800);
@@ -252,6 +281,7 @@
     --color-radio-label: var(--color-gray-50);
     --color-radio-content-inactive: var(--color-gray-600);
 }
+
 [data-theme='light'],
 .ds-theme-light {
     --color-radio-border: var(--color-gray-300);
@@ -267,10 +297,12 @@
     --color-select-label: var(--color-gray-900);
     --color-select-content-inactive: var(--color-gray-300);
 }
-[data-theme='dark'] {
+
+[data-theme='dark'], .ds-theme-dark {
     --color-select-label: var(--color-gray-50);
     --color-select-content-inactive: var(--color-gray-500);
 }
+
 [data-theme='light'],
 .ds-theme-light {
     --color-select-label: var(--color-gray-900);
@@ -285,13 +317,14 @@
     --color-input-field-content-failed: var(--color-red-700);
     --color-input-field-action-inactive: var(--color-gray-400); /* tombol mata saat inactive */
 }
-[data-theme='dark'] {
+[data-theme='dark'], .ds-theme-dark {
     --color-input-field-surface-failed: var(--color-gray-700);
     --color-input-field-border-inactive: var(--color-gray-800);
     --color-input-field-label-inactive: var(--color-gray-50);
     --color-input-field-content-failed: var(--color-red-500);
     --color-input-field-action-inactive: var(--color-gray-600);
 }
+
 [data-theme='light'],
 .ds-theme-light {
     --color-input-field-surface-failed: var(--color-red-100);
@@ -303,17 +336,20 @@
 
 /* Floating Label */
 @theme static {
-    --color-floating-label-content: var(--color-gray-800); /* isian dan ikon kiri */
+    --color-floating-label-content: var(--color-gray-800);
+    /* isian dan ikon kiri */
     --color-floating-label-icon-error: var(--color-red-600);
     --color-floating-label-accent: var(--color-primary-600);
     --color-floating-label-accent-simaya: var(--color-purple-500);
 }
+
 [data-theme='dark'] {
     --color-floating-label-content: var(--color-gray-400);
     --color-floating-label-icon-error: var(--color-gray-400);
     --color-floating-label-accent: var(--color-primary-500);
     --color-floating-label-accent-simaya: var(--color-purple-400);
 }
+
 [data-theme='light'],
 .ds-theme-light {
     --color-floating-label-content: var(--color-gray-800);
@@ -331,6 +367,7 @@
     --color-text-area-submit-simaya: var(--color-purple-700);
     --color-text-area-submit-simaya-hover: var(--color-purple-800);
 }
+
 [data-theme='dark'] {
     --color-text-area-tool-hover: var(--color-gray-200);
     --color-text-area-helper: var(--color-gray-100);
@@ -339,6 +376,7 @@
     --color-text-area-submit-simaya: var(--color-purple-600);
     --color-text-area-submit-simaya-hover: var(--color-purple-700);
 }
+
 [data-theme='light'],
 .ds-theme-light {
     --color-text-area-tool-hover: var(--color-gray-800);
@@ -365,6 +403,7 @@
     --color-toast-purple-surface: var(--color-purple-100);
     --color-toast-purple-icon: var(--color-purple-500);
 }
+
 [data-theme='dark'] {
     --color-toast-heading: var(--color-gray-300);
     --color-toast-body: var(--color-gray-400);
@@ -380,6 +419,7 @@
     --color-toast-purple-surface: var(--color-purple-800);
     --color-toast-purple-icon: var(--color-purple-400);
 }
+
 [data-theme='light'],
 .ds-theme-light {
     --color-toast-heading: var(--color-gray-900);
@@ -425,6 +465,7 @@
     --color-alert-purple-body: var(--color-purple-700);
     --color-alert-purple-close: var(--color-purple-800);
 }
+
 /* Tombol tutup gelap tidak berpola di desain — danger memakai orange-800. */
 [data-theme='dark'] {
     --color-alert-success-surface: var(--color-green-900);
@@ -453,6 +494,7 @@
     --color-alert-purple-body: var(--color-purple-50);
     --color-alert-purple-close: var(--color-purple-500);
 }
+
 [data-theme='light'],
 .ds-theme-light {
     --color-alert-success-surface: var(--color-green-50);
@@ -480,6 +522,37 @@
     --color-alert-purple-heading: var(--color-purple-800);
     --color-alert-purple-body: var(--color-purple-700);
     --color-alert-purple-close: var(--color-purple-800);
+}
+
+/* Sidebar */
+@theme static {
+    --color-sidebar-surface: #ffffff;
+}
+
+[data-theme='dark'] {
+    --color-sidebar-surface: var(--color-gray-700);
+}
+
+[data-theme='light'],
+.ds-theme-light {
+    --color-sidebar-surface: #ffffff;
+}
+
+/* Search */
+@theme static {
+    --color-search-category-surface: var(--color-gray-100);
+    --color-search-field-surface: var(--color-gray-50);
+}
+
+[data-theme='dark'] {
+    --color-search-category-surface: var(--color-gray-700);
+    --color-search-field-surface: var(--color-gray-600);
+}
+
+[data-theme='light'],
+.ds-theme-light {
+    --color-search-category-surface: var(--color-gray-100);
+    --color-search-field-surface: var(--color-gray-50);
 }
 
 @media (max-width: 639px) {

@@ -160,7 +160,7 @@ export function Simaya() {
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Button theme="simaya" onClick={() => setTerkirim(true)}>
+          <Button type="submit" theme="simaya" onClick={() => setTerkirim(true)}>
             Kirim naskah
           </Button>
           <Button variant="outline" theme="simaya">
