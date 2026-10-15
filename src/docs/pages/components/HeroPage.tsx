@@ -47,7 +47,7 @@ const heroProps: PropRow[] = [
     "centeredContent",
     "'text' | 'image'",
     "'text'",
-    'Isi tipe centered. image menampilkan image atau imageContent saja di tengah; sub heading, deskripsi, dan tombol tidak dirender. heading tetap ada sebagai <h1> yang hanya dibacakan pembaca layar. Gambar harus kontras dengan latar hero (primary-50, atau gray-900 saat darkMode). Diabaikan pada tipe horizontal.',
+    'Isi tipe centered. image menampilkan image atau imageContent saja di tengah; sub heading, deskripsi, dan tombol tidak dirender. heading tetap ada sebagai <h1> yang hanya dibacakan pembaca layar. Gambar harus kontras dengan latar hero (primary-50, atau gray-800 saat darkMode). Diabaikan pada tipe horizontal.',
   ],
   [
     "platform",
@@ -131,7 +131,7 @@ const heroProps: PropRow[] = [
     "darkMode",
     "boolean",
     "false",
-    "Tampilan gelap: latar gray-900 untuk ketiga tipe (termasuk centered), judul putih, sub heading primary-500, deskripsi gray-400. Tombol tetap primary-700. Susunan dan ukurannya tidak berubah.",
+    "Tampilan gelap: latar gray-800 (surface-subtle, sama dengan Container) untuk ketiga tipe (termasuk centered), judul putih, sub heading primary-400, deskripsi gray-300. Tombol tetap primary-700. Hero di dalam pembungkus data-theme=\"dark\" juga ikut gelap. Susunan dan ukurannya tidak berubah.",
   ],
   [
     "className",
@@ -239,7 +239,7 @@ function Preview({
 }
 
 /**
- * Bingkai hero di pratinjau. Hero gelap berlatar gray-900, sama dengan panggung
+ * Bingkai hero di pratinjau. Hero gelap berlatar gray-800, dekat dengan panggung
  * gelap, jadi tanpa garis tepi ia menyatu dengan latarnya. Garis gray-700 dan
  * bayangan yang lebih pekat membuatnya tetap terbaca sebagai kartu, seperti
  * hero terang di atas panggung abu-abu.
@@ -713,9 +713,9 @@ export function HeroPage() {
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
           Isi <Hl>darkMode</Hl> untuk halaman berlatar gelap. Ketiga tipe memakai
-          latar <Hl>gray-900</Hl>, termasuk <Hl>centered</Hl> yang di tampilan
+          latar <Hl>gray-800</Hl> (token surface-subtle, sama dengan Container), termasuk <Hl>centered</Hl> yang di tampilan
           terang berlatar <Hl>primary-50</Hl>. Judul jadi putih, sub heading{" "}
-          <Hl>primary-500</Hl>, dan deskripsi <Hl>gray-400</Hl>. Tombolnya tetap{" "}
+          <Hl>primary-400</Hl>, dan deskripsi <Hl>gray-300</Hl>. Tombolnya tetap{" "}
           <Hl>primary-700</Hl>. Susunan, ukuran, dan perilaku responsifnya sama
           persis dengan tampilan terang, termasuk gambar di kiri atau kanan.
         </Lead>

@@ -18,6 +18,7 @@ import {
   Close,
   Search as SearchIcon,
 } from "flowbite-react-icons/outline";
+import { File as FileIcon, FilePdf, Image as ImageIcon } from "flowbite-react-icons/solid";
 import { cn } from "../utils/cn";
 import { Button } from "./Button";
 import { Checkbox } from "./Checkbox";
@@ -109,6 +110,23 @@ export interface TableColumnImage<T> {
   preview?: boolean;
 }
 
+/** Jenis berkas di kolom `file`: menentukan ikon dan cara pratinjaunya. */
+export type TableFileType = "image" | "pdf" | "file";
+
+export interface TableColumnFile<T> {
+  /** Nama berkas yang tampil, mis. `"Document.pdf"`. Kosong menampilkan "—". */
+  name: (row: T) => string | null | undefined;
+  /** Alamat berkas. Tanpa ini nama tampil sebagai teks biasa, tanpa pratinjau. */
+  href?: (row: T) => string | null | undefined;
+  /** Jenis berkas. Bawaannya ditebak dari ekstensi `name`. */
+  type?: TableFileType | ((row: T) => TableFileType);
+  /**
+   * Klik membuka pratinjau (gambar dan PDF) di atas halaman. Bawaannya `true`.
+   * `false` membuka berkasnya di tab baru. Jenis `file` selalu diunduh.
+   */
+  preview?: boolean;
+}
+
 /** Satu kolom. `key` sekaligus nama field bawaan yang dibaca dari tiap baris. */
 export interface TableColumn<T> {
   key: string;
@@ -128,6 +146,12 @@ export interface TableColumn<T> {
   actions?: TableRowAction<T>[];
   /** Gambar di sel, dengan pratinjau saat diklik. Diabaikan bila `cell` atau `actions` diisi. */
   image?: TableColumnImage<T>;
+  /**
+   * Berkas di sel: ikon jenis berkas + nama, klik untuk pratinjau. Untuk kolom
+   * dokumen (PDF, gambar, berkas lain). Diabaikan bila `cell`, `actions`, atau
+   * `image` diisi.
+   */
+  file?: TableColumnFile<T>;
   /** Menampilkan panah di judul kolom dan membuatnya bisa ditekan untuk mengurutkan. */
   sortable?: boolean;
   /** Nilai pembanding saat mengurutkan. Tanpa ini yang dipakai `row[key]`. */
@@ -447,7 +471,12 @@ const headAlignOf = <T,>(column: TableColumn<T>, tableAlign?: TableAlign): Table
   (hasChildren(column) ? "center" : (column.align ?? "left"));
 
 /** Tombol sort compact selebar sel, jadi posisinya diatur lewat `justify`. */
-const compactSortJustify: Record<TableAlign, string> = {
+/**
+ * Letak isi tombol sort per posisi judul. Rata kiri: teks di ujung kiri, ikon
+ * di ujung kanan kolom, supaya ikon di semua kolom berbaris rapi dan tidak
+ * menggantung tepat di belakang teks yang panjangnya beda-beda.
+ */
+const sortJustify: Record<TableAlign, string> = {
   left: "justify-between",
   center: "justify-center",
   right: "justify-end",
@@ -763,6 +792,147 @@ export function TableImage({
   );
 }
 
+/** Menebak jenis berkas dari ekstensi nama atau alamatnya. */
+const fileTypeOf = (name: string): TableFileType => {
+  const ext = name.split("?")[0].split(".").pop()?.toLowerCase() ?? "";
+  if (ext === "pdf") return "pdf";
+  if (["png", "jpg", "jpeg", "gif", "webp", "svg", "avif"].includes(ext)) return "image";
+  return "file";
+};
+
+/** Ikon dan warnanya per jenis berkas, mengikuti rancangan tabel. */
+const fileIcons: Record<TableFileType, { icon: ReactNode; color: string }> = {
+  image: { icon: <ImageIcon aria-hidden="true" className="size-full" />, color: "text-primary-700" },
+  pdf: { icon: <FilePdf aria-hidden="true" className="size-full" />, color: "text-red-500" },
+  file: { icon: <FileIcon aria-hidden="true" className="size-full" />, color: "text-gray-400" },
+};
+
+export interface TableFileProps {
+  /** Nama berkas yang tampil. */
+  name: string;
+  /** Alamat berkas. Tanpa ini nama tampil sebagai teks biasa. */
+  href?: string;
+  /** Jenis berkas. Bawaannya ditebak dari ekstensi `name`. */
+  type?: TableFileType;
+  /** Klik membuka pratinjau gambar/PDF. Bawaannya `true`; `false` membuka tab baru. */
+  preview?: boolean;
+}
+
+/**
+ * TableFile — ikon jenis berkas + nama berkas di sel. Dipakai otomatis oleh
+ * `column.file`, dan bisa dipakai langsung di `cell`.
+ *
+ * Gambar dan PDF dipratinjau di `<dialog>` lewat portal ke `body`, sama
+ * seperti TableImage: PDF memakai penampil bawaan peramban di `<iframe>`.
+ * Berkas lain tidak bisa dipratinjau peramban, jadi tautannya mengunduh.
+ */
+export function TableFile({ name, href, type, preview = true }: TableFileProps) {
+  const [open, setOpen] = useState(false);
+  const kind = type ?? fileTypeOf(name);
+  const { icon, color } = fileIcons[kind];
+
+  const label = (
+    <>
+      <span className={cn("size-6 shrink-0", color)}>{icon}</span>
+      <span className="truncate">{name}</span>
+    </>
+  );
+  const linkClass = cn(
+    "inline-flex max-w-full items-center gap-3 rounded text-left transition-colors hover:text-gray-900 hover:underline",
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
+  );
+
+  if (!href) return <span className="inline-flex max-w-full items-center gap-3">{label}</span>;
+
+  if (kind === "file" || !preview) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        download={kind === "file" ? name : undefined}
+        className={linkClass}
+      >
+        {label}
+      </a>
+    );
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={`Lihat ${name}`}
+        className={cn(linkClass, "cursor-pointer")}
+      >
+        {label}
+      </button>
+
+      {open &&
+        createPortal(
+          <dialog
+            ref={(node) => {
+              if (node && !node.open) node.showModal();
+            }}
+            aria-label={`Pratinjau ${name}`}
+            onCancel={(e) => {
+              e.preventDefault();
+              setOpen(false);
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setOpen(false);
+            }}
+            className={cn(
+              "m-auto max-h-none max-w-none overflow-visible bg-transparent p-4",
+              "backdrop:bg-gray-900/80 backdrop:backdrop-blur-sm",
+            )}
+          >
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Tutup pratinjau"
+              className={cn(
+                "fixed top-4 right-4 inline-flex size-10 items-center justify-center rounded-full",
+                "bg-white/10 text-white transition-colors hover:bg-white/20",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
+              )}
+            >
+              <Close aria-hidden="true" className="size-5" />
+            </button>
+            <figure className="flex flex-col items-center gap-3">
+              {kind === "pdf" ? (
+                <iframe
+                  src={href}
+                  title={name}
+                  className="h-[80vh] w-[90vw] max-w-4xl rounded-lg bg-white shadow-xl"
+                />
+              ) : (
+                <img
+                  src={href}
+                  alt={name}
+                  className="max-h-[80vh] max-w-[90vw] rounded-lg bg-white object-contain shadow-xl"
+                />
+              )}
+              <figcaption className="flex items-center gap-3 text-sm text-white">
+                {name}
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-bold underline underline-offset-2 hover:text-primary-200"
+                >
+                  Buka di tab baru
+                </a>
+              </figcaption>
+            </figure>
+          </dialog>,
+          document.body,
+        )}
+    </>
+  );
+}
+
 /**
  * Table — tabel data dengan toolbar, pengurutan, seleksi baris, dan pagination.
  *
@@ -1019,6 +1189,19 @@ export function Table<T>({
     );
   };
 
+  const renderFile = (file: TableColumnFile<T>, row: T) => {
+    const name = file.name(row);
+    if (!name) return "—";
+    return (
+      <TableFile
+        name={name}
+        href={file.href?.(row) ?? undefined}
+        type={file.type !== undefined ? resolve(file.type, row) : undefined}
+        preview={file.preview}
+      />
+    );
+  };
+
   const renderCell = (column: TableColumn<T>, row: T, index: number) =>
     column.cell
       ? column.cell(row, index)
@@ -1026,7 +1209,9 @@ export function Table<T>({
         ? renderActions(column.actions, row, index)
         : column.image
           ? renderImage(column.image, row)
-          : formatValue(readField(row, column.key));
+          : column.file
+            ? renderFile(column.file, row)
+            : formatValue(readField(row, column.key));
 
   /**
    * Kelas menempel per posisi. Kolom checkbox selebar `w-12` persis, jadi
@@ -1213,11 +1398,10 @@ export function Table<T>({
                           type="button"
                           onClick={() => toggleSort(column)}
                           className={cn(
-                            "items-center gap-1 transition-colors hover:text-gray-900",
-                            // Compact rata kiri: ikon sort di ujung kanan judul, seperti di rancangan.
-                            size === "compact"
-                              ? cn("flex w-full gap-2", compactSortJustify[headAlignOf(column, headerAlign)])
-                              : "inline-flex uppercase",
+                            "flex w-full items-center gap-2 transition-colors hover:text-gray-900",
+                            // Rata kiri: ikon sort di ujung kanan judul, di kedua size.
+                            sortJustify[headAlignOf(column, headerAlign)],
+                            size !== "compact" && "uppercase",
                             "rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
                           )}
                         >

@@ -11,6 +11,12 @@
     --font-sans: 'Lato', ui-sans-serif, system-ui, sans-serif;
     /* Font alternatif (utility `font-alt`). Consumer boleh menimpa di :root. */
     --font-alt: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    /*
+     * Font alternatif kedua (utility `font-alt-2`). Arial font sistem, jadi
+     * tidak perlu diunduh. Cadangannya: Helvetica di macOS/iOS, Liberation Sans
+     * (ukurannya sama dengan Arial) di Linux, lalu sans-serif bawaan.
+     */
+    --font-alt-2: Arial, 'Helvetica Neue', Helvetica, 'Liberation Sans', sans-serif;
 
     --color-primary-50: #ebf5ff;
     --color-primary-100: #e1effe;
@@ -139,6 +145,16 @@
     /* Merah error dinaikkan satu tingkat supaya terbaca di latar gelap. */
     --color-feedback-error-dark: var(--color-red-500);
 
+    /*
+     * Token komponen Hero. Latar hero adalah latar halaman, bukan kartu, jadi
+     * versi gelapnya lebih gelap dari `surface` (gray-900, bukan gray-700).
+     */
+    --color-hero: #ffffff;
+    --color-hero-centered: var(--color-primary-50);
+    --color-hero-dark: var(--color-gray-800);
+
+    --color-container: var(--color-gray-700);
+    
     --text-display: 3rem;
     --text-display--line-height: 1.15;
     --text-heading-1: 2.25rem;
@@ -188,6 +204,8 @@
     --color-field-disabled: var(--color-field-disabled-dark);
     --color-border-strong: var(--color-border-strong-dark);
     --color-feedback-error: var(--color-feedback-error-dark);
+    --color-hero: var(--color-hero-dark);
+    --color-hero-centered: var(--color-hero-dark);
     color-scheme: dark;
 }
 
@@ -212,6 +230,9 @@
     --color-field-disabled: var(--color-gray-100);
     --color-border-strong: var(--color-gray-300);
     --color-feedback-error: var(--color-red-600);
+    --color-hero: #ffffff;
+    --color-hero-centered: var(--color-primary-50);
+    --color-container: var(--color-gray-700);
     color-scheme: light;
 }
 
@@ -252,8 +273,7 @@
     --color-radio-label: var(--color-gray-900);
     --color-radio-content-inactive: var(--color-gray-400);
 }
-
-[data-theme='dark'] {
+[data-theme='dark'], .ds-theme-darkz {
     --color-radio-border: var(--color-gray-400);
     --color-radio-surface: var(--color-gray-300);
     --color-radio-border-inactive: var(--color-gray-800);
@@ -278,7 +298,7 @@
     --color-select-content-inactive: var(--color-gray-300);
 }
 
-[data-theme='dark'] {
+[data-theme='dark'], .ds-theme-dark {
     --color-select-label: var(--color-gray-50);
     --color-select-content-inactive: var(--color-gray-500);
 }
@@ -299,8 +319,7 @@
     /* tombol hapus dan tombol mata */
     --color-input-field-action-inactive: var(--color-gray-400);
 }
-
-[data-theme='dark'] {
+[data-theme='dark'], .ds-theme-dark {
     --color-input-field-surface-failed: var(--color-gray-700);
     --color-input-field-border-inactive: var(--color-gray-800);
     --color-input-field-label-inactive: var(--color-gray-50);

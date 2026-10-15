@@ -45,7 +45,7 @@ const containerProps: PropRow[] = [
     "darkMode",
     "boolean",
     "false",
-    "Tampilan gelap: latar gray-800 dan teks gray-300 di elemen dalam. Tanpa ini Container transparan.",
+    "Tampilan gelap: latar gray-800 dan teks gray-300 di elemen dalam. Container di dalam pembungkus data-theme=\"dark\" juga ikut gelap. Tanpa keduanya Container transparan.",
   ],
   [
     "className",
@@ -201,8 +201,10 @@ const tones = {
   dark: {
     stage: "border-gray-800 bg-gray-900",
     room: "bg-gray-900 ring-gray-700",
-    isi: "border-primary-500 bg-gray-900",
-    isiLabel: "text-primary-400",
+    // Isi transparan: latar Container harus terlihat utuh di belakangnya,
+    // bukan tertutup kotak isi dan tinggal pita di kiri-kanan.
+    isi: "border-primary-400/70 bg-transparent",
+    isiLabel: "text-primary-300",
     isiNote: "text-gray-400",
   },
 };
@@ -214,6 +216,19 @@ function Isi({ label, dark = false }: { label: string; dark?: boolean }) {
     <div className={`rounded-lg border-2 border-dashed px-4 py-6 text-center ${t.isi}`}>
       <p className={`text-sm font-black ${t.isiLabel}`}>{label}</p>
     </div>
+  );
+}
+
+/**
+ * Label kecil di dalam demo dark mode. Padding atas-bawahnya ada di dalam
+ * Container (bukan `className` Container, yang jatuh ke elemen luar), jadi
+ * latar Container membungkus label dan isi di keempat sisi.
+ */
+function ContainerLabel({ note }: { note: string }) {
+  return (
+    <p className="pt-4 pb-3 text-[11px] font-bold tracking-[0.12em] text-gray-400 uppercase">
+      Container <span className="font-medium tracking-normal normal-case">· {note}</span>
+    </p>
   );
 }
 
@@ -455,7 +470,7 @@ export function ContainerPage() {
           bawaan.
         </Lead>
         <Ruang>
-          <Container className="max-w-[720px] py-10">
+          <Container className="max-w-180 py-10">
             <Isi label='className="max-w-[720px] py-10"' />
           </Container>
         </Ruang>
@@ -473,25 +488,54 @@ export function ContainerPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <Hl>darkMode</Hl> memberi elemen dalam latar gray-800 dan teks bawaan
-          gray-300, sama dengan kartu Card dan Toast versi gelap. Lebar, padding,
-          dan pemusatan tidak berubah. Di ruang sempit sudut rounded-xl ikut
-          terlihat karena sekarang ada latarnya. Tanpa <Hl>darkMode</Hl>, Container
-          tetap transparan.
+          Prop <Hl>darkMode</Hl> memberi elemen dalam latar dari token{" "}
+          <Hl>--color-container</Hl> (gray-700) dan teks bawaan gray-300. Lebar,
+          padding, dan pemusatan tidak berubah. Di ruang sempit sudut rounded-xl
+          ikut terlihat karena sekarang ada latarnya. Tanpa <Hl>darkMode</Hl>,
+          Container tetap transparan.
         </Lead>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Ruang dark>
-            <Container darkMode className="py-6">
-              <Isi label="darkMode" dark />
-            </Container>
-          </Ruang>
-          <Ruang dark>
-            <div className="mx-auto max-w-[380px]">
-              <Container darkMode className="py-6">
-                <Isi label="darkMode · ruang sempit" dark />
-              </Container>
-            </div>
-          </Ruang>
+
+        {/* Keterangan tiga lapis di contoh, supaya jelas bidang mana Container-nya. */}
+        <ul className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-500 mb-2">
+          <li className="inline-flex items-center gap-2">
+            <span className="size-3.5 rounded-sm bg-gray-900 ring-1 ring-gray-700" />
+            Halaman (panggung)
+          </li>
+          <li className="inline-flex items-center gap-2">
+            <span className="size-3.5 rounded-sm bg-container" />
+            Container
+          </li>
+          <li className="inline-flex items-center gap-2">
+            <span className="size-3.5 rounded-sm border-2 border-dashed border-primary-400" />
+            Isi (children)
+          </li>
+        </ul>
+
+        {/* Bertumpuk, bukan berdampingan: berdampingan, tiap kotak cuma ±440px,
+            jadi keduanya jatuh ke mode sempit (< 640px) dan terlihat sama. */}
+        <div className="grid gap-4">
+          <div>
+            <p className="mb-2 text-xs font-bold text-gray-500">Ruang lapang (≥ 640px)</p>
+            <Ruang dark>
+              <div className="py-6">
+                <Container darkMode>
+                  <ContainerLabel note="sudut lurus, padding 32–56px, maks. 1126px" />
+                  <div className="pb-4"><Isi label="Konten" dark /></div>
+                </Container>
+              </div>
+            </Ruang>
+          </div>
+          <div>
+            <p className="mb-2 text-xs font-bold text-gray-500">Ruang sempit (&lt; 640px)</p>
+            <Ruang dark>
+              <div className="mx-auto max-w-[380px] py-6">
+                <Container darkMode>
+                  <ContainerLabel note="rounded-xl, padding 20px, maks. 380px" />
+                  <div className="pb-4"><Isi label="Konten" dark /></div>
+                </Container>
+              </div>
+            </Ruang>
+          </div>
         </div>
         <SectionCode>
           {"<Container "}
