@@ -100,19 +100,28 @@ Warna yang hanya dipakai satu komponen dan tidak cocok dengan token semantik man
 | Text Area | `--color-text-area-tool-hover`, `-helper`, `-submit`, `-submit-hover`, `-submit-purple`, `-submit-purple-hover` |
 | Toast | `--color-toast-heading`, `-body`, `-close-hover`, lalu `-{variant}-surface` dan `-{variant}-icon` |
 | Alert | `--color-alert-{variant}-surface`, `-icon`, `-heading`, `-body`, `-close` |
+| Hero | `--color-hero`, `-centered`, `-dark` |
+| Container | `--color-container` |
 | Sidebar | `--color-sidebar-surface` |
 | Search | `--color-search-category-surface`, `--color-search-field-surface` |
 | Breadcrumb | `--color-breadcrumb-surface`, `--color-breadcrumb-active`, `--color-breadcrumb-link-hover` |
 
 `{variant}` adalah `success`, `danger`, `warning`, `info`, atau `purple`.
 
-Token komponen tidak punya pasangan `-dark`. Untuk mengganti nilai gelapnya, timpa di blok `[data-theme='dark']` CSS project:
+Catatan Hero dan Container:
+
+- `--color-hero` adalah latar hero (putih). `--color-hero-centered` latar hero tipe centered (primary-50).
+- Di tema gelap keduanya memakai `--color-hero-dark` (gray-800). Ini satu-satunya token komponen yang punya pasangan `-dark`, jadi cukup timpa `--color-hero-dark` di `:root`.
+- `--color-container` adalah latar bagian dalam Container di tema gelap (gray-700). Di tema terang Container tidak berlatar.
+
+Token komponen lainnya tidak punya pasangan `-dark`. Untuk mengganti nilai gelapnya, timpa di blok `[data-theme='dark']` CSS project:
 
 ```css
 [data-theme='dark'] {
   --color-alert-danger-close: var(--color-red-300);
 }
 ```
+
 
 ## Cara kerja tema gelap
 
@@ -256,6 +265,6 @@ Atau lewat class:
 
 ## Status saat ini
 
-- **Sudah memakai cara ini:** Card, Toggle, Checkbox, Radio, Select, InputField, FloatingLabel, TextArea, Toast, Alert, Sidebar, Search, dan Breadcrumb.
-- **Belum:** komponen lain yang punya `darkMode` (Hero, Popover, Drawer, Datepicker, dan lainnya) masih menulis warna gelapnya sendiri. Komponen ini akan dipindah bertahap.
+- **Sudah memakai cara ini:** Card, Container, Hero, Toggle, Checkbox, Radio, Select, InputField, FloatingLabel, TextArea, Toast, Alert, Sidebar, Search, dan Breadcrumb.
+- **Belum:** komponen lain yang punya `darkMode` (Popover, Drawer, Datepicker, dan lainnya) masih menulis warna gelapnya sendiri. Komponen ini akan dipindah bertahap.
 - Selama belum dipindah, `data-theme="dark"` di pembungkus belum membuat komponen tersebut gelap. Pakai prop `darkMode` di komponennya.

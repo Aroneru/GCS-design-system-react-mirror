@@ -37,7 +37,7 @@ export interface HeroProps {
    *
    * Gambarnya mengisi penuh hero tanpa padding, dan tingginya mengikuti rasio
    * berkasnya. Bagian yang transparan menampilkan latar hero (primary-50, atau
-   * gray-900 pada `darkMode`), jadi pastikan gambarnya kontras dengan latar itu.
+   * gray-800 pada `darkMode`), jadi pastikan gambarnya kontras dengan latar itu.
    * Diabaikan pada tipe horizontal.
    */
   centeredContent?: HeroCenteredContent
@@ -73,32 +73,25 @@ export interface HeroProps {
   /** Dipakai bila `image` kosong — misal ilustrasi <svg> inline. */
   imageContent?: ReactNode
   /**
-   * Tampilan gelap: latar gray-900 untuk semua tipe, judul putih, sub heading
-   * primary-500, deskripsi gray-400. Tombolnya tetap primary-700.
+   * Tampilan gelap: latar gray-800 (`surface-subtle`) untuk semua tipe, judul putih, sub heading
+   * primary-400, deskripsi gray-300. Tombolnya tetap primary-700. Sama dengan
+   * memasang `data-theme="dark"`; Hero di dalam pembungkus `data-theme="dark"`
+   * juga ikut gelap tanpa prop ini.
    */
   darkMode?: boolean
   className?: string
 }
 
-/** Warna latar dan teks untuk tampilan terang dan gelap. */
-const themes = {
-  light: {
-    // Tipe centered tidak punya gambar, jadi latar primary-50 yang memberinya bentuk.
-    section: (centered: boolean) => (centered ? 'bg-primary-50' : 'bg-surface'),
-    heading: 'text-content',
-    subHeading: 'text-primary-600',
-    description: 'text-content-subtle',
-  },
-  dark: {
-    // Mengikuti desain: satu latar gray-900 untuk ketiga tipe, termasuk centered.
-    section: () => 'bg-gray-900',
-    heading: 'text-white',
-    // primary-600 bawaan terang terlalu gelap di atas gray-900; primary-500
-    // yang ada di desain gelap dan tetap terbaca.
-    subHeading: 'text-primary-500',
-    description: 'text-gray-400',
-  },
-}
+/**
+ * Latar hero tanpa token khusus. Tema terang: `surface` (putih), atau
+ * primary-50 untuk tipe centered karena tanpa gambar latar itulah yang
+ * memberinya bentuk. Tema gelap: `surface-subtle` (gray-800), sama dengan
+ * Container — gelapnya bisa dari hero itu sendiri (`data-*`) maupun dari
+ * pembungkus (`in-data-*`).
+ */
+const darkBg = 'data-[theme=dark]:bg-surface-subtle in-data-[theme=dark]:bg-surface-subtle'
+const sectionBg = (centered: boolean) =>
+  cn(centered ? 'bg-primary-50' : 'bg-surface', darkBg)
 
 /** Panah pada tombol — mengisi kotak ikon yang sudah diukur <Button>. */
 const ArrowRight = () => (
@@ -139,8 +132,10 @@ const ArrowRight = () => (
  * sini membuat ilustrasi potret ikut dipipihkan — teks di dalamnya jadi ikut
  * gepeng, dan itu tidak bisa diperbaiki dari sisi pemakai.
  *
- * `darkMode` hanya mengganti warna latar dan teks. Susunan, ukuran, dan
- * perilaku responsifnya sama persis dengan tampilan terang.
+ * Warna latar dan teks diambil dari token (`hero`, `content`, `brand`), jadi
+ * tema gelap cukup mengganti nilai token lewat `data-theme`. `darkMode` hanya
+ * memasang `data-theme="dark"`. Susunan, ukuran, dan perilaku responsifnya sama
+ * persis dengan tampilan terang.
  */
 export function Hero({
   type = 'horizontal-image-left',
@@ -161,7 +156,7 @@ export function Hero({
   darkMode = false,
   className,
 }: HeroProps) {
-  const theme = darkMode ? themes.dark : themes.light
+  const themeAttr = darkMode ? 'dark' : undefined
   const centered = type === 'centered'
   const stacked = platform === 'mobile'
   const hasMedia = !centered && Boolean(image || imageContent)
@@ -208,8 +203,7 @@ export function Hero({
       {heading && (
         <h1
           className={cn(
-            'text-heading-1 font-black tracking-tight',
-            theme.heading,
+            'text-heading-1 font-black tracking-tight text-content',
             // Judul 48px baru dipakai saat kolomnya memang cukup lega; di kolom
             // sempit ukuran itu memecah judul jadi tiga baris.
             !stacked && '@[1024px]:text-display',
@@ -220,7 +214,7 @@ export function Hero({
       )}
 
       {showHeading && subHeading && (
-        <p className={cn('mt-2 text-body-lg font-bold', theme.subHeading)}>{subHeading}</p>
+        <p className="mt-2 text-body-lg font-bold text-brand">{subHeading}</p>
       )}
 
       {description && (
@@ -233,8 +227,7 @@ export function Hero({
             // tipe horizontal — batas ini tidak pernah aktif, jadi deskripsi
             // tetap sebaris dengan judul dan tombolnya; yang ditahan hanya satu
             // kolom di ruang lebar.
-            'mx-auto mt-4 max-w-2xl text-body-lg leading-relaxed',
-            theme.description,
+            'mx-auto mt-4 max-w-2xl text-body-lg leading-relaxed text-content-subtle',
             alignLeftWhenWide && '@[768px]:mx-0',
           )}
         >
@@ -281,7 +274,7 @@ export function Hero({
    */
   if (centeredImage) {
     return (
-      <section className={cn('w-full', theme.section(centered), className)}>
+      <section data-theme={themeAttr} className={cn('w-full', sectionBg(centered), className)}>
         {heading && <h1 className="sr-only">{heading}</h1>}
         {image ? (
           <img src={image} alt={imageAlt} className="block h-auto w-full" />
@@ -304,7 +297,8 @@ export function Hero({
 
   return (
     <section
-      className={cn('@container w-full', theme.section(centered), className)}
+      data-theme={themeAttr}
+      className={cn('@container w-full', sectionBg(centered), className)}
     >
       <div
         className={cn(

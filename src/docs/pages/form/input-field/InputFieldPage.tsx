@@ -253,8 +253,8 @@ export function InputFieldPage() {
         <Lead>
           Prop <Hl>darkMode</Hl> mengganti field ke gray-700 dengan label putih. Garisnya menyatu dengan latar
           dan baru terlihat saat <Hl>typing</Hl> (warna aplikasi) atau <Hl>failed</Hl> (red-500). Teks yang
-          diketik putih, sedangkan placeholder, ikon, dan caption abu-abu. Pada type password, tombol matanya
-          gray-600, dan saat <Hl>failed</Hl> gembok, placeholder, serta caption-nya red-500.
+          diketik putih, sedangkan placeholder, ikon, dan caption abu-abu. Tombol hapus (×) dan tombol mata
+          gray-400. Pada type password saat <Hl>failed</Hl>, gembok, placeholder, serta caption-nya red-500.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (

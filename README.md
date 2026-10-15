@@ -9,7 +9,8 @@ Ceplok Design System. Dipindahkan 1:1 dari versi Laravel/Blade
 - **Tokens** (`@theme`): palet warna (primary, gray, red, orange, yellow, green,
   purple), semantic aliases (`brand`, `feedback-*`, `content`,
   `surface`, `border`), skala tipografi (`display` → `caption`), spacing, radius,
-  shadow, font Lato. Panduan lengkap token dan tema gelap ada di [COLOR.md](COLOR.md).
+  shadow, font Lato, serta font alternatif Inter (`font-alt`) dan Arial
+  (`font-alt-2`). Panduan lengkap token dan tema gelap ada di [COLOR.md](COLOR.md).
 - **Komponen umum**: `Alert`, `Avatar`, `Badge`, `Breadcrumb`, `Button`, `Card`,
   `Clipboard`, `Container`, `Drawer`, `Dropdown`, `Footer`, `Hero`, `Icon`,
   `Modal`, `Navbar`, `Pagination`, `Popover`, `Sidebar`, `Spinner`, `Table`,
@@ -99,9 +100,9 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   `darkMode` satu per satu.
 - **Kembali ke tema terang**: Bagian di dalam area gelap dapat dikembalikan ke
   tema terang dengan `data-theme="light"` atau kelas `.ds-theme-light`.
-- **Komponen yang mendukung `data-theme`**: `Card`, `Sidebar`, `Search`,
-  `Alert`, `Toast`, `InputField`, `FloatingLabel`, `TextArea`, `Select`,
-  `Toggle`, `Radio`, `Checkbox`, dan `Breadcrumb`.
+- **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`,
+  `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
+  `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, dan `Breadcrumb`.
 - **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
   `--color-search-category-surface` dan `--color-search-field-surface` (Search),
@@ -125,7 +126,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
 | `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode`                                          |
 | `Dropdown`   | `trigger`, `items`/`groups`, `attached`, `contentLabel`, `darkMode`                                                  |
-| `Modal`      | `trigger`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape`    |
+| `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape` |
 | `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `theme`, `darkMode`   |
 | `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
@@ -133,7 +134,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Hero`       | `type`, `centeredContent`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`    |
 | `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user` (profil + menu dropdown), `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
-| `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `sticky`, `size`, `loading` |
+| `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `striped`, `sticky`, `size`, `loading` |
 
 Warna Button diatur `theme` (`primary | green | gray | purple | orange |
 yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya
@@ -325,6 +326,14 @@ untuk memilih kolom yang tampil; kolom ber-`hideable: false` selalu tampil.
 Pengurutan dan pembagian halaman dikerjakan tabel. Untuk data dari server pasang
 `manual`: kirim baris halaman aktif saja beserta `pagination.total`, lalu
 tangani `onSortChange` dan `pagination.onPageChange`.
+
+`selectable` menambahkan checkbox per baris dan checkbox pilih semua di judul,
+yang hanya mencakup halaman yang tampil. `pagination.pageSizeOptions` (mis.
+`[10, 25, 50]`) memunculkan pemilih jumlah baris per halaman, dan `striped`
+memberi baris zebra. Kolom berkas memakai `file`, mis.
+`file: { name: (r) => r.berkas, href: (r) => r.url }`: gambar dan PDF dibuka di
+pratinjau, berkas lain diunduh. Bentuk yang sama tersedia sebagai komponen
+`TableFile` untuk dipakai di `cell` sendiri.
 
 ## Ikon
 

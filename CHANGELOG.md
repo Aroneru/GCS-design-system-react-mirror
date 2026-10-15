@@ -11,17 +11,13 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
-Ada perubahan API yang memutus pada komponen `Button` serta migrasi tema/aksen
-warna `simaya` ke `purple` pada seluruh komponen dan token — baca bagian
-**Diubah**. Komponen `Button` kini mendukung pengiriman formulir native lewat
-prop `type`, dan tombol khusus ikon dipisahkan ke prop boolean `iconOnly`.
-Komponen `Sidebar` kini mendukung menu dropdown profil akun pengguna serta
-penanganan tautan eksternal (`external`). Komponen `Search` kini mendukung live
-search (`trigger="change"` / `"auto"`), jeda debounce, dan pengaturan
-visibilitas tombol cari (`showButton`). Komponen `Sidebar`, `Search`, dan
-`Breadcrumb` kini telah mengadopsi sistem token warna semantik dan atribut
-`data-theme` untuk tema gelap. Komponen `Upload` kini membatasi unggahan berkas
-tunggal secara ketat. README di halaman npm dan situs dokumentasi ikut diperbarui.
+Ada perubahan API yang memutus: migrasi tema dan aksen warna `simaya` ke
+`purple` pada seluruh komponen dan token — baca bagian **Diubah**. Satu perbaikan
+token warna `Radio`. Situs dokumentasi ikut diperbarui: bagian Mulai cepat di
+beranda kini empat langkah, dengan langkah baru "Sambungkan Tailwind CSS ke Vite"
+(pasang `tailwindcss` dan `@tailwindcss/vite`, lalu daftarkan `tailwindcss()` di
+`vite.config.ts`). Tombol outline kini selalu di kiri tombol filled di halaman
+contoh, dan contoh kode footer di halaman Modal kini sama dengan demonya.
 
 ### Diubah
 
@@ -45,6 +41,30 @@ tunggal secara ketat. README di halaman npm dan situs dokumentasi ikut diperbaru
   + <InputField application="purple" label="Nama" />
   ```
 
+### Diperbaiki
+
+- **Kelas `ds-theme-dark` kini ikut mengganti warna gelap `Radio`.**
+  Selector di `tokens.css` sebelumnya salah ketik (`.ds-theme-darkz`), jadi
+  token `Radio` tetap terang di dalam elemen berkelas `ds-theme-dark`, padahal
+  token `Select` dan `InputField` sudah ikut gelap. `data-theme="dark"` dan prop
+  `darkMode` tidak terdampak.
+
+## [0.4.0] - 2026-10-15
+
+Ada perubahan API yang memutus pada `Button` dan `Upload`, dan banyak komponen
+kini tampil berbeda di tema gelap — baca bagian **Diubah** sebelum
+memperbarui. Komponen `Button` kini mendukung pengiriman formulir native lewat
+prop `type`, dan tombol khusus ikon dipisahkan ke prop boolean `iconOnly`.
+Banyak komponen kini memakai token warna, jadi komponen tanpa `darkMode` ikut
+tema pembungkusnya lewat `data-theme`. `Table` mendapat kolom berkas, baris
+zebra, checkbox pilih semua, dan pemilih jumlah baris; `Modal` bisa dibuka dari
+kode; `Sidebar` mendapat menu profil akun dan tautan eksternal; `Search`
+mendapat live search. Mengetik kini melompat ke pilihan yang cocok di `Select`,
+menu aksi `Dropdown`, dan kalender `Datepicker`. README di halaman npm dan
+situs dokumentasi ikut diperbarui.
+
+### Diubah
+
 - **Memutus — `type="iconOnly"` pada `Button` kini digantikan prop boolean `iconOnly`.**
   Nilai `"iconOnly"` dihapus dari prop `type`. Di TypeScript, kode yang masih
   menulis `type="iconOnly"` akan gagal dikompilasi. Penggantinya: gunakan prop
@@ -65,6 +85,10 @@ tunggal secara ketat. README di halaman npm dan situs dokumentasi ikut diperbaru
   `<button type={type}>` alih-alih di-hardcode. Tombol kini dapat memicu
   pengiriman formulir secara native saat dipasang di dalam `<form>` lewat
   `type="submit"`.
+- **Memutus — `Upload` kini hanya menerima satu berkas.** Atribut `multiple`
+  dihapus dari `UploadProps`, jadi kode TypeScript yang masih memasangnya gagal
+  dikompilasi. Dari berkas yang diseret hanya yang pertama diambil, dan label
+  serta ukuran berkas menampilkan berkas itu saja.
 - **`Alert` `darkMode`: warna mengikuti desain gelap yang baru.** Latarnya kini
   -900 dari variant itu sendiri, bukan lagi gray-800 untuk semua variant.
   Ikonnya -500, heading dan isi pesan sama-sama -50, dan tombol tutup (×)
@@ -79,6 +103,11 @@ tunggal secara ketat. README di halaman npm dan situs dokumentasi ikut diperbaru
   ikut gray-700 sehingga tetap menyatu dengan latarnya; garis `InputField`
   `inactive` tetap gray-800. `FloatingLabel` kini bergaris gray-600 yang
   terlihat (sebelumnya gray-800, menyatu dengan latar).
+- **Tombol hapus (×) dan tombol mata `InputField` gelap kini gray-400**, sama
+  dengan × pada `FloatingLabel`. Sebelumnya gray-600 (× saat `typing`
+  gray-500), nyaris tak terlihat di latar gray-700. × saat `failed` tetap
+  red-600, mata saat `inactive` tetap gray-600, dan tampilan terang tidak
+  berubah.
 - **`Toast` `darkMode`: kartu kini gray-700, bukan gray-800.** Pesan singkat
   tanpa heading naik ke gray-300, sama dengan heading; teks pendukung di bawah
   heading tetap gray-400.
@@ -103,10 +132,6 @@ tunggal secara ketat. README di halaman npm dan situs dokumentasi ikut diperbaru
   (gray-900 di tema terang, gray-300 di tema gelap), hover tautan memakai
   `--color-breadcrumb-link-hover` (primary-700 di tema terang, putih di tema gelap),
   serta item tidak aktif memakai token semantik `--color-content-muted`.
-- **`Upload`: pembatasan berkas tunggal secara ketat.** Prop `multiple` dihapus
-  dari `UploadProps` untuk memastikan pemenuhan kebutuhan berkas tunggal,
-  operasi drag-and-drop hanya mengambil item pertama, dan label serta ukuran
-  berkas kini menampilkan berkas tunggal.
 - **`--color-feedback-error` kini red-500 di tema gelap**, tetap red-600 di
   tema terang. Error Input Field dan Floating Label gelap memakainya.
 - **Mengetik di daftar pilihan `Select` kini melompat ke pilihan yang cocok
@@ -117,11 +142,63 @@ tunggal secara ketat. README di halaman npm dan situs dokumentasi ikut diperbaru
   katanya ("jakarta" → DKI Jakarta). Huruf yang sama diketik berulang
   berpindah ke pilihan berikutnya. Perilaku ini milik panel `Dropdown`, jadi
   daftar kategori `Search` ikut mendapatkannya.
+- **`Hero` dan `Container` kini memakai token warna, seperti `Card`.**
+  `darkMode` cukup memasang `data-theme="dark"`; tanpa prop itu keduanya ikut
+  tema pembungkusnya, mis. `<section data-theme="dark">`.
+- **`Hero` `darkMode`: latar kini gray-800 (`--color-surface-subtle`), bukan
+  gray-900**, untuk ketiga tipe. Sub heading naik dari primary-500 ke
+  primary-400 dan deskripsi dari gray-400 ke gray-300, supaya kontrasnya lebih
+  tinggi. Hero terang tidak berubah: putih, atau primary-50 untuk `centered`.
+- **`Container` `darkMode`: latar elemen dalam kini gray-700
+  (`--color-container`), bukan gray-800.** Teksnya tetap gray-300.
+- **`Card` kini memakai token warna semantik** (`surface`, `content`, `brand`),
+  jadi `darkMode` cukup memasang `data-theme="dark"`. Kartu gelap kini gray-700
+  bergaris gray-700 (sebelumnya gray-800), deskripsi gray-300 (sebelumnya
+  gray-400), dan tautan primary-400 (sebelumnya primary-500). Kartu terang
+  tidak berubah.
+- **`Badge`: teks kini tepat di tengah tinggi badge**, sejajar dengan ikon dan
+  tombol ×; sebelumnya teks Lato tampak sedikit turun. Tinggi tetap 24px
+  (`sm`) dan 28px (`lg`), sedangkan jarak ikon–teks naik dari 4px ke 6px dan
+  8px. Peramban yang belum mendukung `text-box` tetap memakai perataan lama.
+- **`Table`: ikon sort kini di ujung kanan judul kolom rata kiri, di kedua
+  `size`**, jadi ikon di semua kolom berbaris rapi. Sebelumnya hanya
+  `compact`; pada `default` ikon menempel tepat di belakang teks judul.
+- **`Modal`: `trigger` kini opsional**, asalkan Modal dikendalikan lewat
+  `open`. Tanpa keduanya Modal melempar error yang menjelaskan prop mana yang
+  kurang.
 
 ### Ditambahkan
 
-- **Token komponen `--color-sidebar-surface`, `--color-search-*`, dan `--color-breadcrumb-*` di `tokens.css`.**
-  Menyediakan kontrol warna khusus untuk Sidebar, Search, serta Breadcrumb pada tema terang dan gelap (`data-theme="dark"`).
+- **`Table`: kolom berkas lewat `column.file`.** Sel menampilkan ikon jenis
+  berkas lalu namanya; jenisnya ditebak dari ekstensi nama. Gambar (ikon biru)
+  dan PDF (ikon merah) dibuka di pratinjau di atas halaman, PDF memakai
+  penampil bawaan peramban, lengkap dengan tautan "Buka di tab baru". Berkas
+  lain (ikon abu-abu) diunduh. Isiannya `name`, `href`, `type`, dan `preview`;
+  tanpa `href` nama tampil sebagai teks biasa.
+- **Komponen `TableFile`**, bentuk langsung kolom berkas untuk dipakai di
+  `cell` sendiri. Tipe `TableColumnFile`, `TableFileProps`, dan
+  `TableFileType` ikut diekspor.
+- **`Table`: baris zebra lewat `striped`.** Baris genap berlatar gray-50, dan
+  hover gray-100 supaya tetap terlihat di baris genap.
+- **`Table`: checkbox pilih semua** di judul kolom seleksi. Ia hanya mencakup
+  baris di halaman yang sedang tampil; tanda sebagian (garis datar) muncul
+  mulai dua baris tercentang.
+- **`Table`: pemilih jumlah baris per halaman** lewat
+  `pagination.pageSizeOptions`, mis. `[10, 25, 50]`, bersama
+  `defaultPageSize` dan `onPageSizeChange`. Mengganti jumlah baris
+  mengembalikan tabel ke halaman 1. Bila `pagination.pageSize` diisi, nilainya
+  dikendalikan pemakai.
+- **`Modal`: prop `open` dan `onOpenChange`** untuk membuka dan menutup Modal
+  dari kode, mis. dari tombol hapus di baris tabel. Tombol tutup, Escape,
+  klik backdrop, dan `close` di footer memanggil `onOpenChange(false)`. Tanpa
+  `open`, Modal tetap mengurus dirinya sendiri lewat `trigger` seperti biasa.
+- **Token `--color-container`** untuk latar `Container` di tema gelap.
+- **Font alternatif `font-alt` (Inter) dan `font-alt-2` (Arial)**, lewat token
+  `--font-alt` dan `--font-alt-2` yang boleh ditimpa di `:root`. Inter dimuat
+  `styles.css` dari Google Fonts seperti Lato; Arial font sistem, jadi tidak
+  perlu diunduh.
+- **Token komponen `--color-sidebar-surface`, `--color-search-category-surface`, `--color-search-field-surface`, dan `--color-breadcrumb-*` di `tokens.css`.**
+  Menyediakan kontrol warna latar khusus untuk Sidebar, kategori dan field Search, serta Breadcrumb pada tema terang dan gelap (`data-theme="dark"`).
 - **`Sidebar`: menu dropdown profil akun dan link eksternal.**
   `SidebarUser` kini mendukung `items?: SidebarUserItem[]` dan `groups?: SidebarUserGroup[]`
   untuk menampilkan menu dropdown akun/profil (misalnya profil, pengaturan, dan
@@ -165,9 +242,14 @@ tunggal secara ketat. README di halaman npm dan situs dokumentasi ikut diperbaru
 
 ### Diperbaiki
 
+- **`Container` dengan `max-w-*` di `className` kini tetap di tengah.**
+  Sebelumnya batas lebar menempel di elemen luar yang tidak dipusatkan, jadi
+  Container menempel ke kiri.
 - **`Button`: fungsionalitas pengiriman formulir native kini bekerja.**
   Sebelumnya elemen `<button>` selalu meng-hardcode atribut `type="button"`,
   sehingga tombol tidak dapat memicu aksi submit form.
+- **`Badge` `sm`: ikon kini 14px**, sebelumnya membesar ke 20px sehingga lebih
+  besar dari teksnya.
 
 ## [0.3.1] - 2026-10-08
 

@@ -40,11 +40,17 @@ interface Ink {
   field: string
   helper: string
   icon: string
-  /** Tombol hapus (×) — pada tampilan gelap warnanya berbeda dari ikon kiri. */
+  /**
+   * Tombol hapus (×): gray-500 di tampilan terang, gray-400 di tampilan gelap,
+   * sama dengan × pada Floating Label. Desain gelapnya gray-600 (gray-500 saat
+   * typing), terlalu samar di latar gray-700.
+   */
   clear: string
   /**
-   * Tombol mata pada `type="password"`. Desainnya tidak ikut memerah saat failed:
-   * gray-500 di tampilan terang, gray-600 di tampilan gelap.
+   * Tombol mata pada `type="password"`. Tidak ikut memerah saat failed: gray-500
+   * di tampilan terang, gray-400 di tampilan gelap. Desain gelapnya gray-600,
+   * tetapi warna itu nyaris tak terlihat di latar gray-700. Saat inactive
+   * tetap gray-400 terang dan gray-600 gelap.
    */
   reveal: string
 }
@@ -65,16 +71,16 @@ const inks: Record<InputFieldState, Ink> = {
     field: 'text-content placeholder:text-content-muted',
     helper: 'text-content-muted',
     icon: 'text-content-muted',
-    clear: 'text-input-field-action',
-    reveal: 'text-input-field-action',
+    clear: 'text-content-muted',
+    reveal: 'text-content-muted',
   },
   typing: {
     label: 'text-content',
     field: 'text-content placeholder:text-gray-500',
     helper: 'text-content-muted',
     icon: 'text-gray-500',
-    clear: 'text-gray-500',
-    reveal: 'text-input-field-action',
+    clear: 'text-content-muted',
+    reveal: 'text-content-muted',
   },
   inactive: {
     label: 'text-input-field-label-inactive',
@@ -90,7 +96,7 @@ const inks: Record<InputFieldState, Ink> = {
     helper: 'text-red-600',
     icon: 'text-red-600',
     clear: 'text-red-600',
-    reveal: 'text-input-field-action',
+    reveal: 'text-content-muted',
   },
 }
 

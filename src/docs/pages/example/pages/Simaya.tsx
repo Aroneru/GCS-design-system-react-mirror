@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Alert,
   Badge,
@@ -12,51 +12,53 @@ import {
   TextArea,
   Toast,
   Toggle,
-} from '../../../../lib'
-import { FileLines, InfoCircle, User } from '../../../../lib/icons/outline'
+} from "../../../../lib";
+import { FileLines, InfoCircle, User } from "../../../../lib/icons/outline";
 
 /**
- * Contoh aplikasi Simaya.
- *
- * Simaya bukan tema terpisah, melainkan nilai prop `application` yang diterima
- * tujuh komponen form: InputField, FloatingLabel, Select, TextArea, Radio,
- * Checkbox, dan Toggle. Yang berubah hanya warna aksen — garis saat difokus,
- * cincin radio, kotak centang, jalur sakelar, dan tombol kirim editor — dari
- * primary ke ungu. Struktur, ukuran, dan jaraknya identik.
+ * Simaya bukan tema terpisah, melainkan aplikasi yang memanfaatkan nilai
+ * prop `application="purple"` yang diterima tujuh komponen form: InputField,
+ * FloatingLabel, Select, TextArea, Radio, Checkbox, dan Toggle. Yang berubah
+ * hanya warna aksen — garis saat difokus, cincin radio, kotak centang,
+ * jalur sakelar, dan tombol kirim editor — dari primary ke ungu. Struktur,
+ * ukuran, dan jaraknya identik.
  *
  * Komponen non-form tidak punya prop itu. Untuk menyelaraskannya, Button
  * memakai `theme="purple"` dan Badge memakai kelas token yang sama.
  */
 
 const KLASIFIKASI = [
-  { value: 'biasa', label: 'Biasa' },
-  { value: 'terbatas', label: 'Terbatas' },
-  { value: 'rahasia', label: 'Rahasia' },
-]
+  { value: "biasa", label: "Biasa" },
+  { value: "terbatas", label: "Terbatas" },
+  { value: "rahasia", label: "Rahasia" },
+];
 
 export function Simaya() {
-  const [perihal, setPerihal] = useState('')
-  const [tujuan, setTujuan] = useState('')
-  const [klasifikasi, setKlasifikasi] = useState('biasa')
-  const [sifat, setSifat] = useState('biasa')
-  const [isi, setIsi] = useState('')
-  const [ttd, setTtd] = useState(true)
-  const [tembusan, setTembusan] = useState(false)
-  const [terkirim, setTerkirim] = useState(false)
+  const [perihal, setPerihal] = useState("");
+  const [tujuan, setTujuan] = useState("");
+  const [klasifikasi, setKlasifikasi] = useState("biasa");
+  const [sifat, setSifat] = useState("biasa");
+  const [isi, setIsi] = useState("");
+  const [ttd, setTtd] = useState(true);
+  const [tembusan, setTembusan] = useState(false);
+  const [terkirim, setTerkirim] = useState(false);
 
   return (
     <div className="space-y-8">
       <Alert variant="purple" heading="Mode Simaya aktif" dismissible={false}>
-        Seluruh kontrol di halaman ini memakai <code className="font-mono text-xs">application="purple"</code>.
-        Bandingkan dengan halaman Pengaturan yang memakai nilai bawaan — strukturnya sama persis,
-        hanya warna aksennya yang berbeda.
+        Seluruh kontrol di halaman ini memakai{" "}
+        <code className="font-mono text-xs">application="purple"</code>.
+        Bandingkan dengan halaman Pengaturan yang memakai nilai bawaan —
+        strukturnya sama persis, hanya warna aksennya yang berbeda.
       </Alert>
 
       {/* 20px di ponsel agar toolbar editor Text Area (234px) muat di layar 320px. */}
       <section className="ds-card p-5 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 className="text-heading-3 font-black text-gray-900">Naskah dinas baru</h2>
+            <h2 className="text-heading-3 font-black text-gray-900">
+              Naskah dinas baru
+            </h2>
             <p className="mt-1 text-body-sm text-gray-500">
               Formulir persuratan internal dengan aksen ungu khas Simaya.
             </p>
@@ -100,28 +102,30 @@ export function Simaya() {
             onChange={(e) => setKlasifikasi(e.target.value)}
           />
           <fieldset>
-            <legend className="mb-2 text-sm font-bold text-gray-900">Sifat naskah</legend>
+            <legend className="mb-2 text-sm font-bold text-gray-900">
+              Sifat naskah
+            </legend>
             <div className="flex min-h-9.25 flex-wrap items-center gap-x-6 gap-y-2">
               <Radio
                 application="purple"
                 name="sifat"
                 label="Biasa"
-                checked={sifat === 'biasa'}
-                onChange={() => setSifat('biasa')}
+                checked={sifat === "biasa"}
+                onChange={() => setSifat("biasa")}
               />
               <Radio
                 application="purple"
                 name="sifat"
                 label="Segera"
-                checked={sifat === 'segera'}
-                onChange={() => setSifat('segera')}
+                checked={sifat === "segera"}
+                onChange={() => setSifat("segera")}
               />
               <Radio
                 application="purple"
                 name="sifat"
                 label="Sangat segera"
-                checked={sifat === 'sangat'}
-                onChange={() => setSifat('sangat')}
+                checked={sifat === "sangat"}
+                onChange={() => setSifat("sangat")}
               />
             </div>
           </fieldset>
@@ -160,11 +164,15 @@ export function Simaya() {
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Button type="submit" theme="purple" onClick={() => setTerkirim(true)}>
-            Kirim naskah
-          </Button>
           <Button variant="outline" theme="purple">
             Simpan konsep
+          </Button>
+          <Button
+            type="submit"
+            theme="purple"
+            onClick={() => setTerkirim(true)}
+          >
+            Kirim naskah
           </Button>
         </div>
       </section>
@@ -175,41 +183,63 @@ export function Simaya() {
             <InfoCircle />
           </Icon>
           <div>
-            <h3 className="text-body font-black text-gray-900">Perbandingan berdampingan</h3>
+            <h3 className="text-body font-black text-gray-900">
+              Perbandingan berdampingan
+            </h3>
             <p className="mt-1 text-body-sm text-gray-500">
-              Kontrol yang sama, hanya berbeda nilai <code className="font-mono text-xs">application</code>.
+              Kontrol yang sama, hanya berbeda nilai{" "}
+              <code className="font-mono text-xs">application</code>.
             </p>
           </div>
         </div>
 
         <div className="mt-6 grid gap-6 sm:grid-cols-2">
           <div className="space-y-4 rounded-xl bg-surface-subtle p-5">
-            <p className="text-caption font-bold tracking-wide text-gray-500 uppercase">default</p>
-            <InputField label="Perihal" placeholder="Klik untuk melihat garis fokus" />
+            <p className="text-caption font-bold tracking-wide text-gray-500 uppercase">
+              default
+            </p>
+            <InputField
+              label="Perihal"
+              placeholder="Klik untuk melihat garis fokus"
+            />
             <Toggle label="Tanda tangan elektronik" defaultChecked />
             <Checkbox label="Kirim tembusan" defaultChecked />
           </div>
 
           <div className="space-y-4 rounded-xl bg-surface-subtle p-5">
-            <p className="text-caption font-bold tracking-wide text-purple-700 uppercase">purple</p>
+            <p className="text-caption font-bold tracking-wide text-purple-700 uppercase">
+              simaya
+            </p>
             <InputField
               application="purple"
               label="Perihal"
               placeholder="Klik untuk melihat garis fokus"
             />
-            <Toggle application="purple" label="Tanda tangan elektronik" defaultChecked />
-            <Checkbox application="purple" label="Kirim tembusan" defaultChecked />
+            <Toggle
+              application="purple"
+              label="Tanda tangan elektronik"
+              defaultChecked
+            />
+            <Checkbox
+              application="purple"
+              label="Kirim tembusan"
+              defaultChecked
+            />
           </div>
         </div>
       </section>
 
       {terkirim && (
         <div className="fixed bottom-4 left-4 z-50">
-          <Toast variant="purple" heading="Naskah terkirim" onDismiss={() => setTerkirim(false)}>
+          <Toast
+            variant="purple"
+            heading="Naskah terkirim"
+            onDismiss={() => setTerkirim(false)}
+          >
             Naskah diteruskan ke unit tujuan dan menunggu persetujuan pimpinan.
           </Toast>
         </div>
       )}
     </div>
-  )
+  );
 }
