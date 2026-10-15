@@ -136,7 +136,9 @@ function ModalExampleCode({
 }
 
 const modalProps: PropRow[] = [
-  ['trigger', 'ReactElement', 'required', 'Tombol milik consumer yang membuka Modal.'],
+  ['trigger', 'ReactElement', 'undefined', 'Tombol milik consumer yang membuka Modal. Wajib, kecuali Modal dibuka lewat open.'],
+  ['open', 'boolean', 'undefined', 'Buka-tutup Modal dari kode, mis. dari tombol hapus di baris tabel. Pasangkan dengan onOpenChange.'],
+  ['onOpenChange', '(open: boolean) => void', 'undefined', 'Dipanggil saat Modal minta dibuka atau ditutup (tombol tutup, Escape, backdrop, atau close di footer).'],
   ['variant', "'default' | 'popup'", "'default'", 'Menentukan struktur Modal. Popup digunakan untuk dialog konfirmasi ringkas.'],
   ['size', "'s' | 'm'", "'s'", 'Ukuran Default Modal. Tidak tersedia untuk Popup.'],
   ['title', 'ReactNode', 'undefined', 'Judul Default Modal sekaligus nama aksesibel. Tidak tersedia untuk Popup.'],

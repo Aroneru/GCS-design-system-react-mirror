@@ -2,14 +2,56 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Footer, type FooterMenu } from "../lib";
 import { FacebookIcon, InstagramIcon, XIcon } from "./socialIcons";
 import { asset } from "./asset";
-import { rail, sidebars, type NavItem, type Section } from "./navigation";
+import { pintasanCari, rail, sidebars, type NavItem, type Section } from "./navigation";
 import { Collapse, Drawer, prefersReducedMotion, SlideIn } from "./motion";
+import { DocsSearch } from "./DocsSearch";
+
+/** Ikon kaca pembesar untuk tombol Cari di rail dan top bar. */
+const ikonCari = "m20 20-4.5-4.5M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z";
 
 /**
  * Menu footer sama di seluruh halaman: kelima area utama, diturunkan dari
  * `rail` yang sama dengan navigasi kiri supaya keduanya tak mungkin melenceng.
  */
 const footerMenus: FooterMenu[] = rail.map((r) => ({ label: r.label, url: `#${r.route}` }));
+
+/**
+ * Satu menu di rail: seluruh kolom (ikon + label) bisa diklik, tapi latar
+ * penandanya hanya pill di belakang ikon (lihat RailIcon). Label tanpa latar,
+ * warnanya ikut status: biru saat aktif, abu-abu lalu gelap saat hover.
+ */
+const railItemClass = (active: boolean) =>
+  [
+    "group flex w-full flex-col items-center gap-1 rounded-lg py-0.5 text-[11px] font-bold transition-colors",
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
+    active ? "text-primary-700" : "text-gray-500 hover:text-gray-800",
+  ].join(" ");
+
+/**
+ * Ikon menu rail di dalam penanda 56×32: biru muda saat aktif, abu-abu saat
+ * hover. Sudutnya 8px (`rounded-lg`), bukan bulat penuh, supaya serasi dengan
+ * item aktif di panel samping dan komponen lain.
+ */
+function RailIcon({ path, active }: { path: string; active: boolean }) {
+  return (
+    <span
+      className={`grid h-8 w-14 place-items-center rounded-lg transition-colors ${
+        active ? "bg-primary-50" : "group-hover:bg-gray-100"
+      }`}
+    >
+      <svg
+        className="size-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={1.8}
+        aria-hidden="true"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d={path} />
+      </svg>
+    </span>
+  );
+}
 
 function sectionOf(path: string): Section {
   if (path.startsWith("/foundations")) return "foundations";
@@ -192,6 +234,7 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
   const sidebar = sidebars[section] ?? null;
   const [drawer, setDrawer] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [cari, setCari] = useState(false);
 
   /*
    * Area terakhir yang punya sub-navigasi, ditahan selama daftarnya menutup.
@@ -218,21 +261,38 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
           <Logo small />
           <span className="text-sm font-black tracking-tight text-gray-900">Design System</span>
         </a>
-        <button
-          onClick={() => setDrawer(true)}
-          className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
-          aria-label="Buka navigasi"
-        >
-          <svg
-            className="size-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setCari(true)}
+            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+            aria-label="Cari halaman"
           >
-            <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
-          </svg>
-        </button>
+            <svg
+              className="size-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" d={ikonCari} />
+            </svg>
+          </button>
+          <button
+            onClick={() => setDrawer(true)}
+            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+            aria-label="Buka navigasi"
+          >
+            <svg
+              className="size-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* ══ Drawer — mobile ══ */}
@@ -333,34 +393,42 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
        */}
       <div className="flex flex-1">
         {/* ══ Icon rail — desktop ══ */}
-        <aside className="sticky top-0 z-30 hidden h-screen w-[76px] shrink-0 flex-col items-center border-r border-border bg-white py-5 lg:flex">
+        {/*
+          Pola navigation rail: penanda aktif/hover berupa pill 56×32 di
+          belakang ikon saja, label di bawahnya tanpa latar. Dulu latarnya
+          membungkus ikon + label, jadi label panjang ("Components") membuat
+          kotaknya hampir selebar rail dan terlihat mepet ke garis kanan.
+        */}
+        <aside className="sticky top-0 z-30 hidden h-screen w-[88px] shrink-0 flex-col items-center border-r border-border bg-white px-2 py-5 lg:flex">
           <a href="#/" aria-label="Beranda">
             <Logo />
           </a>
-          <nav className="mt-8 flex flex-col gap-2" aria-label="Area utama">
-            {rail.map((item) => (
-              <a
-                key={item.key}
-                href={`#${item.route}`}
-                className={`flex w-14 flex-col items-center gap-1 rounded-xl py-2 text-[10px] font-bold transition-colors ${
-                  section === item.key
-                    ? "bg-primary-50 text-primary-700"
-                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                }`}
-                aria-current={section === item.key ? "page" : undefined}
-              >
-                <svg
-                  className="size-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.8}
+          {/* Pencarian halaman — juga lewat Ctrl+K / ⌘K atau "/" dari halaman mana pun. */}
+          <button
+            onClick={() => setCari(true)}
+            className={`mt-6 ${railItemClass(false)}`}
+            aria-label="Cari halaman"
+            aria-keyshortcuts="Control+K Meta+K /"
+            title={`Cari halaman (${pintasanCari})`}
+          >
+            <RailIcon path={ikonCari} active={false} />
+            Cari
+          </button>
+          <nav className="mt-3 flex w-full flex-col gap-3" aria-label="Area utama">
+            {rail.map((item) => {
+              const active = section === item.key;
+              return (
+                <a
+                  key={item.key}
+                  href={`#${item.route}`}
+                  className={railItemClass(active)}
+                  aria-current={active ? "page" : undefined}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-                </svg>
-                {item.label}
-              </a>
-            ))}
+                  <RailIcon path={item.icon} active={active} />
+                  {item.label}
+                </a>
+              );
+            })}
           </nav>
           {/*
             Tombolnya tetap dirender di area tanpa panel, hanya dipudarkan.
@@ -417,6 +485,8 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
           { label: "Facebook", url: "#", icon: FacebookIcon },
         ]}
       />
+
+      <DocsSearch open={cari} onOpenChange={setCari} />
     </div>
   );
 }

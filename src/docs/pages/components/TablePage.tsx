@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState, type Key, type ReactNode } from "react";
 import { Plus } from "flowbite-react-icons/outline";
 import { Download, Edit, Eye, Printer, TrashBin } from "flowbite-react-icons/solid";
+import { ExclamationCircle } from "../../../lib/icons/solid";
 import {
   Badge,
   Button,
+  Icon,
+  Modal,
   Table,
   type BadgeVariant,
   type PaginationTheme,
@@ -365,6 +368,7 @@ const tableProps: PropRow[] = [
   ["headerAlign", '"left" | "center" | "right"', "undefined", "Posisi semua judul kolom sekaligus. `headerAlign` di kolom tetap menang. Kalau kosong, judul ikut `align` kolomnya."],
   ["pagination", "TablePaginationConfig", "undefined", "Membagi data per halaman. Tanpa ini semua baris tampil."],
   ["manual", "boolean", "false", "Pasang kalau urutan dan halaman diurus server."],
+  ["striped", "boolean", "false", "Baris zebra: baris genap diberi latar abu-abu muda."],
   ["loading", "boolean", "false", "Menampilkan ikon memuat sebagai ganti isi tabel."],
   ["emptyText", "ReactNode", "Tidak ada data", "Tulisan yang tampil kalau data kosong."],
 ];
@@ -415,6 +419,41 @@ const imageProps: PropRow[] = [
   ["preview", "boolean", "true", "Klik gambar untuk melihatnya besar. Isi `false` kalau tidak perlu."],
 ];
 
+const fileProps: PropRow[] = [
+  ["name", "(row) => string | null", "—", "Nama berkas yang tampil, mis. \"Document.pdf\". Kalau kosong, sel berisi \"—\"."],
+  ["href", "(row) => string | null", "undefined", "Alamat berkas. Tanpa ini nama tampil sebagai teks biasa."],
+  ["type", "'image' | 'pdf' | 'file' | (row) => …", "dari ekstensi", "Jenis berkas, menentukan ikon dan pratinjau. Bawaannya ditebak dari ekstensi nama."],
+  ["preview", "boolean", "true", "Klik untuk pratinjau gambar/PDF di atas halaman. `false` membuka tab baru. Jenis `file` selalu diunduh."],
+];
+
+type Berkas = { id: number; nama: string; foto: string; dokumen: string; dokumenUrl: string };
+
+/** Contoh kolom berkas: gambar, PDF, dan satu berkas lain yang tidak bisa dipratinjau. */
+const berkasRows: Berkas[] = [
+  { id: 1, nama: "Andi Pratama", foto: "Image.png", dokumen: "Document.pdf", dokumenUrl: asset("files/contoh-dokumen.pdf") },
+  { id: 2, nama: "Siti Rahma", foto: "Image.png", dokumen: "Document.pdf", dokumenUrl: asset("files/contoh-dokumen.pdf") },
+  { id: 3, nama: "Budi Santoso", foto: "Image.png", dokumen: "Document.pdf", dokumenUrl: asset("files/contoh-dokumen.pdf") },
+  // Tanpa alamat: hanya menunjukkan ikon berkas lain. Dengan alamat, berkas
+  // jenis ini diunduh karena peramban tidak bisa mempratinjaunya.
+  { id: 4, nama: "Dewi Lestari", foto: "Image.png", dokumen: "Surat.docx", dokumenUrl: "" },
+];
+
+const berkasColumns: TableColumn<Berkas>[] = [
+  { key: "nama", header: "Nama", align: "left", emphasis: true },
+  {
+    key: "foto",
+    header: "Foto",
+    align: "left",
+    file: { name: (r) => r.foto, href: (r) => placeholderImage(r.id) },
+  },
+  {
+    key: "dokumen",
+    header: "Dokumen",
+    align: "left",
+    file: { name: (r) => r.dokumen, href: (r) => r.dokumenUrl || null },
+  },
+];
+
 const filterProps: PropRow[] = [
   ["label", "string", "Filter Data", "Teks tombol."],
   ["title", "ReactNode", "Tampilkan kolom", "Judul di atas daftar kolom."],
@@ -424,13 +463,16 @@ const filterProps: PropRow[] = [
 ];
 
 const paginationProps: PropRow[] = [
-  ["pageSize", "number", "10", "Jumlah baris per halaman."],
+  ["pageSize", "number", "undefined", "Jumlah baris per halaman, kalau kamu ingin menyimpannya sendiri."],
+  ["defaultPageSize", "number", "10", "Jumlah baris per halaman saat tabel pertama tampil."],
+  ["pageSizeOptions", "number[]", "undefined", "Pilihan jumlah baris, mis. `[5, 10, 25, 50, 100]`. Kalau diisi, muncul pilihan \"Baris per halaman\" di samping pagination."],
+  ["onPageSizeChange", "(pageSize) => void", "undefined", "Dipanggil saat user mengganti jumlah baris. Halaman kembali ke 1."],
   ["page", "number", "undefined", "Halaman yang sedang tampil, kalau kamu ingin menyimpannya sendiri."],
   ["defaultPage", "number", "1", "Halaman saat tabel pertama tampil."],
   ["onPageChange", "(page) => void", "undefined", "Dipanggil saat user pindah halaman."],
   ["total", "number", "data.length", "Jumlah seluruh data. Wajib diisi kalau memakai `manual`."],
   ["theme", "PaginationTheme", "primary", "Warna tombol halaman yang aktif."],
-  ["summary", "({ from, to, total }) => ReactNode", "Memperlihatkan …", "Ganti tulisan \"Memperlihatkan 1-10 of 1000 Data\"."],
+  ["summary", "({ from, to, total }) => ReactNode", "Menampilkan …", "Ganti tulisan \"Menampilkan 1–10 dari 50 data\"."],
 ];
 
 /** Daftar poin pendek di bawah Lead — lebih mudah dipindai daripada paragraf panjang. */
@@ -458,9 +500,11 @@ const toc: TocEntry[] = [
   { id: "table", label: "Table" },
   { id: "states", label: "States" },
   { id: "size", label: "Size" },
+  { id: "zebra", label: "Baris zebra" },
   { id: "aksi", label: "Tombol aksi" },
   { id: "posisi", label: "Posisi judul" },
   { id: "gambar", label: "Gambar" },
+  { id: "berkas", label: "Berkas (PDF)" },
   { id: "bertingkat", label: "Kolom bertingkat" },
   { id: "sort", label: "Sorting" },
   { id: "filter", label: "Filter kolom" },
@@ -632,14 +676,95 @@ function ServerTable() {
   );
 }
 
+/**
+ * Modal popup konfirmasi hapus. Dipakai dua cara: dengan `trigger` (tombol
+ * "Hapus Data" di toolbar) atau terkontrol lewat `open` (tombol hapus di
+ * baris). Data baru dihapus saat "Ya, hapus" ditekan; "Tidak, Batalkan" dan
+ * tombol tutup hanya menutup.
+ */
+function ConfirmDeleteModal({
+  trigger,
+  open,
+  onOpenChange,
+  message,
+  confirmLabel,
+  onConfirm,
+}: {
+  trigger?: React.ComponentProps<typeof Modal>["trigger"];
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  message: ReactNode;
+  confirmLabel: string;
+  onConfirm: () => void;
+}) {
+  return (
+    <Modal
+      trigger={trigger}
+      open={open}
+      onOpenChange={onOpenChange}
+      variant="popup"
+      aria-label="Konfirmasi hapus data"
+      footer={({ close }) => (
+        <div className="flex w-full justify-center gap-4">
+          <Button variant="outline" theme="gray" size="xs" onClick={close}>
+            Tidak, Batalkan
+          </Button>
+          <Button
+            theme="orange"
+            size="xs"
+            onClick={() => {
+              onConfirm();
+              close();
+            }}
+          >
+            {confirmLabel}
+          </Button>
+        </div>
+      )}
+    >
+      <div className="text-center">
+        <div className="flex justify-center">
+          <Icon className="size-12 text-orange-600">
+            <ExclamationCircle />
+          </Icon>
+        </div>
+        <p className="mx-auto mt-4 max-w-xs text-body font-medium text-gray-500">{message}</p>
+      </div>
+    </Modal>
+  );
+}
+
+/** Tombol "Hapus Data" di toolbar: menghapus semua baris yang dicentang. */
+function DeleteSelectedButton({ count, onConfirm }: { count: number; onConfirm: () => void }) {
+  return (
+    <ConfirmDeleteModal
+      trigger={
+        <Button size="s" theme="orange" leftIcon={<TrashBin />} disabled={count === 0}>
+          Hapus Data
+        </Button>
+      }
+      message={`Apakah anda yakin ingin menghapus ${count} data terpilih?`}
+      confirmLabel={`Ya, hapus ${count} data`}
+      onConfirm={onConfirm}
+    />
+  );
+}
+
 function DataTable({ cols = columns }: { cols?: TableColumn<Row>[] }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Key[]>([1]);
+  // Data disimpan di state supaya baris yang dihapus benar-benar hilang.
+  const [data, setData] = useState(allRows);
 
   const rows = useMemo(
-    () => allRows.filter((r) => r.field1.toLowerCase().includes(query.toLowerCase())),
-    [query],
+    () => data.filter((r) => r.field1.toLowerCase().includes(query.toLowerCase())),
+    [data, query],
   );
+
+  const deleteSelected = () => {
+    setData((prev) => prev.filter((r) => !selected.includes(r.id)));
+    setSelected([]);
+  };
 
   return (
     <Table
@@ -656,18 +781,10 @@ function DataTable({ cols = columns }: { cols?: TableColumn<Row>[] }) {
           <Button size="s" leftIcon={<Plus />}>
             Tambah Data
           </Button>
-          <Button
-            size="s"
-            theme="orange"
-            leftIcon={<TrashBin />}
-            disabled={selected.length === 0}
-            onClick={() => setSelected([])}
-          >
-            Hapus Data
-          </Button>
+          <DeleteSelectedButton count={selected.length} onConfirm={deleteSelected} />
         </>
       }
-      pagination={{ pageSize: 10 }}
+      pagination={{ pageSizeOptions: [5, 10, 25, 50, 100] }}
     />
   );
 }
@@ -733,12 +850,18 @@ function pengajuanColumns({
   grouped,
   withRowActions,
   actionStyle,
+  onDelete,
 }: {
   preview: boolean;
   grouped: boolean;
   withRowActions: boolean;
   actionStyle: ActionStyle;
+  /** Dipanggil tombol hapus di baris; konfirmasinya diurus pemanggil. */
+  onDelete?: (row: Pengajuan) => void;
 }): TableColumn<Pengajuan>[] {
+  const deleteAction: TableRowAction<Pengajuan>[] = onDelete
+    ? [{ key: "hapus", icon: <TrashBin />, label: "Hapus", theme: "orange", ...actionStyle, onClick: onDelete }]
+    : [];
   const nama: TableColumn<Pengajuan> = { key: "nama", header: "Nama", align: "left", emphasis: true, sortable: true, sortResettable: false };
   const email: TableColumn<Pengajuan> = { key: "email", header: "Email", align: "left" };
 
@@ -766,7 +889,7 @@ function pengajuanColumns({
       cell: (row) => <Badge variant={statusBadge[row.status]}>{row.status}</Badge>,
     },
     ...(withRowActions
-      ? [{ key: "aksi", header: "Aksi", actions: makeActions<Pengajuan>(actionStyle), hideable: false }]
+      ? [{ key: "aksi", header: "Aksi", actions: [...makeActions<Pengajuan>(actionStyle), ...deleteAction], hideable: false }]
       : []),
   ];
 }
@@ -784,11 +907,15 @@ function PlaygroundTable({
   preview,
   grouped,
   headerAlign,
+  striped,
+  withToolbarActions,
 }: {
   count: number;
   selectable: boolean;
   withSearch: boolean;
   withFilter: boolean;
+  striped: boolean;
+  withToolbarActions: boolean;
   theme: PaginationTheme;
   size: TableSize;
   withPagination: boolean;
@@ -801,7 +928,23 @@ function PlaygroundTable({
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Key[]>([]);
 
-  const data = useMemo(() => makePengajuan(count), [count]);
+  // State, bukan useMemo, supaya baris yang dihapus hilang. Saat "Jumlah data"
+  // diganti, komponen ini dipasang ulang lewat `key`, jadi datanya dibuat baru.
+  const [data, setData] = useState(() => makePengajuan(count));
+  const deleteSelected = () => {
+    setData((prev) => prev.filter((r) => !selected.includes(r.id)));
+    setSelected([]);
+  };
+
+  // Baris yang menunggu konfirmasi dari tombol hapus di kolom aksi. Selama
+  // berisi, Modal terbuka; ditutup = dikosongkan lagi.
+  const [pendingDelete, setPendingDelete] = useState<Pengajuan | null>(null);
+  const deletePending = () => {
+    if (!pendingDelete) return;
+    setData((prev) => prev.filter((r) => r.id !== pendingDelete.id));
+    setSelected((prev) => prev.filter((k) => k !== pendingDelete.id));
+  };
+
   const rows = useMemo(() => {
     const q = query.toLowerCase();
     return data.filter(
@@ -810,35 +953,39 @@ function PlaygroundTable({
   }, [data, query]);
 
   return (
+    <>
+    <ConfirmDeleteModal
+      open={pendingDelete !== null}
+      onOpenChange={(open) => !open && setPendingDelete(null)}
+      message={`Apakah anda yakin ingin menghapus data ${pendingDelete?.nama ?? ""}?`}
+      confirmLabel="Ya, hapus data ini"
+      onConfirm={deletePending}
+    />
     <Table
-      columns={pengajuanColumns({ preview, grouped, withRowActions, actionStyle })}
+      columns={pengajuanColumns({ preview, grouped, withRowActions, actionStyle, onDelete: setPendingDelete })}
       data={rows}
       rowKey="id"
       size={size}
       headerAlign={headerAlign}
+      striped={striped}
       selectable={selectable}
       selectedKeys={selected}
       onSelectionChange={setSelected}
       search={withSearch ? { value: query, onChange: (e) => setQuery(e.target.value), placeholder: "Cari nama, email, atau layanan" } : undefined}
       filter={withFilter ? {} : undefined}
       actions={
-        <>
-          <Button size="s" leftIcon={<Plus />}>
-            Tambah Data
-          </Button>
-          <Button
-            size="s"
-            theme="orange"
-            leftIcon={<TrashBin />}
-            disabled={selected.length === 0}
-            onClick={() => setSelected([])}
-          >
-            Hapus Data
-          </Button>
-        </>
+        withToolbarActions ? (
+          <>
+            <Button size="s" leftIcon={<Plus />}>
+              Tambah Data
+            </Button>
+            <DeleteSelectedButton count={selected.length} onConfirm={deleteSelected} />
+          </>
+        ) : undefined
       }
-      pagination={withPagination ? { pageSize: 10, theme } : undefined}
+      pagination={withPagination ? { pageSizeOptions: [5, 10, 25, 50, 100], theme } : undefined}
     />
+    </>
   );
 }
 
@@ -868,19 +1015,23 @@ function OrderTable({ hiddenColumns = [] }: { hiddenColumns?: string[] }) {
           </Button>
         </>
       }
-      pagination={{ pageSize: 10 }}
+      pagination={{ pageSizeOptions: [5, 10, 25, 50, 100] }}
     />
   );
 }
 
 export function TablePage() {
-  const [selectable, setSelectable] = useState(true);
-  const [withSearch, setWithSearch] = useState(true);
-  const [withFilter, setWithFilter] = useState(true);
+  // Playground mulai dari tabel dasar: hanya data, zebra, dan pagination.
+  // Fitur lain dinyalakan sendiri lewat pengaturan di bawah tabel.
+  const [selectable, setSelectable] = useState(false);
+  const [withSearch, setWithSearch] = useState(false);
+  const [withFilter, setWithFilter] = useState(false);
+  const [withToolbarActions, setWithToolbarActions] = useState(false);
+  const [striped, setStriped] = useState(true);
   const [theme, setTheme] = useState<PaginationTheme>("primary");
   const [size, setSize] = useState<TableSize>("normal");
   const [withPagination, setWithPagination] = useState(true);
-  const [withRowActions, setWithRowActions] = useState(true);
+  const [withRowActions, setWithRowActions] = useState(false);
   const [actionIconSize, setActionIconSize] = useState<TableActionIconSize>("base");
   // Hanya nilai yang bukan bawaan, supaya kode di Penggunaan tetap ringkas.
   const actionStyle: ActionStyle = {
@@ -911,8 +1062,8 @@ export function TablePage() {
             <><Hl>search</Hl> menampilkan kotak pencarian di kiri atas.</>,
             <><Hl>filter</Hl> menampilkan tombol "Filter Data" untuk memilih kolom yang tampil.</>,
             <><Hl>actions</Hl> diisi tombol di kanan atas, mis. "Tambah Data".</>,
-            <><Hl>selectable</Hl> menambahkan checkbox di tiap baris.</>,
-            <><Hl>pagination</Hl> membagi data per halaman.</>,
+            <><Hl>selectable</Hl> menambahkan checkbox di tiap baris, plus checkbox "pilih semua" di judul untuk baris di halaman yang tampil.</>,
+            <><Hl>pagination</Hl> membagi data per halaman. Isi <Hl>pageSizeOptions</Hl> supaya user bisa memilih jumlah baris.</>,
             <>Klik judul kolom yang <Hl>sortable</Hl> untuk mengurutkan.</>,
           ]}
         />
@@ -955,7 +1106,7 @@ export function TablePage() {
           {"={<Button size=\"s\" leftIcon={<Plus />}>Tambah Data</Button>}\n"}
           {"  "}
           <H>pagination</H>
-          {"={{ pageSize: 10 }}\n"}
+          {"={{ pageSizeOptions: [5, 10, 25, 50, 100] }}\n"}
           {"/>"}
         </SectionCode>
       </FlowSection>
@@ -1010,6 +1161,24 @@ export function TablePage() {
           {'="compact" />\n\n'}
           {"// Gambar di compact otomatis kotak 32px, caption hanya tampil di pratinjau\n"}
           {"{ key: 'gambar', header: 'Gambar', image: { src: (row) => row.fotoUrl } }"}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="zebra" title="Baris zebra">
+        <Lead>
+          Isi <Hl>striped</Hl> supaya baris genap berlatar abu-abu muda. Cocok untuk tabel dengan
+          banyak kolom, karena mata lebih mudah mengikuti satu baris dari kiri ke kanan. Warna hover
+          dibuat sedikit lebih gelap supaya tetap terlihat di baris genap.
+        </Lead>
+
+        <Demo label="Normal">
+          <Table columns={columns} data={allRows.slice(0, 6)} rowKey="id" selectable striped />
+        </Demo>
+
+        <SectionCode>
+          {"<Table columns={columns} data={rows} rowKey=\"id\" "}
+          <H>striped</H>
+          {" />"}
         </SectionCode>
       </FlowSection>
 
@@ -1140,6 +1309,35 @@ export function TablePage() {
           {"    {row.nama}\n"}
           {"  </div>\n"}
           {")"}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="berkas" title="Berkas (PDF dan lainnya)">
+        <Lead>
+          Untuk kolom dokumen, isi <Hl>file</Hl>. Sel menampilkan ikon jenis berkas dan namanya.
+          Ikonnya ditebak dari ekstensi nama berkas:
+        </Lead>
+        <Points
+          items={[
+            <>Gambar (<Hl>.png</Hl>, <Hl>.jpg</Hl>, …): ikon biru, klik untuk melihat gambarnya besar.</>,
+            <>PDF: ikon merah, klik untuk membaca PDF-nya langsung di atas halaman.</>,
+            <>Berkas lain (<Hl>.docx</Hl>, <Hl>.xlsx</Hl>, …): ikon abu-abu, klik untuk mengunduh.</>,
+          ]}
+        />
+
+        <Demo label="Kolom file">
+          <Table columns={berkasColumns} data={berkasRows} rowKey="id" />
+        </Demo>
+
+        <SectionCode>
+          {"{ key: 'dokumen', header: 'Dokumen',\n"}
+          {"    "}
+          <H>file</H>
+          {": { name: (row) => row.namaBerkas, href: (row) => row.urlBerkas } }\n\n"}
+          {"// Di dalam cell sendiri\n"}
+          {"<"}
+          <H>TableFile</H>
+          {' name="Document.pdf" href="/berkas/dokumen.pdf" />'}
         </SectionCode>
       </FlowSection>
 
@@ -1585,6 +1783,7 @@ export function TablePage() {
 
         <Stage maxWidth="max-w-[1024px]">
           <PlaygroundTable
+            key={count}
             count={count}
             selectable={selectable}
             withSearch={withSearch}
@@ -1597,6 +1796,8 @@ export function TablePage() {
             preview={withPreview}
             grouped={grouped}
             headerAlign={headerAlign}
+            striped={striped}
+            withToolbarActions={withToolbarActions}
           />
         </Stage>
 
@@ -1610,6 +1811,9 @@ export function TablePage() {
           <Control label="Rata judul">
             <Segmented label="Rata judul kolom" value={headerAlign} onChange={setHeaderAlign} options={headerAlignOptions} />
           </Control>
+          <Control label="Baris zebra">
+            <Segmented label="Baris zebra" value={striped} onChange={setStriped} options={onOff} />
+          </Control>
           <Control label="Checkbox baris">
             <Segmented label="Checkbox baris" value={selectable} onChange={setSelectable} options={adaTidakAda} />
           </Control>
@@ -1618,6 +1822,14 @@ export function TablePage() {
           </Control>
           <Control label="Filter">
             <Segmented label="Filter" value={withFilter} onChange={setWithFilter} options={adaTidakAda} />
+          </Control>
+          <Control label="Tombol Tambah & Hapus">
+            <Segmented
+              label="Tombol Tambah dan Hapus Data"
+              value={withToolbarActions}
+              onChange={setWithToolbarActions}
+              options={adaTidakAda}
+            />
           </Control>
           <Control label="Kolom aksi">
             <Segmented label="Kolom aksi" value={withRowActions} onChange={setWithRowActions} options={adaTidakAda} />
@@ -1659,7 +1871,7 @@ export function TablePage() {
         </Lead>
         <SectionCode flush>
           {"import { Badge, Button, Table, type TableColumn } from '@ceplok-ui/design-kit-react'\n"}
-          {"import { Plus } from 'flowbite-react-icons/outline'\n"}
+          {withToolbarActions && "import { Plus, TrashBin } from 'flowbite-react-icons/outline'\n"}
           {withRowActions && "import { Download, Edit, Printer } from 'flowbite-react-icons/solid'\n"}
           {"\n"}
           {"const columns: TableColumn<Pengajuan>[] = [\n"}
@@ -1745,14 +1957,30 @@ export function TablePage() {
               {"={{}}\n"}
             </>
           )}
-          {"    actions={<Button size=\"s\" leftIcon={<Plus />}>Tambah Data</Button>}\n"}
+          {striped && (
+            <>
+              {"    "}
+              <H>striped</H>
+              {"\n"}
+            </>
+          )}
+          {withToolbarActions && (
+            <>
+              {"    "}
+              <H>actions</H>
+              {"={<>\n"}
+              {"        <Button size=\"s\" leftIcon={<Plus />}>Tambah Data</Button>\n"}
+              {"        <Button size=\"s\" theme=\"orange\" leftIcon={<TrashBin />}>Hapus Data</Button>\n"}
+              {"    </>}\n"}
+            </>
+          )}
           {withPagination && (
             <>
               {"    "}
               <H>pagination</H>
               {theme === "primary"
-                ? "={{ pageSize: 10 }}\n"
-                : `={{ pageSize: 10, theme: '${theme}' }}\n`}
+                ? "={{ pageSizeOptions: [5, 10, 25, 50, 100] }}\n"
+                : `={{ pageSizeOptions: [5, 10, 25, 50, 100], theme: '${theme}' }}\n`}
             </>
           )}
           {"/>"}
@@ -1781,6 +2009,12 @@ export function TablePage() {
           isiannya sama tapi berupa nilai langsung, bukan fungsi.
         </p>
         <PropsTable rows={imageProps} minWidth="46rem" />
+
+        <p className="mt-10 mb-6 text-body-sm text-gray-500">
+          Pengaturan di dalam <Hl>file</Hl> milik kolom. Untuk komponen <Hl>TableFile</Hl>,
+          isiannya sama tapi berupa nilai langsung, bukan fungsi.
+        </p>
+        <PropsTable rows={fileProps} minWidth="46rem" />
 
         <p className="mt-10 mb-6 text-body-sm text-gray-500">
           Pengaturan di dalam <Hl>filter</Hl>.

@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { Segmented } from '../../pageKit'
 import {
   FlowSection,
   Lead,
@@ -6,6 +8,54 @@ import {
   UsulanPage,
   type TocEntry,
 } from '../../usulanKit'
+
+type FontKey = 'sans' | 'alt' | 'alt2'
+
+/** Font yang bisa dipratinjau. `cls` dipasang ke seluruh isi halaman. */
+const fonts: Record<FontKey, { name: string; cls: string; role: string; description: string }> = {
+  sans: {
+    name: 'Lato',
+    cls: 'font-sans',
+    role: 'Primary typeface',
+    description:
+      'Lato dipilih karena terbuka, humanis, dan tetap terbaca baik pada layar kecil. Skala berikut menjaga hierarki tetap konsisten di seluruh produk.',
+  },
+  alt: {
+    name: 'Inter',
+    cls: 'font-alt',
+    role: 'Alternate typeface',
+    description:
+      'Inter adalah font alternatif. Dirancang untuk layar, jelas di ukuran kecil, dan angkanya sama lebar. Skala dan token tetap sama dengan Lato.',
+  },
+  alt2: {
+    name: 'Arial',
+    cls: 'font-alt-2',
+    role: 'Alternate typeface 2',
+    description:
+      'Arial adalah font alternatif kedua. Font sistem yang tersedia hampir di semua perangkat, jadi tidak perlu diunduh dan halaman tampil lebih cepat. Skala dan token tetap sama dengan Lato.',
+  },
+}
+
+/**
+ * Pilihan font disimpan di query `?font=inter` / `?font=arial`, bukan di hash,
+ * karena hash sudah dipakai router. Dengan begitu tautannya bisa dibagikan.
+ */
+const fontParams: Record<Exclude<FontKey, 'sans'>, string> = { alt: 'inter', alt2: 'arial' }
+
+function readFont(): FontKey {
+  const param = new URLSearchParams(window.location.search).get('font')
+  const found = (Object.keys(fontParams) as Exclude<FontKey, 'sans'>[]).find(
+    (key) => fontParams[key] === param,
+  )
+  return found ?? 'sans'
+}
+
+function writeFont(font: FontKey) {
+  const url = new URL(window.location.href)
+  if (font === 'sans') url.searchParams.delete('font')
+  else url.searchParams.set('font', fontParams[font])
+  window.history.replaceState(null, '', url)
+}
 
 const typeScale = [
   { name: 'Display', cls: 'text-display font-bold', spec: '48 / 55 · Bold', sample: 'Layanan digital untuk semua' },
@@ -60,11 +110,28 @@ const usage = {
 <p className="leading-none">Rapat — 100%</p>
 <p className="leading-normal">Standar — 150%</p>
 <p className="leading-loose">Renggang — 200%</p>`,
+  alt: `/* Ganti font alternatif di CSS project kamu.
+   Muat file fontnya sendiri, misalnya lewat Google Fonts. */
+:root {
+  --font-alt: 'Plus Jakarta Sans', sans-serif;   /* bawaan: Inter */
+  --font-alt-2: 'Verdana', sans-serif;           /* bawaan: Arial */
+}`,
   transform: `{/* Transform & decoration */}
 <p className="uppercase">huruf kapital semua</p>
 <p className="line-through">Teks dicoret</p>
 <a href="#" className="underline">Tautan bergaris bawah</a>`,
 }
+
+/** Snippet token semantik; saat font alternatif dipilih, tampilkan cara memakainya. */
+const semanticUsage = (font: FontKey) =>
+  (font === 'sans'
+    ? ''
+    : `{/* Pasang ${fonts[font].cls} di pembungkus, semua teks di dalamnya ikut ${fonts[font].name} */}
+<main className="${fonts[font].cls}">
+  ...
+</main>
+
+`) + usage.semantic
 
 /**
  * `id` di sini harus sama persis dengan `id` tiap <FlowSection> di bawah, dan
@@ -78,165 +145,202 @@ const toc: TocEntry[] = [
   { id: 'weight', label: 'Font weight' },
   { id: 'leading', label: 'Line height' },
   { id: 'transform', label: 'Transform & decoration' },
+  { id: 'font-alt', label: 'Mengganti font' },
   { id: 'prinsip', label: 'Prinsip penggunaan' },
 ]
 
 export function TypographyPage() {
+  const [fontKey, setFontKey] = useState<FontKey>(readFont)
+  const font = fonts[fontKey]
+
+  const changeFont = (next: FontKey) => {
+    setFontKey(next)
+    writeFont(next)
+  }
+
   return (
     <UsulanPage
       eyebrow="Foundations · Typography"
-      title="Lato type system"
-      description="Lato dipilih karena terbuka, humanis, dan tetap terbaca baik pada layar kecil. Skala berikut menjaga hierarki tetap konsisten di seluruh produk."
+      title={`${font.name} type system`}
+      description={font.description}
       toc={toc}
-    >
-      <FlowSection id="typeface" title="Typeface & skala semantik">
-        <Lead>
-          Token semantik memegang hierarki utama halaman — Display sampai Caption. Pakai ini lebih
-          dulu; skala Tailwind di bawahnya hanya untuk kebutuhan yang tidak tertampung di sini.
-        </Lead>
-
-        <article className="ds-card overflow-hidden">
-          <div className="grid gap-8 border-b border-border bg-primary-900 p-6 text-white sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
-            <div>
-              <p className="text-xs font-bold tracking-[0.14em] text-primary-300 uppercase">Primary typeface</p>
-              <p className="mt-3 text-[clamp(4.5rem,15vw,9rem)] leading-none font-black tracking-tight">Lato</p>
-            </div>
-            <div className="max-w-sm lg:text-right">
-              <p className="text-heading-4 font-bold">Aa Bb Cc 123</p>
-              <p className="mt-2 text-sm leading-6 text-primary-200">
-                ABCDEFGHIJKLMNOPQRSTUVWXYZ
-                <br />
-                abcdefghijklmnopqrstuvwxyz
-                <br />
-                0123456789 !@#$%&amp;*
-              </p>
-            </div>
-          </div>
-
-          <div className="divide-y divide-border">
-            {typeScale.map((t) => (
-              <div key={t.name} className="grid gap-4 p-5 sm:p-7 lg:grid-cols-[180px_1fr] lg:items-baseline">
-                <div>
-                  <p className="text-sm font-black text-gray-900">{t.name}</p>
-                  <p className="mt-1 text-xs text-gray-400">{t.spec}</p>
-                </div>
-                <p className={`${t.cls} text-gray-900`}>{t.sample}</p>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <SectionCode>{usage.semantic}</SectionCode>
-      </FlowSection>
-
-      <FlowSection id="skala" title="Skala ukuran Tailwind">
-        <Lead>
-          Skala <code className="text-xs font-bold text-gray-700">text-xs</code> hingga{' '}
-          <code className="text-xs font-bold text-gray-700">text-9xl</code> untuk kebutuhan di luar
-          token semantik.
-        </Lead>
-
-        <article className="ds-card divide-y divide-border overflow-hidden">
-          {tailwindScale.map(([cls, label]) => (
-            <div key={cls} className="p-5 sm:p-6">
-              <div className="flex items-baseline gap-2">
-                <code className="text-sm font-bold text-primary-700">.{cls}</code>
-                <span className="text-xs text-gray-400">{label}</span>
-              </div>
-              <div className="ds-scroll-x mt-3 overflow-x-auto">
-                <p className={`${cls} font-normal whitespace-nowrap text-gray-900`}>
-                  The quick brown fox jumps over the lazy dog.
-                </p>
-              </div>
-            </div>
-          ))}
-        </article>
-
-        <SectionCode>{usage.scale}</SectionCode>
-      </FlowSection>
-
-      <FlowSection id="weight" title="Sembilan tingkat ketebalan">
-        <Lead>
-          Dari <code className="text-xs font-bold text-gray-700">.font-thin</code> (100) hingga{' '}
-          <code className="text-xs font-bold text-gray-700">.font-black</code> (900).
-        </Lead>
-
-        <article className="ds-card divide-y divide-border overflow-hidden">
-          {fontWeights.map(([cls, value]) => (
-            <div key={cls} className="grid gap-2 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6">
-              <p className={`${cls} text-4xl text-gray-900`}>Ceplok Design System</p>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:justify-end">
-                <code className="text-sm font-bold text-primary-700">.{cls}</code>
-                <code className="text-xs text-gray-400">font-weight: {value}</code>
-              </div>
-            </div>
-          ))}
-        </article>
-
-        <SectionCode>{usage.weight}</SectionCode>
-      </FlowSection>
-
-      <FlowSection id="leading" title="Leading (jarak antarbaris)">
-        <Lead>Tiga langkah jarak antarbaris untuk kerapatan teks yang berbeda.</Lead>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {lineHeights.map(([cls, value]) => (
-            <article key={cls} className="ds-card p-5">
-              <div className="flex items-center justify-between gap-2">
-                <code className="text-sm font-bold text-primary-700">.{cls}</code>
-                <code className="text-xs text-gray-400">{value}</code>
-              </div>
-              <p className={`${cls} mt-3 text-sm text-gray-900`}>
-                Layanan digital untuk semua masyarakat Indonesia yang inklusif dan mudah diakses.
-              </p>
-            </article>
-          ))}
-        </div>
-
-        <SectionCode>{usage.leading}</SectionCode>
-      </FlowSection>
-
-      <FlowSection id="transform" title="Transform & decoration">
-        <Lead>Kapitalisasi, garis bawah, dan coret — dipakai hemat, hanya saat maknanya jelas.</Lead>
-
-        <article className="ds-card p-6">
-          <div className="space-y-5">
-            {textTransforms.map(([cls, desc]) => (
-              <div key={cls} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                <div className="flex items-center justify-between gap-3">
-                  <code className="text-sm font-bold text-primary-700">.{cls}</code>
-                  <code className="text-[11px] text-gray-400">{desc}</code>
-                </div>
-                <p className={`${cls} mt-2 text-lg text-gray-900`}>
-                  The quick brown fox jumps over the lazy dog.
-                </p>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <SectionCode>{usage.transform}</SectionCode>
-      </FlowSection>
-
-      <FlowSection id="prinsip" title="Prinsip penggunaan">
-        <PrincipleList
-          items={[
-            <>
-              Gunakan <strong className="text-gray-900">Bold atau Black</strong> untuk heading dan
-              angka penting.
-            </>,
-            <>
-              Pertahankan body minimal <strong className="text-gray-900">16px</strong> untuk konten
-              utama.
-            </>,
-            <>Hindari paragraf panjang dengan huruf kapital karena menurunkan keterbacaan.</>,
-            <>
-              Batasi panjang baris ideal antara{' '}
-              <strong className="text-gray-900">45–75 karakter</strong>.
-            </>,
+      actions={
+        <Segmented
+          label="Pratinjau font"
+          value={fontKey}
+          onChange={changeFont}
+          options={[
+            { value: 'sans', label: 'Lato · utama' },
+            { value: 'alt', label: 'Inter · alternatif' },
+            { value: 'alt2', label: 'Arial · alternatif 2' },
           ]}
         />
-      </FlowSection>
+      }
+    >
+      {/* Seluruh isi ikut font terpilih supaya perbandingannya utuh. */}
+      <div className={`${font.cls} space-y-16`}>
+        <FlowSection id="typeface" title="Typeface & skala semantik">
+          <Lead>
+            Token semantik memegang hierarki utama halaman — Display sampai Caption. Pakai ini lebih
+            dulu; skala Tailwind di bawahnya hanya untuk kebutuhan yang tidak tertampung di sini.
+          </Lead>
+
+          <article className="ds-card overflow-hidden">
+            <div className="grid gap-8 border-b border-border bg-primary-900 p-6 text-white sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
+              <div>
+                <p className="text-xs font-bold tracking-[0.14em] text-primary-300 uppercase">{font.role}</p>
+                <p className="mt-3 text-[clamp(4.5rem,15vw,9rem)] leading-none font-black tracking-tight">{font.name}</p>
+              </div>
+              <div className="max-w-sm lg:text-right">
+                <p className="text-heading-4 font-bold">Aa Bb Cc 123</p>
+                <p className="mt-2 text-sm leading-6 text-primary-200">
+                  ABCDEFGHIJKLMNOPQRSTUVWXYZ
+                  <br />
+                  abcdefghijklmnopqrstuvwxyz
+                  <br />
+                  0123456789 !@#$%&amp;*
+                </p>
+              </div>
+            </div>
+
+            <div className="divide-y divide-border">
+              {typeScale.map((t) => (
+                <div key={t.name} className="grid gap-4 p-5 sm:p-7 lg:grid-cols-[180px_1fr] lg:items-baseline">
+                  <div>
+                    <p className="text-sm font-black text-gray-900">{t.name}</p>
+                    <p className="mt-1 text-xs text-gray-400">{t.spec}</p>
+                  </div>
+                  <p className={`${t.cls} text-gray-900`}>{t.sample}</p>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <SectionCode>{semanticUsage(fontKey)}</SectionCode>
+        </FlowSection>
+
+        <FlowSection id="skala" title="Skala ukuran Tailwind">
+          <Lead>
+            Skala <code className="text-xs font-bold text-gray-700">text-xs</code> hingga{' '}
+            <code className="text-xs font-bold text-gray-700">text-9xl</code> untuk kebutuhan di luar
+            token semantik.
+          </Lead>
+
+          <article className="ds-card divide-y divide-border overflow-hidden">
+            {tailwindScale.map(([cls, label]) => (
+              <div key={cls} className="p-5 sm:p-6">
+                <div className="flex items-baseline gap-2">
+                  <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                  <span className="text-xs text-gray-400">{label}</span>
+                </div>
+                <div className="ds-scroll-x mt-3 overflow-x-auto">
+                  <p className={`${cls} font-normal whitespace-nowrap text-gray-900`}>
+                    The quick brown fox jumps over the lazy dog.
+                  </p>
+                </div>
+              </div>
+            ))}
+          </article>
+
+          <SectionCode>{usage.scale}</SectionCode>
+        </FlowSection>
+
+        <FlowSection id="weight" title="Sembilan tingkat ketebalan">
+          <Lead>
+            Dari <code className="text-xs font-bold text-gray-700">.font-thin</code> (100) hingga{' '}
+            <code className="text-xs font-bold text-gray-700">.font-black</code> (900).
+          </Lead>
+
+          <article className="ds-card divide-y divide-border overflow-hidden">
+            {fontWeights.map(([cls, value]) => (
+              <div key={cls} className="grid gap-2 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6">
+                <p className={`${cls} text-4xl text-gray-900`}>Ceplok Design System</p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:justify-end">
+                  <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                  <code className="text-xs text-gray-400">font-weight: {value}</code>
+                </div>
+              </div>
+            ))}
+          </article>
+
+          <SectionCode>{usage.weight}</SectionCode>
+        </FlowSection>
+
+        <FlowSection id="leading" title="Leading (jarak antarbaris)">
+          <Lead>Tiga langkah jarak antarbaris untuk kerapatan teks yang berbeda.</Lead>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {lineHeights.map(([cls, value]) => (
+              <article key={cls} className="ds-card p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                  <code className="text-xs text-gray-400">{value}</code>
+                </div>
+                <p className={`${cls} mt-3 text-sm text-gray-900`}>
+                  Layanan digital untuk semua masyarakat Indonesia yang inklusif dan mudah diakses.
+                </p>
+              </article>
+            ))}
+          </div>
+
+          <SectionCode>{usage.leading}</SectionCode>
+        </FlowSection>
+
+        <FlowSection id="transform" title="Transform & decoration">
+          <Lead>Kapitalisasi, garis bawah, dan coret — dipakai hemat, hanya saat maknanya jelas.</Lead>
+
+          <article className="ds-card p-6">
+            <div className="space-y-5">
+              {textTransforms.map(([cls, desc]) => (
+                <div key={cls} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                  <div className="flex items-center justify-between gap-3">
+                    <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                    <code className="text-[11px] text-gray-400">{desc}</code>
+                  </div>
+                  <p className={`${cls} mt-2 text-lg text-gray-900`}>
+                    The quick brown fox jumps over the lazy dog.
+                  </p>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <SectionCode>{usage.transform}</SectionCode>
+        </FlowSection>
+
+        <FlowSection id="font-alt" title="Mengganti font">
+          <Lead>
+            Lato dipakai lewat <code className="text-xs font-bold text-gray-700">font-sans</code>,
+            Inter lewat <code className="text-xs font-bold text-gray-700">font-alt</code>, dan Arial
+            lewat <code className="text-xs font-bold text-gray-700">font-alt-2</code>. Untuk memakai
+            font lain, timpa variabel{' '}
+            <code className="text-xs font-bold text-gray-700">--font-alt</code> atau{' '}
+            <code className="text-xs font-bold text-gray-700">--font-alt-2</code> di CSS project.
+          </Lead>
+
+          <SectionCode>{usage.alt}</SectionCode>
+        </FlowSection>
+
+        <FlowSection id="prinsip" title="Prinsip penggunaan">
+          <PrincipleList
+            items={[
+              <>
+                Gunakan <strong className="text-gray-900">Bold atau Black</strong> untuk heading dan
+                angka penting.
+              </>,
+              <>
+                Pertahankan body minimal <strong className="text-gray-900">16px</strong> untuk konten
+                utama.
+              </>,
+              <>Hindari paragraf panjang dengan huruf kapital karena menurunkan keterbacaan.</>,
+              <>
+                Batasi panjang baris ideal antara{' '}
+                <strong className="text-gray-900">45–75 karakter</strong>.
+              </>,
+            ]}
+          />
+        </FlowSection>
+      </div>
     </UsulanPage>
   )
 }

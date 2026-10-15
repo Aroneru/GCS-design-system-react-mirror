@@ -138,6 +138,62 @@ const BULAN = [
 ]
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
 
+/** Jeda antar-ketikan yang masih dianggap satu rangkaian — sama dengan Dropdown dan `<select>` bawaan. */
+const JEDA_KETIK = 1000
+
+/** Nama bulan untuk dicocokkan dengan ketikan: bahasa Indonesia dulu, lalu Inggris ("aug", "oct"). */
+const NAMA_BULAN = [
+  BULAN.map((b) => b.toLowerCase()),
+  ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'],
+]
+
+/** Nomor bulan (0–11) yang namanya diawali `kata`, atau `null`. */
+const bulanDari = (kata: string) => {
+  for (const daftar of NAMA_BULAN) {
+    const i = daftar.findIndex((nama) => nama.startsWith(kata))
+    if (i !== -1) return i
+  }
+  return null
+}
+
+/**
+ * Tanggal yang dimaksud sebuah ketikan, mis. "17", "17 agu", "17/8/1945",
+ * "agustus 1945", atau "1945". Urutannya hari-bulan-tahun: angka 1–2 digit
+ * pertama hari, yang kedua bulan (bila belum ada nama bulan), dan angka 4
+ * digit selalu tahun. Bagian yang tidak diketik diambil dari `jangkar`, dan
+ * hari dipotong ke akhir bulannya. `null` bila belum ada bagian yang
+ * dikenali — tahun yang baru 2–3 digit ditunggu sampai lengkap, dan kata yang
+ * bukan nama bulan membatalkan ketikan.
+ */
+function tanggalDariKetikan(teks: string, jangkar: Date): Date | null {
+  let hari: number | null = null
+  let bulan: number | null = null
+  let tahun: number | null = null
+
+  for (const bagian of teks.toLowerCase().match(/\d+|[a-z]+/g) ?? []) {
+    if (/^\d/.test(bagian)) {
+      const n = Number(bagian)
+      if (bagian.length === 4 && n >= 1000) {
+        if (tahun === null) tahun = n
+      } else if (bagian.length <= 2 && hari === null && n >= 1 && n <= 31) {
+        hari = n
+      } else if (bagian.length <= 2 && bulan === null && n >= 1 && n <= 12) {
+        bulan = n - 1
+      }
+    } else {
+      const b = bulanDari(bagian)
+      if (b === null) return null
+      if (bulan === null) bulan = b
+    }
+  }
+
+  if (hari === null && bulan === null && tahun === null) return null
+  const y = tahun ?? jangkar.getFullYear()
+  const m = bulan ?? jangkar.getMonth()
+  const akhir = new Date(y, m + 1, 0).getDate()
+  return new Date(y, m, Math.min(hari ?? jangkar.getDate(), akhir))
+}
+
 /** Tanggal tanpa jam, supaya dua tanggal bisa dibandingkan apa adanya. */
 const polos = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
 const geserHari = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n)
@@ -361,6 +417,7 @@ interface KalenderProps {
   onSebelum: () => void
   onSesudah: () => void
   onKeyDown: (e: KeyboardEvent<HTMLDivElement>) => void
+  onKeyUp: (e: KeyboardEvent<HTMLDivElement>) => void
 }
 
 /** Satu kalender bulanan: judul dengan panah, nama hari, lalu kisi tanggal. */
@@ -378,6 +435,7 @@ function Kalender({
   onSebelum,
   onSesudah,
   onKeyDown,
+  onKeyUp,
 }: KalenderProps) {
   const tanggal = isiBulan(bulan)
   const minggu = Array.from({ length: tanggal.length / 7 }, (_, i) => tanggal.slice(i * 7, i * 7 + 7))
@@ -429,6 +487,7 @@ function Kalender({
         role="grid"
         aria-labelledby={idJudul}
         onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
         className={cn('mt-2 grid grid-cols-7', kelasKisi[kisi])}
       >
         <div role="row" className="contents">
@@ -527,7 +586,8 @@ function Kalender({
  * Seperti Dropdown, panelnya memakai HTML Popover API: peramban yang menutupnya
  * saat pengguna menekan di luar atau menekan Escape, dan mengangkatnya ke top
  * layer. Tanggal ditelusuri dengan panah, Home/End (awal/akhir minggu), dan
- * PageUp/PageDown (bulan; dengan Shift, tahun).
+ * PageUp/PageDown (bulan; dengan Shift, tahun) — atau langsung diketik, mis.
+ * "17 agustus 1945", lalu Enter.
  *
  * `darkMode` mengganti seluruh warnanya ke tampilan gelap.
  */
@@ -586,6 +646,13 @@ export function Datepicker(props: DatepickerProps) {
   const jangkarRef = useRef<HTMLDivElement | null>(null)
   const pemicuRef = useRef<HTMLButtonElement | null>(null)
   const pindahFokus = useRef(false)
+  // Rangkaian ketikan untuk melompat ke tanggal — lihat `ketikTanggal`.
+  const ketikanRef = useRef<{ teks: string; waktu: number; jangkar: Date | null }>({
+    teks: '',
+    waktu: 0,
+    jangkar: null,
+  })
+  const spasiDitahanRef = useRef(false)
 
   const terlihat = (d: Date) => bulanSama(d, tampil) || (ganda && bulanSama(d, tampilKanan))
   // Bila bulan yang tampil sudah digeser menjauh dari tanggal yang difokus,
@@ -761,6 +828,13 @@ export function Datepicker(props: DatepickerProps) {
     }
   }
 
+  /** Memindah fokus kisi ke tanggal itu, menggeser bulan yang tampil bila perlu. */
+  const fokuskan = (d: Date) => {
+    setFokus(d)
+    tampilkan(d)
+    pindahFokus.current = true
+  }
+
   const kisiKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const langkah: Record<string, (d: Date) => Date> = {
       ArrowLeft: (d) => geserHari(d, -1),
@@ -773,13 +847,55 @@ export function Datepicker(props: DatepickerProps) {
       PageDown: (d) => geserBulan(d, e.shiftKey ? 12 : 1),
     }
     const geser = langkah[e.key]
-    if (!geser) return
+    if (!geser) return ketikTanggal(e)
     e.preventDefault()
+    // Bergerak dengan tombol memulai ketikan baru pada huruf berikutnya.
+    ketikanRef.current.teks = ''
     // Berhenti di tepi batas data: tanggal di luarnya tidak bisa difokus.
-    const baru = jepit(geser(sasaran), batas)
-    setFokus(baru)
-    tampilkan(baru)
-    pindahFokus.current = true
+    fokuskan(jepit(geser(sasaran), batas))
+  }
+
+  /**
+   * Mengetik tanggal melompat langsung ke sana, seperti mengetik nama di daftar
+   * pilihan Select: "17" ke tanggal 17 bulan yang sedang difokus, "17 agu" ke 17
+   * Agustus, "17/8/1945" atau "17 agustus 1945" ke tanggal itu, "1945" ke tahun
+   * itu. Ketikan dengan jeda di bawah satu detik digabung; spasi di tengahnya
+   * dan Backspace ikut dihitung. Enter lalu memilih tanggalnya, seperti biasa.
+   * Hasilnya dijepit ke `min`/`max`, sama dengan panah.
+   */
+  const ketikTanggal = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.nativeEvent.isComposing) return
+    const lama = ketikanRef.current
+    // Waktu dari event-nya sendiri, bukan jam dinding: urut dan tak terpengaruh jam sistem.
+    const sedangMengetik = lama.teks !== '' && e.timeStamp - lama.waktu < JEDA_KETIK
+
+    let teks: string
+    if (e.key === 'Backspace') {
+      if (!sedangMengetik) return
+      teks = lama.teks.slice(0, -1)
+    } else if (e.key.length === 1 && /[a-z\d\s/.,-]/i.test(e.key)) {
+      // Spasi di luar rangkaian ketikan tetap tombol memilih tanggal.
+      if (e.key === ' ' && !sedangMengetik) return
+      teks = (sedangMengetik ? lama.teks : '') + e.key
+    } else {
+      return
+    }
+
+    e.preventDefault()
+    if (e.key === ' ') spasiDitahanRef.current = true
+    const jangkar = sedangMengetik && lama.jangkar ? lama.jangkar : sasaran
+    ketikanRef.current = { teks, waktu: e.timeStamp, jangkar }
+    // Ketikan yang dihapus habis kembali ke tanggal sebelum mulai mengetik.
+    const tujuan = teks.trim() === '' ? jangkar : tanggalDariKetikan(teks, jangkar)
+    if (tujuan) fokuskan(jepit(tujuan, batas))
+  }
+
+  // Spasi yang jadi bagian ketikan ditahan juga saat dilepas: tombol tanggal
+  // baru bereaksi pada keyup, jadi tanpa ini tanggal yang difokus ikut terpilih.
+  const kisiKeyUp = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== ' ' || !spasiDitahanRef.current) return
+    e.preventDefault()
+    spasiDitahanRef.current = false
   }
 
   /**
@@ -815,6 +931,7 @@ export function Datepicker(props: DatepickerProps) {
       onSebelum={() => (sisi === 'kiri' ? geserKiri(-1) : geserKanan(-1))}
       onSesudah={() => (sisi === 'kiri' ? geserKiri(1) : geserKanan(1))}
       onKeyDown={kisiKeyDown}
+      onKeyUp={kisiKeyUp}
     />
   )
 

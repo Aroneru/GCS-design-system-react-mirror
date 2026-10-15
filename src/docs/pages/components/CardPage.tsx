@@ -66,7 +66,7 @@ const cardProps: PropRow[] = [
     "darkMode",
     "boolean",
     "false",
-    "Tampilan gelap: kartu gray-800, judul putih, deskripsi gray-400, tautan primary-500. Tombol di actions tidak ikut diubah.",
+    "Tampilan gelap: kartu gray-700, judul putih, deskripsi gray-300, tautan primary-400. Tombol di actions tidak ikut diubah.",
   ],
 ];
 
@@ -87,10 +87,10 @@ const toc: TocEntry[] = [
 
 /**
  * Tombol outline di kartu gelap. Outline bawaan Button memakai primary-700 yang
- * nyaris hilang di atas gray-800, jadi warnanya ditimpa ke primary-500 seperti
+ * nyaris hilang di atas gray-700, jadi warnanya ditimpa ke primary-400 seperti
  * desain. Pakai `!` karena `cn` tidak menggabungkan kelas yang bentrok.
  */
-const darkOutlineClass = "border-primary-500! text-primary-500! hover:bg-primary-500/10!";
+const darkOutlineClass = "border-primary-400! text-primary-400! hover:bg-primary-400/10!";
 
 const SampleButton = ({
   variant,
@@ -358,10 +358,10 @@ export function CardPage() {
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
           Isi <Hl>darkMode</Hl> untuk halaman berlatar gelap. Kartu berubah ke
-          gray-800, judul jadi putih, deskripsi gray-400, dan tautan primary-500
+          gray-700, judul jadi putih, deskripsi gray-300, dan tautan primary-400
           supaya tetap terbaca. Gambar sedikit diredupkan. Semua varian di atas
           tetap berlaku, termasuk ukuran mobile. Tombol di <Hl>actions</Hl> tidak
-          ikut diubah. Tombol outline perlu diberi warna primary-500 sendiri,
+          ikut diubah. Tombol outline perlu diberi warna primary-400 sendiri,
           karena primary-700 bawaannya hampir tidak terlihat di kartu gelap.
         </Lead>
 
@@ -416,31 +416,33 @@ export function CardPage() {
           </Demo>
         </div>
 
-        <Demo label="Mobile · kolom 238px" dark>
-          <div className="flex flex-wrap items-start justify-center gap-5">
-            {(
-              [
-                { image: true, action: "link" },
-                { image: false, action: "one" },
-                { image: true, action: "none" },
-                { image: false, action: "none" },
-              ] as const
-            ).map((v, i) => (
-              <div key={i} className="w-[238px] max-w-full">
-                <Card
-                  darkMode
-                  image={v.image ? asset("/images/card-sample.svg") : undefined}
-                  imageAlt=""
-                  title={cardTitleMobile}
-                  description={cardDesc}
-                  href={v.action === "link" ? "#" : undefined}
-                  linkLabel={v.action === "link" ? "See our guideline" : undefined}
-                  actions={cardActions(v.action, true)}
-                />
-              </div>
-            ))}
-          </div>
-        </Demo>
+        <div className="mt-5">
+          <Demo label="Mobile · kolom 238px" dark>
+            <div className="flex flex-wrap items-start justify-center gap-5">
+              {(
+                [
+                  { image: true, action: "link" },
+                  { image: false, action: "one" },
+                  { image: true, action: "none" },
+                  { image: false, action: "none" },
+                ] as const
+              ).map((v, i) => (
+                <div key={i} className="w-[238px] max-w-full">
+                  <Card
+                    darkMode
+                    image={v.image ? asset("/images/card-sample.svg") : undefined}
+                    imageAlt=""
+                    title={cardTitleMobile}
+                    description={cardDesc}
+                    href={v.action === "link" ? "#" : undefined}
+                    linkLabel={v.action === "link" ? "See our guideline" : undefined}
+                    actions={cardActions(v.action, true)}
+                  />
+                </div>
+              ))}
+            </div>
+          </Demo>
+        </div>
 
         <SectionCode>
           {"<Card\n"}
@@ -453,13 +455,44 @@ export function CardPage() {
           {"    actions={\n"}
           {"        <>\n"}
           {'            <Button variant="outline" size="s"\n'}
-          {'                className="border-primary-500! text-primary-500! hover:bg-primary-500/10!">\n'}
+          {'                className="border-primary-400! text-primary-400! hover:bg-primary-400/10!">\n'}
           {"                Button text\n"}
           {"            </Button>\n"}
           {'            <Button variant="filled" size="s">Button text</Button>\n'}
           {"        </>\n"}
           {"    }\n"}
           {"/>"}
+        </SectionCode>
+
+        <h3 className="mt-10 mb-2 text-heading-4 font-bold text-gray-900">Ikut tema pembungkus</h3>
+        <Lead>
+          Tanpa <Hl>darkMode</Hl>, kartu mengikuti tema elemen di sekitarnya. Pasang{" "}
+          <Hl>data-theme="dark"</Hl> sekali di pembungkus, semua kartu di dalamnya ikut gelap.
+          Di dalam area gelap, <Hl>data-theme="light"</Hl> mengembalikan satu bagian ke terang.
+        </Lead>
+
+        <Demo label='Pembungkus data-theme="dark", kartu tanpa prop' dark>
+          <div data-theme="dark" className="grid gap-5 sm:grid-cols-3">
+            <Card title={cardTitle} description={cardDesc} href="#" linkLabel="See our guideline" />
+            <Card title={cardTitle} description={cardDesc} />
+            <div data-theme="light">
+              <Card title="Tetap terang" description='Dibungkus data-theme="light".' />
+            </div>
+          </div>
+        </Demo>
+
+        <SectionCode>
+          {"<section "}
+          <Mark>data-theme="dark"</Mark>
+          {">\n"}
+          {"    <Card title=\"…\" />       {/* gelap */}\n"}
+          {"    <Card title=\"…\" />       {/* gelap */}\n"}
+          {"    <div "}
+          <Mark>data-theme="light"</Mark>
+          {">\n"}
+          {"        <Card title=\"…\" />   {/* terang */}\n"}
+          {"    </div>\n"}
+          {"</section>"}
         </SectionCode>
       </FlowSection>
 
@@ -492,7 +525,7 @@ export function CardPage() {
           </div>
         </div>
 
-        <p className="mt-3 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500">
           Di halaman formulir kartu perlu selebar kolomnya (lihat halaman{" "}
           <em>Example</em>), sementara di daftar ringkas ia perlu menyempit
           mengikuti grid. Menentukan lebar adalah tugas tata letak, bukan tugas
@@ -626,7 +659,7 @@ export function CardPage() {
               {darkMode ? (
                 <>
                   {'                <Button variant="outline" size="s"\n'}
-                  {'                    className="border-primary-500! text-primary-500! hover:bg-primary-500/10!">\n'}
+                  {'                    className="border-primary-400! text-primary-400! hover:bg-primary-400/10!">\n'}
                   {"                    Button text\n"}
                   {"                </Button>\n"}
                 </>

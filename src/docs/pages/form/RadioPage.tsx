@@ -30,7 +30,7 @@ const radioProps: PropRow[] = [
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran lingkaran: 16px atau 14px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
   ['application', "'default' | 'simaya'", 'default', 'Warna cincin saat pilihan dipilih.'],
-  ['darkMode', 'boolean', 'false', 'Tampilan gelap: lingkaran gray-300 bergaris gray-400 dengan label terang; inactive gray-800 dengan teks gray-600.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: lingkaran gray-300 bergaris gray-400 dengan label terang; inactive gray-700 bergaris gray-800 dengan teks gray-600.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="radio"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
 
@@ -227,7 +227,7 @@ export function RadioPage() {
         <Lead>
           Prop <Hl>darkMode</Hl> mengganti lingkaran ke gray-300 bergaris gray-400, dengan label terang dan
           caption gray-400. Cincin pilihan aktif tetap memakai warna aplikasi. State <Hl>inactive</Hl> memakai
-          lingkaran gray-800 dengan teks gray-600.
+          lingkaran gray-700 bergaris gray-800 dengan teks gray-600.
         </Lead>
         <Demo dark>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

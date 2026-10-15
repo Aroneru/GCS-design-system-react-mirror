@@ -8,8 +8,8 @@ const palettes: { key: string; name: string; colors: [number, string][] }[] = [
   { key: 'red', name: 'Merah (untuk pertanda suatu error)', colors: [[900, '#771D1D'], [800, '#9B1C1C'], [700, '#C81E1E'], [600, '#E02424'], [500, '#F05252'], [400, '#F98080'], [300, '#F8B4B4'], [200, '#FBD5D5'], [100, '#FDE8E8'], [50, '#FDF2F2']] },
   { key: 'orange', name: 'Orange (untuk pertanda suatu peringatan)', colors: [[900, '#771D1D'], [800, '#8A2C0D'], [700, '#B43403'], [600, '#D03801'], [500, '#FF5A1F'], [400, '#FF8A4C'], [300, '#FDBA8C'], [200, '#FCD9BD'], [100, '#FEECDC'], [50, '#FFF8F1']] },
   { key: 'yellow', name: 'Kuning (untuk warna border dari peringatan)', colors: [[900, '#633112'], [800, '#723B13'], [700, '#8E4B10'], [600, '#9F580A'], [500, '#C27803'], [400, '#E3A008'], [300, '#FACA15'], [200, '#FCE96A'], [100, '#FDF6B2'], [50, '#FDFDEA']] },
-  { key: 'green', name: 'Hijau (untuk warna penanda sukses proses & aplikasi Digika)', colors: [[900, '#014737'], [800, '#03543F'], [700, '#046C4E'], [600, '#057A55'], [500, '#0E9F6E'], [400, '#31C48D'], [300, '#84E1BC'], [200, '#BCF0DA'], [100, '#DEF7EC'], [50, '#F3FAF7']] },
-  { key: 'purple', name: 'Ungu (untuk warna Simaya)', colors: [[900, '#4A1D96'], [800, '#5521B5'], [700, '#6C2BD9'], [600, '#7E3AF2'], [500, '#9061F9'], [400, '#AC94FA'], [300, '#CABFFD'], [200, '#DCD7FE'], [100, '#EDEBFE'], [50, '#F6F5FF']] },
+  { key: 'green', name: 'Hijau (untuk warna penanda sukses proses)', colors: [[900, '#014737'], [800, '#03543F'], [700, '#046C4E'], [600, '#057A55'], [500, '#0E9F6E'], [400, '#31C48D'], [300, '#84E1BC'], [200, '#BCF0DA'], [100, '#DEF7EC'], [50, '#F3FAF7']] },
+  { key: 'purple', name: 'Ungu', colors: [[900, '#4A1D96'], [800, '#5521B5'], [700, '#6C2BD9'], [600, '#7E3AF2'], [500, '#9061F9'], [400, '#AC94FA'], [300, '#CABFFD'], [200, '#DCD7FE'], [100, '#EDEBFE'], [50, '#F6F5FF']] },
 ]
 
 const semantics: [string, string, string, string, string][] = [
@@ -84,7 +84,7 @@ export function ColorsPage() {
               <code className="mt-0.5 block text-sm text-gray-400">colors.{palette.key}</code>
 
               <div className="ds-scroll-x mt-4 overflow-x-auto pb-1">
-                <div className="min-w-[46rem]">
+                <div className="min-w-184">
                   <div className="grid grid-cols-10 overflow-hidden rounded-xl">
                     {palette.colors.map(([shade, hex]) => {
                       const id = `${palette.key}-${shade}`
