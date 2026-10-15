@@ -21,7 +21,7 @@ import { adaTidakAda } from '../../../usulanOptions'
 
 const applications: { value: TextAreaApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'purple', label: 'purple', token: 'purple-700' },
+  { value: 'purple', label: 'Purple', token: 'purple-700' },
 ]
 
 const textAreaProps: PropRow[] = [

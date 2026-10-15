@@ -16,7 +16,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: RadioApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'purple', label: 'purple', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 const kewarganegaraan = [
@@ -207,7 +207,7 @@ export function RadioPage() {
           {'{/* Default — tanpa prop application */}\n'}
           {'<Radio name="pilihan-default" label="Dipilih" helperText="border-primary-700" defaultChecked />\n'}
           {'<Radio name="pilihan-default" label="Belum dipilih" />\n\n'}
-          {'{/* purple */}\n'}
+          {'{/* Purple */}\n'}
           {'<Radio\n'}
           {'    name="pilihan-purple"\n'}
           {'    '}

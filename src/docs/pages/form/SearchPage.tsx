@@ -21,7 +21,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: SearchApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'purple', label: 'purple', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 /** Placeholder dan daftar kategori yang dipakai contoh-contoh di halaman ini. */

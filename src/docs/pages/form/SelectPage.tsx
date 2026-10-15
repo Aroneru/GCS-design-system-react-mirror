@@ -21,7 +21,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: SelectApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-500' },
-  { value: 'purple', label: 'purple', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 /** Contoh isi dropdown — dipakai berulang di seluruh halaman. */
@@ -354,7 +354,7 @@ export function SelectPage() {
               helperText="Wajib diisi."
             />
           </Demo>
-          <Demo label="purple" dark>
+          <Demo label="Purple" dark>
             <Select
               darkMode
               application="purple"

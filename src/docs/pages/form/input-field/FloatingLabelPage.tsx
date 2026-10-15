@@ -28,7 +28,7 @@ const states: { value: FloatingLabelState; label: string; desc: string }[] = [
 
 const applications: { value: FloatingLabelApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-600' },
-  { value: 'purple', label: 'purple', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 const floatingProps: PropRow[] = [

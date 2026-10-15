@@ -16,7 +16,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: ToggleApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'purple', label: 'purple', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 const toggleProps: PropRow[] = [
@@ -172,7 +172,7 @@ export function TogglePage() {
           {'{/* Default — tanpa prop application */}\n'}
           {'<Toggle label="Menyala" helperText="bg-primary-700" defaultChecked />\n'}
           {'<Toggle label="Mati" />\n\n'}
-          {'{/* purple */}\n'}
+          {'{/* Purple */}\n'}
           {'<Toggle '}
           <H>application</H>
           {'="purple" label="Menyala" helperText="bg-purple-500" defaultChecked />\n'}

@@ -29,7 +29,7 @@ const states: { value: InputFieldState; label: string; desc: string }[] = [
 
 const applications: { value: InputFieldApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-500' },
-  { value: 'purple', label: 'purple', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 /** Contoh password: desktop dan mobile, lalu failed. Bagian Dark mode memakai daftar yang sama, tanpa mobile. */
