@@ -43,7 +43,7 @@ export function ComponentsOverview() {
       <OverviewCard
         route="/components/button"
         name="Button"
-        desc="Aksi utama dengan empat variant: primary, secondary, danger, ghost."
+        desc="Aksi utama dengan variant filled atau outline, enam theme warna, dan lima ukuran."
       >
         <div className="flex flex-wrap items-center gap-2 rounded-xl bg-surface-subtle p-5">
           <Button variant="outline">Secondary</Button>
@@ -80,7 +80,7 @@ export function ComponentsOverview() {
       <OverviewCard
         route="/components/alert"
         name="Alert"
-        desc="Pesan status di dalam alur halaman: lima variant warna, gaya soft atau outline."
+        desc="Pesan status di dalam alur halaman dengan lima variant warna dan elemen yang sepenuhnya opsional."
       >
         <div className="rounded-xl bg-surface-subtle p-5">
           <Alert variant="success" heading="Ini adalah Alert" dismissible={false}>
@@ -265,8 +265,6 @@ export function ComponentsOverview() {
         name="Card"
         desc="Wadah informasi dengan gambar, judul, deskripsi, dan aksi yang semuanya opsional."
       >
-        {/* Tanpa `href`: Card merender <a> hanya bila href diisi, jadi preview
-            ini aman di dalam anchor kartu. Terverifikasi lewat renderToString. */}
         <div className="rounded-xl bg-surface-subtle p-5">
           <Card
             image={asset("/images/card-sample.svg")}
@@ -365,11 +363,6 @@ export function ComponentsOverview() {
         desc="Penutup halaman responsif dengan logo, menu, hak cipta, dan tautan media sosial."
         wide
       >
-        {/*
-          Catatan: Footer tetap merender <a href="#"> untuk tiap menu walau
-          `url` dikosongkan, jadi preview ini menaruh anchor di dalam anchor
-          kartu — sama seperti kartu Navbar. Lihat komentar di OverviewCard.
-        */}
         <div className="overflow-hidden rounded-xl">
           <Footer
             logo={asset("/images/footer-logo.svg")}
@@ -395,8 +388,6 @@ export function ComponentsOverview() {
         name="Breadcrumb"
         desc="Jejak lokasi halaman dengan pemisah chevron, dua ukuran teks, dan latar opsional."
       >
-        {/* Tanpa href: Breadcrumb hanya merender <a> bila item punya href, dan
-            kartu ini sendiri sudah berupa <a>. */}
         <div className="flex items-center rounded-xl bg-surface-subtle p-5">
           <Breadcrumb
             items={[{ label: "Beranda" }, { label: "Komponen" }, { label: "Breadcrumb" }]}
@@ -422,8 +413,6 @@ export function ComponentsOverview() {
       >
         {/*
           Skeleton, bukan Table asli — sama seperti kartu Modal dan Drawer.
-          Kotak cari, sort, aksi, dan pagination Table asli merender <button>,
-          sedangkan kartu ini sendiri sudah berupa <a>.
 
           Lima kolom (nomor, pemohon, layanan, status, aksi) hanya mulai sm;
           di bawahnya kolom layanan dan aksi disembunyikan supaya tetap muat.

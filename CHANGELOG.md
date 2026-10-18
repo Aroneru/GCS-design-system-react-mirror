@@ -18,6 +18,12 @@ beranda kini empat langkah, dengan langkah baru "Sambungkan Tailwind CSS ke Vite
 (pasang `tailwindcss` dan `@tailwindcss/vite`, lalu daftarkan `tailwindcss()` di
 `vite.config.ts`). Tombol outline kini selalu di kiri tombol filled di halaman
 contoh, dan contoh kode footer di halaman Modal kini sama dengan demonya.
+Deskripsi Button dan Alert di Components Overview kini sesuai komponennya,
+tabel props Search kini memuat `trigger`, `debounce`, `showButton`, dan
+platform `compact`, dan tinggi logo di halaman Footer kini ditulis sesuai
+kodenya: 48px, 60px saat footer ≥ 768px. Kartu di halaman Overview kini `<div>`
+dengan judul sebagai tautannya, bukan satu `<a>` besar yang memuat tautan dan
+tombol preview — klik di mana pun pada kartu tetap membuka halamannya.
 
 ### Diubah
 
