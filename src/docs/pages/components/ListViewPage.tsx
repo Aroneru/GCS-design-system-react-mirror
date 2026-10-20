@@ -1,9 +1,11 @@
 import { useState } from "react";
 import {
+  Badge,
   ListViewItem,
   type ListViewPlatform,
   type ListViewSize,
 } from "../../../lib";
+import { Clock } from "../../../lib/icons/solid";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Demo, H, Hl, Segmented } from "../../pageKit";
 import {
@@ -33,6 +35,11 @@ const decorationOptions = [
   { value: true, label: "Ada" },
 ];
 
+const badgeOptions = [
+  { value: false, label: "Tidak Ada" },
+  { value: true, label: "Ada" },
+];
+
 const listViewItemProps: PropRow[] = [
   ["title", "ReactNode", "—", "Judul utama berkas atau item dokumen."],
   [
@@ -57,13 +64,19 @@ const listViewItemProps: PropRow[] = [
     "platform",
     "'default' | 'mobile'",
     "'default'",
-    "Platform tampilan kartu: 'default' (desktop) atau 'mobile' (tampilan ringkas 58px).",
+    "Platform tampilan kartu: 'default' (desktop) atau 'mobile' (tampilan ringkas 58px / 88px dengan badge).",
   ],
   [
     "decoration",
     "boolean",
     "false",
-    "Menampilkan garis dekorasi aksen warna primary pada sisi kiri kartu.",
+    "Menampilkan garis dekorasi aksen vertikal warna primary pada sisi kiri kartu.",
+  ],
+  [
+    "badge",
+    "ReactNode",
+    "undefined",
+    "Badge atau elemen label status tambahan yang ditampilkan di bawah metadata.",
   ],
   [
     "actionLabel",
@@ -184,6 +197,7 @@ export function ListViewPage() {
   const [platform, setPlatform] = useState<ListViewPlatform>("default");
   const [size, setSize] = useState<ListViewSize>("m");
   const [decoration, setDecoration] = useState(false);
+  const [hasBadge, setHasBadge] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
   return (
@@ -316,9 +330,9 @@ export function ListViewPage() {
       <FlowSection id="mobile" title="Mobile">
         <Lead>
           Tampilan khusus mobile (<Hl>platform=&quot;mobile&quot;</Hl>) berukuran
-          ringkas dengan tinggi 58px, wadah ikon 40×40 px, dan tipografi yang
-          pas untuk layar sempit (lebar kartu 348–380 px). Tersedia dalam variasi{" "}
-          <Hl>decoration</Hl> ada dan tidak ada.
+          ringkas untuk layar sempit (lebar kartu 348–380 px). Mendukung variasi{" "}
+          <Hl>decoration</Hl> (garis aksen vertikal di sisi kiri) serta tambahan{" "}
+          <Hl>badge</Hl> status di bawah baris metadata.
         </Lead>
 
         <div className="space-y-6">
@@ -326,14 +340,14 @@ export function ListViewPage() {
           <div>
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-sm font-bold text-gray-900">
-                Tanpa Dekorasi
+                1. Tanpa Dekorasi
               </h3>
               <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
                 decoration=&#123;false&#125;
               </span>
             </div>
             <p className="mb-3 text-body-sm text-gray-500">
-              Kartu berkas mobile bersih tanpa garis aksen pada sisi kiri.
+              Kartu berkas mobile bersih dengan tinggi 58px tanpa garis aksen.
             </p>
             <Demo>
               <div className="w-full max-w-[348px]">
@@ -350,7 +364,7 @@ export function ListViewPage() {
           <div>
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-sm font-bold text-gray-900">
-                Dengan Dekorasi
+                2. Dengan Dekorasi
               </h3>
               <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
                 decoration=&#123;true&#125;
@@ -371,11 +385,81 @@ export function ListViewPage() {
               </div>
             </Demo>
           </div>
+
+          {/* Mobile tanpa dekorasi + Badge */}
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-gray-900">
+                3. Tanpa Dekorasi + Badge
+              </h3>
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                badge + decoration=&#123;false&#125;
+              </span>
+            </div>
+            <p className="mb-3 text-body-sm text-gray-500">
+              Kartu berkas mobile dengan tambahan badge status hijau di bawah
+              metadata dokumen.
+            </p>
+            <Demo>
+              <div className="w-full max-w-[348px]">
+                <ListViewItem
+                  platform="mobile"
+                  title="Project brief"
+                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                  badge={
+                    <Badge
+                      variant="success"
+                      size="sm"
+                      icon={<Clock className="size-3.5" />}
+                    >
+                      Badge
+                    </Badge>
+                  }
+                />
+              </div>
+            </Demo>
+          </div>
+
+          {/* Mobile dengan dekorasi + Badge */}
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-gray-900">
+                4. Dengan Dekorasi + Badge
+              </h3>
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                badge + decoration=&#123;true&#125;
+              </span>
+            </div>
+            <p className="mb-3 text-body-sm text-gray-500">
+              Kombinasi garis aksen vertikal di sisi kiri dan badge status di
+              bawah metadata dokumen.
+            </p>
+            <Demo>
+              <div className="w-full max-w-[348px]">
+                <ListViewItem
+                  platform="mobile"
+                  decoration
+                  title="Project brief"
+                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                  badge={
+                    <Badge
+                      variant="success"
+                      size="sm"
+                      icon={<Clock className="size-3.5" />}
+                    >
+                      Badge
+                    </Badge>
+                  }
+                />
+              </div>
+            </Demo>
+          </div>
         </div>
 
         <SectionCode>
-          {"import { ListViewItem } from '@ceplok-ui/design-kit-react'\n\n"}
-          {"{/* Mobile — Tanpa Dekorasi */}\n"}
+          {"import { Badge, ListViewItem } from '@ceplok-ui/design-kit-react'\n"}
+          {"import { Clock } from '@ceplok-ui/design-kit-react/icons/solid'\n\n"}
+          {"{/* 1. Mobile — Tanpa Dekorasi */}\n"}
           {"<ListViewItem\n"}
           {"  "}
           <H>platform</H>
@@ -383,7 +467,7 @@ export function ListViewPage() {
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {"/>\n\n"}
-          {"{/* Mobile — Dengan Dekorasi */}\n"}
+          {"{/* 2. Mobile — Dengan Dekorasi */}\n"}
           {"<ListViewItem\n"}
           {"  "}
           <H>platform</H>
@@ -393,6 +477,31 @@ export function ListViewPage() {
           {"\n"}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {"/>\n\n"}
+          {"{/* 3. Mobile — Tanpa Dekorasi + Badge */}\n"}
+          {"<ListViewItem\n"}
+          {"  "}
+          <H>platform</H>
+          {'="mobile"\n'}
+          {'  title="Project brief"\n'}
+          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {"  "}
+          <H>badge</H>
+          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
+          {"/>\n\n"}
+          {"{/* 4. Mobile — Dengan Dekorasi + Badge */}\n"}
+          {"<ListViewItem\n"}
+          {"  "}
+          <H>platform</H>
+          {'="mobile"\n'}
+          {"  "}
+          <H>decoration</H>
+          {"\n"}
+          {'  title="Project brief"\n'}
+          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {"  "}
+          <H>badge</H>
+          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
           {"/>"}
         </SectionCode>
       </FlowSection>
@@ -401,7 +510,7 @@ export function ListViewPage() {
       <FlowSection id="playground" title="Playground">
         <p className="mb-6 text-body-sm text-gray-500">
           Uji coba kombinasi platform (Default/Mobile), varian ukuran, garis
-          dekorasi, serta mode tampilan secara interaktif.
+          dekorasi, penambahan badge, serta mode tampilan secara interaktif.
         </p>
 
         <Stage maxWidth={platform === "mobile" ? "max-w-[380px]" : "max-w-2xl"}>
@@ -421,6 +530,17 @@ export function ListViewPage() {
                 decoration={decoration}
                 title="Project brief"
                 metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                badge={
+                  hasBadge ? (
+                    <Badge
+                      variant="success"
+                      size="sm"
+                      icon={<Clock className="size-3.5" />}
+                    >
+                      Badge
+                    </Badge>
+                  ) : undefined
+                }
                 actionLabel={platform === "default" ? "Open" : undefined}
                 onAction={
                   platform === "default"
@@ -463,6 +583,15 @@ export function ListViewPage() {
             />
           </Control>
 
+          <Control label="Badge">
+            <Segmented
+              label="Pilih status badge"
+              value={hasBadge}
+              onChange={(val) => setHasBadge(Boolean(val))}
+              options={badgeOptions}
+            />
+          </Control>
+
           <Control label="Dark Mode">
             <Segmented
               label="Pilih mode tampilan"
@@ -485,7 +614,10 @@ export function ListViewPage() {
         </p>
 
         <SectionCode flush>
-          {"import { ListViewItem } from '@ceplok-ui/design-kit-react'\n\n"}
+          {"import { Badge, ListViewItem } from '@ceplok-ui/design-kit-react'\n"}
+          {hasBadge &&
+            "import { Clock } from '@ceplok-ui/design-kit-react/icons/solid'\n"}
+          {"\n"}
           {"<ListViewItem\n"}
           {platform === "mobile" ? (
             <>
@@ -511,6 +643,13 @@ export function ListViewPage() {
           )}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {hasBadge && (
+            <>
+              {"  "}
+              <H>badge</H>
+              {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
+            </>
+          )}
           {platform === "default" && (
             <>
               {'  actionLabel="Open"\n'}

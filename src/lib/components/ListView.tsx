@@ -7,6 +7,7 @@ import {
 import { FileLines } from "flowbite-react-icons/outline";
 import { cn } from "../utils/cn";
 import { Button, type ButtonSize } from "./Button";
+import { Badge } from "./Badge";
 
 export type ListViewSize = "sm" | "default" | "lg" | "s" | "m" | "l";
 
@@ -107,6 +108,11 @@ export interface ListViewItemProps
   /** Menampilkan garis dekorasi aksen warna primary pada sisi kiri kartu. */
   decoration?: boolean;
   /**
+   * Badge atau elemen label status tambahan yang ditampilkan di bawah metadata.
+   * Dapat berupa komponen `<Badge>` kustom atau string teks label.
+   */
+  badge?: ReactNode;
+  /**
    * Memaksa item bertema gelap. Tanpa prop ini item ikut tema pembungkusnya
    * (mis. `<section data-theme="dark">`).
    */
@@ -137,6 +143,7 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
       size = "default",
       platform = "default",
       decoration = false,
+      badge,
       darkMode = false,
       as,
       className,
@@ -240,6 +247,18 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
                     <span>{item}</span>
                   </span>
                 ))}
+              </div>
+            )}
+
+            {badge && (
+              <div className="mt-2 flex items-center">
+                {typeof badge === "string" ? (
+                  <Badge variant="success" size="sm">
+                    {badge}
+                  </Badge>
+                ) : (
+                  badge
+                )}
               </div>
             )}
 
