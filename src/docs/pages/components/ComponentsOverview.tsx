@@ -320,6 +320,27 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/list-view"
+        name="List View"
+        desc="Kartu daftar berkas dan dokumen dengan wadah ikon, metadata ringkas, dan aksi cepat."
+      >
+        <div className="flex flex-col justify-center gap-2 rounded-xl bg-surface-subtle p-3">
+          <ListViewItem
+            size="s"
+            title="Project brief"
+            metadata={["PDF", "2.4 MB"]}
+            actionLabel="Open"
+          />
+          <ListViewItem
+            size="s"
+            title="Project brief"
+            metadata={["PDF", "2.4 MB"]}
+            actionLabel="Open"
+          />
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/navbar"
         name="Navbar"
         desc="Navigasi responsif dengan search, menu, guest actions, dan account controls."
@@ -473,21 +494,6 @@ export function ComponentsOverview() {
               </div>
             </div>
           </div>
-        </div>
-      </OverviewCard>
-
-      <OverviewCard
-        route="/components/list-view"
-        name="ListView"
-        desc="Kartu daftar berkas dan dokumen dengan wadah ikon, metadata ringkas, dan aksi cepat."
-      >
-        <div className="rounded-xl bg-surface-subtle p-4">
-          <ListViewItem
-            size="s"
-            title="Project brief"
-            metadata={["PDF", "2.4 MB"]}
-            actionLabel="Open"
-          />
         </div>
       </OverviewCard>
     </OverviewPage>

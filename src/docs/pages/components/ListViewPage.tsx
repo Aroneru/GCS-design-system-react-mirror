@@ -20,7 +20,7 @@ import {
 } from "../../usulanKit";
 
 const platformOptions: { value: ListViewPlatform; label: string }[] = [
-  { value: "default", label: "Default" },
+  { value: "desktop", label: "Desktop" },
   { value: "mobile", label: "Mobile" },
 ];
 
@@ -62,9 +62,9 @@ const listViewItemProps: PropRow[] = [
   ],
   [
     "platform",
-    "'default' | 'mobile'",
-    "'default'",
-    "Platform tampilan kartu: 'default' (desktop) atau 'mobile' (tampilan ringkas 58px / 88px dengan badge).",
+    "'desktop' | 'mobile'",
+    "'desktop'",
+    "Platform tampilan kartu: 'desktop' (lebar 410–600 px) atau 'mobile' (ringkas 348 px).",
   ],
   [
     "decoration",
@@ -149,8 +149,8 @@ const listViewContainerProps: PropRow[] = [
   ],
   [
     "platform",
-    "'default' | 'mobile'",
-    "'default'",
+    "'desktop' | 'mobile'",
+    "'desktop'",
     "Platform bawaan yang diwariskan ke semua item di dalamnya.",
   ],
   [
@@ -162,7 +162,7 @@ const listViewContainerProps: PropRow[] = [
   [
     "size",
     "'s' | 'm' | 'l' | 'sm' | 'default' | 'lg'",
-    "'default'",
+    "'m' / 'default'",
     "Ukuran bawaan yang diwariskan ke semua item di dalamnya.",
   ],
   [
@@ -187,14 +187,15 @@ const listViewContainerProps: PropRow[] = [
 
 const toc: TocEntry[] = [
   { id: "variant", label: "Variant" },
-  { id: "mobile", label: "Mobile" },
+  { id: "decoration", label: "Decoration" },
+  { id: "badge", label: "Badge" },
   { id: "playground", label: "Playground" },
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
 ];
 
 export function ListViewPage() {
-  const [platform, setPlatform] = useState<ListViewPlatform>("default");
+  const [platform, setPlatform] = useState<ListViewPlatform>("desktop");
   const [size, setSize] = useState<ListViewSize>("m");
   const [decoration, setDecoration] = useState(false);
   const [hasBadge, setHasBadge] = useState(false);
@@ -202,426 +203,115 @@ export function ListViewPage() {
 
   return (
     <UsulanPage
-      eyebrow="Components · ListView"
-      title="ListView"
+      eyebrow="Components · List View"
+      title="List View"
       description="Komponen kartu daftar vertikal untuk menampilkan ringkasan berkas, lampiran, dokumen, atau item data lengkap dengan ikon, judul, metadata, dan aksi cepat."
       toc={toc}
     >
-      {/* 1. Variant Section */}
+      {/* 1. Variant Section (Desktop | Mobile) */}
       <FlowSection id="variant" title="Variant">
         <Lead>
-          Tersedia dalam 3 variasi ukuran: <Hl>S</Hl> (Small), <Hl>M</Hl>{" "}
-          (Medium/Default), dan <Hl>L</Hl> (Large). Masing-masing varian
-          menyesuaikan dimensi wadah ikon, kerapatan padding, tipografi judul,
-          serta proporsi tombol aksi di sisi kanan. Dapat digunakan dalam versi
-          standar, versi berdekorasi garis aksen (<Hl>decoration</Hl>), maupun
-          dilengkapi <Hl>badge</Hl> status.
+          Varian terbagi untuk platform <Hl>desktop</Hl> yang menyediakan 3 pilihan ukuran <Hl>(S, M, L)</Hl> serta tombol aksi di sisi kanan, dan <Hl>mobile</Hl> yang
+          ringkas dan terstandardisasi untuk layar perangkat genggam.
         </Lead>
 
-        {/* Bagian A: Versi Standar (Tanpa Dekorasi) */}
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-base font-bold text-gray-900">
-              Versi Standar (Tanpa Dekorasi)
-            </h3>
-            <p className="mt-1 mb-4 text-body-sm text-gray-500">
-              Tampilan kartu desktop bersih tanpa garis aksen pada sisi kiri.
-            </p>
-          </div>
-
-          {/* Variant S */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">Small (S)</h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;s&quot;
-              </span>
+        <div className="space-y-8">
+          {/* Sub-bagian 1: Desktop (S, M, L) */}
+          <div className="space-y-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-gray-900">1. Desktop</h3>
             </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran ringkas dengan wadah ikon 36×36 px dan tombol aksi berukuran
-              XS. Ideal untuk widget samping, modal sempit, atau daftar padat.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="s"
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
-          </div>
 
-          {/* Variant M */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">
-                Medium (M) · Default
-              </h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;m&quot;
-              </span>
+
+            {/* S */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-bold text-gray-900">Small (S)</h4>
+              </div>
+              <p className="mb-3 text-body-sm text-gray-500">
+                Ukuran ringkas (410 px) dengan wadah ikon 36×36 px dan tombol aksi ukuran XS.
+              </p>
+              <Demo>
+                <div className="w-full max-w-[410px]">
+                  <ListViewItem
+                    size="s"
+                    title="Project brief"
+                    metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                    actionLabel="Open"
+                  />
+                </div>
+              </Demo>
             </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran standar bawaan dengan wadah ikon 44×44 px / 48×48 px dan
-              tombol aksi berukuran S. Cocok untuk sebagian besar kebutuhan daftar
-              berkas dan lampiran dokumen.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="m"
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
-          </div>
 
-          {/* Variant L */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">Large (L)</h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;l&quot;
-              </span>
+            {/* M */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-bold text-gray-900">
+                  Medium (M) · Default
+                </h4>
+              </div>
+              <p className="mb-3 text-body-sm text-gray-500">
+                Ukuran standar bawaan (514 px) dengan wadah ikon 44×44 px / 48×48 px dan tombol aksi ukuran S.
+              </p>
+              <Demo>
+                <div className="w-full max-w-[514px]">
+                  <ListViewItem
+                    title="Project brief"
+                    metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                    actionLabel="Open"
+                  />
+                </div>
+              </Demo>
             </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran lapang dengan wadah ikon 52×52 px / 56×56 px, tipografi
-              lebih tegas, dan tombol aksi ukuran Base. Ideal untuk item sorotan
-              utama atau area interaksi sentuh.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="l"
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  actionLabel="Open"
-                />
+
+            {/* L */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-bold text-gray-900">Large (L)</h4>
               </div>
-            </Demo>
-          </div>
-        </div>
-
-        {/* Bagian B: Versi Dengan Dekorasi (decoration) */}
-        <div className="mt-10 space-y-6">
-          <div>
-            <h3 className="text-base font-bold text-gray-900">
-              Versi Dengan Dekorasi (<Hl>decoration</Hl>)
-            </h3>
-            <p className="mt-1 mb-4 text-body-sm text-gray-500">
-              Menampilkan garis aksen vertikal warna primary di sisi kiri kartu
-              pada ketiga variasi ukuran desktop (S, M, L).
-            </p>
-          </div>
-
-          {/* Variant S dengan Dekorasi */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">
-                Small (S) — Dengan Dekorasi
-              </h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;s&quot; + decoration
-              </span>
+              <p className="mb-3 text-body-sm text-gray-500">
+                Ukuran lapang (600 px) dengan wadah ikon 52×52 px / 56×56 px dan tombol aksi ukuran Base.
+              </p>
+              <Demo>
+                <div className="w-full max-w-[600px]">
+                  <ListViewItem
+                    size="l"
+                    title="Project brief"
+                    metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                    actionLabel="Open"
+                  />
+                </div>
+              </Demo>
             </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran ringkas Small dengan garis aksen vertikal warna primary pada sisi kiri kartu.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="s"
-                  decoration
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
           </div>
 
-          {/* Variant M dengan Dekorasi */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">
-                Medium (M) — Dengan Dekorasi
-              </h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;m&quot; + decoration
-              </span>
+          {/* Sub-bagian 2: Mobile (1 Ukuran + Notes) */}
+          <div className="space-y-5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-gray-900">2. Mobile</h3>
             </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran standar Medium dengan garis aksen vertikal warna primary pada sisi kiri kartu.
+            <p className="mt-1 text-body-sm text-gray-500">
+              Platform mobile hanya memiliki 1 ukuran standar (lebar 348 px, tinggi 58 px). Wadah ikon 40×40 px dengan layout satu baris ringkas.
             </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="m"
-                  decoration
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
-          </div>
 
-          {/* Variant L dengan Dekorasi */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">
-                Large (L) — Dengan Dekorasi
-              </h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;l&quot; + decoration
-              </span>
+            {/* Kartu Mobile Standar */}
+            <div>
+              <Demo>
+                <div className="w-full max-w-[348px]">
+                  <ListViewItem
+                    platform="mobile"
+                    title="Project brief"
+                    metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                  />
+                </div>
+              </Demo>
             </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran lapang Large dengan garis aksen vertikal warna primary pada sisi kiri kartu.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="l"
-                  decoration
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
-          </div>
-        </div>
-
-        {/* Bagian C: Versi Dengan Badge (Ukuran S, M, & L) */}
-        <div className="mt-10 space-y-6">
-          <div>
-            <h3 className="text-base font-bold text-gray-900">
-              Versi Dengan Badge (Ukuran S, M, &amp; L)
-            </h3>
-            <p className="mt-1 mb-4 text-body-sm text-gray-500">
-              Varian ukuran desktop Small (S), Medium (M), dan Large (L) dengan
-              tambahan badge status di bawah baris metadata, baik dalam versi
-              standar (tanpa dekorasi) maupun versi berdekorasi garis aksen vertikal.
-            </p>
-          </div>
-
-          {/* S - Tanpa Dekorasi + Badge */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">
-                1. Small (S) — Tanpa Dekorasi + Badge
-              </h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;s&quot; + badge
-              </span>
-            </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran ringkas Small dengan badge status hijau di bawah metadata dan tombol aksi Open.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="s"
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  badge={
-                    <Badge
-                      variant="success"
-                      size="sm"
-                      icon={<Clock className="size-3.5" />}
-                    >
-                      Badge
-                    </Badge>
-                  }
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
-          </div>
-
-          {/* S - Dengan Dekorasi + Badge */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">
-                2. Small (S) — Dengan Dekorasi + Badge
-              </h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;s&quot; + decoration + badge
-              </span>
-            </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran ringkas Small dengan garis dekorasi vertikal warna primary di sisi kiri kartu serta badge status.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="s"
-                  decoration
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  badge={
-                    <Badge
-                      variant="success"
-                      size="sm"
-                      icon={<Clock className="size-3.5" />}
-                    >
-                      Badge
-                    </Badge>
-                  }
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
-          </div>
-
-          {/* M - Tanpa Dekorasi + Badge */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">
-                3. Medium (M) — Tanpa Dekorasi + Badge
-              </h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;m&quot; + badge
-              </span>
-            </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran standar Medium dengan badge status hijau di bawah metadata dan tombol aksi Open.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="m"
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  badge={
-                    <Badge
-                      variant="success"
-                      size="sm"
-                      icon={<Clock className="size-3.5" />}
-                    >
-                      Badge
-                    </Badge>
-                  }
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
-          </div>
-
-          {/* M - Dengan Dekorasi + Badge */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">
-                4. Medium (M) — Dengan Dekorasi + Badge
-              </h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;m&quot; + decoration + badge
-              </span>
-            </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran standar Medium dengan garis dekorasi vertikal warna primary di sisi kiri kartu serta badge status.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="m"
-                  decoration
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  badge={
-                    <Badge
-                      variant="success"
-                      size="sm"
-                      icon={<Clock className="size-3.5" />}
-                    >
-                      Badge
-                    </Badge>
-                  }
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
-          </div>
-
-          {/* L - Tanpa Dekorasi + Badge */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">
-                5. Large (L) — Tanpa Dekorasi + Badge
-              </h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;l&quot; + badge
-              </span>
-            </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran lapang Large dengan badge status hijau di bawah metadata dan tombol aksi Open.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="l"
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  badge={
-                    <Badge
-                      variant="success"
-                      size="sm"
-                      icon={<Clock className="size-3.5" />}
-                    >
-                      Badge
-                    </Badge>
-                  }
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
-          </div>
-
-          {/* L - Dengan Dekorasi + Badge */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h4 className="text-sm font-bold text-gray-900">
-                6. Large (L) — Dengan Dekorasi + Badge
-              </h4>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                size=&quot;l&quot; + decoration + badge
-              </span>
-            </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Ukuran lapang Large dengan garis dekorasi vertikal warna primary di sisi kiri kartu serta badge status.
-            </p>
-            <Demo>
-              <div className="w-full max-w-xl">
-                <ListViewItem
-                  size="l"
-                  decoration
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  badge={
-                    <Badge
-                      variant="success"
-                      size="sm"
-                      icon={<Clock className="size-3.5" />}
-                    >
-                      Badge
-                    </Badge>
-                  }
-                  actionLabel="Open"
-                />
-              </div>
-            </Demo>
           </div>
         </div>
 
         <SectionCode>
-          {"import { Badge, ListViewItem } from '@ceplok-ui/design-kit-react'\n"}
-          {"import { Clock } from '@ceplok-ui/design-kit-react/icons/solid'\n\n"}
-          {"{/* 1. Versi Standar (Tanpa Dekorasi) */}\n"}
+          {"import { ListViewItem } from '@ceplok-ui/design-kit-react'\n\n"}
+          {"{/* 1. Desktop — Small (size=\"s\") */}\n"}
           {"<ListViewItem\n"}
           {"  "}
           <H>size</H>
@@ -630,14 +320,13 @@ export function ListViewPage() {
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {'  actionLabel="Open"\n'}
           {"/>\n\n"}
+          {"{/* 2. Desktop — Medium (Default, prop size tidak perlu ditulis) */}\n"}
           {"<ListViewItem\n"}
-          {"  "}
-          <H>size</H>
-          {'="m"\n'}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {'  actionLabel="Open"\n'}
           {"/>\n\n"}
+          {"{/* 3. Desktop — Large (size=\"l\") */}\n"}
           {"<ListViewItem\n"}
           {"  "}
           <H>size</H>
@@ -646,322 +335,195 @@ export function ListViewPage() {
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {'  actionLabel="Open"\n'}
           {"/>\n\n"}
-          {"{/* 2. Versi Dengan Dekorasi (decoration) */}\n"}
+          {"{/* 4. Mobile — 1 Ukuran Standar (348 px) */}\n"}
           {"<ListViewItem\n"}
           {"  "}
-          <H>size</H>
-          {'="s"\n'}
-          {"  "}
-          <H>decoration</H>
-          {"\n"}
+          <H>platform</H>
+          {'="mobile"\n'}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {'  actionLabel="Open"\n'}
-          {"/>\n\n"}
-          {"<ListViewItem\n"}
-          {"  "}
-          <H>size</H>
-          {'="m"\n'}
-          {"  "}
-          <H>decoration</H>
-          {"\n"}
-          {'  title="Project brief"\n'}
-          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {'  actionLabel="Open"\n'}
-          {"/>\n\n"}
-          {"<ListViewItem\n"}
-          {"  "}
-          <H>size</H>
-          {'="l"\n'}
-          {"  "}
-          <H>decoration</H>
-          {"\n"}
-          {'  title="Project brief"\n'}
-          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {'  actionLabel="Open"\n'}
-          {"/>\n\n"}
-          {"{/* 3. Versi Dengan Badge (Ukuran S, M, & L) */}\n"}
-          {"{/* Small (S) — Tanpa Dekorasi + Badge */}\n"}
-          {"<ListViewItem\n"}
-          {"  "}
-          <H>size</H>
-          {'="s"\n'}
-          {'  title="Project brief"\n'}
-          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {"  "}
-          <H>badge</H>
-          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
-          {'  actionLabel="Open"\n'}
-          {"/>\n\n"}
-          {"{/* Small (S) — Dengan Dekorasi + Badge */}\n"}
-          {"<ListViewItem\n"}
-          {"  "}
-          <H>size</H>
-          {'="s"\n'}
-          {"  "}
-          <H>decoration</H>
-          {"\n"}
-          {'  title="Project brief"\n'}
-          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {"  "}
-          <H>badge</H>
-          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
-          {'  actionLabel="Open"\n'}
-          {"/>\n\n"}
-          {"{/* Medium (M) — Tanpa Dekorasi + Badge */}\n"}
-          {"<ListViewItem\n"}
-          {"  "}
-          <H>size</H>
-          {'="m"\n'}
-          {'  title="Project brief"\n'}
-          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {"  "}
-          <H>badge</H>
-          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
-          {'  actionLabel="Open"\n'}
-          {"/>\n\n"}
-          {"{/* Medium (M) — Dengan Dekorasi + Badge */}\n"}
-          {"<ListViewItem\n"}
-          {"  "}
-          <H>size</H>
-          {'="m"\n'}
-          {"  "}
-          <H>decoration</H>
-          {"\n"}
-          {'  title="Project brief"\n'}
-          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {"  "}
-          <H>badge</H>
-          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
-          {'  actionLabel="Open"\n'}
-          {"/>\n\n"}
-          {"{/* Large (L) — Tanpa Dekorasi + Badge */}\n"}
-          {"<ListViewItem\n"}
-          {"  "}
-          <H>size</H>
-          {'="l"\n'}
-          {'  title="Project brief"\n'}
-          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {"  "}
-          <H>badge</H>
-          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
-          {'  actionLabel="Open"\n'}
-          {"/>\n\n"}
-          {"{/* Large (L) — Dengan Dekorasi + Badge */}\n"}
-          {"<ListViewItem\n"}
-          {"  "}
-          <H>size</H>
-          {'="l"\n'}
-          {"  "}
-          <H>decoration</H>
-          {"\n"}
-          {'  title="Project brief"\n'}
-          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {"  "}
-          <H>badge</H>
-          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
-          {'  actionLabel="Open"\n'}
           {"/>"}
         </SectionCode>
       </FlowSection>
 
-      {/* 2. Mobile Section */}
-      <FlowSection id="mobile" title="Mobile">
+      {/* 2. Decoration Section (Ada | Tidak Ada) */}
+      <FlowSection id="decoration" title="Decoration">
         <Lead>
-          Tampilan khusus mobile (<Hl>platform=&quot;mobile&quot;</Hl>) berukuran
-          ringkas untuk layar sempit (lebar kartu 348–380 px). Mendukung variasi{" "}
-          <Hl>decoration</Hl> (garis aksen vertikal di sisi kiri) serta tambahan{" "}
-          <Hl>badge</Hl> status di bawah baris metadata.
+          Prop <Hl>decoration</Hl> menyematkan garis aksen vertikal warna primary pada sisi kiri
+          kartu untuk memberikan aksentuasi visual atau penanda status berkas.
         </Lead>
 
-        <div className="space-y-6">
-          {/* Mobile tanpa dekorasi */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-gray-900">
-                1. Tanpa Dekorasi
-              </h3>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                decoration=&#123;false&#125;
-              </span>
-            </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Kartu berkas mobile bersih dengan tinggi 58px tanpa garis aksen.
-            </p>
-            <Demo>
-              <div className="w-full max-w-[348px]">
-                <ListViewItem
-                  platform="mobile"
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                />
-              </div>
-            </Demo>
-          </div>
+        <div className="space-y-8">
+          {/* Sub-bagian 2: Dengan Dekorasi */}
+          <div className="space-y-5">
 
-          {/* Mobile dengan dekorasi */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-gray-900">
-                2. Dengan Dekorasi
-              </h3>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                decoration=&#123;true&#125;
-              </span>
-            </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Menampilkan garis aksen vertikal warna primary di sisi kiri kartu
-              untuk penekanan visual status atau tipe dokumen.
-            </p>
-            <Demo>
-              <div className="w-full max-w-[348px]">
-                <ListViewItem
-                  platform="mobile"
-                  decoration
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                />
-              </div>
-            </Demo>
-          </div>
+            {/* Desktop M mewakili */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-bold text-gray-900">
+                  Desktop (Medium)
+                </h4>
 
-          {/* Mobile tanpa dekorasi + Badge */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-gray-900">
-                3. Tanpa Dekorasi + Badge
-              </h3>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                badge + decoration=&#123;false&#125;
-              </span>
-            </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Kartu berkas mobile dengan tambahan badge status hijau di bawah
-              metadata dokumen.
-            </p>
-            <Demo>
-              <div className="w-full max-w-[348px]">
-                <ListViewItem
-                  platform="mobile"
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  badge={
-                    <Badge
-                      variant="success"
-                      size="sm"
-                      icon={<Clock className="size-3.5" />}
-                    >
-                      Badge
-                    </Badge>
-                  }
-                />
               </div>
-            </Demo>
-          </div>
+              <Demo>
+                <div className="w-full max-w-[514px]">
+                  <ListViewItem
+                    decoration
+                    title="Project brief"
+                    metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                    actionLabel="Open"
+                  />
+                </div>
+              </Demo>
+            </div>
 
-          {/* Mobile dengan dekorasi + Badge */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-gray-900">
-                4. Dengan Dekorasi + Badge
-              </h3>
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-                badge + decoration=&#123;true&#125;
-              </span>
-            </div>
-            <p className="mb-3 text-body-sm text-gray-500">
-              Kombinasi garis aksen vertikal di sisi kiri dan badge status di
-              bawah metadata dokumen.
-            </p>
-            <Demo>
-              <div className="w-full max-w-[348px]">
-                <ListViewItem
-                  platform="mobile"
-                  decoration
-                  title="Project brief"
-                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-                  badge={
-                    <Badge
-                      variant="success"
-                      size="sm"
-                      icon={<Clock className="size-3.5" />}
-                    >
-                      Badge
-                    </Badge>
-                  }
-                />
+            {/* Mobile mewakili */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-bold text-gray-900">
+                  Mobile
+                </h4>
               </div>
-            </Demo>
+              <Demo>
+                <div className="w-full max-w-[348px]">
+                  <ListViewItem
+                    platform="mobile"
+                    decoration
+                    title="Project brief"
+                    metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                  />
+                </div>
+              </Demo>
+            </div>
+          </div>
+        </div>
+
+        <SectionCode>
+          {"import { ListViewItem } from '@ceplok-ui/design-kit-react'\n\n"}
+          {"{/* 1. Tanpa Dekorasi (Default) */}\n"}
+          {"<ListViewItem\n"}
+          {'  title="Project brief"\n'}
+          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {'  actionLabel="Open"\n'}
+          {"/>\n\n"}
+          {"{/* 2. Dengan Dekorasi (Garis aksen vertikal di sisi kiri) */}\n"}
+          {"<ListViewItem\n"}
+          {"  "}
+          <H>decoration</H>
+          {"\n"}
+          {'  title="Project brief"\n'}
+          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {'  actionLabel="Open"\n'}
+          {"/>"}
+        </SectionCode>
+      </FlowSection>
+
+      {/* 3. Badge Section (Ada | Tidak Ada) */}
+      <FlowSection id="badge" title="Badge">
+        <Lead>
+          Prop <Hl>badge</Hl> menyisipkan elemen label status di bawah baris metadata dokumen.
+          Tata letak vertikal kartu dan wadah ikon otomatis menyesuaikan proporsinya agar tetap seimbang.
+        </Lead>
+
+        <div className="space-y-8">
+          {/* Sub-bagian 2: Dengan Badge */}
+          <div className="space-y-5">
+
+            {/* Desktop M mewakili */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-bold text-gray-900">
+                  Desktop (Medium)
+                </h4>
+              </div>
+              <Demo>
+                <div className="w-full max-w-[514px]">
+                  <ListViewItem
+                    title="Project brief"
+                    metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                    badge={
+                      <Badge
+                        variant="success"
+                        size="sm"
+                        icon={<Clock className="size-3.5" />}
+                      >
+                        Badge
+                      </Badge>
+                    }
+                    actionLabel="Open"
+                  />
+                </div>
+              </Demo>
+            </div>
+
+            {/* Mobile mewakili */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-bold text-gray-900">
+                  Mobile
+                </h4>
+              </div>
+              <Demo>
+                <div className="w-full max-w-[348px]">
+                  <ListViewItem
+                    platform="mobile"
+                    title="Project brief"
+                    metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                    badge={
+                      <Badge
+                        variant="success"
+                        size="sm"
+                        icon={<Clock className="size-3.5" />}
+                      >
+                        Badge
+                      </Badge>
+                    }
+                  />
+                </div>
+              </Demo>
+            </div>
           </div>
         </div>
 
         <SectionCode>
           {"import { Badge, ListViewItem } from '@ceplok-ui/design-kit-react'\n"}
           {"import { Clock } from '@ceplok-ui/design-kit-react/icons/solid'\n\n"}
-          {"{/* 1. Mobile — Tanpa Dekorasi */}\n"}
+          {"{/* 1. Tanpa Badge */}\n"}
           {"<ListViewItem\n"}
-          {"  "}
-          <H>platform</H>
-          {'="mobile"\n'}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {'  actionLabel="Open"\n'}
           {"/>\n\n"}
-          {"{/* 2. Mobile — Dengan Dekorasi */}\n"}
+          {"{/* 2. Dengan Badge */}\n"}
           {"<ListViewItem\n"}
-          {"  "}
-          <H>platform</H>
-          {'="mobile"\n'}
-          {"  "}
-          <H>decoration</H>
-          {"\n"}
-          {'  title="Project brief"\n'}
-          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {"/>\n\n"}
-          {"{/* 3. Mobile — Tanpa Dekorasi + Badge */}\n"}
-          {"<ListViewItem\n"}
-          {"  "}
-          <H>platform</H>
-          {'="mobile"\n'}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {"  "}
           <H>badge</H>
           {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
-          {"/>\n\n"}
-          {"{/* 4. Mobile — Dengan Dekorasi + Badge */}\n"}
-          {"<ListViewItem\n"}
-          {"  "}
-          <H>platform</H>
-          {'="mobile"\n'}
-          {"  "}
-          <H>decoration</H>
-          {"\n"}
-          {'  title="Project brief"\n'}
-          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {"  "}
-          <H>badge</H>
-          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
+          {'  actionLabel="Open"\n'}
           {"/>"}
         </SectionCode>
       </FlowSection>
 
-      {/* 3. Playground Section */}
+      {/* 4. Playground Section */}
       <FlowSection id="playground" title="Playground">
         <p className="mb-6 text-body-sm text-gray-500">
-          Uji coba kombinasi platform (Default/Mobile), varian ukuran, garis
+          Uji coba kombinasi platform (Desktop/Mobile), varian ukuran, garis
           dekorasi, penambahan badge, serta mode tampilan secara interaktif.
         </p>
 
-        <Stage maxWidth={platform === "mobile" ? "max-w-[380px]" : "max-w-2xl"}>
-          <div
-            className={`w-full transition-colors duration-200 ${
-              darkMode ? "rounded-2xl bg-gray-900 p-6" : "p-2"
-            }`}
-          >
+        <Stage maxWidth="max-w-3xl" dark={darkMode}>
+          <div className="flex h-[134px] w-full items-center justify-center">
             <div
-              className={
-                platform === "mobile" ? "mx-auto w-full max-w-[348px]" : "w-full"
-              }
+              className={`w-full transition-[max-width] duration-300 ease-out ${platform === "mobile"
+                ? "max-w-[348px]"
+                : size === "s"
+                  ? "max-w-[410px]"
+                  : size === "l"
+                    ? "max-w-[600px]"
+                    : "max-w-[514px]"
+                }`}
             >
               <ListViewItem
                 platform={platform}
@@ -980,9 +542,9 @@ export function ListViewPage() {
                     </Badge>
                   ) : undefined
                 }
-                actionLabel={platform === "default" ? "Open" : undefined}
+                actionLabel={platform !== "mobile" ? "Open" : undefined}
                 onAction={
-                  platform === "default"
+                  platform !== "mobile"
                     ? () => alert("Open diklik!")
                     : undefined
                 }
@@ -1002,16 +564,15 @@ export function ListViewPage() {
             />
           </Control>
 
-          {platform === "default" && (
-            <Control label="Size">
-              <Segmented
-                label="Pilih varian ukuran"
-                value={size}
-                onChange={(val) => setSize(val as ListViewSize)}
-                options={sizeOptions}
-              />
-            </Control>
-          )}
+          <Control label="Size">
+            <Segmented
+              label="Pilih varian ukuran"
+              value={size}
+              onChange={(val) => setSize(val as ListViewSize)}
+              options={sizeOptions}
+              disabled={platform === "mobile"}
+            />
+          </Control>
 
           <Control label="Decoration">
             <Segmented
@@ -1045,7 +606,7 @@ export function ListViewPage() {
         </Controls>
       </FlowSection>
 
-      {/* 4. Penggunaan Section */}
+      {/* 5. Penggunaan Section */}
       <FlowSection id="penggunaan" title="Penggunaan">
         <p className="mb-6 text-body-sm text-gray-500">
           Kode di bawah ini otomatis mengikuti kombinasi opsi yang dipilih pada
@@ -1089,7 +650,7 @@ export function ListViewPage() {
               {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
             </>
           )}
-          {platform === "default" && (
+          {platform !== "mobile" && (
             <>
               {'  actionLabel="Open"\n'}
               {"  onAction={() => console.log('Open clicked')}\n"}
@@ -1106,7 +667,7 @@ export function ListViewPage() {
         </SectionCode>
       </FlowSection>
 
-      {/* 5. Properties Section */}
+      {/* 6. Properties Section */}
       <FlowSection id="properties" title="Properties">
         <p className="mb-6 text-body-sm text-gray-500">
           Referensi lengkap prop yang didukung oleh komponen <Hl>ListViewItem</Hl>{" "}

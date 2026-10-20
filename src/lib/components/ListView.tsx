@@ -11,7 +11,7 @@ import { Badge } from "./Badge";
 
 export type ListViewSize = "sm" | "default" | "lg" | "s" | "m" | "l";
 
-export type ListViewPlatform = "default" | "mobile";
+export type ListViewPlatform = "desktop" | "mobile" | "default";
 
 export const normalizeListViewSize = (
   size: ListViewSize = "default",
@@ -25,13 +25,24 @@ export const normalizeListViewSize = (
 const mobileClasses = {
   container: "px-3.5 py-2.5 gap-3 min-h-[58px]",
   decorationPadding: "pl-4 sm:pl-4.5",
-  iconBox: "size-10 rounded-xl",
+  iconBox: "size-10 rounded-lg",
   iconSize: "size-5",
   title: "text-sm font-bold",
   description: "text-xs",
   defaultButtonSize: "xs" as ButtonSize,
 };
 
+const mobileBadgeClasses = {
+  container: "px-3.5 py-3 gap-3 min-h-[88px]",
+  decorationPadding: "pl-4 sm:pl-4.5",
+  iconBox: "size-10 rounded-lg",
+  iconSize: "size-5",
+  title: "text-sm font-bold",
+  description: "text-xs",
+  defaultButtonSize: "xs" as ButtonSize,
+};
+
+/** Dimensi dan gaya kartu desktop saat tanpa badge (badge={false}). */
 const sizeClasses: Record<
   "sm" | "default" | "lg",
   {
@@ -45,8 +56,8 @@ const sizeClasses: Record<
   }
 > = {
   sm: {
-    container: "p-3 gap-3",
-    decorationPadding: "pl-4",
+    container: "px-4 py-3 gap-3 min-h-[63px]",
+    decorationPadding: "pl-5",
     iconBox: "size-9 rounded-lg",
     iconSize: "size-4.5",
     title: "text-sm font-bold",
@@ -54,19 +65,61 @@ const sizeClasses: Record<
     defaultButtonSize: "xs",
   },
   default: {
-    container: "px-4 py-3 sm:px-5 sm:py-3.5 gap-3.5 sm:gap-4",
-    decorationPadding: "pl-5 sm:pl-6",
-    iconBox: "size-11 sm:size-12 rounded-xl",
+    container: "px-5 py-3.5 gap-3.5 sm:gap-4 min-h-[81px]",
+    decorationPadding: "pl-6 sm:pl-7",
+    iconBox: "size-11 sm:size-12 rounded-lg",
     iconSize: "size-5 sm:size-6",
     title: "text-base font-bold",
     description: "text-sm",
     defaultButtonSize: "s",
   },
   lg: {
-    container: "p-5 sm:p-6 gap-4 sm:gap-5",
-    decorationPadding: "pl-6 sm:pl-7",
-    iconBox: "size-13 sm:size-14 rounded-2xl",
+    container: "px-6 py-4.5 gap-4 sm:gap-5 min-h-[103px]",
+    decorationPadding: "pl-7 sm:pl-8",
+    iconBox: "size-13 sm:size-14 rounded-lg",
     iconSize: "size-6 sm:size-7",
+    title: "text-lg font-bold",
+    description: "text-sm sm:text-base",
+    defaultButtonSize: "base",
+  },
+};
+
+/** Dimensi dan gaya kartu desktop saat memiliki badge status (badge={true}). */
+const sizeBadgeClasses: Record<
+  "sm" | "default" | "lg",
+  {
+    container: string;
+    decorationPadding: string;
+    iconBox: string;
+    iconSize: string;
+    title: string;
+    description: string;
+    defaultButtonSize: ButtonSize;
+  }
+> = {
+  sm: {
+    container: "px-4 py-3 gap-3 min-h-[88px]",
+    decorationPadding: "pl-5",
+    iconBox: "size-8 rounded-lg",
+    iconSize: "size-4",
+    title: "text-sm font-bold",
+    description: "text-xs",
+    defaultButtonSize: "xs",
+  },
+  default: {
+    container: "px-6 py-3.5 gap-3.5 sm:gap-4 min-h-[108px]",
+    decorationPadding: "pl-7 sm:pl-8",
+    iconBox: "size-10 rounded-lg",
+    iconSize: "size-5",
+    title: "text-base font-bold",
+    description: "text-sm",
+    defaultButtonSize: "s",
+  },
+  lg: {
+    container: "px-8 py-4 gap-4 sm:gap-5 min-h-[134px]",
+    decorationPadding: "pl-9 sm:pl-10",
+    iconBox: "size-12 rounded-lg",
+    iconSize: "size-6",
     title: "text-lg font-bold",
     description: "text-sm sm:text-base",
     defaultButtonSize: "base",
@@ -108,7 +161,7 @@ export interface ListViewItemProps
   rel?: string;
   /** Kerapatan/ukuran item. Bawaannya `'default'`. */
   size?: ListViewSize;
-  /** Platform target: `'default'` (desktop) atau `'mobile'` (tampilan ringkas responsif 58px). */
+  /** Platform target: `'desktop'` (bawaan) atau `'mobile'` (tampilan ringkas responsif 58px). */
   platform?: ListViewPlatform;
   /** Menampilkan garis dekorasi aksen warna primary pada sisi kiri kartu. */
   decoration?: boolean;
@@ -146,7 +199,7 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
       target,
       rel,
       size = "default",
-      platform = "default",
+      platform = "desktop",
       decoration = false,
       badge,
       darkMode = false,
@@ -161,9 +214,14 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
     const isInteractive = Boolean(href || onClick);
     const Component = as ?? (href ? "a" : "article");
     const isMobile = platform === "mobile";
+    const hasBadge = Boolean(badge);
+    const normalizedSize = normalizeListViewSize(size);
+
     const currentSize = isMobile
-      ? mobileClasses
-      : (sizeClasses[normalizeListViewSize(size)] ?? sizeClasses.default);
+      ? (hasBadge ? mobileBadgeClasses : mobileClasses)
+      : (hasBadge
+          ? (sizeBadgeClasses[normalizedSize] ?? sizeBadgeClasses.default)
+          : (sizeClasses[normalizedSize] ?? sizeClasses.default));
 
     const hasIcon = icon !== null;
     const renderedIcon =
@@ -177,6 +235,10 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
           size={actionButtonSize ?? currentSize.defaultButtonSize}
           theme="primary"
           variant="filled"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAction?.(e as any);
+          }}
         >
           {actionLabel}
         </Button>
@@ -185,7 +247,10 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
           size={actionButtonSize ?? currentSize.defaultButtonSize}
           theme="primary"
           variant="filled"
-          onClick={onAction}
+          onClick={(e) => {
+            e.stopPropagation();
+            onAction?.(e);
+          }}
         >
           {actionLabel}
         </Button>
@@ -201,7 +266,7 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
         onClick={onClick}
         data-theme={darkMode ? "dark" : undefined}
         className={cn(
-          "group relative flex items-center justify-between overflow-hidden rounded-xl sm:rounded-2xl border border-border bg-surface text-content transition-all",
+          "group relative flex items-center justify-between overflow-hidden rounded-lg border border-border bg-surface text-content transition-all",
           currentSize.container,
           decoration && currentSize.decorationPadding,
           isInteractive &&
@@ -220,7 +285,7 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
           {hasIcon && (
             <div
               className={cn(
-                "flex shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-600 in-data-[theme=dark]:bg-primary-950/60 in-data-[theme=dark]:text-primary-400 transition-colors",
+                "flex shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 in-data-[theme=dark]:bg-primary-950/60 in-data-[theme=dark]:text-primary-400 transition-colors",
                 currentSize.iconBox,
                 iconContainerClassName,
               )}
@@ -290,7 +355,7 @@ export interface ListViewProps extends HTMLAttributes<HTMLElement> {
   gap?: "sm" | "md" | "lg" | "none";
   /** Kerapatan/ukuran bawaan untuk item di dalamnya. */
   size?: ListViewSize;
-  /** Platform bawaan untuk seluruh item di dalamnya: `'default'` atau `'mobile'`. */
+  /** Platform bawaan untuk seluruh item di dalamnya: `'desktop'` (bawaan) atau `'mobile'`. */
   platform?: ListViewPlatform;
   /** Garis dekorasi aksen bawaan untuk seluruh item di dalamnya. */
   decoration?: boolean;
@@ -320,7 +385,7 @@ export const ListView = forwardRef<HTMLElement, ListViewProps>(
       items,
       gap = "md",
       size = "default",
-      platform = "default",
+      platform = "desktop",
       decoration = false,
       darkMode = false,
       as: Component = "div",
