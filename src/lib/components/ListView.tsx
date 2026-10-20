@@ -24,6 +24,7 @@ export const normalizeListViewSize = (
 
 const mobileClasses = {
   container: "px-3.5 py-2.5 gap-3 min-h-[58px]",
+  decorationPadding: "pl-4 sm:pl-4.5",
   iconBox: "size-10 rounded-xl",
   iconSize: "size-5",
   title: "text-sm font-bold",
@@ -35,6 +36,7 @@ const sizeClasses: Record<
   "sm" | "default" | "lg",
   {
     container: string;
+    decorationPadding: string;
     iconBox: string;
     iconSize: string;
     title: string;
@@ -44,14 +46,16 @@ const sizeClasses: Record<
 > = {
   sm: {
     container: "p-3 gap-3",
+    decorationPadding: "pl-4",
     iconBox: "size-9 rounded-lg",
     iconSize: "size-4.5",
-    title: "text-sm font-semibold",
+    title: "text-sm font-bold",
     description: "text-xs",
     defaultButtonSize: "xs",
   },
   default: {
     container: "px-4 py-3 sm:px-5 sm:py-3.5 gap-3.5 sm:gap-4",
+    decorationPadding: "pl-5 sm:pl-6",
     iconBox: "size-11 sm:size-12 rounded-xl",
     iconSize: "size-5 sm:size-6",
     title: "text-base font-bold",
@@ -60,6 +64,7 @@ const sizeClasses: Record<
   },
   lg: {
     container: "p-5 sm:p-6 gap-4 sm:gap-5",
+    decorationPadding: "pl-6 sm:pl-7",
     iconBox: "size-13 sm:size-14 rounded-2xl",
     iconSize: "size-6 sm:size-7",
     title: "text-lg font-bold",
@@ -198,7 +203,7 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
         className={cn(
           "group relative flex items-center justify-between overflow-hidden rounded-xl sm:rounded-2xl border border-border bg-surface text-content transition-all",
           currentSize.container,
-          decoration && "pl-4 sm:pl-4.5",
+          decoration && currentSize.decorationPadding,
           isInteractive &&
             "cursor-pointer hover:border-primary-400/80 hover:shadow-soft active:scale-[0.998]",
           className,
