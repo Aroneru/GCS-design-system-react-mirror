@@ -10,6 +10,8 @@ import { Button, type ButtonSize } from "./Button";
 
 export type ListViewSize = "sm" | "default" | "lg" | "s" | "m" | "l";
 
+export type ListViewPlatform = "default" | "mobile";
+
 export const normalizeListViewSize = (
   size: ListViewSize = "default",
 ): "sm" | "default" | "lg" => {
@@ -17,6 +19,15 @@ export const normalizeListViewSize = (
   if (size === "m") return "default";
   if (size === "l") return "lg";
   return size;
+};
+
+const mobileClasses = {
+  container: "px-3.5 py-2.5 gap-3 min-h-[58px]",
+  iconBox: "size-10 rounded-xl",
+  iconSize: "size-5",
+  title: "text-sm font-bold",
+  description: "text-xs",
+  defaultButtonSize: "xs" as ButtonSize,
 };
 
 const sizeClasses: Record<
@@ -91,6 +102,10 @@ export interface ListViewItemProps
   rel?: string;
   /** Kerapatan/ukuran item. Bawaannya `'default'`. */
   size?: ListViewSize;
+  /** Platform target: `'default'` (desktop) atau `'mobile'` (tampilan ringkas responsif 58px). */
+  platform?: ListViewPlatform;
+  /** Menampilkan garis dekorasi aksen warna primary pada sisi kiri kartu. */
+  decoration?: boolean;
   /**
    * Memaksa item bertema gelap. Tanpa prop ini item ikut tema pembungkusnya
    * (mis. `<section data-theme="dark">`).
@@ -120,6 +135,8 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
       target,
       rel,
       size = "default",
+      platform = "default",
+      decoration = false,
       darkMode = false,
       as,
       className,
@@ -131,7 +148,10 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
   ) => {
     const isInteractive = Boolean(href || onClick);
     const Component = as ?? (href ? "a" : "article");
-    const currentSize = sizeClasses[normalizeListViewSize(size)];
+    const isMobile = platform === "mobile";
+    const currentSize = isMobile
+      ? mobileClasses
+      : (sizeClasses[normalizeListViewSize(size)] ?? sizeClasses.default);
 
     const hasIcon = icon !== null;
     const renderedIcon =
@@ -169,14 +189,21 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
         onClick={onClick}
         data-theme={darkMode ? "dark" : undefined}
         className={cn(
-          "group flex items-center justify-between rounded-xl sm:rounded-2xl border border-border bg-surface text-content transition-all",
+          "group relative flex items-center justify-between overflow-hidden rounded-xl sm:rounded-2xl border border-border bg-surface text-content transition-all",
           currentSize.container,
+          decoration && "pl-4 sm:pl-4.5",
           isInteractive &&
             "cursor-pointer hover:border-primary-400/80 hover:shadow-soft active:scale-[0.998]",
           className,
         )}
         {...props}
       >
+        {decoration && (
+          <span
+            className="absolute inset-y-0 left-0 w-1 sm:w-1.5 bg-primary-600 in-data-[theme=dark]:bg-primary-500"
+            aria-hidden="true"
+          />
+        )}
         <div className="flex min-w-0 flex-1 items-center gap-3.5 sm:gap-4">
           {hasIcon && (
             <div
@@ -239,6 +266,10 @@ export interface ListViewProps extends HTMLAttributes<HTMLElement> {
   gap?: "sm" | "md" | "lg" | "none";
   /** Kerapatan/ukuran bawaan untuk item di dalamnya. */
   size?: ListViewSize;
+  /** Platform bawaan untuk seluruh item di dalamnya: `'default'` atau `'mobile'`. */
+  platform?: ListViewPlatform;
+  /** Garis dekorasi aksen bawaan untuk seluruh item di dalamnya. */
+  decoration?: boolean;
   /**
    * Memaksa seluruh daftar bertema gelap. Item di dalamnya otomatis mewarisi
    * tema ini lewat CSS `data-theme="dark"`.
@@ -265,6 +296,8 @@ export const ListView = forwardRef<HTMLElement, ListViewProps>(
       items,
       gap = "md",
       size = "default",
+      platform = "default",
+      decoration = false,
       darkMode = false,
       as: Component = "div",
       className,
@@ -282,7 +315,13 @@ export const ListView = forwardRef<HTMLElement, ListViewProps>(
       >
         {items
           ? items.map((item, index) => (
-              <ListViewItem key={index} size={size} {...item} />
+              <ListViewItem
+                key={index}
+                size={size}
+                platform={item.platform ?? platform}
+                decoration={item.decoration ?? decoration}
+                {...item}
+              />
             ))
           : children}
       </Component>

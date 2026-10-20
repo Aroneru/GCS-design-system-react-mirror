@@ -79,6 +79,7 @@ export type {
   ListViewProps,
   ListViewItemProps,
   ListViewSize,
+  ListViewPlatform,
 } from "./components/ListView";
 
 export { Container } from "./components/Container";

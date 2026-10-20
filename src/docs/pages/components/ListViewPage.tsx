@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   ListViewItem,
+  type ListViewPlatform,
   type ListViewSize,
 } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
@@ -16,10 +17,20 @@ import {
   type TocEntry,
 } from "../../usulanKit";
 
+const platformOptions: { value: ListViewPlatform; label: string }[] = [
+  { value: "default", label: "Default" },
+  { value: "mobile", label: "Mobile" },
+];
+
 const sizeOptions = [
   { value: "s", label: "S (Small)" },
   { value: "m", label: "M (Medium)" },
   { value: "l", label: "L (Large)" },
+];
+
+const decorationOptions = [
+  { value: false, label: "Tidak Ada" },
+  { value: true, label: "Ada" },
 ];
 
 const listViewItemProps: PropRow[] = [
@@ -41,6 +52,18 @@ const listViewItemProps: PropRow[] = [
     "ReactNode | null",
     "<FileLines />",
     "Elemen visual di sisi kiri. Bernilai null jika tidak ingin menampilkan wadah ikon sama sekali.",
+  ],
+  [
+    "platform",
+    "'default' | 'mobile'",
+    "'default'",
+    "Platform tampilan kartu: 'default' (desktop) atau 'mobile' (tampilan ringkas 58px).",
+  ],
+  [
+    "decoration",
+    "boolean",
+    "false",
+    "Menampilkan garis dekorasi aksen warna primary pada sisi kiri kartu.",
   ],
   [
     "actionLabel",
@@ -112,6 +135,18 @@ const listViewContainerProps: PropRow[] = [
     "Jarak vertikal antar item dalam daftar berkas.",
   ],
   [
+    "platform",
+    "'default' | 'mobile'",
+    "'default'",
+    "Platform bawaan yang diwariskan ke semua item di dalamnya.",
+  ],
+  [
+    "decoration",
+    "boolean",
+    "false",
+    "Garis dekorasi aksen bawaan yang diwariskan ke semua item di dalamnya.",
+  ],
+  [
     "size",
     "'s' | 'm' | 'l' | 'sm' | 'default' | 'lg'",
     "'default'",
@@ -139,13 +174,16 @@ const listViewContainerProps: PropRow[] = [
 
 const toc: TocEntry[] = [
   { id: "variant", label: "Variant" },
+  { id: "mobile", label: "Mobile" },
   { id: "playground", label: "Playground" },
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
 ];
 
 export function ListViewPage() {
+  const [platform, setPlatform] = useState<ListViewPlatform>("default");
   const [size, setSize] = useState<ListViewSize>("m");
+  const [decoration, setDecoration] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
   return (
@@ -274,37 +312,154 @@ export function ListViewPage() {
         </SectionCode>
       </FlowSection>
 
-      {/* 2. Playground Section */}
+      {/* 2. Mobile Section */}
+      <FlowSection id="mobile" title="Mobile">
+        <Lead>
+          Tampilan khusus mobile (<Hl>platform=&quot;mobile&quot;</Hl>) berukuran
+          ringkas dengan tinggi 58px, wadah ikon 40×40 px, dan tipografi yang
+          pas untuk layar sempit (lebar kartu 348–380 px). Tersedia dalam variasi{" "}
+          <Hl>decoration</Hl> ada dan tidak ada.
+        </Lead>
+
+        <div className="space-y-6">
+          {/* Mobile tanpa dekorasi */}
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-gray-900">
+                Tanpa Dekorasi
+              </h3>
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                decoration=&#123;false&#125;
+              </span>
+            </div>
+            <p className="mb-3 text-body-sm text-gray-500">
+              Kartu berkas mobile bersih tanpa garis aksen pada sisi kiri.
+            </p>
+            <Demo>
+              <div className="w-full max-w-[348px]">
+                <ListViewItem
+                  platform="mobile"
+                  title="Project brief"
+                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                />
+              </div>
+            </Demo>
+          </div>
+
+          {/* Mobile dengan dekorasi */}
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-gray-900">
+                Dengan Dekorasi
+              </h3>
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                decoration=&#123;true&#125;
+              </span>
+            </div>
+            <p className="mb-3 text-body-sm text-gray-500">
+              Menampilkan garis aksen vertikal warna primary di sisi kiri kartu
+              untuk penekanan visual status atau tipe dokumen.
+            </p>
+            <Demo>
+              <div className="w-full max-w-[348px]">
+                <ListViewItem
+                  platform="mobile"
+                  decoration
+                  title="Project brief"
+                  metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                />
+              </div>
+            </Demo>
+          </div>
+        </div>
+
+        <SectionCode>
+          {"import { ListViewItem } from '@ceplok-ui/design-kit-react'\n\n"}
+          {"{/* Mobile — Tanpa Dekorasi */}\n"}
+          {"<ListViewItem\n"}
+          {"  "}
+          <H>platform</H>
+          {'="mobile"\n'}
+          {'  title="Project brief"\n'}
+          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {"/>\n\n"}
+          {"{/* Mobile — Dengan Dekorasi */}\n"}
+          {"<ListViewItem\n"}
+          {"  "}
+          <H>platform</H>
+          {'="mobile"\n'}
+          {"  "}
+          <H>decoration</H>
+          {"\n"}
+          {'  title="Project brief"\n'}
+          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {"/>"}
+        </SectionCode>
+      </FlowSection>
+
+      {/* 3. Playground Section */}
       <FlowSection id="playground" title="Playground">
         <p className="mb-6 text-body-sm text-gray-500">
-          Uji coba varian ukuran (S, M, L) serta tema tampilan secara interaktif
-          sebelum diterapkan pada proyek Anda.
+          Uji coba kombinasi platform (Default/Mobile), varian ukuran, garis
+          dekorasi, serta mode tampilan secara interaktif.
         </p>
 
-        <Stage maxWidth="max-w-2xl">
+        <Stage maxWidth={platform === "mobile" ? "max-w-[380px]" : "max-w-2xl"}>
           <div
             className={`w-full transition-colors duration-200 ${
               darkMode ? "rounded-2xl bg-gray-900 p-6" : "p-2"
             }`}
           >
-            <ListViewItem
-              size={size}
-              title="Project brief"
-              metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
-              actionLabel="Open"
-              onAction={() => alert("Open diklik!")}
-              darkMode={darkMode}
-            />
+            <div
+              className={
+                platform === "mobile" ? "mx-auto w-full max-w-[348px]" : "w-full"
+              }
+            >
+              <ListViewItem
+                platform={platform}
+                size={size}
+                decoration={decoration}
+                title="Project brief"
+                metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                actionLabel={platform === "default" ? "Open" : undefined}
+                onAction={
+                  platform === "default"
+                    ? () => alert("Open diklik!")
+                    : undefined
+                }
+                darkMode={darkMode}
+              />
+            </div>
           </div>
         </Stage>
 
         <Controls>
-          <Control label="Size">
+          <Control label="Platform">
             <Segmented
-              label="Pilih varian ukuran"
-              value={size}
-              onChange={(val) => setSize(val as ListViewSize)}
-              options={sizeOptions}
+              label="Pilih platform"
+              value={platform}
+              onChange={(val) => setPlatform(val as ListViewPlatform)}
+              options={platformOptions}
+            />
+          </Control>
+
+          {platform === "default" && (
+            <Control label="Size">
+              <Segmented
+                label="Pilih varian ukuran"
+                value={size}
+                onChange={(val) => setSize(val as ListViewSize)}
+                options={sizeOptions}
+              />
+            </Control>
+          )}
+
+          <Control label="Decoration">
+            <Segmented
+              label="Pilih dekorasi garis aksen"
+              value={decoration}
+              onChange={(val) => setDecoration(Boolean(val))}
+              options={decorationOptions}
             />
           </Control>
 
@@ -322,7 +477,7 @@ export function ListViewPage() {
         </Controls>
       </FlowSection>
 
-      {/* 3. Penggunaan Section */}
+      {/* 4. Penggunaan Section */}
       <FlowSection id="penggunaan" title="Penggunaan">
         <p className="mb-6 text-body-sm text-gray-500">
           Kode di bawah ini otomatis mengikuti kombinasi opsi yang dipilih pada
@@ -332,17 +487,36 @@ export function ListViewPage() {
         <SectionCode flush>
           {"import { ListViewItem } from '@ceplok-ui/design-kit-react'\n\n"}
           {"<ListViewItem\n"}
-          {size !== "m" && (
+          {platform === "mobile" ? (
             <>
               {"  "}
-              <H>size</H>
-              {`="${size}"\n`}
+              <H>platform</H>
+              {'="mobile"\n'}
+            </>
+          ) : (
+            size !== "m" && (
+              <>
+                {"  "}
+                <H>size</H>
+                {`="${size}"\n`}
+              </>
+            )
+          )}
+          {decoration && (
+            <>
+              {"  "}
+              <H>decoration</H>
+              {"\n"}
             </>
           )}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
-          {'  actionLabel="Open"\n'}
-          {"  onAction={() => console.log('Open clicked')}\n"}
+          {platform === "default" && (
+            <>
+              {'  actionLabel="Open"\n'}
+              {"  onAction={() => console.log('Open clicked')}\n"}
+            </>
+          )}
           {darkMode && (
             <>
               {"  "}
@@ -354,7 +528,7 @@ export function ListViewPage() {
         </SectionCode>
       </FlowSection>
 
-      {/* 4. Properties Section */}
+      {/* 5. Properties Section */}
       <FlowSection id="properties" title="Properties">
         <p className="mb-6 text-body-sm text-gray-500">
           Referensi lengkap prop yang didukung oleh komponen <Hl>ListViewItem</Hl>{" "}
