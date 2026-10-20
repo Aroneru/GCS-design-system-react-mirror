@@ -189,6 +189,7 @@ const toc: TocEntry[] = [
   { id: "variant", label: "Variant" },
   { id: "decoration", label: "Decoration" },
   { id: "badge", label: "Badge" },
+  { id: "darkmode", label: "Darkmode" },
   { id: "playground", label: "Playground" },
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
@@ -229,7 +230,7 @@ export function ListViewPage() {
                 <h4 className="text-sm font-bold text-gray-900">Small (S)</h4>
               </div>
               <p className="mb-3 text-body-sm text-gray-500">
-                Ukuran ringkas (410 px) dengan wadah ikon 36×36 px dan tombol aksi ukuran XS.
+                Ukuran ringkas (410 px) dengan wadah ikon 32×32 px dan tombol aksi ukuran XS.
               </p>
               <Demo>
                 <div className="w-full max-w-[410px]">
@@ -251,7 +252,7 @@ export function ListViewPage() {
                 </h4>
               </div>
               <p className="mb-3 text-body-sm text-gray-500">
-                Ukuran standar bawaan (514 px) dengan wadah ikon 44×44 px / 48×48 px dan tombol aksi ukuran S.
+                Ukuran standar bawaan (514 px) dengan wadah ikon 40×40 px dan tombol aksi ukuran S.
               </p>
               <Demo>
                 <div className="w-full max-w-[514px]">
@@ -270,7 +271,7 @@ export function ListViewPage() {
                 <h4 className="text-sm font-bold text-gray-900">Large (L)</h4>
               </div>
               <p className="mb-3 text-body-sm text-gray-500">
-                Ukuran lapang (600 px) dengan wadah ikon 52×52 px / 56×56 px dan tombol aksi ukuran Base.
+                Ukuran lapang (600 px) dengan wadah ikon 48×48 px dan tombol aksi ukuran Base.
               </p>
               <Demo>
                 <div className="w-full max-w-[600px]">
@@ -506,7 +507,116 @@ export function ListViewPage() {
         </SectionCode>
       </FlowSection>
 
-      {/* 4. Playground Section */}
+      {/* 4. Darkmode Section */}
+      <FlowSection id="darkmode" title="Darkmode">
+        <Lead>
+          Prop <Hl>darkMode</Hl> mengaktifkan tema gelap pada komponen. Warna latar beralih ke <Hl>gray-700</Hl>, teks judul menjadi (<Hl>white</Hl>),
+          metadata <Hl>gray-400</Hl>, dan ikon <Hl>gray-200</Hl>. Elemen badge menyesuaikan bawaan komponen <Hl>Badge</Hl>.
+        </Lead>
+
+        <div className="space-y-8">
+          <div className="space-y-5">
+            {/* Desktop mewakili */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-bold text-gray-900">
+                  Desktop
+                </h4>
+              </div>
+              <Demo dark>
+                <div className="w-full max-w-[514px]">
+                  <ListViewItem
+                    darkMode
+                    decoration
+                    title="Project brief"
+                    metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                    badge={
+                      <Badge
+                        variant="success"
+                        size="sm"
+                        icon={<Clock className="size-3.5" />}
+                        darkMode
+                      >
+                        Badge
+                      </Badge>
+                    }
+                    actionLabel="Open"
+                  />
+                </div>
+              </Demo>
+            </div>
+
+            {/* Mobile mewakili */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <h4 className="text-sm font-bold text-gray-900">
+                  Mobile
+                </h4>
+              </div>
+              <Demo dark>
+                <div className="w-full max-w-[348px]">
+                  <ListViewItem
+                    platform="mobile"
+                    darkMode
+                    decoration
+                    title="Project brief"
+                    metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
+                    badge={
+                      <Badge
+                        variant="success"
+                        size="sm"
+                        icon={<Clock className="size-3.5" />}
+                        darkMode
+                      >
+                        Badge
+                      </Badge>
+                    }
+                  />
+                </div>
+              </Demo>
+            </div>
+          </div>
+        </div>
+
+        <SectionCode>
+          {"import { Badge, ListViewItem } from '@ceplok-ui/design-kit-react'\n"}
+          {"import { Clock } from '@ceplok-ui/design-kit-react/icons/solid'\n\n"}
+          {"{/* 1. Desktop — Dark Mode dengan Badge + Dekorasi */}\n"}
+          {"<ListViewItem\n"}
+          {"  "}
+          <H>darkMode</H>
+          {"\n"}
+          {"  "}
+          <H>decoration</H>
+          {"\n"}
+          {'  title="Project brief"\n'}
+          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {"  "}
+          <H>badge</H>
+          {'={<Badge variant="success" size="sm" darkMode icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
+          {'  actionLabel="Open"\n'}
+          {"/>\n\n"}
+          {"{/* 2. Mobile — Dark Mode dengan Badge + Dekorasi */}\n"}
+          {"<ListViewItem\n"}
+          {"  "}
+          <H>platform</H>
+          {'="mobile"\n'}
+          {"  "}
+          <H>darkMode</H>
+          {"\n"}
+          {"  "}
+          <H>decoration</H>
+          {"\n"}
+          {'  title="Project brief"\n'}
+          {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
+          {"  "}
+          <H>badge</H>
+          {'={<Badge variant="success" size="sm" darkMode icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
+          {"/>"}
+        </SectionCode>
+      </FlowSection>
+
+      {/* 5. Playground Section */}
       <FlowSection id="playground" title="Playground">
         <p className="mb-6 text-body-sm text-gray-500">
           Uji coba kombinasi platform (Desktop/Mobile), varian ukuran, garis
@@ -537,6 +647,7 @@ export function ListViewPage() {
                       variant="success"
                       size="sm"
                       icon={<Clock className="size-3.5" />}
+                      darkMode={darkMode}
                     >
                       Badge
                     </Badge>
@@ -606,7 +717,7 @@ export function ListViewPage() {
         </Controls>
       </FlowSection>
 
-      {/* 5. Penggunaan Section */}
+      {/* 6. Penggunaan Section */}
       <FlowSection id="penggunaan" title="Penggunaan">
         <p className="mb-6 text-body-sm text-gray-500">
           Kode di bawah ini otomatis mengikuti kombinasi opsi yang dipilih pada
@@ -667,7 +778,7 @@ export function ListViewPage() {
         </SectionCode>
       </FlowSection>
 
-      {/* 6. Properties Section */}
+      {/* 7. Properties Section */}
       <FlowSection id="properties" title="Properties">
         <p className="mb-6 text-body-sm text-gray-500">
           Referensi lengkap prop yang didukung oleh komponen <Hl>ListViewItem</Hl>{" "}

@@ -1,5 +1,7 @@
 import {
+  cloneElement,
   forwardRef,
+  isValidElement,
   type ElementType,
   type HTMLAttributes,
   type ReactNode,
@@ -58,8 +60,8 @@ const sizeClasses: Record<
   sm: {
     container: "px-4 py-3 gap-3 min-h-[63px]",
     decorationPadding: "pl-5",
-    iconBox: "size-9 rounded-lg",
-    iconSize: "size-4.5",
+    iconBox: "size-8 rounded-lg",
+    iconSize: "size-4",
     title: "text-sm font-bold",
     description: "text-xs",
     defaultButtonSize: "xs",
@@ -67,8 +69,8 @@ const sizeClasses: Record<
   default: {
     container: "px-5 py-3.5 gap-3.5 sm:gap-4 min-h-[81px]",
     decorationPadding: "pl-6 sm:pl-7",
-    iconBox: "size-11 sm:size-12 rounded-lg",
-    iconSize: "size-5 sm:size-6",
+    iconBox: "size-10 rounded-lg",
+    iconSize: "size-5",
     title: "text-base font-bold",
     description: "text-sm",
     defaultButtonSize: "s",
@@ -76,8 +78,8 @@ const sizeClasses: Record<
   lg: {
     container: "px-6 py-4.5 gap-4 sm:gap-5 min-h-[103px]",
     decorationPadding: "pl-7 sm:pl-8",
-    iconBox: "size-13 sm:size-14 rounded-lg",
-    iconSize: "size-6 sm:size-7",
+    iconBox: "size-12 rounded-lg",
+    iconSize: "size-6",
     title: "text-lg font-bold",
     description: "text-sm sm:text-base",
     defaultButtonSize: "base",
@@ -220,8 +222,8 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
     const currentSize = isMobile
       ? (hasBadge ? mobileBadgeClasses : mobileClasses)
       : (hasBadge
-          ? (sizeBadgeClasses[normalizedSize] ?? sizeBadgeClasses.default)
-          : (sizeClasses[normalizedSize] ?? sizeClasses.default));
+        ? (sizeBadgeClasses[normalizedSize] ?? sizeBadgeClasses.default)
+        : (sizeClasses[normalizedSize] ?? sizeClasses.default));
 
     const hasIcon = icon !== null;
     const renderedIcon =
@@ -267,17 +269,18 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
         data-theme={darkMode ? "dark" : undefined}
         className={cn(
           "group relative flex items-center justify-between overflow-hidden rounded-lg border border-border bg-surface text-content transition-all",
+          "data-[theme=dark]:border-gray-500 in-data-[theme=dark]:border-gray-500 data-[theme=dark]:bg-gray-700 in-data-[theme=dark]:bg-gray-700",
           currentSize.container,
           decoration && currentSize.decorationPadding,
           isInteractive &&
-            "cursor-pointer hover:border-primary-400/80 hover:shadow-soft active:scale-[0.998]",
+          "cursor-pointer hover:border-primary-400/80 hover:shadow-soft active:scale-[0.998]",
           className,
         )}
         {...props}
       >
         {decoration && (
           <span
-            className="absolute inset-y-0 left-0 w-1 sm:w-1.5 bg-primary-600 in-data-[theme=dark]:bg-primary-500"
+            className="absolute inset-y-0 left-0 w-1 sm:w-1.5 bg-primary-700"
             aria-hidden="true"
           />
         )}
@@ -285,7 +288,8 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
           {hasIcon && (
             <div
               className={cn(
-                "flex shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 in-data-[theme=dark]:bg-primary-950/60 in-data-[theme=dark]:text-primary-400 transition-colors",
+                "flex shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-700 transition-colors",
+                "in-data-[theme=dark]:bg-gray-700 in-data-[theme=dark]:text-gray-200 in-data-[theme=dark]:border in-data-[theme=dark]:border-gray-700",
                 currentSize.iconBox,
                 iconContainerClassName,
               )}
@@ -295,22 +299,40 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
           )}
 
           <div className="min-w-0 flex-1">
-            <h4 className={cn("text-content truncate leading-snug", currentSize.title)}>
+            <h4
+              className={cn(
+                "text-content in-data-[theme=dark]:text-white truncate leading-snug",
+                currentSize.title,
+              )}
+            >
               {title}
             </h4>
 
             {description && (
-              <div className={cn("text-content-muted mt-0.5 truncate leading-normal", currentSize.description)}>
+              <div
+                className={cn(
+                  "text-content-muted in-data-[theme=dark]:text-gray-400 mt-0.5 truncate leading-normal",
+                  currentSize.description,
+                )}
+              >
                 {description}
               </div>
             )}
 
             {metadata && metadata.length > 0 && (
-              <div className={cn("text-content-muted mt-0.5 flex flex-wrap items-center gap-1.5 leading-normal", currentSize.description)}>
+              <div
+                className={cn(
+                  "text-content-muted in-data-[theme=dark]:text-gray-400 mt-0.5 flex flex-wrap items-center gap-1.5 leading-normal",
+                  currentSize.description,
+                )}
+              >
                 {metadata.map((item, index) => (
                   <span key={index} className="inline-flex items-center gap-1.5">
                     {index > 0 && (
-                      <span className="text-content-muted/60 select-none" aria-hidden="true">
+                      <span
+                        className="text-content-muted/60 in-data-[theme=dark]:text-gray-400/60 select-none"
+                        aria-hidden="true"
+                      >
                         &middot;
                       </span>
                     )}
@@ -323,9 +345,13 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
             {badge && (
               <div className="mt-2 flex items-center">
                 {typeof badge === "string" ? (
-                  <Badge variant="success" size="sm">
+                  <Badge variant="success" size="sm" darkMode={Boolean(darkMode)}>
                     {badge}
                   </Badge>
+                ) : isValidElement(badge) ? (
+                  cloneElement(badge as any, {
+                    darkMode: (badge as any).props?.darkMode ?? Boolean(darkMode),
+                  })
                 ) : (
                   badge
                 )}
@@ -404,14 +430,15 @@ export const ListView = forwardRef<HTMLElement, ListViewProps>(
       >
         {items
           ? items.map((item, index) => (
-              <ListViewItem
-                key={index}
-                size={size}
-                platform={item.platform ?? platform}
-                decoration={item.decoration ?? decoration}
-                {...item}
-              />
-            ))
+            <ListViewItem
+              key={index}
+              size={size}
+              platform={item.platform ?? platform}
+              decoration={item.decoration ?? decoration}
+              darkMode={item.darkMode ?? darkMode}
+              {...item}
+            />
+          ))
           : children}
       </Component>
     );
