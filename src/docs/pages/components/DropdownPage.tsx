@@ -11,6 +11,7 @@ import {
   Dropdown,
   Icon,
   Radio,
+  type DropdownHandle,
   type DropdownGroup,
   type DropdownItem,
 } from '../../../lib'
@@ -86,6 +87,7 @@ const toc: TocEntry[] = [
   { id: 'kelompok', label: 'Kelompok' },
   { id: 'keterangan', label: 'Keterangan' },
   { id: 'disable', label: 'Disable' },
+  { id: 'navigation', label: 'Navigation' },
   { id: 'selection', label: 'Selection' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
@@ -97,8 +99,12 @@ const dropdownProps: PropRow[] = [
   ['trigger', 'ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>', 'required', 'Satu native <button>, Button dalam mode button, atau komponen tombol yang meneruskan atribut native ke <button> root-nya.'],
   ['items', 'DropdownItem[]', 'undefined', 'Daftar aksi tanpa pengelompokan.'],
   ['groups', 'DropdownGroup[]', 'undefined', 'Aksi terkelompok, lengkap dengan label dan pemisah antar-kelompok.'],
-  ['children', 'ReactNode', 'undefined', 'Isi panel bila bukan daftar aksi. Diabaikan selama items atau groups terisi.'],
-  ['darkMode', 'boolean', 'false', 'Menggunakan tampilan gelap pada panel dan konten yang dihasilkan Dropdown.'],
+  ['children', 'ReactNode | (({ close }) => ReactNode)', 'undefined', 'Isi panel kustom. Render function menyediakan close() untuk dismissal eksplisit. Diabaikan selama items atau groups terisi.'],
+  ['actionsRef', 'Ref<DropdownHandle>', 'undefined', 'Handle opsional untuk meminta close() dari kondisi eksternal tanpa mengakses DOM Popover.'],
+  ['align', "'start' | 'center' | 'end'", "'start'", 'Menentukan perataan horizontal panel terhadap trigger sebelum penyesuaian batas viewport.'],
+  ['closeOnSelect', 'boolean', 'true', 'Bila true, item generated yang enabled menutup panel setelah diaktifkan. Bila false, panel tetap terbuka.'],
+  ['data-theme', "'light' | 'dark'", 'inherit', 'Boundary tema eksplisit. Jika tidak diisi, Dropdown mewarisi data-theme consumer terdekat. darkMode={true} selalu memaksa dark.'],
+  ['darkMode', 'boolean', 'false', 'Override kompatibilitas yang memaksa boundary dark lokal, termasuk ketika data-theme="light" diberikan.'],
   ['className', 'string', 'undefined', 'Class tambahan pada pembungkus terluar.'],
   ['contentLabel', 'string', 'undefined', 'Nama panel bagi pembaca layar; hanya terpasang pada bentuk daftar pilihan.'],
   ['contentClassName', 'string', 'undefined', 'Class tambahan pada panelnya.'],
@@ -110,9 +116,12 @@ const itemProps: PropRow[] = [
   ['description', 'ReactNode', 'undefined', 'Baris kedua di bawah label.'],
   ['icon', 'ReactNode', 'undefined', 'Ikon kecil di kiri label; ukurannya diatur komponen.'],
   ['href', 'string', 'undefined', 'Bila diisi, aksinya dirender sebagai tautan.'],
-  ['onClick', '() => void', 'undefined', 'Dipanggil saat aksi ditekan. Panel menutup sendiri setelahnya.'],
+  ['target', 'HTMLAttributeAnchorTarget', 'undefined', 'Target native untuk tautan aktif.'],
+  ['rel', 'string', 'undefined', 'Relasi native tautan. target="_blank" memakai noopener noreferrer bila rel tidak diberikan.'],
+  ['onClick', '(event: MouseEvent<HTMLElement>) => void', 'undefined', 'Menerima event klik asli sebelum kebijakan dismissal dijalankan.'],
   ['tone', "'default' | 'danger'", "'default'", 'Warna semantik aksi.'],
   ['disabled', 'boolean', 'false', 'Mematikan aksi.'],
+  ['current', 'AriaAttributes[\'aria-current\']', 'undefined', 'Menandai tujuan navigasi saat ini tanpa mengaktifkan semantik listbox. true berarti page.'],
   ['selected', 'boolean', 'undefined', 'Menandai item sebagai opsi terpilih. Jika digunakan pada item, Dropdown menggunakan semantik daftar pilihan (listbox).'],
   ['id', 'string', 'undefined', 'Kunci React; bila kosong dipakai urutannya.'],
 ]
@@ -325,6 +334,94 @@ function SelectionDemo({ darkMode = false }: { darkMode?: boolean }) {
         selected: label === selected,
         onClick: () => setSelected(label),
       }))}
+    />
+  )
+}
+
+function NavigationDemo() {
+  const [message, setMessage] = useState('Pilih salah satu tujuan')
+
+  return (
+    <div className="space-y-3 text-center">
+      <Dropdown
+        trigger={trigger('Buka navigasi')}
+        items={[
+          { id: 'overview', label: 'Ringkasan', href: '#navigation', current: true },
+          {
+            id: 'settings',
+            label: 'Pengaturan',
+            href: '#properties',
+            onClick: () => setMessage('Navigasi diterima'),
+          },
+          {
+            id: 'protected',
+            label: 'Tujuan dibatalkan',
+            href: '#protected',
+            onClick: (event) => {
+              event.preventDefault()
+              setMessage('Navigasi dibatalkan; Dropdown tetap ditutup otomatis')
+            },
+          },
+          {
+            id: 'external',
+            label: 'Dokumentasi eksternal',
+            href: 'https://example.com',
+            target: '_blank',
+          },
+        ]}
+      />
+      <p className="text-sm text-gray-500" aria-live="polite">{message}</p>
+    </div>
+  )
+}
+
+function ManualCloseDemo() {
+  const [message, setMessage] = useState('Belum diterapkan')
+
+  return (
+    <div className="space-y-3 text-center">
+      <Dropdown trigger={trigger('Atur tampilan')} contentClassName="p-4">
+        {({ close }) => (
+          <div className="w-56 space-y-3">
+            <p className="text-sm text-content">
+              Konten interaktif tetap terbuka sampai aksinya selesai.
+            </p>
+            <button
+              type="button"
+              className="w-full rounded-md bg-primary-700 px-3 py-2 text-sm font-medium text-white hover:bg-primary-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+              onClick={() => {
+                setMessage('Pengaturan diterapkan')
+                close()
+              }}
+            >
+              Terapkan
+            </button>
+          </div>
+        )}
+      </Dropdown>
+      <p className="text-sm text-gray-500" aria-live="polite">{message}</p>
+    </div>
+  )
+}
+
+function ExternalCloseTypeExample() {
+  const actionsRef = useRef<DropdownHandle>(null)
+
+  useEffect(() => {
+    const mobile = window.matchMedia('(max-width: 767px)')
+    const closeForMobile = () => {
+      if (mobile.matches) actionsRef.current?.close()
+    }
+
+    mobile.addEventListener('change', closeForMobile)
+    return () => mobile.removeEventListener('change', closeForMobile)
+  }, [])
+
+  return (
+    <Dropdown
+      actionsRef={actionsRef}
+      trigger={trigger('Navigasi akun')}
+      items={[{ label: 'Profil', href: '/profil' }]}
     />
   )
 }
@@ -784,9 +881,7 @@ export function DropdownPage() {
           <Hl>trigger</Hl> menerima satu tombol milik Anda; <Hl>items</Hl> menerima daftar aksinya. Panel
           ditutup lewat trigger, klik di luar, atau Escape — semuanya diurus HTML Popover API, jadi
           tidak ada state buka/tutup yang bisa melenceng. Aksi menutup panel setelah ditekan;
-          kontrol seperti Radio dan Checkbox tetap terbuka saat pilihannya berubah. Setelah panel
-          terbuka, ketik nama aksinya untuk melompat ke sana — mis. <Hl>k</Hl> ke Keluar — lalu tekan
-          Enter.
+          kontrol seperti Radio dan Checkbox tetap terbuka saat pilihannya berubah.
         </Lead>
         <Stage maxWidth="max-w-xl">
           <div className="flex min-h-72 items-start justify-center pt-10">
@@ -899,13 +994,43 @@ export function DropdownPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="navigation" title="Navigation">
+        <Lead>
+          Item dengan <Hl>href</Hl> menjadi anchor native. Gunakan <Hl>target</Hl> dan <Hl>rel</Hl>{' '}
+          untuk tujuan eksternal, serta <Hl>current</Hl> untuk tujuan yang sedang aktif. Berbeda dari{' '}
+          <Hl>selected</Hl>, current tidak mengubah koleksi menjadi listbox dan menghasilkan{' '}
+          <Hl>aria-current</Hl> pada item tersebut.
+        </Lead>
+        <Stage maxWidth="max-w-xl">
+          <div className="flex min-h-64 items-start justify-center pt-10">
+            <NavigationDemo />
+          </div>
+        </Stage>
+        <SectionCode>
+          {'<Dropdown\n  trigger={trigger}\n  items={[\n    {\n      label: \'Ringkasan\',\n      href: \'/ringkasan\',\n      '}<H>current</H>{': true,\n    },\n    {\n      label: \'Dokumentasi\',\n      href: \'https://example.com\',\n      '}<H>target</H>{': \'_blank\',\n    },\n    {\n      label: \'Tujuan terlindungi\',\n      href: \'/terlindungi\',\n      '}<H>onClick</H>{': (event) => {\n        if (!canNavigate) event.preventDefault()\n      },\n    },\n  ]}\n/>'}
+        </SectionCode>
+        <div className="mt-6 max-w-3xl space-y-3 text-body-sm text-gray-500">
+          <p>
+            Nilai bawaan <Hl>closeOnSelect=true</Hl> menutup panel setelah item generated yang
+            enabled diaktifkan. Nilai <Hl>false</Hl> membiarkan panel tetap terbuka.
+          </p>
+          <p>
+            Kebijakan dismissal tidak menafsirkan <Hl>preventDefault()</Hl> sebagai keberhasilan atau
+            kegagalan navigasi. Untuk penutupan bersyarat, gunakan <Hl>closeOnSelect=false</Hl> lalu
+            minta penutupan secara eksplisit melalui <Hl>actionsRef.close()</Hl> ketika consumer
+            memang menerimanya.
+          </p>
+        </div>
+      </FlowSection>
+
       <FlowSection id="selection" title="Selection">
         <Lead>
           Gunakan Selection ketika Dropdown dipakai untuk memilih nilai. Saat item menggunakan{' '}
           <Hl>selected</Hl>, koleksinya memakai pola <Hl>listbox</Hl>, setiap baris menjadi{' '}
           <Hl>option</Hl>, dan pilihan aktif menerima fokus saat dibuka. Option dapat ditelusuri
-          dengan tombol panah, Home, End, dan pencarian lewat ketikan — sama seperti daftar pilihan
-          Select. Gunakan{' '}
+          dengan tombol panah, Home, End, dan pencarian lewat ketikan. Typeahead menunggu rangkaian
+          ketikan hingga 1 detik, mendukung beberapa kata, dan mengabaikan perbedaan diakritik.
+          Perilaku pencarian yang sama juga tersedia pada menu Action. Gunakan{' '}
           <Hl>contentLabel</Hl> untuk menamai listbox tersebut. Action dan Selection tidak dapat
           dicampur dalam satu koleksi generated: koleksi yang memakai <Hl>selected</Hl> seluruhnya
           diperlakukan sebagai Selection, sedangkan <Hl>href</Hl> hanya untuk item Action.
@@ -928,10 +1053,10 @@ export function DropdownPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <Hl>darkMode</Hl> mengubah panel dan item generated ke tampilan gelap: panel gray-800,
-          teks dan ikon gray-300, pemisah gray-700, serta aksi danger red-500. Untuk konten kustom,
-          tema komponen di dalam <Hl>children</Hl> dikelola consumer. Teruskan <Hl>darkMode</Hl> ke
-          Radio atau Checkbox jika komposisi perlu mengikuti tema Dropdown.
+          Dropdown mewarisi <Hl>data-theme</Hl> dari consumer boundary; gunakan boundary eksplisit
+          untuk satu area bila diperlukan. Prop <Hl>darkMode</Hl> tetap tersedia sebagai override
+          kompatibilitas dan selalu memaksa dark, termasuk terhadap data-theme="light". Untuk konten
+          kustom, tema komponen di dalam <Hl>children</Hl> tetap dikelola consumer.
         </Lead>
         <div className="grid gap-6 md:grid-cols-2">
           <Demo label="Action" dark>
@@ -967,7 +1092,7 @@ export function DropdownPage() {
         <SectionCode>
           {"import { Dropdown } from '@ceplok-ui/design-kit-react'\n"}
           {"import { ArrowRightToBracket, User } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
-          {'<Dropdown\n  '}<H>darkMode</H>{'\n  '}<H>trigger</H>{'={trigger}\n  '}<H>items</H>{"={[\n    { label: 'Profil', icon: <User /> },\n    { label: 'Keluar', icon: <ArrowRightToBracket />, tone: 'danger' },\n  ]}\n/>"}
+          {'<div '}<H>data-theme</H>{'="dark">\n  <Dropdown\n    '}<H>trigger</H>{'={trigger}\n    '}<H>items</H>{"={[\n      { label: 'Profil', icon: <User /> },\n      { label: 'Keluar', icon: <ArrowRightToBracket />, tone: 'danger' },\n    ]}\n  />\n</div>"}
         </SectionCode>
       </FlowSection>
 
@@ -1112,6 +1237,45 @@ export function DropdownPage() {
             darkMode={activeDarkMode}
           />
         </SectionCode>
+        <div className="mt-8">
+          <h3 className="text-heading-4 font-bold text-gray-900">Menutup konten kustom</h3>
+          <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+            Item generated menutup panel otomatis setelah dijalankan. Kontrol kustom tetap terbuka
+            agar form, Radio, atau Checkbox dapat digunakan berulang kali. Ketika aksi final perlu
+            menutup panel, gunakan <Hl>close</Hl> dari render function. Fokus dikembalikan ke trigger
+            bila penutupan terjadi saat fokus masih berada di panel; Escape dan klik di luar tetap
+            ditangani Popover native.
+          </p>
+          <Stage maxWidth="max-w-xl">
+            <div className="flex min-h-56 items-start justify-center pt-10">
+              <ManualCloseDemo />
+            </div>
+          </Stage>
+          <SectionCode>
+            {'<Dropdown trigger={trigger}>\n  {({ '}<H>close</H>{' }) => (\n    <button\n      type="button"\n      onClick={() => {\n        applyChanges()\n        '}<H>close</H>{'()\n      }}\n    >\n      Terapkan\n    </button>\n  )}\n</Dropdown>'}
+          </SectionCode>
+        </div>
+        <div className="mt-8">
+          <h3 className="text-heading-4 font-bold text-gray-900">Menutup dari kondisi eksternal</h3>
+          <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+            Gunakan <Hl>actionsRef</Hl> ketika kondisi di luar Dropdown perlu menutup panel, misalnya
+            trigger desktop disembunyikan setelah viewport berpindah ke mobile. Native Popover tetap
+            menjadi sumber keadaan; <Hl>close()</Hl> hanya meminta dismissal dan aman dipanggil saat
+            panel sudah tertutup.
+          </p>
+          <Stage maxWidth="max-w-xl">
+            <div className="flex min-h-56 items-start justify-center pt-10">
+              <ExternalCloseTypeExample />
+            </div>
+          </Stage>
+          <SectionCode>
+            {"const actionsRef = useRef<DropdownHandle>(null)\n\nuseEffect(() => {\n  const mobile = window.matchMedia('(max-width: 767px)')\n  const closeForMobile = () => {\n    if (mobile.matches) actionsRef.current?.close()\n  }\n\n  mobile.addEventListener('change', closeForMobile)\n  return () => mobile.removeEventListener('change', closeForMobile)\n}, [])\n\n<Dropdown\n  "}<H>actionsRef</H>{'={actionsRef}\n  trigger={trigger}\n  items={navigationItems}\n/>'}
+          </SectionCode>
+          <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+            Forwarded <Hl>ref</Hl> lama tetap menunjuk wrapper <Hl>div</Hl>. Handle lifecycle tersedia
+            terpisah agar integrasi yang sudah memakai DOM ref tidak berubah.
+          </p>
+        </div>
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">

@@ -21,7 +21,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: CheckboxApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'simaya', label: 'simaya', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 const berkas = [
@@ -35,7 +35,7 @@ const checkboxProps: PropRow[] = [
   ['helperText', 'ReactNode', 'undefined', 'Caption 12px di bawah label.'],
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran kotak: 16px atau 14px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan teks sekaligus menonaktifkan kontrol.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna kotak saat tercentang.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna kotak saat tercentang.'],
   ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak gray-700 bergaris gray-600 dengan label putih; inactive meredupkan teksnya ke gray-500.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="checkbox"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
@@ -201,13 +201,13 @@ export function CheckboxPage() {
           {'{/* Default — tanpa prop application */}\n'}
           {'<Checkbox label="Tercentang" helperText="bg-primary-700" defaultChecked />\n'}
           {'<Checkbox label="Kosong" />\n\n'}
-          {'{/* simaya */}\n'}
+          {'{/* Purple */}\n'}
           {'<Checkbox '}
           <H>application</H>
-          {'="simaya" label="Tercentang" helperText="bg-purple-500" defaultChecked />\n'}
+          {'="purple" label="Tercentang" helperText="bg-purple-500" defaultChecked />\n'}
           {'<Checkbox '}
           <H>application</H>
-          {'="simaya" label="Kosong" />'}
+          {'="purple" label="Kosong" />'}
         </SectionCode>
       </FlowSection>
 
@@ -284,7 +284,7 @@ export function CheckboxPage() {
             <Segmented
               label="Pilih platform"
               value={platform}
-              onChange={setPlatform}
+              onChange={(v) => setPlatform(v as CheckboxPlatform)}
               options={[
                 { value: 'mobile', label: 'Mobile' },
                 { value: 'default', label: 'Desktop' },
@@ -296,7 +296,7 @@ export function CheckboxPage() {
             <Segmented
               label="Pilih state"
               value={state}
-              onChange={setState}
+              onChange={(v) => setState(v as CheckboxState)}
               options={[
                 { value: 'default', label: 'Default' },
                 { value: 'inactive', label: 'Inactive' },
@@ -308,7 +308,7 @@ export function CheckboxPage() {
             <Segmented
               label="Pilih aplikasi"
               value={application}
-              onChange={setApplication}
+              onChange={(v) => setApplication(v as CheckboxApplication)}
               itemClassName="px-2.5"
               options={applications.map((a) => ({ value: a.value, label: a.label }))}
             />
@@ -318,7 +318,7 @@ export function CheckboxPage() {
             <Segmented
               label="Tampilkan caption"
               value={withCaption}
-              onChange={setWithCaption}
+              onChange={(v) => setWithCaption(v as boolean)}
               options={adaTidakAda}
             />
           </Control>
@@ -327,7 +327,7 @@ export function CheckboxPage() {
             <Segmented
               label="Pilih tampilan"
               value={dark}
-              onChange={setDark}
+              onChange={(v) => setDark(v as boolean)}
               options={[
                 { value: false, label: 'Light' },
                 { value: true, label: 'Dark' },

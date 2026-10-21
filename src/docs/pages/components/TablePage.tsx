@@ -328,7 +328,7 @@ const sizeOptions: { value: TableSize; label: string }[] = [
 const themeOptions: { value: PaginationTheme; label: string }[] = [
   { value: "default", label: "Default" },
   { value: "primary", label: "Primary" },
-  { value: "simaya", label: "Simaya" },
+  { value: "purple", label: "Purple" },
 ];
 
 const actionIconSizeOptions: { value: TableActionIconSize; label: string }[] = [
@@ -400,7 +400,7 @@ const actionProps: PropRow[] = [
   ["icon", "ReactNode", "—", "Ikon tombol."],
   ["label", "string | (row) => string", "—", "Judul tombol, muncul sebagai tooltip."],
   ["showLabel", "boolean", "false", "Tulis judul di samping ikon."],
-  ["theme", "TableActionTheme", "primary", "Warna tombol: `\"primary\"`, `\"green\"`, `\"gray\"`, `\"simaya\"`, `\"orange\"`, `\"yellow\"`, `\"red\"`."],
+  ["theme", "TableActionTheme", "primary", "Warna tombol: `\"primary\"`, `\"green\"`, `\"gray\"`, `\"purple\"`, `\"orange\"`, `\"yellow\"`, `\"red\"`."],
   ["variant", '"filled" | "outline"', "filled", "Tombol berisi warna atau hanya garis tepi."],
   ["tone", '"light" | "dark"', "light", "Terang-gelapnya warna tombol."],
   ["iconSize", '"s" | "base" | "l" | "xl"', "base", "Ukuran ikon. Tombol ikut membesar: 20px, 24px, 32px, 40px."],
@@ -1809,52 +1809,52 @@ export function TablePage() {
 
         <Controls>
           <Control label="Jumlah data">
-            <Segmented label="Jumlah data" value={count} onChange={setCount} options={countOptions} />
+            <Segmented label="Jumlah data" value={count} onChange={(v) => setCount(Number(v))} options={countOptions} />
           </Control>
           <Control label="Size">
-            <Segmented label="Pilih size" value={size} onChange={setSize} options={sizeOptions} />
+            <Segmented label="Pilih size" value={size} onChange={(v) => setSize(v as TableSize)} options={sizeOptions} />
           </Control>
           <Control label="Rata judul">
-            <Segmented label="Rata judul kolom" value={headerAlign} onChange={setHeaderAlign} options={headerAlignOptions} />
+            <Segmented label="Rata judul kolom" value={headerAlign} onChange={(v) => setHeaderAlign(v as TableAlign)} options={headerAlignOptions} />
           </Control>
           <Control label="Baris zebra">
-            <Segmented label="Baris zebra" value={striped} onChange={setStriped} options={onOff} />
+            <Segmented label="Baris zebra" value={striped} onChange={(v) => setStriped(Boolean(v))} options={onOff} />
           </Control>
           <Control label="Checkbox baris">
-            <Segmented label="Checkbox baris" value={selectable} onChange={setSelectable} options={adaTidakAda} />
+            <Segmented label="Checkbox baris" value={selectable} onChange={(v) => setSelectable(Boolean(v))} options={adaTidakAda} />
           </Control>
           <Control label="Search">
-            <Segmented label="Search" value={withSearch} onChange={setWithSearch} options={adaTidakAda} />
+            <Segmented label="Search" value={withSearch} onChange={(v) => setWithSearch(Boolean(v))} options={adaTidakAda} />
           </Control>
           <Control label="Filter">
-            <Segmented label="Filter" value={withFilter} onChange={setWithFilter} options={adaTidakAda} />
+            <Segmented label="Filter" value={withFilter} onChange={(v) => setWithFilter(Boolean(v))} options={adaTidakAda} />
           </Control>
           <Control label="Tombol Tambah & Hapus">
             <Segmented
               label="Tombol Tambah dan Hapus Data"
               value={withToolbarActions}
-              onChange={setWithToolbarActions}
+              onChange={(v) => setWithToolbarActions(Boolean(v))}
               options={adaTidakAda}
             />
           </Control>
           <Control label="Kolom aksi">
-            <Segmented label="Kolom aksi" value={withRowActions} onChange={setWithRowActions} options={adaTidakAda} />
+            <Segmented label="Kolom aksi" value={withRowActions} onChange={(v) => setWithRowActions(Boolean(v))} options={adaTidakAda} />
           </Control>
           {withRowActions && (
             <>
               <Control label="Ukuran ikon aksi">
-                <Segmented label="Ukuran ikon aksi" value={actionIconSize} onChange={setActionIconSize} options={actionIconSizeOptions} />
+                <Segmented label="Ukuran ikon aksi" value={actionIconSize} onChange={(v) => setActionIconSize(v as TableActionIconSize)} options={actionIconSizeOptions} />
               </Control>
             </>
           )}
           <Control label="Pratinjau gambar">
-            <Segmented label="Pratinjau gambar" value={withPreview} onChange={setWithPreview} options={onOff} />
+            <Segmented label="Pratinjau gambar" value={withPreview} onChange={(v) => setWithPreview(Boolean(v))} options={onOff} />
           </Control>
           <Control label="Kolom bertingkat">
-            <Segmented label="Kolom bertingkat" value={grouped} onChange={setGrouped} options={onOff} />
+            <Segmented label="Kolom bertingkat" value={grouped} onChange={(v) => setGrouped(Boolean(v))} options={onOff} />
           </Control>
           <Control label="Pagination">
-            <Segmented label="Pagination" value={withPagination} onChange={setWithPagination} options={adaTidakAda} />
+            <Segmented label="Pagination" value={withPagination} onChange={(v) => setWithPagination(Boolean(v))} options={adaTidakAda} />
           </Control>
           {withPagination && (
             <Control label="Warna pagination">

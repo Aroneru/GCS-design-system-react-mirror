@@ -24,7 +24,7 @@ export type TextAreaType = 'default' | 'editor'
 export type TextAreaPlatform = 'default' | 'mobile'
 
 /** Warna aksen per aplikasi — dipakai garis saat difokus dan tombol kirim. */
-export type TextAreaApplication = 'default' | 'simaya'
+export type TextAreaApplication = 'default' | 'purple'
 
 /** Tinggi kotak isian pada type `default`: 162px di desktop, 120px di mobile. */
 const boxes: Record<TextAreaPlatform, string> = {
@@ -44,10 +44,10 @@ const accents: Record<TextAreaApplication, { focus: string; submit: string }> = 
     focus: 'focus-within:border-primary-600',
     submit: 'bg-text-area-submit! hover:bg-text-area-submit-hover! focus-visible:outline-text-area-submit',
   },
-  simaya: {
+  purple: {
     focus: 'focus-within:border-purple-700',
     submit:
-      'bg-text-area-submit-simaya! hover:bg-text-area-submit-simaya-hover! focus-visible:outline-text-area-submit-simaya',
+      'bg-text-area-submit-purple! hover:bg-text-area-submit-purple-hover! focus-visible:outline-text-area-submit-purple',
   },
 }
 

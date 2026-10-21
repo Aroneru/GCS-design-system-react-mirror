@@ -28,7 +28,7 @@ const states: { value: FloatingLabelState; label: string; desc: string }[] = [
 
 const applications: { value: FloatingLabelApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-600' },
-  { value: 'simaya', label: 'simaya', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 const floatingProps: PropRow[] = [
@@ -37,7 +37,7 @@ const floatingProps: PropRow[] = [
   ['icon', 'ReactNode', 'undefined', 'Ikon di sisi kiri field.'],
   ['platform', "'default' | 'mobile'", 'default', 'Tinggi field: 58px (default) atau 50px (mobile).'],
   ['state', "'default' | 'active' | 'error'", 'default', 'Mengunci tampilan label yang naik; error sekaligus memasang aria-invalid.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna garis dan label saat field aktif.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna garis dan label saat field aktif.'],
   ['placeholder', 'string', 'undefined', 'Hanya muncul setelah label naik, agar tak bertumpuk dengan label.'],
   ['onClear', '() => void', 'undefined', 'Bila diisi, tombol hapus (×) muncul di kanan field.'],
   ['darkMode', 'boolean', 'false', 'Tampilan gelap: kotak gray-700 bergaris gray-600 dengan teks dan ikon gray-400.'],
@@ -182,7 +182,7 @@ export function FloatingLabelPage() {
           {'<FloatingLabel\n'}
           {'    '}
           <H>application</H>
-          {'="simaya"\n'}
+          {'="purple"\n'}
           {'    state="active"\n'}
           {'    label="Nama lengkap"\n'}
           {'/>'}

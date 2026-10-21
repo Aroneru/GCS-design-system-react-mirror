@@ -29,6 +29,13 @@ const sizes: { value: ModalSize; label: string; description: string }[] = [
 
 type ModalExample = 'basic' | 'image' | 'long'
 
+// Consumer-owned Popup content follows the ambient theme; danger colors follow the reference.
+const popupCancelClass = 'border-gray-400! text-gray-400! bg-transparent hover:bg-[light-dark(var(--color-gray-100),var(--color-surface-subtle))]! hover:text-[light-dark(var(--color-gray-700),var(--color-content))]!'
+// Button has no danger theme. Explicit utility overrides are local to this action;
+// darker red steps keep white text readable, including in the ambient Dark theme.
+const popupDangerClass = 'bg-red-700! text-white! font-sans font-semibold! leading-[1.5] enabled:hover:bg-red-800! enabled:active:bg-red-900! focus:ring-[light-dark(var(--color-red-700),var(--color-red-300))]! focus-visible:ring-offset-2 focus-visible:ring-offset-surface'
+const popupIconClass = 'size-12! shrink-0 text-red-600'
+
 const examples: { value: ModalExample; label: string }[] = [
   { value: 'basic', label: 'Dasar' },
   { value: 'image', label: 'Dengan Gambar' },
@@ -71,7 +78,9 @@ function ModalExampleCode({
   example,
   size,
   dismissal,
+  theme,
 }: {
+  theme: 'light' | 'dark'
   variant: ModalVariant
   example: ModalExample
   size: ModalSize
@@ -93,13 +102,13 @@ function ModalExampleCode({
       <>
         {"import { Button, Icon, Modal } from '@ceplok-ui/design-kit-react'\n"}
         {"import { ExclamationCircle } from '@ceplok-ui/design-kit-react/icons/solid'\n"}
-        {'\n<Modal\n  trigger={<Button>Buka Modal</Button>}'}
+        {`\n<div data-theme="${theme}">\n<Modal\n  trigger={<Button>Buka Modal</Button>}`}
         {dismissalCode}
         {'\n  '}
         <H>variant</H>
         {'="popup"\n  '}
         <H>aria-label</H>
-        {'="Konfirmasi hapus konten"\n  footer={({ close }) => (\n    <div className="flex w-full justify-center gap-4">\n      <Button variant="outline" theme="gray" size="xs" onClick={close}>\n        Tidak, Batalkan\n      </Button>\n      <Button theme="orange" size="xs" onClick={close}>\n        Ya, hapus konten ini\n      </Button>\n    </div>\n  )}\n>\n  <div className="text-center">\n    <div className="flex justify-center">\n      <Icon className="size-12 text-orange-600"><ExclamationCircle /></Icon>\n    </div>\n    <p className="mx-auto mt-4 max-w-xs text-body font-medium text-gray-500">\n      Apakah anda yakin ingin menghapus konten ini?\n    </p>\n  </div>\n</Modal>'}
+        {`="Konfirmasi hapus konten"\n  footer={({ close }) => (\n    <div className="flex w-full flex-wrap justify-center gap-4">\n      <Button variant="outline" theme="gray" size="xs" className="${popupCancelClass}" onClick={close}>\n        Tidak, Batalkan\n      </Button>\n      <Button size="xs" className="${popupDangerClass}" onClick={close}>\n        Ya, hapus konten ini\n      </Button>\n    </div>\n  )}\n>\n  <div className="text-center">\n    <div className="flex justify-center">\n      <Icon className="${popupIconClass}"><ExclamationCircle viewBox="2 2 20 20" /></Icon>\n    </div>\n    <p className="mx-auto mt-4 max-w-xs text-body font-medium text-content-muted">\n      Apakah anda yakin ingin menghapus konten ini?\n    </p>\n  </div>\n</Modal>\n</div>`}
       </>
     )
   }
@@ -107,7 +116,7 @@ function ModalExampleCode({
   return (
     <>
       {"import { Button, Modal } from '@ceplok-ui/design-kit-react'\n"}
-      {'\n<Modal\n  trigger={<Button>Buka Modal</Button>}'}
+      {`\n<div data-theme="${theme}">\n<Modal\n  trigger={<Button>Buka Modal</Button>}`}
       {dismissalCode}
       {size === 'm' && (
         <>
@@ -116,14 +125,14 @@ function ModalExampleCode({
           {'="m"'}
         </>
       )}
-      {`\n  title="${judul}"\n  footer={({ close }) => <Button size="xs" onClick={close}>${
+      {`\n  title="${judul}"\n  footer={({ close }) => <Button size="xs" className="ml-auto" onClick={close}>${
         example === 'long' ? 'Saya mengerti' : 'Ya, saya setuju'
       }</Button>}\n>\n`}
       {example === 'image' ? (
         <>
           {'  <'}
           <H>img</H>
-          {'\n    src="/images/ceplok.svg"\n    alt="Ilustrasi motif Ceplok"\n    className="h-[437px] w-full rounded-lg object-cover"\n  />'}
+          {'\n    src="/images/ceplok.svg"\n    alt="Ilustrasi motif Ceplok"\n    className="aspect-[600/437] w-full rounded-lg object-cover"\n  />'}
           {`\n  <div className="mt-5 space-y-4">\n    <p>${ceplokCopy[0]}</p>\n    <p>${ceplokCopy[1]}</p>\n  </div>\n</Modal>`}
         </>
       ) : example === 'long' ? (
@@ -131,6 +140,7 @@ function ModalExampleCode({
       ) : (
         `  <div className="space-y-4">\n    <p>${ceplokCopy[0]}</p>\n    <p>${ceplokCopy[1]}</p>\n  </div>\n</Modal>`
       )}
+      {'\n</div>'}
     </>
   )
 }
@@ -166,18 +176,18 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-function ControlledModalExample() {
+function ControlledModalExample({ theme }: { theme: 'light' | 'dark' }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="mt-4">
+    <div data-theme={theme} className="mt-4">
       <Button onClick={() => setOpen(true)}>Edit data</Button>
       <Modal
         open={open}
         onOpenChange={setOpen}
         title="Edit data"
         footer={({ close }) => (
-          <Button size="xs" onClick={close}>
+          <Button size="xs" className="ml-auto" onClick={close}>
             Simpan
           </Button>
         )}
@@ -189,6 +199,7 @@ function ControlledModalExample() {
 }
 
 export function ModalPage() {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [playgroundVariant, setPlaygroundVariant] = useState<ModalVariant>('default')
   const [playgroundExample, setPlaygroundExample] = useState<ModalExample>('basic')
   const [playgroundSize, setPlaygroundSize] = useState<ModalSize>('s')
@@ -219,14 +230,14 @@ export function ModalPage() {
             trigger={<Button>Buka Default</Button>}
             title="Terms of Service"
             footer={({ close }) => (
-              <>
+              <div className="flex w-full flex-wrap justify-end gap-3">
                 <Button variant="outline" theme="gray" size="xs" onClick={close}>
                   Batal
                 </Button>
                 <Button size="xs" onClick={close}>
                   Saya Setuju
                 </Button>
-              </>
+              </div>
             )}
           >
             <p>{ceplokCopy[0]}</p>
@@ -234,7 +245,7 @@ export function ModalPage() {
         </div>
 
         <SectionCode>
-          {'<Modal\n  trigger={<Button>Buka Modal</Button>}\n  title="Terms of Service"\n  footer={({ close }) => (\n    <>\n      <Button onClick={close}>Batal</Button>\n      <Button onClick={close}>Saya Setuju</Button>\n    </>\n  )}\n>\n  ...\n</Modal>'}
+          {'<Modal\n  trigger={<Button>Buka Modal</Button>}\n  title="Terms of Service"\n  footer={({ close }) => (\n    <div className="flex w-full flex-wrap justify-end gap-3">\n      <Button variant="outline" theme="gray" size="xs" onClick={close}>Batal</Button>\n      <Button size="xs" onClick={close}>Saya Setuju</Button>\n    </div>\n  )}\n>\n  ...\n</Modal>'}
         </SectionCode>
       </FlowSection>
 
@@ -244,17 +255,17 @@ export function ModalPage() {
           children, lalu tempatkan tombol aksi di footer tanpa divider.
         </Lead>
 
-        <div className="mt-4">
+        <div data-theme="light" className="mt-4">
           <Modal
             trigger={<Button>Buka Popup</Button>}
             variant="popup"
             aria-label="Konfirmasi hapus konten"
             footer={({ close }) => (
-              <div className="flex w-full justify-center gap-4">
-                <Button variant="outline" theme="gray" size="xs" onClick={close}>
+              <div className="flex w-full flex-wrap justify-center gap-4">
+                <Button variant="outline" theme="gray" size="xs" className={popupCancelClass} onClick={close}>
                   Tidak, Batalkan
                 </Button>
-                <Button theme="orange" size="xs" onClick={close}>
+                <Button size="xs" className={popupDangerClass} onClick={close}>
                   Ya, hapus konten ini
                 </Button>
               </div>
@@ -262,11 +273,11 @@ export function ModalPage() {
           >
             <div className="text-center">
               <div className="flex justify-center">
-                <Icon className="size-12 text-orange-600">
-                  <ExclamationCircle />
+                <Icon className={popupIconClass}>
+                  <ExclamationCircle viewBox="2 2 20 20" />
                 </Icon>
               </div>
-              <p className="mx-auto mt-4 max-w-xs text-body font-medium text-gray-500">
+              <p className="mx-auto mt-4 max-w-xs text-body font-medium text-content-muted">
                 Apakah anda yakin ingin menghapus konten ini?
               </p>
             </div>
@@ -274,11 +285,13 @@ export function ModalPage() {
         </div>
 
         <SectionCode>
-          {'<Modal\n  trigger={<Button>Buka Modal</Button>}\n  '}
-          <H>variant</H>
-          {'="popup"\n  '}
-          <H>aria-label</H>
-          {'="Konfirmasi hapus konten"\n  footer={({ close }) => (\n    <div className="flex w-full justify-center gap-4">\n      <Button onClick={close}>Tidak, Batalkan</Button>\n      <Button onClick={close}>Ya, hapus konten ini</Button>\n    </div>\n  )}\n>\n  ...\n</Modal>'}
+          <ModalExampleCode
+            theme="light"
+            variant="popup"
+            example="basic"
+            size="s"
+            dismissal={{ closeOnBackdrop: true, closeOnEscape: true, showCloseButton: true }}
+          />
         </SectionCode>
       </FlowSection>
 
@@ -306,7 +319,7 @@ export function ModalPage() {
                   size={item.value}
                   title="Terms of Service"
                   footer={({ close }) => (
-                    <Button size="xs" onClick={close}>
+                    <Button size="xs" className="ml-auto" onClick={close}>
                       Ya, saya setuju
                     </Button>
                   )}
@@ -325,7 +338,7 @@ export function ModalPage() {
         <SectionCode>
           {'<Modal\n  trigger={<Button>Buka Modal</Button>}\n  '}
           <H>size</H>
-          {`="m"\n  title="Terms of Service"\n  footer={({ close }) => (\n    <Button size="xs" onClick={close}>Ya, saya setuju</Button>\n  )}\n>\n  <div className="space-y-4">\n    <p>${ceplokCopy[0]}</p>\n    <p>${ceplokCopy[1]}</p>\n  </div>\n</Modal>`}
+          {`="m"\n  title="Terms of Service"\n  footer={({ close }) => (\n    <Button size="xs" className="ml-auto" onClick={close}>Ya, saya setuju</Button>\n  )}\n>\n  <div className="space-y-4">\n    <p>${ceplokCopy[0]}</p>\n    <p>${ceplokCopy[1]}</p>\n  </div>\n</Modal>`}
         </SectionCode>
 
         <p className="mt-4 max-w-2xl text-body-sm text-gray-500">
@@ -340,7 +353,7 @@ export function ModalPage() {
         </Lead>
 
         <Stage maxWidth="max-w-[420px]">
-          <div className="flex min-h-40 items-center justify-center">
+          <div data-theme={theme} className="flex min-h-40 items-center justify-center rounded-lg bg-surface">
             {isPopup ? (
               <Modal
                 {...dismissal}
@@ -348,11 +361,11 @@ export function ModalPage() {
                 variant="popup"
                 aria-label="Konfirmasi hapus konten"
                 footer={({ close }) => (
-                  <div className="flex w-full justify-center gap-4">
-                    <Button variant="outline" theme="gray" size="xs" onClick={close}>
+                  <div className="flex w-full flex-wrap justify-center gap-4">
+                    <Button variant="outline" theme="gray" size="xs" className={popupCancelClass} onClick={close}>
                       Tidak, Batalkan
                     </Button>
-                    <Button theme="orange" size="xs" onClick={close}>
+                    <Button size="xs" className={popupDangerClass} onClick={close}>
                       Ya, hapus konten ini
                     </Button>
                   </div>
@@ -360,11 +373,11 @@ export function ModalPage() {
               >
                 <div className="text-center">
                   <div className="flex justify-center">
-                    <Icon className="size-12 text-orange-600">
-                      <ExclamationCircle />
+                    <Icon className={popupIconClass}>
+                      <ExclamationCircle viewBox="2 2 20 20" />
                     </Icon>
                   </div>
-                  <p className="mx-auto mt-4 max-w-xs text-body font-medium text-gray-500">
+                  <p className="mx-auto mt-4 max-w-xs text-body font-medium text-content-muted">
                     Apakah anda yakin ingin menghapus konten ini?
                   </p>
                 </div>
@@ -376,7 +389,7 @@ export function ModalPage() {
                 size={playgroundSize}
                 title={playgroundExample === 'long' ? 'Ketentuan Layanan' : 'Terms of Service'}
                 footer={({ close }) => (
-                  <Button size="xs" onClick={close}>
+                  <Button size="xs" className="ml-auto" onClick={close}>
                     {playgroundExample === 'long' ? 'Saya mengerti' : 'Ya, saya setuju'}
                   </Button>
                 )}
@@ -386,7 +399,7 @@ export function ModalPage() {
                     <img
                       src="/images/ceplok.svg"
                       alt="Ilustrasi motif Ceplok"
-                      className="h-[437px] w-full rounded-lg object-cover"
+                      className="aspect-[600/437] w-full rounded-lg object-cover"
                     />
                     <div className="mt-5 space-y-4">
                       {ceplokCopy.map((paragraph) => (
@@ -413,6 +426,14 @@ export function ModalPage() {
         </Stage>
 
         <Controls>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode warna Modal"
+              value={theme}
+              onChange={setTheme}
+              options={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]}
+            />
+          </Control>
           <Control label="Variant">
             <Segmented
               label="Pilih variant Modal"
@@ -497,12 +518,33 @@ export function ModalPage() {
 
         <SectionCode flush>
           <ModalExampleCode
+            theme={theme}
             variant={playgroundVariant}
             example={playgroundExample}
             size={playgroundSize}
             dismissal={dismissal}
           />
         </SectionCode>
+
+        <h3 className="mt-8 text-sm font-black text-gray-900">Light dan Dark Mode</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
+          Consumer menentukan batas tema dengan <Hl>data-theme="light"</Hl> atau{' '}
+          <Hl>data-theme="dark"</Hl> pada wrapper. Modal mewarisi token semantik melalui DOM,
+          termasuk saat dialog tampil di top layer. Tidak ada prop darkMode pada Modal.
+          Coba kedua mode di Playground untuk Default S/M, konten panjang, gambar, dan Popup.
+          Contoh terkontrol di bawah juga mengikuti pilihan Mode.
+        </p>
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+          Surface, judul, teks body, divider, dan kontrol tutup mengikuti tema. Konten dengan
+          warna sendiri, ikon Popup, serta tombol footer tetap milik consumer. Gunakan token
+          semantik untuk konten; Button memiliki styling sendiri dan tidak otomatis berubah
+          oleh wrapper. Button belum menyediakan variant bahaya merah bawaan. Aksi hapus Popup memakai override
+          class lokal dengan warna merah pada Light maupun Dark, termasuk hover, active, dan
+          indikator fokus. Merah red-700 dengan teks putih dipakai pada kedua tema agar kontras
+          teks kecil tetap terjaga. Ikon solid berukuran 48px memakai viewBox tanpa padding internal dan cutout transparan
+          yang memperlihatkan surface Popup, tanpa warna glyph atau ring tambahan. Ikon ini dekoratif. State disabled tetap memakai perilaku dan opacity Button. Modal
+          tidak memberi styling otomatis pada aksi consumer. Tema hanya berlaku di dalam wrapper contoh.
+        </p>
 
         <h3 className="mt-8 text-sm font-black text-gray-900">Aksi footer</h3>
         <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
@@ -526,9 +568,9 @@ export function ModalPage() {
           aplikasi. Dalam mode terkontrol, <Hl>trigger</Hl> opsional dan nilai <Hl>open</Hl> tetap
           menjadi sumber kebenaran.
         </p>
-        <ControlledModalExample />
+        <ControlledModalExample theme={theme} />
         <SectionCode>
-          {"const [open, setOpen] = useState(false)\n\n<Button onClick={() => setOpen(true)}>Edit data</Button>\n\n<Modal\n  open={open}\n  onOpenChange={setOpen}\n  title=\"Edit data\"\n  footer={({ close }) => <Button onClick={close}>Simpan</Button>}\n>\n  {/* Form milik consumer */}\n</Modal>"}
+          {`import { useState } from 'react'\nimport { Button, Modal } from '@ceplok-ui/design-kit-react'\n\nexport function ControlledModalExample() {\n  const [open, setOpen] = useState(false)\n\n  return (\n    <div data-theme="${theme}">\n      <Button onClick={() => setOpen(true)}>Edit data</Button>\n\n      <Modal\n        open={open}\n        onOpenChange={setOpen}\n        title="Edit data"\n        footer={({ close }) => <Button size="xs" className="ml-auto" onClick={close}>Simpan</Button>}\n      >\n        {/* Form milik consumer */}\n      </Modal>\n    </div>\n  )\n}`}
         </SectionCode>
 
         <h3 className="mt-8 text-sm font-black text-gray-900">Accessibility</h3>

@@ -11,6 +11,44 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+Ada perubahan API yang memutus: migrasi tema dan aksen warna `simaya` ke
+`purple` pada seluruh komponen dan token — baca bagian **Diubah**. Satu perbaikan
+token warna `Radio`. Situs dokumentasi ikut diperbarui: bagian Mulai cepat di
+beranda kini empat langkah, dengan langkah baru "Sambungkan Tailwind CSS ke Vite"
+(pasang `tailwindcss` dan `@tailwindcss/vite`, lalu daftarkan `tailwindcss()` di
+`vite.config.ts`). Tombol outline kini selalu di kiri tombol filled di halaman
+contoh, dan contoh kode footer di halaman Modal kini sama dengan demonya.
+
+### Diubah
+
+- **Memutus — Penyelarasan tema dan token `simaya` menjadi `purple`.**
+  Seluruh komponen dan token yang sebelumnya menerima nilai `"simaya"` kini distandarkan menjadi `"purple"` sebagai nama warna netral:
+  - Komponen Form (`InputField`, `FloatingLabel`, `TextArea`, `Select`, `Checkbox`, `Radio`, `Toggle`, `Upload`, `Search`): prop `application?: 'default' | 'simaya'` diubah menjadi `application?: 'default' | 'purple'`.
+  - Komponen General & Navigasi:
+    - `Button`: `ButtonTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+    - `Pagination`: `PaginationTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+    - `Drawer`: `DrawerNavItemTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+    - `Table`: `TableActionTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+  - Token CSS di `tokens.css`:
+    - `--color-floating-label-accent-simaya` diubah menjadi `--color-floating-label-accent-purple`.
+    - `--color-text-area-submit-simaya` dan `-hover` diubah menjadi `--color-text-area-submit-purple` dan `-hover`.
+
+  ```diff
+  - <Button theme="simaya">Kirim</Button>
+  + <Button theme="purple">Kirim</Button>
+
+  - <InputField application="simaya" label="Nama" />
+  + <InputField application="purple" label="Nama" />
+  ```
+
+### Diperbaiki
+
+- **Kelas `ds-theme-dark` kini ikut mengganti warna gelap `Radio`.**
+  Selector di `tokens.css` sebelumnya salah ketik (`.ds-theme-darkz`), jadi
+  token `Radio` tetap terang di dalam elemen berkelas `ds-theme-dark`, padahal
+  token `Select` dan `InputField` sudah ikut gelap. `data-theme="dark"` dan prop
+  `darkMode` tidak terdampak.
+
 ## [0.4.0] - 2026-10-15
 
 Ada perubahan API yang memutus pada `Button` dan `Upload`, dan banyak komponen
@@ -76,7 +114,7 @@ situs dokumentasi ikut diperbarui.
 - **`Radio` `darkMode` `inactive`: lingkaran kini gray-700 bergaris gray-800**,
   sebelumnya gray-800 seluruhnya.
 - **`Toggle`, `Checkbox`, `Radio`, `Select`, `InputField`, `FloatingLabel`,
-  `TextArea`, `Toast`, `Alert`, `Sidebar`, dan `Search` kini memakai token warna, seperti `Card`.**
+  `TextArea`, `Toast`, `Alert`, `Sidebar`, `Search`, dan `Breadcrumb` kini memakai token warna, seperti `Card`.**
   `darkMode` cukup memasang `data-theme="dark"` di pembungkus terluarnya. Tanpa
   prop itu komponen ikut tema pembungkusnya, mis. `<section data-theme="dark">`,
   dan kembali terang di dalam `data-theme="light"`. Warna terang dan gelapnya
@@ -88,6 +126,12 @@ situs dokumentasi ikut diperbarui.
   tema terang, gray-700 di tema gelap) untuk tombol kategori dan
   `--color-search-field-surface` (gray-50 di tema terang, gray-600 di tema gelap)
   untuk kolom pencarian.
+- **`Breadcrumb` kini memakai token warna komponen di `tokens.css`.**
+  Latar varian `bg` dikontrol lewat `--color-breadcrumb-surface` (gray-100 di tema
+  terang, gray-700 di tema gelap), teks item aktif memakai `--color-breadcrumb-active`
+  (gray-900 di tema terang, gray-300 di tema gelap), hover tautan memakai
+  `--color-breadcrumb-link-hover` (primary-700 di tema terang, putih di tema gelap),
+  serta item tidak aktif memakai token semantik `--color-content-muted`.
 - **`--color-feedback-error` kini red-500 di tema gelap**, tetap red-600 di
   tema terang. Error Input Field dan Floating Label gelap memakainya.
 - **Mengetik di daftar pilihan `Select` kini melompat ke pilihan yang cocok
@@ -153,8 +197,8 @@ situs dokumentasi ikut diperbarui.
   `--font-alt` dan `--font-alt-2` yang boleh ditimpa di `:root`. Inter dimuat
   `styles.css` dari Google Fonts seperti Lato; Arial font sistem, jadi tidak
   perlu diunduh.
-- **Token komponen `--color-sidebar-surface`, `--color-search-category-surface`, dan `--color-search-field-surface` di `tokens.css`.**
-  Menyediakan kontrol warna latar khusus untuk Sidebar serta kategori dan field Search pada tema terang dan gelap (`data-theme="dark"`).
+- **Token komponen `--color-sidebar-surface`, `--color-search-category-surface`, `--color-search-field-surface`, dan `--color-breadcrumb-*` di `tokens.css`.**
+  Menyediakan kontrol warna latar khusus untuk Sidebar, kategori dan field Search, serta Breadcrumb pada tema terang dan gelap (`data-theme="dark"`).
 - **`Sidebar`: menu dropdown profil akun dan link eksternal.**
   `SidebarUser` kini mendukung `items?: SidebarUserItem[]` dan `groups?: SidebarUserGroup[]`
   untuk menampilkan menu dropdown akun/profil (misalnya profil, pengaturan, dan
@@ -181,8 +225,8 @@ situs dokumentasi ikut diperbarui.
 - **Token komponen** untuk warna yang hanya dipakai satu komponen:
   `--color-toggle-*`, `--color-radio-*`, `--color-select-*`,
   `--color-input-field-*`, `--color-floating-label-*`, `--color-text-area-*`,
-  `--color-toast-*`, `--color-alert-*`, `--color-sidebar-surface`, dan
-  `--color-search-*`. Daftarnya ada di `COLOR.md`.
+  `--color-toast-*`, `--color-alert-*`, `--color-sidebar-surface`,
+  `--color-search-*`, dan `--color-breadcrumb-*`. Daftarnya ada di `COLOR.md`.
 - **Kelas `ds-theme-light`**, padanan `data-theme="light"` untuk elemen yang
   tidak bisa diberi atribut.
 - **`Datepicker`: tanggal bisa diketik saat kalender terbuka.** "17" ke tanggal

@@ -21,7 +21,7 @@ import { adaTidakAda } from '../../../usulanOptions'
 
 const applications: { value: TextAreaApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'simaya', label: 'simaya', token: 'purple-700' },
+  { value: 'purple', label: 'Purple', token: 'purple-700' },
 ]
 
 const textAreaProps: PropRow[] = [
@@ -30,7 +30,7 @@ const textAreaProps: PropRow[] = [
   ['helperText', 'ReactNode', 'undefined', 'Caption di bawah kotak.'],
   ['type', "'default' | 'editor'", 'default', 'Kotak polos, atau kotak dengan toolbar di atasnya.'],
   ['platform', "'default' | 'mobile'", 'default', 'Tinggi kotak type default: 162px atau 120px.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna garis saat difokus dan tombol kirim.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna garis saat difokus dan tombol kirim.'],
   ['toolbar', 'ReactNode', 'undefined', 'Mengganti isi toolbar editor dengan elemen sendiri.'],
   ['onToolbarAction', '(action) => void', 'undefined', 'Dipanggil saat tombol toolbar bawaan ditekan, dengan nama aksinya: attachment, code, emoji, list, settings, date, atau download.'],
   ['submitLabel', 'ReactNode', 'undefined', 'Label tombol kirim; tombol hanya muncul bila diisi.'],
@@ -171,7 +171,7 @@ export function TextAreaPage() {
           {'    type="editor"\n'}
           {'    '}
           <H>application</H>
-          {'="simaya"\n'}
+          {'="purple"\n'}
           {'    label="Isi pesan"\n'}
           {'    submitLabel="Submit Text"\n'}
           {'/>'}

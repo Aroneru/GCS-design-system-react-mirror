@@ -5,20 +5,26 @@ import {
   useCallback,
   useEffect,
   useId,
+  useImperativeHandle,
   useLayoutEffect,
   useRef,
   useState,
   type ButtonHTMLAttributes,
+  type AriaAttributes,
+  type HTMLAttributeAnchorTarget,
   type HTMLAttributes,
   type Key,
   type KeyboardEvent,
+  type MouseEvent,
   type ReactElement,
   type ReactNode,
+  type Ref,
 } from 'react'
 import { cn } from '../utils/cn'
 
 /** Warna semantik satu aksi. */
 export type DropdownItemTone = 'default' | 'danger'
+export type DropdownCloseOnSelect = boolean
 
 /** Satu aksi di dalam panel. */
 export interface DropdownItem {
@@ -30,9 +36,19 @@ export interface DropdownItem {
   icon?: ReactNode
   /** Bila diisi, aksinya dirender sebagai tautan. */
   href?: string
-  onClick?: () => void
+  /** Target native untuk item tautan. Diabaikan pada aksi tombol dan item disabled. */
+  target?: HTMLAttributeAnchorTarget
+  /** Relasi native untuk item tautan. `_blank` memakai `noopener noreferrer` bila prop ini kosong. */
+  rel?: string
+  /** Dipanggil dengan event klik asli sebelum kebijakan penutupan dijalankan. */
+  onClick?: (event: MouseEvent<HTMLElement>) => void
   tone?: DropdownItemTone
   disabled?: boolean
+  /**
+   * Menandai tujuan navigasi saat ini tanpa mengubah koleksi menjadi listbox.
+   * `true` dipetakan ke `aria-current="page"`; token lain diteruskan apa adanya.
+   */
+  current?: AriaAttributes['aria-current']
   /**
    * Menandai baris ini sebagai pilihan yang sedang aktif. Begitu ada satu
    * baris yang memakainya, panel berpindah peran: dari menu aksi menjadi
@@ -55,7 +71,21 @@ export interface DropdownGroup {
   items: DropdownItem[]
 }
 
+/** Aksi lifecycle yang tersedia bagi konten Dropdown kustom. */
+export interface DropdownRenderProps {
+  /** Menutup panel bila sedang terbuka. Aman dipanggil berulang kali. */
+  close: () => void
+}
+
+/** Handle lifecycle opsional untuk menutup Dropdown dari kondisi eksternal. */
+export interface DropdownHandle {
+  /** Menutup panel bila sedang terbuka. Aman dipanggil berulang kali. */
+  close: () => void
+}
+
 export interface DropdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+  /** Batas tema eksplisit; `darkMode` bernilai true selalu lebih diutamakan. */
+  'data-theme'?: 'light' | 'dark'
   /**
    * Elemen yang membuka panel — satu `<button>` milik Anda, biasanya `Button`.
    * Komponen ini menyalinnya untuk memasang atribut Popover. Komponen tombol
@@ -69,9 +99,10 @@ export interface DropdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chi
   groups?: DropdownGroup[]
   /**
    * Isi panel bila bukan daftar aksi — form kecil, daftar panjang yang
-   * digulir, apa pun. Diabaikan selama `items` atau `groups` masih terisi.
+   * digulir, apa pun. Render function menerima `close` untuk dismissal
+   * eksplisit. Diabaikan selama `items` atau `groups` masih terisi.
    */
-  children?: ReactNode
+  children?: ReactNode | ((actions: DropdownRenderProps) => ReactNode)
   /**
    * Nama panel bagi pembaca layar. Hanya terpasang pada bentuk daftar
    * pilihan, karena menu aksi sudah cukup dikenali lewat tombolnya.
@@ -79,35 +110,35 @@ export interface DropdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chi
   contentLabel?: string
   /** Kelas untuk panelnya. `className` sendiri menuju pembungkus terluar. */
   contentClassName?: string
-  /** Tampilan gelap untuk panel dan item generated. Custom children tetap mengatur temanya sendiri. */
+  /** Perataan horizontal panel terhadap trigger sebelum dibatasi ke viewport. */
+  align?: 'start' | 'center' | 'end'
+  /** Memaksa tema gelap lokal. Tanpa prop ini Dropdown mewarisi `data-theme` consumer. */
   darkMode?: boolean
+  /** Handle opsional untuk dismissal dari kondisi eksternal tanpa mengekspos DOM Popover. */
+  actionsRef?: Ref<DropdownHandle>
+  /**
+   * Kebijakan penutupan item generated. `true` menutup panel setelah item
+   * enabled diaktifkan; `false` membiarkan panel terbuka.
+   */
+  closeOnSelect?: DropdownCloseOnSelect
 }
 
-const tones: Record<'light' | 'dark', Record<DropdownItemTone, string>> = {
-  light: {
-    default: 'text-gray-700 hover:bg-gray-100',
-    danger: 'text-red-600 hover:bg-red-50',
-  },
-  dark: {
-    default: 'text-gray-300 hover:bg-gray-700',
-    danger: 'text-red-500 hover:bg-gray-700',
-  },
+const tones: Record<DropdownItemTone, string> = {
+  default: 'text-dropdown-item-content hover:bg-dropdown-item-hover-surface',
+  danger: 'text-feedback-error hover:bg-dropdown-item-danger-hover-surface',
 }
 
 /** Jarak panel dari tombol dan dari tepi layar, dalam piksel. */
 const JARAK = 4
 
-/**
- * Jeda antar-ketikan yang masih dianggap satu kata kunci saat melompat ke
- * baris — satu detik, sama dengan `<select>` bawaan peramban.
- */
+/** Jeda antar-ketikan yang masih dianggap satu kata kunci saat melompat ke baris. */
 const JEDA_KETIK = 1000
 
-/** Teks yang dicocokkan dengan ketikan: huruf kecil, tanpa tanda diakritik, spasi dirapikan. */
+/** Teks pencarian tanpa perbedaan kapital, tanda diakritik, atau spasi berlebih. */
 const rapikan = (teks: string) =>
   teks.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').toLowerCase()
 
-/** Apakah `kunci` muncul di awal salah satu kata `teks`, mis. "jakarta" di "dki jakarta". */
+/** Mencocokkan kata kunci pada awal label atau awal salah satu katanya. */
 const diAwalKata = (teks: string, kunci: string) => {
   for (let i = teks.indexOf(kunci); i !== -1; i = teks.indexOf(kunci, i + 1)) {
     if (i === 0 || /[\s/(),.-]/.test(teks[i - 1])) return true
@@ -115,10 +146,10 @@ const diAwalKata = (teks: string, kunci: string) => {
   return false
 }
 
-/** Label sebuah baris untuk dicocokkan dengan ketikan — keterangan di bawahnya tidak ikut. */
-const namaBaris = (el: HTMLElement) => {
-  const semua = el.textContent ?? ''
-  const keterangan = el.querySelector('[data-keterangan]')?.textContent ?? ''
+/** Label baris untuk typeahead; teks deskripsi tidak ikut dicocokkan. */
+const namaBaris = (element: HTMLElement) => {
+  const semua = element.textContent ?? ''
+  const keterangan = element.querySelector('[data-keterangan]')?.textContent ?? ''
   return rapikan(semua.slice(0, semua.length - keterangan.length)).trim()
 }
 
@@ -127,6 +158,12 @@ const TRIGGER_CONTRACT_ERROR =
 
 /** `newState` belum ada di lib.dom semua versi TypeScript, jadi ditulis sendiri. */
 type PeristiwaToggle = Event & { newState?: string }
+
+function resolveAriaCurrent(current: DropdownItem['current']) {
+  if (current === true || current === 'true') return 'page'
+  if (current === false || current === 'false') return undefined
+  return current
+}
 
 /**
  * Dropdown — panel yang dibuka dari sebuah tombol.
@@ -140,9 +177,8 @@ type PeristiwaToggle = Event & { newState?: string }
  * Punya dua peran. Bawaannya menu aksi: tiap baris sebuah tombol atau tautan,
  * ditelusuri dengan Tab. Begitu ada baris yang memakai `selected`, ia jadi
  * daftar pilihan — `listbox` berisi `option` yang ditelusuri dengan panah,
- * Home/End, atau dengan mengetik namanya untuk melompat langsung ke sana.
- * Peran kedua itulah yang dipakai Select dan Search, jadi panel di seluruh
- * kit hanya ada satu.
+ * Home/End, atau dengan mengetik huruf awalnya. Peran kedua itulah yang
+ * dipakai Select dan Search, jadi panel di seluruh kit hanya ada satu.
  *
  * Visibilitasnya diurus HTML Popover API: peramban yang menutup panel saat
  * pengguna menekan di luar atau menekan Escape, mengangkatnya ke top layer,
@@ -157,9 +193,13 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     groups,
     children,
     darkMode = false,
+    actionsRef,
+    closeOnSelect = true,
+    align = 'start',
     className,
     contentLabel,
     contentClassName,
+    'data-theme': dataTheme,
     ...props
   },
   ref,
@@ -168,6 +208,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
   const wrapRef = useRef<HTMLDivElement | null>(null)
   const contentRef = useRef<HTMLDivElement | null>(null)
   const barisAktifRef = useRef<HTMLElement | null>(null)
+  const pulihkanFokusRef = useRef(false)
   const framePosisiRef = useRef(0)
   const ketikan = useRef({ teks: '', waktu: 0 })
   const spasiDitahanRef = useRef(false)
@@ -191,6 +232,8 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     if (panel?.isConnected && panel.matches(':popover-open')) panel.hidePopover()
   }, [])
 
+  useImperativeHandle(actionsRef, () => ({ close: tutup }), [tutup])
+
   /** Panel top-layer diukur dari tombol dan selalu dijaga di dalam viewport. */
   const tempatkan = useCallback(() => {
     const panel = contentRef.current
@@ -208,7 +251,13 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     tulis('maxWidth', `${lebarAman}px`)
 
     const lebar = panel.offsetWidth || kotak.width
-    tulis('left', `${Math.max(JARAK, Math.min(kotak.left, window.innerWidth - lebar - JARAK))}px`)
+    const kiriIdeal =
+      align === 'center'
+        ? kotak.left + kotak.width / 2 - lebar / 2
+        : align === 'end'
+          ? kotak.right - lebar
+          : kotak.left
+    tulis('left', `${Math.max(JARAK, Math.min(kiriIdeal, window.innerWidth - lebar - JARAK))}px`)
 
     const ruangBawah = Math.max(0, window.innerHeight - JARAK - (kotak.bottom + JARAK))
     const ruangAtas = Math.max(0, kotak.top - JARAK - JARAK)
@@ -222,7 +271,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
       'top',
       keAtas ? `${Math.max(JARAK, kotak.top - JARAK - tinggiPanel)}px` : `${kotak.bottom + JARAK}px`,
     )
-  }, [])
+  }, [align])
 
   const batalkanPenempatan = useCallback(() => {
     if (!framePosisiRef.current) return
@@ -292,13 +341,23 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     const sebelum = (e: Event) => {
       const jadiBuka = (e as PeristiwaToggle).newState === 'open'
       setTerbuka(jadiBuka)
-      if (jadiBuka) tempatkan()
-      else if (!jadiBuka) batalkanPenempatan()
+      if (jadiBuka) {
+        // Panel tertutup belum selalu punya lebar terukur. Sembunyikan hanya
+        // siklus buka baru ini sampai `toggle` dapat menempatkannya memakai
+        // ukuran panel sebenarnya, terutama untuk perataan center dan end.
+        panel.style.visibility = 'hidden'
+        tempatkan()
+      } else {
+        pulihkanFokusRef.current = panel.contains(document.activeElement)
+        panel.style.visibility = 'hidden'
+        batalkanPenempatan()
+      }
     }
 
     const sesudah = (e: Event) => {
       if ((e as PeristiwaToggle).newState === 'open') {
         tempatkan()
+        panel.style.visibility = 'visible'
         // Pada daftar pilihan, fokus jatuh ke baris yang sedang aktif supaya
         // panah bergerak dari sana — seperti perilaku `<select>` bawaan.
         if (pilihan) {
@@ -313,12 +372,16 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
             pemicu()?.focus()
           }
         }
-      } else if (pilihan && panel.contains(document.activeElement)) {
+      } else if (pulihkanFokusRef.current) {
         // Ditutup selagi fokus ada di dalamnya — Escape, klik di luar, atau
         // sebuah pilihan diambil — jadi fokus dikembalikan ke tombolnya.
-        pemicu()?.focus()
+        const tombol = pemicu()
+        if (tombol?.isConnected && tombol.getClientRects().length > 0) tombol.focus()
       }
-      if ((e as PeristiwaToggle).newState !== 'open') barisAktifRef.current = null
+      if ((e as PeristiwaToggle).newState !== 'open') {
+        barisAktifRef.current = null
+        pulihkanFokusRef.current = false
+      }
     }
 
     panel.addEventListener('beforetoggle', sebelum)
@@ -411,47 +474,28 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     }
   })
 
-  /** Masih dalam satu rangkaian ketikan — jeda dari ketikan terakhir di bawah `JEDA_KETIK`? */
   const sedangMengetik = () => ketikan.current.teks !== '' && Date.now() - ketikan.current.waktu < JEDA_KETIK
 
-  /**
-   * Mengetik melompat ke baris yang cocok, seperti `<select>` bawaan — di
-   * daftar pilihan maupun menu aksi. Ketikan yang berdekatan digabung jadi satu
-   * kata kunci, spasi termasuk, jadi "jawa t" sampai ke Jawa Tengah. Yang
-   * dicari dulu baris yang diawali kata kunci itu; bila tidak ada, baris yang
-   * salah satu katanya diawali kata kunci itu ("jakarta" → DKI Jakarta). Huruf
-   * yang sama diketik berulang berpindah ke baris berikutnya yang diawali
-   * huruf itu.
-   */
   const lompatKetik = (huruf: string) => {
     const baris = barisHidup()
     if (!baris.length) return
     const kini = baris.indexOf(document.activeElement as HTMLElement)
     const teks = rapikan((sedangMengetik() ? ketikan.current.teks : '') + huruf)
     ketikan.current = { teks, waktu: Date.now() }
-
-    const ulang = [...teks].every((h) => h === teks[0])
+    const ulang = [...teks].every((character) => character === teks[0])
     const kunci = ulang ? teks[0] : teks
-    // Huruf baru atau huruf ulangan dicari mulai baris sesudah yang aktif;
-    // kata kunci yang bertambah panjang boleh tetap di baris yang aktif.
     const mulai = ulang ? kini + 1 : Math.max(kini, 0)
     const urut = [...baris.slice(mulai), ...baris.slice(0, mulai)]
-
     const temu =
-      urut.find((el) => namaBaris(el).startsWith(kunci)) ??
-      urut.find((el) => diAwalKata(namaBaris(el), kunci))
+      urut.find((element) => namaBaris(element).startsWith(kunci)) ??
+      urut.find((element) => diAwalKata(namaBaris(element), kunci))
+
     if (temu) {
       temu.focus()
       barisAktifRef.current = temu
     }
   }
 
-  /**
-   * Menangkap satu ketikan untuk pencarian. Spasi hanya ditangkap di tengah
-   * rangkaian ketikan; di luar itu ia tetap tombol memilih/menekan. Spasi yang
-   * ditangkap juga ditahan saat dilepas, karena tombol baru bereaksi pada
-   * `keyup` — tanpa itu, baris menu aksi yang sedang difokus ikut tertekan.
-   */
   const tangkapKetikan = (e: KeyboardEvent<HTMLElement>) => {
     if (e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return false
     if (e.key === ' ' && !sedangMengetik()) return false
@@ -471,16 +515,12 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     const baris = barisHidup()
     if (!baris.length) return
 
-    // Navigasi komposit — panah, Home/End, dan Enter/Spasi pada `option` —
-    // hanya untuk daftar pilihan. Menu aksi tetap memakai Tab dan Enter/Spasi
-    // bawaan tombolnya; yang ditambahkan di sana hanya pencarian lewat ketikan.
     if (pilihan) {
       const kini = baris.indexOf(document.activeElement as HTMLElement)
       const ke = (i: number) => {
         e.preventDefault()
         baris[i]?.focus()
         barisAktifRef.current = baris[i] ?? null
-        // Bergerak dengan tombol memulai kata kunci baru pada ketikan berikutnya.
         ketikan.current = { teks: '', waktu: 0 }
       }
 
@@ -495,10 +535,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
           return ke(baris.length - 1)
         case 'Enter':
         case ' ':
-          // Spasi di tengah ketikan adalah bagian kata kunci ("jawa t"), bukan
-          // tanda memilih — jadi diteruskan ke pencarian di bawah.
           if (e.key === ' ' && sedangMengetik()) break
-          // `option` bukan elemen interaktif, jadi pilihannya dijalankan di sini.
           if (kini >= 0) {
             e.preventDefault()
             baris[kini].click()
@@ -512,12 +549,6 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     tangkapKetikan(e)
   }
 
-  /**
-   * Menu aksi yang baru dibuka belum memindahkan fokus dari tombolnya, jadi
-   * ketikan pertama ditangkap di tombol lalu dilanjutkan di panel — begitu ada
-   * baris yang cocok, fokus sudah pindah ke sana. Daftar pilihan tidak perlu:
-   * fokusnya langsung masuk ke panel saat dibuka.
-   */
   const pemicuKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
     trigger.props.onKeyDown?.(e)
     if (!e.defaultPrevented && terbuka && !pilihan) tangkapKetikan(e)
@@ -530,8 +561,11 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
 
   const renderItem = (item: DropdownItem, key: Key) => {
     const tone = item.tone ?? 'default'
-    const jalankan = () => {
-      item.onClick?.()
+    const current = item.href ? resolveAriaCurrent(item.current) : undefined
+    const jalankan = (event: MouseEvent<HTMLElement>) => {
+      item.onClick?.(event)
+
+      if (closeOnSelect === false) return
       tutup()
     }
 
@@ -542,8 +576,8 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
             aria-hidden="true"
             className={cn(
               'flex shrink-0 items-center [&_svg]:size-3.5',
-              tone === 'default' && (darkMode ? 'text-gray-300' : 'text-gray-500'),
-              item.disabled && darkMode && 'text-gray-500',
+              tone === 'default' && 'text-dropdown-item-icon',
+              item.disabled && 'text-dropdown-item-support-disabled',
             )}
           >
             {item.icon}
@@ -557,8 +591,8 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
               data-keterangan=""
               className={cn(
                 'mt-0.5 block text-xs font-normal',
-                darkMode ? 'text-gray-400' : 'text-gray-500',
-                item.disabled && darkMode && 'text-gray-500',
+                'text-dropdown-item-description',
+                item.disabled && 'text-dropdown-item-support-disabled',
               )}
             >
               {item.description}
@@ -588,8 +622,8 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
           data-baris=""
           aria-selected={Boolean(item.selected)}
           aria-disabled={item.disabled || undefined}
-          onClick={() => {
-            if (!item.disabled) jalankan()
+          onClick={(event) => {
+            if (!item.disabled) jalankan(event)
           }}
           className={cn(
             dasar,
@@ -600,14 +634,12 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
             item.disabled
               ? cn(
                   'cursor-not-allowed opacity-50',
-                  tone === 'danger'
-                    ? darkMode ? 'text-red-500' : 'text-red-600'
-                    : darkMode ? 'text-gray-500' : 'text-gray-700',
+                  tone === 'danger' ? 'text-feedback-error' : 'text-dropdown-item-disabled',
                 )
               : cn(
                   'cursor-default',
-                  tones[darkMode ? 'dark' : 'light'][tone],
-                  darkMode ? 'focus:bg-gray-700' : 'focus:bg-gray-100',
+                  tones[tone],
+                  'focus:bg-dropdown-item-hover-surface',
                 ),
           )}
         >
@@ -618,18 +650,31 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
 
     const kelas = cn(
       dasar,
-      'focus-visible:outline-2 focus-visible:outline-offset-2',
-      darkMode ? 'focus-visible:outline-primary-400' : 'focus-visible:outline-primary-600',
+      'focus-visible:outline-2 focus-visible:outline-offset-[-2px]',
+      'focus-visible:outline-brand',
       'disabled:cursor-not-allowed disabled:opacity-50',
-      tones[darkMode ? 'dark' : 'light'][tone],
+      current
+        ? 'bg-dropdown-item-current-surface text-content'
+        : tones[tone],
     )
 
     // Aksi yang berpindah halaman dirender sebagai tautan supaya bisa dibuka
     // di tab baru dan disalin alamatnya. Yang dimatikan tetap <button>: <a>
     // tanpa href tidak punya keadaan disabled yang berarti.
     if (item.href && !item.disabled) {
+      const rel = item.target === '_blank' ? (item.rel ?? 'noopener noreferrer') : item.rel
+
       return (
-        <a key={key} href={item.href} data-baris="" className={kelas} onClick={jalankan}>
+        <a
+          key={key}
+          href={item.href}
+          target={item.target}
+          rel={rel}
+          aria-current={current}
+          data-baris=""
+          className={kelas}
+          onClick={jalankan}
+        >
           {isi}
         </a>
       )
@@ -658,7 +703,12 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
   const polos = daftar.length === 1 && !daftar[0].label && !daftar[0].separator
 
   return (
-    <div ref={pasangWrap} className={cn('inline-block', className)} {...props}>
+    <div
+      ref={pasangWrap}
+      data-theme={darkMode ? 'dark' : dataTheme}
+      className={cn('inline-block', className)}
+      {...props}
+    >
       {cloneElement(trigger, {
         popoverTarget: contentId,
         popoverTargetAction: 'toggle',
@@ -684,13 +734,13 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
         }}
         className={cn(
           'fixed inset-auto m-0 overflow-x-hidden overflow-y-auto overscroll-contain rounded-lg shadow-md [overflow-wrap:anywhere]',
-          darkMode ? 'bg-gray-800 text-gray-300' : 'bg-surface text-content',
+          'bg-dropdown-surface text-dropdown-content',
           pakaiDaftar && 'py-1',
           contentClassName,
         )}
       >
         {!pakaiDaftar
-          ? children
+          ? typeof children === 'function' ? children({ close: tutup }) : children
           : polos
             ? barisan(daftar[0])
             : daftar.map((group) => (
@@ -702,10 +752,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
                   {group.separator && (
                     <hr
                       aria-hidden="true"
-                      className={cn(
-                        'my-1 border-0 border-t',
-                        darkMode ? 'border-gray-700' : 'border-border',
-                      )}
+                      className="my-1 border-0 border-t border-border"
                     />
                   )}
                   {group.label && (
@@ -714,7 +761,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
                     // dari pembaca layar supaya tidak dibacakan dua kali.
                     <p
                       aria-hidden={pilihan || undefined}
-                      className="px-4 pt-2 pb-1 text-caption font-bold tracking-wide text-gray-400 uppercase"
+                      className="px-4 pt-2 pb-1 text-caption font-bold tracking-wide text-dropdown-group-label uppercase"
                     >
                       {group.label}
                     </p>

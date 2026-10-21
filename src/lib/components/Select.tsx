@@ -18,7 +18,7 @@ import { cn } from '../utils/cn'
 import { Dropdown, type DropdownGroup } from './Dropdown'
 
 /** Warna aksen per aplikasi — dipakai ikon info dan garis saat field difokus. */
-export type SelectApplication = 'default' | 'simaya'
+export type SelectApplication = 'default' | 'purple'
 
 /** State mengikuti varian desain. `inactive` sekaligus menonaktifkan kontrol. */
 export type SelectState = 'default' | 'inactive'
@@ -38,7 +38,7 @@ type KelompokOpsi = { label?: string; options: Opsi[] }
 
 const accents: Record<SelectApplication, { icon: string; focus: string }> = {
   default: { icon: 'text-primary-500', focus: 'focus-within:border-primary-500' },
-  simaya: { icon: 'text-purple-500', focus: 'focus-within:border-purple-500' },
+  purple: { icon: 'text-purple-500', focus: 'focus-within:border-purple-500' },
 }
 
 /** Warna satu state. `icon` kosong berarti ikon info mengikuti warna aplikasi. */

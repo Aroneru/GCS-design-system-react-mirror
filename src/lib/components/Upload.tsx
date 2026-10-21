@@ -18,7 +18,7 @@ export type UploadType = 'default' | 'attach'
 export type UploadPlatform = 'default' | 'mobile'
 
 /** Warna aksen per aplikasi — dipakai tombol pilih berkas dan sorotan saat seret. */
-export type UploadApplication = 'default' | 'simaya'
+export type UploadApplication = 'default' | 'purple'
 
 /**
  * Tinggi kotak, ukuran teks, dan jarak samping tombol per platform.
@@ -43,7 +43,7 @@ const accents: Record<UploadApplication, { solid: string; drag: string; dragDark
     drag: 'border-primary-500 bg-primary-50',
     dragDark: 'border-primary-500 bg-gray-600',
   },
-  simaya: {
+  purple: {
     solid: 'bg-purple-500 hover:bg-purple-600 focus-visible:outline-purple-500',
     drag: 'border-purple-500 bg-purple-50',
     dragDark: 'border-purple-500 bg-gray-600',

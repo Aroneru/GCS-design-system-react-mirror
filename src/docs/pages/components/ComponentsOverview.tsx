@@ -46,8 +46,8 @@ export function ComponentsOverview() {
         desc="Aksi utama dengan empat variant: primary, secondary, danger, ghost."
       >
         <div className="flex flex-wrap items-center gap-2 rounded-xl bg-surface-subtle p-5">
-          <Button variant="filled">Primary</Button>
           <Button variant="outline">Secondary</Button>
+          <Button variant="filled">Primary</Button>
         </div>
       </OverviewCard>
 
@@ -326,17 +326,20 @@ export function ComponentsOverview() {
       >
         <div className="overflow-hidden rounded-xl bg-surface-subtle p-2">
           <Navbar
-            brand={<span className="text-sm font-black text-content">CEPLOK</span>}
-            brandLabel="CEPLOK — Beranda"
+            platform="front-office"
+            brand={{
+              content: <span className="text-sm font-black text-content">CEPLOK</span>,
+              href: "#/",
+              ariaLabel: "CEPLOK — Beranda",
+            }}
             items={[
-              { id: "menu-1", label: "Menu 1", href: "#/menu-1" },
-              { id: "menu-2", label: "Menu 2", href: "#/menu-2" },
+              { id: "menu-1", type: "destination", label: "Menu 1", href: "#/components" },
+              { id: "menu-2", type: "destination", label: "Menu 2", href: "#/example" },
             ]}
             guestActions={{
-              login: { label: "Masuk", onClick: () => undefined },
-              register: { label: "Daftar", onClick: () => undefined },
+              signIn: { label: "Masuk", href: "#/example/app" },
+              signUp: { label: "Daftar", href: "#/components/navbar" },
             }}
-            onNavigate={(_, event) => event.preventDefault()}
           />
         </div>
       </OverviewCard>

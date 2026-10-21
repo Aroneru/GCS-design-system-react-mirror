@@ -158,8 +158,7 @@ export function BreadcrumbPage() {
 
       <FlowSection id="dark-mode" title="Dark mode">
         <p className="mb-6 text-body-sm text-gray-500">
-          Prop <H>darkMode</H> mengaktifkan tampilan gelap dengan mengubah latar belakang (pada varian <H>bg</H>) menjadi <H>gray-800</H>. Warna item juga disesuaikan agar tetap kontras: item aktif menggunakan
-          warna <H>gray-300</H>, sementara item tidak aktif beserta ikon dan pemisah (chevron) menggunakan warna <H>gray-400</H>.
+          Breadcrumb mengadopsi sistem token warna semantik dan token komponen (<H>--color-breadcrumb-surface</H>, <H>--color-breadcrumb-active</H>, dan <H>--color-breadcrumb-link-hover</H>). Mode gelap dapat diaktifkan lewat prop <H>darkMode</H> maupun pewarisan otomatis atribut <H>data-theme="dark"</H> dari kontainer pembungkusnya. Latar belakang (pada varian <H>bg</H>) menjadi <H>gray-700</H>, item aktif <H>gray-300</H>, serta item tidak aktif dan ikon pemisah (chevron) menggunakan <H>gray-400</H>.
         </p>
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">

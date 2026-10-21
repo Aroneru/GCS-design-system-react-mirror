@@ -241,9 +241,11 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
         onClose={handleNativeClose}
         onClick={handleClick}
         className={cn(
-          'm-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-hidden rounded-lg border border-border bg-surface p-0 text-left text-content shadow-xl',
+          'm-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-hidden rounded-lg border border-[light-dark(var(--color-border),var(--color-border-strong))] p-0 text-left text-content shadow-xl',
           'backdrop:bg-gray-900/50 open:flex open:flex-col',
-          isPopup ? 'max-w-[416px]' : sizes[size ?? 's'],
+          isPopup
+            ? 'max-w-[416px] bg-[light-dark(var(--color-surface),var(--color-gray-600))]'
+            : cn(sizes[size ?? 's'], 'bg-surface'),
           className,
         )}
         {...props}
@@ -253,11 +255,11 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
             'flex shrink-0 items-start justify-between gap-4',
             isPopup
               ? 'relative h-7 px-5'
-              : cn('px-6', adaJudul ? 'border-b border-border py-5' : 'pt-4'),
+              : cn('px-6', adaJudul ? 'border-b border-[light-dark(var(--color-border),var(--color-border-strong))] py-5' : 'pt-4'),
           )}
         >
           {adaJudul && (
-            <h2 id={titleId} className="min-w-0 flex-1 text-heading-4 font-bold text-gray-900">
+            <h2 id={titleId} className="min-w-0 flex-1 font-alt text-lg leading-[1.5] font-semibold text-content">
               {title}
             </h2>
           )}
@@ -268,7 +270,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
               onClick={() => requestOpenChange(false)}
               aria-label={closeLabel}
               className={cn(
-                'ml-auto inline-flex shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+                'ml-auto inline-flex shrink-0 items-center justify-center rounded-lg text-[light-dark(var(--color-gray-400),var(--color-content-muted))] transition-colors hover:bg-[light-dark(var(--color-gray-100),var(--color-surface-subtle))] hover:text-[light-dark(var(--color-gray-600),var(--color-content))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
                 isPopup ? 'absolute right-0.5 top-0.5 size-10' : '-my-2 -mr-2 size-10',
               )}
             >
@@ -279,7 +281,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
 
         <div
           className={cn(
-            'min-h-0 flex-1 overflow-y-auto overscroll-y-contain text-body-sm text-gray-500',
+            'min-h-0 flex-1 overflow-y-auto overscroll-y-contain font-sans text-body font-medium text-content-muted',
             isPopup ? 'px-5 pb-4 pt-5' : 'px-5 py-6',
           )}
         >
@@ -290,7 +292,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
           <div
             className={cn(
               'flex shrink-0 flex-wrap items-center gap-3',
-              isPopup ? 'px-5 pb-5' : 'border-t border-border px-6 py-4',
+              isPopup ? 'px-5 pb-5' : 'border-t border-[light-dark(var(--color-border),var(--color-border-strong))] px-6 py-4',
             )}
           >
             {renderedFooter}

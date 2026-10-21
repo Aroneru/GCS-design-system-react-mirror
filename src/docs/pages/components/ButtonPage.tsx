@@ -27,7 +27,7 @@ const themeOptions: { value: ButtonTheme; label: string }[] = [
   { value: "primary", label: "Primary" },
   { value: "green", label: "Green" },
   { value: "gray", label: "Gray" },
-  { value: "simaya", label: "Simaya" },
+  { value: "purple", label: "Purple" },
   { value: "orange", label: "Orange" },
   { value: "yellow", label: "Yellow" },
 ];
@@ -229,12 +229,12 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button variant="filled" theme="simaya" tone="light">
-              Simaya
+            <Button variant="filled" theme="purple" tone="light">
+              Purple
             </Button>
 
             <p className="mt-3 text-sm text-gray-600">
-              <Hl>Simaya</Hl> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
+              <Hl>Purple</Hl> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
               visual berbeda.
             </p>
           </div>
