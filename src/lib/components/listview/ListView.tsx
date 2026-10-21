@@ -7,21 +7,35 @@ import {
   type ReactNode,
 } from "react";
 import { FileLines } from "flowbite-react-icons/outline";
-import { cn } from "../utils/cn";
-import { Button, type ButtonSize } from "./Button";
-import { Badge } from "./Badge";
+import { cn } from "../../utils/cn";
+import { Button, type ButtonSize } from "../Button";
+import { Badge } from "../Badge";
+import {
+  ListViewArticle,
+  type ListViewArticleProps,
+  type ListViewArticleSize,
+} from "./ListViewArticle";
 
-export type ListViewSize = "sm" | "default" | "lg" | "s" | "m" | "l";
+export type ListViewItemVariant = "simple" | "article";
+
+export type ListViewSize =
+  | "sm"
+  | "default"
+  | "lg"
+  | "s"
+  | "m"
+  | "l"
+  | "xl";
 
 export type ListViewPlatform = "desktop" | "mobile" | "default";
 
-export const normalizeListViewSize = (
+const normalizeListViewSize = (
   size: ListViewSize = "default",
 ): "sm" | "default" | "lg" => {
-  if (size === "s") return "sm";
-  if (size === "m") return "default";
-  if (size === "l") return "lg";
-  return size;
+  if (size === "s" || size === "sm") return "sm";
+  if (size === "m" || size === "default") return "default";
+  if (size === "l" || size === "lg" || size === "xl") return "lg";
+  return "default";
 };
 
 const mobileClasses = {
@@ -130,9 +144,11 @@ const sizeBadgeClasses: Record<
 
 export interface ListViewItemProps
   extends Omit<HTMLAttributes<HTMLElement>, "title"> {
-  /** Judul utama item (misalnya: "Project brief"). */
+  /** Jenis / varian tampilan kartu: 'simple' (bawaan) atau 'article'. */
+  variant?: ListViewItemVariant;
+  /** Judul utama item (misalnya: "Project brief" atau judul artikel). */
   title: ReactNode;
-  /** Keterangan atau deskripsi tambahan di bawah judul. */
+  /** Keterangan atau deskripsi tambahan di bawah judul (varian simple). */
   description?: ReactNode;
   /**
    * Daftar metadata ringkas yang otomatis digabung dengan tanda pemisah (·).
@@ -140,7 +156,7 @@ export interface ListViewItemProps
    */
   metadata?: ReactNode[];
   /**
-   * Ikon atau elemen visual di sebelah kiri.
+   * Ikon atau elemen visual di sebelah kiri (varian simple).
    * Bawaannya menggunakan ikon dokumen (`FileLines`).
    * Isi `null` jika tidak ingin menampilkan wadah ikon sama sekali.
    */
@@ -150,7 +166,7 @@ export interface ListViewItemProps
   /** Label untuk tombol aksi cepat bawaan (misalnya `"Open"`). */
   actionLabel?: ReactNode;
   /** Callback saat tombol aksi bawaan diklik. */
-  onAction?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onAction?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
   /** Tautan untuk tombol aksi bawaan. */
   actionHref?: string;
   /** Ukuran tombol aksi bawaan. Mengikuti `size` item bila tidak diisi. */
@@ -161,17 +177,39 @@ export interface ListViewItemProps
   target?: string;
   /** Rel tautan jika `href` diisi. */
   rel?: string;
-  /** Kerapatan/ukuran item. Bawaannya `'default'`. */
+  /** Kerapatan/ukuran item ('s', 'm', 'l', 'xl', atau 'sm', 'default', 'lg'). */
   size?: ListViewSize;
   /** Platform target: `'desktop'` (bawaan) atau `'mobile'` (tampilan ringkas responsif 58px). */
   platform?: ListViewPlatform;
-  /** Menampilkan garis dekorasi aksen warna primary pada sisi kiri kartu. */
+  /**
+   * Menampilkan garis dekorasi aksen warna primary pada sisi kiri kartu.
+   * Otomatis `true` bila `variant="article"`, bawaannya `false` bila `variant="simple"`.
+   */
   decoration?: boolean;
   /**
-   * Badge atau elemen label status tambahan yang ditampilkan di bawah metadata.
+   * Badge atau elemen label status tambahan yang ditampilkan di bawah metadata (varian simple).
    * Dapat berupa komponen `<Badge>` kustom atau string teks label.
    */
   badge?: ReactNode;
+
+  // --- Props khusus untuk variant="article" ---
+  /** Nama subjek / pengirim di kiri atas (varian article). */
+  subject?: ReactNode;
+  /** Kategori topik di kanan atas (varian article). */
+  category?: ReactNode;
+  /** Tanggal / waktu publikasi di kanan atas (varian article). */
+  timestamp?: ReactNode;
+  /** Jumlah tayangan / views di kanan bawah (varian article). */
+  views?: ReactNode;
+  /** Jumlah komentar di kanan bawah (varian article). */
+  comments?: ReactNode;
+  /** Jumlah suka / likes di kanan bawah (varian article). */
+  likes?: ReactNode;
+  /** Menampilkan lencana pin (thumbtack) di kanan atas (varian article). Bawaannya `true`. */
+  pinned?: boolean;
+  /** Callback saat tombol pin diklik (varian article). */
+  onPin?: (e: React.MouseEvent<HTMLElement>) => void;
+
   /**
    * Memaksa item bertema gelap. Tanpa prop ini item ikut tema pembungkusnya
    * (mis. `<section data-theme="dark">`).
@@ -182,12 +220,14 @@ export interface ListViewItemProps
 }
 
 /**
- * ListViewItem — kartu baris individual yang menampilkan ikon/media di kiri,
- * judul dan metadata/deskripsi di tengah, serta aksi di sebelah kanan.
+ * ListViewItem — kartu baris individual yang mendukung dua jenis varian:
+ * - `'simple'` (bawaan): menampilkan ikon/media di kiri, judul dan metadata di tengah, aksi di kanan.
+ * - `'article'`: menampilkan kartu artikel dengan subject, kategori/tanggal, pin di header, judul di tengah, serta views/comments/likes di footer.
  */
 export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
   (
     {
+      variant = "simple",
       title,
       description,
       metadata,
@@ -202,8 +242,17 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
       rel,
       size = "default",
       platform = "desktop",
-      decoration = false,
+      decoration,
       badge,
+      // Props khusus variant 'article'
+      subject,
+      category,
+      timestamp,
+      views,
+      comments,
+      likes,
+      pinned = true,
+      onPin,
       darkMode = false,
       as,
       className,
@@ -213,6 +262,46 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
     },
     ref,
   ) => {
+    // Jika varian article, delegasikan ke ListViewArticle
+    if (variant === "article") {
+      const articleSize: ListViewArticleSize =
+        size === "default"
+          ? "m"
+          : size === "sm"
+          ? "s"
+          : size === "lg"
+          ? "l"
+          : (size as ListViewArticleSize);
+
+      return (
+        <ListViewArticle
+          ref={ref as React.Ref<never>}
+          subject={subject}
+          category={category}
+          timestamp={timestamp}
+          title={title}
+          views={views}
+          comments={comments}
+          likes={likes}
+          pinned={pinned}
+          onPin={onPin}
+          decoration={decoration ?? true}
+          size={articleSize}
+          href={href}
+          target={target}
+          rel={rel}
+          darkMode={darkMode}
+          as={as}
+          className={className}
+          onClick={onClick}
+          {...props}
+        >
+          {children}
+        </ListViewArticle>
+      );
+    }
+
+    const isDecoration = decoration ?? false;
     const isInteractive = Boolean(href || onClick);
     const Component = as ?? (href ? "a" : "article");
     const isMobile = platform === "mobile";
@@ -239,7 +328,7 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
           variant="filled"
           onClick={(e) => {
             e.stopPropagation();
-            onAction?.(e as any);
+            onAction?.(e);
           }}
         >
           {actionLabel}
@@ -261,7 +350,7 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
 
     return (
       <Component
-        ref={ref as any}
+        ref={ref as React.Ref<never>}
         href={href}
         target={target}
         rel={target === "_blank" ? (rel ?? "noreferrer noopener") : rel}
@@ -271,14 +360,14 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
           "group relative flex items-center justify-between overflow-hidden rounded-lg border border-border bg-surface text-content transition-all",
           "data-[theme=dark]:border-gray-500 in-data-[theme=dark]:border-gray-500 data-[theme=dark]:bg-gray-700 in-data-[theme=dark]:bg-gray-700",
           currentSize.container,
-          decoration && currentSize.decorationPadding,
+          isDecoration && currentSize.decorationPadding,
           isInteractive &&
           "cursor-pointer hover:border-primary-400/80 hover:shadow-soft active:scale-[0.998]",
           className,
         )}
         {...props}
       >
-        {decoration && (
+        {isDecoration && (
           <span
             className="absolute inset-y-0 left-0 w-1 sm:w-1.5 bg-primary-700"
             aria-hidden="true"
@@ -348,9 +437,9 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
                   <Badge variant="success" size="sm" darkMode={Boolean(darkMode)}>
                     {badge}
                   </Badge>
-                ) : isValidElement(badge) ? (
-                  cloneElement(badge as any, {
-                    darkMode: (badge as any).props?.darkMode ?? Boolean(darkMode),
+                ) : isValidElement<{ darkMode?: boolean }>(badge) ? (
+                  cloneElement(badge, {
+                    darkMode: badge.props?.darkMode ?? Boolean(darkMode),
                   })
                 ) : (
                   badge
@@ -412,7 +501,7 @@ export const ListView = forwardRef<HTMLElement, ListViewProps>(
       gap = "md",
       size = "default",
       platform = "desktop",
-      decoration = false,
+      decoration,
       darkMode = false,
       as: Component = "div",
       className,
@@ -423,7 +512,7 @@ export const ListView = forwardRef<HTMLElement, ListViewProps>(
   ) => {
     return (
       <Component
-        ref={ref as any}
+        ref={ref as React.Ref<never>}
         data-theme={darkMode ? "dark" : undefined}
         className={cn("w-full", gapClasses[gap], className)}
         {...props}
@@ -432,7 +521,7 @@ export const ListView = forwardRef<HTMLElement, ListViewProps>(
           ? items.map((item, index) => (
             <ListViewItem
               key={index}
-              size={size}
+              size={item.size ?? size}
               platform={item.platform ?? platform}
               decoration={item.decoration ?? decoration}
               darkMode={item.darkMode ?? darkMode}
@@ -447,7 +536,12 @@ export const ListView = forwardRef<HTMLElement, ListViewProps>(
   ListViewProps & React.RefAttributes<HTMLElement>
 > & {
   Item: typeof ListViewItem;
+  Article: typeof ListViewArticle;
 };
 
 ListView.displayName = "ListView";
 ListView.Item = ListViewItem;
+ListView.Article = ListViewArticle;
+
+export { ListViewArticle };
+export type { ListViewArticleProps, ListViewArticleSize };
