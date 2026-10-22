@@ -248,6 +248,7 @@ export type {
 export { TableOfContents } from "./components/TableOfContents";
 export type {
   TableOfContentsItem,
+  TableOfContentsItemElement,
   TableOfContentsLayout,
   TableOfContentsProps,
 } from "./components/TableOfContents";

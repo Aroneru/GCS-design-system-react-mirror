@@ -51,7 +51,15 @@ export interface TableOfContentsProps extends Omit<HTMLAttributes<HTMLElement>, 
    */
   getHref?: (id: string) => string
   /** Dipanggil saat entri diklik, sebelum tautan berjalan. */
-  onItemClick?: (item: TableOfContentsItem, event: MouseEvent<HTMLAnchorElement>) => void
+  onItemClick?: (item: TableOfContentsItem, event: MouseEvent<TableOfContentsItemElement>) => void
+  /**
+   * Entri berupa tautan `<a href>` yang melompat ke bagiannya, dengan
+   * scroll-spy. Bawaan: true. `false` menjadikan entri `<button>` biasa:
+   * klik hanya memindahkan sorotan, tanpa berpindah atau menggulir, dan
+   * scroll-spy tidak dipasang. Pakai `onItemClick` atau `onActiveChange`
+   * untuk menanggapi pilihannya sendiri.
+   */
+  anchor?: boolean
   /** Sama dengan memasang `data-theme="dark"`. Tanpa prop ini komponen ikut tema pembungkusnya. */
   darkMode?: boolean
   /**
@@ -83,6 +91,9 @@ export interface TableOfContentsProps extends Omit<HTMLAttributes<HTMLElement>, 
 }
 
 export type TableOfContentsLayout = 'auto' | 'list' | 'drawer'
+
+/** Elemen entri: `<a>` saat `anchor` (bawaan), `<button>` saat `anchor={false}`. */
+export type TableOfContentsItemElement = HTMLAnchorElement | HTMLButtonElement
 
 /** Menyorot bagian yang paling atas di pita sempit di bawah tepi atas layar atau wadah. */
 function useScrollSpy(
@@ -167,7 +178,7 @@ function ActiveIndicator({
   // nilainya benar-benar berubah, supaya ResizeObserver yang sering menembak
   // tidak memicu render kosong.
   const measure = useCallback(() => {
-    const link = listRef.current?.querySelector<HTMLElement>('a[aria-current]')
+    const link = listRef.current?.querySelector<HTMLElement>('[aria-current]')
     if (!link || !link.offsetHeight) {
       setBox(null)
       setAnimate(false)
@@ -242,18 +253,23 @@ export function TableOfContents({
   scrollContainer,
   layout = 'auto',
   drawerContained = false,
+  anchor = true,
   className,
   'aria-label': ariaLabel = 'Daftar isi halaman',
   ...props
 }: TableOfContentsProps) {
   const controlled = activeId !== undefined
+  // Tanpa anchor tidak ada bagian yang dituju, jadi scroll-spy tidak dipasang;
+  // sorotan cukup mengikuti entri yang terakhir diklik.
   const spied = useScrollSpy(
     items.map((i) => i.id),
     offset,
-    scrollSpy && !controlled,
+    anchor && scrollSpy && !controlled,
     scrollContainer,
   )
-  const active = controlled ? activeId : spied
+  const [selected, setSelected] = useState(items[0]?.id ?? '')
+  const internal = anchor ? spied : selected
+  const active = controlled ? activeId : internal
   const listRef = useRef<HTMLUListElement>(null)
 
   // Daftar yang bisa digulir mengikuti entri aktif. scrollTop diatur langsung,
@@ -277,8 +293,12 @@ export function TableOfContents({
     })
   }
 
-  const handleClick = (item: TableOfContentsItem, event: MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = (item: TableOfContentsItem, event: MouseEvent<TableOfContentsItemElement>) => {
     onItemClick?.(item, event)
+    if (!anchor) {
+      if (!event.defaultPrevented) setSelected(item.id)
+      return
+    }
     const root = scrollContainer?.current
     if (event.defaultPrevented || !root) return
     const el = document.getElementById(item.id)
@@ -288,11 +308,11 @@ export function TableOfContents({
   }
 
   useEffect(() => {
-    if (!controlled && spied) onActiveChange?.(spied)
+    if (!controlled && internal) onActiveChange?.(internal)
     // onActiveChange sengaja tidak masuk dependensi supaya fungsi inline
     // tidak memicu panggilan ulang tiap render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spied, controlled])
+  }, [internal, controlled])
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   // Daftar di Drawer baru dirender setelah Drawer pertama kali dibuka. Dengan
@@ -343,12 +363,14 @@ export function TableOfContents({
    * terbuka, halaman di belakangnya tidak bisa digulir. Drawer ditutup dulu,
    * baru berpindah ke bagiannya.
    */
-  const handleDrawerClick = (item: TableOfContentsItem, event: MouseEvent<HTMLAnchorElement>) => {
+  const handleDrawerClick = (item: TableOfContentsItem, event: MouseEvent<TableOfContentsItemElement>) => {
     onItemClick?.(item, event)
     const handled = event.defaultPrevented
     event.preventDefault()
     closeDrawer()
-    if (!handled) setTimeout(() => goTo(item), 0)
+    if (handled) return
+    if (anchor) setTimeout(() => goTo(item), 0)
+    else setSelected(item.id)
   }
 
   const renderList = (variant: 'inline' | 'drawer') => (
@@ -363,28 +385,42 @@ export function TableOfContents({
     >
       {items.map((item) => {
         const isActive = item.id === active
+        const onClick = (event: MouseEvent<TableOfContentsItemElement>) =>
+          variant === 'inline' ? handleClick(item, event) : handleDrawerClick(item, event)
+        const itemClass = cn(
+          '-ml-px block w-full border-l-2 pl-3.5 text-left transition-colors',
+          // Desktop 12px; di Drawer 14px dengan baris 40px supaya mudah disentuh.
+          variant === 'inline' ? 'py-1.5 text-xs leading-5' : 'py-2.5 text-sm leading-5',
+          'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand',
+          // Garis brand entri aktif digambar ActiveIndicator supaya bisa
+          // meluncur; garisnya sendiri cukup untuk hover.
+          isActive
+            ? 'border-transparent text-brand'
+            : 'border-transparent text-content-subtle hover:border-border-strong hover:text-content',
+        )
         return (
           <li key={item.id}>
-            <a
-              href={hrefOf(item)}
-              onClick={(event) =>
-                variant === 'inline' ? handleClick(item, event) : handleDrawerClick(item, event)
-              }
-              aria-current={isActive ? 'location' : undefined}
-              className={cn(
-                '-ml-px block border-l-2 pl-3.5 transition-colors',
-                // Desktop 12px; di Drawer 14px dengan baris 40px supaya mudah disentuh.
-                variant === 'inline' ? 'py-1.5 text-xs leading-5' : 'py-2.5 text-sm leading-5',
-                'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand',
-                // Garis brand entri aktif digambar ActiveIndicator supaya bisa
-                // meluncur; garisnya sendiri cukup untuk hover.
-                isActive
-                  ? 'border-transparent text-brand'
-                  : 'border-transparent text-content-subtle hover:border-border-strong hover:text-content',
-              )}
-            >
-              {item.label}
-            </a>
+            {anchor ? (
+              <a
+                href={hrefOf(item)}
+                onClick={onClick}
+                aria-current={isActive ? 'location' : undefined}
+                className={itemClass}
+              >
+                {item.label}
+              </a>
+            ) : (
+              // Tanpa anchor entri tidak menuju ke mana pun, jadi tombol, bukan
+              // tautan: tidak ada alamat palsu yang bisa disalin atau dibuka.
+              <button
+                type="button"
+                onClick={onClick}
+                aria-current={isActive ? 'true' : undefined}
+                className={itemClass}
+              >
+                {item.label}
+              </button>
+            )}
           </li>
         )
       })}
