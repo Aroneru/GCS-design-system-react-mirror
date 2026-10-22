@@ -245,4 +245,11 @@ export type {
   SidebarUserItemTone,
 } from "./components/sidebar/Sidebar";
 
+export { TableOfContents } from "./components/TableOfContents";
+export type {
+  TableOfContentsItem,
+  TableOfContentsLayout,
+  TableOfContentsProps,
+} from "./components/TableOfContents";
+
 export { cn } from "./utils/cn";
