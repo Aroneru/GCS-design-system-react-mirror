@@ -327,7 +327,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         </select>
 
         <Dropdown
-          attached
+          className="w-full"
           contentLabel={typeof label === 'string' ? label : props['aria-label']}
           groups={menuGroups}
           // Panel tinggal di dalam field ini (top layer tetap ikut pohon DOM),

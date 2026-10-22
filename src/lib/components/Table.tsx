@@ -1499,7 +1499,6 @@ export function Table<T>({
                     sama dengan Dropdown lain; <select> bawaan tidak bisa diberi gaya.
                     Tinggi, sudut, dan garis tombolnya disamakan dengan Pagination. */}
                 <Dropdown
-                  attached
                   contentLabel="Baris per halaman"
                   trigger={
                     <button

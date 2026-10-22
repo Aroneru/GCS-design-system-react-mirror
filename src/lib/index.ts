@@ -32,6 +32,9 @@ export type {
   DropdownItem,
   DropdownGroup,
   DropdownItemTone,
+  DropdownCloseOnSelect,
+  DropdownRenderProps,
+  DropdownHandle,
 } from "./components/Dropdown";
 
 export { Modal } from "./components/Modal";
@@ -177,16 +180,20 @@ export type { FooterProps, FooterMenu, FooterSocial } from "./components/Footer"
 export { Navbar } from "./components/Navbar";
 export type {
   NavbarProps,
-  NavbarItem,
-  NavbarContextItem,
-  NavbarSubItem,
-  NavbarSearchConfig,
-  NavbarAction,
+  NavbarPlatform,
+  NavbarBrand,
+  NavbarDestination,
+  NavbarDisclosure,
+  NavbarPrimaryItem,
+  NavbarAccountDestination,
+  NavbarAccountAction,
+  NavbarAccountItem,
+  NavbarAccount,
+  NavbarGuestLink,
   NavbarGuestActions,
-  NavbarUser,
-  NavbarNotification,
-  NavbarMenuPosition,
-  NavbarVariant,
+  NavbarMobileDrawer,
+  NavbarFrontOfficeProps,
+  NavbarBackOfficeProps,
 } from "./components/Navbar";
 
 export { Breadcrumb } from "./components/Breadcrumb";

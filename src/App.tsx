@@ -47,6 +47,7 @@ import {
   NavbarDesktopPreview,
   NavbarMobilePreview,
   NavbarPage,
+  NavbarPlaygroundPreview,
 } from "./docs/pages/components/NavbarPage";
 import { BreadcrumbPage } from "./docs/pages/components/BreadcrumbPage";
 import { PaginationPage } from "./docs/pages/components/PaginationPage";
@@ -104,11 +105,17 @@ const routes: Record<string, () => React.ReactElement> = {
 };
 
 function renderNavbarPreview(path: string) {
+  if (path.startsWith("/preview/navbar/playground")) {
+    return <NavbarPlaygroundPreview />;
+  }
+
   switch (path) {
     case "/preview/navbar/mobile-guest":
       return <NavbarMobilePreview variant="guest" />;
     case "/preview/navbar/mobile-authenticated":
       return <NavbarMobilePreview variant="authenticated" />;
+    case "/preview/navbar/mobile-back-office":
+      return <NavbarMobilePreview variant="authenticated" platform="back-office" />;
     case "/preview/navbar/desktop-guest-5":
       return <NavbarDesktopPreview variant="guest" menuCount={5} />;
     case "/preview/navbar/desktop-guest-4":
@@ -129,6 +136,8 @@ function renderNavbarPreview(path: string) {
       return <NavbarDesktopPreview variant="authenticated" menuCount={4} />;
     case "/preview/navbar/desktop-authenticated-3":
       return <NavbarDesktopPreview variant="authenticated" menuCount={3} />;
+    case "/preview/navbar/desktop-back-office":
+      return <NavbarDesktopPreview variant="authenticated" menuCount={3} platform="back-office" />;
     default:
       return null;
   }
