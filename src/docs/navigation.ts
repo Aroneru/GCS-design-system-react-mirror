@@ -131,6 +131,11 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: "Pagination", route: "/components/pagination", keywords: "halaman paginasi" },
       { label: "Sidebar", route: "/components/sidebar", keywords: "menu samping" },
       { label: "Table", route: "/components/table", keywords: "tabel data" },
+      {
+        label: "Timeline View",
+        route: "/components/timeline",
+        keywords: "linimasa riwayat aktivitas jejak proses persetujuan",
+      },
     ],
   },
 };

@@ -1,4 +1,5 @@
 import { CheckCircle, CloseCircle, Hourglass, InfoCircle } from "flowbite-react-icons/outline";
+import { Clock } from "flowbite-react-icons/solid";
 import {
   Alert,
   Avatar,
@@ -13,6 +14,7 @@ import {
   Pagination,
   Sidebar,
   Spinner,
+  Timeline,
   Toast,
   Drawer,
 } from "../../../lib";
@@ -461,6 +463,28 @@ export function ComponentsOverview() {
               </div>
             </div>
           </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/timeline"
+        name="Timeline View"
+        desc="Riwayat kejadian berurutan dengan avatar, waktu, dan status di tiap langkah. Desainnya belum final."
+      >
+        <div className="rounded-xl bg-surface-subtle p-5">
+          <Timeline
+            platform="mobile"
+            size="small"
+            items={[
+              { name: "User 01", role: "Role / Department", time: "01 Jan 2026 · 09:00" },
+              {
+                name: "User 02",
+                role: "Role / Department",
+                time: "01 Jan 2026 · 09:05",
+                status: { label: "Badge", icon: <Clock />, dismissible: true },
+              },
+            ]}
+          />
         </div>
       </OverviewCard>
     </OverviewPage>

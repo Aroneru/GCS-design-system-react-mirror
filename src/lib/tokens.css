@@ -575,6 +575,33 @@
     --color-breadcrumb-link-hover: var(--color-primary-700);
 }
 
+/*
+ * Timeline. Garis, latar avatar, dan tepi kartu memakai token semantik
+ * `border` (gray-200/gray-700), nama dan jabatan memakai `brand`
+ * (primary-600/primary-400), dan status memakai Badge, persis seperti
+ * desainnya. Nilai di bawah adalah token terdekat dari warna desain: teks isi
+ * #1F2A37 menjadi gray-800, siluet avatar hitam menjadi gray-900, dan latar
+ * kartu gelap #1C2634 menjadi gray-800.
+ */
+@theme static {
+    --color-timeline-surface: #ffffff;
+    --color-timeline-content: var(--color-gray-800);
+    --color-timeline-avatar: var(--color-gray-900);
+}
+
+[data-theme='dark'] {
+    --color-timeline-surface: var(--color-gray-800);
+    --color-timeline-content: var(--color-gray-100);
+    --color-timeline-avatar: var(--color-gray-100);
+}
+
+[data-theme='light'],
+.ds-theme-light {
+    --color-timeline-surface: #ffffff;
+    --color-timeline-content: var(--color-gray-800);
+    --color-timeline-avatar: var(--color-gray-900);
+}
+
 @media (max-width: 639px) {
     :root {
         --text-display: 2.25rem;

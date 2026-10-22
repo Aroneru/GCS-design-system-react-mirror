@@ -238,4 +238,16 @@ export type {
   SidebarUserItemTone,
 } from "./components/sidebar/Sidebar";
 
+// Eksperimental: desain Timeline belum final, jadi prop-nya masih bisa berubah.
+export { Timeline } from "./components/Timeline";
+export type {
+  TimelineProps,
+  TimelineItem,
+  TimelineAttachment,
+  TimelineStatus,
+  TimelineLabels,
+  TimelineSize,
+  TimelinePlatform,
+} from "./components/Timeline";
+
 export { cn } from "./utils/cn";
