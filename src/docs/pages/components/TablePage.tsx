@@ -682,26 +682,32 @@ function ServerTable() {
  * baris). Data baru dihapus saat "Ya, hapus" ditekan; "Tidak, Batalkan" dan
  * tombol tutup hanya menutup.
  */
-function ConfirmDeleteModal({
-  trigger,
-  open,
-  onOpenChange,
-  message,
-  confirmLabel,
-  onConfirm,
-}: {
-  trigger?: React.ComponentProps<typeof Modal>["trigger"];
-  open?: boolean;
+type ConfirmDeleteModalProps = {
   onOpenChange?: (open: boolean) => void;
   message: ReactNode;
   confirmLabel: string;
   onConfirm: () => void;
-}) {
+} & (
+  | {
+      trigger: NonNullable<React.ComponentProps<typeof Modal>["trigger"]>;
+      open?: undefined;
+    }
+  | {
+      open: boolean;
+      trigger?: React.ComponentProps<typeof Modal>["trigger"];
+    }
+);
+
+function ConfirmDeleteModal(props: ConfirmDeleteModalProps) {
+  const { message, confirmLabel, onConfirm } = props;
+  const visibilityProps =
+    props.open === undefined
+      ? { trigger: props.trigger, onOpenChange: props.onOpenChange }
+      : { open: props.open, trigger: props.trigger, onOpenChange: props.onOpenChange };
+
   return (
     <Modal
-      trigger={trigger}
-      open={open}
-      onOpenChange={onOpenChange}
+      {...visibilityProps}
       variant="popup"
       aria-label="Konfirmasi hapus data"
       footer={({ close }) => (

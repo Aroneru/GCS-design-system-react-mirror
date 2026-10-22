@@ -1,5 +1,14 @@
-import { useState } from "react";
-import { Breadcrumb, Container, Hero, Navbar, Sidebar } from "../../../lib";
+import { useId, useState, type MouseEvent } from "react";
+import {
+  Breadcrumb,
+  Container,
+  Drawer,
+  Hero,
+  Navbar,
+  Search,
+  Sidebar,
+  type DrawerMenuItem,
+} from "../../../lib";
 import {
   ChartMixed,
   Cog,
@@ -59,6 +68,27 @@ const DESKRIPSI: Record<HalamanDemo, string> = {
   pengaturan: "Data profil dan preferensi pemberitahuan akun Anda.",
 };
 
+const RUTE_KONTEKSTUAL: Record<HalamanDemo, HalamanDemo[]> = {
+  dasbor: ["pengajuan", "layanan"],
+  pengajuan: ["pemohon", "layanan"],
+  pemohon: ["pengajuan", "layanan"],
+  layanan: ["pengajuan", "pengaturan"],
+  simaya: ["pengajuan", "pengaturan"],
+  modifikasi: ["layanan", "pengaturan"],
+  pengaturan: ["pemohon", "modifikasi"],
+};
+
+function isAcceptedNavigation(event: MouseEvent<HTMLElement>) {
+  return (
+    !event.defaultPrevented &&
+    event.button === 0 &&
+    !event.altKey &&
+    !event.ctrlKey &&
+    !event.metaKey &&
+    !event.shiftKey
+  );
+}
+
 function Isi({ halaman }: { halaman: HalamanDemo }) {
   switch (halaman) {
     case "pengajuan":
@@ -81,6 +111,10 @@ function Isi({ halaman }: { halaman: HalamanDemo }) {
 export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
   const [ringkas, setRingkas] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [contextualDrawerPage, setContextualDrawerPage] = useState<HalamanDemo | null>(null);
+  const [searchFeedback, setSearchFeedback] = useState("");
+  const contextualDrawerOpen = contextualDrawerPage === halaman;
+  const contextualDrawerId = useId();
 
   const menu = RUTE.map(({ halaman: h, ikon, badge }) => ({
     id: h,
@@ -90,6 +124,20 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
     badge,
     active: h === halaman,
   }));
+  const contextualMenu: DrawerMenuItem[] = [halaman, ...RUTE_KONTEKSTUAL[halaman]].map((h) => {
+    const route = RUTE.find(({ halaman: routePage }) => routePage === h);
+
+    return {
+      id: h,
+      label: JUDUL_HALAMAN[h],
+      href: href(h),
+      icon: route?.ikon,
+      active: h === halaman,
+      onClick: (event) => {
+        if (isAcceptedNavigation(event)) setContextualDrawerPage(null);
+      },
+    };
+  });
 
   return (
     // Kolom, bukan baris: Sidebar dan konten berdampingan di dalam satu baris,
@@ -134,53 +182,61 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Navbar
-            className="[&>div:last-child]:hidden"
-            brand={<span className="text-sm font-black text-content">CEPLOK</span>}
-            brandLabel="CEPLOK — Dasbor"
-            items={RUTE.map(({ halaman: h }) => ({
+            platform="back-office"
+            brand={{
+              content: (
+                <img
+                  src={asset("/images/ceplok.svg")}
+                  alt=""
+                  className="size-8 object-contain"
+                />
+              ),
+              href: href("dasbor"),
+              ariaLabel: "CEPLOK — Dasbor",
+            }}
+            items={RUTE.map(({ halaman: h, ikon }) => ({
               id: h,
+              type: "destination" as const,
               label: JUDUL_HALAMAN[h],
               href: href(h),
-              active: h === halaman,
+              icon: ikon,
+              current: h === halaman,
             }))}
-            search={{ onSubmit: () => undefined, placeholder: "Cari pengajuan, pemohon ..." }}
-            user={{ name: "Rafli Arandhana", initials: "RA" }}
-            notification={{ unread: 3, onClick: () => undefined }}
-            mobileOpen={mobileSidebarOpen}
-            onMobileOpenChange={setMobileSidebarOpen}
+            search={
+              <Search
+                platform="compact"
+                showButton={false}
+                trigger="enter"
+                aria-label="Cari pengajuan atau pemohon"
+                placeholder="Cari pengajuan, pemohon ..."
+                onSearch={(value) => setSearchFeedback(`Pencarian demo: ${value}`)}
+              />
+            }
+            account={{ name: "Rafli Arandhana", initials: "RA", items: [] }}
+            mobileNavigationOpen={mobileSidebarOpen}
+            onMobileNavigationOpenChange={setMobileSidebarOpen}
+            mobileDrawer={{
+              open: contextualDrawerOpen,
+              onOpenChange: (open) => setContextualDrawerPage(open ? halaman : null),
+              controls: contextualDrawerId,
+              ariaLabel: `Buka navigasi kontekstual ${JUDUL_HALAMAN[halaman]}`,
+            }}
           />
 
-          {mobileSidebarOpen && (
-            <div className="fixed inset-0 z-[60] lg:hidden">
-              <button
-                type="button"
-                className="absolute inset-0 bg-gray-900/50"
-                aria-label="Tutup navigasi utama"
-                onClick={() => setMobileSidebarOpen(false)}
-              />
-              <Sidebar
-                className="relative z-10 h-full !min-h-0 w-[88vw] max-w-[320px] shadow-soft"
-                logo={
-                  <img
-                    src={asset("/images/ceplok.svg")}
-                    alt="CEPLOK"
-                    className="h-8 max-w-full w-auto"
-                  />
-                }
-                items={menu}
-                user={{ name: "Rafli Arandhana", profileLabel: "Administrator" }}
-                onCollapse={() => setMobileSidebarOpen(false)}
-                onClick={(event) => {
-                  if ((event.target as HTMLElement).closest("a")) setMobileSidebarOpen(false);
-                }}
-              />
+          {searchFeedback && (
+            <div className="border-b border-border bg-surface">
+              <Container>
+                <p role="status" aria-live="polite" className="py-2 text-body-sm text-content-subtle">
+                  {searchFeedback}
+                </p>
+              </Container>
             </div>
           )}
 
           <main className="flex-1">
             <div className="border-b border-border bg-white">
               <Container>
-                <div className="py-6">
+                <div className="flex items-center gap-4 py-6">
                   <Breadcrumb
                     items={[
                       { label: "Beranda", href: href("dasbor"), icon: <Home className="size-4" /> },
@@ -222,6 +278,17 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
               </div>
             </Container>
           </main>
+
+          <Drawer
+            id={contextualDrawerId}
+            open={contextualDrawerOpen}
+            onClose={() => setContextualDrawerPage(null)}
+            position="right"
+            size="s"
+            eyebrow="Navigasi kontekstual"
+            header={<Drawer.Title>{JUDUL_HALAMAN[halaman]}</Drawer.Title>}
+            items={contextualMenu}
+          />
         </div>
       </div>
 
