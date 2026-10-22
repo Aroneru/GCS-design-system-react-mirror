@@ -51,8 +51,8 @@ const sizeClasses: Record<
   }
 > = {
   s: {
-    container: "px-4 py-3.5 min-h-[140px]",
-    decorationPadding: "pl-5",
+    container: "w-full max-w-[410px] min-h-[140px] px-4 py-3.5",
+    decorationPadding: "pl-[22px]",
     headerGap: "gap-2",
     subject: "text-sm font-semibold",
     category: "text-xs font-normal",
@@ -67,7 +67,7 @@ const sizeClasses: Record<
     metricIcon: "size-4",
   },
   m: {
-    container: "px-5 py-4 min-h-[155px]",
+    container: "w-full max-w-[514px] min-h-[159px] px-5 py-4",
     decorationPadding: "pl-6",
     headerGap: "gap-2.5",
     subject: "text-base font-semibold",
@@ -83,7 +83,7 @@ const sizeClasses: Record<
     metricIcon: "size-4.5",
   },
   l: {
-    container: "px-6 py-4.5 min-h-[170px]",
+    container: "w-full max-w-[728px] min-h-[149px] px-6 py-4.5",
     decorationPadding: "pl-7",
     headerGap: "gap-3",
     subject: "text-base sm:text-lg font-semibold",
@@ -99,7 +99,7 @@ const sizeClasses: Record<
     metricIcon: "size-4.5",
   },
   xl: {
-    container: "px-7 py-5 min-h-[185px]",
+    container: "w-full max-w-[1028px] min-h-[149px] px-7 py-5",
     decorationPadding: "pl-8",
     headerGap: "gap-3.5",
     subject: "text-lg font-semibold",
@@ -197,8 +197,9 @@ export const ListViewArticle = forwardRef<HTMLElement, ListViewArticleProps>(
         onClick={onClick}
         data-theme={darkMode ? "dark" : undefined}
         className={cn(
-          "group relative flex flex-col justify-between overflow-hidden rounded-lg border border-border bg-surface text-content transition-all",
+          "group relative flex flex-col justify-between overflow-hidden rounded-[8px] border-t border-r border-b border-border bg-surface text-content transition-all",
           "data-[theme=dark]:border-gray-500 in-data-[theme=dark]:border-gray-500 data-[theme=dark]:bg-gray-700 in-data-[theme=dark]:bg-gray-700",
+          !decoration && "border-l border-border data-[theme=dark]:border-l-gray-500 in-data-[theme=dark]:border-l-gray-500",
           currentSize.container,
           decoration && currentSize.decorationPadding,
           isInteractive &&
@@ -209,7 +210,7 @@ export const ListViewArticle = forwardRef<HTMLElement, ListViewArticleProps>(
       >
         {decoration && (
           <span
-            className="absolute inset-y-0 left-0 w-1 sm:w-1.5 bg-primary-700"
+            className="absolute inset-y-0 left-0 w-1 bg-primary-700"
             aria-hidden="true"
           />
         )}
