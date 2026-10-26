@@ -71,19 +71,19 @@ const listViewItemProps: PropRow[] = [
     "category",
     "ReactNode",
     "undefined",
-    "Kategori topik di kanan atas (varian article).",
+    "Kategori topik di dalam blok metadata rata kiri pada sisi kanan header (varian article).",
   ],
   [
     "timestamp",
     "ReactNode",
     "undefined",
-    "Tanggal / waktu publikasi di kanan atas (varian article).",
+    "Tanggal / waktu publikasi di bawah kategori, rata kiri dalam blok metadata header (varian article).",
   ],
   [
     "pinned",
     "boolean",
     "true",
-    "Menampilkan lencana pin bulat di kanan atas (varian article).",
+    "Menampilkan lencana pin bulat berorientasi ke kanan di kanan atas (varian article).",
   ],
   [
     "onPin",
@@ -137,7 +137,7 @@ const listViewItemProps: PropRow[] = [
     "decoration",
     "boolean",
     "false",
-    "Menampilkan garis dekorasi aksen vertikal warna primary pada sisi kiri kartu.",
+    "Menampilkan garis dekorasi aksen vertikal warna primary pada sisi kiri kartu (hanya varian simple; selalu aktif pada article).",
   ],
   [
     "badge",
@@ -419,7 +419,7 @@ export function ListViewPage() {
       {/* 2. List View Article Section */}
       <FlowSection id="article" title="List View Article">
         <Lead>
-          Varian <Hl>variant="article"</Hl> dirancang untuk kartu artikel, diskusi forum, atau utas topik dengan aksen garis vertikal (<Hl>decoration</Hl>) aktif secara bawaan. Dilengkapi dengan <Hl>subject</Hl>, <Hl>category</Hl>, waktu publikasi, lencana pin (<Hl>pinned</Hl>), garis pemisah horizontal, serta metrik interaksi (<Hl>views</Hl>, <Hl>comments</Hl>, <Hl>likes</Hl>) di sudut kanan bawah.
+          Varian <Hl>variant="article"</Hl> untuk artikel, diskusi, atau utas topik. Garis aksen selalu aktif; header memuat <Hl>subject</Hl>, metadata, dan pin, sementara judul semibold serta metrik berada di bawah.
         </Lead>
 
         <div className="space-y-8">
@@ -430,7 +430,7 @@ export function ListViewPage() {
                 <h4 className="text-sm font-bold text-gray-900">Small (S)</h4>
               </div>
               <p className="mb-3 text-body-sm text-gray-500">
-                Ukuran ringkas (410 px) dengan judul teks 14px dan metrik interaksi 12px.
+                Ukuran ringkas (410 px) dengan judul semibold 14px dan metrik interaksi 12px.
               </p>
               <Demo>
                 <div className="w-full max-w-[410px]">
@@ -457,7 +457,7 @@ export function ListViewPage() {
                 </h4>
               </div>
               <p className="mb-3 text-body-sm text-gray-500">
-                Ukuran standar bawaan (514 px) dengan judul teks 16px dan proporsi yang seimbang.
+                Ukuran standar bawaan (514 px) dengan judul semibold 16px dan proporsi yang seimbang.
               </p>
               <Demo>
                 <div className="w-full max-w-[514px]">
@@ -482,7 +482,7 @@ export function ListViewPage() {
                 <h4 className="text-sm font-bold text-gray-900">Large (L)</h4>
               </div>
               <p className="mb-3 text-body-sm text-gray-500">
-                Ukuran lapang (728 px) dengan judul teks 18px untuk keterbacaan yang lebih tinggi.
+                Ukuran lapang (728 px) dengan judul semibold 18px untuk keterbacaan yang lebih tinggi.
               </p>
               <Demo>
                 <div className="w-full max-w-[728px]">
@@ -509,7 +509,7 @@ export function ListViewPage() {
                 </h4>
               </div>
               <p className="mb-3 text-body-sm text-gray-500">
-                Ukuran ekstra besar (1028 px) dengan judul teks 20px dan bantalan lebih luas, ideal untuk judul panjang atau artikel sorotan utama.
+                Ukuran ekstra besar (1028 px) dengan judul semibold 20px dan bantalan lebih luas, ideal untuk judul panjang atau artikel sorotan utama.
               </p>
               <Demo>
                 <div className="w-full max-w-[1028px]">
@@ -759,8 +759,7 @@ export function ListViewPage() {
       {/* 4. Darkmode Section */}
       <FlowSection id="darkmode" title="Darkmode">
         <Lead>
-          Prop <Hl>darkMode</Hl> mengaktifkan tema gelap pada komponen. Warna latar beralih ke <Hl>gray-700</Hl>, teks judul menjadi (<Hl>white</Hl>),
-          metadata <Hl>gray-400</Hl>, dan ikon <Hl>gray-200</Hl>. Elemen badge menyesuaikan bawaan komponen <Hl>Badge</Hl>.
+          Prop <Hl>darkMode</Hl> mengaktifkan tema gelap. Article memakai surface <Hl>gray-700</Hl>, teks bertingkat <Hl>gray-100</Hl> hingga <Hl>gray-300</Hl>, serta pin transparan beraksen primary.
         </Lead>
 
         <div className="space-y-8">
@@ -873,7 +872,9 @@ export function ListViewPage() {
         </p>
 
         <Stage maxWidth="max-w-6xl" dark={darkMode}>
-          <div className="flex min-h-[200px] w-full items-center justify-center py-4">
+          {/* Tinggi desktop dikunci pada kebutuhan Article XL agar pergantian
+              varian/ukuran tidak membuat canvas dan kontrol di bawahnya meloncat. */}
+          <div className="flex min-h-[328px] w-full items-center justify-center py-4">
             <div
               className={`w-full transition-[max-width] duration-300 ease-out ${
                 variant === "article"
@@ -897,7 +898,6 @@ export function ListViewPage() {
                 <ListViewItem
                   variant="article"
                   size={size}
-                  decoration={decoration}
                   subject="subject Name"
                   category="Category"
                   timestamp="12 Okt 2026 09:59 WIB"
@@ -988,6 +988,7 @@ export function ListViewPage() {
               value={decoration}
               onChange={(val) => setDecoration(Boolean(val))}
               options={decorationOptions}
+              disabled={variant === "article"}
             />
           </Control>
 
@@ -1038,13 +1039,6 @@ export function ListViewPage() {
                   {"  "}
                   <H>size</H>
                   {`="${size}"\n`}
-                </>
-              )}
-              {!decoration && (
-                <>
-                  {"  "}
-                  <H>decoration</H>
-                  {"={false}\n"}
                 </>
               )}
               {'  subject="subject Name"\n'}

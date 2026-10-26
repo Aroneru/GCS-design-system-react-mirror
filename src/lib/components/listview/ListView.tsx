@@ -285,7 +285,6 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
           likes={likes}
           pinned={pinned}
           onPin={onPin}
-          decoration={decoration ?? true}
           size={articleSize}
           href={href}
           target={target}
