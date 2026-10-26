@@ -12,12 +12,44 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 ## [Belum dirilis]
 
 Ada perubahan API yang memutus: migrasi tema dan aksen warna `simaya` ke
-`purple` pada seluruh komponen dan token — baca bagian **Diubah**. Satu perbaikan
+`purple` pada seluruh komponen dan token — baca bagian **Diubah**. Komponen baru
+`Timeline` masih eksperimental karena desainnya belum final. Satu perbaikan
 token warna `Radio`. Situs dokumentasi ikut diperbarui: bagian Mulai cepat di
 beranda kini empat langkah, dengan langkah baru "Sambungkan Tailwind CSS ke Vite"
 (pasang `tailwindcss` dan `@tailwindcss/vite`, lalu daftarkan `tailwindcss()` di
 `vite.config.ts`). Tombol outline kini selalu di kiri tombol filled di halaman
 contoh, dan contoh kode footer di halaman Modal kini sama dengan demonya.
+Deskripsi Button dan Alert di Components Overview kini sesuai komponennya,
+tabel props Search kini memuat `trigger`, `debounce`, `showButton`, dan
+platform `compact`, dan tinggi logo di halaman Footer kini ditulis sesuai
+kodenya: 48px, 60px saat footer ≥ 768px. Kartu di halaman Overview kini `<div>`
+dengan judul sebagai tautannya, bukan satu `<a>` besar yang memuat tautan dan
+tombol preview — klik di mana pun pada kartu tetap membuka halamannya.
+
+### Ditambahkan
+
+- **`Timeline` (eksperimental).** Riwayat kejadian berurutan dengan avatar di
+  sepanjang satu garis. Tiap item memuat nama, jabatan, waktu, lama proses,
+  keterangan, Details, Attachments, dan status; selain `name`, semuanya
+  opsional. `time` menerima `Date` dan selalu ditulis dengan format desain,
+  mis. `01 Jan 2026 · 09:05`, dalam jam lokal browser; formatnya tidak
+  mengikuti bahasa browser, dan singkatan bulannya diganti lewat
+  `labels.months`. `platform` memilih `desktop` (kartu berselang-seling kiri dan
+  kanan garis) atau `mobile` (garis di kiri), `size` memilih `large` atau
+  `small`, `labels` mengganti label tetapnya, dan `darkMode` atau
+  `data-theme="dark"` di pembungkus menyalakan tema gelap. Avatar-nya memakai
+  komponen `Avatar`, dengan foto (`avatar`), `initials`, atau siluet bawaan.
+  Status memakai komponen `Badge`: `status` menerima prop Badge ditambah
+  `label`, dengan bawaan variant `success` ukuran `sm` seperti di desain.
+  Tiap lampiran berisi `name` dan `href`, ditambah `target` untuk membukanya di
+  tab baru atau `download` untuk mengunduhnya; tanpa `href` namanya tampil
+  sebagai teks biasa.
+  Desainnya belum final, jadi nama prop dan ukurannya masih bisa berubah di
+  rilis berikutnya. Halaman dokumentasinya: Components → Timeline View.
+- Token komponen `--color-timeline-surface`, `-content`, dan `-avatar`, berisi
+  token terdekat dari warna desain Timeline. Garis, tepi kartu, dan latar
+  avatar memakai token semantik `border`, sedangkan nama dan jabatan memakai
+  `brand`.
 
 ### Diubah
 

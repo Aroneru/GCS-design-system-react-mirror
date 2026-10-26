@@ -105,6 +105,7 @@ Warna yang hanya dipakai satu komponen dan tidak cocok dengan token semantik man
 | Sidebar | `--color-sidebar-surface` |
 | Search | `--color-search-category-surface`, `--color-search-field-surface` |
 | Breadcrumb | `--color-breadcrumb-surface`, `--color-breadcrumb-active`, `--color-breadcrumb-link-hover` |
+| Timeline | `--color-timeline-surface`, `-content`, `-avatar` (garis, tepi kartu, dan latar avatar memakai `--color-border`; nama dan jabatan `--color-brand`; status memakai Badge) |
 
 `{variant}` adalah `success`, `danger`, `warning`, `info`, atau `purple`.
 
@@ -265,6 +266,6 @@ Atau lewat class:
 
 ## Status saat ini
 
-- **Sudah memakai cara ini:** Card, Container, Hero, Toggle, Checkbox, Radio, Select, InputField, FloatingLabel, TextArea, Toast, Alert, Sidebar, Search, dan Breadcrumb.
+- **Sudah memakai cara ini:** Card, Container, Hero, Toggle, Checkbox, Radio, Select, InputField, FloatingLabel, TextArea, Toast, Alert, Sidebar, Search, Breadcrumb, dan Timeline.
 - **Belum:** komponen lain yang punya `darkMode` (Popover, Drawer, Datepicker, dan lainnya) masih menulis warna gelapnya sendiri. Komponen ini akan dipindah bertahap.
 - Selama belum dipindah, `data-theme="dark"` di pembungkus belum membuat komponen tersebut gelap. Pakai prop `darkMode` di komponennya.
