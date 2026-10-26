@@ -1,10 +1,9 @@
-import { useRef, useState, type MouseEvent, type ReactNode, type RefObject } from 'react'
+import { useRef, useState, type MouseEvent, type RefObject } from 'react'
 import {
   TableOfContents,
   type TableOfContentsItem,
   type TableOfContentsItemElement,
 } from '../../../lib'
-import { DocExample } from '../../DocExample'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { adaTidakAda } from '../../usulanOptions'
 import { CodeBlock, H, Hl, Segmented } from '../../pageKit'
@@ -76,38 +75,39 @@ const daftarPanjang: TableOfContentsItem[] = Array.from({ length: 24 }, (_, i) =
 }))
 
 /**
- * Tiruan halaman dokumentasi untuk contoh Tampilan dasar: jendela peramban,
- * judul halaman, lalu satu bagian per entri `contoh` dengan daftar isi di
- * kanan. Bagian yang sedang aktif di daftar isi ikut ditandai di halaman,
- * supaya hubungan keduanya langsung terbaca.
+ * Tiruan halaman dokumentasi untuk contoh Tampilan dasar: judul halaman, lalu
+ * satu bagian per entri `contoh` dengan daftar isi di kanan. Bagian yang
+ * sedang aktif di daftar isi ikut ditandai di halaman, supaya hubungan
+ * keduanya langsung terbaca.
+ *
+ * Di bawah 640px daftar 208px tidak muat di samping isi, jadi daftar isinya
+ * berganti tombol yang membuka Drawer di dalam kartu ini, sama seperti
+ * layout `auto` di layar sempit.
  */
-function PagePreview({ active, children }: { active: string; children: ReactNode }) {
+function PagePreview({ demo }: { demo: ReturnType<typeof useDemo> }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-soft">
-      {/* Bilah jendela peramban. */}
-      <div className="flex items-center gap-3 border-b border-border px-4 py-2.5" aria-hidden="true">
-        <span className="flex gap-1.5">
-          <span className="size-2.5 rounded-full bg-red-400" />
-          <span className="size-2.5 rounded-full bg-yellow-300" />
-          <span className="size-2.5 rounded-full bg-green-400" />
-        </span>
-        <span className="mx-auto w-full max-w-xs truncate rounded-md bg-surface-subtle px-3 py-1 text-center text-[11px] text-content-muted">
-          ceplok.go.id/components/hero
-        </span>
-        <span className="w-[42px]" />
-      </div>
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-toc-surface shadow-soft">
+      <div className="flex gap-8 p-5 sm:p-8">
+        <div className="min-w-0 flex-1">
+          <div aria-hidden="true">
+            <p className="text-[11px] font-bold tracking-[0.14em] text-content-disabled uppercase">
+              Components
+            </p>
+            <p className="mt-1 text-heading-3 font-black text-content">Hero</p>
+            <div className="mt-2 h-2 w-3/4 rounded bg-border" />
+          </div>
 
-      <div className="flex gap-8 bg-toc-surface p-6 sm:p-8">
-        <div className="min-w-0 flex-1" aria-hidden="true">
-          <p className="text-[11px] font-bold tracking-[0.14em] text-content-disabled uppercase">
-            Components
-          </p>
-          <p className="mt-1 text-heading-3 font-black text-content">Hero</p>
-          <div className="mt-2 h-2 w-3/4 rounded bg-border" />
+          <TableOfContents
+            className="mt-5 sm:hidden"
+            items={contoh}
+            layout="drawer"
+            drawerContained
+            {...demo}
+          />
 
-          <div className="mt-6 space-y-2">
+          <div className="mt-6 space-y-2" aria-hidden="true">
             {contoh.map((item) => {
-              const isActive = item.id === active
+              const isActive = item.id === demo.activeId
               return (
                 <div
                   key={item.id}
@@ -132,8 +132,147 @@ function PagePreview({ active, children }: { active: string; children: ReactNode
           </div>
         </div>
 
-        <div className="hidden shrink-0 sm:block">{children}</div>
+        <TableOfContents
+          className="sticky top-0 hidden shrink-0 sm:block"
+          items={contoh}
+          layout="list"
+          {...demo}
+        />
       </div>
+    </div>
+  )
+}
+
+/**
+ * Tiruan halaman desktop untuk contoh Daftar panjang: navbar, isi bagian yang sedang aktif, dan daftar isi `maxHeight` yang
+ * menempel di kanan. Judul isi halaman mengikuti entri aktif, jadi hubungan
+ * daftar isi yang digulir dengan bagian yang dibaca langsung terlihat.
+ *
+ * Di bawah 640px daftarnya berganti tombol yang membuka Drawer di dalam
+ * bingkai ini, sama seperti PagePreview dan layout `auto` di layar sempit.
+ */
+function LongListPreview({
+  activeId,
+  onSelect,
+}: {
+  activeId: string
+  onSelect: (id: string) => void
+}) {
+  const active = daftarPanjang.find((item) => item.id === activeId) ?? daftarPanjang[0]
+  const demo = {
+    activeId,
+    scrollSpy: false,
+    onItemClick: (item: TableOfContentsItem, e: MouseEvent<TableOfContentsItemElement>) => {
+      e.preventDefault()
+      onSelect(item.id)
+    },
+  }
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-toc-surface shadow-soft">
+      {/* Navbar halaman */}
+      <div className="flex items-center justify-between border-b border-border px-5 py-3 sm:px-8" aria-hidden="true">
+        <div className="h-3 w-24 rounded bg-border-strong" />
+        <div className="hidden gap-4 sm:flex">
+          <div className="h-2 w-12 rounded bg-border" />
+          <div className="h-2 w-12 rounded bg-border" />
+          <div className="h-2 w-12 rounded bg-border" />
+        </div>
+      </div>
+
+      <div className="flex gap-8 p-5 sm:p-8">
+        <div className="min-w-0 flex-1">
+          <div aria-hidden="true">
+            <p className="text-[11px] font-bold tracking-[0.14em] text-content-disabled uppercase">
+              Panduan
+            </p>
+            <p className="mt-1 text-heading-3 font-black text-content">Dokumentasi panjang</p>
+            <div className="mt-2 h-2 w-3/4 rounded bg-border" />
+          </div>
+
+          <TableOfContents
+            className="mt-5 sm:hidden"
+            items={daftarPanjang}
+            layout="drawer"
+            drawerContained
+            {...demo}
+          />
+
+          {/* Bagian yang sedang dibaca: judulnya mengikuti entri aktif. */}
+          <div className="mt-6 space-y-4" aria-hidden="true">
+            <div className="rounded-lg border-l-2 border-brand bg-primary-50 px-3 py-2.5">
+              <p className="truncate text-sm font-bold text-brand">{active.label}</p>
+              <div className="mt-2 space-y-1.5">
+                <div className="h-1.5 w-full rounded bg-border" />
+                <div className="h-1.5 w-5/6 rounded bg-border" />
+                <div className="h-1.5 w-4/6 rounded bg-border" />
+              </div>
+            </div>
+            <div className="h-28 rounded-lg bg-border" />
+            <div className="space-y-1.5 px-3">
+              <div className="h-1.5 w-full rounded bg-border" />
+              <div className="h-1.5 w-11/12 rounded bg-border" />
+              <div className="h-1.5 w-3/6 rounded bg-border" />
+            </div>
+          </div>
+        </div>
+
+        <TableOfContents
+          className="sticky top-0 hidden shrink-0 sm:block"
+          items={daftarPanjang}
+          layout="list"
+          maxHeight={256}
+          {...demo}
+        />
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Pasangan Desktop dan Mobile untuk bagian Platform dan Dark mode. Bingkainya
+ * memakai token semantik dan dibungkus `data-theme`, jadi versi gelapnya cukup
+ * menukar atribut itu; judul kolomnya tetap ikut halaman.
+ */
+function PlatformPair({ dark = false }: { dark?: boolean }) {
+  const theme = dark ? 'dark' : 'light'
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      <article>
+        <h3 className="text-sm font-black text-gray-900">Desktop · 12px</h3>
+        <p className="mt-1 mb-3 text-body-sm text-gray-500">
+          Daftar biasa di kanan isi halaman, mulai lebar layar 1024px.
+        </p>
+        <div data-theme={theme} className="rounded-2xl border border-border bg-surface-subtle p-6">
+          <TableOfContents items={contoh} layout="list" anchor={false} darkMode={dark} />
+        </div>
+      </article>
+
+      <article>
+        <h3 className="text-sm font-black text-gray-900">Mobile · 14px</h3>
+        <p className="mt-1 mb-3 text-body-sm text-gray-500">
+          Tombol yang menampilkan bagian aktif. Ketuk untuk membuka Drawer berisi daftarnya.
+        </p>
+        {/* Bingkai `relative` supaya Drawer muncul di sini, bukan menutupi seluruh layar. */}
+        <div
+          data-theme={theme}
+          className="relative h-[400px] overflow-hidden rounded-[1.75rem] border-4 border-border-strong bg-toc-surface p-4"
+        >
+          <TableOfContents
+            items={contoh}
+            layout="drawer"
+            drawerContained
+            anchor={false}
+            darkMode={dark}
+          />
+          <div className="mt-5 space-y-2.5 px-1" aria-hidden="true">
+            <div className="h-3 w-1/2 rounded bg-border-strong" />
+            <div className="h-2 w-full rounded bg-border" />
+            <div className="h-2 w-5/6 rounded bg-border" />
+            <div className="h-2 w-4/6 rounded bg-border" />
+          </div>
+        </div>
+      </article>
     </div>
   )
 }
@@ -227,7 +366,6 @@ function useDemo() {
 
 export function TableOfContentsPage() {
   const dasar = useDemo()
-  const gelap = useDemo()
   const wadah = useRef<HTMLDivElement>(null)
   const deskScroll = useRef<HTMLDivElement>(null)
   const mobileScroll = useRef<HTMLDivElement>(null)
@@ -252,9 +390,7 @@ export function TableOfContentsPage() {
           halaman ikut ditandai. Di layar di bawah 1024px daftar ini berubah jadi tombol yang membuka
           Drawer dari kanan; lihat bagian Platform.
         </Lead>
-        <PagePreview active={dasar.activeId}>
-          <TableOfContents className="sticky top-0" items={contoh} layout="list" {...dasar} />
-        </PagePreview>
+        <PagePreview demo={dasar} />
         <div className="mt-4">
           <CodeBlock>
             {"import { TableOfContents } from '@ceplok-ui/design-kit-react'\n\n"}
@@ -270,34 +406,7 @@ export function TableOfContentsPage() {
           supaya mudah disentuh. Dengan <Hl>layout</Hl> bawaan (<Hl>auto</Hl>) peralihannya terjadi
           sendiri di 1024px.
         </Lead>
-        <div className="grid gap-4 md:grid-cols-2">
-          <article>
-            <h3 className="text-sm font-black text-gray-900">Desktop · 12px</h3>
-            <p className="mt-1 mb-3 text-body-sm text-gray-500">
-              Daftar biasa di kanan isi halaman, mulai lebar layar 1024px.
-            </p>
-            <DocExample>
-              <TableOfContents items={contoh} layout="list" anchor={false} />
-            </DocExample>
-          </article>
-
-          <article>
-            <h3 className="text-sm font-black text-gray-900">Mobile · 14px</h3>
-            <p className="mt-1 mb-3 text-body-sm text-gray-500">
-              Tombol yang menampilkan bagian aktif. Ketuk untuk membuka Drawer berisi daftarnya.
-            </p>
-            {/* Bingkai `relative` supaya Drawer muncul di sini, bukan menutupi seluruh layar. */}
-            <div className="relative h-[400px] overflow-hidden rounded-[1.75rem] border-4 border-border-strong bg-toc-surface p-4">
-              <TableOfContents items={contoh} layout="drawer" drawerContained anchor={false} />
-              <div className="mt-5 space-y-2.5 px-1" aria-hidden="true">
-                <div className="h-3 w-1/2 rounded bg-border-strong" />
-                <div className="h-2 w-full rounded bg-border" />
-                <div className="h-2 w-5/6 rounded bg-border" />
-                <div className="h-2 w-4/6 rounded bg-border" />
-              </div>
-            </div>
-          </article>
-        </div>
+        <PlatformPair />
         <SectionCode>
           {'<TableOfContents items={items} />                 // auto: 12px di desktop, Drawer 14px di mobile\n'}
           {'<TableOfContents items={items} '}
@@ -314,9 +423,7 @@ export function TableOfContentsPage() {
           Hanya palet warnanya yang berubah: latar jadi gray-800, teks dan garis ikut token semantik.
           Pakai <Hl>darkMode</Hl>, atau letakkan di dalam pembungkus <Hl>data-theme=&quot;dark&quot;</Hl>.
         </Lead>
-        <div className="rounded-2xl bg-gray-800 p-6 sm:p-10">
-          <TableOfContents items={contoh} darkMode {...gelap} />
-        </div>
+        <PlatformPair dark />
         <div className="mt-4">
           <CodeBlock>
             {'<TableOfContents '}
@@ -332,7 +439,16 @@ export function TableOfContentsPage() {
           <Hl>scrollContainer</Hl>. Gulir panel di bawah: sorotan ikut berpindah, dan klik entri
           menggulir panelnya.
         </Lead>
-        <div className="flex gap-6 rounded-2xl border border-border bg-surface-subtle p-6">
+        <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-border bg-surface-subtle p-4 sm:flex-row sm:gap-6 sm:p-6">
+          {/* Di layar sempit daftarnya berupa tombol Drawer di atas panel. */}
+          <TableOfContents
+            className="bg-transparent sm:hidden"
+            items={bagianGulir}
+            layout="drawer"
+            drawerContained
+            scrollContainer={wadah}
+            offset={24}
+          />
           <div
             ref={wadah}
             className="h-80 min-w-0 flex-1 space-y-8 overflow-y-auto rounded-xl border border-border bg-white p-6"
@@ -360,19 +476,10 @@ export function TableOfContentsPage() {
         <h3 className="mt-8 text-sm font-black text-gray-900">Daftar panjang</h3>
         <p className="mt-1 mb-3 max-w-2xl text-body-sm text-gray-500">
           Dengan <Hl>maxHeight</Hl>, daftar yang panjang bisa digulir sendiri dan entri aktif tetap
-          terlihat. Contoh ini menyorot Bagian 19.
+          terlihat. Contoh ini menyorot Bagian 19; klik entri lain dan judul isi halaman ikut
+          berganti. Di layar sempit daftarnya menjadi tombol yang membuka Drawer.
         </p>
-        <DocExample>
-          <TableOfContents
-            items={daftarPanjang}
-            maxHeight={256}
-            activeId={aktifPanjang}
-            onItemClick={(item, e) => {
-              e.preventDefault()
-              setAktifPanjang(item.id)
-            }}
-          />
-        </DocExample>
+        <LongListPreview activeId={aktifPanjang} onSelect={setAktifPanjang} />
 
         <div className="mt-4">
           <CodeBlock>
@@ -458,18 +565,6 @@ export function TableOfContentsPage() {
         </Stage>
 
         <Controls>
-          <Control label="Platform">
-            <Segmented
-              label="Pilih platform"
-              value={tampilan}
-              onChange={setTampilan}
-              options={[
-                { value: 'list', label: 'Desktop' },
-                { value: 'drawer', label: 'Mobile' },
-              ]}
-            />
-          </Control>
-
           <Control label="Tampilan">
             <Segmented
               label="Pilih tampilan"
@@ -478,6 +573,17 @@ export function TableOfContentsPage() {
               options={[
                 { value: 'light', label: 'Light' },
                 { value: 'dark', label: 'Dark' },
+              ]}
+            />
+          </Control>
+          <Control label="Platform">
+            <Segmented
+              label="Pilih platform"
+              value={tampilan}
+              onChange={setTampilan}
+              options={[
+                { value: 'list', label: 'Desktop' },
+                { value: 'drawer', label: 'Mobile' },
               ]}
             />
           </Control>

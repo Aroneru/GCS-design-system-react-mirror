@@ -18,6 +18,24 @@
      */
     --font-alt-2: Arial, 'Helvetica Neue', Helvetica, 'Liberation Sans', sans-serif;
 
+    /*
+     * Ketebalan huruf (utility `font-thin` sampai `font-black`). Namanya sama
+     * dengan bawaan Tailwind, jadi token ini yang dipakai utility-nya.
+     *
+     * Lato (Lato 2.0 di fonts/lato.css) dan Inter punya kesembilan tingkat.
+     * Arial umumnya hanya 400 dan 700; tingkat lain digantikan browser dengan
+     * yang terdekat, mis. semibold (600) tampil 700.
+     */
+    --font-weight-thin: 100;
+    --font-weight-extralight: 200;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
+
     --color-primary-50: #ebf5ff;
     --color-primary-100: #e1effe;
     --color-primary-200: #c3ddfd;

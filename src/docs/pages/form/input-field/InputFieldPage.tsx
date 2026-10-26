@@ -314,6 +314,18 @@ export function InputFieldPage() {
         </Stage>
 
         <Controls>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Tipe">
             <Segmented
               label="Pilih tipe"
@@ -392,18 +404,6 @@ export function InputFieldPage() {
               onChange={setWithClear}
               disabled={isPassword || fieldState === 'inactive'}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Tampilan">
-            <Segmented
-              label="Pilih tampilan"
-              value={dark}
-              onChange={setDark}
-              options={[
-                { value: false, label: 'Light' },
-                { value: true, label: 'Dark' },
-              ]}
             />
           </Control>
         </Controls>

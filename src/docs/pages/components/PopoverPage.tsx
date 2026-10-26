@@ -184,15 +184,6 @@ export function PopoverPage() {
           </div>
         </Stage>
         <Controls>
-          <Control label="Side">
-            <Segmented
-              label="Pilih preferensi posisi Popover"
-              value={side}
-              onChange={(value) => setSide(value as PopoverSide)}
-              wrap
-              options={sides}
-            />
-          </Control>
           <Control label="Tampilan">
             <Segmented
               label="Pilih tampilan Popover"
@@ -202,6 +193,15 @@ export function PopoverPage() {
                 { value: false, label: 'Light' },
                 { value: true, label: 'Dark' },
               ]}
+            />
+          </Control>
+          <Control label="Side">
+            <Segmented
+              label="Pilih preferensi posisi Popover"
+              value={side}
+              onChange={(value) => setSide(value as PopoverSide)}
+              wrap
+              options={sides}
             />
           </Control>
         </Controls>

@@ -1,0 +1,91 @@
+/*
+ * Lato 2.015 (latofonts.com), di-host sendiri bersama package.
+ *
+ * Lato di Google Fonts hanya punya 100, 300, 400, 700, dan 900, sehingga
+ * `font-medium` tampil 400 dan `font-semibold` tampil 700. Lato 2.0 punya
+ * kesembilan tingkat, jadi setiap token --font-weight-* tampil apa adanya.
+ *
+ * Berkasnya tidak dipotong (subset): Lato memakai Reserved Font Name di
+ * lisensi OFL-nya, dan berkas yang dimodifikasi tidak boleh lagi bernama
+ * "Lato". Browser hanya mengunduh ketebalan yang benar-benar dipakai halaman.
+ * Lisensi: OFL.txt di folder ini.
+ */
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url('./lato-hairline.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 200;
+    font-display: swap;
+    src: url('./lato-thin.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('./lato-light.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('./lato-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url('./lato-normal-italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('./lato-medium.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('./lato-semibold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('./lato-bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url('./lato-heavy.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url('./lato-black.woff2') format('woff2');
+}

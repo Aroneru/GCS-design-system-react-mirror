@@ -400,6 +400,18 @@ export function SelectPage() {
         </Stage>
 
         <Controls>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Application">
             <Segmented
               label="Pilih aplikasi"
@@ -449,18 +461,6 @@ export function SelectPage() {
               value={withHelper}
               onChange={setWithHelper}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Tampilan">
-            <Segmented
-              label="Pilih tampilan"
-              value={dark}
-              onChange={setDark}
-              options={[
-                { value: false, label: 'Light' },
-                { value: true, label: 'Dark' },
-              ]}
             />
           </Control>
         </Controls>

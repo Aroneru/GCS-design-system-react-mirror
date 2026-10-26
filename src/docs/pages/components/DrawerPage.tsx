@@ -551,7 +551,7 @@ export function DrawerPage() {
                                     <div className="flex-1 space-y-1 overflow-y-auto p-3">
                                         {playgroundItems.map((item, index) => (
                                             <DrawerNavItem
-                                                key={index}
+                                                keysesuaikanl={index}
                                                 icon={showIcons ? item.icon : undefined}
                                                 label={item.label}
                                                 active={activeMenu === item.label || (item.children && item.children.some(sub => activeMenu === `${item.label} - ${sub.label}`))}
@@ -590,6 +590,17 @@ export function DrawerPage() {
                 </div>
 
                 <Controls>
+                    <Control label="Mode">
+                        <Segmented
+                            label="Pilih mode"
+                            value={playgroundDarkMode ? 'dark' : 'light'}
+                            onChange={(val) => setPlaygroundDarkMode(val === 'dark')}
+                            options={[
+                                { value: 'light', label: 'Light' },
+                                { value: 'dark', label: 'Dark' },
+                            ]}
+                        />
+                    </Control>
                     <Control label="theme">
                         <Segmented
                             label="theme"
@@ -604,17 +615,6 @@ export function DrawerPage() {
                             value={showIcons ? 'true' : 'false'}
                             onChange={(val) => setShowIcons(val === 'true')}
                             options={iconOptions}
-                        />
-                    </Control>
-                    <Control label="Mode">
-                        <Segmented
-                            label="Pilih mode"
-                            value={playgroundDarkMode ? 'dark' : 'light'}
-                            onChange={(val) => setPlaygroundDarkMode(val === 'dark')}
-                            options={[
-                                { value: 'light', label: 'Light' },
-                                { value: 'dark', label: 'Dark' },
-                            ]}
                         />
                     </Control>
                 </Controls>

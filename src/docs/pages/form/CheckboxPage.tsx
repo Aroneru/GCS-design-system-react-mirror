@@ -280,6 +280,18 @@ export function CheckboxPage() {
         </Stage>
 
         <Controls>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={(v) => setDark(v as boolean)}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Platform">
             <Segmented
               label="Pilih platform"
@@ -320,18 +332,6 @@ export function CheckboxPage() {
               value={withCaption}
               onChange={(v) => setWithCaption(v as boolean)}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Tampilan">
-            <Segmented
-              label="Pilih tampilan"
-              value={dark}
-              onChange={(v) => setDark(v as boolean)}
-              options={[
-                { value: false, label: 'Light' },
-                { value: true, label: 'Dark' },
-              ]}
             />
           </Control>
         </Controls>
