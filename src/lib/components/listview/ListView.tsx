@@ -1,0 +1,546 @@
+import {
+  cloneElement,
+  forwardRef,
+  isValidElement,
+  type ElementType,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
+import { FileLines } from "flowbite-react-icons/outline";
+import { cn } from "../../utils/cn";
+import { Button, type ButtonSize } from "../Button";
+import { Badge } from "../Badge";
+import {
+  ListViewArticle,
+  type ListViewArticleProps,
+  type ListViewArticleSize,
+} from "./ListViewArticle";
+
+export type ListViewItemVariant = "simple" | "article";
+
+export type ListViewSize =
+  | "sm"
+  | "default"
+  | "lg"
+  | "s"
+  | "m"
+  | "l"
+  | "xl";
+
+export type ListViewPlatform = "desktop" | "mobile" | "default";
+
+const normalizeListViewSize = (
+  size: ListViewSize = "default",
+): "sm" | "default" | "lg" => {
+  if (size === "s" || size === "sm") return "sm";
+  if (size === "m" || size === "default") return "default";
+  if (size === "l" || size === "lg" || size === "xl") return "lg";
+  return "default";
+};
+
+const mobileClasses = {
+  container: "px-3.5 py-2.5 gap-3 min-h-[58px]",
+  decorationPadding: "pl-4 sm:pl-4.5",
+  iconBox: "size-10 rounded-lg",
+  iconSize: "size-5",
+  title: "text-sm font-bold",
+  description: "text-xs",
+  defaultButtonSize: "xs" as ButtonSize,
+};
+
+const mobileBadgeClasses = {
+  container: "px-3.5 py-3 gap-3 min-h-[88px]",
+  decorationPadding: "pl-4 sm:pl-4.5",
+  iconBox: "size-10 rounded-lg",
+  iconSize: "size-5",
+  title: "text-sm font-bold",
+  description: "text-xs",
+  defaultButtonSize: "xs" as ButtonSize,
+};
+
+/** Dimensi dan gaya kartu desktop saat tanpa badge (badge={false}). */
+const sizeClasses: Record<
+  "sm" | "default" | "lg",
+  {
+    container: string;
+    decorationPadding: string;
+    iconBox: string;
+    iconSize: string;
+    title: string;
+    description: string;
+    defaultButtonSize: ButtonSize;
+  }
+> = {
+  sm: {
+    container: "px-4 py-3 gap-3 min-h-[63px]",
+    decorationPadding: "pl-5",
+    iconBox: "size-8 rounded-lg",
+    iconSize: "size-4",
+    title: "text-sm font-bold",
+    description: "text-xs",
+    defaultButtonSize: "xs",
+  },
+  default: {
+    container: "px-5 py-3.5 gap-3.5 sm:gap-4 min-h-[81px]",
+    decorationPadding: "pl-6 sm:pl-7",
+    iconBox: "size-10 rounded-lg",
+    iconSize: "size-5",
+    title: "text-base font-bold",
+    description: "text-sm",
+    defaultButtonSize: "s",
+  },
+  lg: {
+    container: "px-6 py-4.5 gap-4 sm:gap-5 min-h-[103px]",
+    decorationPadding: "pl-7 sm:pl-8",
+    iconBox: "size-12 rounded-lg",
+    iconSize: "size-6",
+    title: "text-lg font-bold",
+    description: "text-sm sm:text-base",
+    defaultButtonSize: "base",
+  },
+};
+
+/** Dimensi dan gaya kartu desktop saat memiliki badge status (badge={true}). */
+const sizeBadgeClasses: Record<
+  "sm" | "default" | "lg",
+  {
+    container: string;
+    decorationPadding: string;
+    iconBox: string;
+    iconSize: string;
+    title: string;
+    description: string;
+    defaultButtonSize: ButtonSize;
+  }
+> = {
+  sm: {
+    container: "px-4 py-3 gap-3 min-h-[88px]",
+    decorationPadding: "pl-5",
+    iconBox: "size-8 rounded-lg",
+    iconSize: "size-4",
+    title: "text-sm font-bold",
+    description: "text-xs",
+    defaultButtonSize: "xs",
+  },
+  default: {
+    container: "px-6 py-3.5 gap-3.5 sm:gap-4 min-h-[108px]",
+    decorationPadding: "pl-7 sm:pl-8",
+    iconBox: "size-10 rounded-lg",
+    iconSize: "size-5",
+    title: "text-base font-bold",
+    description: "text-sm",
+    defaultButtonSize: "s",
+  },
+  lg: {
+    container: "px-8 py-4 gap-4 sm:gap-5 min-h-[134px]",
+    decorationPadding: "pl-9 sm:pl-10",
+    iconBox: "size-12 rounded-lg",
+    iconSize: "size-6",
+    title: "text-lg font-bold",
+    description: "text-sm sm:text-base",
+    defaultButtonSize: "base",
+  },
+};
+
+export interface ListViewItemProps
+  extends Omit<HTMLAttributes<HTMLElement>, "title"> {
+  /** Jenis / varian tampilan kartu: 'simple' (bawaan) atau 'article'. */
+  variant?: ListViewItemVariant;
+  /** Judul utama item (misalnya: "Project brief" atau judul artikel). */
+  title: ReactNode;
+  /** Keterangan atau deskripsi tambahan di bawah judul (varian simple). */
+  description?: ReactNode;
+  /**
+   * Daftar metadata ringkas yang otomatis digabung dengan tanda pemisah (·).
+   * Contoh: `['PDF', '2.4 MB', 'Updated Oct 10, 2026']`
+   */
+  metadata?: ReactNode[];
+  /**
+   * Ikon atau elemen visual di sebelah kiri (varian simple).
+   * Bawaannya menggunakan ikon dokumen (`FileLines`).
+   * Isi `null` jika tidak ingin menampilkan wadah ikon sama sekali.
+   */
+  icon?: ReactNode | null;
+  /** ClassName kustom untuk wadah ikon. */
+  iconContainerClassName?: string;
+  /** Label untuk tombol aksi cepat bawaan (misalnya `"Open"`). */
+  actionLabel?: ReactNode;
+  /** Callback saat tombol aksi bawaan diklik. */
+  onAction?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
+  /** Tautan untuk tombol aksi bawaan. */
+  actionHref?: string;
+  /** Ukuran tombol aksi bawaan. Mengikuti `size` item bila tidak diisi. */
+  actionButtonSize?: ButtonSize;
+  /** Tautan jika seluruh item bertindak sebagai tautan. */
+  href?: string;
+  /** Target tautan jika `href` diisi. */
+  target?: string;
+  /** Rel tautan jika `href` diisi. */
+  rel?: string;
+  /** Kerapatan/ukuran item ('s', 'm', 'l', 'xl', atau 'sm', 'default', 'lg'). */
+  size?: ListViewSize;
+  /** Platform target: `'desktop'` (bawaan) atau `'mobile'` (tampilan ringkas responsif 58px). */
+  platform?: ListViewPlatform;
+  /**
+   * Menampilkan garis dekorasi aksen warna primary pada sisi kiri kartu.
+   * Otomatis `true` bila `variant="article"`, bawaannya `false` bila `variant="simple"`.
+   */
+  decoration?: boolean;
+  /**
+   * Badge atau elemen label status tambahan yang ditampilkan di bawah metadata (varian simple).
+   * Dapat berupa komponen `<Badge>` kustom atau string teks label.
+   */
+  badge?: ReactNode;
+
+  // --- Props khusus untuk variant="article" ---
+  /** Nama subjek / pengirim di kiri atas (varian article). */
+  subject?: ReactNode;
+  /** Kategori topik di kanan atas (varian article). */
+  category?: ReactNode;
+  /** Tanggal / waktu publikasi di kanan atas (varian article). */
+  timestamp?: ReactNode;
+  /** Jumlah tayangan / views di kanan bawah (varian article). */
+  views?: ReactNode;
+  /** Jumlah komentar di kanan bawah (varian article). */
+  comments?: ReactNode;
+  /** Jumlah suka / likes di kanan bawah (varian article). */
+  likes?: ReactNode;
+  /** Menampilkan lencana pin (thumbtack) di kanan atas (varian article). Bawaannya `true`. */
+  pinned?: boolean;
+  /** Callback saat tombol pin diklik (varian article). */
+  onPin?: (e: React.MouseEvent<HTMLElement>) => void;
+
+  /**
+   * Memaksa item bertema gelap. Tanpa prop ini item ikut tema pembungkusnya
+   * (mis. `<section data-theme="dark">`).
+   */
+  darkMode?: boolean;
+  /** Elemen HTML yang dirender (default: `'article'`, atau `'a'` jika ada `href`). */
+  as?: ElementType;
+}
+
+/**
+ * ListViewItem — kartu baris individual yang mendukung dua jenis varian:
+ * - `'simple'` (bawaan): menampilkan ikon/media di kiri, judul dan metadata di tengah, aksi di kanan.
+ * - `'article'`: menampilkan kartu artikel dengan subject, kategori/tanggal, pin di header, judul di tengah, serta views/comments/likes di footer.
+ */
+export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
+  (
+    {
+      variant = "simple",
+      title,
+      description,
+      metadata,
+      icon,
+      iconContainerClassName,
+      actionLabel,
+      onAction,
+      actionHref,
+      actionButtonSize,
+      href,
+      target,
+      rel,
+      size = "default",
+      platform = "desktop",
+      decoration,
+      badge,
+      // Props khusus variant 'article'
+      subject,
+      category,
+      timestamp,
+      views,
+      comments,
+      likes,
+      pinned = true,
+      onPin,
+      darkMode = false,
+      as,
+      className,
+      children,
+      onClick,
+      ...props
+    },
+    ref,
+  ) => {
+    // Jika varian article, delegasikan ke ListViewArticle
+    if (variant === "article") {
+      const articleSize: ListViewArticleSize =
+        size === "default"
+          ? "m"
+          : size === "sm"
+          ? "s"
+          : size === "lg"
+          ? "l"
+          : (size as ListViewArticleSize);
+
+      return (
+        <ListViewArticle
+          ref={ref as React.Ref<never>}
+          subject={subject}
+          category={category}
+          timestamp={timestamp}
+          title={title}
+          views={views}
+          comments={comments}
+          likes={likes}
+          pinned={pinned}
+          onPin={onPin}
+          size={articleSize}
+          href={href}
+          target={target}
+          rel={rel}
+          darkMode={darkMode}
+          as={as}
+          className={className}
+          onClick={onClick}
+          {...props}
+        >
+          {children}
+        </ListViewArticle>
+      );
+    }
+
+    const isDecoration = decoration ?? false;
+    const isInteractive = Boolean(href || onClick);
+    const Component = as ?? (href ? "a" : "article");
+    const isMobile = platform === "mobile";
+    const hasBadge = Boolean(badge);
+    const normalizedSize = normalizeListViewSize(size);
+
+    const currentSize = isMobile
+      ? (hasBadge ? mobileBadgeClasses : mobileClasses)
+      : (hasBadge
+        ? (sizeBadgeClasses[normalizedSize] ?? sizeBadgeClasses.default)
+        : (sizeClasses[normalizedSize] ?? sizeClasses.default));
+
+    const hasIcon = icon !== null;
+    const renderedIcon =
+      icon ?? <FileLines className={cn(currentSize.iconSize, "shrink-0")} aria-hidden="true" />;
+
+    const renderedAction = actionLabel ? (
+      actionHref ? (
+        <Button
+          as="anchor"
+          href={actionHref}
+          size={actionButtonSize ?? currentSize.defaultButtonSize}
+          theme="primary"
+          variant="filled"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAction?.(e);
+          }}
+        >
+          {actionLabel}
+        </Button>
+      ) : (
+        <Button
+          size={actionButtonSize ?? currentSize.defaultButtonSize}
+          theme="primary"
+          variant="filled"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAction?.(e);
+          }}
+        >
+          {actionLabel}
+        </Button>
+      )
+    ) : null;
+
+    return (
+      <Component
+        ref={ref as React.Ref<never>}
+        href={href}
+        target={target}
+        rel={target === "_blank" ? (rel ?? "noreferrer noopener") : rel}
+        onClick={onClick}
+        data-theme={darkMode ? "dark" : undefined}
+        className={cn(
+          "group relative flex items-center justify-between overflow-hidden rounded-lg border border-border bg-surface text-content transition-all",
+          "data-[theme=dark]:border-gray-500 in-data-[theme=dark]:border-gray-500 data-[theme=dark]:bg-gray-700 in-data-[theme=dark]:bg-gray-700",
+          currentSize.container,
+          isDecoration && currentSize.decorationPadding,
+          isInteractive &&
+          "cursor-pointer hover:border-primary-400/80 hover:shadow-soft active:scale-[0.998]",
+          className,
+        )}
+        {...props}
+      >
+        {isDecoration && (
+          <span
+            className="absolute inset-y-0 left-0 w-1 sm:w-1.5 bg-primary-700"
+            aria-hidden="true"
+          />
+        )}
+        <div className="flex min-w-0 flex-1 items-center gap-3.5 sm:gap-4">
+          {hasIcon && (
+            <div
+              className={cn(
+                "flex shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-700 transition-colors",
+                "in-data-[theme=dark]:bg-gray-700 in-data-[theme=dark]:text-gray-200 in-data-[theme=dark]:border in-data-[theme=dark]:border-gray-700",
+                currentSize.iconBox,
+                iconContainerClassName,
+              )}
+            >
+              {renderedIcon}
+            </div>
+          )}
+
+          <div className="min-w-0 flex-1">
+            <h4
+              className={cn(
+                "text-content in-data-[theme=dark]:text-white truncate leading-snug",
+                currentSize.title,
+              )}
+            >
+              {title}
+            </h4>
+
+            {description && (
+              <div
+                className={cn(
+                  "text-content-muted in-data-[theme=dark]:text-gray-400 mt-0.5 truncate leading-normal",
+                  currentSize.description,
+                )}
+              >
+                {description}
+              </div>
+            )}
+
+            {metadata && metadata.length > 0 && (
+              <div
+                className={cn(
+                  "text-content-muted in-data-[theme=dark]:text-gray-400 mt-0.5 flex flex-wrap items-center gap-1.5 leading-normal",
+                  currentSize.description,
+                )}
+              >
+                {metadata.map((item, index) => (
+                  <span key={index} className="inline-flex items-center gap-1.5">
+                    {index > 0 && (
+                      <span
+                        className="text-content-muted/60 in-data-[theme=dark]:text-gray-400/60 select-none"
+                        aria-hidden="true"
+                      >
+                        &middot;
+                      </span>
+                    )}
+                    <span>{item}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {badge && (
+              <div className="mt-2 flex items-center">
+                {typeof badge === "string" ? (
+                  <Badge variant="success" size="sm" darkMode={Boolean(darkMode)}>
+                    {badge}
+                  </Badge>
+                ) : isValidElement<{ darkMode?: boolean }>(badge) ? (
+                  cloneElement(badge, {
+                    darkMode: badge.props?.darkMode ?? Boolean(darkMode),
+                  })
+                ) : (
+                  badge
+                )}
+              </div>
+            )}
+
+            {children}
+          </div>
+        </div>
+
+        {renderedAction && (
+          <div className="shrink-0 flex items-center pl-2">
+            {renderedAction}
+          </div>
+        )}
+      </Component>
+    );
+  },
+);
+
+ListViewItem.displayName = "ListViewItem";
+
+export interface ListViewProps extends HTMLAttributes<HTMLElement> {
+  /** Daftar data item ListView jika ingin dirender otomatis. */
+  items?: ListViewItemProps[];
+  /** Jarak vertikal antar item. Bawaannya `'md'` (gap-3). */
+  gap?: "sm" | "md" | "lg" | "none";
+  /** Kerapatan/ukuran bawaan untuk item di dalamnya. */
+  size?: ListViewSize;
+  /** Platform bawaan untuk seluruh item di dalamnya: `'desktop'` (bawaan) atau `'mobile'`. */
+  platform?: ListViewPlatform;
+  /** Garis dekorasi aksen bawaan untuk seluruh item di dalamnya. */
+  decoration?: boolean;
+  /**
+   * Memaksa seluruh daftar bertema gelap. Item di dalamnya otomatis mewarisi
+   * tema ini lewat CSS `data-theme="dark"`.
+   */
+  darkMode?: boolean;
+  /** Elemen pembungkus HTML (default: `'div'`, atau `'ul'`). */
+  as?: ElementType;
+}
+
+const gapClasses: Record<NonNullable<ListViewProps["gap"]>, string> = {
+  none: "space-y-0",
+  sm: "space-y-2",
+  md: "space-y-3",
+  lg: "space-y-4",
+};
+
+/**
+ * ListView — pembungkus daftar yang menampung kumpulan `ListViewItem`.
+ * Dapat menerima array `items` atau `children` secara deklaratif.
+ */
+export const ListView = forwardRef<HTMLElement, ListViewProps>(
+  (
+    {
+      items,
+      gap = "md",
+      size = "default",
+      platform = "desktop",
+      decoration,
+      darkMode = false,
+      as: Component = "div",
+      className,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    return (
+      <Component
+        ref={ref as React.Ref<never>}
+        data-theme={darkMode ? "dark" : undefined}
+        className={cn("w-full", gapClasses[gap], className)}
+        {...props}
+      >
+        {items
+          ? items.map((item, index) => (
+            <ListViewItem
+              key={index}
+              size={item.size ?? size}
+              platform={item.platform ?? platform}
+              decoration={item.decoration ?? decoration}
+              darkMode={item.darkMode ?? darkMode}
+              {...item}
+            />
+          ))
+          : children}
+      </Component>
+    );
+  },
+) as React.ForwardRefExoticComponent<
+  ListViewProps & React.RefAttributes<HTMLElement>
+> & {
+  Item: typeof ListViewItem;
+  Article: typeof ListViewArticle;
+};
+
+ListView.displayName = "ListView";
+ListView.Item = ListViewItem;
+ListView.Article = ListViewArticle;
+
+export { ListViewArticle };
+export type { ListViewArticleProps, ListViewArticleSize };

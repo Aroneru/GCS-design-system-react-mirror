@@ -52,6 +52,7 @@ import {
 import { BreadcrumbPage } from "./docs/pages/components/BreadcrumbPage";
 import { PaginationPage } from "./docs/pages/components/PaginationPage";
 import { TablePage } from "./docs/pages/components/TablePage";
+import { ListViewPage } from "./docs/pages/components/ListViewPage";
 
 const routes: Record<string, () => React.ReactElement> = {
   "/": HomePage,
@@ -98,6 +99,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/breadcrumb": BreadcrumbPage,
   "/components/pagination": PaginationPage,
   "/components/sidebar": SidebarPage,
+  "/components/list-view": ListViewPage,
   // Komponen Table belum ada, jadi halamannya masih placeholder.
   "/components/table": TablePage,
 };

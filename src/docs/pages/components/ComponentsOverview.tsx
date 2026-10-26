@@ -15,6 +15,7 @@ import {
   Spinner,
   Toast,
   Drawer,
+  ListViewItem,
 } from "../../../lib";
 import { OverviewCard, OverviewPage } from "../../pageKit";
 import { asset } from "../../asset";
@@ -315,6 +316,27 @@ export function ComponentsOverview() {
               ]}
             />
           </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/list-view"
+        name="List View"
+        desc="Kartu daftar berkas dan dokumen dengan wadah ikon, metadata ringkas, dan aksi cepat."
+      >
+        <div className="flex flex-col justify-center gap-2 rounded-xl bg-surface-subtle p-3">
+          <ListViewItem
+            size="s"
+            title="Project brief"
+            metadata={["PDF", "2.4 MB"]}
+            actionLabel="Open"
+          />
+          <ListViewItem
+            size="s"
+            title="Project brief"
+            metadata={["PDF", "2.4 MB"]}
+            actionLabel="Open"
+          />
         </div>
       </OverviewCard>
 
