@@ -1129,6 +1129,19 @@ export function DropdownPage() {
         </Stage>
 
         <Controls>
+          <Control label="Tampilan">
+            <div onPointerDownCapture={ingatKeadaan}>
+              <Segmented
+                label="Pilih tampilan"
+                value={darkMode}
+                onChange={(value) => ubah(() => setDarkMode(value))}
+                options={[
+                  { value: false, label: 'Light' },
+                  { value: true, label: 'Dark' },
+                ]}
+              />
+            </div>
+          </Control>
           <Control label="Mode">
             <div onPointerDownCapture={ingatKeadaan}>
               <Segmented
@@ -1171,19 +1184,6 @@ export function DropdownPage() {
                 value={withDisabled}
                 onChange={(value) => ubah(() => setWithDisabled(value))}
                 options={booleanOptions}
-              />
-            </div>
-          </Control>
-          <Control label="Tampilan">
-            <div onPointerDownCapture={ingatKeadaan}>
-              <Segmented
-                label="Pilih tampilan"
-                value={darkMode}
-                onChange={(value) => ubah(() => setDarkMode(value))}
-                options={[
-                  { value: false, label: 'Light' },
-                  { value: true, label: 'Dark' },
-                ]}
               />
             </div>
           </Control>

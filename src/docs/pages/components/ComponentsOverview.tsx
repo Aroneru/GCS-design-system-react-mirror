@@ -320,6 +320,54 @@ export function ComponentsOverview() {
       </OverviewCard>
 
       <OverviewCard
+        route="/components/table-of-contents"
+        name="Table of Contents"
+        desc="Daftar isi “On this page” yang menyorot bagian yang sedang dibaca."
+      >
+        {/*
+          Kartu Overview sendiri sudah berupa <a>, jadi <TableOfContents> asli
+          tidak bisa dipasang di sini: tautan di dalam tautan tidak sah dan
+          peramban akan memecah DOM-nya. Yang dirender tiruan statis dengan
+          ukuran dan warna yang sama; isi halamannya berupa skeleton.
+        */}
+        <div
+          className="relative flex h-[264px] gap-6 overflow-hidden rounded-xl bg-surface-subtle p-5"
+          aria-hidden="true"
+        >
+          <div className="min-w-0 flex-1 space-y-3 rounded-lg bg-white p-5 shadow-sm">
+            <div className="h-2 w-2/5 rounded bg-primary-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-5/6 rounded bg-gray-200" />
+            <div className="mt-6 h-2 w-1/3 rounded bg-gray-300" />
+            <div className="h-1.5 w-full rounded bg-gray-200" />
+            <div className="h-1.5 w-4/6 rounded bg-gray-200" />
+            <div className="mt-6 h-2 w-1/4 rounded bg-gray-300" />
+            <div className="h-1.5 w-5/6 rounded bg-gray-200" />
+          </div>
+
+          <div className="w-36 shrink-0 pt-1">
+            <p className="text-[11px] leading-4 font-bold tracking-[0.14em] text-content-disabled uppercase">
+              On this page
+            </p>
+            <ul className="mt-3 border-l border-border">
+              {["Tampilan dasar", "Variasi", "Dark mode", "Playground", "Properties"].map(
+                (label, i) => (
+                  <li
+                    key={label}
+                    className={`-ml-px border-l-2 py-1.5 pl-3.5 text-xs leading-5 ${
+                      i === 0 ? "border-brand text-brand" : "border-transparent text-content-subtle"
+                    }`}
+                  >
+                    {label}
+                  </li>
+                ),
+              )}
+            </ul>
+          </div>
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
         route="/components/list-view"
         name="List View"
         desc="Kartu daftar berkas dan dokumen dengan wadah ikon, metadata ringkas, dan aksi cepat."
@@ -336,6 +384,28 @@ export function ComponentsOverview() {
             title="Project brief"
             metadata={["PDF", "2.4 MB"]}
             actionLabel="Open"
+          />
+        </div>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/components/timeline"
+        name="Timeline View"
+        desc="Riwayat kejadian berurutan dengan avatar, waktu, dan status di tiap langkah. Desainnya belum final."
+      >
+        <div className="rounded-xl bg-surface-subtle p-5">
+          <Timeline
+            platform="mobile"
+            size="small"
+            items={[
+              { name: "User 01", role: "Role / Department", time: new Date("2026-01-01T09:00") },
+              {
+                name: "User 02",
+                role: "Role / Department",
+                time: new Date("2026-01-01T09:05"),
+                status: { label: "Badge", icon: <Clock />, dismissible: true },
+              },
+            ]}
           />
         </div>
       </OverviewCard>
@@ -488,28 +558,6 @@ export function ComponentsOverview() {
               </div>
             </div>
           </div>
-        </div>
-      </OverviewCard>
-
-      <OverviewCard
-        route="/components/timeline"
-        name="Timeline View"
-        desc="Riwayat kejadian berurutan dengan avatar, waktu, dan status di tiap langkah. Desainnya belum final."
-      >
-        <div className="rounded-xl bg-surface-subtle p-5">
-          <Timeline
-            platform="mobile"
-            size="small"
-            items={[
-              { name: "User 01", role: "Role / Department", time: new Date("2026-01-01T09:00") },
-              {
-                name: "User 02",
-                role: "Role / Department",
-                time: new Date("2026-01-01T09:05"),
-                status: { label: "Badge", icon: <Clock />, dismissible: true },
-              },
-            ]}
-          />
         </div>
       </OverviewCard>
     </OverviewPage>

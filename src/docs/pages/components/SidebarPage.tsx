@@ -767,16 +767,6 @@ export function SidebarPage() {
         </Stage>
 
         <Controls>
-          <Control label="Sidebar">
-            <Segmented
-              label="Pilih kondisi Sidebar"
-              value={resolvedCollapse}
-              onChange={(value) => setCollapse(value as CollapseOption)}
-              options={collapseOptions}
-              disabled={menuIcon === "hide"}
-            />
-          </Control>
-
           <Control label="Mode">
             <Segmented
               label="Pilih mode"
@@ -786,6 +776,15 @@ export function SidebarPage() {
                 { value: "light", label: "Light" },
                 { value: "dark", label: "Dark" },
               ]}
+            />
+          </Control>
+          <Control label="Sidebar">
+            <Segmented
+              label="Pilih kondisi Sidebar"
+              value={resolvedCollapse}
+              onChange={(value) => setCollapse(value as CollapseOption)}
+              options={collapseOptions}
+              disabled={menuIcon === "hide"}
             />
           </Control>
 

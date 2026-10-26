@@ -25,7 +25,31 @@ tabel props Search kini memuat `trigger`, `debounce`, `showButton`, dan
 platform `compact`, dan tinggi logo di halaman Footer kini ditulis sesuai
 kodenya: 48px, 60px saat footer ≥ 768px. Kartu di halaman Overview kini `<div>`
 dengan judul sebagai tautannya, bukan satu `<a>` besar yang memuat tautan dan
-tombol preview — klik di mana pun pada kartu tetap membuka halamannya.
+tombol preview — klik di mana pun pada kartu tetap membuka halamannya. Ada
+halaman baru Table of Contents. Setiap Playground kini punya kontrol Typography
+(Lato, Inter, Arial) dengan urutan kontrol yang sama: font, dark mode, lalu
+kontrol lain. Halaman Typography menandai ketebalan yang tidak dimiliki font
+yang dipilih.
+
+`Modal`, `Navbar`, dan `Dropdown` sedang dikerjakan ulang dan belum final —
+baca bagian **Dalam pengerjaan** sebelum memakainya.
+
+### Dalam pengerjaan
+
+Perubahan di bagian ini sudah ada di kode, tetapi belum selesai. API dan
+tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
+
+- **`Navbar` V2.** Ditulis ulang dengan API baru untuk Front Office dan Back
+  Office. Tipe lama (`NavbarItem`, `NavbarContextItem`, `NavbarSubItem`,
+  `NavbarSearchConfig`, `NavbarAction`, `NavbarUser`, `NavbarNotification`,
+  `NavbarMenuPosition`, `NavbarVariant`) sudah tidak diekspor. Panduan migrasi
+  menyusul saat API-nya final.
+- **`Dropdown`.** Isi bisa berupa fungsi yang menerima `close`, prop baru
+  `actionsRef`, `closeOnSelect`, dan `align`, serta item yang menerima
+  `target`, `rel`, `onClick`, dan `current`. Warnanya kini dari token
+  `--color-dropdown-*`.
+- **`Modal`.** Tampilan disesuaikan dengan desain: judul Inter 18px semibold,
+  isi 16px medium, dan latar popup gray-600 di tema gelap.
 
 ### Ditambahkan
 
@@ -85,8 +109,42 @@ tombol preview — klik di mana pun pada kartu tetap membuka halamannya.
   + <InputField application="purple" label="Nama" />
   ```
 
+- **`Badge` mengikuti ukuran desain.** `sm` kini tinggi 22px (sebelumnya 24px)
+  dan `lg` 25px (sebelumnya 28px). Jarak ikon ke teks jadi 4px, dan ikon `lg`
+  jadi 18px. Badge di tata letak yang ukurannya dikunci bisa sedikit bergeser.
+
+### Ditambahkan
+
+- **Komponen `TableOfContents`.** Daftar isi "On this page" yang menyorot
+  bagian yang sedang dibaca. Di layar 1024px ke atas tampil sebagai daftar,
+  di bawahnya sebagai tombol yang membuka Drawer dari kanan. Tipe yang
+  diekspor: `TableOfContentsItem`, `TableOfContentsItemElement`,
+  `TableOfContentsLayout`, dan `TableOfContentsProps`. Latarnya memakai token
+  baru `--color-toc-surface`.
+
+  ```tsx
+  <TableOfContents
+    className="sticky top-10"
+    items={[w
+      { id: 'dasar', label: 'Tampilan dasar' },
+      { id: 'variasi', label: 'Variasi' },
+    ]}
+  />
+  ```
+
+- **Token ketebalan huruf `--font-weight-*`.** Sembilan token, `thin` (100)
+  sampai `black` (900), di `tokens.css`. Utility `font-thin` sampai
+  `font-black` kini mengambil nilainya dari token ini. Di CSS biasa pakai
+  langsung, mis. `font-weight: var(--font-weight-semibold)`.
+
 ### Diperbaiki
 
+- **`font-medium` dan `font-semibold` kini tampil sesuai ketebalannya di Lato.**
+  Lato dari Google Fonts hanya punya 100, 300, 400, 700, dan 900, jadi medium
+  tampil 400 dan semibold tampil 700. Lato kini memakai Lato 2.0 yang ikut
+  dalam package (`dist/fonts/`, lisensi OFL), dengan kesembilan ketebalan.
+  `styles.css` tidak lagi memuat Lato dari Google Fonts. Satu ketebalan
+  berukuran sekitar 180 KB, dan browser hanya mengunduh yang dipakai halaman.
 - **`Sidebar`: perilaku submenu lebih konsisten.** Parent sekarang otomatis
   terbuka saat dirinya atau salah satu subitem aktif. Saat Sidebar ringkas,
   klik group membuka Sidebar lebih dulu bila `onCollapse` tersedia; tanpa
@@ -255,7 +313,7 @@ situs dokumentasi ikut diperbarui.
   `SidebarUser` kini mendukung `items?: SidebarUserItem[]` dan `groups?: SidebarUserGroup[]`
   untuk menampilkan menu dropdown akun/profil (misalnya profil, pengaturan, dan
   keluar). Mendukung `tone="danger"` untuk aksi destruktif seperti Logout,
-  penutupan via klik luar (*pointerdown*) dan tombol `Escape`, rotasi chevron,
+  penutupan via klik luar (_pointerdown_) dan tombol `Escape`, rotasi chevron,
   serta tata letak flyout yang rapi saat sidebar dalam kondisi `collapsed`.
   Selain itu, `SidebarItem`, `SidebarSubItem`, dan `SidebarUser` kini mendukung
   prop `external?: boolean` yang otomatis membuka tab baru dengan
@@ -370,7 +428,7 @@ diperbarui: kini ada bagian Table, baris props Button sudah dibetulkan
   menu aktif berlatar gray-700 (gray-600 saat disorot).
 - **`Search`: `platform="compact"`** — kotak setinggi 37px dengan tombol cari
   25px, untuk dipasang di navbar. `SearchPlatform` kini `default | mobile |
-  compact`.
+compact`.
 
 ### Diperbaiki
 
@@ -580,6 +638,7 @@ Dibanding 0.2.0 ada enam perubahan yang memutus, termasuk nama paketnya.
 
   Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
   `DatepickerRangeProps` ikut diekspor.
+
 - **`Drawer`** — panel yang meluncur dari tepi layar, dikendalikan lewat
   `open` + `onClose`; klik latar dan Esc menutupnya, kecuali dimatikan lewat
   `closeOnOverlayClick` dan `closeOnEsc`. Sisinya dipilih lewat `position`
@@ -612,6 +671,7 @@ Dibanding 0.2.0 ada enam perubahan yang memutus, termasuk nama paketnya.
 
   Tipe pendukung `DropdownItem`, `DropdownGroup`, dan `DropdownItemTone` ikut
   diekspor.
+
 - **`FloatingLabel`: prop `darkMode`** — tampilan gelap sesuai desain: kotak
   gray-800 dengan teks, ikon, dan tombol hapus gray-400. Garis aksen tidak
   berubah, tetapi label yang naik satu tingkat lebih terang (primary-500,

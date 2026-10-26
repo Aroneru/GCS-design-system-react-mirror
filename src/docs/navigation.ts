@@ -132,6 +132,7 @@ export const sidebars: Record<string, { title: string; items: NavItem[] }> = {
       { label: "Sidebar", route: "/components/sidebar", keywords: "menu samping" },
       { label: "List View", route: "/components/list-view", keywords: "daftar list view berkas item lampiran" },
       { label: "Table", route: "/components/table", keywords: "tabel data" },
+      { label: "Table of Contents", route: "/components/table-of-contents", keywords: "daftar isi toc on this page" },
       {
         label: "Timeline View",
         route: "/components/timeline",
