@@ -19,7 +19,13 @@ tema gelap. Situs dokumentasi ikut diperbarui: bagian Mulai cepat di
 beranda kini empat langkah, dengan langkah baru "Sambungkan Tailwind CSS ke Vite"
 (pasang `tailwindcss` dan `@tailwindcss/vite`, lalu daftarkan `tailwindcss()` di
 `vite.config.ts`). Tombol outline kini selalu di kiri tombol filled di halaman
-contoh, dan contoh kode footer di halaman Modal kini sama dengan demonya. Ada
+contoh, dan contoh kode footer di halaman Modal kini sama dengan demonya.
+Deskripsi Button dan Alert di Components Overview kini sesuai komponennya,
+tabel props Search kini memuat `trigger`, `debounce`, `showButton`, dan
+platform `compact`, dan tinggi logo di halaman Footer kini ditulis sesuai
+kodenya: 48px, 60px saat footer ≥ 768px. Kartu di halaman Overview kini `<div>`
+dengan judul sebagai tautannya, bukan satu `<a>` besar yang memuat tautan dan
+tombol preview — klik di mana pun pada kartu tetap membuka halamannya. Ada
 halaman baru Table of Contents. Setiap Playground kini punya kontrol Typography
 (Lato, Inter, Arial) dengan urutan kontrol yang sama: font, dark mode, lalu
 kontrol lain. Halaman Typography menandai ketebalan yang tidak dimiliki font
@@ -44,13 +50,6 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   `--color-dropdown-*`.
 - **`Modal`.** Tampilan disesuaikan dengan desain: judul Inter 18px semibold,
   isi 16px medium, dan latar popup gray-600 di tema gelap.
-  contoh, dan contoh kode footer di halaman Modal kini sama dengan demonya.
-  Deskripsi Button dan Alert di Components Overview kini sesuai komponennya,
-  tabel props Search kini memuat `trigger`, `debounce`, `showButton`, dan
-  platform `compact`, dan tinggi logo di halaman Footer kini ditulis sesuai
-  kodenya: 48px, 60px saat footer ≥ 768px. Kartu di halaman Overview kini `<div>`
-  dengan judul sebagai tautannya, bukan satu `<a>` besar yang memuat tautan dan
-  tombol preview — klik di mana pun pada kartu tetap membuka halamannya.
 
 ### Ditambahkan
 
