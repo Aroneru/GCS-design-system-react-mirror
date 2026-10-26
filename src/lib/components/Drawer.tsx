@@ -13,6 +13,8 @@ import {
   type ButtonHTMLAttributes,
   type DialogHTMLAttributes,
   type HTMLAttributes,
+  type KeyboardEvent,
+  type KeyboardEventHandler,
   type MouseEvent,
   type ReactNode,
   type SyntheticEvent,
@@ -39,7 +41,12 @@ export interface DrawerMenuItem {
   icon?: ReactNode
   label: ReactNode
   active?: boolean
+  /** Nilai controlled untuk status submenu terbuka. Gunakan bersama onExpandedChange. */
   expanded?: boolean
+  /** Status awal submenu untuk pemakaian uncontrolled. */
+  defaultExpanded?: boolean
+  /** Dipanggil saat consumer meminta perubahan status submenu. */
+  onExpandedChange?: (expanded: boolean) => void
   collapsible?: boolean
   theme?: DrawerNavItemTheme
   href?: string
@@ -81,11 +88,17 @@ export interface DrawerNavItemProps extends Omit<HTMLAttributes<HTMLDivElement>,
   icon?: ReactNode
   label: ReactNode
   active?: boolean
+  /** Nilai controlled untuk status submenu terbuka. Gunakan bersama onExpandedChange. */
   expanded?: boolean
+  /** Status awal submenu untuk pemakaian uncontrolled. */
+  defaultExpanded?: boolean
+  /** Dipanggil saat consumer meminta perubahan status submenu. */
+  onExpandedChange?: (expanded: boolean) => void
   collapsible?: boolean
   theme?: DrawerNavItemTheme
   href?: string
   badge?: ReactNode
+  disabled?: boolean
   onClick?: (e: MouseEvent<HTMLElement>) => void
   children?: ReactNode
 }
@@ -95,6 +108,7 @@ export interface DrawerSubItemProps extends HTMLAttributes<HTMLAnchorElement> {
   active?: boolean
   theme?: DrawerNavItemTheme
   href?: string
+  disabled?: boolean
   onClick?: (e: MouseEvent<HTMLElement>) => void
 }
 
@@ -188,14 +202,24 @@ const subItemHoverClasses: Record<DrawerNavItemTheme, string> = {
 }
 
 function DrawerMenuItemRenderer({ item, theme = 'primary' }: { item: DrawerMenuItem; theme?: DrawerNavItemTheme }) {
-  const [expanded, setExpanded] = useState(Boolean(item.expanded ?? (item.children && item.children.length > 0)))
+  const [uncontrolledExpanded, setUncontrolledExpanded] = useState(
+    () => item.defaultExpanded ?? Boolean(item.children && item.children.length > 0),
+  )
   const [activeSubId, setActiveSubId] = useState<string | undefined>()
 
   const hasChildren = Boolean(item.children && item.children.length > 0)
+  const isControlled = item.expanded !== undefined
+  const expanded = item.expanded ?? uncontrolledExpanded
 
   const handleClick = (e: MouseEvent<HTMLElement>) => {
+    if (item.disabled) {
+      e.preventDefault()
+      return
+    }
     if (hasChildren) {
-      setExpanded((prev) => !prev)
+      const nextExpanded = !expanded
+      if (!isControlled) setUncontrolledExpanded(nextExpanded)
+      item.onExpandedChange?.(nextExpanded)
     }
     item.onClick?.(e)
   }
@@ -204,12 +228,16 @@ function DrawerMenuItemRenderer({ item, theme = 'primary' }: { item: DrawerMenuI
     <DrawerNavItem
       icon={item.icon}
       label={item.label}
-      active={item.active}
+      active={item.active ?? item.children?.some((child) => child.active)}
       expanded={expanded}
       collapsible={item.collapsible}
       theme={item.theme ?? theme}
-      href={item.href}
+      // Parent yang memiliki submenu adalah disclosure (button), bukan link.
+      // Tujuan navigasi harus ditempatkan sebagai subitem agar satu klik tidak
+      // sekaligus membuka submenu dan berpindah halaman.
+      href={hasChildren ? undefined : item.href}
       badge={item.badge}
+      disabled={item.disabled}
       onClick={handleClick}
     >
       {item.children?.map((sub, sIdx) => {
@@ -221,8 +249,13 @@ function DrawerMenuItemRenderer({ item, theme = 'primary' }: { item: DrawerMenuI
             label={sub.label}
             active={isSubActive}
             href={sub.href}
+            disabled={sub.disabled}
             theme={item.theme ?? theme}
             onClick={(e) => {
+              if (sub.disabled) {
+                e.preventDefault()
+                return
+              }
               setActiveSubId(subKey)
               sub.onClick?.(e)
             }}
@@ -551,12 +584,16 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
     icon,
     label,
     active = false,
-    expanded = false,
+    expanded,
+    defaultExpanded = false,
+    onExpandedChange,
     collapsible = false,
     theme = 'primary',
     href,
     badge,
+    disabled = false,
     onClick,
+    onKeyDown,
     className,
     children,
     ...props
@@ -564,18 +601,53 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
   ref,
 ) {
   const context = useContext(DrawerContext)
-  const isExpandable = collapsible || Boolean(children)
-  const Component = href ? 'a' : 'button'
+  const hasSubmenu = Boolean(children)
+  const isExpandable = collapsible || hasSubmenu
+  const [uncontrolledExpanded, setUncontrolledExpanded] = useState(defaultExpanded)
+  const isExpanded = expanded ?? uncontrolledExpanded
+  // DrawerNavItem juga dipakai langsung melalui JSX; terapkan aturan yang
+  // sama seperti renderer data-driven: submenu dan link tidak digabung.
+  const destinationHref = hasSubmenu ? undefined : href
+  const Component = destinationHref ? 'a' : 'button'
   const isDark = context?.darkMode
+  const submenuId = useId()
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
+    if (disabled) {
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
+    onClick?.(event)
+    if (hasSubmenu) {
+      const nextExpanded = !isExpanded
+      if (expanded === undefined) setUncontrolledExpanded(nextExpanded)
+      onExpandedChange?.(nextExpanded)
+    }
+  }
+  const handleKeyDown: KeyboardEventHandler = (event) => {
+    if (disabled) {
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
+    onKeyDown?.(event as KeyboardEvent<HTMLDivElement>)
+  }
 
   return (
     <div ref={ref} className={cn('w-full', className)} {...props}>
       <Component
-        href={href}
-        onClick={onClick}
-        type={href ? undefined : 'button'}
+        href={disabled ? undefined : destinationHref}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        type={destinationHref ? undefined : 'button'}
+        disabled={destinationHref ? undefined : disabled}
+        aria-disabled={disabled || undefined}
+        aria-current={destinationHref && !disabled && active ? 'page' : undefined}
+        aria-expanded={hasSubmenu ? isExpanded : undefined}
+        aria-controls={hasSubmenu ? submenuId : undefined}
+        tabIndex={disabled ? -1 : undefined}
         className={cn(
-          'group flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-base transition-all text-left font-medium',
+          'group flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-base transition-all text-left font-medium disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
           active
             ? (isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : activeThemeClasses[theme])
             : (isDark ? 'text-gray-50 hover:bg-gray-700 hover:text-white' : cn('text-gray-900', hoverThemeClasses[theme])),
@@ -608,14 +680,14 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
                   : (isDark ? 'text-gray-400 group-hover:text-white' : cn('text-gray-500', hoverIconClasses[theme])),
               )}
             >
-              {expanded ? <ChevronUp className="w-[18px] h-[18px]" /> : <ChevronDown className="w-[18px] h-[18px]" />}
+                  {isExpanded ? <ChevronUp className="w-[18px] h-[18px]" /> : <ChevronDown className="w-[18px] h-[18px]" />}
             </span>
           )}
         </div>
       </Component>
 
-      {expanded && children && (
-        <div className="mt-1 space-y-1 pl-8">
+      {children && (
+        <div id={submenuId} hidden={!isExpanded} className="mt-1 space-y-1 pl-8">
           {Children.map(children, (child) => {
             if (isValidElement<DrawerSubItemProps>(child)) {
               return cloneElement(child, { theme: child.props.theme ?? theme })
@@ -634,7 +706,7 @@ DrawerNavItem.displayName = 'DrawerNavItem'
  * Subkomponen sub-menu ter-indentasi di bawah DrawerNavItem yang expanded.
  */
 export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(function DrawerSubItem(
-  { label, active = false, theme = 'primary', href, onClick, className, ...props },
+  { label, active = false, theme = 'primary', href, disabled = false, onClick, onKeyDown, className, ...props },
   ref,
 ) {
   const context = useContext(DrawerContext)
@@ -642,20 +714,38 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
   const isDark = context?.darkMode
 
   const handleClick = (e: MouseEvent<HTMLElement>) => {
+    if (disabled) {
+      e.preventDefault()
+      e.stopPropagation()
+      return
+    }
     if (!href) {
       e.preventDefault()
     }
     onClick?.(e)
   }
+  const handleKeyDown: KeyboardEventHandler = (event) => {
+    if (disabled) {
+      event.preventDefault()
+      event.stopPropagation()
+      return
+    }
+    onKeyDown?.(event as KeyboardEvent<HTMLAnchorElement>)
+  }
 
   return (
     <Component
       ref={ref}
-      href={href}
+      href={disabled ? undefined : href}
       type={href ? undefined : 'button'}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      disabled={href ? undefined : disabled}
+      aria-disabled={disabled || undefined}
+      aria-current={href && !disabled && active ? 'page' : undefined}
+      tabIndex={disabled ? -1 : undefined}
       className={cn(
-        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-base text-left transition-colors font-medium',
+        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-base text-left transition-colors font-medium disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
         isDark
           ? (active ? 'bg-gray-700/50 hover:bg-gray-600 text-white' : 'text-gray-50 hover:bg-gray-700 hover:text-white')
           : cn(

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { ChevronDown } from "flowbite-react-icons/outline";
 import { cn } from "../../utils/cn";
 import type { SidebarGroup, SidebarItem } from "./SidebarTypes";
@@ -8,13 +8,31 @@ interface SidebarNavigationProps {
   groups?: SidebarGroup[];
   items?: SidebarItem[];
   collapsed: boolean;
+  /** Meminta Sidebar induk dibuka sebelum submenu dapat ditampilkan. */
+  onExpandSidebar?: () => void;
   darkMode?: boolean;
 }
 
-function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean; darkMode?: boolean }) {
+function MenuItem({
+  item,
+  collapsed,
+  onExpandSidebar,
+}: {
+  item: SidebarItem;
+  collapsed: boolean;
+  onExpandSidebar?: () => void;
+  darkMode?: boolean;
+}) {
   const hasChildren = Boolean(item.children?.length);
-  const [open, setOpen] = useState(Boolean(item.defaultOpen || item.active));
-  const itemId = item.id ?? item.label;
+  const hasActiveChild = Boolean(item.children?.some((child) => child.active));
+  const [open, setOpen] = useState(Boolean(item.defaultOpen || item.active || hasActiveChild));
+  const submenuId = `sidebar-submenu-${useId()}`;
+
+  // Ketika navigasi berubah (mis. setelah route change), lokasi aktif harus
+  // tetap terlihat tanpa consumer perlu mengatur defaultOpen secara manual.
+  useEffect(() => {
+    if (item.active || hasActiveChild) setOpen(true);
+  }, [hasActiveChild, item.active]);
   const className = cn(
     "group flex w-full rounded-lg text-sm font-medium transition-colors",
     "text-content hover:bg-gray-100 in-data-[theme=dark]:hover:bg-gray-600",
@@ -61,16 +79,28 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean; 
     );
   }
 
+  const toggleDisabled = Boolean(item.disabled || item.submenuToggleDisabled || (collapsed && !onExpandSidebar));
+  const handleSubmenuToggle = () => {
+    // Submenu tidak dirender saat ringkas. Bila Sidebar dapat dikendalikan,
+    // buka dulu agar klik ikon memiliki hasil yang terlihat.
+    if (collapsed) {
+      onExpandSidebar?.();
+      return;
+    }
+    setOpen((current) => !current);
+  };
+
   return (
     <div>
       <button
         type="button"
         className={className}
-        onClick={() => setOpen((current) => !current)}
-        aria-expanded={open}
-        aria-controls={`sidebar-submenu-${itemId}`}
-        disabled={item.disabled || item.submenuToggleDisabled}
-        aria-disabled={item.disabled || item.submenuToggleDisabled || undefined}
+        onClick={handleSubmenuToggle}
+        aria-expanded={collapsed ? undefined : open}
+        aria-controls={collapsed ? undefined : submenuId}
+        aria-label={collapsed ? `Buka sidebar untuk melihat submenu ${item.label}` : undefined}
+        disabled={toggleDisabled}
+        aria-disabled={toggleDisabled || undefined}
         title={collapsed ? item.label : undefined}
       >
         {item.icon && (
@@ -104,7 +134,7 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean; 
       </button>
 
       {!collapsed && open && (
-        <ul id={`sidebar-submenu-${itemId}`} className="mt-1 space-y-1 pl-8">
+        <ul id={submenuId} className="mt-1 space-y-1 pl-8">
           {item.children?.map((child) => (
             <li key={child.id ?? child.label}>
               <a
@@ -147,7 +177,7 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean; 
   );
 }
 
-export function SidebarNavigation({ groups, items, collapsed, darkMode }: SidebarNavigationProps) {
+export function SidebarNavigation({ groups, items, collapsed, onExpandSidebar, darkMode }: SidebarNavigationProps) {
   const resolvedGroups: SidebarGroup[] = groups?.length
     ? groups
     : [{ id: "default", items: items ?? [] }];
@@ -171,7 +201,7 @@ export function SidebarNavigation({ groups, items, collapsed, darkMode }: Sideba
           <ul className="space-y-1">
             {group.items.map((item) => (
               <li key={item.id ?? item.label}>
-                <MenuItem item={item} collapsed={collapsed} darkMode={darkMode} />
+                <MenuItem item={item} collapsed={collapsed} onExpandSidebar={onExpandSidebar} darkMode={darkMode} />
               </li>
             ))}
           </ul>

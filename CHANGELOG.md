@@ -14,7 +14,8 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 Ada perubahan API yang memutus: migrasi tema dan aksen warna `simaya` ke
 `purple` pada seluruh komponen dan token — baca bagian **Diubah**. Komponen baru
 `Timeline` masih eksperimental karena desainnya belum final. Satu perbaikan
-token warna `Radio`. Situs dokumentasi ikut diperbarui: bagian Mulai cepat di
+token warna `Radio`. `ListView` dan Button kini memiliki penyesuaian baru untuk
+tema gelap. Situs dokumentasi ikut diperbarui: bagian Mulai cepat di
 beranda kini empat langkah, dengan langkah baru "Sambungkan Tailwind CSS ke Vite"
 (pasang `tailwindcss` dan `@tailwindcss/vite`, lalu daftarkan `tailwindcss()` di
 `vite.config.ts`). Tombol outline kini selalu di kiri tombol filled di halaman
@@ -28,6 +29,17 @@ tombol preview — klik di mana pun pada kartu tetap membuka halamannya.
 
 ### Ditambahkan
 
+- **`ListView`** — daftar item dengan dua varian: `simple` untuk informasi
+  ringkas berikon, badge, dekorasi aksen, dan aksi; serta `article` untuk
+  artikel atau diskusi dengan subject, kategori, waktu, pin, judul, dan metrik
+  interaksi. `simple` mendukung platform `desktop` dan `mobile` serta ukuran
+  `S`, `M`, dan `L`; `article` mendukung ukuran `S` hingga `XL`, memakai garis
+  aksen vertikal secara permanen, dan mendukung `darkMode`. `ListView`,
+  `ListViewItem`, `ListViewArticle`, serta tipe props-nya ikut diekspor.
+- **`Button`: prop `darkMode`** — menyesuaikan warna tombol untuk latar gelap
+  tanpa mengubah ukuran atau API lainnya. Filled memakai gray-50 dengan teks
+  gray-700; outline `tone="light"` memakai gray-50, sedangkan `tone="dark"`
+  memakai gray-500. Saat hover keduanya berlatar putih dengan teks gray-700.
 - **`Timeline` (eksperimental).** Riwayat kejadian berurutan dengan avatar di
   sepanjang satu garis. Tiap item memuat nama, jabatan, waktu, lama proses,
   keterangan, Details, Attachments, dan status; selain `name`, semuanya
@@ -75,6 +87,14 @@ tombol preview — klik di mana pun pada kartu tetap membuka halamannya.
 
 ### Diperbaiki
 
+- **`Sidebar`: perilaku submenu lebih konsisten.** Parent sekarang otomatis
+  terbuka saat dirinya atau salah satu subitem aktif. Saat Sidebar ringkas,
+  klik group membuka Sidebar lebih dulu bila `onCollapse` tersedia; tanpa
+  callback tersebut tombol group dinonaktifkan agar tidak memberi kesan klik
+  yang tidak bekerja. ID panel submenu kini unik per instance Sidebar untuk
+  menjaga hubungan `aria-controls`. `href` pada parent yang memiliki
+  `children` juga didokumentasikan sebagai nilai yang diabaikan karena parent
+  berperan sebagai disclosure, bukan link.
 - **Kelas `ds-theme-dark` kini ikut mengganti warna gelap `Radio`.**
   Selector di `tokens.css` sebelumnya salah ketik (`.ds-theme-darkz`), jadi
   token `Radio` tetap terang di dalam elemen berkelas `ds-theme-dark`, padahal
