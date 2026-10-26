@@ -14,7 +14,7 @@ import {
     type DrawerMenuItem,
     type DrawerNavItemTheme,
 } from '../../../lib'
-import { DrawerContext } from '../../../lib/components/Drawer'
+import { DrawerContext } from '../../../lib/components/DrawerContext'
 
 const drawerContextDummy = {
     onClose: () => { },

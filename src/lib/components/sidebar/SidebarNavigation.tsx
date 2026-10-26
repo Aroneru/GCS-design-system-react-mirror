@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { ChevronDown } from "flowbite-react-icons/outline";
 import { cn } from "../../utils/cn";
 import type { SidebarGroup, SidebarItem } from "./SidebarTypes";
@@ -25,14 +25,11 @@ function MenuItem({
 }) {
   const hasChildren = Boolean(item.children?.length);
   const hasActiveChild = Boolean(item.children?.some((child) => child.active));
-  const [open, setOpen] = useState(Boolean(item.defaultOpen || item.active || hasActiveChild));
+  const [open, setOpen] = useState(Boolean(item.defaultOpen));
   const submenuId = `sidebar-submenu-${useId()}`;
-
-  // Ketika navigasi berubah (mis. setelah route change), lokasi aktif harus
-  // tetap terlihat tanpa consumer perlu mengatur defaultOpen secara manual.
-  useEffect(() => {
-    if (item.active || hasActiveChild) setOpen(true);
-  }, [hasActiveChild, item.active]);
+  // Status aktif selalu menang atas state manual, sehingga route yang berubah
+  // langsung menampilkan lokasi aktif tanpa render tambahan.
+  const isOpen = open || item.active || hasActiveChild;
   const className = cn(
     "group flex w-full rounded-lg text-sm font-medium transition-colors",
     "text-content hover:bg-gray-100 in-data-[theme=dark]:hover:bg-gray-600",
@@ -96,7 +93,7 @@ function MenuItem({
         type="button"
         className={className}
         onClick={handleSubmenuToggle}
-        aria-expanded={collapsed ? undefined : open}
+        aria-expanded={collapsed ? undefined : isOpen}
         aria-controls={collapsed ? undefined : submenuId}
         aria-label={collapsed ? `Buka sidebar untuk melihat submenu ${item.label}` : undefined}
         disabled={toggleDisabled}
@@ -126,14 +123,14 @@ function MenuItem({
             <ChevronDown
               className={cn(
                 "w-[28px] h-[28px] shrink-0 text-content transition-transform",
-                open && "rotate-180",
+                isOpen && "rotate-180",
               )}
             />
           </>
         )}
       </button>
 
-      {!collapsed && open && (
+      {!collapsed && isOpen && (
         <ul id={submenuId} className="mt-1 space-y-1 pl-8">
           {item.children?.map((child) => (
             <li key={child.id ?? child.label}>

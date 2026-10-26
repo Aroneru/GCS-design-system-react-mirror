@@ -1,7 +1,6 @@
 import {
   Children,
   cloneElement,
-  createContext,
   forwardRef,
   isValidElement,
   useCallback,
@@ -12,6 +11,7 @@ import {
   useState,
   type ButtonHTMLAttributes,
   type DialogHTMLAttributes,
+  type ForwardedRef,
   type HTMLAttributes,
   type KeyboardEvent,
   type KeyboardEventHandler,
@@ -22,6 +22,7 @@ import {
 import { Close, ChevronDown, ChevronUp } from 'flowbite-react-icons/outline'
 import { BarsFromLeft } from '../icons/outline'
 import { cn } from '../utils/cn'
+import { DrawerContext } from './DrawerContext'
 
 export type DrawerPosition = 'right' | 'left' | 'top' | 'bottom'
 export type DrawerSize = 's' | 'm' | 'l' | 'xl' | 'full'
@@ -103,7 +104,7 @@ export interface DrawerNavItemProps extends Omit<HTMLAttributes<HTMLDivElement>,
   children?: ReactNode
 }
 
-export interface DrawerSubItemProps extends HTMLAttributes<HTMLAnchorElement> {
+export interface DrawerSubItemProps extends Omit<HTMLAttributes<HTMLElement>, 'onClick'> {
   label: ReactNode
   active?: boolean
   theme?: DrawerNavItemTheme
@@ -111,17 +112,6 @@ export interface DrawerSubItemProps extends HTMLAttributes<HTMLAnchorElement> {
   disabled?: boolean
   onClick?: (e: MouseEvent<HTMLElement>) => void
 }
-
-interface DrawerContextValue {
-  onClose: () => void
-  titleId: string
-  descriptionId: string
-  registerTitle: (id: string, isMounted: boolean) => void
-  registerDescription: (id: string, isMounted: boolean) => void
-  darkMode?: boolean
-}
-
-export const DrawerContext = createContext<DrawerContextValue | null>(null)
 
 const sideSizes: Record<DrawerSize, string> = {
   s: 'w-[320px] max-w-[calc(100vw-2rem)]',
@@ -706,11 +696,20 @@ DrawerNavItem.displayName = 'DrawerNavItem'
  * Subkomponen sub-menu ter-indentasi di bawah DrawerNavItem yang expanded.
  */
 export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(function DrawerSubItem(
-  { label, active = false, theme = 'primary', href, disabled = false, onClick, onKeyDown, className, ...props },
+  {
+    label,
+    active = false,
+    theme = 'primary',
+    href,
+    disabled = false,
+    onClick,
+    onKeyDown,
+    className,
+    ...props
+  },
   ref,
 ) {
   const context = useContext(DrawerContext)
-  const Component = (href ? 'a' : 'button') as any
   const isDark = context?.darkMode
 
   const handleClick = (e: MouseEvent<HTMLElement>) => {
@@ -733,37 +732,55 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
     onKeyDown?.(event as KeyboardEvent<HTMLAnchorElement>)
   }
 
+  const itemClassName = cn(
+    'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-base text-left transition-colors font-medium disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
+    isDark
+      ? (active ? 'bg-gray-700/50 hover:bg-gray-600 text-white' : 'text-gray-50 hover:bg-gray-700 hover:text-white')
+      : cn(
+          subItemHoverClasses[theme],
+          active
+            ? theme === 'purple'
+              ? 'text-purple-700 bg-purple-50/70'
+              : theme === 'gray'
+                ? 'text-gray-900 bg-gray-100'
+                : 'text-blue-600 bg-blue-50/70'
+            : 'text-gray-900'
+        ),
+    className,
+  )
+
+  if (href) {
+    return (
+      <a
+        ref={ref as ForwardedRef<HTMLAnchorElement>}
+        href={disabled ? undefined : href}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        aria-disabled={disabled || undefined}
+        aria-current={!disabled && active ? 'page' : undefined}
+        tabIndex={disabled ? -1 : undefined}
+        className={itemClassName}
+        {...props}
+      >
+        {label}
+      </a>
+    )
+  }
+
   return (
-    <Component
-      ref={ref}
-      href={disabled ? undefined : href}
-      type={href ? undefined : 'button'}
+    <button
+      ref={ref as ForwardedRef<HTMLButtonElement>}
+      type="button"
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      disabled={href ? undefined : disabled}
+      disabled={disabled}
       aria-disabled={disabled || undefined}
-      aria-current={href && !disabled && active ? 'page' : undefined}
       tabIndex={disabled ? -1 : undefined}
-      className={cn(
-        'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-base text-left transition-colors font-medium disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
-        isDark
-          ? (active ? 'bg-gray-700/50 hover:bg-gray-600 text-white' : 'text-gray-50 hover:bg-gray-700 hover:text-white')
-          : cn(
-              subItemHoverClasses[theme],
-              active
-                ? theme === 'purple'
-                  ? 'text-purple-700 bg-purple-50/70'
-                  : theme === 'gray'
-                    ? 'text-gray-900 bg-gray-100'
-                    : 'text-blue-600 bg-blue-50/70'
-                : 'text-gray-900'
-            ),
-        className,
-      )}
+      className={itemClassName}
       {...props}
     >
       {label}
-    </Component>
+    </button>
   )
 })
 
@@ -810,6 +827,9 @@ export type DrawerComponentType = typeof DrawerRoot & {
   Trigger: typeof DrawerTrigger
 }
 
+// Static subcomponents membuat `Object.assign` ini tidak dapat dikenali oleh
+// aturan Fast Refresh sebagai deklarasi komponen biasa.
+// eslint-disable-next-line react-refresh/only-export-components
 export const Drawer: DrawerComponentType = Object.assign(DrawerRoot, {
   Header: DrawerHeader,
   Title: DrawerTitle,
