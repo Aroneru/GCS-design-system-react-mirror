@@ -58,8 +58,12 @@ export interface TimelineItem {
   name: ReactNode
   /** Jabatan atau unit kerja, di bawah nama. */
   role?: ReactNode
-  /** Waktu kejadian, mis. `01 Jan 2026 · 09:00`. */
-  time?: ReactNode
+  /**
+   * Waktu kejadian. Ditulis dengan format tetap desain, mis.
+   * `01 Jan 2026 · 09:05`, dalam jam lokal browser. Tanggal yang tidak valid
+   * tidak ditampilkan.
+   */
+  time?: Date
   /** Lama prosesnya, mis. `5 minutes`. Ditulis setelah `labels.elapsed`. */
   elapsed?: ReactNode
   /** Keterangan utama kejadiannya. */
@@ -85,6 +89,11 @@ export interface TimelineLabels {
   elapsed: ReactNode
   details: ReactNode
   attachments: ReactNode
+  /**
+   * Dua belas singkatan bulan untuk `time`, dimulai Januari. Bawaannya bahasa
+   * Inggris (`Jan` … `Dec`), seperti label lainnya.
+   */
+  months: readonly string[]
 }
 
 export interface TimelineProps extends Omit<HTMLAttributes<HTMLOListElement>, 'children'> {
@@ -101,11 +110,32 @@ export interface TimelineProps extends Omit<HTMLAttributes<HTMLOListElement>, 'c
   darkMode?: boolean
 }
 
+const defaultMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 const defaultLabels: TimelineLabels = {
   elapsed: 'Elapsed time:',
   details: 'Details',
   attachments: 'Attachments',
+  months: defaultMonths,
 }
+
+const pad = (n: number) => String(n).padStart(2, '0')
+
+/**
+ * Waktu kejadian dengan format tetap desain, mis. `01 Jan 2026 · 09:05`:
+ * tanggal dua digit, singkatan bulan, tahun, lalu jam 24 jam. Ditulis sendiri,
+ * bukan lewat `toLocaleString()`, supaya tidak berubah mengikuti bahasa atau
+ * pengaturan browser. Bulan yang tidak ada di `months` memakai bawaannya.
+ */
+function formatTime(date: Date, months: readonly string[] | undefined) {
+  const month = months?.[date.getMonth()] ?? defaultMonths[date.getMonth()]
+
+  return `${pad(date.getDate())} ${month} ${date.getFullYear()} · ${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+/** Nilai `dateTime` untuk `<time>`: tanggal dan jam lokal yang sama dengan teksnya. */
+const dateTimeOf = (date: Date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 
 /**
  * Ukuran per bagian. `line` menaruh garis mobile tepat di tengah avatar:
@@ -207,7 +237,8 @@ function TimelineCard({
 }) {
   const s = sizes[size]
   const attachments = item.attachments ?? []
-  const hasMain = Boolean(item.time || item.elapsed || item.description)
+  const time = item.time instanceof Date && !Number.isNaN(item.time.getTime()) ? item.time : null
+  const hasMain = Boolean(time || item.elapsed || item.description)
   const hasBody = hasMain || Boolean(item.details) || attachments.length > 0
 
   return (
@@ -230,7 +261,11 @@ function TimelineCard({
         <div className="mt-1 space-y-[1.5em] text-timeline-content">
           {hasMain && (
             <div>
-              {item.time && <p>{item.time}</p>}
+              {time && (
+                <p>
+                  <time dateTime={dateTimeOf(time)}>{formatTime(time, labels.months)}</time>
+                </p>
+              )}
               {item.elapsed && (
                 <p>
                   {labels.elapsed} {item.elapsed}

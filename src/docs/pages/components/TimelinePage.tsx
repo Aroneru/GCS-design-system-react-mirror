@@ -1,7 +1,6 @@
 import { Fragment, useState, type ReactNode } from 'react'
 import { CheckCircle, Clock, ExclamationCircle } from 'flowbite-react-icons/solid'
 import {
-  Alert,
   Timeline,
   type TimelineItem,
   type TimelinePlatform,
@@ -25,17 +24,23 @@ import {
 const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
 const sed = 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
 
+const pad = (n: number) => String(n).padStart(2, '0')
+
+/** Tanggal dan jam lokal seperti yang ditulis di contoh kode, mis. `2026-01-01T09:05`. */
+const lokal = (d: Date) =>
+  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+
 /** Status seperti di desain: Badge success dengan ikon jam dan tombol tutup. */
 const designStatus: TimelineStatus = { label: 'Badge', icon: <Clock />, dismissible: true }
 
 /** Isi contoh dari desain: item pertama ringkas, sisanya lengkap. */
 const designItems: TimelineItem[] = [
-  { id: 1, name: 'User 01', role: 'Role / Department', time: '01 Jan 2026 · 09:00', description: lorem },
+  { id: 1, name: 'User 01', role: 'Role / Department', time: new Date('2026-01-01T09:00'), description: lorem },
   ...[2, 3, 4].map((n) => ({
     id: n,
     name: `User 0${n}`,
     role: 'Role / Department',
-    time: `01 Jan 2026 · 09:${String((n - 1) * 5).padStart(2, '0')}`,
+    time: new Date(`2026-01-01T09:${pad((n - 1) * 5)}`),
     elapsed: '5 minutes',
     description: lorem,
     details: sed,
@@ -50,21 +55,21 @@ const statusItems: TimelineItem[] = [
     id: 'menunggu',
     name: 'User 01',
     role: 'Role / Department',
-    time: '01 Jan 2026 · 09:00',
+    time: new Date('2026-01-01T09:00'),
     status: { label: 'Menunggu', variant: 'warning', icon: <ExclamationCircle /> },
   },
   {
     id: 'disetujui',
     name: 'User 02',
     role: 'Role / Department',
-    time: '01 Jan 2026 · 09:05',
+    time: new Date('2026-01-01T09:05'),
     status: { label: 'Disetujui', icon: <CheckCircle /> },
   },
   {
     id: 'badge',
     name: 'User 03',
     role: 'Role / Department',
-    time: '01 Jan 2026 · 09:10',
+    time: new Date('2026-01-01T09:10'),
     status: designStatus,
   },
 ]
@@ -77,7 +82,7 @@ const lampiranItems: TimelineItem[] = [
     id: 'lampiran',
     name: 'User 02',
     role: 'Role / Department',
-    time: '01 Jan 2026 · 09:05',
+    time: new Date('2026-01-01T09:05'),
     description: lorem,
     attachments: [
       { name: 'surat-permohonan.pdf' },
@@ -106,13 +111,20 @@ function linkAttachments(items: TimelineItem[], mode: AttachmentMode): TimelineI
   }))
 }
 
+/** Tiga waktu untuk bagian Waktu: tanggal dan jam selalu dua digit, dan jamnya 24 jam. */
+const waktuItems: TimelineItem[] = [
+  { id: 'januari', name: 'User 01', role: 'Role / Department', time: new Date('2026-01-01T09:05') },
+  { id: 'agustus', name: 'User 02', role: 'Role / Department', time: new Date('2026-08-07T07:30') },
+  { id: 'desember', name: 'User 03', role: 'Role / Department', time: new Date('2026-12-25T15:45') },
+]
+
 const contohIndonesia: TimelineItem[] = [
   {
     id: 'pengajuan',
     name: 'Rina Wulandari',
     role: 'Pemohon',
     initials: 'RW',
-    time: '12 Okt 2026 · 08:30',
+    time: new Date('2026-10-12T08:30'),
     description: 'Mengajukan permohonan izin usaha mikro.',
   },
   {
@@ -120,7 +132,7 @@ const contohIndonesia: TimelineItem[] = [
     name: 'Budi Santoso',
     role: 'Verifikator / Dinas PMPTSP',
     avatar: asset('/images/avatar-sample.svg'),
-    time: '12 Okt 2026 · 10:05',
+    time: new Date('2026-10-12T10:05'),
     elapsed: '1 jam 35 menit',
     description: 'Memeriksa kelengkapan berkas permohonan.',
     details: 'Seluruh dokumen persyaratan lengkap dan sesuai.',
@@ -129,7 +141,12 @@ const contohIndonesia: TimelineItem[] = [
   },
 ]
 
-const labelIndonesia = { elapsed: 'Waktu proses:', details: 'Rincian', attachments: 'Lampiran' }
+const labelIndonesia = {
+  elapsed: 'Waktu proses:',
+  details: 'Rincian',
+  attachments: 'Lampiran',
+  months: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+}
 
 const platformOptions = [
   { value: 'desktop', label: 'Desktop' },
@@ -143,6 +160,10 @@ const sizeOptions = [
 
 /** Nilai teks di contoh kode, dikutip tunggal seperti kode di halaman lain. */
 const q = (value: ReactNode) => `'${String(value)}'`
+
+/** Nilai satu kunci item di contoh kode; `time` ditulis sebagai `new Date(…)` jam lokal. */
+const valueCode = (value: ReactNode | Date) =>
+  value instanceof Date ? `new Date('${lokal(value)}')` : q(value)
 
 /** Ikon status di data Playground selalu Clock, jadi ditulis apa adanya. */
 const statusCode = (status: TimelineStatus) =>
@@ -163,7 +184,7 @@ function itemCode(item: TimelineItem) {
   return (
     <Fragment key={item.id}>
       {'  {\n'}
-      {fields.map((key) => `    ${key}: ${q(item[key])},\n`).join('')}
+      {fields.map((key) => `    ${key}: ${valueCode(item[key])},\n`).join('')}
       {item.attachments && (
         <>
           {'    attachments: [\n'}
@@ -228,8 +249,8 @@ const timelineProps: PropRow[] = [
   [
     'labels',
     'Partial<TimelineLabels>',
-    "Elapsed time:, Details, Attachments",
-    'Mengganti label elapsed, details, dan attachments di dalam kartu. Label yang tidak diisi tetap memakai bawaannya.',
+    'Elapsed time:, Details, Attachments, Jan–Dec',
+    'Mengganti label elapsed, details, dan attachments di dalam kartu, serta months: dua belas singkatan bulan untuk time, dimulai Januari. Label yang tidak diisi tetap memakai bawaannya.',
   ],
   ['darkMode', 'boolean', 'false', 'Memaksa tema gelap. Tanpa prop ini Timeline ikut data-theme elemen pembungkusnya.'],
   [
@@ -243,7 +264,12 @@ const timelineProps: PropRow[] = [
 const itemProps: PropRow[] = [
   ['name', 'ReactNode', '—', 'Wajib. Nama pelaku, ditulis paling atas dengan warna aksen.'],
   ['role', 'ReactNode', 'undefined', 'Jabatan atau unit kerja, di bawah nama.'],
-  ['time', 'ReactNode', 'undefined', 'Waktu kejadian, mis. 01 Jan 2026 · 09:00.'],
+  [
+    'time',
+    'Date',
+    'undefined',
+    'Waktu kejadian, ditulis dengan format tetap 01 Jan 2026 · 09:05 dalam jam lokal browser. Tanggal yang tidak valid tidak ditampilkan.',
+  ],
   ['elapsed', 'ReactNode', 'undefined', 'Lama prosesnya, ditulis setelah label elapsed.'],
   ['description', 'ReactNode', 'undefined', 'Keterangan utama kejadiannya.'],
   ['details', 'ReactNode', 'undefined', 'Isi bagian Details, satu baris kosong di bawah keterangan utama.'],
@@ -300,6 +326,7 @@ const toc: TocEntry[] = [
   { id: 'platform', label: 'Platform' },
   { id: 'sizes', label: 'Sizes' },
   { id: 'isi-item', label: 'Isi item' },
+  { id: 'waktu', label: 'Waktu' },
   { id: 'status', label: 'Status' },
   { id: 'attachments', label: 'Attachments' },
   { id: 'label', label: 'Label' },
@@ -325,15 +352,6 @@ export function TimelinePage() {
       title="Timeline View"
       description="Riwayat kejadian berurutan: siapa, kapan, dan apa yang terjadi di tiap langkah, dengan avatar di sepanjang satu garis."
       toc={toc}
-      actions={
-        <div className="max-w-2xl">
-          <Alert variant="info" heading="Desain belum final" dismissible={false}>
-            Desain Timeline View masih bisa berubah, begitu pula nama prop, ukuran, dan warnanya.
-            Pakai untuk uji coba dulu, dan hindari fitur produksi sampai komponen ini dinyatakan
-            stabil.
-          </Alert>
-        </div>
-      }
     >
       <FlowSection id="platform" title="Platform">
         <Lead>
@@ -406,7 +424,7 @@ export function TimelinePage() {
           <H>name</H>
           {": 'User 01',\n"}
           {"    role: 'Role / Department',\n"}
-          {"    time: '01 Jan 2026 · 09:00',\n"}
+          {"    time: new Date('2026-01-01T09:00'),\n"}
           {`    description: '${lorem}',\n`}
           {'  },\n'}
           {'  {\n'}
@@ -414,7 +432,7 @@ export function TimelinePage() {
           <H>name</H>
           {": 'User 02',\n"}
           {"    role: 'Role / Department',\n"}
-          {"    time: '01 Jan 2026 · 09:05',\n"}
+          {"    time: new Date('2026-01-01T09:05'),\n"}
           {'    '}
           <H>elapsed</H>
           {": '5 minutes',\n"}
@@ -431,6 +449,36 @@ export function TimelinePage() {
           {'  },\n'}
           {']\n\n'}
           {'<Timeline items={items} />'}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="waktu" title="Waktu">
+        <Lead>
+          <Hl>time</Hl> menerima <Hl>Date</Hl>, dan Timeline selalu menuliskannya dengan format
+          desain: tanggal dua digit, singkatan bulan, tahun, lalu jam 24 jam, mis.{' '}
+          <Hl>01 Jan 2026 · 09:05</Hl>. Formatnya tidak mengikuti bahasa atau pengaturan browser, jadi
+          tampilannya sama di mana pun; hanya jamnya yang mengikuti zona waktu browser. Waktu dari API
+          cukup dibungkus <Hl>new Date()</Hl>, dan tanggal yang tidak valid tidak ditampilkan.
+          Singkatan bulannya bisa diganti lewat <Hl>labels.months</Hl>; lihat bagian Label.
+        </Lead>
+
+        <Demo label="tanggal dan jam dua digit, jam 24 jam">
+          <div className="max-w-102">
+            <Timeline items={waktuItems} platform="mobile" />
+          </div>
+        </Demo>
+
+        <SectionCode>
+          <H>time</H>
+          {": new Date('2026-01-01T09:05') // 01 Jan 2026 · 09:05\n"}
+          <H>time</H>
+          {": new Date('2026-08-07T07:30') // 07 Aug 2026 · 07:30\n"}
+          <H>time</H>
+          {": new Date('2026-12-25T15:45') // 25 Dec 2026 · 15:45\n\n"}
+          {'// Dari API: string ISO 8601 dibungkus new Date(). Jamnya ikut zona waktu browser,\n'}
+          {"// jadi '2026-01-01T02:05:00Z' tampil 01 Jan 2026 · 09:05 di WIB.\n"}
+          <H>time</H>
+          {': new Date(log.createdAt)'}
         </SectionCode>
       </FlowSection>
 
@@ -507,9 +555,11 @@ export function TimelinePage() {
       <FlowSection id="label" title="Label">
         <Lead>
           Label <Hl>Elapsed time:</Hl>, <Hl>Details</Hl>, dan <Hl>Attachments</Hl> mengikuti teks
-          desain. Ganti lewat <Hl>labels</Hl>, mis. untuk aplikasi berbahasa Indonesia; label yang
-          tidak diisi tetap memakai bawaannya. Contoh ini juga memakai <Hl>initials</Hl> dan foto{' '}
-          <Hl>avatar</Hl>, yang diteruskan ke komponen Avatar.
+          desain, dan singkatan bulan di <Hl>time</Hl> bawaannya bahasa Inggris. Ganti lewat{' '}
+          <Hl>labels</Hl>, mis. untuk aplikasi berbahasa Indonesia: <Hl>months</Hl> berisi dua belas
+          singkatan bulan, dimulai Januari. Label yang tidak diisi tetap memakai bawaannya. Contoh ini
+          juga memakai <Hl>initials</Hl> dan foto <Hl>avatar</Hl>, yang diteruskan ke komponen
+          Avatar.
         </Lead>
 
         <Demo label="labels bahasa Indonesia">
@@ -532,7 +582,14 @@ export function TimelinePage() {
           {'  platform="mobile"\n'}
           {'  '}
           <H>labels</H>
-          {"={{ elapsed: 'Waktu proses:', details: 'Rincian', attachments: 'Lampiran' }}\n"}
+          {'={{\n'}
+          {"    elapsed: 'Waktu proses:',\n"}
+          {"    details: 'Rincian',\n"}
+          {"    attachments: 'Lampiran',\n"}
+          {'    '}
+          <H>months</H>
+          {": ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],\n"}
+          {'  }}\n'}
           {'/>'}
         </SectionCode>
       </FlowSection>

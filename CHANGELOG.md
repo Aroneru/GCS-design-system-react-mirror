@@ -31,7 +31,10 @@ tombol preview — klik di mana pun pada kartu tetap membuka halamannya.
 - **`Timeline` (eksperimental).** Riwayat kejadian berurutan dengan avatar di
   sepanjang satu garis. Tiap item memuat nama, jabatan, waktu, lama proses,
   keterangan, Details, Attachments, dan status; selain `name`, semuanya
-  opsional. `platform` memilih `desktop` (kartu berselang-seling kiri dan
+  opsional. `time` menerima `Date` dan selalu ditulis dengan format desain,
+  mis. `01 Jan 2026 · 09:05`, dalam jam lokal browser; formatnya tidak
+  mengikuti bahasa browser, dan singkatan bulannya diganti lewat
+  `labels.months`. `platform` memilih `desktop` (kartu berselang-seling kiri dan
   kanan garis) atau `mobile` (garis di kiri), `size` memilih `large` atau
   `small`, `labels` mengganti label tetapnya, dan `darkMode` atau
   `data-theme="dark"` di pembungkus menyalakan tema gelap. Avatar-nya memakai

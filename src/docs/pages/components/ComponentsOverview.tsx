@@ -479,11 +479,11 @@ export function ComponentsOverview() {
             platform="mobile"
             size="small"
             items={[
-              { name: "User 01", role: "Role / Department", time: "01 Jan 2026 · 09:00" },
+              { name: "User 01", role: "Role / Department", time: new Date("2026-01-01T09:00") },
               {
                 name: "User 02",
                 role: "Role / Department",
-                time: "01 Jan 2026 · 09:05",
+                time: new Date("2026-01-01T09:05"),
                 status: { label: "Badge", icon: <Clock />, dismissible: true },
               },
             ]}
