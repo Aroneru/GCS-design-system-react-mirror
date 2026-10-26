@@ -16,6 +16,7 @@ export interface SidebarSubItem {
 export interface SidebarItem {
   id?: string;
   label: string;
+  /** Tujuan link. Diabaikan bila `children` diisi karena parent menjadi tombol disclosure. */
   href?: string;
   external?: boolean;
   icon?: ReactNode;
