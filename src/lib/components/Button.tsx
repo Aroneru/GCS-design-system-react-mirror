@@ -19,6 +19,8 @@ interface CommonProps {
   className?: string;
   theme?: ButtonTheme;
   tone?: ButtonTone;
+  /** Menyesuaikan warna Button untuk permukaan bertema gelap. */
+  darkMode?: boolean;
 }
 
 type AsButton = CommonProps & {
@@ -143,6 +145,22 @@ const colorClasses: Record<ButtonTheme, Record<ButtonTone, Record<ButtonVariant,
   },
 };
 
+// Warna dari spesifikasi dark mode: outline light memakai gray-50, sedangkan
+// outline dark memakai gray-500. Keduanya menjadi white/gray-700 saat hover.
+// `disabled:opacity-50` menghasilkan gray-400 pada gray-700, sesuai desain.
+const darkModeClasses: Record<ButtonTone, Record<ButtonVariant, string>> = {
+  light: {
+    filled: "bg-gray-50 text-gray-700 hover:bg-white hover:text-gray-700",
+    outline:
+      "border border-gray-50 text-gray-50 hover:border-gray-50 hover:bg-white hover:text-gray-700",
+  },
+  dark: {
+    filled: "bg-gray-50 text-gray-700 hover:bg-white hover:text-gray-700",
+    outline:
+      "border border-gray-500 text-gray-500 hover:border-gray-50 hover:bg-white hover:text-gray-700",
+  },
+};
+
 export function Button({
   children,
   iconOnly = false,
@@ -150,6 +168,7 @@ export function Button({
   size = "base",
   theme = "primary",
   tone = "light",
+  darkMode = false,
   leftIcon,
   rightIcon,
   className,
@@ -164,7 +183,7 @@ export function Button({
     "focus:outline-none",
     "focus:ring-2 focus:ring-primary-400",
     "disabled:pointer-events-none disabled:opacity-50",
-    colorClasses[theme][tone][variant],
+    darkMode ? darkModeClasses[tone][variant] : colorClasses[theme][tone][variant],
     iconOnly ? currentSize.iconOnly : currentSize.button,
     className,
   );

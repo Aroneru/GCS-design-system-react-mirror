@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Messages } from "../../../lib/icons/solid";
 import { Button, type ButtonTheme, type ButtonVariant } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { Demo, H, Hl, Segmented } from "../../pageKit";
+import { H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
@@ -44,6 +44,7 @@ const buttonProps: PropRow[] = [
   ["size", '"xs" | "s" | "base" | "l" | "xl"', "base", "Menentukan ukuran tombol."],
   ["variant", '"filled" | "outline"', "filled", "Gaya utama tombol: solid atau outline."],
   ["tone", '"light" | "dark"', "light", "Menyetel kontras warna untuk variant atau theme."],
+  ["darkMode", "boolean", "false", "Menyesuaikan warna Button untuk permukaan bertema gelap."],
   ["leftIcon", "ReactNode", "undefined", "Ikon di sisi kiri tombol."],
   ["rightIcon", "ReactNode", "undefined", "Ikon di sisi kanan tombol."],
   ["theme", "ButtonTheme", "primary", "Warna aksen tombol."],
@@ -54,6 +55,7 @@ const toc: TocEntry[] = [
   { id: "icon-only", label: "Icon Only & Sizes" },
   { id: "variants", label: "Variants" },
   { id: "themes", label: "Themes" },
+  { id: "darkmode", label: "Dark Mode" },
   { id: "playground", label: "Playground" },
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
@@ -64,6 +66,7 @@ export function ButtonPage() {
   const [variant, setVariant] = useState<ButtonVariant>("filled");
   const [theme, setTheme] = useState<ButtonTheme>("primary");
   const [tone, setTone] = useState<"light" | "dark">("light");
+  const [darkMode, setDarkMode] = useState(false);
   const [iconOnly, setIconOnly] = useState(false);
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
@@ -159,23 +162,29 @@ export function ButtonPage() {
 
       <FlowSection id="variants" title="Variants">
         <p className="mb-4 text-body-sm text-gray-500">
-          Variasi tombol yang itentukan oleh <Hl>variant</Hl>. Gunakan <Hl>filled</Hl> untuk aksi utama
+          Variasi tombol yang ditentukan oleh <Hl>variant</Hl>. Gunakan <Hl>filled</Hl> untuk aksi utama
           yang perlu mendapat perhatian lebih, dan <Hl>outline</Hl> untuk tindakan pendukung yang
           tetap terlihat, namun tidak terlalu dominan.
         </p>
 
-        <div className="mb-4 grid gap-5 sm:grid-cols-2">
-          <Demo label="Filled">
-            <Button variant="filled" theme="primary" tone="light">
-              Simpan Perubahan
-            </Button>
-          </Demo>
+        <div className="mb-6 grid gap-5 sm:grid-cols-2 sm:gap-8">
+          <div>
+            <h3 className="mb-3 text-lg font-bold text-gray-900">Filled</h3>
+            <div className="flex min-h-[130px] items-center rounded-2xl border border-border bg-surface-subtle p-8">
+              <Button variant="filled" theme="primary" tone="light">
+                Simpan Perubahan
+              </Button>
+            </div>
+          </div>
 
-          <Demo label="Outline">
-            <Button variant="outline" theme="primary" tone="light">
-              Lihat Detail
-            </Button>
-          </Demo>
+          <div>
+            <h3 className="mb-3 text-lg font-bold text-gray-900">Outline</h3>
+            <div className="flex min-h-[130px] items-center rounded-2xl border border-border bg-surface-subtle p-8">
+              <Button variant="outline" theme="primary" tone="light">
+                Lihat Detail
+              </Button>
+            </div>
+          </div>
         </div>
         <SectionCode>
           {"<Button\n"}
@@ -277,13 +286,56 @@ export function ButtonPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="darkmode" title="Dark Mode">
+        <p className="mb-6 text-body-sm text-gray-500">
+          Gunakan <Hl>darkMode</Hl> pada permukaan gelap agar tombol Filled tetap memiliki kontras tinggi.
+        </p>
+
+        <div className="mb-6 grid gap-5 sm:grid-cols-2 sm:gap-8">
+          <div>
+            <h3 className="mb-3 text-lg font-bold text-gray-900">Filled</h3>
+            <Stage maxWidth="max-w-none" dark>
+              <div className="flex min-h-[70px] items-center">
+                <Button variant="filled" darkMode leftIcon={<Messages className="size-4" />}>
+                  Simpan Perubahan
+                </Button>
+              </div>
+            </Stage>
+          </div>
+
+          <div>
+            <h3 className="mb-3 text-lg font-bold text-gray-900">Icon Only</h3>
+            <Stage maxWidth="max-w-none" dark>
+              <div className="flex min-h-[70px] items-center">
+                <Button variant="filled" darkMode iconOnly aria-label="Open messages">
+                  <Messages className="size-4" />
+                </Button>
+              </div>
+            </Stage>
+          </div>
+        </div>
+
+        <SectionCode>
+          {"<Button variant=\"filled\" "}
+          <H>darkMode</H>
+          {" leftIcon={<Messages className=\"size-4\" />}>\n"}
+          {"  Simpan Perubahan\n"}
+          {"</Button>\n\n"}
+          {"<Button variant=\"filled\" "}
+          <H>darkMode</H>
+          {" iconOnly aria-label=\"Open messages\">\n"}
+          {"  <Messages className=\"size-4\" />\n"}
+          {"</Button>"}
+        </SectionCode>
+      </FlowSection>
+
       <FlowSection id="playground" title="Playground">
         <p className="mb-6 text-body-sm text-gray-500">
           Memungkinkan Anda mencoba kombinasi prop secara langsung untuk membantu menyesuaikan
           tombol dengan kebutuhan aplikasi Anda sebelum diimplementasikan.
         </p>
 
-        <Stage maxWidth="max-w-[380px]">
+        <Stage maxWidth="max-w-[380px]" dark={darkMode}>
           <div className="mx-auto flex min-h-[180px] items-center justify-center">
             <Button
               iconOnly={iconOnly}
@@ -293,6 +345,7 @@ export function ButtonPage() {
               variant={variant}
               theme={theme}
               tone={tone}
+              darkMode={darkMode}
               leftIcon={showLeftIcon ? <Messages className="size-4" /> : undefined}
               rightIcon={showRightIcon ? <Messages className="size-4" /> : undefined}
             >
@@ -357,6 +410,18 @@ export function ButtonPage() {
               options={[
                 { value: "light", label: "Light" },
                 { value: "dark", label: "Dark" },
+              ]}
+            />
+          </Control>
+
+          <Control label="Dark Mode">
+            <Segmented
+              label="Pilih mode tampilan"
+              value={darkMode}
+              onChange={(value) => setDarkMode(Boolean(value))}
+              options={[
+                { value: false, label: "Light" },
+                { value: true, label: "Dark" },
               ]}
             />
           </Control>
@@ -446,6 +511,14 @@ export function ButtonPage() {
             <H>tone</H>
             {`="${tone}"\n`}
           </>
+
+          {darkMode && (
+            <>
+              {"    "}
+              <H>darkMode</H>
+              {"\n"}
+            </>
+          )}
 
           <>
             {"    "}

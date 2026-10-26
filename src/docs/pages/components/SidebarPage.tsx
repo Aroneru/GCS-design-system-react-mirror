@@ -2,6 +2,7 @@ import { type MouseEvent as ReactMouseEvent, type ReactNode, useState } from "re
 import { ChartPie, Clipboard, Inbox, Layers, Lock, Cart } from "flowbite-react-icons/solid";
 import { Sidebar, type SidebarGroup, type SidebarItem } from "../../../lib";
 import { PropsTable, type PropRow } from "../../PropsTable";
+import { asset } from "../../asset";
 import { H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
@@ -87,7 +88,7 @@ const sidebarProps: PropRow[] = [
 
 const sidebarItemProps: PropRow[] = [
   ["label", "string", "—", "Teks menu yang ditampilkan."],
-  ["href", "string", "undefined", "Tujuan tautan menu."],
+  ["href", "string", "undefined", "Tujuan tautan menu; diabaikan bila children diisi karena parent menjadi tombol submenu."],
   [
     "external",
     "boolean",
@@ -99,7 +100,7 @@ const sidebarItemProps: PropRow[] = [
   ["active", "boolean", "false", "Mengaktifkan tampilan state aktif."],
   ["disabled", "boolean", "false", "Menonaktifkan interaksi pada menu."],
   ["children", "SidebarSubItem[]", "undefined", "Daftar submenu pada menu."],
-  ["defaultOpen", "boolean", "false", "Membuka submenu saat pertama dirender."],
+  ["defaultOpen", "boolean", "false", "Membuka submenu saat pertama dirender; parent juga otomatis terbuka bila ada child aktif."],
   [
     "submenuToggleDisabled",
     "boolean",
@@ -274,12 +275,11 @@ const separatorGroups: SidebarGroup[] = [
 function SidebarBrand({ collapsed = false }: { collapsed?: boolean }) {
   return (
     <span className="flex items-center gap-2">
-      <span className="grid size-9 grid-cols-2 gap-0.5 rounded-md bg-primary-700 p-1.5">
-        <span className="rounded-sm bg-white" />
-        <span className="rounded-sm bg-primary-300" />
-        <span className="rounded-sm bg-primary-300" />
-        <span className="rounded-sm bg-white" />
-      </span>
+      <img
+        src={asset("/images/ceplok.svg")}
+        alt={collapsed ? "CEPLOK" : ""}
+        className="size-9 shrink-0 object-contain"
+      />
       {!collapsed && <span className="text-sm font-black tracking-tight">CEPLOK</span>}
     </span>
   );

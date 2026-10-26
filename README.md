@@ -13,8 +13,8 @@ Ceplok Design System. Dipindahkan 1:1 dari versi Laravel/Blade
   (`font-alt-2`). Panduan lengkap token dan tema gelap ada di [COLOR.md](COLOR.md).
 - **Komponen umum**: `Alert`, `Avatar`, `Badge`, `Breadcrumb`, `Button`, `Card`,
   `Clipboard`, `Container`, `Drawer`, `Dropdown`, `Footer`, `Hero`, `Icon`,
-  `Modal`, `Navbar`, `Pagination`, `Popover`, `Sidebar`, `Spinner`, `Table`,
-  `Toast`.
+  `ListView`, `Modal`, `Navbar`, `Pagination`, `Popover`, `Sidebar`, `Spinner`,
+  `Table`, `Timeline` (eksperimental, desainnya belum final), `Toast`.
 - **Komponen form**: `InputField`, `FloatingLabel`, `TextArea`, `Select`,
   `Search`, `Datepicker`, `Upload`, `Radio`, `Toggle`, `Checkbox`.
 - **Ikon**: logo brand & sosial (`Github`, `Instagram`, …) dari barrel utama,
@@ -102,11 +102,12 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   tema terang dengan `data-theme="light"` atau kelas `.ds-theme-light`.
 - **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`,
   `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
-  `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, dan `Breadcrumb`.
+  `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, dan
+  `Timeline`.
 - **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
   `--color-search-category-surface` dan `--color-search-field-surface` (Search),
-  serta `--color-breadcrumb-*` (Breadcrumb). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
+  `--color-breadcrumb-*` (Breadcrumb), serta `--color-timeline-*` (Timeline). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
 
 ## Komponen & props
 
@@ -114,7 +115,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 
 | Komponen     | Props utama                                                                                                          |
 | ------------ | -------------------------------------------------------------------------------------------------------------------- |
-| `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| submit \| reset`, `iconOnly`, `as`: `button \| anchor` |
+| `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| submit \| reset`, `iconOnly`, `as`: `button \| anchor`, `darkMode` |
 | `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
 | `Avatar`     | `src`, `alt`, `initials`, `size`: `small \| default \| large`, `darkMode`                                            |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
@@ -122,6 +123,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Toast`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Card`       | `image`, `title`, `description`, `href`, `linkLabel`, `actions`, `darkMode`                                          |
+| `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `darkMode` |
 | `Container`  | `as` (default `div`), `padded` (default `true`), `darkMode`                                                          |
 | `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
 | `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode`                                          |
@@ -135,6 +137,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user` (profil + menu dropdown), `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
 | `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `striped`, `sticky`, `size`, `loading` |
+| `Timeline`   | Eksperimental. `items` (`name`, `role`, `time` (`Date`, ditulis `01 Jan 2026 · 09:05`), `elapsed`, `description`, `details`, `attachments` (`name`, `href`, `target`, `download`), `status` (prop `Badge` + `label`), `avatar`, `initials`), `platform`: `desktop \| mobile`, `size`: `large \| small`, `labels` (`elapsed`, `details`, `attachments`, `months`), `darkMode` |
 
 Warna Button diatur `theme` (`primary | green | gray | purple | orange |
 yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya
@@ -144,6 +147,17 @@ persegi berisi ikon saja. Prop `type` (`button | submit | reset`, bawaan `button
 meneruskan atribut HTML native ke elemen `<button>`, memungkinkan tombol dipakai
 untuk submit form. Untuk tautan pakai `as="anchor"` bersama `href`, maka
 Button dirender sebagai `<a>`.
+
+`darkMode` pada Button menyesuaikan warna untuk permukaan gelap. Pada `tone="light"`,
+filled memakai gray-50 dan outline memakai gray-50; pada `tone="dark"`, filled
+tetap memakai gray-50 sedangkan outline memakai gray-500. Saat hover, seluruh
+varian berubah menjadi latar putih dengan teks gray-700.
+
+`ListView` menyediakan daftar item berukuran `S`, `M`, atau `L` untuk desktop
+dan mobile. Varian `simple` dapat memakai ikon, badge, dekorasi aksen, dan aksi;
+varian `article` tersedia hingga `XL`, selalu memakai garis aksen vertikal, dan
+menampilkan subject, metadata, pin, judul, serta metrik interaksi. Gunakan
+`darkMode` pada pembungkus atau item untuk tampilan gelap.
 
 ### Form
 
@@ -276,6 +290,12 @@ import { ChartPie, Inbox } from 'flowbite-react-icons/solid'
 Sidebar menyediakan navigasi vertikal yang mendukung pengelompokan menu
 (`groups`), multi-level submenu accordion, indikator badge, dan mode rel ringkas
 (`collapsed`).
+
+Parent yang memiliki `children` selalu menjadi tombol pembuka submenu; `href`
+pada parent tersebut sengaja diabaikan agar satu klik tidak sekaligus membuka
+submenu dan bernavigasi. Group otomatis terbuka bila parent atau salah satu
+subitem aktif. Saat Sidebar ringkas, klik ikon group membuka Sidebar terlebih
+dahulu bila `onCollapse` tersedia.
 
 Area profil (`user`) mendukung menu dropdown interaktif melalui prop `items`
 atau `groups` (dengan dukungan pemisah `separator`). Pilihan aksi seperti

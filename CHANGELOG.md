@@ -12,8 +12,10 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 ## [Belum dirilis]
 
 Ada perubahan API yang memutus: migrasi tema dan aksen warna `simaya` ke
-`purple` pada seluruh komponen dan token — baca bagian **Diubah**. Satu perbaikan
-token warna `Radio`. Situs dokumentasi ikut diperbarui: bagian Mulai cepat di
+`purple` pada seluruh komponen dan token — baca bagian **Diubah**. Komponen baru
+`Timeline` masih eksperimental karena desainnya belum final. Satu perbaikan
+token warna `Radio`. `ListView` dan Button kini memiliki penyesuaian baru untuk
+tema gelap. Situs dokumentasi ikut diperbarui: bagian Mulai cepat di
 beranda kini empat langkah, dengan langkah baru "Sambungkan Tailwind CSS ke Vite"
 (pasang `tailwindcss` dan `@tailwindcss/vite`, lalu daftarkan `tailwindcss()` di
 `vite.config.ts`). Tombol outline kini selalu di kiri tombol filled di halaman
@@ -42,6 +44,49 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   `--color-dropdown-*`.
 - **`Modal`.** Tampilan disesuaikan dengan desain: judul Inter 18px semibold,
   isi 16px medium, dan latar popup gray-600 di tema gelap.
+  contoh, dan contoh kode footer di halaman Modal kini sama dengan demonya.
+  Deskripsi Button dan Alert di Components Overview kini sesuai komponennya,
+  tabel props Search kini memuat `trigger`, `debounce`, `showButton`, dan
+  platform `compact`, dan tinggi logo di halaman Footer kini ditulis sesuai
+  kodenya: 48px, 60px saat footer ≥ 768px. Kartu di halaman Overview kini `<div>`
+  dengan judul sebagai tautannya, bukan satu `<a>` besar yang memuat tautan dan
+  tombol preview — klik di mana pun pada kartu tetap membuka halamannya.
+
+### Ditambahkan
+
+- **`ListView`** — daftar item dengan dua varian: `simple` untuk informasi
+  ringkas berikon, badge, dekorasi aksen, dan aksi; serta `article` untuk
+  artikel atau diskusi dengan subject, kategori, waktu, pin, judul, dan metrik
+  interaksi. `simple` mendukung platform `desktop` dan `mobile` serta ukuran
+  `S`, `M`, dan `L`; `article` mendukung ukuran `S` hingga `XL`, memakai garis
+  aksen vertikal secara permanen, dan mendukung `darkMode`. `ListView`,
+  `ListViewItem`, `ListViewArticle`, serta tipe props-nya ikut diekspor.
+- **`Button`: prop `darkMode`** — menyesuaikan warna tombol untuk latar gelap
+  tanpa mengubah ukuran atau API lainnya. Filled memakai gray-50 dengan teks
+  gray-700; outline `tone="light"` memakai gray-50, sedangkan `tone="dark"`
+  memakai gray-500. Saat hover keduanya berlatar putih dengan teks gray-700.
+- **`Timeline` (eksperimental).** Riwayat kejadian berurutan dengan avatar di
+  sepanjang satu garis. Tiap item memuat nama, jabatan, waktu, lama proses,
+  keterangan, Details, Attachments, dan status; selain `name`, semuanya
+  opsional. `time` menerima `Date` dan selalu ditulis dengan format desain,
+  mis. `01 Jan 2026 · 09:05`, dalam jam lokal browser; formatnya tidak
+  mengikuti bahasa browser, dan singkatan bulannya diganti lewat
+  `labels.months`. `platform` memilih `desktop` (kartu berselang-seling kiri dan
+  kanan garis) atau `mobile` (garis di kiri), `size` memilih `large` atau
+  `small`, `labels` mengganti label tetapnya, dan `darkMode` atau
+  `data-theme="dark"` di pembungkus menyalakan tema gelap. Avatar-nya memakai
+  komponen `Avatar`, dengan foto (`avatar`), `initials`, atau siluet bawaan.
+  Status memakai komponen `Badge`: `status` menerima prop Badge ditambah
+  `label`, dengan bawaan variant `success` ukuran `sm` seperti di desain.
+  Tiap lampiran berisi `name` dan `href`, ditambah `target` untuk membukanya di
+  tab baru atau `download` untuk mengunduhnya; tanpa `href` namanya tampil
+  sebagai teks biasa.
+  Desainnya belum final, jadi nama prop dan ukurannya masih bisa berubah di
+  rilis berikutnya. Halaman dokumentasinya: Components → Timeline View.
+- Token komponen `--color-timeline-surface`, `-content`, dan `-avatar`, berisi
+  token terdekat dari warna desain Timeline. Garis, tepi kartu, dan latar
+  avatar memakai token semantik `border`, sedangkan nama dan jabatan memakai
+  `brand`.
 
 ### Diubah
 
@@ -101,6 +146,14 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   dalam package (`dist/fonts/`, lisensi OFL), dengan kesembilan ketebalan.
   `styles.css` tidak lagi memuat Lato dari Google Fonts. Satu ketebalan
   berukuran sekitar 180 KB, dan browser hanya mengunduh yang dipakai halaman.
+- **`Sidebar`: perilaku submenu lebih konsisten.** Parent sekarang otomatis
+  terbuka saat dirinya atau salah satu subitem aktif. Saat Sidebar ringkas,
+  klik group membuka Sidebar lebih dulu bila `onCollapse` tersedia; tanpa
+  callback tersebut tombol group dinonaktifkan agar tidak memberi kesan klik
+  yang tidak bekerja. ID panel submenu kini unik per instance Sidebar untuk
+  menjaga hubungan `aria-controls`. `href` pada parent yang memiliki
+  `children` juga didokumentasikan sebagai nilai yang diabaikan karena parent
+  berperan sebagai disclosure, bukan link.
 - **Kelas `ds-theme-dark` kini ikut mengganti warna gelap `Radio`.**
   Selector di `tokens.css` sebelumnya salah ketik (`.ds-theme-darkz`), jadi
   token `Radio` tetap terang di dalam elemen berkelas `ds-theme-dark`, padahal

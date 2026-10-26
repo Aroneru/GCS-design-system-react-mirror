@@ -43,7 +43,7 @@ const footerProps: PropRow[] = [
     'logo',
     'string',
     'undefined',
-    'URL berkas gambar logo, dirender sebagai <img> setinggi 64px (80px saat footer ≥ 768px) dengan lebar mengikuti rasio aslinya. Bila diisi, logoContent diabaikan.',
+    'URL berkas gambar logo, dirender sebagai <img> setinggi 48px (60px saat footer ≥ 768px) dengan lebar mengikuti rasio aslinya. Bila diisi, logoContent diabaikan.',
   ],
   [
     'logoAlt',
@@ -191,8 +191,8 @@ export function FooterPage() {
 
       <FlowSection id="logo" title="logo · logoAlt · logoContent">
         <Lead>
-          <Hl>logo</Hl> menerima URL berkas gambar dan dirender sebagai <Hl>{'<img>'}</Hl> setinggi 64px —
-          80px saat footer selebar ≥ 768px — dengan lebar mengikuti rasio aslinya. <Hl>logoAlt</Hl> jadi
+          <Hl>logo</Hl> menerima URL berkas gambar dan dirender sebagai <Hl>{'<img>'}</Hl> setinggi 48px —
+          60px saat footer selebar ≥ 768px — dengan lebar mengikuti rasio aslinya. <Hl>logoAlt</Hl> jadi
           teks alternatifnya; isi dengan nama instansi, bukan kata "logo", supaya wajar dibacakan
           pembaca layar.
         </Lead>

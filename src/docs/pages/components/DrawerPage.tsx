@@ -14,7 +14,7 @@ import {
     type DrawerMenuItem,
     type DrawerNavItemTheme,
 } from '../../../lib'
-import { DrawerContext } from '../../../lib/components/Drawer'
+import { DrawerContext } from '../../../lib/components/DrawerContext'
 
 const drawerContextDummy = {
     onClose: () => { },
@@ -71,11 +71,14 @@ const navItemProps: PropRow[] = [
     ['icon', 'ReactNode', 'optional', 'Ikon di sisi kiri label menu.'],
     ['label', 'ReactNode', 'required', 'Judul / teks item menu.'],
     ['active', 'boolean', 'false', 'Menandai status aktif dengan latar pill berwarna.'],
-    ['expanded', 'boolean', 'false', 'Menentukan apakah sub-menu sedang terbuka (menampilkan chevron).'],
+    ['expanded', 'boolean', 'optional', 'Status submenu controlled. Gunakan bersama onExpandedChange.'],
+    ['defaultExpanded', 'boolean', 'false', 'Status submenu saat render pertama untuk pemakaian uncontrolled.'],
+    ['onExpandedChange', '(expanded: boolean) => void', 'optional', 'Dipanggil saat pengguna membuka atau menutup submenu.'],
     ['collapsible', 'boolean', 'false', 'Menampilkan ikon chevron tanda dropdown jika tidak memiliki anak.'],
     ['theme', "'primary' | 'purple' | 'blue' | 'gray'", "'primary'", 'Skema warna sorotan saat item status active.'],
-    ['href', 'string', 'optional', 'Link tujuan navigasi (mengubah elemen menjadi tag a).'],
+    ['href', 'string', 'optional', 'Link tujuan navigasi. Item yang memiliki children berperan sebagai disclosure, sehingga href diabaikan.'],
     ['badge', 'ReactNode', 'optional', 'Elemen badge di sisi kanan label.'],
+    ['disabled', 'boolean', 'false', 'Menonaktifkan interaksi dan menampilkan status nonaktif.'],
     ['onClick', '(e: MouseEvent) => void', 'optional', 'Handler saat menu item diklik.'],
     ['children', 'ReactNode', 'optional', 'Daftar DrawerSubItem ter-indentasi di bawah item.'],
 ]
@@ -85,6 +88,7 @@ const subItemProps: PropRow[] = [
     ['active', 'boolean', 'false', 'Menandai status aktif.'],
     ['theme', "'primary' | 'purple' | 'blue' | 'gray'", "'primary'", 'Skema warna teks saat aktif.'],
     ['href', 'string', 'optional', 'Link tujuan navigasi.'],
+    ['disabled', 'boolean', 'false', 'Menonaktifkan interaksi dan menampilkan status nonaktif.'],
     ['onClick', '(e: MouseEvent) => void', 'optional', 'Handler saat sub-item diklik.'],
 ]
 
@@ -551,7 +555,7 @@ export function DrawerPage() {
                                     <div className="flex-1 space-y-1 overflow-y-auto p-3">
                                         {playgroundItems.map((item, index) => (
                                             <DrawerNavItem
-                                                keysesuaikanl={index}
+                                                key={index}
                                                 icon={showIcons ? item.icon : undefined}
                                                 label={item.label}
                                                 active={activeMenu === item.label || (item.children && item.children.some(sub => activeMenu === `${item.label} - ${sub.label}`))}

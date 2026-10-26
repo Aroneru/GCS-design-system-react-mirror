@@ -77,6 +77,17 @@ export type { ToastProps, ToastVariant } from "./components/Toast";
 export { Card } from "./components/Card";
 export type { CardProps } from "./components/Card";
 
+export { ListView, ListViewItem, ListViewArticle } from "./components/listview";
+export type {
+  ListViewProps,
+  ListViewItemProps,
+  ListViewItemVariant,
+  ListViewSize,
+  ListViewPlatform,
+  ListViewArticleProps,
+  ListViewArticleSize,
+} from "./components/listview";
+
 export { Container } from "./components/Container";
 export type { ContainerProps, ContainerSize } from "./components/Container";
 
@@ -252,5 +263,16 @@ export type {
   TableOfContentsLayout,
   TableOfContentsProps,
 } from "./components/TableOfContents";
+// Eksperimental: desain Timeline belum final, jadi prop-nya masih bisa berubah.
+export { Timeline } from "./components/Timeline";
+export type {
+  TimelineProps,
+  TimelineItem,
+  TimelineAttachment,
+  TimelineStatus,
+  TimelineLabels,
+  TimelineSize,
+  TimelinePlatform,
+} from "./components/Timeline";
 
 export { cn } from "./utils/cn";
