@@ -153,6 +153,17 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   menjaga hubungan `aria-controls`. `href` pada parent yang memiliki
   `children` juga didokumentasikan sebagai nilai yang diabaikan karena parent
   berperan sebagai disclosure, bukan link.
+- **Navbar: status `current` pada navigasi utama tidak lagi memberi sorotan visual statis.**
+  Status ini tetap diteruskan sebagai `aria-current="page"`; konteks halaman
+  visual tetap menjadi tanggung jawab Breadcrumb atau navigasi consumer.
+- **Navbar mobile meneruskan destination eksternal ke `Sidebar`.** Destination
+  utama maupun child Disclosure dengan `target="_blank"` kini memakai kontrak
+  `external` Sidebar, sehingga Sidebar merender target baru dengan rel aman
+  bawaan komponennya.
+- **Dokumentasi Navbar menambah fixture current dan overflow.** Preview dapat
+  merepresentasikan current child Disclosure, current/disabled/action account,
+  serta Disclosure bersarang di `Lainnya`; fixture tetap data consumer, bukan
+  router internal Navbar.
 - **Kelas `ds-theme-dark` kini ikut mengganti warna gelap `Radio`.**
   Selector di `tokens.css` sebelumnya salah ketik (`.ds-theme-darkz`), jadi
   token `Radio` tetap terang di dalam elemen berkelas `ds-theme-dark`, padahal
