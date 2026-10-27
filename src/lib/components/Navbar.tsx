@@ -182,7 +182,6 @@ function Destination({ item, spacingMode }: { item: NavbarDestination; spacingMo
       className={cn(
         'whitespace-nowrap rounded py-1.5 font-sans text-base leading-[1.5] font-semibold text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
         desktopItemPadding[spacingMode],
-        item.current && 'text-brand',
         item.disabled && 'pointer-events-none opacity-50',
       )}
     >
@@ -262,7 +261,6 @@ function OverflowPanel({
       'flex min-w-0 items-center rounded-md py-2 text-sm font-medium text-content transition-colors',
       nested ? 'pr-3 pl-7' : 'px-3',
       'hover:bg-dropdown-item-hover-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
-      item.current && 'bg-dropdown-item-current-surface text-content',
       item.disabled && 'cursor-not-allowed opacity-50',
     )
     const content = (
@@ -287,6 +285,7 @@ function OverflowPanel({
         rel={rel}
         aria-current={item.current ? 'page' : undefined}
         aria-label={item.label}
+        data-baris=""
         className={className}
         onClick={(event) => {
           item.onClick?.(event)
@@ -329,7 +328,6 @@ function OverflowPanel({
             if (item.type === 'destination') return destination(item, close, `destination:${item.id}`)
 
             const isExpanded = expanded.has(item.id)
-            const hasActiveChild = item.children.some((child) => child.current)
             const groupId = `${panelId}-group-${index}`
             return (
               <div key={item.id} className="min-w-0">
@@ -339,10 +337,10 @@ function OverflowPanel({
                   aria-expanded={isExpanded}
                   aria-controls={groupId}
                   aria-label={item.label}
+                  data-baris=""
                   onClick={() => toggleDisclosure(item.id)}
                   className={cn(
                     'flex w-full min-w-0 items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold text-content transition-colors hover:bg-dropdown-item-hover-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50',
-                    hasActiveChild && 'text-brand',
                   )}
                 >
                   <span
@@ -576,7 +574,6 @@ function CapacityAwareDesktopNavigation({
         className={cn('flex items-center justify-end', desktopNavigationGap[spacingMode])}
       >
         {items.slice(0, visibleCount).map((item, index) => {
-          const hasActiveChild = item.type === 'disclosure' && item.children.some((child) => child.current)
           return (
             <li key={item.id} data-navbar-visible-index={index}>
               {item.type === 'destination' ? (
@@ -592,7 +589,6 @@ function CapacityAwareDesktopNavigation({
                       className={cn(
                         'inline-flex items-center gap-1 whitespace-nowrap rounded py-1.5 font-sans text-base leading-[1.5] font-semibold text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50',
                         desktopItemPadding[spacingMode],
-                        hasActiveChild && 'text-brand',
                       )}
                     >
                       {item.label}
@@ -736,6 +732,7 @@ function toSidebarItem(item: NavbarPrimaryItem, close: () => void): SidebarItem 
       id: item.id,
       label: item.label,
       href: item.href,
+      external: !item.disabled && item.target === '_blank',
       icon: item.icon,
       active: item.current,
       disabled: item.disabled,
@@ -757,6 +754,7 @@ function toSidebarItem(item: NavbarPrimaryItem, close: () => void): SidebarItem 
       id: child.id,
       label: child.label,
       href: child.href,
+      external: !child.disabled && child.target === '_blank',
       icon: child.icon,
       active: child.current,
       disabled: child.disabled,
@@ -805,10 +803,6 @@ function MobileIdentity({
               }
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-content hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-brand',
-                item.current &&
-                  (item.tone === 'danger'
-                    ? 'bg-surface-subtle font-medium'
-                    : 'bg-surface-subtle font-medium text-content'),
                 item.tone === 'danger' &&
                   'text-feedback-error hover:text-feedback-error focus-visible:bg-surface-subtle active:bg-surface-subtle',
                 item.disabled && 'pointer-events-none opacity-50',
