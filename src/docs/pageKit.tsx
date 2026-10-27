@@ -87,20 +87,34 @@ export function Section({ title, children }: { title: string; children: ReactNod
   )
 }
 
-/** Kartu contoh: label kecil di atas, lalu isi di dalam kotak berlatar netral. */
-export function Demo({ children, label, dark }: { children: ReactNode; label?: string; dark?: boolean }) {
+/**
+ * Kartu contoh: label kecil di atas, lalu isi di dalam kotak berlatar netral.
+ *
+ * `minWidth` untuk isi yang tidak boleh lebih sempit dari lebar tertentu, mis.
+ * Timeline desktop. Di layar yang lebih sempit kotaknya digeser ke samping
+ * seperti tabel props, alih-alih isinya diperas.
+ */
+export function Demo({
+  children,
+  label,
+  dark,
+  minWidth,
+}: {
+  children: ReactNode
+  label?: string
+  dark?: boolean
+  minWidth?: string
+}) {
   return (
     <div>
       {label && <p className="mb-2 text-sm font-black text-gray-900">{label}</p>}
       {/* `dark` untuk komponen yang punya tampilan gelap — latarnya ikut gelap. */}
       <div
-        className={
-          dark
-            ? 'rounded-xl border border-gray-800 bg-gray-900 p-5'
-            : 'rounded-xl border border-border bg-surface-subtle p-5'
-        }
+        className={`rounded-xl border p-5 ${minWidth ? 'ds-scroll-x overflow-x-auto' : ''} ${
+          dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
+        }`}
       >
-        {children}
+        {minWidth ? <div style={{ minWidth }}>{children}</div> : children}
       </div>
     </div>
   )

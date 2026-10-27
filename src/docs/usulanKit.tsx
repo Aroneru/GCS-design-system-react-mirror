@@ -141,21 +141,27 @@ export function PrincipleList({ items }: { items: ReactNode[] }) {
 /** Panggung Playground: kartu berlatar netral, lebarnya bisa dianimasikan. */
 export function Stage({
   maxWidth,
+  minWidth,
   dark,
   children,
 }: {
   maxWidth: string
+  /**
+   * Sama seperti `minWidth` pada <Demo>: isinya tidak menyempit di bawah lebar
+   * itu, dan panggungnya digeser ke samping di layar yang lebih sempit.
+   */
+  minWidth?: string
   /** Latar gelap, untuk komponen yang sedang ditampilkan dalam tampilan gelapnya. */
   dark?: boolean
   children: ReactNode
 }) {
   return (
     <div
-      className={`rounded-2xl border p-6 transition-colors sm:p-10 ${
+      className={`rounded-2xl border p-6 transition-colors sm:p-10 ${minWidth ? 'ds-scroll-x overflow-x-auto' : ''} ${
         dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
       }`}
     >
-      <div className={`mx-auto transition-[max-width] duration-300 ease-out ${maxWidth}`}>
+      <div className={`mx-auto transition-[max-width] duration-300 ease-out ${maxWidth}`} style={{ minWidth }}>
         {children}
       </div>
     </div>
