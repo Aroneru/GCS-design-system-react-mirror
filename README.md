@@ -103,11 +103,12 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 - **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`,
   `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
   `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, dan
-  `Timeline`, serta `Avatar`.
+  `Timeline`, serta `Avatar` dan `Clipboard`.
 - **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
   `--color-search-category-surface` dan `--color-search-field-surface` (Search),
-  `--color-breadcrumb-*` (Breadcrumb), serta `--color-timeline-*` (Timeline). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
+  `--color-breadcrumb-*` (Breadcrumb), `--color-clipboard-*` (Clipboard), serta
+  `--color-timeline-*` (Timeline). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
 
 ## Komponen & props
 
@@ -119,7 +120,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
 | `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| profile`, `gender`: `male \| female`, `size`: `small \| default \| large`, `darkMode` (deprecated) |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
-| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `onCopySuccess`, `darkMode` |
+| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `disabled`, `onCopySuccess`, `onCopyError`, `darkMode` (deprecated) |
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Toast`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Card`       | `image`, `title`, `description`, `href`, `linkLabel`, `actions`, `darkMode`                                          |
@@ -173,6 +174,52 @@ Prop `darkMode` masih didukung untuk kompatibilitas tetapi deprecated. Pakai
 `alt=""` bila nama pemilik sudah tertulis di dekat Avatar agar pembaca layar
 tidak mengumumkannya dua kali. Ukuran API tetap `small` (S, 24px), `default`
 (M, 32px), dan `large` (L, 80px); M adalah bawaan.
+
+#### Clipboard
+
+`Clipboard` menampilkan `value` melalui input hanya-baca dan menyalin string
+persisnya dengan aksi native browser. Bentuk `default` memakai tombol teks
+Copy; `variant="segmented"` menyatukan nilai dengan tombol ikon dan dapat
+menampilkan `prefix` kontekstual yang **tidak** ikut disalin. `platform` bernilai
+`default` atau `mobile`: keduanya preset eksplisit, bukan hasil deteksi viewport.
+Desktop memakai teks 14px; Mobile mempertahankan ukuran ringkasnya. Ukuran,
+weight, dan line-height mengikuti preset tersebut, sedangkan keluarga font tetap
+mewarisi pilihan consumer: Lato, Inter, atau Arial.
+
+```tsx
+import { Clipboard } from '@ceplok-ui/design-kit-react'
+
+<Clipboard value="INV-2026-001" label="Nomor referensi" />
+
+<Clipboard
+  value="https://komdigi.go.id/"
+  label="Alamat situs"
+  variant="segmented"
+  prefix="URL"
+/>
+```
+
+Setelah `navigator.clipboard.writeText(value)` berhasil, Clipboard menampilkan
+feedback Copied sementara; aksi bersegmen mengganti ikon Clipboard menjadi
+Check tanpa mengubah ukuran tombol. Tooltip ikon “Copy to clipboard” berada di
+tengah tombol, muncul untuk hover atau fokus keyboard, dapat ditutup dengan
+Escape, dan tidak muncul kembali sepanjang status Copied. Setelah reset, tooltip
+menunggu hover atau fokus baru.
+
+Saat `disabled`, aksi Copy, tooltip, pemilihan teks, serta copy/cut melalui UI
+dinonaktifkan; ini bukan mekanisme keamanan data yang sudah berada di browser.
+`onCopySuccess` hanya berjalan setelah salin berhasil dan `onCopyError` menerima
+kegagalan Clipboard API. Tampilan mengikuti scope ambient `data-theme`, termasuk
+scope bertingkat:
+
+```tsx
+<section data-theme="dark">
+  <Clipboard value="INV-2026-001" label="Nomor referensi" />
+</section>
+```
+
+`darkMode` masih tersedia sebagai override kompatibilitas, tetapi deprecated;
+gunakan `data-theme="dark"` untuk kode baru.
 
 #### Modal
 

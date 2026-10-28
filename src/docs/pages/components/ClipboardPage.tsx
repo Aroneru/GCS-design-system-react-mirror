@@ -1,14 +1,15 @@
 import { useState } from 'react'
-import { Clipboard, type ClipboardVariant, type ClipboardPlatform } from '../../../lib'
+import { Clipboard, type ClipboardPlatform, type ClipboardVariant } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Segmented } from '../../pageKit'
 import { Control, Controls, FlowSection, Lead, SectionCode, Stage, UsulanPage, type TocEntry } from '../../usulanKit'
 import { adaTidakAda } from '../../usulanOptions'
 
 const toc: TocEntry[] = [
-  { id: 'clipboard', label: 'Clipboard' },
+  { id: 'default', label: 'Default' },
   { id: 'platform', label: 'Platform' },
   { id: 'segmen', label: 'Dengan segmen' },
+  { id: 'states', label: 'States' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
@@ -33,8 +34,8 @@ const clipboardProps: PropRow[] = [
   ['prefix', 'ReactNode', 'undefined', 'Konten sebelum nilai pada tampilan bersegmen. Prefix tidak ikut disalin.'],
   ['variant', "'default' | 'segmented'", 'default', 'Menentukan susunan Clipboard.'],
   ['platform', "'default' | 'mobile'", 'default', 'Menentukan preset ukuran Default atau Mobile.'],
-  ['darkMode', 'boolean', 'false', 'Menggunakan warna Clipboard untuk tampilan gelap.'],
-  ['disabled', 'boolean', 'false', 'Menonaktifkan aksi salin tanpa menonaktifkan pemilihan nilai.'],
+  ['darkMode', 'boolean', 'false', 'Deprecated. Gunakan scope ambient data-theme="dark".'],
+  ['disabled', 'boolean', 'false', 'Menonaktifkan aksi salin dan interaksi pemilihan nilai melalui UI.'],
   ['className', 'string', 'undefined', 'Kelas CSS untuk pembungkus terluar Clipboard.'],
   ['onCopySuccess', '(value: string) => void', 'undefined', 'Dipanggil setelah nilai berhasil disalin.'],
   ['onCopyError', '(error: unknown) => void', 'undefined', 'Dipanggil ketika proses salin gagal.'],
@@ -49,7 +50,7 @@ export function ClipboardPage() {
   const [withHelper, setWithHelper] = useState(true)
   const [withPrefix, setWithPrefix] = useState(true)
   const [disabled, setDisabled] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
+  const [dark, setDark] = useState(false)
   const label = 'Nomor referensi'
   const helper = 'Gunakan nomor ini saat menghubungi layanan.'
   const previewProps = {
@@ -59,15 +60,17 @@ export function ClipboardPage() {
     'aria-label': withLabel ? undefined : label,
     helperText: withHelper ? helper : undefined,
     disabled,
-    darkMode,
   }
+  const snippetIndent = dark ? '  ' : ''
 
   return (
     <UsulanPage eyebrow="Components · Clipboard" title="Clipboard" description="Menampilkan nilai yang dapat disalin melalui tombol aksi, dengan dukungan label dan keterangan tambahan." toc={toc}>
-      <FlowSection id="clipboard" title="Clipboard">
-        <Lead>Clipboard menampilkan nilai hanya-baca yang dapat disalin melalui tombol aksi. Nilai tetap dapat dipilih untuk disalin secara manual.</Lead>
+      <FlowSection id="default" title="Default">
+        <Lead>Clipboard menampilkan nilai hanya-baca yang dapat disalin melalui tombol aksi. Saat aktif, nilai tetap dapat dipilih untuk disalin secara manual.</Lead>
         <Demo label="Default">
-          <div className={`mx-auto w-full ${previewWidths.default.default}`}><Clipboard value="INV-2026-001" label="Nomor referensi" /></div>
+          <div className={`mx-auto w-full ${previewWidths.default.default}`}>
+            <Clipboard value="INV-2026-001" label="Nomor referensi" helperText="Gunakan nomor ini saat menghubungi layanan." />
+          </div>
         </Demo>
         <SectionCode>
           {"import { Clipboard } from '@ceplok-ui/design-kit-react'\n\n<Clipboard\n    "}<H>value</H>{'="INV-2026-001"\n    '}<H>label</H>{'="Nomor referensi"\n/>'}
@@ -77,82 +80,81 @@ export function ClipboardPage() {
       <FlowSection id="platform" title="Platform">
         <Lead>Platform menentukan preset ukuran Clipboard. Gunakan Default untuk ukuran standar dan Mobile untuk tampilan yang lebih ringkas. Preset dipilih melalui prop, bukan lebar viewport.</Lead>
         <div className="grid gap-5">
-          <Demo label="Default"><div className={`mx-auto w-full ${previewWidths.default.default}`}> <Clipboard value="npm i komdigi" label="Perintah instalasi" platform="default" /> </div></Demo>
-          <Demo label="Mobile"><div className={`mx-auto w-full ${previewWidths.default.mobile}`}> <Clipboard value="npm i komdigi" label="Perintah instalasi" platform="mobile" /> </div></Demo>
+          <Demo label="Desktop"><div className={`mx-auto w-full ${previewWidths.default.default}`}><Clipboard value="npm i komdigi" label="Perintah instalasi" /></div></Demo>
+          <Demo label="Mobile"><div className={`mx-auto w-full ${previewWidths.default.mobile}`}><Clipboard value="npm i komdigi" label="Perintah instalasi" platform="mobile" /></div></Demo>
         </div>
         <SectionCode>{'<Clipboard value="npm i komdigi" '}<H>platform</H>{'="mobile" aria-label="Perintah instalasi" />'}</SectionCode>
       </FlowSection>
 
       <FlowSection id="segmen" title="Dengan segmen">
-        <Lead>Gunakan susunan bersegmen untuk menggabungkan prefix, nilai, dan aksi salin dalam satu grup. Prefix bersifat kontekstual dan tidak ikut disalin. Tinggi grup tetap sama pada kedua platform.</Lead>
+        <Lead>Susunan bersegmen menggabungkan prefix, nilai, dan aksi salin dalam satu grup. Prefix bersifat kontekstual dan tidak ikut disalin. Arahkan pointer ke ikon untuk melihat tooltip; setelah salin berhasil, ikon berubah menjadi Check tanpa pergeseran layout.</Lead>
         <div className="grid gap-5">
-          <Demo label="Dengan prefix"><div className={`mx-auto w-full ${previewWidths.segmented.default}`}> <Clipboard value="https://komdigi.go.id/" label="Alamat situs" variant="segmented" prefix="URL" /> </div></Demo>
-          <Demo label="Tanpa prefix"><div className={`mx-auto w-full ${previewWidths.segmented.default}`}> <Clipboard value="INV-2026-001" label="Nomor referensi" variant="segmented" /> </div></Demo>
+          <Demo label="Dengan prefix"><div className={`mx-auto w-full ${previewWidths.segmented.default}`}><Clipboard value="https://komdigi.go.id/" label="Alamat situs" variant="segmented" prefix="URL" /></div></Demo>
+          <Demo label="Tanpa prefix"><div className={`mx-auto w-full ${previewWidths.segmented.default}`}><Clipboard value="INV-2026-001" label="Nomor referensi" variant="segmented" /></div></Demo>
         </div>
-        <SectionCode>
-          {'<Clipboard\n    '}<H>value</H>{'="https://komdigi.go.id/"\n    '}<H>label</H>{'="Alamat situs"\n    '}<H>variant</H>{'="segmented"\n    '}<H>prefix</H>{'="URL"\n/>'}
-        </SectionCode>
+        <SectionCode>{'<Clipboard\n    '}<H>value</H>{'="https://komdigi.go.id/"\n    '}<H>label</H>{'="Alamat situs"\n    '}<H>variant</H>{'="segmented"\n    '}<H>prefix</H>{'="URL"\n/>'}</SectionCode>
+      </FlowSection>
+
+      <FlowSection id="states" title="States">
+        <Lead>Tekan aksi salin untuk melihat status Copied. Saat Nonaktif, tombol, tooltip, dan pemilihan atau penyalinan nilai melalui UI dinonaktifkan; ini bukan mekanisme keamanan data.</Lead>
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Demo label="Copied interaktif"><div className={`mx-auto w-full ${previewWidths.segmented.default}`}><Clipboard value="https://komdigi.go.id/" variant="segmented" prefix="URL" aria-label="Alamat situs" /></div></Demo>
+          <Demo label="Disabled"><div className={`mx-auto w-full ${previewWidths.default.default}`}><Clipboard value="INV-2026-001" label="Nomor referensi" disabled /></div></Demo>
+        </div>
       </FlowSection>
 
       <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>Prop <H>darkMode</H> menggunakan warna Clipboard dari desain gelap: field gray-800, label dan prefix gray-300, nilai gray-400, serta keterangan gray-500. Aksi salin tetap primary-700. Tekan aksi pada contoh bersegmen untuk melihat ikon sukses tanpa perubahan ukuran.</Lead>
-        <div className="grid gap-5">
-          <Demo label="Tombol teks" dark>
-            <div className={`mx-auto w-full ${previewWidths.default.default}`}>
-              <Clipboard darkMode value="INV-2026-001" label="Nomor referensi" helperText="Gunakan nomor ini saat menghubungi layanan." />
-            </div>
-          </Demo>
-          <Demo label="Tombol ikon" dark>
-            <div className={`mx-auto w-full ${previewWidths.segmented.default}`}>
-              <Clipboard darkMode value="https://komdigi.go.id/" label="Alamat situs" variant="segmented" prefix="URL" />
-            </div>
-          </Demo>
-        </div>
-        <SectionCode>
-          {"import { Clipboard } from '@ceplok-ui/design-kit-react'\n\n<Clipboard\n    "}<H>darkMode</H>{'\n    '}<H>value</H>{'="INV-2026-001"\n    '}<H>label</H>{'="Nomor referensi"\n    '}<H>helperText</H>{'="Gunakan nomor ini saat menghubungi layanan."\n/>'}
-        </SectionCode>
+        <Lead>Clipboard mengikuti scope ambient <H>data-theme</H>. Warna Dark diterapkan pada field, teks, prefix, dan tooltip tanpa prop tema baru.</Lead>
+        <Demo label="Dark" dark>
+          <div data-theme="dark" className={`mx-auto w-full ${previewWidths.segmented.default}`}>
+            <Clipboard value="https://komdigi.go.id/" label="Alamat situs" helperText="Gunakan alamat ini untuk mengunjungi situs." variant="segmented" prefix="URL" />
+          </div>
+        </Demo>
+        <SectionCode>{'<section '}<H>data-theme</H>{'="dark">\n  <Clipboard value="https://komdigi.go.id/" variant="segmented" prefix="URL" />\n</section>'}</SectionCode>
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
-        <Lead>Satu komponen yang bisa Anda utak-atik lewat kontrol di bawahnya. Tekan tombol salin untuk melihat umpan baliknya; bagian Penggunaan mengikuti pilihan Anda.</Lead>
-        <Stage maxWidth={previewWidths[variant][platform]} dark={darkMode}>
-          {variant === 'segmented'
-            ? <Clipboard {...previewProps} variant="segmented" prefix={withPrefix ? 'ID' : undefined} />
-            : <Clipboard {...previewProps} />}
+        <Lead>Ubah tampilan, variasi, dan konten melalui kontrol berikut. Preview memakai komponen production yang sama; bagian Penggunaan mengikuti pilihan Anda.</Lead>
+        <Stage maxWidth={previewWidths[variant][platform]} dark={dark}>
+          <div data-theme={dark ? 'dark' : 'light'}>
+            {variant === 'segmented'
+              ? <Clipboard {...previewProps} variant="segmented" prefix={withPrefix ? 'ID' : undefined} />
+              : <Clipboard {...previewProps} />}
+          </div>
         </Stage>
         <Controls>
-          <Control label="Tampilan"><Segmented label="Pilih tampilan" value={darkMode} onChange={setDarkMode} options={[{ value: false, label: 'Light' }, { value: true, label: 'Dark' }]} /></Control>
+          <Control label="Tampilan"><Segmented label="Pilih tampilan" value={dark} onChange={setDark} options={[{ value: false, label: 'Light' }, { value: true, label: 'Dark' }]} /></Control>
           <Control label="Variasi"><Segmented label="Pilih variasi" value={variant} onChange={setVariant} options={variants} wrap /></Control>
-          <Control label="Platform"><Segmented label="Pilih platform" value={platform} onChange={setPlatform} options={[{ value: 'default', label: 'Default' }, { value: 'mobile', label: 'Mobile' }]} /></Control>
-          <Control label="Nilai">
-            <input aria-label="Nilai yang disalin" value={value} onChange={(event) => setValue(event.target.value)} className="h-10 w-full rounded-lg border border-gray-300 bg-surface px-3 text-sm text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600" />
-          </Control>
+          <Control label="Platform"><Segmented label="Pilih platform" value={platform} onChange={setPlatform} options={[{ value: 'default', label: 'Desktop' }, { value: 'mobile', label: 'Mobile' }]} /></Control>
+          <Control label="Nilai"><input aria-label="Nilai yang disalin" value={value} onChange={(event) => setValue(event.target.value)} className="h-10 w-full rounded-lg border border-gray-300 bg-surface px-3 text-sm text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600" /></Control>
           <Control label="Label"><Segmented label="Tampilkan label" value={withLabel} onChange={setWithLabel} options={adaTidakAda} /></Control>
           <Control label="Helper text"><Segmented label="Tampilkan helper text" value={withHelper} onChange={setWithHelper} options={adaTidakAda} /></Control>
           <Control label="Prefix"><Segmented label="Tampilkan prefix" value={withPrefix} onChange={setWithPrefix} options={adaTidakAda} disabled={variant === 'default'} /></Control>
           <Control label="Nonaktif"><Segmented label="Nonaktifkan salin" value={disabled} onChange={setDisabled} options={[{ value: false, label: 'Tidak' }, { value: true, label: 'Ya' }]} /></Control>
         </Controls>
-        <p className="mt-4 text-body-sm text-content-subtle">Kontrol Nilai mengubah contoh; Clipboard tetap hanya-baca. Penyalinan memerlukan HTTPS atau lingkungan lokal yang dipercaya browser. Jika gagal, pilih teks dan salin secara manual.</p>
+        <p className="mt-4 text-body-sm text-content-subtle">Kontrol Nilai hanya mengubah contoh. Clipboard production tetap hanya-baca; penyalinan memerlukan HTTPS atau lingkungan lokal yang dipercaya browser.</p>
       </FlowSection>
 
       <FlowSection id="penggunaan" title="Penggunaan">
-        <Lead>Blok ini mengikuti kontrol di Playground — ubah kontrolnya, kodenya ikut berubah. Prop yang nilainya masih bawaan sengaja tidak ditulis.</Lead>
+        <Lead>Blok ini mengikuti kontrol di Playground. Prop bernilai bawaan sengaja tidak ditulis.</Lead>
         <SectionCode flush>
-          {"import { Clipboard } from '@ceplok-ui/design-kit-react'\n\n<Clipboard\n"}
-          {'    '}<H>value</H>{`={${JSON.stringify(value)}}\n`}
-          {withLabel ? <>{'    '}<H>label</H>{`="${label}"\n`}</> : <>{'    '}<H>aria-label</H>{`="${label}"\n`}</>}
-          {variant === 'segmented' && <>{'    '}<H>variant</H>{'="segmented"\n'}</>}
-          {platform === 'mobile' && <>{'    '}<H>platform</H>{'="mobile"\n'}</>}
-          {darkMode && <>{'    '}<H>darkMode</H>{'\n'}</>}
-          {variant === 'segmented' && withPrefix && <>{'    '}<H>prefix</H>{'="ID"\n'}</>}
-          {withHelper && <>{'    '}<H>helperText</H>{`="${helper}"\n`}</>}
-          {disabled && <>{'    '}<H>disabled</H>{'\n'}</>}
-          {'/>'}
+          {"import { Clipboard } from '@ceplok-ui/design-kit-react'\n\n"}
+          {dark && <>{'<section '}<H>data-theme</H>{'="dark">\n'}</>}
+          {`${snippetIndent}<Clipboard\n`}
+          {`${snippetIndent}    `}<H>value</H>{`={${JSON.stringify(value)}}\n`}
+          {withLabel ? <>{`${snippetIndent}    `}<H>label</H>{`="${label}"\n`}</> : <>{`${snippetIndent}    `}<H>aria-label</H>{`="${label}"\n`}</>}
+          {variant === 'segmented' && <>{`${snippetIndent}    `}<H>variant</H>{'="segmented"\n'}</>}
+          {platform === 'mobile' && <>{`${snippetIndent}    `}<H>platform</H>{'="mobile"\n'}</>}
+          {variant === 'segmented' && withPrefix && <>{`${snippetIndent}    `}<H>prefix</H>{'="ID"\n'}</>}
+          {withHelper && <>{`${snippetIndent}    `}<H>helperText</H>{`="${helper}"\n`}</>}
+          {disabled && <>{`${snippetIndent}    `}<H>disabled</H>{'\n'}</>}
+          {`${snippetIndent}/>`}
+          {dark && '\n</section>'}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
-        <Lead>Daftar prop, tipe, dan nilai bawaannya. Hanya <H>id</H> dan atribut penamaan atau deskripsi aksesibel yang diteruskan ke input hanya-baca. Ref mengarah ke input yang sama.</Lead>
+        <Lead>Daftar prop, tipe, dan nilai bawaannya. Hanya <H>id</H> serta atribut penamaan atau deskripsi aksesibel yang diteruskan ke input hanya-baca. Ref mengarah ke input yang sama.</Lead>
         <PropsTable rows={clipboardProps} minWidth="46rem" />
       </FlowSection>
     </UsulanPage>

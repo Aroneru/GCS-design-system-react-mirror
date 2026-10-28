@@ -130,6 +130,16 @@
     --avatar-profile-light-display: block;
     --avatar-profile-dark-display: none;
 
+    /* Clipboard memakai nilai Figma yang tidak seluruhnya sama dengan field generik. */
+    --color-clipboard-field: #f9fafb;
+    --color-clipboard-border: #d1d5db;
+    --color-clipboard-label: #111928;
+    --color-clipboard-value: var(--color-gray-400);
+    --color-clipboard-caption: var(--color-gray-500);
+    --color-clipboard-prefix-surface: var(--color-gray-100);
+    --color-clipboard-prefix: #111928;
+    --color-clipboard-tooltip: var(--color-gray-900);
+
     /*
      * Token semantik field dan kontrol form (Input Field, Select, Text Area,
      * Checkbox, Radio, Toggle, Floating Label).
@@ -219,6 +229,14 @@
     --color-avatar-content: #f3f4f6;
     --avatar-profile-light-display: none;
     --avatar-profile-dark-display: block;
+    --color-clipboard-field: #1f2a37;
+    --color-clipboard-border: #1f2a37;
+    --color-clipboard-label: var(--color-gray-300);
+    --color-clipboard-value: var(--color-gray-400);
+    --color-clipboard-caption: var(--color-gray-500);
+    --color-clipboard-prefix-surface: #1f2a37;
+    --color-clipboard-prefix: var(--color-gray-300);
+    --color-clipboard-tooltip: #1f2a37;
     --color-border: var(--color-border-dark);
     --color-content: var(--color-content-dark);
     --color-content-subtle: var(--color-content-dark-subtle);
@@ -249,6 +267,14 @@
     --color-avatar-content: #111928;
     --avatar-profile-light-display: block;
     --avatar-profile-dark-display: none;
+    --color-clipboard-field: #f9fafb;
+    --color-clipboard-border: #d1d5db;
+    --color-clipboard-label: #111928;
+    --color-clipboard-value: var(--color-gray-400);
+    --color-clipboard-caption: var(--color-gray-500);
+    --color-clipboard-prefix-surface: var(--color-gray-100);
+    --color-clipboard-prefix: #111928;
+    --color-clipboard-tooltip: var(--color-gray-900);
     --color-border: var(--color-gray-200);
     --color-content: var(--color-gray-900);
     --color-content-subtle: var(--color-gray-500);

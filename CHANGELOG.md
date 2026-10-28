@@ -103,6 +103,20 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
 
 ### Diubah
 
+- **`Clipboard` V2.** Sambungan varian `segmented` kini satu bidang rapi tanpa
+  sisa lapisan latar di belakang tombol aksi. Warna terang dan metrik tipografi
+  Desktop diselaraskan ke Figma, sedangkan preset Mobile tetap mempertahankan
+  ukurannya sendiri. Clipboard mengikuti `data-theme="light"`/`"dark"` secara
+  ambient, termasuk nested scope, melalui token `--color-clipboard-*`;
+  `darkMode` tetap menjadi override kompatibilitas yang deprecated. Saat
+  `disabled`, aksi salin, tooltip, dan pemilihan/copy/cut melalui UI tidak aktif;
+  hasil async lama juga tidak dapat lagi memicu callback atau feedback. Ikon
+  Clipboard dan Check pada aksi bersegmen kini 20px dalam tombol 42px. Tooltip
+  dipusatkan pada tombol, mendukung fokus keyboard dan Escape, hilang sepanjang
+  status Copied, lalu menunggu hover/fokus baru setelah feedback direset.
+  Dokumentasi, Playground, dan snippet penggunaan kini mencerminkan kontrak
+  tersebut.
+
 - **Memutus — Penyelarasan tema dan token `simaya` menjadi `purple`.**
   Seluruh komponen dan token yang sebelumnya menerima nilai `"simaya"` kini distandarkan menjadi `"purple"` sebagai nama warna netral:
   - Komponen Form (`InputField`, `FloatingLabel`, `TextArea`, `Select`, `Checkbox`, `Radio`, `Toggle`, `Upload`, `Search`): prop `application?: 'default' | 'simaya'` diubah menjadi `application?: 'default' | 'purple'`.
