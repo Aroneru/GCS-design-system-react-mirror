@@ -124,6 +124,11 @@
     --color-border: var(--color-gray-200);
     --color-surface: #ffffff;
     --color-surface-subtle: var(--color-gray-50);
+    /* Avatar mengikuti nilai Figma yang sedikit berbeda dari gray-800/900 repository. */
+    --color-avatar-surface: #f3f4f6;
+    --color-avatar-content: #111928;
+    --avatar-profile-light-display: block;
+    --avatar-profile-dark-display: none;
 
     /*
      * Token semantik field dan kontrol form (Input Field, Select, Text Area,
@@ -210,6 +215,10 @@
 [data-theme='dark'] {
     --color-surface: var(--color-surface-dark);
     --color-surface-subtle: var(--color-surface-subtle-dark);
+    --color-avatar-surface: #1f2a37;
+    --color-avatar-content: #f3f4f6;
+    --avatar-profile-light-display: none;
+    --avatar-profile-dark-display: block;
     --color-border: var(--color-border-dark);
     --color-content: var(--color-content-dark);
     --color-content-subtle: var(--color-content-dark-subtle);
@@ -236,6 +245,10 @@
 .ds-theme-light {
     --color-surface: #ffffff;
     --color-surface-subtle: var(--color-gray-50);
+    --color-avatar-surface: #f3f4f6;
+    --color-avatar-content: #111928;
+    --avatar-profile-light-display: block;
+    --avatar-profile-dark-display: none;
     --color-border: var(--color-gray-200);
     --color-content: var(--color-gray-900);
     --color-content-subtle: var(--color-gray-500);

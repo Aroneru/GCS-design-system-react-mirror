@@ -54,6 +54,19 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
 
 ### Ditambahkan
 
+- **`Avatar` V2.** Prop `name` menambahkan nama aksesibel sekaligus menghasilkan
+  inisial Unicode-aware; `initials` tetap menjadi override manual. Fallback
+  dapat dipilih lewat `fallback="initials" | "profile"`: foto yang tersedia
+  selalu diprioritaskan, lalu inisial manual, inisial nama, ilustrasi gender,
+  dan ikon User netral. `gender="female" | "male"` dipilih eksplisit, tidak
+  pernah diturunkan dari nama; `fallback="profile"` memilih ilustrasi tersebut
+  meski `name` tersedia. Empat SVG Male/Female Light/Dark ikut dibundle sebagai
+  asset package-local. Avatar kini mengikuti scope ambient `data-theme`,
+  termasuk nested scope; `darkMode` tetap didukung sebagai prop deprecated.
+  `alt` mengatur nama aksesibel (`alt=""` menjadikan Avatar dekoratif), dan
+  foto gagal kembali ke fallback yang sama. Ukuran API tetap `small`, `default`,
+  dan `large` (S/M/L: 24/32/80px, dengan M sebagai bawaan).
+
 - **`ListView`** — daftar item dengan dua varian: `simple` untuk informasi
   ringkas berikon, badge, dekorasi aksen, dan aksi; serta `article` untuk
   artikel atau diskusi dengan subject, kategori, waktu, pin, judul, dan metrik
@@ -139,6 +152,13 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   langsung, mis. `font-weight: var(--font-weight-semibold)`.
 
 ### Diperbaiki
+
+- **Dokumentasi `Avatar`.** Halaman komponen kini mencakup fallback foto,
+  inisial otomatis dan override, profile Male/Female/netral, S/M/L, tema
+  ambient, Playground, generated snippet, dan contoh kode menurut fitur.
+  Preview Dark memakai scope `data-theme="dark"`; inisial dipusatkan lewat
+  line-height yang konsisten dan asset Dark tidak lagi memiliki halo terang
+  akibat rect latar SVG yang bertumpuk.
 
 - **`font-medium` dan `font-semibold` kini tampil sesuai ketebalannya di Lato.**
   Lato dari Google Fonts hanya punya 100, 300, 400, 700, dan 900, jadi medium

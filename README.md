@@ -103,7 +103,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 - **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`,
   `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
   `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, dan
-  `Timeline`.
+  `Timeline`, serta `Avatar`.
 - **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
   `--color-search-category-surface` dan `--color-search-field-surface` (Search),
@@ -117,7 +117,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | ------------ | -------------------------------------------------------------------------------------------------------------------- |
 | `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| submit \| reset`, `iconOnly`, `as`: `button \| anchor`, `darkMode` |
 | `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
-| `Avatar`     | `src`, `alt`, `initials`, `size`: `small \| default \| large`, `darkMode`                                            |
+| `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| profile`, `gender`: `male \| female`, `size`: `small \| default \| large`, `darkMode` (deprecated) |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
 | `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `onCopySuccess`, `darkMode` |
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
@@ -147,6 +147,32 @@ persegi berisi ikon saja. Prop `type` (`button | submit | reset`, bawaan `button
 meneruskan atribut HTML native ke elemen `<button>`, memungkinkan tombol dipakai
 untuk submit form. Untuk tautan pakai `as="anchor"` bersama `href`, maka
 Button dirender sebagai `<a>`.
+
+#### Avatar
+
+Avatar memprioritaskan foto dari `src`. Bila foto tidak ada atau gagal dimuat,
+fallback bawaannya adalah `initials` manual, lalu inisial Unicode-aware dari
+`name`, ilustrasi `gender`, dan akhirnya ikon User netral. `initials` tetap
+tersedia untuk override:
+
+```tsx
+<Avatar src={user.avatarUrl} name={user.name} />
+<Avatar name="Putri Handayani" initials="PT" />
+```
+
+Untuk langsung memakai ilustrasi profile, pilih gender secara eksplisit — kami
+menyediakan asset Male/Female untuk tema terang dan gelap:
+
+```tsx
+<Avatar gender="female" fallback="profile" />
+<Avatar gender="male" fallback="profile" />
+```
+
+Avatar mengikuti `data-theme` dari pembungkusnya, termasuk scope bertingkat.
+Prop `darkMode` masih didukung untuk kompatibilitas tetapi deprecated. Pakai
+`alt=""` bila nama pemilik sudah tertulis di dekat Avatar agar pembaca layar
+tidak mengumumkannya dua kali. Ukuran API tetap `small` (S, 24px), `default`
+(M, 32px), dan `large` (L, 80px); M adalah bawaan.
 
 #### Modal
 
