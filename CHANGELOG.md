@@ -31,8 +31,9 @@ halaman baru Table of Contents. Setiap Playground kini punya kontrol Typography
 kontrol lain. Halaman Typography menandai ketebalan yang tidak dimiliki font
 yang dipilih.
 
-`Modal`, `Navbar`, dan `Dropdown` sedang dikerjakan ulang dan belum final —
-baca bagian **Dalam pengerjaan** sebelum memakainya.
+`Navbar` dan `Dropdown` sedang dikerjakan ulang dan belum final. Modal dan
+dokumentasinya sudah mencakup controlled state, dismissal controls, ambient
+theme, dan contoh Nested Modal.
 
 ### Dalam pengerjaan
 

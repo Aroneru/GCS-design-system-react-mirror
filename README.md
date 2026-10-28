@@ -128,7 +128,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
 | `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode`                                          |
 | `Dropdown`   | `trigger`, `items`/`groups` atau `children`, `align`, `closeOnSelect`, `actionsRef`, `contentLabel`, `contentClassName`, `data-theme`, `darkMode` |
-| `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape` |
+| `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape`, `showCloseButton`, `closeLabel` |
 | `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `theme`, `darkMode`   |
 | `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
@@ -147,6 +147,37 @@ persegi berisi ikon saja. Prop `type` (`button | submit | reset`, bawaan `button
 meneruskan atribut HTML native ke elemen `<button>`, memungkinkan tombol dipakai
 untuk submit form. Untuk tautan pakai `as="anchor"` bersama `href`, maka
 Button dirender sebagai `<a>`.
+
+#### Modal
+
+`Modal` memakai native `<dialog>`. Tanpa `open`, berikan `trigger` berupa
+elemen `<button>` dan Modal mengelola visibilitas internal. Dengan `open`, Modal
+menjadi controlled; `onOpenChange` menerima permintaan buka/tutup dan `trigger`
+boleh dihilangkan. Render function pada `footer` menerima `close()` untuk aksi
+eksplisit:
+
+```tsx
+<Modal
+  trigger={<Button>Buka</Button>}
+  title="Konfirmasi"
+  footer={({ close }) => <Button size="xs" onClick={close}>Selesai</Button>}
+>
+  <p>Isi dialog milik consumer.</p>
+</Modal>
+```
+
+Default mendukung `size="s"` dan `size="m"`; body menggulir saat konten
+melebihi viewport, sementara header dan footer tetap di panel. Popup memakai
+ukuran ringkas bawaannya dan tidak menerima `title` atau `size`; berikan
+`aria-label` atau `aria-labelledby` untuk nama aksesibelnya.
+
+`closeOnBackdrop`, `closeOnEscape`, dan `showCloseButton` bernilai `true` secara
+bawaan dan dapat dimatikan secara independen. Jika semuanya dimatikan,
+sediakan aksi footer yang memanggil `close()`. `closeLabel` memberi nama
+aksesibel pada tombol X. Tema mengikuti wrapper ambient `data-theme="dark"`;
+Modal tidak memiliki prop `darkMode`. Nested Modal adalah komposisi dua Modal
+controlled dengan state terpisah: Default membuka Popup, penutupan Popup tidak
+menutup Default, dan fokus kembali ke kontrol pembukanya.
 
 `darkMode` pada Button menyesuaikan warna untuk permukaan gelap. Pada `tone="light"`,
 filled memakai gray-50 dan outline memakai gray-50; pada `tone="dark"`, filled
