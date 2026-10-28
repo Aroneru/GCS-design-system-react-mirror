@@ -1,5 +1,13 @@
-import { useEffect, useState, type MouseEvent, type ReactNode } from 'react'
-import { CodeBlock, ControlLabel } from './pageKit'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from 'react'
+import { CodeBlock, ControlLabel, Segmented } from './pageKit'
+import { fontClass, typographyOptions, type PlaygroundFont } from './usulanOptions'
 
 /**
  * Kerangka halaman dokumentasi: judul ber-anchor, blok kode menempel di tiap
@@ -76,6 +84,41 @@ function useActiveSection(toc: TocEntry[]) {
   return active
 }
 
+/**
+ * Font Playground. Disediakan oleh <FlowSection id="playground">, jadi setiap
+ * Playground otomatis punya kontrol Typography (disisipkan <Controls> sebagai
+ * kontrol pertama) dan panggungnya (<Stage>) ikut memakai font itu, tanpa
+ * state tambahan di tiap halaman. Di luar bagian Playground konteksnya kosong,
+ * sehingga contoh-contoh lain di halaman tidak ikut berubah font.
+ */
+const PlaygroundFontContext = createContext<{
+  font: PlaygroundFont
+  setFont: (font: PlaygroundFont) => void
+} | null>(null)
+
+function PlaygroundFontProvider({ children }: { children: ReactNode }) {
+  const [font, setFont] = useState<PlaygroundFont>('sans')
+  return (
+    <PlaygroundFontContext.Provider value={{ font, setFont }}>{children}</PlaygroundFontContext.Provider>
+  )
+}
+
+/**
+ * Pembungkus pratinjau Playground yang tidak memakai <Stage>, mis. panggung
+ * khusus Toast atau Navbar. Memasang font pilihan kontrol Typography.
+ */
+export function PlaygroundFontScope({
+  className,
+  children,
+}: {
+  className?: string
+  children: ReactNode
+}) {
+  const ctx = useContext(PlaygroundFontContext)
+  const cls = [className, ctx ? fontClass[ctx.font] : ''].filter(Boolean).join(' ')
+  return <div className={cls || undefined}>{children}</div>
+}
+
 /** Pola satu bagian: judul ber-anchor, lalu isi. */
 export function FlowSection({
   id,
@@ -100,7 +143,9 @@ export function FlowSection({
           #
         </a>
       </h2>
-      <div className="mt-3">{children}</div>
+      <div className="mt-3">
+        {id === 'playground' ? <PlaygroundFontProvider>{children}</PlaygroundFontProvider> : children}
+      </div>
     </section>
   )
 }
@@ -143,6 +188,7 @@ export function Stage({
   maxWidth,
   minWidth,
   dark,
+  font,
   children,
 }: {
   maxWidth: string
@@ -153,8 +199,15 @@ export function Stage({
   minWidth?: string
   /** Latar gelap, untuk komponen yang sedang ditampilkan dalam tampilan gelapnya. */
   dark?: boolean
+  /**
+   * Font panggung. Tanpa prop ini, Stage di dalam bagian Playground memakai
+   * pilihan kontrol Typography.
+   */
+  font?: PlaygroundFont
   children: ReactNode
 }) {
+  const ctx = useContext(PlaygroundFontContext)
+  const activeFont = font ?? ctx?.font
   return (
     <div
       className={`rounded-2xl border p-6 transition-colors sm:p-10 ${minWidth ? 'ds-scroll-x overflow-x-auto' : ''} ${
@@ -176,7 +229,27 @@ export function Stage({
  * yang melebar justru gridnya.
  */
 export function Controls({ children }: { children: ReactNode }) {
-  return <div className="mt-4 grid items-start gap-6 sm:grid-cols-2 xl:grid-cols-3">{children}</div>
+  return (
+    <div className="mt-4 grid items-start gap-6 sm:grid-cols-2 xl:grid-cols-3">
+      <TypographyControl />
+      {children}
+    </div>
+  )
+}
+
+/**
+ * Kontrol Typography, disisipkan <Controls> sebagai kontrol pertama di setiap
+ * Playground. Urutan berikutnya ditulis halaman: tampilan gelap (bila
+ * komponennya punya), lalu kontrol lain. Di luar Playground tidak dirender.
+ */
+function TypographyControl() {
+  const ctx = useContext(PlaygroundFontContext)
+  if (!ctx) return null
+  return (
+    <Control label="Typography">
+      <Segmented label="Pilih font" value={ctx.font} onChange={ctx.setFont} options={typographyOptions} />
+    </Control>
+  )
 }
 
 /** Satu kelompok kontrol: label kecil di atas, segmented di bawah. */

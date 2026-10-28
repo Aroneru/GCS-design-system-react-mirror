@@ -247,6 +247,18 @@ export function TogglePage() {
         </Stage>
 
         <Controls>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Platform">
             <Segmented
               label="Pilih platform"
@@ -287,18 +299,6 @@ export function TogglePage() {
               value={withCaption}
               onChange={setWithCaption}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Tampilan">
-            <Segmented
-              label="Pilih tampilan"
-              value={dark}
-              onChange={setDark}
-              options={[
-                { value: false, label: 'Light' },
-                { value: true, label: 'Dark' },
-              ]}
             />
           </Control>
         </Controls>

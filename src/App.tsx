@@ -52,6 +52,7 @@ import {
 import { BreadcrumbPage } from "./docs/pages/components/BreadcrumbPage";
 import { PaginationPage } from "./docs/pages/components/PaginationPage";
 import { TablePage } from "./docs/pages/components/TablePage";
+import { TableOfContentsPage } from "./docs/pages/components/TableOfContentsPage";
 import { ListViewPage } from "./docs/pages/components/ListViewPage";
 import { TimelinePage } from "./docs/pages/components/TimelinePage";
 
@@ -100,6 +101,7 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/breadcrumb": BreadcrumbPage,
   "/components/pagination": PaginationPage,
   "/components/sidebar": SidebarPage,
+  "/components/table-of-contents": TableOfContentsPage,
   "/components/list-view": ListViewPage,
   "/components/table": TablePage,
   "/components/timeline": TimelinePage,
