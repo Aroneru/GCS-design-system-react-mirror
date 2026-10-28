@@ -232,6 +232,14 @@ const stageWidth: Record<TimelinePlatform, Record<TimelineSize, string>> = {
   mobile: { large: 'max-w-102', small: 'max-w-82' },
 }
 
+/**
+ * Lebar paling kecil Timeline desktop. Nama dan jabatan di sebelah Badge status
+ * baru muat sebaris mulai sekitar 625px, jadi 40rem menyisakan sedikit ruang.
+ * Di layar yang lebih sempit kotak contoh dan panggung Playground digeser ke
+ * samping, alih-alih kartunya diperas.
+ */
+const desktopMinWidth = '40rem'
+
 const timelineProps: PropRow[] = [
   ['items', 'TimelineItem[]', '—', 'Kejadian berurutan dari atas ke bawah. Isi tiap item ada di tabel TimelineItem.'],
   [
@@ -363,7 +371,7 @@ export function TimelinePage() {
         </Lead>
 
         <div className="space-y-5">
-          <Demo label="desktop">
+          <Demo label="desktop" minWidth={desktopMinWidth}>
             <Timeline items={designItems.slice(0, 3)} />
           </Demo>
           <Demo label="mobile">
@@ -412,7 +420,7 @@ export function TimelinePage() {
           kelompok berikutnya, dan <Hl>status</Hl> menjadi Badge di pojok kanan atas kartu.
         </Lead>
 
-        <Demo label="ringkas dan lengkap">
+        <Demo label="ringkas dan lengkap" minWidth={desktopMinWidth}>
           <Timeline items={designItems.slice(0, 2)} />
         </Demo>
 
@@ -608,7 +616,7 @@ export function TimelinePage() {
           status.
         </Lead>
 
-        <Demo label="darkMode" dark>
+        <Demo label="darkMode" dark minWidth={desktopMinWidth}>
           <Timeline items={designItems.slice(0, 2)} darkMode />
         </Demo>
 
@@ -625,7 +633,11 @@ export function TimelinePage() {
           sampai keempat menautkan PDF dummy. Kode di bagian Penggunaan ikut berubah.
         </Lead>
 
-        <Stage maxWidth={stageWidth[platform][size]} dark={dark}>
+        <Stage
+          maxWidth={stageWidth[platform][size]}
+          minWidth={platform === 'desktop' ? desktopMinWidth : undefined}
+          dark={dark}
+        >
           <Timeline
             items={playgroundItems}
             platform={platform}
