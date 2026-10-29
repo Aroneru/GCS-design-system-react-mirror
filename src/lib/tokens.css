@@ -642,7 +642,7 @@
 }
 
 [data-theme='dark'] {
-    --color-dropdown-surface: var(--color-gray-800);
+    --color-dropdown-surface: var(--color-gray-700);
     --color-dropdown-content: var(--color-gray-300);
     --color-dropdown-item-content: var(--color-gray-300);
     --color-dropdown-item-icon: var(--color-gray-300);

@@ -100,15 +100,16 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   `darkMode` satu per satu.
 - **Kembali ke tema terang**: Bagian di dalam area gelap dapat dikembalikan ke
   tema terang dengan `data-theme="light"` atau kelas `.ds-theme-light`.
-- **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`,
+- **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`, `Dropdown`,
   `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
   `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, dan
   `Timeline`, serta `Avatar` dan `Clipboard`.
 - **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
   `--color-search-category-surface` dan `--color-search-field-surface` (Search),
-  `--color-breadcrumb-*` (Breadcrumb), `--color-clipboard-*` (Clipboard), serta
-  `--color-timeline-*` (Timeline). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
+  `--color-breadcrumb-*` (Breadcrumb), `--color-clipboard-*` (Clipboard),
+  `--color-dropdown-*` (Dropdown), serta `--color-timeline-*` (Timeline). Panduan
+  lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
 
 ## Komponen & props
 
@@ -305,6 +306,155 @@ Prop yang dipakai bersama seluruh komponen form:
 > kotaknya, `Radio` memakai latar gray-100, `Toggle` justru menggelapkan
 > jalurnya ke gray-300. Perlu diselaraskan di rancangannya lebih dulu.
 
+### Dropdown
+
+`Dropdown` adalah foundation generik untuk action, link navigasi, selection,
+dan konten interaktif milik consumer. Prop `trigger` harus menghasilkan satu
+native `<button>` sebagai root DOM langsung serta meneruskan atribut dan event
+button yang diberikan Dropdown. Native button, `Button` dalam mode button, dan
+komponen tombol kustom yang meneruskan seluruh atribut native didukung; anchor,
+`div`, `span`, Fragment, atau button yang dibungkus elemen lain tidak didukung.
+
+#### Action dan Navigation
+
+Action dan Navigation sama-sama memakai generated `items` atau `groups`.
+Navigation bukan mode production tersendiri: `href`, `target`, `rel`, dan
+`current` adalah API publik `DropdownItem`.
+
+```tsx
+import { Dropdown, type DropdownItem } from '@ceplok-ui/design-kit-react'
+
+const actions: DropdownItem[] = [
+  { id: 'edit', label: 'Edit', onClick: () => console.info('Edit') },
+  { id: 'delete', label: 'Hapus', tone: 'danger', onClick: () => console.info('Hapus') },
+]
+
+const navigation: DropdownItem[] = [
+  { id: 'overview', label: 'Ringkasan', href: '/ringkasan', current: true },
+  { id: 'settings', label: 'Pengaturan', href: '/pengaturan' },
+  {
+    id: 'docs',
+    label: 'Dokumentasi',
+    href: 'https://example.com/docs',
+    target: '_blank',
+    rel: 'noopener noreferrer',
+  },
+  { id: 'archive', label: 'Arsip', href: '/arsip', disabled: true },
+]
+
+export function DropdownExamples() {
+  return (
+    <div className="flex gap-4">
+      <Dropdown
+        trigger={<button type="button">Aksi</button>}
+        items={actions}
+        align="start"
+      />
+      <Dropdown
+        trigger={<button type="button">Navigasi</button>}
+        items={navigation}
+        align="end"
+        closeOnSelect={false}
+      />
+    </div>
+  )
+}
+```
+
+Item dengan `href` dirender sebagai anchor native, sehingga modified click dan
+atribut link browser tetap bekerja. Bila `target="_blank"` diberikan tanpa
+`rel`, Dropdown memakai `rel="noopener noreferrer"` sebagai default keamanan.
+`current` menandai link navigasi aktif melalui `aria-current`; ia tidak
+mengaktifkan pola listbox.
+
+#### Selection
+
+`selected` dipakai untuk koleksi pilihan. Begitu salah satu generated item
+memakai `selected`, panel menggunakan semantik listbox/option. Jangan memakai
+`selected` sebagai pengganti `current` pada link navigasi.
+
+```tsx
+import { useState } from 'react'
+import { Dropdown } from '@ceplok-ui/design-kit-react'
+
+export function SortDropdown() {
+  const [selected, setSelected] = useState('Terbaru')
+
+  return (
+    <Dropdown
+      contentLabel="Urutan hasil"
+      trigger={<button type="button">Urutkan: {selected}</button>}
+      items={['Terbaru', 'Terlama'].map((label) => ({
+        id: label,
+        label,
+        selected: selected === label,
+        onClick: () => setSelected(label),
+      }))}
+      align="center"
+      closeOnSelect
+    />
+  )
+}
+```
+
+`closeOnSelect` menentukan apakah generated item menutup panel setelah
+diaktifkan. Prop ini tidak mengatur custom content.
+
+#### Custom content dan kontrol penutupan
+
+Untuk form atau kontrol bebas, gunakan `children`. Render function menyediakan
+`close()` untuk aksi final. Gunakan `actionsRef.close()` bila kondisi di luar
+Dropdown perlu meminta panel ditutup.
+
+```tsx
+import { useRef } from 'react'
+import { Dropdown, type DropdownHandle } from '@ceplok-ui/design-kit-react'
+
+export function FilterDropdown() {
+  const actionsRef = useRef<DropdownHandle>(null)
+
+  return (
+    <div>
+      <button type="button" onClick={() => actionsRef.current?.close()}>
+        Tutup filter
+      </button>
+      <Dropdown
+        actionsRef={actionsRef}
+        trigger={<button type="button">Filter</button>}
+        contentClassName="p-4"
+      >
+        {({ close }) => (
+          <button
+            type="button"
+            onClick={() => {
+              console.info('Filter diterapkan')
+              close()
+            }}
+          >
+            Terapkan
+          </button>
+        )}
+      </Dropdown>
+    </div>
+  )
+}
+```
+
+Dropdown mengikuti boundary ambient `data-theme="light" | "dark"`. Warna
+surface, content, icon, description, current, hover, disabled, dan danger
+berasal dari semantic component tokens `--color-dropdown-*`. Prop
+`darkMode={true}` tetap tersedia sebagai compatibility override dan belum
+deprecated; untuk kode baru, utamakan boundary ambient:
+
+```tsx
+<div data-theme="dark">
+  <Dropdown
+    trigger={<button type="button">Menu</button>}
+    items={[{ id: 'profile', label: 'Profil', href: '/profil' }]}
+  />
+</div>
+```
+
 ### Navbar
 
 Navbar memakai kontrak terdiskriminasi berdasarkan `platform`. Front Office
@@ -464,13 +614,6 @@ export function BackOfficeNavbar() {
 serta kontennya; Navbar hanya mengendalikan trigger contextual dan menutup
 navigasi mobile saat Drawer dibuka. `guestActions` dan `notificationTrigger`
 tidak berlaku pada BO.
-
-Dropdown tidak lagi memakai prop `attached`. Panelnya diposisikan relatif ke
-trigger, menyesuaikan batas viewport, dan dapat diratakan dengan
-`align="start" | "center" | "end"`. Gunakan `data-theme="light" | "dark"`
-untuk batas tema eksplisit; tanpa prop tersebut Dropdown mewarisi tema consumer.
-`darkMode={true}` tetap tersedia sebagai override kompatibilitas dan lebih
-diutamakan daripada `data-theme`.
 
 Type publik Navbar yang diekspor meliputi `NavbarProps`, `NavbarPlatform`,
 `NavbarBrand`, `NavbarDestination`, `NavbarDisclosure`, `NavbarPrimaryItem`,

@@ -103,6 +103,13 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
 
 ### Diubah
 
+- **Dokumentasi `Dropdown` V2.** Playground kini memisahkan contoh Action,
+  Navigation, dan Selection, dengan kontrol `align` serta `closeOnSelect` yang
+  tercermin pada generated snippet. Contoh `children({ close })` dan
+  `actionsRef.close()` dikumpulkan dalam section Kontrol Penutupan, sedangkan
+  contoh Dark Mode konsisten memakai ambient `data-theme="dark"`. Perubahan ini
+  hanya menyelaraskan dokumentasi; tidak menambahkan API atau token production.
+
 - **`Clipboard` V2.** Sambungan varian `segmented` kini satu bidang rapi tanpa
   sisa lapisan latar di belakang tombol aksi. Warna terang dan metrik tipografi
   Desktop diselaraskan ke Figma, sedangkan preset Mobile tetap mempertahankan

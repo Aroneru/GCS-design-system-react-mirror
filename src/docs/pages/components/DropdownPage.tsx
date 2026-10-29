@@ -29,10 +29,12 @@ import {
 } from '../../usulanKit'
 
 type DropdownExample = 'actions' | 'icons' | 'radio' | 'checkbox' | 'scroll'
-type DropdownMode = 'action' | 'selection'
+type DropdownMode = 'action' | 'navigation' | 'selection'
+type DropdownAlign = 'start' | 'center' | 'end'
 
 const modes: { value: DropdownMode; label: string }[] = [
   { value: 'action', label: 'Action' },
+  { value: 'navigation', label: 'Navigation' },
   { value: 'selection', label: 'Selection' },
 ]
 
@@ -47,6 +49,17 @@ const examples: { value: DropdownExample; label: string }[] = [
 const booleanOptions = [
   { value: true, label: 'Ada' },
   { value: false, label: 'Tidak Ada' },
+]
+
+const alignOptions: { value: DropdownAlign; label: string }[] = [
+  { value: 'start', label: 'Start' },
+  { value: 'center', label: 'Center' },
+  { value: 'end', label: 'End' },
+]
+
+const closeOnSelectOptions = [
+  { value: true, label: 'true' },
+  { value: false, label: 'false' },
 ]
 
 const variationMinHeights: Record<DropdownExample, string> = {
@@ -89,6 +102,7 @@ const toc: TocEntry[] = [
   { id: 'disable', label: 'Disable' },
   { id: 'navigation', label: 'Navigation' },
   { id: 'selection', label: 'Selection' },
+  { id: 'kontrol-penutupan', label: 'Kontrol Penutupan' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
@@ -193,24 +207,23 @@ function ScrollContentItems({
   const rowClassName = darkMode ? darkSelectionRowClassName : selectionRowClassName
   return (
     <>
-      <Checkbox darkMode={darkMode} className={rowClassName} label="Email" helperText={withDescription ? 'Notifikasi melalui email.' : undefined} defaultChecked />
-      <Checkbox darkMode={darkMode} className={rowClassName} label="Push notification" helperText={withDescription ? 'Notifikasi pada perangkat.' : undefined} />
-      <Checkbox darkMode={darkMode} className={rowClassName} label="SMS" helperText={withDescription ? 'Notifikasi melalui SMS.' : undefined} />
-      <Checkbox darkMode={darkMode} className={rowClassName} label="WhatsApp" defaultChecked />
+      <Checkbox className={rowClassName} label="Email" helperText={withDescription ? 'Notifikasi melalui email.' : undefined} defaultChecked />
+      <Checkbox className={rowClassName} label="Push notification" helperText={withDescription ? 'Notifikasi pada perangkat.' : undefined} />
+      <Checkbox className={rowClassName} label="SMS" helperText={withDescription ? 'Notifikasi melalui SMS.' : undefined} />
+      <Checkbox className={rowClassName} label="WhatsApp" defaultChecked />
       {withSeparator && <hr className={darkMode ? darkHrClassName : hrClassName} />}
-      <Checkbox darkMode={darkMode} className={rowClassName} label="Pembaruan produk" />
-      <Checkbox darkMode={darkMode} className={rowClassName} label="Aktivitas akun" />
+      <Checkbox className={rowClassName} label="Pembaruan produk" />
+      <Checkbox className={rowClassName} label="Aktivitas akun" />
       <Checkbox
-        darkMode={darkMode}
         className={withDisabled ? disabledSelectionRowClassName : rowClassName}
         label="Keamanan"
         disabled={withDisabled}
       />
-      <Checkbox darkMode={darkMode} className={rowClassName} label="Promosi" />
-      <Checkbox darkMode={darkMode} className={rowClassName} label="Laporan mingguan" />
-      <Checkbox darkMode={darkMode} className={rowClassName} label="Pengingat" defaultChecked />
-      <Checkbox darkMode={darkMode} className={rowClassName} label="Integrasi" />
-      <Checkbox darkMode={darkMode} className={rowClassName} label="Sistem" />
+      <Checkbox className={rowClassName} label="Promosi" />
+      <Checkbox className={rowClassName} label="Laporan mingguan" />
+      <Checkbox className={rowClassName} label="Pengingat" defaultChecked />
+      <Checkbox className={rowClassName} label="Integrasi" />
+      <Checkbox className={rowClassName} label="Sistem" />
     </>
   )
 }
@@ -220,6 +233,8 @@ interface ContohProps extends VariationOptions {
   groupName: string
   label?: string
   darkMode?: boolean
+  align?: DropdownAlign
+  closeOnSelect?: boolean
 }
 
 /**
@@ -236,6 +251,8 @@ function ContohDropdown({
   withDescription,
   withDisabled,
   darkMode,
+  align = 'start',
+  closeOnSelect = true,
 }: ContohProps) {
   const opsi = { withSeparator, withDescription, withDisabled }
   const rowClassName = darkMode ? darkSelectionRowClassName : selectionRowClassName
@@ -243,15 +260,15 @@ function ContohDropdown({
   if (example === 'actions' || example === 'icons') {
     const withIcons = example === 'icons'
     return withSeparator ? (
-      <Dropdown darkMode={darkMode} trigger={trigger()} groups={kelompokAksi(opsi, withIcons)} aria-label="Daftar aksi" />
+      <Dropdown align={align} closeOnSelect={closeOnSelect} trigger={trigger()} groups={kelompokAksi(opsi, withIcons)} aria-label="Daftar aksi" />
     ) : (
-      <Dropdown darkMode={darkMode} trigger={trigger()} items={aksi(opsi, withIcons)} aria-label="Daftar aksi" />
+      <Dropdown align={align} closeOnSelect={closeOnSelect} trigger={trigger()} items={aksi(opsi, withIcons)} aria-label="Daftar aksi" />
     )
   }
 
   if (example === 'scroll') {
     return (
-      <Dropdown darkMode={darkMode} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
+      <Dropdown align={align} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
         <div className={`flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain ${darkMode ? darkScrollClassName : ''}`}>
           <ScrollContentItems {...opsi} darkMode={darkMode} />
         </div>
@@ -261,13 +278,12 @@ function ContohDropdown({
 
   if (example === 'radio') {
     return (
-      <Dropdown darkMode={darkMode} trigger={trigger()} contentClassName="p-4" aria-label="Pilih akses">
+      <Dropdown align={align} trigger={trigger()} contentClassName="p-4" aria-label="Pilih akses">
         <div className="flex flex-col gap-4">
-          <Radio darkMode={darkMode} className={rowClassName} name={groupName} value="viewer" label="Viewer" />
-          <Radio darkMode={darkMode} className={rowClassName} name={groupName} value="editor" label="Editor" helperText={withDescription ? 'Dapat mengubah konten.' : undefined} defaultChecked />
+          <Radio className={rowClassName} name={groupName} value="viewer" label="Viewer" />
+          <Radio className={rowClassName} name={groupName} value="editor" label="Editor" helperText={withDescription ? 'Dapat mengubah konten.' : undefined} defaultChecked />
           {withSeparator && <hr className={darkMode ? darkHrClassName : hrClassName} />}
           <Radio
-            darkMode={darkMode}
             className={withDisabled ? disabledSelectionRowClassName : rowClassName}
             name={groupName}
             value="admin"
@@ -280,13 +296,12 @@ function ContohDropdown({
   }
 
   return (
-    <Dropdown darkMode={darkMode} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi">
+    <Dropdown align={align} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi">
       <div className="flex flex-col gap-4">
-        <Checkbox darkMode={darkMode} className={rowClassName} label="Email" helperText={withDescription ? 'Kirim pembaruan melalui email.' : undefined} />
-        <Checkbox darkMode={darkMode} className={rowClassName} label="Push notification" helperText={withDescription ? 'Tampilkan pada perangkat.' : undefined} defaultChecked />
+        <Checkbox className={rowClassName} label="Email" helperText={withDescription ? 'Kirim pembaruan melalui email.' : undefined} />
+        <Checkbox className={rowClassName} label="Push notification" helperText={withDescription ? 'Tampilkan pada perangkat.' : undefined} defaultChecked />
         {withSeparator && <hr className={darkMode ? darkHrClassName : hrClassName} />}
         <Checkbox
-          darkMode={darkMode}
           className={withDisabled ? disabledSelectionRowClassName : rowClassName}
           label="SMS"
           disabled={withDisabled}
@@ -432,11 +447,13 @@ function SelectionPlayground({
   withSeparator,
   withDescription,
   withDisabled,
-  darkMode,
+  align,
+  closeOnSelect,
 }: VariationOptions & {
   selected: string
   onSelectedChange: (value: string) => void
-  darkMode: boolean
+  align: DropdownAlign
+  closeOnSelect: boolean
 }) {
   const items: DropdownItem[] = [
     {
@@ -464,7 +481,8 @@ function SelectionPlayground({
 
   return (
     <Dropdown
-      darkMode={darkMode}
+      align={align}
+      closeOnSelect={closeOnSelect}
       contentLabel="Urutan hasil"
       trigger={trigger(`Urutkan: ${selected}`)}
       {...(withSeparator
@@ -479,17 +497,67 @@ function SelectionPlayground({
   )
 }
 
+function NavigationPlayground({
+  withDescription,
+  withDisabled,
+  align,
+  closeOnSelect,
+}: Pick<VariationOptions, 'withDescription' | 'withDisabled'> & {
+  align: DropdownAlign
+  closeOnSelect: boolean
+}) {
+  const items: DropdownItem[] = [
+    {
+      id: 'overview',
+      label: 'Ringkasan',
+      description: withDescription ? 'Bagian navigasi pada halaman ini.' : undefined,
+      href: '#navigation',
+      current: true,
+    },
+    {
+      id: 'properties',
+      label: 'Properties',
+      description: withDescription ? 'Lihat kontrak API Dropdown.' : undefined,
+      href: '#properties',
+    },
+    {
+      id: 'external',
+      label: 'Dokumentasi eksternal',
+      href: 'https://example.com/docs',
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    },
+    {
+      id: 'archive',
+      label: 'Arsip',
+      href: '#archive',
+      disabled: withDisabled,
+    },
+  ]
+
+  return (
+    <Dropdown
+      align={align}
+      closeOnSelect={closeOnSelect}
+      trigger={trigger('Buka navigasi')}
+      items={items}
+    />
+  )
+}
+
 /** Satu entri `items` dalam bentuk kode, mengikuti kontrol Playground. */
 function ItemCode({
   label,
   description,
   icon,
+  onClick,
   tone,
   disabled,
 }: {
   label: string
   description?: string
   icon?: string
+  onClick?: string
   tone?: string
   disabled?: boolean
 }) {
@@ -512,10 +580,54 @@ function ItemCode({
       </span>,
     )
   }
+  if (onClick) {
+    bagian.push(
+      <span key="onClick">
+        {', '}
+        <H>onClick</H>
+        {`: ${onClick}`}
+      </span>,
+    )
+  }
   if (tone) bagian.push(`, tone: '${tone}'`)
   if (disabled) bagian.push(<span key="disabled">{', '}<H>disabled</H>{': true'}</span>)
   bagian.push(' },')
   return <>{bagian}</>
+}
+
+function NavigationExampleCode({
+  withDescription,
+  withDisabled,
+  darkMode,
+  align,
+  closeOnSelect,
+}: Pick<VariationOptions, 'withDescription' | 'withDisabled'> & {
+  darkMode: boolean
+  align: DropdownAlign
+  closeOnSelect: boolean
+}) {
+  return (
+    <>
+      {"import { Dropdown } from '@ceplok-ui/design-kit-react'\n\n"}
+      {darkMode && <>{'<div '}<H>data-theme</H>{'="dark">\n'}</>}
+      {darkMode ? '  ' : ''}{'<Dropdown\n'}
+      {darkMode ? '    ' : '  '}<H>align</H>{`="${align}"\n`}
+      {darkMode ? '    ' : '  '}<H>closeOnSelect</H>{`={${closeOnSelect}}\n`}
+      {darkMode ? '    ' : '  '}{'trigger={<button type="button">Buka navigasi</button>}\n'}
+      {darkMode ? '    ' : '  '}<H>items</H>{'={[\n'}
+      {"    {\n      id: 'overview',\n      label: 'Ringkasan',\n"}
+      {withDescription && "      description: 'Bagian navigasi pada halaman ini.',\n"}
+      {'      '}<H>href</H>{": '#navigation',\n      "}<H>current</H>{': true,\n    },\n'}
+      {"    {\n      id: 'properties',\n      label: 'Properties',\n"}
+      {withDescription && "      description: 'Lihat kontrak API Dropdown.',\n"}
+      {'      '}<H>href</H>{": '#properties',\n    },\n"}
+      {"    {\n      id: 'external',\n      label: 'Dokumentasi eksternal',\n      "}<H>href</H>{": 'https://example.com/docs',\n      "}<H>target</H>{": '_blank',\n      "}<H>rel</H>{": 'noopener noreferrer',\n    },\n"}
+      {"    {\n      id: 'archive',\n      label: 'Arsip',\n      href: '#archive',\n"}
+      {withDisabled && '      disabled: true,\n'}
+      {'    },\n  ]}\n'}
+      {darkMode ? '  />\n</div>' : '/>'}
+    </>
+  )
 }
 
 function SelectionExampleCode({
@@ -524,7 +636,14 @@ function SelectionExampleCode({
   withDescription,
   withDisabled,
   darkMode,
-}: VariationOptions & { selected: string; darkMode: boolean }) {
+  align,
+  closeOnSelect,
+}: VariationOptions & {
+  selected: string
+  darkMode: boolean
+  align: DropdownAlign
+  closeOnSelect: boolean
+}) {
   const item = (label: string, description?: string, disabled?: boolean) => (
     <>
       {'        {\n          label: '}
@@ -572,10 +691,13 @@ function SelectionExampleCode({
       {'useState'}
       {'('}
       {`'${selected}'`}
-      {')\n\n  return (\n    <'}
+      {')\n\n  return (\n'}
+      {darkMode && <>{'    <div '}<H>data-theme</H>{'="dark">\n'}</>}
+      {'    <'}
       {'Dropdown'}
       {'\n'}
-      {darkMode && <>{'      '}<H>darkMode</H>{'\n'}</>}
+      {'      '}<H>align</H>{`="${align}"\n`}
+      {'      '}<H>closeOnSelect</H>{`={${closeOnSelect}}\n`}
       {'      '}
       <H>contentLabel</H>
       {'='}
@@ -600,7 +722,9 @@ function SelectionExampleCode({
           {'      ]}\n'}
         </>
       )}
-      {'    />\n  )\n}'}
+      {'    />\n'}
+      {darkMode && '    </div>\n'}
+      {'  )\n}'}
     </>
   )
 }
@@ -613,12 +737,28 @@ function ExampleCode({
   withDescription,
   withDisabled,
   darkMode,
+  align,
+  closeOnSelect,
 }: VariationOptions & {
   mode: DropdownMode
   selected: string
   example: DropdownExample
   darkMode: boolean
+  align: DropdownAlign
+  closeOnSelect: boolean
 }) {
+  if (mode === 'navigation') {
+    return (
+      <NavigationExampleCode
+        withDescription={withDescription}
+        withDisabled={withDisabled}
+        darkMode={darkMode}
+        align={align}
+        closeOnSelect={closeOnSelect}
+      />
+    )
+  }
+
   if (mode === 'selection') {
     return (
       <SelectionExampleCode
@@ -627,6 +767,8 @@ function ExampleCode({
         withDescription={withDescription}
         withDisabled={withDisabled}
         darkMode={darkMode}
+        align={align}
+        closeOnSelect={closeOnSelect}
       />
     )
   }
@@ -662,15 +804,17 @@ function ExampleCode({
       {daftarAksi ? (
         withSeparator ? (
           <>
-            {'\n<Dropdown\n'}
-            {darkMode && <>{'  '}<H>darkMode</H>{'\n'}</>}
-            {'  trigger={trigger}\n  '}
+            {'\n'}
+            {darkMode && <>{'<div '}<H>data-theme</H>{'="dark">\n  '}</>}
+            {'<Dropdown\n  '}<H>align</H>{`="${align}"\n  `}
+            <H>closeOnSelect</H>{`={${closeOnSelect}}\n  trigger={trigger}\n  `}
             <H>groups</H>
             {'={[\n    {\n      id: \'utama\',\n      items: [\n        '}
             <ItemCode
               label="Profil"
               icon={withIcons ? 'User' : undefined}
               description={withDescription ? 'Lihat dan ubah profil.' : undefined}
+              onClick="() => openProfile()"
             />
             {'\n        '}
             <ItemCode
@@ -693,16 +837,19 @@ function ExampleCode({
               tone="danger"
             />
             {'\n      ],\n    },\n  ]}\n/>'}
+            {darkMode && '\n</div>'}
           </>
         ) : (
           <>
-            {'\n<Dropdown\n'}
-            {darkMode && <>{'  '}<H>darkMode</H>{'\n'}</>}
-            {'  trigger={trigger}\n  items={[\n    '}
+            {'\n'}
+            {darkMode && <>{'<div '}<H>data-theme</H>{'="dark">\n  '}</>}
+            {'<Dropdown\n  '}<H>align</H>{`="${align}"\n  `}
+            <H>closeOnSelect</H>{`={${closeOnSelect}}\n  trigger={trigger}\n  items={[\n    `}
             <ItemCode
               label="Profil"
               icon={withIcons ? 'User' : undefined}
               description={withDescription ? 'Lihat dan ubah profil.' : undefined}
+              onClick="() => openProfile()"
             />
             {'\n    '}
             <ItemCode
@@ -723,13 +870,14 @@ function ExampleCode({
               tone="danger"
             />
             {'\n  ]}\n/>'}
+            {darkMode && '\n</div>'}
           </>
         )
       ) : (
         <>
-          {'\nconst darkMode = '}{darkMode ? 'true' : 'false'}{'\n\n<Dropdown '}
-          <H>darkMode</H>{'={darkMode} '}
-          {'trigger={trigger} '}
+          {'\n'}
+          {darkMode && <>{'<div '}<H>data-theme</H>{'="dark">\n  '}</>}
+          {'<Dropdown '}<H>align</H>{`="${align}" `}{'trigger={trigger} '}
           <H>contentClassName</H>
           {'="p-4">\n'}
           {example === 'scroll' ? (
@@ -737,9 +885,9 @@ function ExampleCode({
               {'  <div '}
               <H>className</H>
               {`="flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain${darkMode ? ` ${darkScrollClassName}` : ''}">\n`}
-              {'    <Checkbox '}<H>darkMode</H>{'={darkMode} label="Email" '}
+              {'    <Checkbox label="Email" '}
               {withDescription && <><H>helperText</H>{'="Notifikasi melalui email." '}</>}
-              {'defaultChecked />\n    <Checkbox darkMode={darkMode} label="Push notification" />\n    {/* … */}\n'}
+              {'defaultChecked />\n    <Checkbox label="Push notification" />\n    {/* … */}\n'}
               {withSeparator && (
                 <>
                   {'    <hr '}
@@ -747,17 +895,17 @@ function ExampleCode({
                   {`="${darkMode ? darkHrClassName : hrClassName}" />\n`}
                 </>
               )}
-              {'    <Checkbox darkMode={darkMode} label="Pembaruan produk" />\n    {/* … */}\n    <Checkbox darkMode={darkMode} label="Keamanan" '}
+              {'    <Checkbox label="Pembaruan produk" />\n    {/* … */}\n    <Checkbox label="Keamanan" '}
               {withDisabled && <><H>disabled</H>{' '}</>}
-              {'/>\n    {/* … */}\n    <Checkbox darkMode={darkMode} label="Sistem" />\n  </div>\n</Dropdown>'}
+              {'/>\n    {/* … */}\n    <Checkbox label="Sistem" />\n  </div>\n</Dropdown>'}
             </>
           ) : example === 'radio' ? (
             <>
               {'  <div className="flex flex-col gap-4">\n    <'}
               <H>Radio</H>
-              {' '}<H>darkMode</H>{'={darkMode} name="access" value="viewer" label="Viewer" />\n    <'}
+              {' name="access" value="viewer" label="Viewer" />\n    <'}
               <H>Radio</H>
-              {' '}<H>darkMode</H>{'={darkMode} name="access" value="editor" label="Editor" '}
+              {' name="access" value="editor" label="Editor" '}
               {withDescription && <><H>helperText</H>{'="Dapat mengubah konten." '}</>}
               {'defaultChecked />\n'}
               {withSeparator && (
@@ -769,7 +917,7 @@ function ExampleCode({
               )}
               {'    <'}
               <H>Radio</H>
-              {' '}<H>darkMode</H>{'={darkMode} name="access" value="admin" label="Admin" '}
+              {' name="access" value="admin" label="Admin" '}
               {withDisabled && <><H>disabled</H>{' '}</>}
               {'/>\n  </div>\n</Dropdown>'}
             </>
@@ -777,11 +925,11 @@ function ExampleCode({
             <>
               {'  <div className="flex flex-col gap-4">\n    <'}
               <H>Checkbox</H>
-              {' '}<H>darkMode</H>{'={darkMode} label="Email" '}
+              {' label="Email" '}
               {withDescription && <><H>helperText</H>{'="Kirim pembaruan melalui email." '}</>}
               {'/>\n    <'}
               <H>Checkbox</H>
-              {' '}<H>darkMode</H>{'={darkMode} label="Push notification" defaultChecked />\n'}
+              {' label="Push notification" defaultChecked />\n'}
               {withSeparator && (
                 <>
                   {'    <hr '}
@@ -791,11 +939,12 @@ function ExampleCode({
               )}
               {'    <'}
               <H>Checkbox</H>
-              {' '}<H>darkMode</H>{'={darkMode} label="SMS" '}
+              {' label="SMS" '}
               {withDisabled && <><H>disabled</H>{' '}</>}
               {'/>\n  </div>\n</Dropdown>'}
             </>
           )}
+          {darkMode && '\n</div>'}
         </>
       )}
     </>
@@ -810,6 +959,9 @@ export function DropdownPage() {
   const [withDisabled, setWithDisabled] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
   const [selected, setSelected] = useState('Terbaru')
+  const [align, setAlign] = useState<DropdownAlign>('start')
+  const [closeOnSelect, setCloseOnSelect] = useState(true)
+  const customActionExample = mode === 'action' && !['actions', 'icons'].includes(example)
   const separatorDataDriven =
     mode === 'selection' || example === 'actions' || example === 'icons'
   const activeDarkMode = darkMode
@@ -895,7 +1047,13 @@ export function DropdownPage() {
           </div>
         </Stage>
         <SectionCode>
-          {"<Dropdown\n  trigger={<button type=\"button\">Dropdown button</button>}\n  items={[\n    { label: 'Profil' },\n    { label: 'Pengaturan' },\n    { label: 'Keluar', tone: 'danger' },\n  ]}\n/>"}
+          {'<Dropdown\n  trigger={<button type="button">Dropdown button</button>}\n  '}
+          <H>closeOnSelect</H>
+          {'\n  '}
+          <H>items</H>
+          {"={[\n    { label: 'Profil', "}
+          <H>onClick</H>
+          {": () => openProfile() },\n    { label: 'Pengaturan', onClick: () => openSettings() },\n    { label: 'Keluar', tone: 'danger', onClick: () => signOut() },\n  ]}\n/>"}
         </SectionCode>
       </FlowSection>
 
@@ -1007,7 +1165,19 @@ export function DropdownPage() {
           </div>
         </Stage>
         <SectionCode>
-          {'<Dropdown\n  trigger={trigger}\n  items={[\n    {\n      label: \'Ringkasan\',\n      href: \'/ringkasan\',\n      '}<H>current</H>{': true,\n    },\n    {\n      label: \'Dokumentasi\',\n      href: \'https://example.com\',\n      '}<H>target</H>{': \'_blank\',\n    },\n    {\n      label: \'Tujuan terlindungi\',\n      href: \'/terlindungi\',\n      '}<H>onClick</H>{': (event) => {\n        if (!canNavigate) event.preventDefault()\n      },\n    },\n  ]}\n/>'}
+          {'<Dropdown\n  trigger={trigger}\n  items={[\n    {\n      label: \'Ringkasan\',\n      '}
+          <H>href</H>
+          {': \'/ringkasan\',\n      '}
+          <H>current</H>
+          {': true,\n    },\n    {\n      label: \'Dokumentasi\',\n      '}
+          <H>href</H>
+          {': \'https://example.com\',\n      '}
+          <H>target</H>
+          {': \'_blank\',\n      '}
+          <H>rel</H>
+          {': \'noopener noreferrer\',\n    },\n    {\n      label: \'Tujuan terlindungi\',\n      href: \'/terlindungi\',\n      '}
+          <H>onClick</H>
+          {': (event) => {\n        if (!canNavigate) event.preventDefault()\n      },\n    },\n  ]}\n/>'}
         </SectionCode>
         <div className="mt-6 max-w-3xl space-y-3 text-body-sm text-gray-500">
           <p>
@@ -1051,6 +1221,58 @@ export function DropdownPage() {
         </SectionCode>
       </FlowSection>
 
+      <FlowSection id="kontrol-penutupan" title="Kontrol Penutupan">
+        <div className="space-y-8">
+          <div>
+            <h3 className="mb-2 text-sm font-black text-gray-900">Menutup konten kustom</h3>
+            <Lead>
+              Item generated menutup panel otomatis setelah dijalankan. Kontrol kustom tetap terbuka
+              agar form, Radio, atau Checkbox dapat digunakan berulang kali. Ketika aksi final perlu
+              menutup panel, gunakan <Hl>close</Hl> dari render function. Fokus dikembalikan ke trigger
+              bila penutupan terjadi saat fokus masih berada di panel; Escape dan klik di luar tetap
+              ditangani Popover native.
+            </Lead>
+            <Demo>
+              <div className="flex min-h-56 items-start justify-center pt-10">
+                <ManualCloseDemo />
+              </div>
+            </Demo>
+            <SectionCode>
+              {'<Dropdown trigger={trigger}>\n  {({ '}<H>close</H>{' }) => (\n    <button\n      type="button"\n      onClick={() => {\n        applyChanges()\n        '}<H>close</H>{'()\n      }}\n    >\n      Terapkan\n    </button>\n  )}\n</Dropdown>'}
+            </SectionCode>
+          </div>
+          <div>
+            <h3 className="mb-2 text-sm font-black text-gray-900">Menutup dari kondisi eksternal</h3>
+            <Lead>
+              Gunakan <Hl>actionsRef</Hl> ketika kondisi di luar Dropdown perlu menutup panel, misalnya
+              trigger desktop disembunyikan setelah viewport berpindah ke mobile. Native Popover tetap
+              menjadi sumber keadaan; <Hl>close()</Hl> hanya meminta dismissal dan aman dipanggil saat
+              panel sudah tertutup.
+            </Lead>
+            <Demo>
+              <div className="flex min-h-56 items-start justify-center pt-10">
+                <ExternalCloseTypeExample />
+              </div>
+            </Demo>
+            <SectionCode>
+              {"import { useEffect, useRef } from 'react'\n"}
+              {"import { Dropdown, type DropdownHandle } from '@ceplok-ui/design-kit-react'\n\n"}
+              {'function ResponsiveDropdown() {\n  const actionsRef = useRef<DropdownHandle>(null)\n\n  useEffect(() => {\n    const mobile = window.matchMedia(\'(max-width: 767px)\')\n    const closeForMobile = () => {\n      if (mobile.matches) '}
+              <H>actionsRef</H>
+              {'.current?.'}
+              <H>close</H>
+              {'()\n    }\n\n    mobile.addEventListener(\'change\', closeForMobile)\n    return () => mobile.removeEventListener(\'change\', closeForMobile)\n  }, [])\n\n  return (\n    <Dropdown\n      '}
+              <H>actionsRef</H>
+              {'={actionsRef}\n      trigger={trigger}\n      items={navigationItems}\n    />\n  )\n}'}
+            </SectionCode>
+            <p className="mt-4 max-w-2xl text-body-sm text-gray-500">
+              Forwarded <Hl>ref</Hl> lama tetap menunjuk wrapper <Hl>div</Hl>. Handle lifecycle tersedia
+              terpisah agar integrasi yang sudah memakai DOM ref tidak berubah.
+            </p>
+          </div>
+        </div>
+      </FlowSection>
+
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
           Dropdown mewarisi <Hl>data-theme</Hl> dari consumer boundary; gunakan boundary eksplisit
@@ -1058,37 +1280,21 @@ export function DropdownPage() {
           kompatibilitas dan selalu memaksa dark, termasuk terhadap data-theme="light". Untuk konten
           kustom, tema komponen di dalam <Hl>children</Hl> tetap dikelola consumer.
         </Lead>
-        <div className="grid gap-6 md:grid-cols-2">
-          <Demo label="Action" dark>
-            <div className="flex min-h-72 items-start justify-center pt-3">
-              <ContohDropdown
-                darkMode
-                example="actions"
-                groupName="dark-actions"
-                withSeparator
-                withDescription={false}
-                withDisabled={false}
-              />
-            </div>
-          </Demo>
-          <Demo label="Action dengan ikon" dark>
-            <div className="flex min-h-72 items-start justify-center pt-3">
-              <ContohDropdown
-                darkMode
-                example="icons"
-                groupName="dark-icons"
-                withSeparator
-                withDescription={false}
-                withDisabled={false}
-              />
-            </div>
-          </Demo>
-          <Demo label="Selection" dark>
-            <div className="flex min-h-56 items-start justify-center pt-3">
-              <SelectionDemo darkMode />
-            </div>
-          </Demo>
-        </div>
+        <Stage maxWidth="max-w-xl" dark>
+          <div data-theme="dark" className="flex min-h-72 items-start justify-center pt-3">
+            <Dropdown
+              trigger={trigger()}
+              items={[
+                { label: 'Profil', icon: <User /> },
+                {
+                  label: 'Keluar',
+                  icon: <ArrowRightToBracket />,
+                  tone: 'danger',
+                },
+              ]}
+            />
+          </div>
+        </Stage>
         <SectionCode>
           {"import { Dropdown } from '@ceplok-ui/design-kit-react'\n"}
           {"import { ArrowRightToBracket, User } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
@@ -1098,14 +1304,18 @@ export function DropdownPage() {
 
       <FlowSection id="playground" title="Playground">
         <Lead>
-          Mode Action memakai button atau link native untuk menjalankan aksi dan navigasi. Mode
-          Selection memakai <Hl>selected</Hl> untuk membentuk listbox berisi option yang dapat
-          dinavigasi lewat keyboard. Pratinjaunya dibuka sejak halaman dimuat supaya tiap variasi
-          mudah dibandingkan.
+          Action menjalankan perintah, Navigation memakai link native melalui item generated, dan
+          Selection memakai <Hl>selected</Hl> untuk membentuk listbox. Navigation adalah kategori
+          contoh pada Docs, bukan prop atau mode baru pada API Dropdown. Pratinjaunya dibuka sejak
+          halaman dimuat supaya tiap variasi mudah dibandingkan.
         </Lead>
 
         <Stage maxWidth="max-w-xl" dark={activeDarkMode}>
-          <div ref={panggung} className="flex min-h-80 items-start justify-center pt-10">
+          <div
+            ref={panggung}
+            data-theme={activeDarkMode ? 'dark' : 'light'}
+            className="flex min-h-80 items-start justify-center pt-10"
+          >
             {mode === 'action' ? (
               <ContohDropdown
                 example={example}
@@ -1114,6 +1324,15 @@ export function DropdownPage() {
                 withDescription={withDescription}
                 withDisabled={withDisabled}
                 darkMode={activeDarkMode}
+                align={align}
+                closeOnSelect={closeOnSelect}
+              />
+            ) : mode === 'navigation' ? (
+              <NavigationPlayground
+                withDescription={withDescription}
+                withDisabled={withDisabled}
+                align={align}
+                closeOnSelect={closeOnSelect}
               />
             ) : (
               <SelectionPlayground
@@ -1122,7 +1341,8 @@ export function DropdownPage() {
                 withSeparator={withSeparator}
                 withDescription={withDescription}
                 withDisabled={withDisabled}
-                darkMode={activeDarkMode}
+                align={align}
+                closeOnSelect={closeOnSelect}
               />
             )}
           </div>
@@ -1152,6 +1372,32 @@ export function DropdownPage() {
               />
             </div>
           </Control>
+          <Control label="Align">
+            <div onPointerDownCapture={ingatKeadaan}>
+              <Segmented
+                label="Pilih perataan Dropdown"
+                value={align}
+                onChange={(value) => ubah(() => setAlign(value))}
+                options={alignOptions}
+              />
+            </div>
+          </Control>
+          <Control label="Close on select">
+            <div onPointerDownCapture={ingatKeadaan}>
+              <Segmented
+                label="Tutup setelah item dipilih"
+                value={closeOnSelect}
+                onChange={(value) => ubah(() => setCloseOnSelect(value))}
+                options={closeOnSelectOptions}
+                disabled={customActionExample}
+              />
+            </div>
+            {customActionExample && (
+              <p className="mt-2 text-xs text-gray-500">
+                Hanya berlaku pada item generated; konten kustom menutup panel secara eksplisit.
+              </p>
+            )}
+          </Control>
           <Control label="Kelompok">
             <div onPointerDownCapture={ingatKeadaan}>
               <Segmented
@@ -1159,10 +1405,13 @@ export function DropdownPage() {
                 value={withSeparator}
                 onChange={(value) => ubah(() => setWithSeparator(value))}
                 options={booleanOptions}
+                disabled={mode === 'navigation'}
               />
             </div>
             <p className="mt-2 text-xs text-gray-500">
-              {separatorDataDriven
+              {mode === 'navigation'
+                ? 'Navigation memakai satu daftar items agar contoh link tetap ringkas.'
+                : separatorDataDriven
                 ? 'Kelompok dibuat melalui groups dengan separator: true.'
                 : 'Kelompok dibuat dengan garis pemisah (border) di antara custom children.'}
             </p>
@@ -1195,13 +1444,14 @@ export function DropdownPage() {
                 onChange={(value) => ubah(() => setExample(value))}
                 options={examples}
                 itemClassName="basis-1/2 justify-center px-2.5 sm:basis-1/3"
-                disabled={mode === 'selection'}
+                disabled={mode !== 'action'}
                 wrap
               />
             </div>
-            {mode === 'selection' && (
+            {mode !== 'action' && (
               <p className="mt-2 text-xs text-gray-500">
-                Tidak tersedia pada mode Selection. Item dirender sebagai option dalam listbox.
+                Contoh custom content hanya tersedia pada Action. Navigation dan Selection memakai
+                generated items.
               </p>
             )}
           </Control>
@@ -1210,10 +1460,12 @@ export function DropdownPage() {
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Action cukup diisi lewat <Hl>items</Hl> atau <Hl>groups</Hl>. Selection memakai struktur yang
-          sama dengan menambahkan <Hl>selected</Hl> dan pembaruan state pada setiap option. Panel
-          yang berisi kontrol bebas diisi lewat <Hl>children</Hl> dan diberi jarak sendiri lewat{' '}
-          <Hl>contentClassName</Hl>. Kode berikut mengikuti Mode dan kontrol Playground.
+          Action cukup diisi lewat <Hl>items</Hl> atau <Hl>groups</Hl>. Navigation memakai struktur
+          items yang sama dengan API link native seperti href, target, rel, dan current—tanpa prop
+          mode tambahan. Selection menambahkan <Hl>selected</Hl> dan pembaruan state pada setiap
+          option. Panel yang berisi kontrol bebas diisi lewat <Hl>children</Hl> dan diberi jarak
+          sendiri lewat <Hl>contentClassName</Hl>. Kode berikut mengikuti kategori dan kontrol
+          Playground.
         </Lead>
         <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
           Prop <Hl>trigger</Hl> harus menghasilkan satu <Hl>&lt;button&gt;</Hl> sebagai root DOM langsung.
@@ -1235,47 +1487,10 @@ export function DropdownPage() {
             withDescription={withDescription}
             withDisabled={withDisabled}
             darkMode={activeDarkMode}
+            align={align}
+            closeOnSelect={closeOnSelect}
           />
         </SectionCode>
-        <div className="mt-8">
-          <h3 className="text-heading-4 font-bold text-gray-900">Menutup konten kustom</h3>
-          <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-            Item generated menutup panel otomatis setelah dijalankan. Kontrol kustom tetap terbuka
-            agar form, Radio, atau Checkbox dapat digunakan berulang kali. Ketika aksi final perlu
-            menutup panel, gunakan <Hl>close</Hl> dari render function. Fokus dikembalikan ke trigger
-            bila penutupan terjadi saat fokus masih berada di panel; Escape dan klik di luar tetap
-            ditangani Popover native.
-          </p>
-          <Stage maxWidth="max-w-xl">
-            <div className="flex min-h-56 items-start justify-center pt-10">
-              <ManualCloseDemo />
-            </div>
-          </Stage>
-          <SectionCode>
-            {'<Dropdown trigger={trigger}>\n  {({ '}<H>close</H>{' }) => (\n    <button\n      type="button"\n      onClick={() => {\n        applyChanges()\n        '}<H>close</H>{'()\n      }}\n    >\n      Terapkan\n    </button>\n  )}\n</Dropdown>'}
-          </SectionCode>
-        </div>
-        <div className="mt-8">
-          <h3 className="text-heading-4 font-bold text-gray-900">Menutup dari kondisi eksternal</h3>
-          <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
-            Gunakan <Hl>actionsRef</Hl> ketika kondisi di luar Dropdown perlu menutup panel, misalnya
-            trigger desktop disembunyikan setelah viewport berpindah ke mobile. Native Popover tetap
-            menjadi sumber keadaan; <Hl>close()</Hl> hanya meminta dismissal dan aman dipanggil saat
-            panel sudah tertutup.
-          </p>
-          <Stage maxWidth="max-w-xl">
-            <div className="flex min-h-56 items-start justify-center pt-10">
-              <ExternalCloseTypeExample />
-            </div>
-          </Stage>
-          <SectionCode>
-            {"const actionsRef = useRef<DropdownHandle>(null)\n\nuseEffect(() => {\n  const mobile = window.matchMedia('(max-width: 767px)')\n  const closeForMobile = () => {\n    if (mobile.matches) actionsRef.current?.close()\n  }\n\n  mobile.addEventListener('change', closeForMobile)\n  return () => mobile.removeEventListener('change', closeForMobile)\n}, [])\n\n<Dropdown\n  "}<H>actionsRef</H>{'={actionsRef}\n  trigger={trigger}\n  items={navigationItems}\n/>'}
-          </SectionCode>
-          <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
-            Forwarded <Hl>ref</Hl> lama tetap menunjuk wrapper <Hl>div</Hl>. Handle lifecycle tersedia
-            terpisah agar integrasi yang sudah memakai DOM ref tidak berubah.
-          </p>
-        </div>
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
