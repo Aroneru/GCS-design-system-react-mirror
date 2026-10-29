@@ -48,7 +48,12 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
 - **`Dropdown`.** Isi bisa berupa fungsi yang menerima `close`, prop baru
   `actionsRef`, `closeOnSelect`, dan `align`, serta item yang menerima
   `target`, `rel`, `onClick`, dan `current`. Warnanya kini dari token
-  `--color-dropdown-*`.
+  `--color-dropdown-*`; shadow panel kini memakai `--shadow-dropdown` sesuai
+  dua layer elevasi desain.
+- **`Popover`.** Contoh Penggunaan merapatkan ikon informasi ke teks. Tampilan
+  gelap kini mengikuti `data-theme` ambient dan memakai token lokal
+  `--color-popover-*` untuk surface, border, header, serta teks; `darkMode`
+  tetap menjadi override kompatibilitas.
 - **`Modal`.** Tampilan disesuaikan dengan desain: judul Inter 18px semibold,
   isi 16px medium, dan latar popup gray-600 di tema gelap.
 

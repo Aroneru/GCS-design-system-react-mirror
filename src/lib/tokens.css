@@ -213,6 +213,7 @@
     /* Skala radius & shadow mengikuti penamaan desain dan Tailwind v3. */
     --radius-sm: 0.125rem;
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.08);
+    --shadow-dropdown: 0 2px 4px -2px rgb(0 0 0 / 0.05), 0 4px 6px -1px rgb(0 0 0 / 0.1);
 
     --shadow-soft: 0 1px 2px rgb(17 24 39 / 0.04), 0 8px 24px rgb(17 24 39 / 0.05);
 }
@@ -669,6 +670,33 @@
     --color-dropdown-item-current-surface: var(--color-gray-100);
     --color-dropdown-group-label: var(--color-gray-400);
 }
+
+/* Popover */
+@theme static {
+    --color-popover-surface: #ffffff;
+    --color-popover-border: var(--color-gray-200);
+    --color-popover-header-surface: var(--color-gray-50);
+    --color-popover-header-content: var(--color-gray-900);
+    --color-popover-body-content: var(--color-gray-500);
+}
+
+[data-theme='dark'] {
+    --color-popover-surface: var(--color-gray-800);
+    --color-popover-border: var(--color-gray-800);
+    --color-popover-header-surface: var(--color-gray-700);
+    --color-popover-header-content: var(--color-gray-50);
+    --color-popover-body-content: var(--color-gray-400);
+}
+
+[data-theme='light'],
+.ds-theme-light {
+    --color-popover-surface: #ffffff;
+    --color-popover-border: var(--color-gray-200);
+    --color-popover-header-surface: var(--color-gray-50);
+    --color-popover-header-content: var(--color-gray-900);
+    --color-popover-body-content: var(--color-gray-500);
+}
+
 /* Breadcrumb */
 @theme static {
     --color-breadcrumb-surface: var(--color-gray-100);

@@ -100,7 +100,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   `darkMode` satu per satu.
 - **Kembali ke tema terang**: Bagian di dalam area gelap dapat dikembalikan ke
   tema terang dengan `data-theme="light"` atau kelas `.ds-theme-light`.
-- **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`, `Dropdown`,
+- **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`, `Dropdown`, `Popover`,
   `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
   `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, dan
   `Timeline`, serta `Avatar` dan `Clipboard`.
@@ -108,7 +108,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
   `--color-search-category-surface` dan `--color-search-field-surface` (Search),
   `--color-breadcrumb-*` (Breadcrumb), `--color-clipboard-*` (Clipboard),
-  `--color-dropdown-*` (Dropdown), serta `--color-timeline-*` (Timeline). Panduan
+  `--color-dropdown-*` (Dropdown), `--color-popover-*` (Popover), serta `--color-timeline-*` (Timeline). Panduan
   lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
 
 ## Komponen & props
@@ -128,7 +128,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `darkMode` |
 | `Container`  | `as` (default `div`), `padded` (default `true`), `darkMode`                                                          |
 | `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
-| `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode`                                          |
+| `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, ambient `data-theme`, `darkMode` (override kompatibilitas) |
 | `Dropdown`   | `trigger`, `items`/`groups` atau `children`, `align`, `closeOnSelect`, `actionsRef`, `contentLabel`, `contentClassName`, `data-theme`, `darkMode` |
 | `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape`, `showCloseButton`, `closeLabel` |
 | `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `theme`, `darkMode`   |
@@ -452,6 +452,32 @@ deprecated; untuk kode baru, utamakan boundary ambient:
     trigger={<button type="button">Menu</button>}
     items={[{ id: 'profile', label: 'Profil', href: '/profil' }]}
   />
+</div>
+```
+
+### Popover
+
+`Popover` adalah panel informasi non-modal yang ditambatkan pada satu trigger.
+`trigger` harus berupa satu elemen button-like yang meneruskan atribut native
+dan ARIA yang disuntikkan Popover ke elemen DOM fokusabel. `side` memilih
+preferensi `top | right | bottom | left` (default `right`); panel dapat berbalik
+agar tetap berada di viewport. Visibility dapat dikontrol melalui
+`open`/`onOpenChange`, atau diawali dengan `defaultOpen`.
+
+Popover mengikuti boundary ambient `data-theme="light" | "dark"`. Token lokal
+`--color-popover-*` mengatur surface, border, header, dan teks. `darkMode`
+tetap tersedia sebagai compatibility override; untuk kode baru, gunakan boundary
+ambient:
+
+```tsx
+<div data-theme="dark">
+  <Popover
+    trigger={<button type="button" aria-label="Buka informasi">i</button>}
+    title="Informasi"
+    side="top"
+  >
+    Penjelasan singkat.
+  </Popover>
 </div>
 ```
 
