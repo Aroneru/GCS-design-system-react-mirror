@@ -135,6 +135,7 @@
     --color-clipboard-border: #d1d5db;
     --color-clipboard-label: #111928;
     --color-clipboard-value: var(--color-gray-400);
+    --color-clipboard-segmented-value: var(--color-gray-500);
     --color-clipboard-caption: var(--color-gray-500);
     --color-clipboard-prefix-surface: var(--color-gray-100);
     --color-clipboard-prefix: #111928;
@@ -234,6 +235,7 @@
     --color-clipboard-border: #1f2a37;
     --color-clipboard-label: var(--color-gray-300);
     --color-clipboard-value: var(--color-gray-400);
+    --color-clipboard-segmented-value: var(--color-gray-400);
     --color-clipboard-caption: var(--color-gray-500);
     --color-clipboard-prefix-surface: #1f2a37;
     --color-clipboard-prefix: var(--color-gray-300);
@@ -272,6 +274,7 @@
     --color-clipboard-border: #d1d5db;
     --color-clipboard-label: #111928;
     --color-clipboard-value: var(--color-gray-400);
+    --color-clipboard-segmented-value: var(--color-gray-500);
     --color-clipboard-caption: var(--color-gray-500);
     --color-clipboard-prefix-surface: var(--color-gray-100);
     --color-clipboard-prefix: #111928;

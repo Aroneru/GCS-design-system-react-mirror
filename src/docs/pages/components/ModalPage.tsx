@@ -1,5 +1,5 @@
 import { Fragment, useState, type ReactNode } from 'react'
-import { createPortal } from 'react-dom'
+import { Close } from 'flowbite-react-icons/outline'
 import { ExclamationCircle } from '../../../lib/icons/solid'
 import { Button, Icon, Modal, type ModalSize, type ModalVariant } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
@@ -246,41 +246,71 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-// Each preview owns a browsing context, so native dialog top layers stay inside the docs frame.
-function ModalThemeFrame({ theme, label, children }: {
-  theme: 'light' | 'dark'
+function ModalThemeFrame({ label, children }: {
   label: string
   children: ReactNode
 }) {
-  const [mount, setMount] = useState<HTMLElement | null>(null)
   return (
     <div>
       <p className="mb-2 text-sm font-black text-gray-900">{label}</p>
-      <div className={`overflow-hidden rounded-2xl border ${theme === 'dark' ? 'border-gray-800 bg-gray-950' : 'border-border bg-surface-subtle'}`}>
-        <iframe
-          title={`${label} - ${theme === 'dark' ? 'Dark' : 'Light'}`}
-          className={`block h-[440px] w-full border-0 ${theme === 'dark' ? 'bg-gray-950' : 'bg-surface-subtle'}`}
-          srcDoc="<!doctype html><html><head></head><body><main></main></body></html>"
-          onLoad={(event) => {
-            const doc = event.currentTarget.contentDocument
-            if (!doc) return
-            const base = doc.createElement('base')
-            base.href = document.baseURI
-            doc.head.append(base)
-            document.querySelectorAll('link[rel="stylesheet"], style').forEach((style) => {
-              doc.head.append(style.cloneNode(true))
-            })
-            doc.documentElement.dataset.theme = theme
-            doc.body.className = theme === 'dark' ? 'bg-gray-950' : 'bg-surface-subtle'
-            if (theme === 'dark') {
-              const previewStyle = doc.createElement('style')
-              previewStyle.textContent = 'dialog::backdrop { background: var(--color-gray-950); }'
-              doc.head.append(previewStyle)
-            }
-            setMount(doc.querySelector('main'))
-          }}
-        />
-        {mount && createPortal(children, mount)}
+      <div data-theme="dark" className="grid min-h-[440px] place-items-center overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 p-4">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function StaticModalCloseButton() {
+  return (
+    <button
+      type="button"
+      onClick={(event) => event.preventDefault()}
+      aria-label="Tutup modal"
+      className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle hover:text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+    >
+      <Close className="size-4" aria-hidden="true" />
+    </button>
+  )
+}
+
+function StaticDefaultDarkModal() {
+  return (
+    <div className="flex w-full max-w-[416px] flex-col overflow-hidden rounded-lg border border-border-strong bg-surface text-left text-content shadow-xl">
+      <div className="flex shrink-0 items-start justify-between gap-4 border-b border-border-strong px-6 py-5">
+        <h3 className="min-w-0 flex-1 font-alt text-lg leading-[1.5] font-semibold text-content">Terms of Service</h3>
+        <div className="-my-2 -mr-2"><StaticModalCloseButton /></div>
+      </div>
+      <div className="min-h-0 flex-1 px-5 py-6 font-sans text-body font-medium text-content-muted">
+        <p>{ceplokCopy[0]}</p>
+      </div>
+      <div className="flex shrink-0 flex-wrap items-center gap-3 border-t border-border-strong px-6 py-4">
+        <Button size="xs" className="ml-auto">Saya Setuju</Button>
+      </div>
+    </div>
+  )
+}
+
+function StaticPopupDarkModal() {
+  return (
+    <div className="flex w-full max-w-[416px] flex-col overflow-hidden rounded-lg border border-border-strong bg-gray-600 text-left text-content shadow-xl">
+      <div className="relative h-7 shrink-0 px-5">
+        <div className="absolute right-0.5 top-0.5"><StaticModalCloseButton /></div>
+      </div>
+      <div className="min-h-0 flex-1 px-5 pb-4 pt-5 font-sans text-body font-medium text-content-muted">
+        <div className="text-center">
+          <div className="flex justify-center">
+            <Icon className={popupIconClass}>
+              <ExclamationCircle viewBox="2 2 20 20" />
+            </Icon>
+          </div>
+          <p className="mx-auto mt-4 max-w-xs text-body font-medium text-content-subtle">
+            Apakah anda yakin ingin menghapus konten ini?
+          </p>
+        </div>
+      </div>
+      <div className="flex shrink-0 flex-wrap items-center justify-center gap-4 px-5 pb-5">
+        <Button variant="outline" theme="gray" size="xs" className={popupCancelClass}>Tidak, Batalkan</Button>
+        <Button size="xs" className={popupDangerClass}>Ya, hapus konten ini</Button>
       </div>
     </div>
   )
@@ -603,42 +633,11 @@ export function ModalPage() {
           sedangkan Popup memakai gray-600 dengan teks gray-300 dan warna action sesuai desain.
         </p>
         <div className="mt-5 grid gap-5 lg:grid-cols-2">
-          <ModalThemeFrame theme="dark" label="Default Dark">
-            <Modal
-              open
-              title="Terms of Service"
-              footer={({ close }) => <Button size="xs" className="ml-auto" onClick={close}>Saya Setuju</Button>}
-            >
-              <p>{ceplokCopy[0]}</p>
-            </Modal>
+          <ModalThemeFrame label="Default Dark">
+            <StaticDefaultDarkModal />
           </ModalThemeFrame>
-          <ModalThemeFrame theme="dark" label="Popup Dark">
-            <Modal
-              open
-              variant="popup"
-              aria-label="Konfirmasi hapus konten"
-              footer={({ close }) => (
-                <div className="flex w-full flex-wrap justify-center gap-4">
-                  <Button variant="outline" theme="gray" size="xs" className={popupCancelClass} onClick={close}>
-                    Tidak, Batalkan
-                  </Button>
-                  <Button size="xs" className={popupDangerClass} onClick={close}>
-                    Ya, hapus konten ini
-                  </Button>
-                </div>
-              )}
-            >
-              <div className="text-center">
-                <div className="flex justify-center">
-                  <Icon className={popupIconClass}>
-                    <ExclamationCircle viewBox="2 2 20 20" />
-                  </Icon>
-                </div>
-                <p className="mx-auto mt-4 max-w-xs text-body font-medium text-content-subtle">
-                  Apakah anda yakin ingin menghapus konten ini?
-                </p>
-              </div>
-            </Modal>
+          <ModalThemeFrame label="Popup Dark">
+            <StaticPopupDarkModal />
           </ModalThemeFrame>
         </div>
         <SectionCode>

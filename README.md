@@ -222,6 +222,29 @@ scope bertingkat:
 `darkMode` masih tersedia sebagai override kompatibilitas, tetapi deprecated;
 gunakan `data-theme="dark"` untuk kode baru.
 
+#### Spinner
+
+`Spinner` adalah indikator loading SVG dengan dua ukuran: default 50×50px dan
+`size="large"` 100×100px. Lingkaran latar memakai gray-200 dan arc proses
+memakai primary-600. Spinner meneruskan atribut SVG native yang relevan, tetapi
+geometri internalnya tetap dikendalikan komponen. Animasi berhenti saat pengguna
+mengaktifkan reduced motion.
+
+```tsx
+import { Spinner } from '@ceplok-ui/design-kit-react'
+
+<Spinner aria-label="Memuat daftar pengguna" />
+
+<div className="flex items-center gap-3">
+  <Spinner size="large" aria-hidden="true" />
+  <span>Memuat data…</span>
+</div>
+```
+
+Tanpa `aria-hidden`, Spinner memiliki `role="status"` dan label default
+`"Loading"`. Saat teks di sekitarnya sudah menjelaskan proses loading, gunakan
+`aria-hidden="true"` agar status tidak diumumkan dua kali.
+
 #### Modal
 
 `Modal` memakai native `<dialog>`. Tanpa `open`, berikan `trigger` berupa

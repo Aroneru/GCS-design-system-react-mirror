@@ -54,6 +54,12 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   gelap kini mengikuti `data-theme` ambient dan memakai token lokal
   `--color-popover-*` untuk surface, border, header, serta teks; `darkMode`
   tetap menjadi override kompatibilitas.
+- **`Spinner`.** README kini mendokumentasikan ukuran 50px/100px, atribut SVG
+  yang diteruskan, reduced motion, serta pola aksesibel standalone dan bersama
+  teks loading.
+- **`Clipboard`.** Value Light pada varian `segmented` kini memakai gray-500,
+  sementara varian default tetap gray-400, sesuai referensi desain; nilai Dark
+  tidak berubah.
 - **`Modal`.** Tampilan disesuaikan dengan desain: judul Inter 18px semibold,
   isi 16px medium, dan latar popup gray-600 di tema gelap.
 

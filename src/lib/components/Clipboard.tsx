@@ -235,7 +235,8 @@ export const Clipboard = forwardRef<HTMLInputElement, ClipboardProps>(function C
           aria-describedby={[hasHelper ? helperId : undefined, describedBy].filter(Boolean).join(' ') || undefined}
           className={cn(
             'min-w-0 flex-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:pointer-events-none disabled:cursor-not-allowed disabled:select-none',
-            'bg-clipboard-field text-clipboard-value',
+            'bg-clipboard-field',
+            segmented ? 'text-clipboard-segmented-value' : 'text-clipboard-value',
             size.value,
             segmented ? cn('h-10 px-3', !hasPrefix && 'rounded-s-lg') : cn('rounded-lg border border-clipboard-border', size.field, size.padding),
           )}
