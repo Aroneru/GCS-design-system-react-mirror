@@ -153,7 +153,7 @@ export function Sidebar({
               onClick={onCollapse}
               disabled={!onCollapse}
               className={cn(
-                "flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors disabled:cursor-default disabled:hover:bg-transparent",
+                "flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors disabled:cursor-not-allowed disabled:hover:bg-transparent",
                 "text-content-muted hover:bg-surface",
                 collapsed && "order-1",
               )}
@@ -279,7 +279,7 @@ export function Sidebar({
                             const itemClasses = cn(
                               "group flex w-full items-center gap-2.5 px-3 py-2 text-sm text-left transition-colors focus-visible:outline-none",
                               item.disabled
-                                ? "cursor-not-allowed opacity-50 pointer-events-none"
+                                ? "cursor-not-allowed opacity-50"
                                 : isDanger
                                 ? "text-feedback-error hover:bg-red-50 hover:text-red-700 in-data-[theme=dark]:hover:bg-red-950/40 in-data-[theme=dark]:hover:text-red-300 focus-visible:bg-red-50 in-data-[theme=dark]:focus-visible:bg-red-950/40"
                                 : "text-content hover:bg-gray-100 in-data-[theme=dark]:hover:bg-surface focus-visible:bg-gray-100 in-data-[theme=dark]:focus-visible:bg-surface",

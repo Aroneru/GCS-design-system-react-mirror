@@ -35,7 +35,7 @@ function MenuItem({
     "text-content hover:bg-gray-100 in-data-[theme=dark]:hover:bg-gray-600",
     collapsed ? "justify-center px-2 py-2.5" : "items-center gap-3 px-3 py-2.5",
     item.active && "bg-gray-100 in-data-[theme=dark]:bg-gray-600 text-content",
-    item.disabled && "pointer-events-none cursor-not-allowed opacity-50",
+    item.disabled && "cursor-not-allowed opacity-50",
   );
 
   if (!hasChildren) {
@@ -45,8 +45,13 @@ function MenuItem({
         className={className}
         aria-current={item.active ? "page" : undefined}
         aria-disabled={item.disabled || undefined}
+        tabIndex={item.disabled ? -1 : undefined}
         title={collapsed ? item.label : undefined}
         onClick={(e) => {
+          if (item.disabled) {
+            e.preventDefault();
+            return;
+          }
           if (!item.href || item.href === "#") {
             e.preventDefault();
           }
@@ -91,7 +96,7 @@ function MenuItem({
     <div>
       <button
         type="button"
-        className={className}
+        className={cn(className, toggleDisabled && "cursor-not-allowed opacity-50")}
         onClick={handleSubmenuToggle}
         aria-expanded={collapsed ? undefined : isOpen}
         aria-controls={collapsed ? undefined : submenuId}
@@ -140,11 +145,16 @@ function MenuItem({
                   "group flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                   "text-content-subtle hover:bg-gray-100 hover:text-content in-data-[theme=dark]:hover:bg-gray-600",
                   child.active && "bg-gray-100 font-medium text-content in-data-[theme=dark]:bg-gray-600",
-                  child.disabled && "pointer-events-none cursor-not-allowed opacity-50",
+                  child.disabled && "cursor-not-allowed opacity-50",
                 )}
                 aria-current={child.active ? "page" : undefined}
                 aria-disabled={child.disabled || undefined}
+                tabIndex={child.disabled ? -1 : undefined}
                 onClick={(e) => {
+                  if (child.disabled) {
+                    e.preventDefault();
+                    return;
+                  }
                   if (!child.href || child.href === "#") {
                     e.preventDefault();
                   }

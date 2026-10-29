@@ -270,6 +270,22 @@ export function ListViewPage() {
   const [decoration, setDecoration] = useState(false);
   const [hasBadge, setHasBadge] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const canvasWidth =
+    variant === "article"
+      ? size === "s"
+        ? "410px"
+        : size === "l"
+          ? "728px"
+          : size === "xl"
+            ? "1028px"
+            : "514px"
+      : platform === "mobile"
+        ? "348px"
+        : size === "s"
+          ? "410px"
+          : size === "l"
+            ? "600px"
+            : "514px";
 
   return (
     <UsulanPage
@@ -301,8 +317,8 @@ export function ListViewPage() {
               <p className="mb-3 text-body-sm text-gray-500">
                 Ukuran ringkas (410 px) dengan wadah ikon 32×32 px dan tombol aksi ukuran XS.
               </p>
-              <Demo>
-                <div className="w-full max-w-[410px]">
+              <Demo minWidth="410px">
+                <div className="w-[410px]">
                   <ListViewItem
                     size="s"
                     title="Project brief"
@@ -323,8 +339,8 @@ export function ListViewPage() {
               <p className="mb-3 text-body-sm text-gray-500">
                 Ukuran standar bawaan (514 px) dengan wadah ikon 40×40 px dan tombol aksi ukuran S.
               </p>
-              <Demo>
-                <div className="w-full max-w-[514px]">
+              <Demo minWidth="514px">
+                <div className="w-[514px]">
                   <ListViewItem
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
@@ -342,8 +358,8 @@ export function ListViewPage() {
               <p className="mb-3 text-body-sm text-gray-500">
                 Ukuran lapang (600 px) dengan wadah ikon 48×48 px dan tombol aksi ukuran Base.
               </p>
-              <Demo>
-                <div className="w-full max-w-[600px]">
+              <Demo minWidth="600px">
+                <div className="w-[600px]">
                   <ListViewItem
                     size="l"
                     title="Project brief"
@@ -366,8 +382,8 @@ export function ListViewPage() {
 
             {/* Kartu Mobile Standar */}
             <div>
-              <Demo>
-                <div className="w-full max-w-[348px]">
+              <Demo minWidth="348px">
+                <div className="w-[348px]">
                   <ListViewItem
                     platform="mobile"
                     title="Project brief"
@@ -432,8 +448,8 @@ export function ListViewPage() {
               <p className="mb-3 text-body-sm text-gray-500">
                 Ukuran ringkas (410 px) dengan judul semibold 14px dan metrik interaksi 12px.
               </p>
-              <Demo>
-                <div className="w-full max-w-[410px]">
+              <Demo minWidth="410px">
+                <div className="w-[410px]">
                   <ListViewItem
                     variant="article"
                     size="s"
@@ -459,8 +475,8 @@ export function ListViewPage() {
               <p className="mb-3 text-body-sm text-gray-500">
                 Ukuran standar bawaan (514 px) dengan judul semibold 16px dan proporsi yang seimbang.
               </p>
-              <Demo>
-                <div className="w-full max-w-[514px]">
+              <Demo minWidth="514px">
+                <div className="w-[514px]">
                   <ListViewItem
                     variant="article"
                     size="m"
@@ -484,8 +500,8 @@ export function ListViewPage() {
               <p className="mb-3 text-body-sm text-gray-500">
                 Ukuran lapang (728 px) dengan judul semibold 18px untuk keterbacaan yang lebih tinggi.
               </p>
-              <Demo>
-                <div className="w-full max-w-[728px]">
+              <Demo minWidth="728px">
+                <div className="w-[728px]">
                   <ListViewItem
                     variant="article"
                     size="l"
@@ -511,8 +527,8 @@ export function ListViewPage() {
               <p className="mb-3 text-body-sm text-gray-500">
                 Ukuran ekstra besar (1028 px) dengan judul semibold 20px dan bantalan lebih luas, ideal untuk judul panjang atau artikel sorotan utama.
               </p>
-              <Demo>
-                <div className="w-full max-w-[1028px]">
+              <Demo minWidth="1028px">
+                <div className="w-[1028px]">
                   <ListViewItem
                     variant="article"
                     size="xl"
@@ -615,8 +631,8 @@ export function ListViewPage() {
                 </h4>
 
               </div>
-              <Demo>
-                <div className="w-full max-w-[514px]">
+              <Demo minWidth="514px">
+                <div className="w-[514px]">
                   <ListViewItem
                     decoration
                     title="Project brief"
@@ -634,8 +650,8 @@ export function ListViewPage() {
                   Mobile
                 </h4>
               </div>
-              <Demo>
-                <div className="w-full max-w-[348px]">
+              <Demo minWidth="348px">
+                <div className="w-[348px]">
                   <ListViewItem
                     platform="mobile"
                     decoration
@@ -686,8 +702,8 @@ export function ListViewPage() {
                   Desktop (Medium)
                 </h4>
               </div>
-              <Demo>
-                <div className="w-full max-w-[514px]">
+              <Demo minWidth="514px">
+                <div className="w-[514px]">
                   <ListViewItem
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
@@ -713,8 +729,8 @@ export function ListViewPage() {
                   Mobile
                 </h4>
               </div>
-              <Demo>
-                <div className="w-full max-w-[348px]">
+              <Demo minWidth="348px">
+                <div className="w-[348px]">
                   <ListViewItem
                     platform="mobile"
                     title="Project brief"
@@ -771,8 +787,8 @@ export function ListViewPage() {
                   Desktop
                 </h4>
               </div>
-              <Demo dark>
-                <div className="w-full max-w-[514px]">
+              <Demo dark minWidth="514px">
+                <div className="w-[514px]">
                   <ListViewItem
                     darkMode
                     decoration
@@ -801,8 +817,8 @@ export function ListViewPage() {
                   Mobile
                 </h4>
               </div>
-              <Demo dark>
-                <div className="w-full max-w-[348px]">
+              <Demo dark minWidth="348px">
+                <div className="w-[348px]">
                   <ListViewItem
                     platform="mobile"
                     darkMode
@@ -871,27 +887,27 @@ export function ListViewPage() {
           dekorasi, penambahan badge, serta mode tampilan secara interaktif.
         </p>
 
-        <Stage maxWidth="max-w-6xl" dark={darkMode}>
+        <Stage maxWidth="max-w-6xl" minWidth={canvasWidth} dark={darkMode}>
           {/* Tinggi desktop dikunci pada kebutuhan Article XL agar pergantian
               varian/ukuran tidak membuat canvas dan kontrol di bawahnya meloncat. */}
-          <div className="flex min-h-[328px] w-full items-center justify-center py-4">
+          <div className="flex min-h-[328px] min-w-full w-max items-center justify-center py-4">
             <div
-              className={`w-full transition-[max-width] duration-300 ease-out ${
+              className={`shrink-0 transition-[width] duration-300 ease-out ${
                 variant === "article"
                   ? size === "s"
-                    ? "max-w-[410px]"
+                    ? "w-[410px]"
                     : size === "l"
-                      ? "max-w-[728px]"
+                      ? "w-[728px]"
                       : size === "xl"
-                        ? "max-w-[1028px]"
-                        : "max-w-[514px]"
+                        ? "w-[1028px]"
+                        : "w-[514px]"
                   : platform === "mobile"
-                    ? "max-w-[348px]"
+                    ? "w-[348px]"
                     : size === "s"
-                      ? "max-w-[410px]"
+                      ? "w-[410px]"
                       : size === "l"
-                        ? "max-w-[600px]"
-                        : "max-w-[514px]"
+                        ? "w-[600px]"
+                        : "w-[514px]"
               }`}
             >
               {variant === "article" ? (

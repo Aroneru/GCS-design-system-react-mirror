@@ -15,6 +15,7 @@ import {
     type DrawerNavItemTheme,
 } from '../../../lib'
 import { DrawerContext } from '../../../lib/components/DrawerContext'
+import { asset } from '../../asset'
 
 const drawerContextDummy = {
     onClose: () => { },
@@ -122,11 +123,13 @@ function VariantPreview({
     description,
     children,
     darkMode = false,
+    minWidth,
 }: {
     title: string
     description: string
     children: ReactNode
     darkMode?: boolean
+    minWidth?: string
 }) {
     return (
         <article className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
@@ -134,8 +137,8 @@ function VariantPreview({
                 <h3 className="text-sm font-bold text-gray-900">{title}</h3>
                 <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
             </div>
-            <div className={`flex h-[500px] w-full items-center justify-center py-4 ${darkMode ? 'bg-gray-900' : 'bg-gray-50/80'}`}>
-                <div className={`relative flex h-full w-[420px] max-w-full flex-col overflow-hidden rounded-none border-x shadow-md ${darkMode ? 'bg-gray-800 border-white/10 shadow-2xl' : 'bg-white border-gray-200'}`}>
+            <div className={`h-[500px] w-full overflow-x-auto py-4 ${minWidth ? 'ds-scroll-x' : ''} ${darkMode ? 'bg-gray-900' : 'bg-gray-50/80'}`}>
+                <div style={{ minWidth }} className={`relative mx-auto flex h-full w-[420px] flex-col overflow-hidden rounded-none border-x shadow-md ${darkMode ? 'bg-gray-800 border-white/10 shadow-2xl' : 'bg-white border-gray-200'}`}>
                     {children}
                 </div>
             </div>
@@ -239,6 +242,7 @@ export function DrawerPage() {
     const [expandedMenu2, setExpandedMenu2] = useState(false)
     const [expandedMenu3, setExpandedMenu3] = useState(true)
     const [expandedMenu5, setExpandedMenu5] = useState(false)
+    const playgroundCanvasMinWidth = '420px'
     const [activeMenu, setActiveMenu] = useState('Menu 3 - sub menu 1')
 
     const playgroundItems: DrawerMenuItem[] = [
@@ -282,13 +286,12 @@ export function DrawerPage() {
                     <VariantPreview
                         title="1. Drawer Terbuka (Open Drawer)"
                         description="Drawer muncul dari sisi kanan secara mengambang (overlay) di atas tampilan layar mobile."
+                        minWidth="420px"
                     >
                         <div className="flex flex-col w-full h-full">
                             <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3.5">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-xs font-bold text-white">
-                                        C
-                                    </div>
+                                    <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
                                     <span className="text-base font-bold tracking-tight text-gray-900">CEPLOK</span>
                                 </div>
                                 <DrawerTrigger />
@@ -347,13 +350,12 @@ export function DrawerPage() {
                     <VariantPreview
                         title="2. Drawer Tertutup (Closed State / Page View)"
                         description="Tampilan utama layar mobile dengan topbar header dan icon hamburger drawer di bagian kanan."
+                        minWidth="420px"
                     >
                         <div className="flex flex-col w-full h-full">
                             <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3.5">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-xs font-bold text-white">
-                                        C
-                                    </div>
+                                    <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
                                     <span className="text-base font-bold tracking-tight text-gray-900">CEPLOK</span>
                                 </div>
                                 <DrawerTrigger />
@@ -374,13 +376,12 @@ export function DrawerPage() {
                         title="1. Drawer Terbuka (Open Drawer)"
                         description="Drawer muncul dari sisi kanan secara mengambang (overlay) di atas tampilan layar mobile."
                         darkMode
+                        minWidth="420px"
                     >
                         <div className="flex flex-col w-full h-full">
                             <div className="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900 px-4 py-3.5">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-xs font-bold text-white">
-                                        C
-                                    </div>
+                                    <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
                                     <span className="text-base font-bold tracking-tight text-white">CEPLOK</span>
                                 </div>
                                 <DrawerTrigger darkMode />
@@ -442,13 +443,12 @@ export function DrawerPage() {
                         title="2. Drawer Tertutup (Closed State / Page View)"
                         description="Tampilan utama layar mobile dengan topbar header dan icon hamburger drawer di bagian kanan."
                         darkMode
+                        minWidth="420px"
                     >
                         <div className="flex flex-col w-full h-full">
                             <div className="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900 px-4 py-3.5">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-xs font-bold text-white">
-                                        C
-                                    </div>
+                                    <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
                                     <span className="text-base font-bold tracking-tight text-white">CEPLOK</span>
                                 </div>
                                 <DrawerTrigger darkMode />
@@ -468,10 +468,12 @@ export function DrawerPage() {
                 <div className="grid gap-6 lg:grid-cols-2">
                     <div className="min-w-0">
                         <h3 className="mb-3 text-sm font-bold text-gray-900">Menu</h3>
-                        <div className="mb-4 max-w-[300px] overflow-hidden rounded-xl border border-border bg-surface p-4 shadow-xs space-y-1">
-                            <DrawerNavItem icon={<ChartPie className="size-5" />} label="Menu 1" />
-                            <DrawerNavItem icon={<FileLines className="size-5" />} label="Menu 2" />
-                            <DrawerNavItem icon={<Inbox className="size-5" />} label="Menu 3" />
+                        <div className="ds-scroll-x mb-4 overflow-x-auto">
+                            <div className="w-[300px] overflow-hidden rounded-xl border border-border bg-surface p-4 shadow-xs space-y-1">
+                                <DrawerNavItem icon={<ChartPie className="size-5" />} label="Menu 1" />
+                                <DrawerNavItem icon={<FileLines className="size-5" />} label="Menu 2" />
+                                <DrawerNavItem icon={<Inbox className="size-5" />} label="Menu 3" />
+                            </div>
                         </div>
 
                         <SectionCode>
@@ -490,8 +492,9 @@ export function DrawerPage() {
 
                     <div className="min-w-0">
                         <h3 className="mb-3 text-sm font-bold text-gray-900">Sub Menu</h3>
-                        <div className="mb-4 max-w-[300px] overflow-hidden rounded-xl border border-border bg-surface p-4 shadow-xs">
-                            <DrawerNavItem
+                        <div className="ds-scroll-x mb-4 overflow-x-auto">
+                            <div className="w-[300px] overflow-hidden rounded-xl border border-border bg-surface p-4 shadow-xs">
+                                <DrawerNavItem
                                 icon={<Cart className="size-5" />}
                                 label="Menu 3"
                                 expanded
@@ -499,7 +502,8 @@ export function DrawerPage() {
                             >
                                 <DrawerSubItem label="sub menu 1" />
                                 <DrawerSubItem label="sub menu 2" />
-                            </DrawerNavItem>
+                                </DrawerNavItem>
+                            </div>
                         </div>
 
                         <SectionCode>
@@ -526,15 +530,16 @@ export function DrawerPage() {
             <FlowSection id="playground" title="Playground">
                 <Lead>Uji coba perilaku dan variasi konfigurasi Drawer secara langsung pada tampilan mobile.</Lead>
 
-                <div className={`flex h-[580px] w-full items-center justify-center py-4 overflow-hidden rounded-2xl border border-border ${playgroundDarkMode ? 'bg-gray-900' : 'bg-gray-50/80'}`}>
+                <div className={`ds-scroll-x h-[580px] w-full overflow-x-auto rounded-2xl border border-border py-4 ${playgroundDarkMode ? 'bg-gray-900' : 'bg-gray-50/80'}`}>
                     {/* Mobile Screen Canvas */}
-                    <div className={`relative flex h-full w-[420px] max-w-full flex-col overflow-hidden rounded-none border-x shadow-md ${playgroundDarkMode ? 'border-white/10 bg-gray-800 shadow-2xl' : 'border-gray-200 bg-white'}`}>
+                    <div
+                        style={{ minWidth: playgroundCanvasMinWidth }}
+                        className={`relative mx-auto flex h-full w-[420px] flex-col overflow-hidden rounded-none border-x shadow-md ${playgroundDarkMode ? 'border-white/10 bg-gray-800 shadow-2xl' : 'border-gray-200 bg-white'}`}
+                    >
                         {/* Topbar Header */}
                         <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${playgroundDarkMode ? 'border-white/10 bg-gray-800' : 'border-gray-200 bg-white'}`}>
                             <div className="flex items-center gap-2.5">
-                                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-xs font-bold text-white">
-                                    C
-                                </div>
+                                <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
                                 <span className={`text-base font-bold tracking-tight ${playgroundDarkMode ? 'text-white' : 'text-gray-900'}`}>CEPLOK</span>
                             </div>
                             <DrawerTrigger darkMode={playgroundDarkMode} onClick={() => setOpenPlayground(!openPlayground)} />
@@ -560,6 +565,7 @@ export function DrawerPage() {
                                                 label={item.label}
                                                 active={activeMenu === item.label || (item.children && item.children.some(sub => activeMenu === `${item.label} - ${sub.label}`))}
                                                 expanded={index === 1 ? expandedMenu2 : index === 2 ? expandedMenu3 : index === 4 ? expandedMenu5 : false}
+                                                disabled={index === 3}
                                                 theme={playgroundTheme}
                                                 onClick={() => {
                                                     if (item.children) {

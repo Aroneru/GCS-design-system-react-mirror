@@ -18,201 +18,209 @@ import {
   type MouseEvent,
   type ReactNode,
   type SyntheticEvent,
-} from 'react'
-import { Close, ChevronDown, ChevronUp } from 'flowbite-react-icons/outline'
-import { BarsFromLeft } from '../icons/outline'
-import { cn } from '../utils/cn'
-import { DrawerContext } from './DrawerContext'
+} from "react";
+import { Close, ChevronDown, ChevronUp } from "flowbite-react-icons/outline";
+import { BarsFromLeft } from "../icons/outline";
+import { cn } from "../utils/cn";
+import { DrawerContext } from "./DrawerContext";
 
-export type DrawerPosition = 'right' | 'left' | 'top' | 'bottom'
-export type DrawerSize = 's' | 'm' | 'l' | 'xl' | 'full'
-export type DrawerNavItemTheme = 'primary' | 'purple' | 'blue' | 'gray'
+export type DrawerPosition = "right" | "left" | "top" | "bottom";
+export type DrawerSize = "s" | "m" | "l" | "xl" | "full";
+export type DrawerNavItemTheme = "primary" | "purple" | "blue" | "gray";
 
 export interface DrawerMenuSubItem {
-  id?: string
-  label: ReactNode
-  active?: boolean
-  href?: string
-  disabled?: boolean
-  onClick?: (e: MouseEvent<HTMLElement>) => void
+  id?: string;
+  label: ReactNode;
+  active?: boolean;
+  href?: string;
+  disabled?: boolean;
+  onClick?: (e: MouseEvent<HTMLElement>) => void;
 }
 
 export interface DrawerMenuItem {
-  id?: string
-  icon?: ReactNode
-  label: ReactNode
-  active?: boolean
+  id?: string;
+  icon?: ReactNode;
+  label: ReactNode;
+  active?: boolean;
   /** Nilai controlled untuk status submenu terbuka. Gunakan bersama onExpandedChange. */
-  expanded?: boolean
+  expanded?: boolean;
   /** Status awal submenu untuk pemakaian uncontrolled. */
-  defaultExpanded?: boolean
+  defaultExpanded?: boolean;
   /** Dipanggil saat consumer meminta perubahan status submenu. */
-  onExpandedChange?: (expanded: boolean) => void
-  collapsible?: boolean
-  theme?: DrawerNavItemTheme
-  href?: string
-  badge?: ReactNode
-  disabled?: boolean
-  onClick?: (e: MouseEvent<HTMLElement>) => void
-  children?: DrawerMenuSubItem[]
+  onExpandedChange?: (expanded: boolean) => void;
+  collapsible?: boolean;
+  theme?: DrawerNavItemTheme;
+  href?: string;
+  badge?: ReactNode;
+  disabled?: boolean;
+  onClick?: (e: MouseEvent<HTMLElement>) => void;
+  children?: DrawerMenuSubItem[];
 }
 
-export interface DrawerProps
-  extends Omit<DialogHTMLAttributes<HTMLDialogElement>, 'open' | 'onClose' | 'onCancel'> {
-  open: boolean
-  onClose: () => void
-  position?: DrawerPosition
-  size?: DrawerSize
-  closeOnOverlayClick?: boolean
-  closeOnEsc?: boolean
-  eyebrow?: string
-  header?: ReactNode
-  items?: DrawerMenuItem[]
-  theme?: DrawerNavItemTheme
-  darkMode?: boolean
-  children?: ReactNode
+export interface DrawerProps extends Omit<
+  DialogHTMLAttributes<HTMLDialogElement>,
+  "open" | "onClose" | "onCancel"
+> {
+  open: boolean;
+  onClose: () => void;
+  position?: DrawerPosition;
+  size?: DrawerSize;
+  closeOnOverlayClick?: boolean;
+  closeOnEsc?: boolean;
+  eyebrow?: string;
+  header?: ReactNode;
+  items?: DrawerMenuItem[];
+  theme?: DrawerNavItemTheme;
+  darkMode?: boolean;
+  children?: ReactNode;
 }
 
 export interface DrawerHeaderProps extends HTMLAttributes<HTMLDivElement> {
-  eyebrow?: string
-  closeLabel?: string
-  showCloseButton?: boolean
-  onClose?: () => void
+  eyebrow?: string;
+  closeLabel?: string;
+  showCloseButton?: boolean;
+  onClose?: () => void;
 }
 
-export type DrawerTitleProps = HTMLAttributes<HTMLHeadingElement>
-export type DrawerDescriptionProps = HTMLAttributes<HTMLParagraphElement>
-export type DrawerBodyProps = HTMLAttributes<HTMLDivElement>
-export type DrawerFooterProps = HTMLAttributes<HTMLDivElement>
+export type DrawerTitleProps = HTMLAttributes<HTMLHeadingElement>;
+export type DrawerDescriptionProps = HTMLAttributes<HTMLParagraphElement>;
+export type DrawerBodyProps = HTMLAttributes<HTMLDivElement>;
+export type DrawerFooterProps = HTMLAttributes<HTMLDivElement>;
 
-export interface DrawerNavItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
-  icon?: ReactNode
-  label: ReactNode
-  active?: boolean
+export interface DrawerNavItemProps extends Omit<HTMLAttributes<HTMLDivElement>, "title"> {
+  icon?: ReactNode;
+  label: ReactNode;
+  active?: boolean;
   /** Nilai controlled untuk status submenu terbuka. Gunakan bersama onExpandedChange. */
-  expanded?: boolean
+  expanded?: boolean;
   /** Status awal submenu untuk pemakaian uncontrolled. */
-  defaultExpanded?: boolean
+  defaultExpanded?: boolean;
   /** Dipanggil saat consumer meminta perubahan status submenu. */
-  onExpandedChange?: (expanded: boolean) => void
-  collapsible?: boolean
-  theme?: DrawerNavItemTheme
-  href?: string
-  badge?: ReactNode
-  disabled?: boolean
-  onClick?: (e: MouseEvent<HTMLElement>) => void
-  children?: ReactNode
+  onExpandedChange?: (expanded: boolean) => void;
+  collapsible?: boolean;
+  theme?: DrawerNavItemTheme;
+  href?: string;
+  badge?: ReactNode;
+  disabled?: boolean;
+  onClick?: (e: MouseEvent<HTMLElement>) => void;
+  children?: ReactNode;
 }
 
-export interface DrawerSubItemProps extends Omit<HTMLAttributes<HTMLElement>, 'onClick'> {
-  label: ReactNode
-  active?: boolean
-  theme?: DrawerNavItemTheme
-  href?: string
-  disabled?: boolean
-  onClick?: (e: MouseEvent<HTMLElement>) => void
+export interface DrawerSubItemProps extends Omit<HTMLAttributes<HTMLElement>, "onClick"> {
+  label: ReactNode;
+  active?: boolean;
+  theme?: DrawerNavItemTheme;
+  href?: string;
+  disabled?: boolean;
+  onClick?: (e: MouseEvent<HTMLElement>) => void;
 }
 
 const sideSizes: Record<DrawerSize, string> = {
-  s: 'w-[320px] max-w-[calc(100vw-2rem)]',
-  m: 'w-[440px] max-w-[calc(100vw-2rem)]',
-  l: 'w-[600px] max-w-[calc(100vw-2rem)]',
-  xl: 'w-[800px] max-w-[calc(100vw-2rem)]',
-  full: 'w-screen max-w-full',
-}
+  s: "w-[320px] max-w-[calc(100vw-2rem)]",
+  m: "w-[440px] max-w-[calc(100vw-2rem)]",
+  l: "w-[600px] max-w-[calc(100vw-2rem)]",
+  xl: "w-[800px] max-w-[calc(100vw-2rem)]",
+  full: "w-screen max-w-full",
+};
 
 const verticalSizes: Record<DrawerSize, string> = {
-  s: 'h-[260px] max-h-[calc(100vh-2rem)]',
-  m: 'h-[380px] max-h-[calc(100vh-2rem)]',
-  l: 'h-[540px] max-h-[calc(100vh-2rem)]',
-  xl: 'h-[720px] max-h-[calc(100vh-2rem)]',
-  full: 'h-screen max-h-full',
-}
+  s: "h-[260px] max-h-[calc(100vh-2rem)]",
+  m: "h-[380px] max-h-[calc(100vh-2rem)]",
+  l: "h-[540px] max-h-[calc(100vh-2rem)]",
+  xl: "h-[720px] max-h-[calc(100vh-2rem)]",
+  full: "h-screen max-h-full",
+};
 
 const positionClasses: Record<DrawerPosition, (size: DrawerSize, darkMode?: boolean) => string> = {
   right: (size, darkMode) =>
     cn(
-      'fixed inset-y-0 right-0 left-auto h-full max-h-full border-l rounded-none',
-      darkMode ? 'border-gray-700' : 'border-border',
+      "fixed inset-y-0 right-0 left-auto h-full max-h-full border-l rounded-none",
+      darkMode ? "border-gray-700" : "border-border",
       sideSizes[size],
     ),
   left: (size, darkMode) =>
     cn(
-      'fixed inset-y-0 left-0 right-auto h-full max-h-full border-r rounded-none',
-      darkMode ? 'border-gray-700' : 'border-border',
+      "fixed inset-y-0 left-0 right-auto h-full max-h-full border-r rounded-none",
+      darkMode ? "border-gray-700" : "border-border",
       sideSizes[size],
     ),
   top: (size, darkMode) =>
     cn(
-      'fixed inset-x-0 top-0 bottom-auto w-full max-w-full border-b rounded-none',
-      darkMode ? 'border-gray-700' : 'border-border',
+      "fixed inset-x-0 top-0 bottom-auto w-full max-w-full border-b rounded-none",
+      darkMode ? "border-gray-700" : "border-border",
       verticalSizes[size],
     ),
   bottom: (size, darkMode) =>
     cn(
-      'fixed inset-x-0 bottom-0 top-auto w-full max-w-full border-t rounded-none',
-      darkMode ? 'border-gray-700' : 'border-border',
+      "fixed inset-x-0 bottom-0 top-auto w-full max-w-full border-t rounded-none",
+      darkMode ? "border-gray-700" : "border-border",
       verticalSizes[size],
     ),
-}
+};
 
 const activeThemeClasses: Record<DrawerNavItemTheme, string> = {
-  primary: 'bg-blue-50 text-blue-600 font-medium',
-  purple: 'bg-purple-100/70 text-purple-700 font-medium',
-  blue: 'bg-blue-50 text-blue-600 font-medium',
-  gray: 'bg-gray-100 text-gray-900 font-medium',
-}
+  primary: "bg-blue-50 text-blue-600 font-medium",
+  purple: "bg-purple-100/70 text-purple-700 font-medium",
+  blue: "bg-blue-50 text-blue-600 font-medium",
+  gray: "bg-gray-100 text-gray-900 font-medium",
+};
 
 const activeIconClasses: Record<DrawerNavItemTheme, string> = {
-  primary: 'text-blue-600',
-  purple: 'text-purple-600',
-  blue: 'text-blue-600',
-  gray: 'text-gray-700',
-}
+  primary: "text-blue-600",
+  purple: "text-purple-600",
+  blue: "text-blue-600",
+  gray: "text-gray-700",
+};
 
 const hoverThemeClasses: Record<DrawerNavItemTheme, string> = {
-  primary: 'hover:bg-blue-50 hover:text-blue-600',
-  purple: 'hover:bg-purple-100/70 hover:text-purple-700',
-  blue: 'hover:bg-blue-50 hover:text-blue-600',
-  gray: 'hover:bg-gray-100/70 hover:text-gray-900',
-}
+  primary: "hover:bg-blue-50 hover:text-blue-600",
+  purple: "hover:bg-purple-100/70 hover:text-purple-700",
+  blue: "hover:bg-blue-50 hover:text-blue-600",
+  gray: "hover:bg-gray-100/70 hover:text-gray-900",
+};
 
 const hoverIconClasses: Record<DrawerNavItemTheme, string> = {
-  primary: 'group-hover:text-blue-600',
-  purple: 'group-hover:text-purple-700',
-  blue: 'group-hover:text-blue-600',
-  gray: 'group-hover:text-gray-900',
-}
+  primary: "group-hover:text-blue-600",
+  purple: "group-hover:text-purple-700",
+  blue: "group-hover:text-blue-600",
+  gray: "group-hover:text-gray-900",
+};
 
 const subItemHoverClasses: Record<DrawerNavItemTheme, string> = {
-  primary: 'hover:bg-blue-50 hover:text-blue-600',
-  purple: 'hover:bg-purple-100/70 hover:text-purple-700',
-  blue: 'hover:bg-blue-50 hover:text-blue-600',
-  gray: 'hover:bg-gray-100/70 hover:text-gray-900',
-}
+  primary: "hover:bg-blue-50 hover:text-blue-600",
+  purple: "hover:bg-purple-100/70 hover:text-purple-700",
+  blue: "hover:bg-blue-50 hover:text-blue-600",
+  gray: "hover:bg-gray-100/70 hover:text-gray-900",
+};
 
-function DrawerMenuItemRenderer({ item, theme = 'primary' }: { item: DrawerMenuItem; theme?: DrawerNavItemTheme }) {
+function DrawerMenuItemRenderer({
+  item,
+  theme = "primary",
+}: {
+  item: DrawerMenuItem;
+  theme?: DrawerNavItemTheme;
+}) {
   const [uncontrolledExpanded, setUncontrolledExpanded] = useState(
     () => item.defaultExpanded ?? Boolean(item.children && item.children.length > 0),
-  )
-  const [activeSubId, setActiveSubId] = useState<string | undefined>()
+  );
+  const [activeSubId, setActiveSubId] = useState<string | undefined>();
 
-  const hasChildren = Boolean(item.children && item.children.length > 0)
-  const isControlled = item.expanded !== undefined
-  const expanded = item.expanded ?? uncontrolledExpanded
+  const hasChildren = Boolean(item.children && item.children.length > 0);
+  const isControlled = item.expanded !== undefined;
+  const expanded = item.expanded ?? uncontrolledExpanded;
 
   const handleClick = (e: MouseEvent<HTMLElement>) => {
     if (item.disabled) {
-      e.preventDefault()
-      return
+      e.preventDefault();
+      return;
     }
     if (hasChildren) {
-      const nextExpanded = !expanded
-      if (!isControlled) setUncontrolledExpanded(nextExpanded)
-      item.onExpandedChange?.(nextExpanded)
+      const nextExpanded = !expanded;
+      if (!isControlled) setUncontrolledExpanded(nextExpanded);
+      item.onExpandedChange?.(nextExpanded);
     }
-    item.onClick?.(e)
-  }
+    item.onClick?.(e);
+  };
 
   return (
     <DrawerNavItem
@@ -231,8 +239,8 @@ function DrawerMenuItemRenderer({ item, theme = 'primary' }: { item: DrawerMenuI
       onClick={handleClick}
     >
       {item.children?.map((sub, sIdx) => {
-        const subKey = sub.id ?? `sub-${sIdx}`
-        const isSubActive = sub.active ?? (activeSubId === subKey)
+        const subKey = sub.id ?? `sub-${sIdx}`;
+        const isSubActive = sub.active ?? activeSubId === subKey;
         return (
           <DrawerSubItem
             key={subKey}
@@ -243,17 +251,17 @@ function DrawerMenuItemRenderer({ item, theme = 'primary' }: { item: DrawerMenuI
             theme={item.theme ?? theme}
             onClick={(e) => {
               if (sub.disabled) {
-                e.preventDefault()
-                return
+                e.preventDefault();
+                return;
               }
-              setActiveSubId(subKey)
-              sub.onClick?.(e)
+              setActiveSubId(subKey);
+              sub.onClick?.(e);
             }}
           />
-        )
+        );
       })}
     </DrawerNavItem>
-  )
+  );
 }
 
 /**
@@ -263,125 +271,126 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
   {
     open,
     onClose,
-    position = 'right',
-    size = 'm',
+    position = "right",
+    size = "m",
     closeOnOverlayClick = true,
     closeOnEsc = true,
     eyebrow,
     header,
     items,
-    theme = 'primary',
+    theme = "primary",
     darkMode = false,
     className,
     children,
-    'aria-label': ariaLabel,
-    'aria-labelledby': ariaLabelledBy,
-    'aria-describedby': ariaDescribedBy,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-describedby": ariaDescribedBy,
     onClick,
     ...props
   },
   forwardedRef,
 ) {
-  const internalRef = useRef<HTMLDialogElement | null>(null)
-  const titleId = useId()
-  const descriptionId = useId()
-  const mountedTitleIdRef = useRef<string | undefined>(undefined)
-  const mountedDescIdRef = useRef<string | undefined>(undefined)
-  const [registeredTitleId, setRegisteredTitleId] = useState<string>()
-  const [registeredDescId, setRegisteredDescId] = useState<string>()
+  const internalRef = useRef<HTMLDialogElement | null>(null);
+  const titleId = useId();
+  const descriptionId = useId();
+  const mountedTitleIdRef = useRef<string | undefined>(undefined);
+  const mountedDescIdRef = useRef<string | undefined>(undefined);
+  const [registeredTitleId, setRegisteredTitleId] = useState<string>();
+  const [registeredDescId, setRegisteredDescId] = useState<string>();
 
   const registerTitle = useCallback((id: string, isMounted: boolean) => {
     if (isMounted) {
-      mountedTitleIdRef.current = id
-      setRegisteredTitleId((current) => (current === id ? current : id))
+      mountedTitleIdRef.current = id;
+      setRegisteredTitleId((current) => (current === id ? current : id));
     } else {
       if (mountedTitleIdRef.current === id) {
-        mountedTitleIdRef.current = undefined
-        setRegisteredTitleId((current) => (current === id ? undefined : current))
+        mountedTitleIdRef.current = undefined;
+        setRegisteredTitleId((current) => (current === id ? undefined : current));
       }
     }
-  }, [])
+  }, []);
 
   const registerDescription = useCallback((id: string, isMounted: boolean) => {
     if (isMounted) {
-      mountedDescIdRef.current = id
-      setRegisteredDescId((current) => (current === id ? current : id))
+      mountedDescIdRef.current = id;
+      setRegisteredDescId((current) => (current === id ? current : id));
     } else {
       if (mountedDescIdRef.current === id) {
-        mountedDescIdRef.current = undefined
-        setRegisteredDescId((current) => (current === id ? undefined : current))
+        mountedDescIdRef.current = undefined;
+        setRegisteredDescId((current) => (current === id ? undefined : current));
       }
     }
-  }, [])
+  }, []);
 
   const setRef = useCallback(
     (node: HTMLDialogElement | null) => {
-      internalRef.current = node
-      if (typeof forwardedRef === 'function') {
-        forwardedRef(node)
+      internalRef.current = node;
+      if (typeof forwardedRef === "function") {
+        forwardedRef(node);
       } else if (forwardedRef) {
-        forwardedRef.current = node
+        forwardedRef.current = node;
       }
     },
     [forwardedRef],
-  )
+  );
 
   const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     if (!closeOnEsc) {
-      event.preventDefault()
-      return
+      event.preventDefault();
+      return;
     }
-    event.preventDefault()
-    onClose()
-  }
+    event.preventDefault();
+    onClose();
+  };
 
   const handleNativeClose = () => {
-    if (open) onClose()
-  }
+    if (open) onClose();
+  };
 
   const handleClick = (event: MouseEvent<HTMLDialogElement>) => {
-    onClick?.(event)
-    if (!closeOnOverlayClick || event.defaultPrevented || event.target !== event.currentTarget) return
+    onClick?.(event);
+    if (!closeOnOverlayClick || event.defaultPrevented || event.target !== event.currentTarget)
+      return;
 
-    const rect = event.currentTarget.getBoundingClientRect()
+    const rect = event.currentTarget.getBoundingClientRect();
     const outsidePanel =
       event.clientX < rect.left ||
       event.clientX > rect.right ||
       event.clientY < rect.top ||
-      event.clientY > rect.bottom
+      event.clientY > rect.bottom;
 
-    if (outsidePanel) onClose()
-  }
+    if (outsidePanel) onClose();
+  };
 
-  const explicitAriaLabelledBy = ariaLabelledBy?.trim() || undefined
-  const explicitAriaLabel = ariaLabel?.trim() ? ariaLabel : undefined
+  const explicitAriaLabelledBy = ariaLabelledBy?.trim() || undefined;
+  const explicitAriaLabel = ariaLabel?.trim() ? ariaLabel : undefined;
   const resolvedAriaLabelledBy =
-    explicitAriaLabelledBy ?? (explicitAriaLabel ? undefined : registeredTitleId)
-  const resolvedAriaDescribedBy = ariaDescribedBy?.trim() || registeredDescId
+    explicitAriaLabelledBy ?? (explicitAriaLabel ? undefined : registeredTitleId);
+  const resolvedAriaDescribedBy = ariaDescribedBy?.trim() || registeredDescId;
 
-  const usesExplicitAccessibleName = Boolean(explicitAriaLabelledBy || explicitAriaLabel)
+  const usesExplicitAccessibleName = Boolean(explicitAriaLabelledBy || explicitAriaLabel);
 
   useEffect(() => {
-    const dialog = internalRef.current
-    if (!dialog) return
+    const dialog = internalRef.current;
+    if (!dialog) return;
 
     if (!open && dialog.open) {
-      dialog.close()
-      return
+      dialog.close();
+      return;
     }
 
-    if (!open || dialog.open) return
+    if (!open || dialog.open) return;
 
-    const mountedTitleId = mountedTitleIdRef.current
+    const mountedTitleId = mountedTitleIdRef.current;
     const waitingForAutomaticTitle =
       !usesExplicitAccessibleName &&
       mountedTitleId !== undefined &&
-      registeredTitleId !== mountedTitleId
+      registeredTitleId !== mountedTitleId;
 
-    if (!waitingForAutomaticTitle) dialog.showModal()
-  }, [open, registeredTitleId, usesExplicitAccessibleName])
+    if (!waitingForAutomaticTitle) dialog.showModal();
+  }, [open, registeredTitleId, usesExplicitAccessibleName]);
 
-  const hasHeaderProps = Boolean(eyebrow || header)
+  const hasHeaderProps = Boolean(eyebrow || header);
 
   return (
     <DrawerContext.Provider
@@ -396,8 +405,8 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
         onClose={handleNativeClose}
         onClick={handleClick}
         className={cn(
-          'm-0 p-0 text-left shadow-2xl backdrop:bg-gray-900/50 open:flex open:flex-col overflow-hidden',
-          darkMode ? 'bg-gray-800 text-gray-300' : 'bg-surface text-content',
+          "m-0 p-0 text-left shadow-2xl backdrop:bg-gray-900/50 open:flex open:flex-col overflow-hidden",
+          darkMode ? "bg-gray-800 text-gray-300" : "bg-surface text-content",
           positionClasses[position](size, darkMode),
           className,
         )}
@@ -405,15 +414,15 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
       >
         {children ?? (
           <>
-            {hasHeaderProps && (
-              <DrawerHeader eyebrow={eyebrow}>
-                {header}
-              </DrawerHeader>
-            )}
+            {hasHeaderProps && <DrawerHeader eyebrow={eyebrow}>{header}</DrawerHeader>}
             {items && items.length > 0 && (
               <DrawerBody className="p-3 space-y-1">
                 {items.map((item, index) => (
-                  <DrawerMenuItemRenderer key={item.id ?? index} item={item} theme={item.theme ?? theme} />
+                  <DrawerMenuItemRenderer
+                    key={item.id ?? index}
+                    item={item}
+                    theme={item.theme ?? theme}
+                  />
                 ))}
               </DrawerBody>
             )}
@@ -421,32 +430,42 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
         )}
       </dialog>
     </DrawerContext.Provider>
-  )
-})
+  );
+});
 
-DrawerRoot.displayName = 'Drawer'
+DrawerRoot.displayName = "Drawer";
 
 export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(function DrawerHeader(
-  { eyebrow, children, closeLabel = 'Tutup drawer', showCloseButton = true, onClose: explicitOnClose, className, ...props },
+  {
+    eyebrow,
+    children,
+    closeLabel = "Tutup drawer",
+    showCloseButton = true,
+    onClose: explicitOnClose,
+    className,
+    ...props
+  },
   ref,
 ) {
-  const context = useContext(DrawerContext)
-  const handleClose = explicitOnClose ?? context?.onClose
+  const context = useContext(DrawerContext);
+  const handleClose = explicitOnClose ?? context?.onClose;
 
-  const hasContent = Boolean(children)
+  const hasContent = Boolean(children);
 
   return (
     <div
       ref={ref}
-      className={cn(
-        'flex shrink-0 items-center justify-between gap-4 px-5 pt-4 pb-2',
-        className,
-      )}
+      className={cn("flex shrink-0 items-center justify-between gap-4 px-5 pt-4 pb-2", className)}
       {...props}
     >
       <div className="min-w-0 flex-1 space-y-1">
         {eyebrow && (
-          <span className={cn("block text-base font-semibold tracking-wider uppercase", context?.darkMode ? "text-gray-500" : "text-gray-500")}>
+          <span
+            className={cn(
+              "block text-base font-semibold tracking-wider uppercase",
+              context?.darkMode ? "text-gray-500" : "text-gray-500",
+            )}
+          >
             {eyebrow}
           </span>
         )}
@@ -460,111 +479,122 @@ export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(functi
           aria-label={closeLabel}
           className={cn(
             "-mr-2 ml-auto inline-flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
-            context?.darkMode ? "text-gray-500 hover:bg-gray-700 hover:text-white" : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+            context?.darkMode
+              ? "text-gray-500 hover:bg-gray-700 hover:text-white"
+              : "text-gray-500 hover:bg-gray-100 hover:text-gray-700",
           )}
         >
           <Close className="w-[18px] h-[18px]" aria-hidden="true" />
         </button>
       )}
     </div>
-  )
-})
+  );
+});
 
-DrawerHeader.displayName = 'DrawerHeader'
+DrawerHeader.displayName = "DrawerHeader";
 
 export const DrawerTitle = forwardRef<HTMLHeadingElement, DrawerTitleProps>(function DrawerTitle(
   { className, children, id: explicitId, ...props },
   forwardedRef,
 ) {
-  const context = useContext(DrawerContext)
-  const id = explicitId ?? context?.titleId
+  const context = useContext(DrawerContext);
+  const id = explicitId ?? context?.titleId;
 
   useEffect(() => {
-    if (!context || !context.titleId) return
-    const currentTitleId = context.titleId
-    context.registerTitle(currentTitleId, true)
+    if (!context || !context.titleId) return;
+    const currentTitleId = context.titleId;
+    context.registerTitle(currentTitleId, true);
     return () => {
-      context.registerTitle(currentTitleId, false)
-    }
-  }, [context])
+      context.registerTitle(currentTitleId, false);
+    };
+  }, [context]);
 
   return (
     <h2
       ref={forwardedRef}
       id={id}
-      className={cn('text-base font-bold', context?.darkMode ? 'text-white' : 'text-gray-900', className)}
+      className={cn(
+        "text-base font-bold",
+        context?.darkMode ? "text-white" : "text-gray-900",
+        className,
+      )}
       {...props}
     >
       {children}
     </h2>
-  )
-})
+  );
+});
 
-DrawerTitle.displayName = 'DrawerTitle'
+DrawerTitle.displayName = "DrawerTitle";
 
 export const DrawerDescription = forwardRef<HTMLParagraphElement, DrawerDescriptionProps>(
   function DrawerDescription({ className, children, id: explicitId, ...props }, forwardedRef) {
-    const context = useContext(DrawerContext)
-    const id = explicitId ?? context?.descriptionId
+    const context = useContext(DrawerContext);
+    const id = explicitId ?? context?.descriptionId;
 
     useEffect(() => {
-      if (!context || !context.descriptionId) return
-      const currentDescId = context.descriptionId
-      context.registerDescription(currentDescId, true)
+      if (!context || !context.descriptionId) return;
+      const currentDescId = context.descriptionId;
+      context.registerDescription(currentDescId, true);
       return () => {
-        context.registerDescription(currentDescId, false)
-      }
-    }, [context])
+        context.registerDescription(currentDescId, false);
+      };
+    }, [context]);
 
     return (
-      <p ref={forwardedRef} id={id} className={cn('text-xs', context?.darkMode ? 'text-gray-400' : 'text-gray-500', className)} {...props}>
+      <p
+        ref={forwardedRef}
+        id={id}
+        className={cn("text-xs", context?.darkMode ? "text-gray-400" : "text-gray-500", className)}
+        {...props}
+      >
         {children}
       </p>
-    )
+    );
   },
-)
+);
 
-DrawerDescription.displayName = 'DrawerDescription'
+DrawerDescription.displayName = "DrawerDescription";
 
 export const DrawerBody = forwardRef<HTMLDivElement, DrawerBodyProps>(function DrawerBody(
   { className, ...props },
   ref,
 ) {
-  const context = useContext(DrawerContext)
+  const context = useContext(DrawerContext);
   return (
     <div
       ref={ref}
       className={cn(
-        'min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-5 text-xs',
-        context?.darkMode ? 'text-gray-400' : 'text-gray-600',
+        "min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-5 text-xs",
+        context?.darkMode ? "text-gray-400" : "text-gray-600",
         className,
       )}
       {...props}
     />
-  )
-})
+  );
+});
 
-DrawerBody.displayName = 'DrawerBody'
+DrawerBody.displayName = "DrawerBody";
 
 export const DrawerFooter = forwardRef<HTMLDivElement, DrawerFooterProps>(function DrawerFooter(
   { className, ...props },
   ref,
 ) {
-  const context = useContext(DrawerContext)
+  const context = useContext(DrawerContext);
   return (
     <div
       ref={ref}
       className={cn(
-        'flex shrink-0 flex-wrap items-center justify-end gap-2 border-t px-5 py-3',
-        context?.darkMode ? 'border-gray-700' : 'border-border',
-        className
+        "flex shrink-0 flex-wrap items-center justify-end gap-2 border-t px-5 py-3",
+        context?.darkMode ? "border-gray-700" : "border-border",
+        className,
       )}
       {...props}
     />
-  )
-})
+  );
+});
 
-DrawerFooter.displayName = 'DrawerFooter'
+DrawerFooter.displayName = "DrawerFooter";
 
 /**
  * Subkomponen item navigasi menu di dalam Drawer (seperti pada contoh desain wireframe).
@@ -578,7 +608,7 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
     defaultExpanded = false,
     onExpandedChange,
     collapsible = false,
-    theme = 'primary',
+    theme = "primary",
     href,
     badge,
     disabled = false,
@@ -590,67 +620,75 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
   },
   ref,
 ) {
-  const context = useContext(DrawerContext)
-  const hasSubmenu = Boolean(children)
-  const isExpandable = collapsible || hasSubmenu
-  const [uncontrolledExpanded, setUncontrolledExpanded] = useState(defaultExpanded)
-  const isExpanded = expanded ?? uncontrolledExpanded
+  const context = useContext(DrawerContext);
+  const hasSubmenu = Boolean(children);
+  const isExpandable = collapsible || hasSubmenu;
+  const [uncontrolledExpanded, setUncontrolledExpanded] = useState(defaultExpanded);
+  const isExpanded = expanded ?? uncontrolledExpanded;
   // DrawerNavItem juga dipakai langsung melalui JSX; terapkan aturan yang
   // sama seperti renderer data-driven: submenu dan link tidak digabung.
-  const destinationHref = hasSubmenu ? undefined : href
-  const Component = destinationHref ? 'a' : 'button'
-  const isDark = context?.darkMode
-  const submenuId = useId()
+  const destinationHref = hasSubmenu ? undefined : href;
+  const Component = destinationHref ? "a" : "button";
+  const isDark = context?.darkMode;
+  const submenuId = useId();
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     if (disabled) {
-      event.preventDefault()
-      event.stopPropagation()
-      return
+      event.preventDefault();
+      event.stopPropagation();
+      return;
     }
-    onClick?.(event)
+    onClick?.(event);
     if (hasSubmenu) {
-      const nextExpanded = !isExpanded
-      if (expanded === undefined) setUncontrolledExpanded(nextExpanded)
-      onExpandedChange?.(nextExpanded)
+      const nextExpanded = !isExpanded;
+      if (expanded === undefined) setUncontrolledExpanded(nextExpanded);
+      onExpandedChange?.(nextExpanded);
     }
-  }
+  };
   const handleKeyDown: KeyboardEventHandler = (event) => {
     if (disabled) {
-      event.preventDefault()
-      event.stopPropagation()
-      return
+      event.preventDefault();
+      event.stopPropagation();
+      return;
     }
-    onKeyDown?.(event as KeyboardEvent<HTMLDivElement>)
-  }
+    onKeyDown?.(event as KeyboardEvent<HTMLDivElement>);
+  };
 
   return (
-    <div ref={ref} className={cn('w-full', className)} {...props}>
+    <div ref={ref} className={cn("w-full", className)} {...props}>
       <Component
         href={disabled ? undefined : destinationHref}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
-        type={destinationHref ? undefined : 'button'}
+        type={destinationHref ? undefined : "button"}
         disabled={destinationHref ? undefined : disabled}
         aria-disabled={disabled || undefined}
-        aria-current={destinationHref && !disabled && active ? 'page' : undefined}
+        aria-current={destinationHref && !disabled && active ? "page" : undefined}
         aria-expanded={hasSubmenu ? isExpanded : undefined}
         aria-controls={hasSubmenu ? submenuId : undefined}
         tabIndex={disabled ? -1 : undefined}
         className={cn(
-          'group flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-base transition-all text-left font-medium disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
+          "group flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-base transition-all text-left font-medium disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50",
           active
-            ? (isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : activeThemeClasses[theme])
-            : (isDark ? 'text-gray-50 hover:bg-gray-700 hover:text-white' : cn('text-gray-900', hoverThemeClasses[theme])),
+            ? isDark
+              ? "bg-gray-700 hover:bg-gray-600 text-white"
+              : activeThemeClasses[theme]
+            : isDark
+              ? "text-gray-50 hover:bg-gray-700 hover:text-white"
+              : cn("text-gray-900", hoverThemeClasses[theme]),
         )}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {icon && (
             <span
               className={cn(
-                'flex w-[18px] h-[18px] shrink-0 items-center justify-center transition-colors',
+                "flex w-[18px] h-[18px] shrink-0 items-center justify-center transition-colors",
                 active
-                  ? (isDark ? 'text-white' : activeIconClasses[theme])
-                  : (isDark ? 'text-gray-400 group-hover:text-white' : cn('text-gray-500', hoverIconClasses[theme])),
+                  ? isDark
+                    ? "text-white"
+                    : activeIconClasses[theme]
+                  : isDark
+                    ? "text-gray-400 group-hover:text-white"
+                    : cn("text-gray-500", hoverIconClasses[theme]),
               )}
             >
               {icon}
@@ -664,13 +702,21 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
           {isExpandable && (
             <span
               className={cn(
-                'flex w-[18px] h-[18px] items-center justify-center transition-all',
+                "flex w-[18px] h-[18px] items-center justify-center transition-all",
                 active
-                  ? (isDark ? 'text-white' : activeIconClasses[theme])
-                  : (isDark ? 'text-gray-400 group-hover:text-white' : cn('text-gray-500', hoverIconClasses[theme])),
+                  ? isDark
+                    ? "text-white"
+                    : activeIconClasses[theme]
+                  : isDark
+                    ? "text-gray-400 group-hover:text-white"
+                    : cn("text-gray-500", hoverIconClasses[theme]),
               )}
             >
-                  {isExpanded ? <ChevronUp className="w-[18px] h-[18px]" /> : <ChevronDown className="w-[18px] h-[18px]" />}
+              {isExpanded ? (
+                <ChevronUp className="w-[18px] h-[18px]" />
+              ) : (
+                <ChevronDown className="w-[18px] h-[18px]" />
+              )}
             </span>
           )}
         </div>
@@ -680,17 +726,17 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
         <div id={submenuId} hidden={!isExpanded} className="mt-1 space-y-1 pl-8">
           {Children.map(children, (child) => {
             if (isValidElement<DrawerSubItemProps>(child)) {
-              return cloneElement(child, { theme: child.props.theme ?? theme })
+              return cloneElement(child, { theme: child.props.theme ?? theme });
             }
-            return child
+            return child;
           })}
         </div>
       )}
     </div>
-  )
-})
+  );
+});
 
-DrawerNavItem.displayName = 'DrawerNavItem'
+DrawerNavItem.displayName = "DrawerNavItem";
 
 /**
  * Subkomponen sub-menu ter-indentasi di bawah DrawerNavItem yang expanded.
@@ -699,7 +745,7 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
   {
     label,
     active = false,
-    theme = 'primary',
+    theme = "primary",
     href,
     disabled = false,
     onClick,
@@ -709,45 +755,47 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
   },
   ref,
 ) {
-  const context = useContext(DrawerContext)
-  const isDark = context?.darkMode
+  const context = useContext(DrawerContext);
+  const isDark = context?.darkMode;
 
   const handleClick = (e: MouseEvent<HTMLElement>) => {
     if (disabled) {
-      e.preventDefault()
-      e.stopPropagation()
-      return
+      e.preventDefault();
+      e.stopPropagation();
+      return;
     }
     if (!href) {
-      e.preventDefault()
+      e.preventDefault();
     }
-    onClick?.(e)
-  }
+    onClick?.(e);
+  };
   const handleKeyDown: KeyboardEventHandler = (event) => {
     if (disabled) {
-      event.preventDefault()
-      event.stopPropagation()
-      return
+      event.preventDefault();
+      event.stopPropagation();
+      return;
     }
-    onKeyDown?.(event as KeyboardEvent<HTMLAnchorElement>)
-  }
+    onKeyDown?.(event as KeyboardEvent<HTMLAnchorElement>);
+  };
 
   const itemClassName = cn(
-    'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-base text-left transition-colors font-medium disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
+    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-base text-left transition-colors font-medium disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50",
     isDark
-      ? (active ? 'bg-gray-700/50 hover:bg-gray-600 text-white' : 'text-gray-50 hover:bg-gray-700 hover:text-white')
+      ? active
+        ? "bg-gray-700/50 hover:bg-gray-600 text-white"
+        : "text-gray-50 hover:bg-gray-700 hover:text-white"
       : cn(
           subItemHoverClasses[theme],
           active
-            ? theme === 'purple'
-              ? 'text-purple-700 bg-purple-50/70'
-              : theme === 'gray'
-                ? 'text-gray-900 bg-gray-100'
-                : 'text-blue-600 bg-blue-50/70'
-            : 'text-gray-900'
+            ? theme === "purple"
+              ? "text-purple-700 bg-purple-50/70"
+              : theme === "gray"
+                ? "text-gray-900 bg-gray-100"
+                : "text-blue-600 bg-blue-50/70"
+            : "text-gray-900",
         ),
     className,
-  )
+  );
 
   if (href) {
     return (
@@ -757,14 +805,14 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         aria-disabled={disabled || undefined}
-        aria-current={!disabled && active ? 'page' : undefined}
+        aria-current={!disabled && active ? "page" : undefined}
         tabIndex={disabled ? -1 : undefined}
         className={itemClassName}
         {...props}
       >
         {label}
       </a>
-    )
+    );
   }
 
   return (
@@ -781,14 +829,14 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
     >
       {label}
     </button>
-  )
-})
+  );
+});
 
-DrawerSubItem.displayName = 'DrawerSubItem'
+DrawerSubItem.displayName = "DrawerSubItem";
 
 export interface DrawerTriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  icon?: ReactNode
-  darkMode?: boolean
+  icon?: ReactNode;
+  darkMode?: boolean;
 }
 
 /**
@@ -802,30 +850,32 @@ export const DrawerTrigger = forwardRef<HTMLButtonElement, DrawerTriggerProps>(
         type="button"
         aria-label="Buka menu drawer"
         className={cn(
-          'inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
-          darkMode ? 'text-gray-200 hover:bg-gray-700 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700',
+          "inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
+          darkMode
+            ? "text-gray-200 hover:bg-gray-700 hover:text-white"
+            : "text-gray-500 hover:bg-gray-100 hover:text-gray-700",
           className,
         )}
         {...props}
       >
         {children ?? icon ?? <BarsFromLeft className="w-6 h-6" />}
       </button>
-    )
+    );
   },
-)
+);
 
-DrawerTrigger.displayName = 'DrawerTrigger'
+DrawerTrigger.displayName = "DrawerTrigger";
 
 export type DrawerComponentType = typeof DrawerRoot & {
-  Header: typeof DrawerHeader
-  Title: typeof DrawerTitle
-  Description: typeof DrawerDescription
-  Body: typeof DrawerBody
-  Footer: typeof DrawerFooter
-  NavItem: typeof DrawerNavItem
-  SubItem: typeof DrawerSubItem
-  Trigger: typeof DrawerTrigger
-}
+  Header: typeof DrawerHeader;
+  Title: typeof DrawerTitle;
+  Description: typeof DrawerDescription;
+  Body: typeof DrawerBody;
+  Footer: typeof DrawerFooter;
+  NavItem: typeof DrawerNavItem;
+  SubItem: typeof DrawerSubItem;
+  Trigger: typeof DrawerTrigger;
+};
 
 // Static subcomponents membuat `Object.assign` ini tidak dapat dikenali oleh
 // aturan Fast Refresh sebagai deklarasi komponen biasa.
@@ -839,4 +889,4 @@ export const Drawer: DrawerComponentType = Object.assign(DrawerRoot, {
   NavItem: DrawerNavItem,
   SubItem: DrawerSubItem,
   Trigger: DrawerTrigger,
-})
+});
