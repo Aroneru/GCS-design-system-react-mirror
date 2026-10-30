@@ -168,8 +168,86 @@ function Brand({ brand }: { brand: NavbarBrand }) {
   )
 }
 
-function Destination({ item, spacingMode }: { item: NavbarDestination; spacingMode: DesktopSpacingMode }) {
+const navbarLabelClass = 'min-w-0 max-w-[304px] line-clamp-2 break-words font-sans text-base leading-[1.5] font-semibold'
+
+function useTruncatedNavbarLabels<T extends HTMLElement>(
+  containerRef: RefObject<T | null>,
+  attribute: 'data-navbar-primary-label' | 'data-navbar-overflow-label',
+  contentKey: string,
+) {
+  const [truncatedLabels, setTruncatedLabels] = useState<Set<string>>(() => new Set())
+  const measureTruncation = useCallback(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const next = new Set<string>()
+    for (const label of container.querySelectorAll<HTMLElement>(`[${attribute}]`)) {
+      const key = label.getAttribute(attribute)
+      if (
+        key &&
+        label.clientWidth > 0 &&
+        label.clientHeight > 0 &&
+        (label.scrollHeight > label.clientHeight + 0.5 || label.scrollWidth > label.clientWidth + 0.5)
+      ) next.add(key)
+    }
+
+    setTruncatedLabels((current) => {
+      if (current.size === next.size && Array.from(current).every((key) => next.has(key))) return current
+      return next
+    })
+  }, [attribute, containerRef])
+
+  useLayoutEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const labels = Array.from(container.querySelectorAll<HTMLElement>(`[${attribute}]`))
+    const observer = new ResizeObserver(measureTruncation)
+    for (const label of labels) observer.observe(label)
+    measureTruncation()
+
+    let active = true
+    void document.fonts.ready.then(() => {
+      if (active) measureTruncation()
+    })
+
+    return () => {
+      active = false
+      observer.disconnect()
+    }
+  }, [attribute, containerRef, contentKey, measureTruncation])
+
+  return truncatedLabels
+}
+
+function NavbarLabel({
+  label,
+  measurementKey,
+  scope,
+  truncated,
+  className,
+}: {
+  label: string
+  measurementKey: string
+  scope: 'primary' | 'overflow'
+  truncated: boolean
+  className?: string
+}) {
+  return (
+    <span
+      data-navbar-primary-label={scope === 'primary' ? measurementKey : undefined}
+      data-navbar-overflow-label={scope === 'overflow' ? measurementKey : undefined}
+      className={cn(navbarLabelClass, className)}
+      title={truncated ? label : undefined}
+    >
+      {label}
+    </span>
+  )
+}
+
+function Destination({ item, spacingMode, truncated }: { item: NavbarDestination; spacingMode: DesktopSpacingMode; truncated: boolean }) {
   const rel = item.target === '_blank' ? (item.rel ?? 'noopener noreferrer') : item.rel
+  const measurementKey = `primary:destination:${item.id}`
 
   return (
     <a
@@ -180,12 +258,12 @@ function Destination({ item, spacingMode }: { item: NavbarDestination; spacingMo
       aria-disabled={item.disabled || undefined}
       onClick={item.disabled ? undefined : item.onClick}
       className={cn(
-        'whitespace-nowrap rounded py-1.5 font-sans text-base leading-[1.5] font-semibold text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+        'inline-flex items-center rounded py-1.5 text-left text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
         desktopItemPadding[spacingMode],
         item.disabled && 'pointer-events-none opacity-50',
       )}
     >
-      {item.label}
+      <NavbarLabel label={item.label} measurementKey={measurementKey} scope="primary" truncated={truncated} />
     </a>
   )
 }
@@ -204,47 +282,25 @@ function OverflowPanel({
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set(items.flatMap((item) => item.type === 'disclosure' && item.children.some((child) => child.current) ? [item.id] : [])),
   )
-  const [truncatedLabels, setTruncatedLabels] = useState<Set<string>>(() => new Set())
   const labelKey = items.map((item) => item.type === 'destination'
     ? `destination:${item.id}:${item.label}`
     : `disclosure:${item.id}:${item.label}:${item.children.map((child) => `${child.id}:${child.label}`).join(',')}`
   ).join('|')
+  const expandedKey = Array.from(expanded).sort().join('|')
+  const truncatedLabels = useTruncatedNavbarLabels(contentRef, 'data-navbar-overflow-label', `${labelKey}|${expandedKey}`)
 
-  const measureTruncation = useCallback(() => {
-    const content = contentRef.current
-    if (!content) return
+  useEffect(() => {
+    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    if (!panel) return
 
-    const next = new Set<string>()
-    for (const label of content.querySelectorAll<HTMLElement>('[data-navbar-overflow-label]')) {
-      const key = label.dataset.navbarOverflowLabel
-      if (key && label.clientWidth > 0 && label.scrollWidth > label.clientWidth + 0.5) next.add(key)
+    const resetExpandedAfterClose = (event: Event) => {
+      if ((event as Event & { newState?: string }).newState !== 'closed') return
+      setExpanded((current) => current.size === 0 ? current : new Set())
     }
 
-    setTruncatedLabels((current) => {
-      if (current.size === next.size && Array.from(current).every((key) => next.has(key))) return current
-      return next
-    })
+    panel.addEventListener('toggle', resetExpandedAfterClose)
+    return () => panel.removeEventListener('toggle', resetExpandedAfterClose)
   }, [])
-
-  useLayoutEffect(() => {
-    const content = contentRef.current
-    if (!content) return
-
-    const labels = Array.from(content.querySelectorAll<HTMLElement>('[data-navbar-overflow-label]'))
-    const observer = new ResizeObserver(measureTruncation)
-    for (const label of labels) observer.observe(label)
-    measureTruncation()
-
-    let active = true
-    void document.fonts.ready.then(() => {
-      if (active) measureTruncation()
-    })
-
-    return () => {
-      active = false
-      observer.disconnect()
-    }
-  }, [expanded, labelKey, measureTruncation])
 
   const toggleDisclosure = (id: string) => {
     setExpanded((current) => {
@@ -258,20 +314,12 @@ function OverflowPanel({
   const destination = (item: NavbarDestination, close: () => void, measurementKey: string, nested = false) => {
     const rel = item.target === '_blank' ? (item.rel ?? 'noopener noreferrer') : item.rel
     const className = cn(
-      'flex min-w-0 items-center rounded-md py-2 text-sm font-medium text-content transition-colors',
+      'flex min-w-0 items-center rounded-md py-2 text-content transition-colors',
       nested ? 'pr-3 pl-7' : 'px-3',
       'hover:bg-dropdown-item-hover-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
       item.disabled && 'cursor-not-allowed opacity-50',
     )
-    const content = (
-      <span
-        data-navbar-overflow-label={measurementKey}
-        className="min-w-0 flex-1 truncate"
-        title={truncatedLabels.has(measurementKey) ? item.label : undefined}
-      >
-        {item.label}
-      </span>
-    )
+    const content = <NavbarLabel label={item.label} measurementKey={measurementKey} scope="overflow" truncated={truncatedLabels.has(measurementKey)} className="flex-1" />
 
     if (item.disabled) {
       return <span key={item.id} aria-disabled="true" aria-label={item.label} className={className}>{content}</span>
@@ -314,7 +362,7 @@ function OverflowPanel({
           <ChevronDownIcon />
         </button>
       }
-      contentClassName="w-fit p-2"
+      contentClassName="w-[min(clamp(240px,21vw,304px),calc(100vw-48px))] p-2"
     >
       {({ close }) => (
         <div
@@ -322,7 +370,7 @@ function OverflowPanel({
           id={panelId}
           role="region"
           aria-label="Navigasi lainnya"
-          className="w-max min-w-0 max-w-[min(304px,calc(100vw-24px))]"
+          className="w-full min-w-0"
         >
           {items.map((item, index) => {
             if (item.type === 'destination') return destination(item, close, `destination:${item.id}`)
@@ -340,16 +388,10 @@ function OverflowPanel({
                   data-baris=""
                   onClick={() => toggleDisclosure(item.id)}
                   className={cn(
-                    'flex w-full min-w-0 items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-semibold text-content transition-colors hover:bg-dropdown-item-hover-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50',
+                    'flex w-full min-w-0 items-center gap-2 rounded-md px-3 py-2 text-left text-content transition-colors hover:bg-dropdown-item-hover-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50',
                   )}
                 >
-                  <span
-                    data-navbar-overflow-label={`disclosure:${item.id}`}
-                    className="min-w-0 flex-1 truncate"
-                    title={truncatedLabels.has(`disclosure:${item.id}`) ? item.label : undefined}
-                  >
-                    {item.label}
-                  </span>
+                  <NavbarLabel label={item.label} measurementKey={`disclosure:${item.id}`} scope="overflow" truncated={truncatedLabels.has(`disclosure:${item.id}`)} className="flex-1" />
                   <span className={cn('shrink-0 transition-transform', isExpanded && 'rotate-180')}><ChevronDownIcon /></span>
                 </button>
                 {isExpanded && !item.disabled && (
@@ -377,15 +419,15 @@ function MeasurementItem({
 
   if (item.type === 'destination') {
     return (
-      <span className={cn('block whitespace-nowrap py-1.5 font-sans text-base leading-[1.5] font-semibold', padding)}>
-        {item.label}
+      <span className={cn('inline-flex items-center py-1.5', padding)}>
+        <span className={navbarLabelClass}>{item.label}</span>
       </span>
     )
   }
 
   return (
-    <span className={cn('inline-flex items-center gap-1 whitespace-nowrap py-1.5 font-sans text-base leading-[1.5] font-semibold', padding)}>
-      {item.label}
+    <span className={cn('inline-flex items-center gap-1 py-1.5', padding)}>
+      <span className={navbarLabelClass}>{item.label}</span>
       <ChevronDownIcon />
     </span>
   )
@@ -409,6 +451,7 @@ function CapacityAwareDesktopNavigation({
   platform: NavbarPlatform
 }) {
   const measurementRef = useRef<HTMLUListElement>(null)
+  const navigationRef = useRef<HTMLElement>(null)
   const overflowTriggerRef = useRef<HTMLButtonElement>(null)
   const focusAfterAllocationRef = useRef<{ type: 'overflow' | 'item'; index?: number } | null>(null)
   const spacingMode: DesktopSpacingMode = platform === 'front-office' ? 'viewport' : 'container'
@@ -423,6 +466,11 @@ function CapacityAwareDesktopNavigation({
   const validAllocation = allocation.key === allocationKey && allocation.ready
   const visibleCount = validAllocation ? Math.min(allocation.visibleCount, items.length) : items.length
   const overflowedItems = items.slice(visibleCount)
+  const primaryLabelKey = items.slice(0, visibleCount).map((item) => item.type === 'destination'
+    ? `${item.id}:${item.label}`
+    : `${item.id}:${item.label}:${item.children.map((child) => `${child.id}:${child.label}`).join(',')}`
+  ).join('|')
+  const truncatedLabels = useTruncatedNavbarLabels(navigationRef, 'data-navbar-primary-label', primaryLabelKey)
 
   useLayoutEffect(() => {
     const measurement = measurementRef.current
@@ -562,6 +610,7 @@ function CapacityAwareDesktopNavigation({
 
   return (
     <nav
+      ref={navigationRef}
       aria-label="Navigasi utama"
       data-navbar-capacity={validAllocation
         ? allocation.impossible ? 'impossible' : 'ready'
@@ -577,25 +626,29 @@ function CapacityAwareDesktopNavigation({
           return (
             <li key={item.id} data-navbar-visible-index={index}>
               {item.type === 'destination' ? (
-                <Destination item={item} spacingMode={spacingMode} />
+                <Destination item={item} spacingMode={spacingMode} truncated={truncatedLabels.has(`primary:destination:${item.id}`)} />
               ) : (
                 <Dropdown
                   align="center"
                   closeOnSelect
+                  contentClassName="w-max max-w-[min(304px,calc(100vw-48px))]!"
                   trigger={
                     <button
                       type="button"
                       disabled={item.disabled}
                       className={cn(
-                        'inline-flex items-center gap-1 whitespace-nowrap rounded py-1.5 font-sans text-base leading-[1.5] font-semibold text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50',
+                        'inline-flex items-center gap-1 rounded py-1.5 text-left text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50',
                         desktopItemPadding[spacingMode],
                       )}
                     >
-                      {item.label}
+                      <NavbarLabel label={item.label} measurementKey={`primary:disclosure:${item.id}`} scope="primary" truncated={truncatedLabels.has(`primary:disclosure:${item.id}`)} />
                       <ChevronDownIcon />
                     </button>
                   }
-                  items={item.children.map(toDropdownDestination)}
+                  items={item.children.map((child) => {
+                    const measurementKey = `primary:child:${item.id}:${child.id}`
+                    return toDropdownDestination(child, <NavbarLabel label={child.label} measurementKey={measurementKey} scope="primary" truncated={truncatedLabels.has(measurementKey)} />)
+                  })}
                 />
               )}
             </li>
@@ -631,10 +684,10 @@ function ChevronDownIcon() {
   )
 }
 
-function toDropdownDestination(item: NavbarDestination): DropdownItem {
+function toDropdownDestination(item: NavbarDestination, label: ReactNode = item.label): DropdownItem {
   return {
     id: item.id,
-    label: item.label,
+    label,
     icon: item.icon,
     href: item.href,
     target: item.target,
