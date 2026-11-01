@@ -258,14 +258,175 @@ function Destination({ item, spacingMode, truncated }: { item: NavbarDestination
       aria-disabled={item.disabled || undefined}
       onClick={item.disabled ? undefined : item.onClick}
       className={cn(
-        'inline-flex items-center rounded py-1.5 text-left text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+        'inline-flex items-center rounded py-1.5 text-left text-content transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
         desktopItemPadding[spacingMode],
-        item.disabled && 'pointer-events-none opacity-50',
+        item.disabled ? 'cursor-not-allowed opacity-50' : 'hover:text-brand-hover',
       )}
     >
       <NavbarLabel label={item.label} measurementKey={measurementKey} scope="primary" truncated={truncated} />
     </a>
   )
+}
+
+const overflowRowClass =
+  'flex min-w-0 items-center rounded-md py-2 text-content transition-colors'
+const overflowInteractiveClass =
+  'hover:bg-dropdown-item-hover-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand'
+
+function OverflowLabel({
+  label,
+  measurementKey,
+  measurement,
+  truncated,
+}: {
+  label: string
+  measurementKey: string
+  measurement: boolean
+  truncated: boolean
+}) {
+  if (measurement) return <span className={cn(navbarLabelClass, 'flex-1')}>{label}</span>
+  return (
+    <NavbarLabel
+      label={label}
+      measurementKey={measurementKey}
+      scope="overflow"
+      truncated={truncated}
+      className="flex-1"
+    />
+  )
+}
+
+function OverflowItemBlock({
+  item,
+  index,
+  panelId,
+  expanded,
+  measurement,
+  truncatedLabels,
+  close,
+  onToggle,
+}: {
+  item: NavbarPrimaryItem
+  index: number
+  panelId: string
+  expanded: boolean
+  measurement: boolean
+  truncatedLabels: Set<string>
+  close?: () => void
+  onToggle?: (id: string) => void
+}) {
+  const destination = (destinationItem: NavbarDestination, measurementKey: string, nested = false) => {
+    const rel = destinationItem.target === '_blank' ? (destinationItem.rel ?? 'noopener noreferrer') : destinationItem.rel
+    const className = cn(
+      overflowRowClass,
+      nested ? 'pr-3 pl-7' : 'px-3',
+      !measurement && overflowInteractiveClass,
+      destinationItem.disabled && 'cursor-not-allowed opacity-50',
+    )
+    const content = (
+      <OverflowLabel
+        label={destinationItem.label}
+        measurementKey={measurementKey}
+        measurement={measurement}
+        truncated={truncatedLabels.has(measurementKey)}
+      />
+    )
+
+    if (measurement) return <div className={className}>{content}</div>
+    if (destinationItem.disabled) {
+      return <span aria-disabled="true" aria-label={destinationItem.label} className={className}>{content}</span>
+    }
+
+    return (
+      <a
+        href={destinationItem.href}
+        target={destinationItem.target}
+        rel={rel}
+        aria-current={destinationItem.current ? 'page' : undefined}
+        aria-label={destinationItem.label}
+        data-baris=""
+        className={className}
+        onClick={(event) => {
+          destinationItem.onClick?.(event)
+          if (ordinaryActivation(event)) close?.()
+        }}
+      >
+        {content}
+      </a>
+    )
+  }
+
+  if (item.type === 'destination') {
+    return (
+      <div data-navbar-overflow-item-index={index}>
+        {destination(item, `destination:${item.id}`)}
+      </div>
+    )
+  }
+
+  const groupId = `${panelId}-group-${index}`
+  return (
+    <div data-navbar-overflow-item-index={index} className="min-w-0">
+      {measurement ? (
+        <div
+          className={cn(
+            'flex w-full min-w-0 items-center gap-2 rounded-md px-3 py-2 text-left text-content transition-colors',
+            item.disabled && 'cursor-not-allowed opacity-50',
+          )}
+        >
+          <OverflowLabel
+            label={item.label}
+            measurementKey={`disclosure:${item.id}`}
+            measurement
+            truncated={false}
+          />
+          <span className={cn('shrink-0 transition-transform', expanded && 'rotate-180')}><ChevronDownIcon /></span>
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled={item.disabled}
+          aria-expanded={expanded}
+          aria-controls={groupId}
+          aria-label={item.label}
+          data-baris=""
+          onClick={() => onToggle?.(item.id)}
+          className={cn(
+            'flex w-full min-w-0 items-center gap-2 rounded-md px-3 py-2 text-left text-content transition-colors',
+            overflowInteractiveClass,
+            'disabled:cursor-not-allowed disabled:opacity-50',
+          )}
+        >
+          <OverflowLabel
+            label={item.label}
+            measurementKey={`disclosure:${item.id}`}
+            measurement={false}
+            truncated={truncatedLabels.has(`disclosure:${item.id}`)}
+          />
+          <span className={cn('shrink-0 transition-transform', expanded && 'rotate-180')}><ChevronDownIcon /></span>
+        </button>
+      )}
+      {expanded && !item.disabled && (
+        <div id={measurement ? undefined : groupId} className="grid min-w-0 border-l border-border-subtle">
+          {item.children.map((child) => (
+            <div key={child.id}>
+              {destination(child, `child:${item.id}:${child.id}`, true)}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+const loadMoreClass = cn(
+  'mt-1 flex w-full min-w-0 items-center justify-center rounded-md px-3 py-2 text-center text-content transition-colors',
+  'hover:bg-dropdown-item-hover-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
+)
+
+interface OverflowMeasurementMetrics {
+  width: number
+  availableHeight: number
 }
 
 function OverflowPanel({
@@ -279,6 +440,16 @@ function OverflowPanel({
 }) {
   const panelId = useId()
   const contentRef = useRef<HTMLDivElement>(null)
+  const measurementRef = useRef<HTMLDivElement>(null)
+  const measurementFrameRef = useRef(0)
+  const focusFrameRef = useRef(0)
+  const pendingScrollRef = useRef<{ scrollTop: number } | null>(null)
+  const [parentOpen, setParentOpen] = useState(false)
+  const [visibleItemCount, setVisibleItemCount] = useState(() => Math.min(1, items.length))
+  const [capacityReady, setCapacityReady] = useState(false)
+  const [focusTransferIndex, setFocusTransferIndex] = useState<number | null>(null)
+  const [measurementMetrics, setMeasurementMetrics] = useState<OverflowMeasurementMetrics | null>(null)
+  const [fontMeasurementRevision, setFontMeasurementRevision] = useState(0)
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set(items.flatMap((item) => item.type === 'disclosure' && item.children.some((child) => child.current) ? [item.id] : [])),
   )
@@ -289,18 +460,195 @@ function OverflowPanel({
   const expandedKey = Array.from(expanded).sort().join('|')
   const truncatedLabels = useTruncatedNavbarLabels(contentRef, 'data-navbar-overflow-label', `${labelKey}|${expandedKey}`)
 
+  const readMeasurementMetrics = useCallback(() => {
+    const content = contentRef.current
+    const panel = content?.closest<HTMLElement>('[popover]')
+    if (!content || !panel || !panel.matches(':popover-open')) return null
+
+    const panelStyle = window.getComputedStyle(panel)
+    const maxHeight = Number.parseFloat(panelStyle.maxHeight)
+    const padding = Number.parseFloat(panelStyle.paddingTop) + Number.parseFloat(panelStyle.paddingBottom)
+    const availableHeight = Math.max(0, (Number.isFinite(maxHeight) ? maxHeight : panel.clientHeight) - padding)
+    return { width: content.clientWidth, availableHeight }
+  }, [])
+
+  const syncMeasurementMetrics = useCallback(() => {
+    const next = readMeasurementMetrics()
+    if (!next || next.width <= 0 || next.availableHeight <= 0) return
+    setMeasurementMetrics((current) => (
+      current && Math.abs(current.width - next.width) < 0.5 && Math.abs(current.availableHeight - next.availableHeight) < 0.5
+        ? current
+        : next
+    ))
+  }, [readMeasurementMetrics])
+
+  const scheduleMeasurement = useCallback(() => {
+    if (measurementFrameRef.current) return
+    measurementFrameRef.current = window.requestAnimationFrame(() => {
+      measurementFrameRef.current = 0
+      syncMeasurementMetrics()
+    })
+  }, [syncMeasurementMetrics])
+
+  const measuredHeights = useCallback(() => {
+    const measurement = measurementRef.current
+    if (!measurement) return null
+    const rows = Array.from(measurement.querySelectorAll<HTMLElement>('[data-navbar-overflow-measure-item]'))
+    const button = measurement.querySelector<HTMLElement>('[data-navbar-overflow-measure-more]')
+    if (rows.length !== items.length || !button) return null
+    return {
+      rows: rows.map((row) => row.getBoundingClientRect().height),
+      button: button.getBoundingClientRect().height,
+    }
+  }, [items.length])
+
+  const initialVisibleCount = useCallback((availableHeight: number) => {
+    const heights = measuredHeights()
+    if (!heights || items.length === 0) return 0
+    const totalHeight = heights.rows.reduce((total, height) => total + height, 0)
+    if (totalHeight <= availableHeight + 0.5) return items.length
+
+    const budget = Math.max(0, availableHeight - heights.button)
+    let used = 0
+    let count = 0
+    while (count < heights.rows.length && used + heights.rows[count] <= budget + 0.5) {
+      used += heights.rows[count]
+      count += 1
+    }
+    return Math.max(1, count)
+  }, [items.length, measuredHeights])
+
+  const nextVisibleCount = useCallback((current: number, availableHeight: number) => {
+    const heights = measuredHeights()
+    if (!heights || current >= items.length) return current
+
+    const remainingBudget = Math.max(0, availableHeight - heights.button)
+    let used = 0
+    let next = current
+    while (next < heights.rows.length && used + heights.rows[next] <= remainingBudget + 0.5) {
+      used += heights.rows[next]
+      next += 1
+    }
+    return Math.max(current + 1, next)
+  }, [items.length, measuredHeights])
+
   useEffect(() => {
     const panel = contentRef.current?.closest<HTMLElement>('[popover]')
     if (!panel) return
 
-    const resetExpandedAfterClose = (event: Event) => {
-      if ((event as Event & { newState?: string }).newState !== 'closed') return
+    const handleParentToggle = (event: Event) => {
+      const newState = (event as Event & { newState?: string }).newState
+      if (newState === 'open') {
+        panel.style.visibility = 'hidden'
+        setParentOpen(true)
+        setCapacityReady(false)
+        scheduleMeasurement()
+        return
+      }
+      if (newState !== 'closed') return
+
+      setParentOpen(false)
+      setCapacityReady(false)
+      setMeasurementMetrics(null)
+      setVisibleItemCount(Math.min(1, items.length))
+      setFocusTransferIndex(null)
       setExpanded((current) => current.size === 0 ? current : new Set())
+      pendingScrollRef.current = null
+      if (measurementFrameRef.current) {
+        window.cancelAnimationFrame(measurementFrameRef.current)
+        measurementFrameRef.current = 0
+      }
+      if (focusFrameRef.current) {
+        window.cancelAnimationFrame(focusFrameRef.current)
+        focusFrameRef.current = 0
+      }
     }
 
-    panel.addEventListener('toggle', resetExpandedAfterClose)
-    return () => panel.removeEventListener('toggle', resetExpandedAfterClose)
-  }, [])
+    panel.addEventListener('toggle', handleParentToggle)
+    return () => {
+      panel.removeEventListener('toggle', handleParentToggle)
+      if (measurementFrameRef.current) {
+        window.cancelAnimationFrame(measurementFrameRef.current)
+        measurementFrameRef.current = 0
+      }
+      if (focusFrameRef.current) {
+        window.cancelAnimationFrame(focusFrameRef.current)
+        focusFrameRef.current = 0
+      }
+    }
+  }, [items.length, scheduleMeasurement])
+
+  useEffect(() => {
+    if (!parentOpen) return
+    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    if (!panel) return
+
+    const observer = new ResizeObserver(scheduleMeasurement)
+    observer.observe(panel)
+    if (contentRef.current) observer.observe(contentRef.current)
+    window.addEventListener('resize', scheduleMeasurement)
+    let active = true
+    void document.fonts.ready.then(() => {
+      if (!active) return
+      setFontMeasurementRevision((revision) => revision + 1)
+      scheduleMeasurement()
+    })
+
+    return () => {
+      active = false
+      observer.disconnect()
+      window.removeEventListener('resize', scheduleMeasurement)
+    }
+  }, [parentOpen, scheduleMeasurement])
+
+  useEffect(() => {
+    if (!parentOpen || !measurementMetrics) return
+    const frame = window.requestAnimationFrame(() => {
+      const calculated = initialVisibleCount(measurementMetrics.availableHeight)
+      setVisibleItemCount((current) => Math.min(items.length, Math.max(current, calculated)))
+      setCapacityReady(true)
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [expandedKey, fontMeasurementRevision, initialVisibleCount, items.length, labelKey, measurementMetrics, parentOpen])
+
+  useLayoutEffect(() => {
+    if (!parentOpen || !capacityReady) return
+    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    if (panel) panel.style.visibility = 'visible'
+  }, [capacityReady, parentOpen])
+
+  useLayoutEffect(() => {
+    const pending = pendingScrollRef.current
+    if (!pending) return
+    pendingScrollRef.current = null
+    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    if (!panel) return
+    panel.scrollTop = pending.scrollTop
+  }, [visibleItemCount])
+
+  useEffect(() => {
+    if (focusTransferIndex === null || visibleItemCount < items.length) return
+    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    if (!panel) return
+    const scrollTop = panel.scrollTop
+    focusFrameRef.current = window.requestAnimationFrame(() => {
+      setFocusTransferIndex(null)
+      focusFrameRef.current = window.requestAnimationFrame(() => {
+        focusFrameRef.current = window.requestAnimationFrame(() => {
+          focusFrameRef.current = 0
+          const firstNewItem = Array.from(
+            contentRef.current?.querySelectorAll<HTMLElement>('[data-navbar-overflow-item-index] [data-baris]') ?? [],
+          ).find((candidate) => {
+            const item = candidate.closest<HTMLElement>('[data-navbar-overflow-item-index]')
+            return Number(item?.dataset.navbarOverflowItemIndex) >= focusTransferIndex && !candidate.matches(':disabled, [aria-disabled="true"]')
+          })
+          const focusTarget = firstNewItem ?? triggerRef.current
+          focusTarget?.focus({ preventScroll: true })
+          panel.scrollTop = scrollTop
+        })
+      })
+    })
+  }, [focusTransferIndex, items.length, triggerRef, visibleItemCount])
 
   const toggleDisclosure = (id: string) => {
     setExpanded((current) => {
@@ -311,100 +659,106 @@ function OverflowPanel({
     })
   }
 
-  const destination = (item: NavbarDestination, close: () => void, measurementKey: string, nested = false) => {
-    const rel = item.target === '_blank' ? (item.rel ?? 'noopener noreferrer') : item.rel
-    const className = cn(
-      'flex min-w-0 items-center rounded-md py-2 text-content transition-colors',
-      nested ? 'pr-3 pl-7' : 'px-3',
-      'hover:bg-dropdown-item-hover-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
-      item.disabled && 'cursor-not-allowed opacity-50',
-    )
-    const content = <NavbarLabel label={item.label} measurementKey={measurementKey} scope="overflow" truncated={truncatedLabels.has(measurementKey)} className="flex-1" />
+  const loadMore = (event: MouseEvent<HTMLButtonElement>) => {
+    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const metrics = readMeasurementMetrics()
+    if (!panel || !metrics) return
+    const currentVisibleCount = Math.min(visibleItemCount, items.length)
+    const next = Math.min(items.length, nextVisibleCount(currentVisibleCount, metrics.availableHeight))
+    if (next <= currentVisibleCount) return
 
-    if (item.disabled) {
-      return <span key={item.id} aria-disabled="true" aria-label={item.label} className={className}>{content}</span>
+    pendingScrollRef.current = {
+      scrollTop: panel.scrollTop,
     }
-
-    return (
-      <a
-        key={item.id}
-        href={item.href}
-        target={item.target}
-        rel={rel}
-        aria-current={item.current ? 'page' : undefined}
-        aria-label={item.label}
-        data-baris=""
-        className={className}
-        onClick={(event) => {
-          item.onClick?.(event)
-          if (ordinaryActivation(event)) close()
-        }}
-      >
-        {content}
-      </a>
-    )
+    if (document.activeElement === event.currentTarget && next >= items.length) {
+      setFocusTransferIndex(currentVisibleCount)
+    }
+    setVisibleItemCount(next)
   }
 
-  return (
-    <Dropdown
-      align="end"
-      trigger={
-        <button
-          ref={triggerRef}
-          type="button"
-          aria-controls={panelId}
-          className={cn(
-            'inline-flex items-center gap-1 whitespace-nowrap rounded py-1.5 font-sans text-base leading-[1.5] font-semibold text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-            desktopItemPadding[spacingMode],
-          )}
-        >
-          Lainnya
-          <ChevronDownIcon />
-        </button>
-      }
-      contentClassName="w-[min(clamp(240px,21vw,304px),calc(100vw-48px))] p-2"
-    >
-      {({ close }) => (
-        <div
-          ref={contentRef}
-          id={panelId}
-          role="region"
-          aria-label="Navigasi lainnya"
-          className="w-full min-w-0"
-        >
-          {items.map((item, index) => {
-            if (item.type === 'destination') return destination(item, close, `destination:${item.id}`)
+  const currentVisibleCount = Math.min(visibleItemCount, items.length)
+  const visibleItems = items.slice(0, currentVisibleCount)
+  const hasMoreItems = currentVisibleCount < items.length
 
-            const isExpanded = expanded.has(item.id)
-            const groupId = `${panelId}-group-${index}`
-            return (
-              <div key={item.id} className="min-w-0">
-                <button
-                  type="button"
-                  disabled={item.disabled}
-                  aria-expanded={isExpanded}
-                  aria-controls={groupId}
-                  aria-label={item.label}
-                  data-baris=""
-                  onClick={() => toggleDisclosure(item.id)}
-                  className={cn(
-                    'flex w-full min-w-0 items-center gap-2 rounded-md px-3 py-2 text-left text-content transition-colors hover:bg-dropdown-item-hover-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50',
-                  )}
-                >
-                  <NavbarLabel label={item.label} measurementKey={`disclosure:${item.id}`} scope="overflow" truncated={truncatedLabels.has(`disclosure:${item.id}`)} className="flex-1" />
-                  <span className={cn('shrink-0 transition-transform', isExpanded && 'rotate-180')}><ChevronDownIcon /></span>
-                </button>
-                {isExpanded && !item.disabled && (
-                  <div id={groupId} className="grid min-w-0 border-l border-border-subtle">
-                    {item.children.map((child) => destination(child, close, `child:${item.id}:${child.id}`, true))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
+  return (
+    <>
+      <Dropdown
+        align="end"
+        trigger={
+          <button
+            ref={triggerRef}
+            type="button"
+            aria-controls={panelId}
+            className={cn(
+              'inline-flex items-center gap-1 whitespace-nowrap rounded py-1.5 font-sans text-base leading-[1.5] font-semibold text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+              desktopItemPadding[spacingMode],
+            )}
+          >
+            Lainnya
+            <ChevronDownIcon />
+          </button>
+        }
+        contentClassName="w-[min(clamp(240px,21vw,304px),calc(100vw-48px))] p-2"
+      >
+        {({ close }) => (
+          <div
+            ref={contentRef}
+            id={panelId}
+            role="region"
+            aria-label="Navigasi lainnya"
+            className={cn('w-full min-w-0', !capacityReady && 'invisible')}
+          >
+            {visibleItems.map((item, index) => (
+              <OverflowItemBlock
+                key={item.id}
+                item={item}
+                index={index}
+                panelId={panelId}
+                expanded={item.type === 'disclosure' && expanded.has(item.id)}
+                measurement={false}
+                truncatedLabels={truncatedLabels}
+                close={close}
+                onToggle={toggleDisclosure}
+              />
+            ))}
+            {(hasMoreItems || focusTransferIndex !== null) && (
+              <button
+                type="button"
+                className={loadMoreClass}
+                disabled={!hasMoreItems}
+                onClick={loadMore}
+              >
+                <span className={navbarLabelClass}>Muat lebih banyak</span>
+              </button>
+            )}
+          </div>
+        )}
+      </Dropdown>
+      {measurementMetrics && (
+        <div
+          ref={measurementRef}
+          aria-hidden="true"
+          className="pointer-events-none fixed top-0 left-0 invisible min-w-0"
+          style={{ width: `${measurementMetrics.width}px` }}
+        >
+          {items.map((item, index) => (
+            <div key={item.id} data-navbar-overflow-measure-item="">
+              <OverflowItemBlock
+                item={item}
+                index={index}
+                panelId={`${panelId}-measurement`}
+                expanded={index < currentVisibleCount && item.type === 'disclosure' && expanded.has(item.id)}
+                measurement
+                truncatedLabels={new Set()}
+              />
+            </div>
+          ))}
+          <div data-navbar-overflow-measure-more="" className={loadMoreClass}>
+            <span className={navbarLabelClass}>Muat lebih banyak</span>
+          </div>
         </div>
       )}
-    </Dropdown>
+    </>
   )
 }
 
