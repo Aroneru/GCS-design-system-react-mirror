@@ -214,7 +214,12 @@ export function Stage({
         dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
       }`}
     >
-      <div className={`mx-auto transition-[max-width] duration-300 ease-out ${maxWidth}`} style={{ minWidth }}>
+      <div
+        className={`mx-auto transition-[max-width] duration-300 ease-out ${maxWidth} ${
+          activeFont ? fontClass[activeFont] : ''
+        }`}
+        style={{ minWidth }}
+      >
         {children}
       </div>
     </div>
