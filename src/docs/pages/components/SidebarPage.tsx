@@ -306,11 +306,13 @@ function VariantPreview({
   description,
   children,
   dark = false,
+  minWidth,
 }: {
   title: string;
   description: string;
   children: ReactNode;
   dark?: boolean;
+  minWidth?: string;
 }) {
   return (
     <article className="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -318,7 +320,9 @@ function VariantPreview({
         <h3 className="text-sm font-bold text-gray-900">{title}</h3>
         <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
       </div>
-      <div className={`h-[440px] overflow-y-auto overscroll-contain ${dark ? "bg-gray-900" : "bg-gray-50"}`}>{children}</div>
+      <div className={`h-[440px] overflow-y-auto overscroll-contain ${minWidth ? "ds-scroll-x overflow-x-auto" : ""} ${dark ? "bg-gray-900" : "bg-gray-50"}`}>
+        <div className="h-full" style={{ minWidth }}>{children}</div>
+      </div>
     </article>
   );
 }
@@ -336,7 +340,7 @@ function SidebarVariant({
 }) {
   return (
     <Sidebar
-      className="!min-h-0 h-full"
+      className={cn("!min-h-0 h-full shrink-0", collapsed ? "w-[72px]" : "w-[280px]")}
       collapsed={collapsed}
       showCollapseButton
       darkMode={darkMode}
@@ -372,6 +376,7 @@ export function SidebarPage() {
       e.preventDefault();
       setActiveMenu(item.label as string);
     },
+    disabled: item.label === "Menu 7" || item.label === "Menu 8",
     icon: menuIcon === "show" ? item.icon : undefined,
     ...(item.label === "Menu 4" ? { badge: badge === "show" ? 1 : undefined } : {}),
     children: item.children?.map((sub) => ({
@@ -486,6 +491,7 @@ export function SidebarPage() {
           <VariantPreview
             title="1. Menu Only"
             description="Navigasi dasar tanpa logo dan informasi akun."
+            minWidth="280px"
           >
             <Sidebar items={menuOnlyItems} />
           </VariantPreview>
@@ -493,6 +499,7 @@ export function SidebarPage() {
           <VariantPreview
             title="2. Menu, user info, logo web"
             description="Navigasi dasar dengan identitas aplikasi dan area akun."
+            minWidth="280px"
           >
             <SidebarVariant items={standardItems} />
           </VariantPreview>
@@ -500,6 +507,7 @@ export function SidebarPage() {
           <VariantPreview
             title="3. Multi-level menu, user info, logo web"
             description="Menu anak dipakai untuk mengelompokkan navigasi yang berkaitan."
+            minWidth="280px"
           >
             <SidebarVariant items={nestedItems} />
           </VariantPreview>
@@ -507,6 +515,7 @@ export function SidebarPage() {
           <VariantPreview
             title="4. Multi-level menu + icon,user info, logo web"
             description="Menu berikon dikelompokkan; separator membedakan area konten."
+            minWidth="280px"
           >
             <SidebarVariant groups={iconGroups} />
           </VariantPreview>
@@ -514,6 +523,7 @@ export function SidebarPage() {
           <VariantPreview
             title="5. Collapsed"
             description="Konfigurasi varian 4 dalam kondisi tertutup: icon, user, dan logo mark tetap terlihat."
+            minWidth="72px"
           >
             <SidebarVariant groups={iconGroups} collapsed />
           </VariantPreview>
@@ -529,8 +539,9 @@ export function SidebarPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="min-w-0">
             <h3 className="mb-3 text-sm font-bold text-gray-900">Menu</h3>
-            <div className="mb-4 max-w-[280px] rounded-xl border border-gray-200 bg-white p-4">
-              <div className="space-y-1">
+            <div className="ds-scroll-x mb-4 overflow-x-auto">
+              <div className="w-[280px] rounded-xl border border-gray-200 bg-white p-4">
+                <div className="space-y-1">
                 <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
                   <ChartPie className="size-5" />
                   <span>Menu 1</span>
@@ -544,6 +555,7 @@ export function SidebarPage() {
                 <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
                   <Inbox className="size-5" />
                   <span>Menu 3</span>
+                </div>
                 </div>
               </div>
             </div>
@@ -571,10 +583,11 @@ export function SidebarPage() {
 
           <div className="min-w-0">
             <h3 className="mb-3 text-sm font-bold text-gray-900">Sub Menu</h3>
-            <div className="mb-4 max-w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white">
-              <Sidebar
-                className="!min-h-0"
-                items={[
+            <div className="ds-scroll-x mb-4 overflow-x-auto">
+              <div className="w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white">
+                <Sidebar
+                  className="!min-h-0"
+                  items={[
                   {
                     label: "Menu 3",
                     icon: <Cart className="size-5" />,
@@ -586,8 +599,9 @@ export function SidebarPage() {
                       { label: "Sub - Menu 2", href: "#" },
                     ],
                   },
-                ]}
-              />
+                  ]}
+                />
+              </div>
             </div>
 
             <SectionCode>
@@ -618,8 +632,9 @@ export function SidebarPage() {
           item baru pada menu tertentu.
         </p>
 
-        <div className="mb-4 max-w-[280px] rounded-xl border border-gray-200 bg-white p-4">
-          <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
+        <div className="ds-scroll-x mb-4 overflow-x-auto">
+          <div className="w-[280px] rounded-xl border border-gray-200 bg-white p-4">
+            <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
             <Inbox className="size-5" />
 
             <span className="flex-1">Menu 4</span>
@@ -627,6 +642,7 @@ export function SidebarPage() {
             <span className="flex min-w-5 items-center justify-center rounded-full bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-600">
               1
             </span>
+            </div>
           </div>
         </div>
 
@@ -649,8 +665,10 @@ export function SidebarPage() {
           <Hl>separator: true</Hl> pada group yang ingin diberi garis pemisah di bagian atas.
         </p>
 
-        <div className="mb-4 max-w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white">
-          <Sidebar className="!min-h-0" groups={separatorGroups} />
+        <div className="ds-scroll-x mb-4 overflow-x-auto">
+          <div className="w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white">
+            <Sidebar className="!min-h-0" groups={separatorGroups} />
+          </div>
         </div>
 
         <SectionCode>
@@ -682,6 +700,7 @@ export function SidebarPage() {
             title="1. Multi-level menu + icon, user info, logo web"
             description="Menu berikon dikelompokkan; separator membedakan area konten."
             dark
+            minWidth="280px"
           >
             <SidebarVariant groups={iconGroups} darkMode />
           </VariantPreview>
@@ -690,6 +709,7 @@ export function SidebarPage() {
             title="2. Collapsed"
             description="Konfigurasi varian 1 dalam kondisi tertutup: icon, user, dan logo terlihat."
             dark
+            minWidth="72px"
           >
             <SidebarVariant groups={iconGroups} collapsed darkMode />
           </VariantPreview>
@@ -702,7 +722,7 @@ export function SidebarPage() {
           collapse, badge, separator, logo, user info, dan tombol collapse.
         </p>
 
-        <Stage maxWidth="max-w-[768px]" dark={theme === "dark"}>
+        <Stage maxWidth="max-w-[768px]" minWidth="768px" dark={theme === "dark"}>
           <div
             className={cn(
               "flex min-h-[760px] w-full items-stretch overflow-hidden border",
