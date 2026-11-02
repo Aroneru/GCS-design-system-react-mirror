@@ -100,16 +100,6 @@ export function FormOverview() {
       </OverviewCard>
 
       <OverviewCard
-        route="/form/datepicker"
-        name="Datepicker"
-        desc="Pemilih tanggal dengan kalender: satu tanggal, pintasan periode, atau rentang dua kalender."
-      >
-        <Preview>
-          <Datepicker label="Tanggal pengajuan" defaultValue={new Date(2021, 5, 25)} />
-        </Preview>
-      </OverviewCard>
-
-      <OverviewCard
         route="/form/upload"
         name="Upload Form"
         desc="Pemilih berkas: satu baris tombol dengan nama berkas, atau area seret-lepas."
@@ -170,6 +160,16 @@ export function FormOverview() {
             <Checkbox label="Saya menyetujui syarat" defaultChecked />
             <Checkbox label="Kirim salinan ke email" />
           </div>
+        </Preview>
+      </OverviewCard>
+
+      <OverviewCard
+        route="/form/datepicker"
+        name="Datepicker"
+        desc="Pemilih tanggal dengan kalender: satu tanggal, pintasan periode, atau rentang dua kalender."
+      >
+        <Preview>
+          <Datepicker label="Tanggal pengajuan" defaultValue={new Date(2021, 5, 25)} />
         </Preview>
       </OverviewCard>
     </OverviewPage>
