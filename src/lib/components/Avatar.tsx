@@ -1,8 +1,15 @@
 import { forwardRef, useState, type HTMLAttributes, type ReactNode } from 'react'
+import { User } from 'flowbite-react-icons/outline'
+import femaleDark from '../assets/avatar/Female-Dark.svg'
+import femaleLight from '../assets/avatar/Female-Light.svg'
+import maleDark from '../assets/avatar/Male-Dark.svg'
+import maleLight from '../assets/avatar/Male-Light.svg'
 import { cn } from '../utils/cn'
 
 /** Tiga diameter lingkaran: 24px, 32px, dan 80px. */
 export type AvatarSize = 'small' | 'default' | 'large'
+export type AvatarGender = 'male' | 'female'
+export type AvatarFallback = 'initials' | 'profile'
 
 /**
  * Diameter lingkaran beserta ukuran teks isinya.
@@ -26,14 +33,72 @@ export interface AvatarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'child
    * sebagai hiasan dan tidak diumumkan dua kali.
    */
   alt?: string
+  /** Nama pemilik Avatar, dipakai untuk nama aksesibel dan inisial otomatis. */
+  name?: string
   /**
    * Isi lingkaran saat tidak ada gambar — umumnya satu atau dua huruf inisial.
    * Bisa juga diisi ikon kecil bila memang tidak ada nama yang bisa disingkat.
    */
   initials?: ReactNode
   size?: AvatarSize
-  /** Warna fallback untuk permukaan gelap. Foto profil tidak diubah. */
+  /** Ilustrasi profil yang dipakai ketika fallback tidak menghasilkan inisial. */
+  gender?: AvatarGender
+  /** Memilih fallback inisial atau langsung menampilkan ilustrasi profil. */
+  fallback?: AvatarFallback
+  /** @deprecated Gunakan scope ambient `data-theme="dark"`. */
   darkMode?: boolean
+}
+
+const profileAssets = {
+  male: { light: maleLight, dark: maleDark },
+  female: { light: femaleLight, dark: femaleDark },
+} satisfies Record<AvatarGender, { light: string; dark: string }>
+
+function graphemes(value: string): string[] {
+  if (typeof Intl.Segmenter === 'function') {
+    return Array.from(new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(value), ({ segment }) => segment)
+  }
+
+  return Array.from(value)
+}
+
+function initialsFromName(name?: string): string {
+  const words = name?.trim().split(/\s+/u).filter(Boolean) ?? []
+  if (words.length === 0) return ''
+
+  if (words.length === 1) return graphemes(words[0]).slice(0, 2).join('').toLocaleUpperCase()
+
+  const first = graphemes(words[0])[0] ?? ''
+  const last = graphemes(words.at(-1) ?? '')[0] ?? ''
+  return `${first}${last}`.toLocaleUpperCase()
+}
+
+function hasInitials(value: ReactNode): boolean {
+  return value !== undefined && value !== null && value !== false && value !== ''
+}
+
+function ProfileFallback({ gender }: { gender?: AvatarGender }) {
+  if (!gender) {
+    return <User className="size-[60%]" aria-hidden="true" />
+  }
+
+  const assets = profileAssets[gender]
+  return (
+    <>
+      <img
+        src={assets.light}
+        alt=""
+        className="size-full [display:var(--avatar-profile-light-display)]"
+        aria-hidden="true"
+      />
+      <img
+        src={assets.dark}
+        alt=""
+        className="size-full [display:var(--avatar-profile-dark-display)]"
+        aria-hidden="true"
+      />
+    </>
+  )
 }
 
 /**
@@ -48,28 +113,38 @@ export interface AvatarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'child
  * penanganan ini yang tersisa hanya ikon gambar rusak.
  */
 export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
-  { src, alt = '', initials, size = 'default', darkMode = false, className, ...props },
+  {
+    src,
+    alt,
+    name,
+    initials,
+    size = 'default',
+    gender,
+    fallback = 'initials',
+    darkMode = false,
+    className,
+    ...props
+  },
   ref,
 ) {
   // Yang diingat adalah alamat yang gagal, bukan sekadar "pernah gagal", supaya
   // pergantian src berikutnya tetap dicoba lagi.
   const [gagal, setGagal] = useState<string | null>(null)
   const pakaiGambar = Boolean(src) && gagal !== src
+  const inisialOtomatis = initialsFromName(name)
+  const isiInisial = hasInitials(initials) ? initials : inisialOtomatis
+  const pakaiProfil = !pakaiGambar && (fallback === 'profile' || !hasInitials(isiInisial))
 
-  // Saat isinya cuma inisial, nama pemiliknya tidak punya tempat lain untuk
-  // hidup selain di sini.
-  const namanya = !pakaiGambar && alt ? alt : undefined
+  const namaAksesibel = alt ?? name ?? ''
 
   return (
     <div
       ref={ref}
-      role={namanya ? 'img' : undefined}
-      aria-label={namanya}
+      role={!pakaiGambar && namaAksesibel ? 'img' : undefined}
+      aria-label={!pakaiGambar && namaAksesibel ? namaAksesibel : undefined}
+      data-theme={darkMode ? 'dark' : undefined}
       className={cn(
-        'grid shrink-0 place-items-center overflow-hidden rounded-full font-normal',
-        darkMode && !pakaiGambar
-          ? 'bg-gray-800 text-gray-100'
-          : 'bg-gray-100 text-gray-900',
+        'grid shrink-0 place-items-center overflow-hidden rounded-full bg-avatar-surface font-sans font-normal text-avatar-content',
         sizes[size],
         className,
       )}
@@ -78,14 +153,20 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
       {pakaiGambar ? (
         <img
           src={src}
-          alt={alt}
+          alt={namaAksesibel}
           className="size-full object-cover"
           onError={() => setGagal(src ?? null)}
         />
+      ) : pakaiProfil ? (
+        <span className="grid size-full place-items-center" aria-hidden="true">
+          <ProfileFallback gender={gender} />
+        </span>
       ) : (
         // Inisial disembunyikan dari pembaca layar: dieja huruf per huruf ia
         // tidak berarti apa-apa, dan namanya sudah diwakili aria-label di atas.
-        <span aria-hidden="true">{initials}</span>
+        <span className="leading-none" aria-hidden="true">
+          {isiInisial}
+        </span>
       )}
     </div>
   )

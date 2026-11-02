@@ -100,14 +100,16 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   `darkMode` satu per satu.
 - **Kembali ke tema terang**: Bagian di dalam area gelap dapat dikembalikan ke
   tema terang dengan `data-theme="light"` atau kelas `.ds-theme-light`.
-- **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`,
+- **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`, `Dropdown`, `Popover`,
   `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
   `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, dan
-  `Timeline`.
+  `Timeline`, serta `Avatar` dan `Clipboard`.
 - **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
   `--color-search-category-surface` dan `--color-search-field-surface` (Search),
-  `--color-breadcrumb-*` (Breadcrumb), serta `--color-timeline-*` (Timeline). Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
+  `--color-breadcrumb-*` (Breadcrumb), `--color-clipboard-*` (Clipboard),
+  `--color-dropdown-*` (Dropdown), `--color-popover-*` (Popover), serta `--color-timeline-*` (Timeline). Panduan
+  lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
 
 ## Komponen & props
 
@@ -117,18 +119,18 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | ------------ | -------------------------------------------------------------------------------------------------------------------- |
 | `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| submit \| reset`, `iconOnly`, `as`: `button \| anchor`, `darkMode` |
 | `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
-| `Avatar`     | `src`, `alt`, `initials`, `size`: `small \| default \| large`, `darkMode`                                            |
+| `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| profile`, `gender`: `male \| female`, `size`: `small \| default \| large`, `darkMode` (deprecated) |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
-| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `onCopySuccess`, `darkMode` |
+| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `disabled`, `onCopySuccess`, `onCopyError`, `darkMode` (deprecated) |
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Toast`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Card`       | `image`, `title`, `description`, `href`, `linkLabel`, `actions`, `darkMode`                                          |
 | `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `darkMode` |
 | `Container`  | `as` (default `div`), `padded` (default `true`), `darkMode`                                                          |
 | `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
-| `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode`                                          |
+| `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, ambient `data-theme`, `darkMode` (override kompatibilitas) |
 | `Dropdown`   | `trigger`, `items`/`groups` atau `children`, `align`, `closeOnSelect`, `actionsRef`, `contentLabel`, `contentClassName`, `data-theme`, `darkMode` |
-| `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape` |
+| `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape`, `showCloseButton`, `closeLabel` |
 | `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `theme`, `darkMode`   |
 | `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
@@ -147,6 +149,132 @@ persegi berisi ikon saja. Prop `type` (`button | submit | reset`, bawaan `button
 meneruskan atribut HTML native ke elemen `<button>`, memungkinkan tombol dipakai
 untuk submit form. Untuk tautan pakai `as="anchor"` bersama `href`, maka
 Button dirender sebagai `<a>`.
+
+#### Avatar
+
+Avatar memprioritaskan foto dari `src`. Bila foto tidak ada atau gagal dimuat,
+fallback bawaannya adalah `initials` manual, lalu inisial Unicode-aware dari
+`name`, ilustrasi `gender`, dan akhirnya ikon User netral. `initials` tetap
+tersedia untuk override:
+
+```tsx
+<Avatar src={user.avatarUrl} name={user.name} />
+<Avatar name="Putri Handayani" initials="PT" />
+```
+
+Untuk langsung memakai ilustrasi profile, pilih gender secara eksplisit — kami
+menyediakan asset Male/Female untuk tema terang dan gelap:
+
+```tsx
+<Avatar gender="female" fallback="profile" />
+<Avatar gender="male" fallback="profile" />
+```
+
+Avatar mengikuti `data-theme` dari pembungkusnya, termasuk scope bertingkat.
+Prop `darkMode` masih didukung untuk kompatibilitas tetapi deprecated. Pakai
+`alt=""` bila nama pemilik sudah tertulis di dekat Avatar agar pembaca layar
+tidak mengumumkannya dua kali. Ukuran API tetap `small` (S, 24px), `default`
+(M, 32px), dan `large` (L, 80px); M adalah bawaan.
+
+#### Clipboard
+
+`Clipboard` menampilkan `value` melalui input hanya-baca dan menyalin string
+persisnya dengan aksi native browser. Bentuk `default` memakai tombol teks
+Copy; `variant="segmented"` menyatukan nilai dengan tombol ikon dan dapat
+menampilkan `prefix` kontekstual yang **tidak** ikut disalin. `platform` bernilai
+`default` atau `mobile`: keduanya preset eksplisit, bukan hasil deteksi viewport.
+Desktop memakai teks 14px; Mobile mempertahankan ukuran ringkasnya. Ukuran,
+weight, dan line-height mengikuti preset tersebut, sedangkan keluarga font tetap
+mewarisi pilihan consumer: Lato, Inter, atau Arial.
+
+```tsx
+import { Clipboard } from '@ceplok-ui/design-kit-react'
+
+<Clipboard value="INV-2026-001" label="Nomor referensi" />
+
+<Clipboard
+  value="https://komdigi.go.id/"
+  label="Alamat situs"
+  variant="segmented"
+  prefix="URL"
+/>
+```
+
+Setelah `navigator.clipboard.writeText(value)` berhasil, Clipboard menampilkan
+feedback Copied sementara; aksi bersegmen mengganti ikon Clipboard menjadi
+Check tanpa mengubah ukuran tombol. Tooltip ikon “Copy to clipboard” berada di
+tengah tombol, muncul untuk hover atau fokus keyboard, dapat ditutup dengan
+Escape, dan tidak muncul kembali sepanjang status Copied. Setelah reset, tooltip
+menunggu hover atau fokus baru.
+
+Saat `disabled`, aksi Copy, tooltip, pemilihan teks, serta copy/cut melalui UI
+dinonaktifkan; ini bukan mekanisme keamanan data yang sudah berada di browser.
+`onCopySuccess` hanya berjalan setelah salin berhasil dan `onCopyError` menerima
+kegagalan Clipboard API. Tampilan mengikuti scope ambient `data-theme`, termasuk
+scope bertingkat:
+
+```tsx
+<section data-theme="dark">
+  <Clipboard value="INV-2026-001" label="Nomor referensi" />
+</section>
+```
+
+`darkMode` masih tersedia sebagai override kompatibilitas, tetapi deprecated;
+gunakan `data-theme="dark"` untuk kode baru.
+
+#### Spinner
+
+`Spinner` adalah indikator loading SVG dengan dua ukuran: default 50×50px dan
+`size="large"` 100×100px. Lingkaran latar memakai gray-200 dan arc proses
+memakai primary-600. Spinner meneruskan atribut SVG native yang relevan, tetapi
+geometri internalnya tetap dikendalikan komponen. Animasi berhenti saat pengguna
+mengaktifkan reduced motion.
+
+```tsx
+import { Spinner } from '@ceplok-ui/design-kit-react'
+
+<Spinner aria-label="Memuat daftar pengguna" />
+
+<div className="flex items-center gap-3">
+  <Spinner size="large" aria-hidden="true" />
+  <span>Memuat data…</span>
+</div>
+```
+
+Tanpa `aria-hidden`, Spinner memiliki `role="status"` dan label default
+`"Loading"`. Saat teks di sekitarnya sudah menjelaskan proses loading, gunakan
+`aria-hidden="true"` agar status tidak diumumkan dua kali.
+
+#### Modal
+
+`Modal` memakai native `<dialog>`. Tanpa `open`, berikan `trigger` berupa
+elemen `<button>` dan Modal mengelola visibilitas internal. Dengan `open`, Modal
+menjadi controlled; `onOpenChange` menerima permintaan buka/tutup dan `trigger`
+boleh dihilangkan. Render function pada `footer` menerima `close()` untuk aksi
+eksplisit:
+
+```tsx
+<Modal
+  trigger={<Button>Buka</Button>}
+  title="Konfirmasi"
+  footer={({ close }) => <Button size="xs" onClick={close}>Selesai</Button>}
+>
+  <p>Isi dialog milik consumer.</p>
+</Modal>
+```
+
+Default mendukung `size="s"` dan `size="m"`; body menggulir saat konten
+melebihi viewport, sementara header dan footer tetap di panel. Popup memakai
+ukuran ringkas bawaannya dan tidak menerima `title` atau `size`; berikan
+`aria-label` atau `aria-labelledby` untuk nama aksesibelnya.
+
+`closeOnBackdrop`, `closeOnEscape`, dan `showCloseButton` bernilai `true` secara
+bawaan dan dapat dimatikan secara independen. Jika semuanya dimatikan,
+sediakan aksi footer yang memanggil `close()`. `closeLabel` memberi nama
+aksesibel pada tombol X. Tema mengikuti wrapper ambient `data-theme="dark"`;
+Modal tidak memiliki prop `darkMode`. Nested Modal adalah komposisi dua Modal
+controlled dengan state terpisah: Default membuka Popup, penutupan Popup tidak
+menutup Default, dan fokus kembali ke kontrol pembukanya.
 
 `darkMode` pada Button menyesuaikan warna untuk permukaan gelap. Pada `tone="light"`,
 filled memakai gray-50 dan outline memakai gray-50; pada `tone="dark"`, filled
@@ -201,21 +329,197 @@ Prop yang dipakai bersama seluruh komponen form:
 > kotaknya, `Radio` memakai latar gray-100, `Toggle` justru menggelapkan
 > jalurnya ke gray-300. Perlu diselaraskan di rancangannya lebih dulu.
 
-### Navbar
+### Dropdown
 
-Navbar memakai kontrak terdiskriminasi berdasarkan `platform`. Front Office
-(FO) mendukung identitas guest atau account; Back Office (BO) memakai
-`mobileDrawer` untuk menghubungkan tombol contextual Drawer milik consumer.
-`brand` selalu berupa objek terstruktur, sedangkan `search` adalah slot
-`ReactNode` yang disediakan consumer. Navbar merender `brand.content` sebagai
-satu unit dan tidak memisahkan mark maupun wordmark secara otomatis. Brand
-ditampilkan pada FO desktop/mobile dan BO mobile; BO desktop tidak
-menampilkannya karena identitas aplikasi berada pada Sidebar desktop.
+`Dropdown` adalah foundation generik untuk action, link navigasi, selection,
+dan konten interaktif milik consumer. Prop `trigger` harus menghasilkan satu
+native `<button>` sebagai root DOM langsung serta meneruskan atribut dan event
+button yang diberikan Dropdown. Native button, `Button` dalam mode button, dan
+komponen tombol kustom yang meneruskan seluruh atribut native didukung; anchor,
+`div`, `span`, Fragment, atau button yang dibungkus elemen lain tidak didukung.
 
-#### Front Office — guest
+#### Action dan Navigation
+
+Action dan Navigation sama-sama memakai generated `items` atau `groups`.
+Navigation bukan mode production tersendiri: `href`, `target`, `rel`, dan
+`current` adalah API publik `DropdownItem`.
 
 ```tsx
-import { Navbar, Search, type NavbarPrimaryItem } from '@ceplok-ui/design-kit-react'
+import { Dropdown, type DropdownItem } from '@ceplok-ui/design-kit-react'
+
+const actions = [
+  { id: 'edit', label: 'Edit', onClick: () => console.info('Edit') },
+  { id: 'delete', label: 'Hapus', tone: 'danger', onClick: () => console.info('Hapus') },
+] satisfies DropdownItem[]
+
+const navigation = [
+  { id: 'overview', label: 'Ringkasan', href: '/ringkasan', current: true },
+  { id: 'settings', label: 'Pengaturan', href: '/pengaturan' },
+  {
+    id: 'docs',
+    label: 'Dokumentasi',
+    href: 'https://example.com/docs',
+    target: '_blank',
+    rel: 'noopener noreferrer',
+  },
+  { id: 'archive', label: 'Arsip', href: '/arsip', disabled: true },
+] satisfies DropdownItem[]
+
+export function DropdownExamples() {
+  return (
+    <div className="flex gap-4">
+      <Dropdown
+        trigger={<button type="button">Aksi</button>}
+        items={actions}
+        align="start"
+      />
+      <Dropdown
+        trigger={<button type="button">Navigasi</button>}
+        items={navigation}
+        align="end"
+        closeOnSelect={false}
+      />
+    </div>
+  )
+}
+```
+
+Item dengan `href` dirender sebagai anchor native, sehingga modified click dan
+atribut link browser tetap bekerja. Bila `target="_blank"` diberikan tanpa
+`rel`, Dropdown memakai `rel="noopener noreferrer"` sebagai default keamanan.
+`current` menandai link navigasi aktif melalui `aria-current`; ia tidak
+mengaktifkan pola listbox.
+
+#### Selection
+
+`selected` dipakai untuk koleksi pilihan. Begitu salah satu generated item
+memakai `selected`, panel menggunakan semantik listbox/option. Jangan memakai
+`selected` sebagai pengganti `current` pada link navigasi.
+
+```tsx
+import { useState } from 'react'
+import { Dropdown } from '@ceplok-ui/design-kit-react'
+
+export function SortDropdown() {
+  const [selected, setSelected] = useState('Terbaru')
+
+  return (
+    <Dropdown
+      contentLabel="Urutan hasil"
+      trigger={<button type="button">Urutkan: {selected}</button>}
+      items={['Terbaru', 'Terlama'].map((label) => ({
+        id: label,
+        label,
+        selected: selected === label,
+        onClick: () => setSelected(label),
+      }))}
+      align="center"
+      closeOnSelect
+    />
+  )
+}
+```
+
+`closeOnSelect` menentukan apakah generated item menutup panel setelah
+diaktifkan. Prop ini tidak mengatur custom content.
+
+#### Custom content dan kontrol penutupan
+
+Untuk form atau kontrol bebas, gunakan `children`. Render function menyediakan
+`close()` untuk aksi final. Gunakan `actionsRef.close()` bila kondisi di luar
+Dropdown perlu meminta panel ditutup.
+
+```tsx
+import { useRef } from 'react'
+import { Dropdown, type DropdownHandle } from '@ceplok-ui/design-kit-react'
+
+export function FilterDropdown() {
+  const actionsRef = useRef<DropdownHandle>(null)
+
+  return (
+    <div>
+      <button type="button" onClick={() => actionsRef.current?.close()}>
+        Tutup filter
+      </button>
+      <Dropdown
+        actionsRef={actionsRef}
+        trigger={<button type="button">Filter</button>}
+        contentClassName="p-4"
+      >
+        {({ close }) => (
+          <button
+            type="button"
+            onClick={() => {
+              console.info('Filter diterapkan')
+              close()
+            }}
+          >
+            Terapkan
+          </button>
+        )}
+      </Dropdown>
+    </div>
+  )
+}
+```
+
+Dropdown mengikuti boundary ambient `data-theme="light" | "dark"`. Warna
+surface, content, icon, description, current, hover, disabled, dan danger
+berasal dari semantic component tokens `--color-dropdown-*`. Prop
+`darkMode={true}` tetap tersedia sebagai compatibility override dan belum
+deprecated; untuk kode baru, utamakan boundary ambient:
+
+```tsx
+<div data-theme="dark">
+  <Dropdown
+    trigger={<button type="button">Menu</button>}
+    items={[{ id: 'profile', label: 'Profil', href: '/profil' }]}
+  />
+</div>
+```
+
+### Popover
+
+`Popover` adalah panel informasi non-modal yang ditambatkan pada satu trigger.
+`trigger` harus berupa satu elemen button-like yang meneruskan atribut native
+dan ARIA yang disuntikkan Popover ke elemen DOM fokusabel. `side` memilih
+preferensi `top | right | bottom | left` (default `right`); panel dapat berbalik
+agar tetap berada di viewport. Visibility dapat dikontrol melalui
+`open`/`onOpenChange`, atau diawali dengan `defaultOpen`.
+
+Popover mengikuti boundary ambient `data-theme="light" | "dark"`. Token lokal
+`--color-popover-*` mengatur surface, border, header, dan teks. `darkMode`
+tetap tersedia sebagai compatibility override; untuk kode baru, gunakan boundary
+ambient:
+
+```tsx
+<div data-theme="dark">
+  <Popover
+    trigger={<button type="button" aria-label="Buka informasi">i</button>}
+    title="Informasi"
+    side="top"
+  >
+    Penjelasan singkat.
+  </Popover>
+</div>
+```
+
+### Navbar
+
+Navbar menyediakan navigasi responsif untuk aplikasi Front Office (FO) dan
+Back Office (BO). Komponen menangani komposisi desktop dan mobile, sedangkan
+consumer tetap memiliki brand, status route, perilaku pencarian, identitas,
+notifikasi, dan Drawer kontekstual.
+
+#### Penggunaan dasar — Front Office
+
+```tsx
+import {
+  Navbar,
+  Search,
+  type NavbarAccount,
+  type NavbarPrimaryItem,
+} from '@ceplok-ui/design-kit-react'
 
 const brand = {
   content: <img src="/logo.svg" alt="" />,
@@ -223,22 +527,56 @@ const brand = {
   ariaLabel: 'CEPLOK — Beranda',
 }
 
-const items: NavbarPrimaryItem[] = [
-  { id: 'beranda', type: 'destination', label: 'Beranda', href: '/', current: true },
+const items = [
+  {
+    id: 'beranda',
+    type: 'destination',
+    label: 'Beranda',
+    href: '/',
+    current: true,
+  },
   {
     id: 'layanan',
     type: 'disclosure',
-    label: 'Layanan',
+    label: 'Layanan Digital',
     children: [
-      { id: 'layanan-ringkasan', type: 'destination', label: 'Ringkasan', href: '/layanan' },
+      {
+        id: 'katalog-layanan',
+        type: 'destination',
+        label: 'Katalog Layanan',
+        href: '/layanan',
+      },
+      {
+        id: 'status-permohonan',
+        type: 'destination',
+        label: 'Status Permohonan',
+        href: '/permohonan',
+      },
     ],
   },
-]
+  {
+    id: 'informasi-publik',
+    type: 'destination',
+    label: 'Informasi Publik',
+    href: '/informasi',
+    disabled: true,
+  },
+] satisfies NavbarPrimaryItem[]
 
-const guestActions = {
-  signIn: { label: 'Masuk', href: '/masuk' },
-  signUp: { label: 'Daftar', href: '/daftar' },
-}
+const account = {
+  name: 'Siti Rahma',
+  initials: 'SR',
+  items: [
+    { id: 'profil', type: 'destination', label: 'Profil', href: '/profil' },
+    {
+      id: 'keluar',
+      type: 'action',
+      label: 'Keluar',
+      tone: 'danger',
+      onClick: () => {},
+    },
+  ],
+} satisfies NavbarAccount
 
 export function FrontOfficeNavbar() {
   return (
@@ -246,57 +584,29 @@ export function FrontOfficeNavbar() {
       platform="front-office"
       brand={brand}
       items={items}
-      search={<Search platform="compact" showButton={false} aria-label="Cari" />}
-      guestActions={guestActions}
-    />
-  )
-}
-```
-
-Untuk FO authenticated, gunakan `account` sebagai pengganti `guestActions`.
-`notificationTrigger` hanya valid bersama `account` dan merupakan slot yang
-sepenuhnya dirender consumer:
-
-```tsx
-import { Navbar, type NavbarAccount, type NavbarPrimaryItem } from '@ceplok-ui/design-kit-react'
-
-const brand = {
-  content: <img src="/logo.svg" alt="" />,
-  href: '/',
-  ariaLabel: 'CEPLOK — Beranda',
-}
-
-const items: NavbarPrimaryItem[] = [
-  { id: 'beranda', type: 'destination', label: 'Beranda', href: '/', current: true },
-]
-
-const account: NavbarAccount = {
-  name: 'User CEPLOK',
-  initials: 'UC',
-  items: [
-    { id: 'profil', type: 'destination', label: 'Profil', href: '/profil' },
-    { id: 'keluar', type: 'action', label: 'Keluar', tone: 'danger', onClick: () => {} },
-  ],
-}
-
-export function FrontOfficeAuthenticatedNavbar() {
-  return (
-    <Navbar
-      platform="front-office"
-      brand={brand}
-      items={items}
+      search={(
+        <Search
+          platform="compact"
+          showButton={false}
+          trigger="enter"
+          aria-label="Cari layanan"
+        />
+      )}
       account={account}
-      notificationTrigger={<a href="/notifikasi">Notifikasi</a>}
     />
   )
 }
 ```
 
-Navbar bersifat router-agnostic dan beralih ke komposisi mobile di bawah
-breakpoint `lg`. Pada mobile, search tetap berada pada baris kedua di luar
-navigasi. Navigasi utamanya dibuka sebagai dialog native modal; gunakan
-`mobileNavigationOpen` dan `onMobileNavigationOpenChange` bila state navigasi
-mobile perlu dikendalikan consumer.
+Untuk FO guest, ganti `account` dengan `guestActions` yang berisi `signIn` dan
+opsional `signUp`. `notificationTrigger` hanya valid pada FO authenticated
+bersama `account` dan merupakan slot yang dirender consumer.
+
+Navbar bersifat router-agnostic dan berpindah antara komposisi desktop dan
+mobile secara internal. Consumer tidak perlu mengirim ukuran viewport atau
+breakpoint. Gunakan `mobileNavigationOpen` dan
+`onMobileNavigationOpenChange` bila state navigasi mobile perlu dikendalikan
+consumer.
 
 `current` adalah state navigasi milik consumer: setelah route berubah,
 consumer perlu merender ulang `items` dengan destination yang sesuai sebagai
@@ -305,17 +615,24 @@ navigation desktop tidak memakai sorotan permanen; Breadcrumb menyediakan
 konteks halaman. Sidebar mobile dan baris destination di Dropdown tetap memakai
 tampilan current dari kontrak komponennya masing-masing.
 
-Disclosure desktop dan Account destination diteruskan ke generated item
-`Dropdown`; `current` tetap berbeda dari `selected`. `Lainnya` memakai konten
-custom agar dapat memuat Disclosure bersarang. Pada Sidebar mobile,
-`target="_blank"` diterjemahkan ke prop `external`, sehingga Sidebar menerapkan
-target baru dan `rel` aman bawaan komponennya.
+#### Item navigasi
+
+- `destination` adalah tautan langsung. Isi `href`; gunakan `current` untuk
+  route aktif dan `disabled` untuk menonaktifkan interaksi.
+- `disclosure` mengelompokkan `children` yang masing-masing berupa destination.
+- `icon` bersifat opsional pada destination maupun disclosure.
+- Setiap item memerlukan `id` dan `label`. Consumer bertanggung jawab
+  memperbarui `current` ketika route berubah.
 
 #### Back Office — contextual Drawer milik consumer
 
 ```tsx
 import { useState } from 'react'
-import { Drawer, Navbar, type NavbarPrimaryItem } from '@ceplok-ui/design-kit-react'
+import {
+  Drawer,
+  Navbar,
+  type NavbarPrimaryItem,
+} from '@ceplok-ui/design-kit-react'
 
 const brand = {
   content: <span>CEPLOK Admin</span>,
@@ -323,9 +640,15 @@ const brand = {
   ariaLabel: 'CEPLOK Admin — Beranda',
 }
 
-const items: NavbarPrimaryItem[] = [
-  { id: 'dashboard', type: 'destination', label: 'Dashboard', href: '/', current: true },
-]
+const items = [
+  {
+    id: 'dashboard',
+    type: 'destination',
+    label: 'Dashboard',
+    href: '/',
+    current: true,
+  },
+] satisfies NavbarPrimaryItem[]
 
 export function BackOfficeNavbar() {
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -357,22 +680,31 @@ export function BackOfficeNavbar() {
 ```
 
 `mobileDrawer` bukan isi Drawer. Consumer memiliki state, elemen `<Drawer>`,
-serta kontennya; Navbar hanya mengendalikan trigger contextual dan menutup
-navigasi mobile saat Drawer dibuka. `guestActions` dan `notificationTrigger`
-tidak berlaku pada BO.
+serta kontennya; Navbar hanya menghubungkan trigger kontekstual pada mobile.
 
-Dropdown tidak lagi memakai prop `attached`. Panelnya diposisikan relatif ke
-trigger, menyesuaikan batas viewport, dan dapat diratakan dengan
-`align="start" | "center" | "end"`. Gunakan `data-theme="light" | "dark"`
-untuk batas tema eksplisit; tanpa prop tersebut Dropdown mewarisi tema consumer.
-`darkMode={true}` tetap tersedia sebagai override kompatibilitas dan lebih
-diutamakan daripada `data-theme`.
+#### Perbedaan platform dan integrasi
 
-Type publik Navbar yang diekspor meliputi `NavbarProps`, `NavbarPlatform`,
-`NavbarBrand`, `NavbarDestination`, `NavbarDisclosure`, `NavbarPrimaryItem`,
-`NavbarAccount`, `NavbarAccountItem`, `NavbarGuestActions`, dan
-`NavbarMobileDrawer`. Lihat type exports package untuk tipe item account serta
-varian FO/BO yang lebih spesifik.
+| Platform | Konfigurasi yang didukung |
+| --- | --- |
+| Front Office guest | `guestActions` untuk tautan Masuk dan Daftar; tanpa `account` atau `notificationTrigger`. |
+| Front Office authenticated | `account` dan opsional `notificationTrigger`; tanpa `guestActions`. |
+| Back Office | Opsional `account` dan `mobileDrawer`; tanpa `guestActions` atau `notificationTrigger`. |
+
+`brand` wajib pada kedua platform. Isi visualnya tetap dimiliki consumer
+melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
+
+- `search` menerima `ReactNode`. Gunakan `Search` dengan
+  `platform="compact"`, `showButton={false}`, dan `trigger="enter"` untuk pola
+  Navbar.
+- `account` berisi identitas pengguna dan daftar destination atau action pada
+  menu akun.
+- `notificationTrigger` adalah slot milik consumer dan hanya berlaku pada FO
+  authenticated.
+- `mobileDrawer` hanya berlaku pada BO dan menghubungkan `open`,
+  `onOpenChange`, serta `controls` ke Drawer milik consumer.
+
+Tema mengikuti boundary ambient `data-theme` milik consumer; Navbar tidak
+memerlukan prop tema khusus.
 
 Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
 bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.

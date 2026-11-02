@@ -733,7 +733,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
           }
         }}
         className={cn(
-          'fixed inset-auto m-0 overflow-x-hidden overflow-y-auto overscroll-contain rounded-lg shadow-md [overflow-wrap:anywhere]',
+          'fixed inset-auto m-0 overflow-x-hidden overflow-y-auto overscroll-contain rounded-lg shadow-dropdown [overflow-wrap:anywhere]',
           'bg-dropdown-surface text-dropdown-content',
           pakaiDaftar && 'py-1',
           contentClassName,

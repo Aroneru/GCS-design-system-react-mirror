@@ -31,8 +31,9 @@ halaman baru Table of Contents. Setiap Playground kini punya kontrol Typography
 kontrol lain. Halaman Typography menandai ketebalan yang tidak dimiliki font
 yang dipilih.
 
-`Modal`, `Navbar`, dan `Dropdown` sedang dikerjakan ulang dan belum final —
-baca bagian **Dalam pengerjaan** sebelum memakainya.
+`Navbar` dan `Dropdown` sedang dikerjakan ulang dan belum final. Modal dan
+dokumentasinya sudah mencakup controlled state, dismissal controls, ambient
+theme, dan contoh Nested Modal.
 
 ### Dalam pengerjaan
 
@@ -47,11 +48,42 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
 - **`Dropdown`.** Isi bisa berupa fungsi yang menerima `close`, prop baru
   `actionsRef`, `closeOnSelect`, dan `align`, serta item yang menerima
   `target`, `rel`, `onClick`, dan `current`. Warnanya kini dari token
-  `--color-dropdown-*`.
+  `--color-dropdown-*`; shadow panel kini memakai `--shadow-dropdown` sesuai
+  dua layer elevasi desain.
+- **`Popover`.** Contoh Penggunaan merapatkan ikon informasi ke teks. Tampilan
+  gelap kini mengikuti `data-theme` ambient dan memakai token lokal
+  `--color-popover-*` untuk surface, border, header, serta teks; `darkMode`
+  tetap menjadi override kompatibilitas.
+- **`Spinner`.** README kini mendokumentasikan ukuran 50px/100px, atribut SVG
+  yang diteruskan, reduced motion, serta pola aksesibel standalone dan bersama
+  teks loading.
+- **`Clipboard`.** Value Light pada varian `segmented` kini memakai gray-500,
+  sementara varian default tetap gray-400, sesuai referensi desain; nilai Dark
+  tidak berubah.
 - **`Modal`.** Tampilan disesuaikan dengan desain: judul Inter 18px semibold,
   isi 16px medium, dan latar popup gray-600 di tema gelap.
 
 ### Ditambahkan
+
+- **Progressive Load More pada overflow Navbar desktop.** Dropdown `Lainnya`
+  menentukan jumlah item awal dari tinggi panel dan tinggi baris yang benar-benar
+  dirender, lalu `Muat lebih banyak` menampilkan batch berikutnya berdasarkan
+  tinggi konten. Item yang sudah terlihat tidak disembunyikan kembali selama
+  dropdown masih terbuka, dan state disclosure tetap dipertahankan saat item
+  tambahan dimuat.
+
+- **`Avatar` V2.** Prop `name` menambahkan nama aksesibel sekaligus menghasilkan
+  inisial Unicode-aware; `initials` tetap menjadi override manual. Fallback
+  dapat dipilih lewat `fallback="initials" | "profile"`: foto yang tersedia
+  selalu diprioritaskan, lalu inisial manual, inisial nama, ilustrasi gender,
+  dan ikon User netral. `gender="female" | "male"` dipilih eksplisit, tidak
+  pernah diturunkan dari nama; `fallback="profile"` memilih ilustrasi tersebut
+  meski `name` tersedia. Empat SVG Male/Female Light/Dark ikut dibundle sebagai
+  asset package-local. Avatar kini mengikuti scope ambient `data-theme`,
+  termasuk nested scope; `darkMode` tetap didukung sebagai prop deprecated.
+  `alt` mengatur nama aksesibel (`alt=""` menjadikan Avatar dekoratif), dan
+  foto gagal kembali ke fallback yang sama. Ukuran API tetap `small`, `default`,
+  dan `large` (S/M/L: 24/32/80px, dengan M sebagai bawaan).
 
 - **`ListView`** — daftar item dengan dua varian: `simple` untuk informasi
   ringkas berikon, badge, dekorasi aksen, dan aksi; serta `article` untuk
@@ -88,6 +120,47 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   `brand`.
 
 ### Diubah
+
+- **Navbar desktop dan mobile disempurnakan.** Alokasi navigasi desktop kini
+  dihitung ulang saat komposisi Search, account, guest action, atau notifikasi
+  berubah sehingga transisi identitas FO/BO tidak menampilkan susunan sementara
+  yang keliru. Panel `Lainnya` memakai lebar responsif yang stabil, sedangkan
+  disclosure mandiri tetap mengikuti lebar trigger dan ruang viewport. Label
+  navigasi dapat membungkus hingga dua baris dengan tooltip hanya ketika teks
+  benar-benar terpotong. Disclosure di dalam `Lainnya` kembali tertutup setelah
+  parent dropdown ditutup. Header mobile FO dan BO kini memakai tinggi luar
+  yang konsisten tanpa mengubah susunan khusus platform.
+
+- **Dokumentasi Navbar diperbarui.** Playground menambahkan tinggi viewport
+  custom yang independen dari lebarnya, menghapus Brand Fixture, dan menghasilkan
+  snippet FO/BO yang mengikuti konfigurasi aktif dengan import consumer minimal
+  serta penyorotan prop yang konsisten. Preview responsive dan Dark Mode kini
+  sejajar, memakai stage yang sama, dan background dokumentasi yang konsisten.
+  Shared Example kini menunjukkan destination, disclosure, Search, account, dan
+  Drawer BO menggunakan API production. README memuat panduan consumer terbaru
+  untuk item navigasi, perbedaan platform, integrasi, tema ambient, dan perilaku
+  responsif.
+
+- **Dokumentasi `Dropdown` V2.** Playground kini memisahkan contoh Action,
+  Navigation, dan Selection, dengan kontrol `align` serta `closeOnSelect` yang
+  tercermin pada generated snippet. Contoh `children({ close })` dan
+  `actionsRef.close()` dikumpulkan dalam section Kontrol Penutupan, sedangkan
+  contoh Dark Mode konsisten memakai ambient `data-theme="dark"`. Perubahan ini
+  hanya menyelaraskan dokumentasi; tidak menambahkan API atau token production.
+
+- **`Clipboard` V2.** Sambungan varian `segmented` kini satu bidang rapi tanpa
+  sisa lapisan latar di belakang tombol aksi. Warna terang dan metrik tipografi
+  Desktop diselaraskan ke Figma, sedangkan preset Mobile tetap mempertahankan
+  ukurannya sendiri. Clipboard mengikuti `data-theme="light"`/`"dark"` secara
+  ambient, termasuk nested scope, melalui token `--color-clipboard-*`;
+  `darkMode` tetap menjadi override kompatibilitas yang deprecated. Saat
+  `disabled`, aksi salin, tooltip, dan pemilihan/copy/cut melalui UI tidak aktif;
+  hasil async lama juga tidak dapat lagi memicu callback atau feedback. Ikon
+  Clipboard dan Check pada aksi bersegmen kini 20px dalam tombol 42px. Tooltip
+  dipusatkan pada tombol, mendukung fokus keyboard dan Escape, hilang sepanjang
+  status Copied, lalu menunggu hover/fokus baru setelah feedback direset.
+  Dokumentasi, Playground, dan snippet penggunaan kini mencerminkan kontrak
+  tersebut.
 
 - **Memutus — Penyelarasan tema dan token `simaya` menjadi `purple`.**
   Seluruh komponen dan token yang sebelumnya menerima nilai `"simaya"` kini distandarkan menjadi `"purple"` sebagai nama warna netral:
@@ -138,6 +211,19 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   langsung, mis. `font-weight: var(--font-weight-semibold)`.
 
 ### Diperbaiki
+
+- **Interaksi Navbar desktop.** Destination primary yang disabled kini tetap
+  menampilkan cursor terlarang tanpa meneruskan pointer ke elemen di belakangnya.
+  Pengamatan tooltip overflow ikut diperbarui ketika jumlah item yang terlihat
+  berubah, sehingga label baru dari Progressive Load More mendapat tooltip hanya
+  bila benar-benar terpotong.
+
+- **Dokumentasi `Avatar`.** Halaman komponen kini mencakup fallback foto,
+  inisial otomatis dan override, profile Male/Female/netral, S/M/L, tema
+  ambient, Playground, generated snippet, dan contoh kode menurut fitur.
+  Preview Dark memakai scope `data-theme="dark"`; inisial dipusatkan lewat
+  line-height yang konsisten dan asset Dark tidak lagi memiliki halo terang
+  akibat rect latar SVG yang bertumpuk.
 
 - **`font-medium` dan `font-semibold` kini tampil sesuai ketebalannya di Lato.**
   Lato dari Google Fonts hanya punya 100, 300, 400, 700, dan 900, jadi medium

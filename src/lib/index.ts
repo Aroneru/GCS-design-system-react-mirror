@@ -15,7 +15,7 @@ export { Clipboard } from "./components/Clipboard";
 export type { ClipboardProps, ClipboardVariant, ClipboardPlatform } from "./components/Clipboard";
 
 export { Avatar } from "./components/Avatar";
-export type { AvatarProps, AvatarSize } from "./components/Avatar";
+export type { AvatarFallback, AvatarGender, AvatarProps, AvatarSize } from "./components/Avatar";
 
 export { Badge } from "./components/Badge";
 export type { BadgeProps, BadgeSize, BadgeVariant } from "./components/Badge";
