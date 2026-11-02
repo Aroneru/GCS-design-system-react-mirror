@@ -190,6 +190,18 @@ export function BadgePage() {
         </Stage>
 
         <Controls>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Variant">
             <Segmented
               label="Pilih variant"
@@ -220,18 +232,6 @@ export function BadgePage() {
               value={pakaiTutup}
               onChange={setPakaiTutup}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Tampilan">
-            <Segmented
-              label="Pilih tampilan"
-              value={dark}
-              onChange={setDark}
-              options={[
-                { value: false, label: 'Light' },
-                { value: true, label: 'Dark' },
-              ]}
             />
           </Control>
         </Controls>

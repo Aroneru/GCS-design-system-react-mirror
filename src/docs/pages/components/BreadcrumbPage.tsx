@@ -215,6 +215,18 @@ export function BreadcrumbPage() {
         </Stage>
 
         <Controls>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={theme}
+              onChange={(v) => setTheme(String(v))}
+              options={[
+                { value: "light", label: "Light" },
+                { value: "dark", label: "Dark" },
+              ]}
+            />
+          </Control>
+
           {/* SIZE */}
 
           <Control label="Size">
@@ -238,18 +250,6 @@ export function BreadcrumbPage() {
           </Control>
 
           {/* THEME */}
-
-          <Control label="Mode">
-            <Segmented
-              label="Pilih mode"
-              value={theme}
-              onChange={(v) => setTheme(String(v))}
-              options={[
-                { value: "light", label: "Light" },
-                { value: "dark", label: "Dark" },
-              ]}
-            />
-          </Control>
 
           {/* MENU */}
 

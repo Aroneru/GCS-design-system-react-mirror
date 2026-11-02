@@ -600,6 +600,18 @@ export function ContainerPage() {
         </div>
 
         <Controls>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={darkMode}
+              onChange={setDarkMode}
+              options={[
+                { value: false, label: "Terang" },
+                { value: true, label: "Gelap" },
+              ]}
+            />
+          </Control>
+
           <Control label="Varian">
             <Segmented
               label="Pilih varian lebar container"
@@ -621,18 +633,6 @@ export function ContainerPage() {
                 { value: "mobile", label: "Mobile" },
                 { value: "desktop", label: "Desktop" },
                 { value: "custom", label: "Custom" },
-              ]}
-            />
-          </Control>
-
-          <Control label="Mode">
-            <Segmented
-              label="Pilih mode"
-              value={darkMode}
-              onChange={setDarkMode}
-              options={[
-                { value: false, label: "Terang" },
-                { value: true, label: "Gelap" },
               ]}
             />
           </Control>

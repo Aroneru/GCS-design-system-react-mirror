@@ -7,8 +7,12 @@
  * package ini di CSS Tailwind kamu:
  *   @source '../node_modules/@ceplok-ui/design-kit-react/dist/**\/*.js';
  */
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,400&display=swap');
+/*
+ * Import URL wajib paling atas: lato.css digabung ke sini sebagai aturan
+ * @font-face, dan @import yang jatuh setelah aturan biasa diabaikan browser.
+ */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import './fonts/lato.css';
 @import 'tailwindcss';
 @import './tokens.css';
 

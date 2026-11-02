@@ -121,9 +121,9 @@ export function ClipboardPage() {
             : <Clipboard {...previewProps} />}
         </Stage>
         <Controls>
+          <Control label="Tampilan"><Segmented label="Pilih tampilan" value={darkMode} onChange={setDarkMode} options={[{ value: false, label: 'Light' }, { value: true, label: 'Dark' }]} /></Control>
           <Control label="Variasi"><Segmented label="Pilih variasi" value={variant} onChange={setVariant} options={variants} wrap /></Control>
           <Control label="Platform"><Segmented label="Pilih platform" value={platform} onChange={setPlatform} options={[{ value: 'default', label: 'Default' }, { value: 'mobile', label: 'Mobile' }]} /></Control>
-          <Control label="Tampilan"><Segmented label="Pilih tampilan" value={darkMode} onChange={setDarkMode} options={[{ value: false, label: 'Light' }, { value: true, label: 'Dark' }]} /></Control>
           <Control label="Nilai">
             <input aria-label="Nilai yang disalin" value={value} onChange={(event) => setValue(event.target.value)} className="h-10 w-full rounded-lg border border-gray-300 bg-surface px-3 text-sm text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600" />
           </Control>

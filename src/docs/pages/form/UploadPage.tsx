@@ -245,6 +245,18 @@ export function UploadPage() {
         </Stage>
 
         <Controls>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={theme}
+              onChange={(v) => setTheme(v as string)}
+              options={[
+                { value: 'light', label: 'Light' },
+                { value: 'dark', label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Type">
             <Segmented
               label="Pilih bentuk"
@@ -296,18 +308,6 @@ export function UploadPage() {
               value={withHelper}
               onChange={(v) => setWithHelper(v as boolean)}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Mode">
-            <Segmented
-              label="Pilih mode"
-              value={theme}
-              onChange={(v) => setTheme(v as string)}
-              options={[
-                { value: 'light', label: 'Light' },
-                { value: 'dark', label: 'Dark' },
-              ]}
             />
           </Control>
         </Controls>

@@ -206,6 +206,18 @@ export function AvatarPage() {
         </Stage>
 
         <Controls>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={darkMode}
+              onChange={setDarkMode}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Size">
             <Segmented
               label="Pilih ukuran"
@@ -230,18 +242,6 @@ export function AvatarPage() {
               value={withNama}
               onChange={setWithNama}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Tampilan">
-            <Segmented
-              label="Pilih tampilan"
-              value={darkMode}
-              onChange={setDarkMode}
-              options={[
-                { value: false, label: 'Light' },
-                { value: true, label: 'Dark' },
-              ]}
             />
           </Control>
         </Controls>

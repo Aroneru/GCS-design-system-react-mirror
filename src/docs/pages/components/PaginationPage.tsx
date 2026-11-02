@@ -195,6 +195,17 @@ export function PaginationPage() {
         </Stage>
 
         <Controls>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={mode}
+              onChange={(value) => setMode(value as string)}
+              options={[
+                { value: "light", label: "Light" },
+                { value: "dark", label: "Dark" },
+              ]}
+            />
+          </Control>
           <Control label="Theme">
             <Segmented
               label="Pilih theme"
@@ -212,17 +223,6 @@ export function PaginationPage() {
                 setCurrentPage((page) => Math.min(page, value));
               }}
               options={totalPageOptions}
-            />
-          </Control>
-          <Control label="Mode">
-            <Segmented
-              label="Pilih mode"
-              value={mode}
-              onChange={(value) => setMode(value as string)}
-              options={[
-                { value: "light", label: "Light" },
-                { value: "dark", label: "Dark" },
-              ]}
             />
           </Control>
         </Controls>

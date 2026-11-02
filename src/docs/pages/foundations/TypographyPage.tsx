@@ -80,6 +80,33 @@ const fontWeights = [
   ['font-medium', 500], ['font-semibold', 600], ['font-bold', 700], ['font-extrabold', 800], ['font-black', 900],
 ] as [string, number][]
 
+/**
+ * Ketebalan yang benar-benar dimiliki tiap font. Lato memakai Lato 2.0 yang
+ * di-host sendiri (src/lib/fonts/lato.css), Inter berupa variable font
+ * 100–900, keduanya lengkap; Arial di hampir semua sistem hanya 400 dan 700.
+ */
+const availableWeights: Record<FontKey, number[]> = {
+  sans: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+  alt: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+  alt2: [400, 700],
+}
+
+/**
+ * Ketebalan yang akhirnya dipakai browser bila tingkat yang diminta tidak
+ * ada, mengikuti aturan pencocokan font CSS: di bawah 400 cari yang lebih
+ * tipis dulu, di atas 500 cari yang lebih tebal dulu, 400–500 cari ke atas
+ * sampai 500 lalu ke bawah.
+ */
+function renderedWeight(wanted: number, available: number[]) {
+  if (available.includes(wanted)) return wanted
+  const lighter = available.filter((w) => w < wanted).reverse()
+  const heavier = available.filter((w) => w > wanted)
+  if (wanted > 500) return heavier[0] ?? lighter[0]
+  if (wanted < 400) return lighter[0] ?? heavier[0]
+  const upTo500 = heavier.filter((w) => w <= 500)
+  return upTo500[0] ?? lighter[0] ?? heavier[0]
+}
+
 const lineHeights = [
   ['leading-none', '100%'], ['leading-normal', '150%'], ['leading-loose', '200%'],
 ]
@@ -101,11 +128,14 @@ const usage = {
 <p className="text-base">Teks 16px</p>
 <p className="text-2xl">Teks 24px</p>
 <p className="text-5xl">Teks 48px</p>`,
-  weight: `{/* Sembilan tingkat ketebalan */}
+  weight: `{/* Sembilan tingkat ketebalan, nilainya dari token --font-weight-* */}
 <p className="font-thin">Thin 100</p>
 <p className="font-normal">Regular 400</p>
 <p className="font-semibold">Semi Bold 600</p>
-<p className="font-black">Black 900</p>`,
+<p className="font-black">Black 900</p>
+
+/* Di CSS biasa, pakai tokennya langsung */
+.judul-kartu { font-weight: var(--font-weight-semibold); }`,
   leading: `{/* Jarak antarbaris */}
 <p className="leading-none">Rapat — 100%</p>
 <p className="leading-normal">Standar — 150%</p>
@@ -248,19 +278,33 @@ export function TypographyPage() {
         <FlowSection id="weight" title="Sembilan tingkat ketebalan">
           <Lead>
             Dari <code className="text-xs font-bold text-gray-700">.font-thin</code> (100) hingga{' '}
-            <code className="text-xs font-bold text-gray-700">.font-black</code> (900).
+            <code className="text-xs font-bold text-gray-700">.font-black</code> (900). Nilainya
+            berasal dari token <code className="text-xs font-bold text-gray-700">--font-weight-*</code>{' '}
+            di tokens.css. Tingkat yang tidak dimiliki {font.name} ditandai beserta ketebalan yang
+            tampil sebagai gantinya.
           </Lead>
 
           <article className="ds-card divide-y divide-border overflow-hidden">
-            {fontWeights.map(([cls, value]) => (
-              <div key={cls} className="grid gap-2 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6">
-                <p className={`${cls} text-4xl text-gray-900`}>Ceplok Design System</p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:justify-end">
-                  <code className="text-sm font-bold text-primary-700">.{cls}</code>
-                  <code className="text-xs text-gray-400">font-weight: {value}</code>
+            {fontWeights.map(([cls, value]) => {
+              const shown = renderedWeight(value, availableWeights[fontKey])
+              return (
+                <div key={cls} className="grid gap-2 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6">
+                  <p className={`${cls} text-4xl text-gray-900`}>Ceplok Design System</p>
+                  {/* Label ditumpuk di bawah kode, bukan di sampingnya, supaya kolom ini tidak melebar dan memotong teks contoh. */}
+                  <div className="flex flex-col gap-1.5 sm:items-end">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:justify-end">
+                      <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                      <code className="text-xs text-gray-400">--font-weight-{cls.slice(5)}: {value}</code>
+                    </div>
+                    {shown !== value && (
+                      <span className="w-fit rounded-full bg-orange-50 px-2 py-0.5 text-xs font-bold text-orange-700">
+                        Tidak ada di {font.name}, tampil {shown}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </article>
 
           <SectionCode>{usage.weight}</SectionCode>

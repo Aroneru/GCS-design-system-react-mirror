@@ -47,7 +47,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:lib": "vite build --config vite.lib.config.ts && cp src/lib/styles.css src/lib/tokens.css dist/",
+    "build:lib": "vite build --config vite.lib.config.ts && cp src/lib/styles.css src/lib/tokens.css dist/ && cp -r src/lib/fonts dist/",
     "preview": "vite preview",
     "lint": "eslint .",
     "prepublishOnly": "npm run build:lib"

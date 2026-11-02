@@ -362,7 +362,13 @@ export function Sidebar({
         </div>
       )}
 
-      <SidebarNavigation groups={groups} items={items} collapsed={collapsed} darkMode={darkMode} />
+      <SidebarNavigation
+        groups={groups}
+        items={items}
+        collapsed={collapsed}
+        onExpandSidebar={onCollapse}
+        darkMode={darkMode}
+      />
 
       {/* `shrink-0`: navigasi di atasnya `flex-1`, jadi tanpa ini footer yang
           ikut menyusut duluan saat menunya panjang. */}

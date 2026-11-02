@@ -240,6 +240,13 @@ const stageWidth: Record<TimelinePlatform, Record<TimelineSize, string>> = {
  */
 const desktopMinWidth = '40rem'
 
+/**
+ * Satu rem lebih lebar daripada demo desktop, karena kontrol Typography bisa
+ * memilih Inter, font yang paling lebar: dengan Inter, nama dan jabatan di
+ * sebelah Badge status baru muat sebaris mulai sekitar 645px.
+ */
+const playgroundMinWidth = '41rem'
+
 const timelineProps: PropRow[] = [
   ['items', 'TimelineItem[]', '—', 'Kejadian berurutan dari atas ke bawah. Isi tiap item ada di tabel TimelineItem.'],
   [
@@ -635,7 +642,7 @@ export function TimelinePage() {
 
         <Stage
           maxWidth={stageWidth[platform][size]}
-          minWidth={platform === 'desktop' ? desktopMinWidth : undefined}
+          minWidth={platform === 'desktop' ? playgroundMinWidth : undefined}
           dark={dark}
         >
           <Timeline
