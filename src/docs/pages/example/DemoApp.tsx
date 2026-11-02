@@ -29,6 +29,7 @@ import { Pemohon } from "./pages/Pemohon";
 import { Pengajuan } from "./pages/Pengajuan";
 import { Pengaturan } from "./pages/Pengaturan";
 import { Simaya } from "./pages/Simaya";
+import { Simaya2 } from "./pages/Simaya2";
 
 /**
  * Kerangka aplikasi demo.
@@ -53,6 +54,7 @@ const RUTE: { halaman: HalamanDemo; ikon: React.ReactNode; badge?: string }[] = 
   { halaman: "simaya", ikon: <Envelope className="size-5" /> },
   { halaman: "modifikasi", ikon: <Palette className="size-5" /> },
   { halaman: "pengaturan", ikon: <Cog className="size-5" /> },
+  { halaman: "simaya2", ikon: <Cog className="size-5" />, },
 ];
 
 /** Sub-rute nyata, bukan state palsu — jadi Sidebar dan Navbar bekerja sebagai tautan. */
@@ -66,6 +68,7 @@ const DESKRIPSI: Record<HalamanDemo, string> = {
   simaya: "Persuratan internal dengan aksen Simaya — prop application pada tujuh komponen form.",
   modifikasi: "Tiga tingkat penyesuaian komponen: varian bawaan, slot, lalu className.",
   pengaturan: "Data profil dan preferensi pemberitahuan akun Anda.",
+  simaya2: "Simaya-simayaan.",
 };
 
 const RUTE_KONTEKSTUAL: Record<HalamanDemo, HalamanDemo[]> = {
@@ -76,7 +79,10 @@ const RUTE_KONTEKSTUAL: Record<HalamanDemo, HalamanDemo[]> = {
   simaya: ["pengajuan", "pengaturan"],
   modifikasi: ["layanan", "pengaturan"],
   pengaturan: ["pemohon", "modifikasi"],
+  simaya2: ["simaya", "pengaturan"],
 };
+
+const RUTE_LAYANAN = ["pengajuan", "pemohon", "layanan"] as const;
 
 function isAcceptedNavigation(event: MouseEvent<HTMLElement>) {
   return (
@@ -99,6 +105,8 @@ function Isi({ halaman }: { halaman: HalamanDemo }) {
       return <Layanan />;
     case "simaya":
       return <Simaya />;
+    case "simaya2":
+      return <Simaya2 />;
     case "modifikasi":
       return <Modifikasi />;
     case "pengaturan":
@@ -124,6 +132,29 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
     badge,
     active: h === halaman,
   }));
+  const navbarDestination = (h: HalamanDemo) => {
+    const route = RUTE.find(({ halaman: routePage }) => routePage === h);
+
+    return {
+      id: h,
+      type: "destination" as const,
+      label: JUDUL_HALAMAN[h],
+      href: href(h),
+      icon: route?.ikon,
+      current: h === halaman,
+    };
+  };
+  const navbarItems = [
+    navbarDestination("dasbor"),
+    {
+      id: "layanan-digital",
+      type: "disclosure" as const,
+      label: "Layanan Digital",
+      icon: <GridPlus className="size-5" />,
+      children: RUTE_LAYANAN.map(navbarDestination),
+    },
+    ...(["simaya", "modifikasi", "pengaturan", "simaya2"] as const).map(navbarDestination),
+  ];
   const contextualMenu: DrawerMenuItem[] = [halaman, ...RUTE_KONTEKSTUAL[halaman]].map((h) => {
     const route = RUTE.find(({ halaman: routePage }) => routePage === h);
 
@@ -194,14 +225,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
               href: href("dasbor"),
               ariaLabel: "CEPLOK — Dasbor",
             }}
-            items={RUTE.map(({ halaman: h, ikon }) => ({
-              id: h,
-              type: "destination" as const,
-              label: JUDUL_HALAMAN[h],
-              href: href(h),
-              icon: ikon,
-              current: h === halaman,
-            }))}
+            items={navbarItems}
             search={
               <Search
                 platform="compact"
@@ -212,7 +236,26 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
                 onSearch={(value) => setSearchFeedback(`Pencarian demo: ${value}`)}
               />
             }
-            account={{ name: "Rafli Arandhana", initials: "RA", items: [] }}
+            account={{
+              name: "Rafli Arandhana",
+              initials: "RA",
+              items: [
+                {
+                  id: "account-settings",
+                  type: "destination",
+                  label: "Pengaturan akun",
+                  href: href("pengaturan"),
+                  current: halaman === "pengaturan",
+                },
+                {
+                  id: "logout",
+                  type: "action",
+                  label: "Keluar",
+                  tone: "danger",
+                  onClick: () => setSearchFeedback("Aksi demo: Keluar"),
+                },
+              ],
+            }}
             mobileNavigationOpen={mobileSidebarOpen}
             onMobileNavigationOpenChange={setMobileSidebarOpen}
             mobileDrawer={{

@@ -26,6 +26,8 @@ export interface PopoverProps
   side?: PopoverSide
   /** Menggunakan tampilan gelap pada panel Popover. */
   darkMode?: boolean
+  /** Boundary tema eksplisit. Tanpa prop ini Popover mengikuti data-theme ancestor. */
+  'data-theme'?: 'light' | 'dark'
   /** Visibilitas terkontrol. */
   open?: boolean
   /** Visibilitas awal saat tidak dikontrol. */
@@ -74,14 +76,9 @@ const arrowClasses: Record<PopoverSide, string> = {
   left: 'right-[-8px] rotate-90',
 }
 
-const lightArrowSurfaceClasses: Record<Placement['arrowSurface'], string> = {
-  header: 'bg-gray-50',
-  body: 'bg-surface',
-}
-
-const darkArrowSurfaceClasses: Record<Placement['arrowSurface'], string> = {
-  header: 'bg-gray-700',
-  body: 'bg-gray-800',
+const arrowSurfaceClasses: Record<Placement['arrowSurface'], string> = {
+  header: 'bg-popover-header-surface',
+  body: 'bg-popover-surface',
 }
 
 const clamp = (value: number, min: number, max: number) =>
@@ -112,6 +109,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
     className,
     children,
     id,
+    'data-theme': dataTheme,
     ...props
   },
   forwardedRef,
@@ -396,7 +394,6 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
     },
   })
 
-  const arrowSurfaceClasses = darkMode ? darkArrowSurfaceClasses : lightArrowSurfaceClasses
   const horizontalArrow = placement.side === 'top' || placement.side === 'bottom'
   const arrowStyle = horizontalArrow
     ? { left: placement.arrowOffset - ARROW_WRAPPER_HALF }
@@ -409,6 +406,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
       <div
         ref={setPanelRef}
         id={panelId}
+        data-theme={darkMode ? 'dark' : dataTheme}
         className={cn(
           'fixed inset-auto m-0 w-[255px] shrink-0 overflow-visible border-0 bg-transparent p-0 [filter:drop-shadow(0_1px_2px_rgb(0_0_0/0.08))]',
           positionReady ? 'visible' : 'invisible',
@@ -429,7 +427,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
           <span
             className={cn(
               'absolute top-[3.25px] left-[3px] size-2.5 rotate-45 border-t border-l',
-              darkMode ? 'border-gray-800' : 'border-border',
+              'border-popover-border',
               arrowSurfaceClasses[placement.arrowSurface],
             )}
           />
@@ -438,15 +436,13 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
         <div
           className={cn(
             'relative z-10 overflow-hidden rounded-md',
-            darkMode ? 'bg-gray-800' : 'bg-surface',
+            'bg-popover-surface',
           )}
         >
           <div
             className={cn(
               'border-b px-3 py-1.5 text-sm leading-[1.5] font-semibold [overflow-wrap:anywhere]',
-              darkMode
-                ? 'border-gray-800 bg-gray-700 text-gray-50'
-                : 'border-border bg-gray-50 text-gray-900',
+              'border-popover-border bg-popover-header-surface text-popover-header-content',
             )}
           >
             {title}
@@ -454,7 +450,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
           <div
             className={cn(
               'px-3 py-2 text-sm leading-[1.5] font-medium [overflow-wrap:anywhere]',
-              darkMode ? 'bg-gray-800 text-gray-400' : 'bg-surface text-gray-500',
+              'bg-popover-surface text-popover-body-content',
             )}
           >
             {children}
@@ -463,7 +459,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
             aria-hidden="true"
             className={cn(
               'pointer-events-none absolute inset-0 z-20 rounded-md border',
-              darkMode ? 'border-gray-800' : 'border-border',
+              'border-popover-border',
             )}
           />
         </div>

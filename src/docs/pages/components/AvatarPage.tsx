@@ -1,41 +1,34 @@
 import { useState } from 'react'
-import { Avatar, type AvatarSize } from '../../../lib'
+import { Avatar, type AvatarFallback, type AvatarGender, type AvatarSize } from '../../../lib'
 import { asset } from '../../asset'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
-import {
-  Control,
-  Controls,
-  FlowSection,
-  Lead,
-  SectionCode,
-  Stage,
-  UsulanPage,
-  type TocEntry,
-} from '../../usulanKit'
-import { adaTidakAda } from '../../usulanOptions'
+import { Control, Controls, FlowSection, Lead, SectionCode, Stage, UsulanPage, type TocEntry } from '../../usulanKit'
 
-/** Foto contoh untuk demo di halaman ini. */
 const FOTO = asset('/images/avatar-sample.svg')
 
 const ukuran: { value: AvatarSize; label: string; diameter: string; teks: string }[] = [
-  { value: 'small', label: 'Small', diameter: '24px', teks: '12px' },
-  { value: 'default', label: 'Default', diameter: '32px', teks: '16px' },
-  { value: 'large', label: 'Large', diameter: '80px', teks: '30px' },
+  { value: 'small', label: 'S', diameter: '24px', teks: '12px' },
+  { value: 'default', label: 'M', diameter: '32px', teks: '16px' },
+  { value: 'large', label: 'L', diameter: '80px', teks: '30px' },
 ]
 
 const avatarProps: PropRow[] = [
-  ['src', 'string', 'undefined', 'Alamat gambar. Bila kosong atau gagal dimuat, isian teks yang tampil.'],
-  ['alt', 'string', "''", 'Nama pemiliknya. Jadi alt gambar, atau nama aksesibilitas saat yang tampil hanya inisial.'],
-  ['initials', 'ReactNode', 'undefined', 'Isi lingkaran saat tidak ada gambar — umumnya satu atau dua huruf.'],
-  ['size', "'small' | 'default' | 'large'", 'default', 'Diameter lingkaran: 24px, 32px, atau 80px.'],
-  ['darkMode', 'boolean', 'false', 'Menggunakan warna fallback Avatar untuk permukaan gelap.'],
-  ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut <div> standar diteruskan (className, onClick, title, …).'],
+  ['src', 'string', 'undefined', 'Alamat foto. Bila kosong atau gagal dimuat, Avatar menampilkan fallback.'],
+  ['name', 'string', 'undefined', 'Nama untuk accessible name dan inisial otomatis.'],
+  ['alt', 'string', 'name atau ""', 'Override accessible name. String kosong menjadikan Avatar dekoratif.'],
+  ['initials', 'ReactNode', 'undefined', 'Override isi inisial ketika foto tidak tersedia.'],
+  ['fallback', "'initials' | 'profile'", 'initials', 'Gunakan inisial atau langsung ilustrasi profil.'],
+  ['gender', "'male' | 'female'", 'undefined', 'Ilustrasi profil gender; tidak pernah ditebak dari name.'],
+  ['size', "'small' | 'default' | 'large'", 'default (M)', 'Diameter lingkaran: 24px, 32px, atau 80px.'],
+  ['darkMode', 'boolean', 'false', 'Deprecated. Gunakan scope ambient data-theme="dark".'],
+  ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut <div> standar diteruskan, termasuk className.'],
 ]
 
 const toc: TocEntry[] = [
   { id: 'avatar', label: 'Avatar' },
   { id: 'inisial', label: 'Inisial' },
+  { id: 'profile', label: 'Default profile' },
   { id: 'sizes', label: 'Sizes' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
@@ -45,179 +38,203 @@ const toc: TocEntry[] = [
 
 export function AvatarPage() {
   const [size, setSize] = useState<AvatarSize>('default')
-  const [withFoto, setWithFoto] = useState(true)
-  const [withNama, setWithNama] = useState(true)
-  const [darkMode, setDarkMode] = useState(false)
+  const [content, setContent] = useState<'photo' | 'auto' | 'override' | 'profile'>('auto')
+  const [gender, setGender] = useState<AvatarGender>('female')
+  const [name, setName] = useState('Putri Handayani')
+  const [dark, setDark] = useState(false)
+  const fallback: AvatarFallback = content === 'profile' ? 'profile' : 'initials'
 
   return (
     <UsulanPage
       eyebrow="Components"
       title="Avatar"
-      description="Lingkaran identitas berisi foto profil, atau inisial namanya bila fotonya tidak ada. Tersedia dalam tiga ukuran, dari yang menempel di daftar sampai yang jadi kepala halaman profil."
+      description="Lingkaran identitas berisi foto, inisial otomatis, atau ilustrasi profil."
       toc={toc}
     >
       <FlowSection id="avatar" title="Avatar">
         <Lead>
-          Isinya yang menentukan bentuknya, bukan prop terpisah: begitu <Hl>src</Hl> diisi, avatarnya
-          menampilkan foto; tanpa itu ia jatuh ke inisial. Fotonya selalu dipotong ke lingkaran dan
-          diratakan di tengah, jadi gambar apa pun bisa masuk tanpa disiapkan lebih dulu.
+          Foto dari <Hl>src</Hl> selalu menjadi pilihan pertama. Jika kosong atau gagal dimuat,
+          Avatar berpindah ke fallback tanpa mengubah ukuran, crop, atau bentuk lingkarannya.
         </Lead>
-        <Demo label="Dengan foto">
+        <Demo label="Default Avatar / foto">
           <div className="flex items-center gap-4">
-            <Avatar src={FOTO} alt="Putri Handayani" size="large" />
-            <Avatar src={FOTO} alt="Putri Handayani" />
-            <Avatar src={FOTO} alt="Putri Handayani" size="small" />
+            <Avatar src={FOTO} name="Putri Handayani" size="large" />
+            <Avatar src={FOTO} name="Putri Handayani" />
+            <Avatar src={FOTO} name="Putri Handayani" size="small" />
           </div>
         </Demo>
         <SectionCode>
-          {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Avatar '}
           <H>src</H>
-          {'="/foto/putri.jpg" '}
-          <H>alt</H>
-          {'="Putri Handayani" />'}
+          {'={user.avatarUrl} '}
+          <H>name</H>
+          {'={user.name} />'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500">
-          Beri <Hl>alt</Hl> berisi nama pemiliknya. Kalau namanya sudah tertulis persis di sebelah
-          avatar — seperti pada daftar anggota atau menu profil — kosongkan saja: avatarnya akan
-          terbaca sebagai hiasan dan pembaca layar tidak menyebut nama yang sama dua kali.
+          Bila nama sudah ditampilkan sebagai teks di dekat Avatar, gunakan <Hl>alt=&quot;&quot;</Hl>{' '}
+          agar tidak dibacakan dua kali.
         </p>
+        <SectionCode>
+          {'<Avatar '}
+          <H>name</H>
+          {'="Putri Handayani" '}
+          <H>alt</H>
+          {'="" />'}
+        </SectionCode>
       </FlowSection>
 
       <FlowSection id="inisial" title="Inisial">
         <Lead>
-          Tanpa <Hl>src</Hl>, lingkarannya diisi teks yang Anda beri lewat <Hl>initials</Hl> di atas latar
-          abu-abu. Satu atau dua huruf adalah takaran yang aman; lebih dari itu mulai berdesakan di
-          ukuran kecil.
+          Tanpa foto, <Hl>name</Hl> menghasilkan inisial otomatis. Nama satu kata memakai dua
+          karakter awal; nama beberapa kata memakai karakter awal kata pertama dan terakhir.
         </Lead>
-        <Demo label="Tanpa foto">
+        <Demo label="Otomatis dari name">
           <div className="flex items-center gap-4">
-            <Avatar initials="PH" alt="Putri Handayani" size="large" />
-            <Avatar initials="PH" alt="Putri Handayani" />
-            <Avatar initials="PH" alt="Putri Handayani" size="small" />
+            <Avatar name="Putri Handayani" size="large" />
+            <Avatar name="Putri Handayani" />
+            <Avatar name="Putri Handayani" size="small" />
           </div>
         </Demo>
         <SectionCode>
           {'<Avatar '}
-          <H>initials</H>
-          {'="PH" '}
-          <H>alt</H>
+          <H>name</H>
           {'="Putri Handayani" />'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
-          Inisial juga jadi jaring pengaman: bila <Hl>src</Hl> diisi tapi gambarnya gagal dimuat,
-          avatarnya berpindah sendiri ke inisial. Alamat foto profil biasanya datang dari sistem lain
-          dan bisa mati kapan saja — tanpa ini yang tersisa di halaman hanya ikon gambar rusak.
-        </p>
-        <Demo label="Foto rusak → jatuh ke inisial">
-          <div className="flex items-center gap-4">
-            <Avatar src="/foto/tidak-ada.jpg" initials="PH" alt="Putri Handayani" size="large" />
-            <Avatar src="/foto/tidak-ada.jpg" initials="PH" alt="Putri Handayani" />
-            <Avatar src="/foto/tidak-ada.jpg" initials="PH" alt="Putri Handayani" size="small" />
-          </div>
-        </Demo>
+        <div className="mt-5">
+          <Demo label="Override initials">
+            <div className="flex items-center gap-4">
+              <Avatar name="Putri Handayani" initials="UI" size="large" />
+              <Avatar name="Putri Handayani" initials="UI" />
+              <Avatar name="Putri Handayani" initials="UI" size="small" />
+            </div>
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Avatar '}
+          <H>name</H>
+          {'="Putri Handayani" '}
+          <H>initials</H>
+          {'="PT" />'}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="profile" title="Default profile">
+        <Lead>
+          <Hl>fallback=&quot;profile&quot;</Hl> menampilkan ilustrasi walaupun <Hl>name</Hl>{' '}
+          tersedia. Gender dipilih eksplisit dan tidak pernah ditebak dari nama. Tanpa gender,
+          Avatar memakai ikon User netral.
+        </Lead>
+        <div className="grid gap-5 sm:grid-cols-3">
+          <Demo label="Female">
+            <Avatar name="Putri Handayani" fallback="profile" gender="female" size="large" />
+          </Demo>
+          <Demo label="Male">
+            <Avatar name="Rafli Arandhana" fallback="profile" gender="male" size="large" />
+          </Demo>
+          <Demo label="Neutral">
+            <Avatar name="Pengguna" fallback="profile" size="large" />
+          </Demo>
+        </div>
+        <SectionCode>
+          {'<Avatar '}
+          <H>gender</H>
+          {'="female" '}
+          <H>fallback</H>
+          {'="profile" />\n<Avatar '}
+          <H>gender</H>
+          {'="male" '}
+          <H>fallback</H>
+          {'="profile" />'}
+        </SectionCode>
+        <SectionCode>
+          {'<Avatar '}
+          <H>name</H>
+          {'="Putri Handayani" '}
+          <H>gender</H>
+          {'="female" '}
+          <H>fallback</H>
+          {'="profile" />'}
+        </SectionCode>
       </FlowSection>
 
       <FlowSection id="sizes" title="Sizes">
         <Lead>
-          Tiga ukuran, dan teks inisialnya ikut naik bersamanya supaya porsi isian di dalam lingkaran
-          tetap terasa sama. <Hl>small</Hl> untuk baris daftar yang padat, <Hl>default</Hl> untuk navbar
-          dan menu profil, <Hl>large</Hl> untuk kepala halaman profil.
+          S berdiameter 24px, M 32px, dan L 80px. M adalah ukuran default, sehingga prop{' '}
+          <Hl>size</Hl> tidak perlu ditulis untuk ukuran tersebut.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-3">
           {ukuran.map((u) => (
-            <Demo key={u.value} label={`${u.label} — ${u.diameter}`}>
+            <Demo key={u.value} label={u.label + ' — ' + u.diameter}>
               <div className="flex items-center gap-3">
-                <Avatar src={FOTO} alt="Putri Handayani" size={u.value} />
-                <Avatar initials="PH" alt="Putri Handayani" size={u.value} />
+                <Avatar name="Putri Handayani" size={u.value} />
+                <Avatar name="Putri Handayani" fallback="profile" gender="female" size={u.value} />
               </div>
             </Demo>
           ))}
         </div>
+        <p className="mt-4 text-body-sm text-gray-500">
+          Ukuran teks inisial S, M, dan L berturut-turut {ukuran.map((u) => u.teks).join(', ')}.
+        </p>
         <SectionCode>
           {'<Avatar '}
           <H>size</H>
-          {'="large" '}
-          <H>src</H>
-          {'="/foto/putri.jpg" '}
-          <H>alt</H>
-          {'="Putri Handayani" />'}
+          {'="small" name="Putri Handayani" />\n<Avatar name="Putri Handayani" />\n<Avatar '}
+          <H>size</H>
+          {'="large" name="Putri Handayani" />'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
-          Ukuran teks inisialnya berturut-turut{' '}
-          {ukuran.map((u, i) => (
-            <span key={u.value}>
-              {i > 0 ? ', ' : ''}
-              <Hl>{u.teks}</Hl>
-            </span>
-          ))}
-          . Avatar tidak pernah ikut menyusut oleh flexbox, jadi aman diletakkan di samping teks
-          panjang tanpa takut gepeng.
-        </p>
       </FlowSection>
 
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
-          Prop <H>darkMode</H> mengubah fallback menjadi gray-800 dengan inisial gray-100. Foto
-          profil tetap tampil apa adanya; bila foto gagal dimuat, fallback gelap ini yang mengambil
-          alih.
+          Avatar mengikuti scope ambient <Hl>data-theme</Hl>. Inisial dan ilustrasi profile berpindah
+          otomatis, termasuk dalam nested theme scope; foto pengguna tidak diberi tint.
         </Lead>
-        <Demo label="Fallback di permukaan gelap" dark>
-          <div className="flex items-center gap-4">
-            <Avatar darkMode initials="PH" alt="Putri Handayani" size="large" />
-            <Avatar darkMode initials="PH" alt="Putri Handayani" />
-            <Avatar darkMode initials="PH" alt="Putri Handayani" size="small" />
+        <Stage maxWidth="max-w-full" dark>
+          <div data-theme="dark" className="flex flex-wrap items-center gap-4">
+            <Avatar name="Putri Handayani" size="large" />
+            <Avatar name="Putri Handayani" fallback="profile" gender="female" size="large" />
+            <Avatar name="Rafli Arandhana" fallback="profile" gender="male" size="large" />
           </div>
-        </Demo>
+        </Stage>
         <SectionCode>
-          {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n<Avatar "}
-          <H>darkMode</H>
-          {' '}
-          <H>initials</H>
-          {'="PH" '}
-          <H>alt</H>
-          {'="Putri Handayani" />'}
+          {'<section '}
+          <H>data-theme</H>
+          {'="dark">\n  <Avatar name="Putri Handayani" />\n</section>'}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
-        <Lead>
-          Satu avatar yang bisa Anda utak-atik lewat kontrol di bawahnya. Matikan fotonya untuk
-          melihat inisialnya mengambil alih.
-        </Lead>
-
-        {/*
-          Tinggi minimumnya dikunci supaya kotaknya tidak ikut naik-turun saat
-          ukuran avatar diganti — 120px cukup untuk melapangi yang 80px.
-        */}
-        <Stage maxWidth="max-w-[320px]" dark={darkMode}>
-          <div className="flex min-h-30 items-center justify-center gap-3">
+        <Lead>Ubah tema, ukuran, isi, gender, dan nama. Preview memakai komponen production yang sama.</Lead>
+        <Stage maxWidth="max-w-[360px]" dark={dark}>
+          <div
+            data-theme={dark ? 'dark' : 'light'}
+            className="flex min-h-30 items-center justify-center gap-3"
+          >
             <Avatar
               size={size}
-              src={withFoto ? FOTO : undefined}
-              initials="PH"
-              alt={withNama ? 'Putri Handayani' : ''}
-              darkMode={darkMode}
+              src={content === 'photo' ? FOTO : undefined}
+              name={name}
+              alt=""
+              initials={content === 'override' ? 'UI' : undefined}
+              fallback={fallback}
+              gender={content === 'profile' ? gender : undefined}
             />
-            <span className={darkMode ? 'text-sm text-gray-100' : 'text-sm text-gray-900'}>
-              Putri Handayani
-            </span>
+            <span className="text-sm text-content">{name || 'Tanpa nama'}</span>
           </div>
         </Stage>
 
         <Controls>
-          <Control label="Tampilan">
+          <Control label="Theme">
             <Segmented
-              label="Pilih tampilan"
-              value={darkMode}
-              onChange={setDarkMode}
+              label="Pilih theme"
+              value={dark}
+              onChange={setDark}
               options={[
                 { value: false, label: 'Light' },
                 { value: true, label: 'Dark' },
               ]}
             />
           </Control>
-
           <Control label="Size">
             <Segmented
               label="Pilih ukuran"
@@ -226,82 +243,113 @@ export function AvatarPage() {
               options={ukuran.map((u) => ({ value: u.value, label: u.label }))}
             />
           </Control>
-
-          <Control label="Foto">
+          <Control label="Isi">
             <Segmented
-              label="Tampilkan foto"
-              value={withFoto}
-              onChange={setWithFoto}
-              options={adaTidakAda}
+              label="Pilih isi Avatar"
+              value={content}
+              onChange={setContent}
+              wrap
+              options={[
+                { value: 'photo', label: 'Foto' },
+                { value: 'auto', label: 'Initials' },
+                { value: 'override', label: 'Override' },
+                { value: 'profile', label: 'Profile' },
+              ]}
             />
           </Control>
-
-          <Control label="Nama (alt)">
+          <Control label="Gender">
             <Segmented
-              label="Isi nama"
-              value={withNama}
-              onChange={setWithNama}
-              options={adaTidakAda}
+              label="Pilih gender profile"
+              value={gender}
+              onChange={setGender}
+              disabled={content !== 'profile'}
+              options={[
+                { value: 'female', label: 'Female' },
+                { value: 'male', label: 'Male' },
+              ]}
+            />
+          </Control>
+          <Control label="Nama">
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              aria-label="Nama untuk preview Avatar"
+              className="mt-1 w-full rounded-lg border border-field-border bg-field px-3 py-2 text-sm text-content outline-none focus:border-brand"
             />
           </Control>
         </Controls>
 
-        <p className="mt-4 text-body-sm text-gray-500">
-          Contoh di atas sengaja menaruh nama di sebelah avatarnya — susunan yang paling sering
-          dipakai. Dalam keadaan itu <em>Nama (alt)</em> justru lebih baik dikosongkan, karena
-          namanya sudah terbaca dari teks di sampingnya.
-        </p>
       </FlowSection>
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Blok ini mengikuti kontrol di Playground — ubah kontrolnya, kodenya ikut berubah. Prop yang
-          nilainya masih bawaan sengaja tidak ditulis.
+          Gunakan urutan berikut untuk memilih konfigurasi Avatar yang sesuai kebutuhan consumer.
         </Lead>
+        <ol className="mb-4 list-decimal space-y-2 pl-5 text-body-sm text-gray-500">
+          <li>Tentukan apakah Avatar memakai foto melalui <Hl>src</Hl> atau tanpa foto.</li>
+          <li>Berikan <Hl>name</Hl> untuk identitas dan inisial otomatis.</li>
+          <li>
+            Untuk ilustrasi Male/Female, gunakan <Hl>gender</Hl> bersama{' '}
+            <Hl>fallback=&quot;profile&quot;</Hl>.
+          </li>
+          <li>Gunakan <Hl>initials</Hl> hanya saat membutuhkan override.</li>
+          <li>
+            Atur <Hl>size</Hl> bila bukan M, dan pilih <Hl>alt</Hl> sesuai konteks aksesibilitas.
+          </li>
+        </ol>
         <SectionCode flush>
           {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
+          {dark && '<section data-theme="dark">\n'}
+          {dark && '  '}
           {'<Avatar\n'}
-          {darkMode && (
-            <>
-              {'    '}
-              <H>darkMode</H>
-              {'\n'}
-            </>
-          )}
           {size !== 'default' && (
             <>
               {'    '}
               <H>size</H>
-              {`="${size}"\n`}
+              {'="' + size + '"\n'}
             </>
           )}
-          {withFoto && (
+          {content === 'photo' && (
             <>
               {'    '}
               <H>src</H>
               {'="/foto/putri.jpg"\n'}
             </>
           )}
-          {'    '}
-          <H>initials</H>
-          {'="PH"\n'}
-          {withNama && (
+          {name && (
             <>
               {'    '}
-              <H>alt</H>
-              {'="Putri Handayani"\n'}
+              <H>name</H>
+              {'=' + JSON.stringify(name) + '\n'}
             </>
           )}
-          {'/>'}
+          {content === 'override' && (
+            <>
+              {'    '}
+              <H>initials</H>
+              {'="UI"\n'}
+            </>
+          )}
+          {content === 'profile' && (
+            <>
+              {'    '}
+              <H>fallback</H>
+              {'="profile"\n'}
+              {'    '}
+              <H>gender</H>
+              {'="' + gender + '"\n'}
+            </>
+          )}
+          {dark ? '  />\n</section>' : '/>'}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Seluruh prop yang diterima komponen, beserta tipe dan nilai bawaannya. Atribut{' '}
-          <Hl>&lt;div&gt;</Hl> standar juga diteruskan apa adanya.
+          Seluruh prop public Avatar. Native attributes dan ref tetap diteruskan ke wrapper{' '}
+          <Hl>&lt;div&gt;</Hl>.
         </Lead>
-        <PropsTable rows={avatarProps} minWidth="48rem" />
+        <PropsTable rows={avatarProps} minWidth="52rem" />
       </FlowSection>
     </UsulanPage>
   )
