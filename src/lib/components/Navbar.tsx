@@ -424,6 +424,8 @@ const loadMoreClass = cn(
   'hover:bg-dropdown-item-hover-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
 )
 
+const LOAD_MORE_BATCH_HEIGHT = 160
+
 interface OverflowMeasurementMetrics {
   width: number
   availableHeight: number
@@ -458,7 +460,8 @@ function OverflowPanel({
     : `disclosure:${item.id}:${item.label}:${item.children.map((child) => `${child.id}:${child.label}`).join(',')}`
   ).join('|')
   const expandedKey = Array.from(expanded).sort().join('|')
-  const truncatedLabels = useTruncatedNavbarLabels(contentRef, 'data-navbar-overflow-label', `${labelKey}|${expandedKey}`)
+  const currentVisibleCount = Math.min(visibleItemCount, items.length)
+  const truncatedLabels = useTruncatedNavbarLabels(contentRef, 'data-navbar-overflow-label', `${labelKey}|${expandedKey}|${currentVisibleCount}`)
 
   const readMeasurementMetrics = useCallback(() => {
     const content = contentRef.current
@@ -496,38 +499,53 @@ function OverflowPanel({
     const rows = Array.from(measurement.querySelectorAll<HTMLElement>('[data-navbar-overflow-measure-item]'))
     const button = measurement.querySelector<HTMLElement>('[data-navbar-overflow-measure-more]')
     if (rows.length !== items.length || !button) return null
+    const outerHeight = (element: HTMLElement) => {
+      const style = window.getComputedStyle(element)
+      return element.getBoundingClientRect().height
+        + Number.parseFloat(style.marginTop || '0')
+        + Number.parseFloat(style.marginBottom || '0')
+    }
     return {
-      rows: rows.map((row) => row.getBoundingClientRect().height),
-      button: button.getBoundingClientRect().height,
+      rows: rows.map(outerHeight),
+      button: outerHeight(button),
     }
   }, [items.length])
 
   const initialVisibleCount = useCallback((availableHeight: number) => {
     const heights = measuredHeights()
     if (!heights || items.length === 0) return 0
-    const totalHeight = heights.rows.reduce((total, height) => total + height, 0)
-    if (totalHeight <= availableHeight + 0.5) return items.length
+    let targetHeight = 0
+    let targetCount = 0
+    while (targetCount < heights.rows.length) {
+      targetHeight += heights.rows[targetCount]
+      targetCount += 1
+      if (targetHeight >= LOAD_MORE_BATCH_HEIGHT - 0.5) break
+    }
+    if (targetCount === heights.rows.length && targetHeight <= availableHeight + 0.5) return targetCount
 
     const budget = Math.max(0, availableHeight - heights.button)
     let used = 0
     let count = 0
-    while (count < heights.rows.length && used + heights.rows[count] <= budget + 0.5) {
-      used += heights.rows[count]
+    while (count < heights.rows.length) {
+      const nextHeight = heights.rows[count]
+      if (count > 0 && used + nextHeight > budget + 0.5) break
+      used += nextHeight
       count += 1
+      if (used >= LOAD_MORE_BATCH_HEIGHT - 0.5) break
     }
     return Math.max(1, count)
   }, [items.length, measuredHeights])
 
-  const nextVisibleCount = useCallback((current: number, availableHeight: number) => {
+  const nextVisibleCount = useCallback((current: number) => {
     const heights = measuredHeights()
     if (!heights || current >= items.length) return current
 
-    const remainingBudget = Math.max(0, availableHeight - heights.button)
     let used = 0
     let next = current
-    while (next < heights.rows.length && used + heights.rows[next] <= remainingBudget + 0.5) {
+    while (next < heights.rows.length) {
       used += heights.rows[next]
       next += 1
+      if (used >= LOAD_MORE_BATCH_HEIGHT - 0.5) break
     }
     return Math.max(current + 1, next)
   }, [items.length, measuredHeights])
@@ -661,10 +679,9 @@ function OverflowPanel({
 
   const loadMore = (event: MouseEvent<HTMLButtonElement>) => {
     const panel = contentRef.current?.closest<HTMLElement>('[popover]')
-    const metrics = readMeasurementMetrics()
-    if (!panel || !metrics) return
+    if (!panel) return
     const currentVisibleCount = Math.min(visibleItemCount, items.length)
-    const next = Math.min(items.length, nextVisibleCount(currentVisibleCount, metrics.availableHeight))
+    const next = Math.min(items.length, nextVisibleCount(currentVisibleCount))
     if (next <= currentVisibleCount) return
 
     pendingScrollRef.current = {
@@ -676,7 +693,6 @@ function OverflowPanel({
     setVisibleItemCount(next)
   }
 
-  const currentVisibleCount = Math.min(visibleItemCount, items.length)
   const visibleItems = items.slice(0, currentVisibleCount)
   const hasMoreItems = currentVisibleCount < items.length
 
@@ -799,17 +815,19 @@ function CapacityAwareDesktopNavigation({
   items,
   row,
   platform,
+  compositionKey,
 }: {
   items: NavbarPrimaryItem[]
   row: HTMLDivElement | null
   platform: NavbarPlatform
+  compositionKey: string
 }) {
   const measurementRef = useRef<HTMLUListElement>(null)
   const navigationRef = useRef<HTMLElement>(null)
   const overflowTriggerRef = useRef<HTMLButtonElement>(null)
   const focusAfterAllocationRef = useRef<{ type: 'overflow' | 'item'; index?: number } | null>(null)
   const spacingMode: DesktopSpacingMode = platform === 'front-office' ? 'viewport' : 'container'
-  const allocationKey = `${platform}|${items.map((item) => `${item.id}:${item.type}:${item.label}`).join('|')}`
+  const allocationKey = `${platform}|${compositionKey}|${items.map((item) => `${item.id}:${item.type}:${item.label}`).join('|')}`
   const [allocation, setAllocation] = useState<NavigationAllocation>({
     key: allocationKey,
     visibleCount: items.length,
@@ -1446,7 +1464,16 @@ export function Navbar(props: NavbarProps) {
             {search}
           </div>
         )}
-        <CapacityAwareDesktopNavigation items={items} row={desktopRow} platform={platform} />
+        <CapacityAwareDesktopNavigation
+          items={items}
+          row={desktopRow}
+          platform={platform}
+          compositionKey={[
+            search ? 'search' : 'no-search',
+            account ? 'account' : platform === 'front-office' && guestActions ? 'guest' : 'no-identity',
+            account && notificationTrigger ? 'notification' : 'no-notification',
+          ].join('|')}
+        />
         <DesktopIdentity
           platform={platform}
           account={account}
@@ -1456,10 +1483,7 @@ export function Navbar(props: NavbarProps) {
       </div>
 
       <div
-        className={cn(
-          'w-full px-4 sm:px-5 lg:hidden in-data-[theme=dark]:[--color-field-border:var(--color-gray-600)]',
-          platform === 'front-office' ? 'py-4' : 'py-[19px]',
-        )}
+        className="w-full px-4 py-4 sm:px-5 lg:hidden in-data-[theme=dark]:[--color-field-border:var(--color-gray-600)]"
       >
         {platform === 'front-office' ? (
           <>
@@ -1492,7 +1516,12 @@ export function Navbar(props: NavbarProps) {
             {search && <div className="mt-3 min-w-0">{search}</div>}
           </>
         ) : (
-          <div className="grid min-h-10 grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-3 min-[440px]:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto]">
+          <div
+            className={cn(
+              'grid min-h-10 grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-3 min-[440px]:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto]',
+              search && 'grid-rows-[minmax(40px,auto)_auto] min-[440px]:grid-rows-none',
+            )}
+          >
             {hasMobileNavigation && (
               <button
                 ref={mobileTriggerRef}

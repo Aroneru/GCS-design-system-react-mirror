@@ -347,12 +347,12 @@ Navigation bukan mode production tersendiri: `href`, `target`, `rel`, dan
 ```tsx
 import { Dropdown, type DropdownItem } from '@ceplok-ui/design-kit-react'
 
-const actions: DropdownItem[] = [
+const actions = [
   { id: 'edit', label: 'Edit', onClick: () => console.info('Edit') },
   { id: 'delete', label: 'Hapus', tone: 'danger', onClick: () => console.info('Hapus') },
-]
+] satisfies DropdownItem[]
 
-const navigation: DropdownItem[] = [
+const navigation = [
   { id: 'overview', label: 'Ringkasan', href: '/ringkasan', current: true },
   { id: 'settings', label: 'Pengaturan', href: '/pengaturan' },
   {
@@ -363,7 +363,7 @@ const navigation: DropdownItem[] = [
     rel: 'noopener noreferrer',
   },
   { id: 'archive', label: 'Arsip', href: '/arsip', disabled: true },
-]
+] satisfies DropdownItem[]
 
 export function DropdownExamples() {
   return (
@@ -506,19 +506,20 @@ ambient:
 
 ### Navbar
 
-Navbar memakai kontrak terdiskriminasi berdasarkan `platform`. Front Office
-(FO) mendukung identitas guest atau account; Back Office (BO) memakai
-`mobileDrawer` untuk menghubungkan tombol contextual Drawer milik consumer.
-`brand` selalu berupa objek terstruktur, sedangkan `search` adalah slot
-`ReactNode` yang disediakan consumer. Navbar merender `brand.content` sebagai
-satu unit dan tidak memisahkan mark maupun wordmark secara otomatis. Brand
-ditampilkan pada FO desktop/mobile dan BO mobile; BO desktop tidak
-menampilkannya karena identitas aplikasi berada pada Sidebar desktop.
+Navbar menyediakan navigasi responsif untuk aplikasi Front Office (FO) dan
+Back Office (BO). Komponen menangani komposisi desktop dan mobile, sedangkan
+consumer tetap memiliki brand, status route, perilaku pencarian, identitas,
+notifikasi, dan Drawer kontekstual.
 
-#### Front Office — guest
+#### Penggunaan dasar — Front Office
 
 ```tsx
-import { Navbar, Search, type NavbarPrimaryItem } from '@ceplok-ui/design-kit-react'
+import {
+  Navbar,
+  Search,
+  type NavbarAccount,
+  type NavbarPrimaryItem,
+} from '@ceplok-ui/design-kit-react'
 
 const brand = {
   content: <img src="/logo.svg" alt="" />,
@@ -526,22 +527,56 @@ const brand = {
   ariaLabel: 'CEPLOK — Beranda',
 }
 
-const items: NavbarPrimaryItem[] = [
-  { id: 'beranda', type: 'destination', label: 'Beranda', href: '/', current: true },
+const items = [
+  {
+    id: 'beranda',
+    type: 'destination',
+    label: 'Beranda',
+    href: '/',
+    current: true,
+  },
   {
     id: 'layanan',
     type: 'disclosure',
-    label: 'Layanan',
+    label: 'Layanan Digital',
     children: [
-      { id: 'layanan-ringkasan', type: 'destination', label: 'Ringkasan', href: '/layanan' },
+      {
+        id: 'katalog-layanan',
+        type: 'destination',
+        label: 'Katalog Layanan',
+        href: '/layanan',
+      },
+      {
+        id: 'status-permohonan',
+        type: 'destination',
+        label: 'Status Permohonan',
+        href: '/permohonan',
+      },
     ],
   },
-]
+  {
+    id: 'informasi-publik',
+    type: 'destination',
+    label: 'Informasi Publik',
+    href: '/informasi',
+    disabled: true,
+  },
+] satisfies NavbarPrimaryItem[]
 
-const guestActions = {
-  signIn: { label: 'Masuk', href: '/masuk' },
-  signUp: { label: 'Daftar', href: '/daftar' },
-}
+const account = {
+  name: 'Siti Rahma',
+  initials: 'SR',
+  items: [
+    { id: 'profil', type: 'destination', label: 'Profil', href: '/profil' },
+    {
+      id: 'keluar',
+      type: 'action',
+      label: 'Keluar',
+      tone: 'danger',
+      onClick: () => {},
+    },
+  ],
+} satisfies NavbarAccount
 
 export function FrontOfficeNavbar() {
   return (
@@ -549,57 +584,29 @@ export function FrontOfficeNavbar() {
       platform="front-office"
       brand={brand}
       items={items}
-      search={<Search platform="compact" showButton={false} aria-label="Cari" />}
-      guestActions={guestActions}
-    />
-  )
-}
-```
-
-Untuk FO authenticated, gunakan `account` sebagai pengganti `guestActions`.
-`notificationTrigger` hanya valid bersama `account` dan merupakan slot yang
-sepenuhnya dirender consumer:
-
-```tsx
-import { Navbar, type NavbarAccount, type NavbarPrimaryItem } from '@ceplok-ui/design-kit-react'
-
-const brand = {
-  content: <img src="/logo.svg" alt="" />,
-  href: '/',
-  ariaLabel: 'CEPLOK — Beranda',
-}
-
-const items: NavbarPrimaryItem[] = [
-  { id: 'beranda', type: 'destination', label: 'Beranda', href: '/', current: true },
-]
-
-const account: NavbarAccount = {
-  name: 'User CEPLOK',
-  initials: 'UC',
-  items: [
-    { id: 'profil', type: 'destination', label: 'Profil', href: '/profil' },
-    { id: 'keluar', type: 'action', label: 'Keluar', tone: 'danger', onClick: () => {} },
-  ],
-}
-
-export function FrontOfficeAuthenticatedNavbar() {
-  return (
-    <Navbar
-      platform="front-office"
-      brand={brand}
-      items={items}
+      search={(
+        <Search
+          platform="compact"
+          showButton={false}
+          trigger="enter"
+          aria-label="Cari layanan"
+        />
+      )}
       account={account}
-      notificationTrigger={<a href="/notifikasi">Notifikasi</a>}
     />
   )
 }
 ```
 
-Navbar bersifat router-agnostic dan beralih ke komposisi mobile di bawah
-breakpoint `lg`. Pada mobile, search tetap berada pada baris kedua di luar
-navigasi. Navigasi utamanya dibuka sebagai dialog native modal; gunakan
-`mobileNavigationOpen` dan `onMobileNavigationOpenChange` bila state navigasi
-mobile perlu dikendalikan consumer.
+Untuk FO guest, ganti `account` dengan `guestActions` yang berisi `signIn` dan
+opsional `signUp`. `notificationTrigger` hanya valid pada FO authenticated
+bersama `account` dan merupakan slot yang dirender consumer.
+
+Navbar bersifat router-agnostic dan berpindah antara komposisi desktop dan
+mobile secara internal. Consumer tidak perlu mengirim ukuran viewport atau
+breakpoint. Gunakan `mobileNavigationOpen` dan
+`onMobileNavigationOpenChange` bila state navigasi mobile perlu dikendalikan
+consumer.
 
 `current` adalah state navigasi milik consumer: setelah route berubah,
 consumer perlu merender ulang `items` dengan destination yang sesuai sebagai
@@ -608,17 +615,24 @@ navigation desktop tidak memakai sorotan permanen; Breadcrumb menyediakan
 konteks halaman. Sidebar mobile dan baris destination di Dropdown tetap memakai
 tampilan current dari kontrak komponennya masing-masing.
 
-Disclosure desktop dan Account destination diteruskan ke generated item
-`Dropdown`; `current` tetap berbeda dari `selected`. `Lainnya` memakai konten
-custom agar dapat memuat Disclosure bersarang. Pada Sidebar mobile,
-`target="_blank"` diterjemahkan ke prop `external`, sehingga Sidebar menerapkan
-target baru dan `rel` aman bawaan komponennya.
+#### Item navigasi
+
+- `destination` adalah tautan langsung. Isi `href`; gunakan `current` untuk
+  route aktif dan `disabled` untuk menonaktifkan interaksi.
+- `disclosure` mengelompokkan `children` yang masing-masing berupa destination.
+- `icon` bersifat opsional pada destination maupun disclosure.
+- Setiap item memerlukan `id` dan `label`. Consumer bertanggung jawab
+  memperbarui `current` ketika route berubah.
 
 #### Back Office — contextual Drawer milik consumer
 
 ```tsx
 import { useState } from 'react'
-import { Drawer, Navbar, type NavbarPrimaryItem } from '@ceplok-ui/design-kit-react'
+import {
+  Drawer,
+  Navbar,
+  type NavbarPrimaryItem,
+} from '@ceplok-ui/design-kit-react'
 
 const brand = {
   content: <span>CEPLOK Admin</span>,
@@ -626,9 +640,15 @@ const brand = {
   ariaLabel: 'CEPLOK Admin — Beranda',
 }
 
-const items: NavbarPrimaryItem[] = [
-  { id: 'dashboard', type: 'destination', label: 'Dashboard', href: '/', current: true },
-]
+const items = [
+  {
+    id: 'dashboard',
+    type: 'destination',
+    label: 'Dashboard',
+    href: '/',
+    current: true,
+  },
+] satisfies NavbarPrimaryItem[]
 
 export function BackOfficeNavbar() {
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -660,15 +680,31 @@ export function BackOfficeNavbar() {
 ```
 
 `mobileDrawer` bukan isi Drawer. Consumer memiliki state, elemen `<Drawer>`,
-serta kontennya; Navbar hanya mengendalikan trigger contextual dan menutup
-navigasi mobile saat Drawer dibuka. `guestActions` dan `notificationTrigger`
-tidak berlaku pada BO.
+serta kontennya; Navbar hanya menghubungkan trigger kontekstual pada mobile.
 
-Type publik Navbar yang diekspor meliputi `NavbarProps`, `NavbarPlatform`,
-`NavbarBrand`, `NavbarDestination`, `NavbarDisclosure`, `NavbarPrimaryItem`,
-`NavbarAccount`, `NavbarAccountItem`, `NavbarGuestActions`, dan
-`NavbarMobileDrawer`. Lihat type exports package untuk tipe item account serta
-varian FO/BO yang lebih spesifik.
+#### Perbedaan platform dan integrasi
+
+| Platform | Konfigurasi yang didukung |
+| --- | --- |
+| Front Office guest | `guestActions` untuk tautan Masuk dan Daftar; tanpa `account` atau `notificationTrigger`. |
+| Front Office authenticated | `account` dan opsional `notificationTrigger`; tanpa `guestActions`. |
+| Back Office | Opsional `account` dan `mobileDrawer`; tanpa `guestActions` atau `notificationTrigger`. |
+
+`brand` wajib pada kedua platform. Isi visualnya tetap dimiliki consumer
+melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
+
+- `search` menerima `ReactNode`. Gunakan `Search` dengan
+  `platform="compact"`, `showButton={false}`, dan `trigger="enter"` untuk pola
+  Navbar.
+- `account` berisi identitas pengguna dan daftar destination atau action pada
+  menu akun.
+- `notificationTrigger` adalah slot milik consumer dan hanya berlaku pada FO
+  authenticated.
+- `mobileDrawer` hanya berlaku pada BO dan menghubungkan `open`,
+  `onOpenChange`, serta `controls` ke Drawer milik consumer.
+
+Tema mengikuti boundary ambient `data-theme` milik consumer; Navbar tidak
+memerlukan prop tema khusus.
 
 Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
 bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.

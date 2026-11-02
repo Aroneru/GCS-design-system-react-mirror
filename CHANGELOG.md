@@ -65,6 +65,13 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
 
 ### Ditambahkan
 
+- **Progressive Load More pada overflow Navbar desktop.** Dropdown `Lainnya`
+  menentukan jumlah item awal dari tinggi panel dan tinggi baris yang benar-benar
+  dirender, lalu `Muat lebih banyak` menampilkan batch berikutnya berdasarkan
+  tinggi konten. Item yang sudah terlihat tidak disembunyikan kembali selama
+  dropdown masih terbuka, dan state disclosure tetap dipertahankan saat item
+  tambahan dimuat.
+
 - **`Avatar` V2.** Prop `name` menambahkan nama aksesibel sekaligus menghasilkan
   inisial Unicode-aware; `initials` tetap menjadi override manual. Fallback
   dapat dipilih lewat `fallback="initials" | "profile"`: foto yang tersedia
@@ -113,6 +120,26 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   `brand`.
 
 ### Diubah
+
+- **Navbar desktop dan mobile disempurnakan.** Alokasi navigasi desktop kini
+  dihitung ulang saat komposisi Search, account, guest action, atau notifikasi
+  berubah sehingga transisi identitas FO/BO tidak menampilkan susunan sementara
+  yang keliru. Panel `Lainnya` memakai lebar responsif yang stabil, sedangkan
+  disclosure mandiri tetap mengikuti lebar trigger dan ruang viewport. Label
+  navigasi dapat membungkus hingga dua baris dengan tooltip hanya ketika teks
+  benar-benar terpotong. Disclosure di dalam `Lainnya` kembali tertutup setelah
+  parent dropdown ditutup. Header mobile FO dan BO kini memakai tinggi luar
+  yang konsisten tanpa mengubah susunan khusus platform.
+
+- **Dokumentasi Navbar diperbarui.** Playground menambahkan tinggi viewport
+  custom yang independen dari lebarnya, menghapus Brand Fixture, dan menghasilkan
+  snippet FO/BO yang mengikuti konfigurasi aktif dengan import consumer minimal
+  serta penyorotan prop yang konsisten. Preview responsive dan Dark Mode kini
+  sejajar, memakai stage yang sama, dan background dokumentasi yang konsisten.
+  Shared Example kini menunjukkan destination, disclosure, Search, account, dan
+  Drawer BO menggunakan API production. README memuat panduan consumer terbaru
+  untuk item navigasi, perbedaan platform, integrasi, tema ambient, dan perilaku
+  responsif.
 
 - **Dokumentasi `Dropdown` V2.** Playground kini memisahkan contoh Action,
   Navigation, dan Selection, dengan kontrol `align` serta `closeOnSelect` yang
@@ -184,6 +211,12 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   langsung, mis. `font-weight: var(--font-weight-semibold)`.
 
 ### Diperbaiki
+
+- **Interaksi Navbar desktop.** Destination primary yang disabled kini tetap
+  menampilkan cursor terlarang tanpa meneruskan pointer ke elemen di belakangnya.
+  Pengamatan tooltip overflow ikut diperbarui ketika jumlah item yang terlihat
+  berubah, sehingga label baru dari Progressive Load More mendapat tooltip hanya
+  bila benar-benar terpotong.
 
 - **Dokumentasi `Avatar`.** Halaman komponen kini mencakup fallback foto,
   inisial otomatis dan override, profile Male/Female/netral, S/M/L, tema
