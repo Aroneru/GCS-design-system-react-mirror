@@ -14,7 +14,7 @@ Ceplok Design System. Dipindahkan 1:1 dari versi Laravel/Blade
 - **Komponen umum**: `Alert`, `Avatar`, `Badge`, `Breadcrumb`, `Button`, `Card`,
   `Clipboard`, `Container`, `Drawer`, `Dropdown`, `Footer`, `Hero`, `Icon`,
   `ListView`, `Modal`, `Navbar`, `Pagination`, `Popover`, `Sidebar`, `Spinner`,
-  `Table`, `Timeline` (eksperimental, desainnya belum final), `Toast`.
+  `Table`, `Timeline`, `Toast`.
 - **Komponen form**: `InputField`, `FloatingLabel`, `TextArea`, `Select`,
   `Search`, `Datepicker`, `Upload`, `Radio`, `Toggle`, `Checkbox`.
 - **Ikon**: logo brand & sosial (`Github`, `Instagram`, …) dari barrel utama,
@@ -139,7 +139,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user` (profil + menu dropdown), `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
 | `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `striped`, `sticky`, `size`, `loading` |
-| `Timeline`   | Eksperimental. `items` (`name`, `role`, `time` (`Date`, ditulis `01 Jan 2026 · 09:05`), `elapsed`, `description`, `details`, `attachments` (`name`, `href`, `target`, `download`), `status` (prop `Badge` + `label`), `avatar`, `initials`), `platform`: `desktop \| mobile`, `size`: `large \| small`, `labels` (`elapsed`, `details`, `attachments`, `months`), `darkMode` |
+| `Timeline`   | `items` (`name`, `role`, `time` (`Date`, ditulis `01 Jan 2026 · 09:05`), `elapsed`, `description`, `details`, `attachments` (`name`, `href`, `target`, `download`), `status` (prop `Badge` + `label`), `avatar`, `initials`), `platform`: `desktop \| mobile`, `size`: `large \| small`, `labels` (`elapsed`, `details`, `attachments`, `months`), `darkMode` |
 
 Warna Button diatur `theme` (`primary | green | gray | purple | orange |
 yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya

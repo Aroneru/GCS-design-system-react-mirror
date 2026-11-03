@@ -263,7 +263,6 @@ export type {
   TableOfContentsLayout,
   TableOfContentsProps,
 } from "./components/TableOfContents";
-// Eksperimental: desain Timeline belum final, jadi prop-nya masih bisa berubah.
 export { Timeline } from "./components/Timeline";
 export type {
   TimelineProps,
