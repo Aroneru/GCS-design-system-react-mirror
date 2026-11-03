@@ -7,6 +7,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  PlaygroundFontScope,
   SectionCode,
   UsulanPage,
   type TocEntry,
@@ -576,7 +577,7 @@ export function ContainerPage() {
           tiruan: angkanya diukur langsung dari elemen yang dirender.
         </Lead>
 
-        <div className={`rounded-2xl border p-4 transition-colors sm:p-6 ${tone.stage}`}>
+        <PlaygroundFontScope className={`rounded-2xl border p-4 transition-colors sm:p-6 ${tone.stage}`}>
           <div
             ref={availRef}
             className={`mx-auto max-w-full rounded-xl ring-1 transition-[width] duration-300 ease-out ${tone.room}`}
@@ -597,7 +598,7 @@ export function ContainerPage() {
               </div>
             </Container>
           </div>
-        </div>
+        </PlaygroundFontScope>
 
         <Controls>
           <Control label="Mode">

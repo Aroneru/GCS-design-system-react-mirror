@@ -6,6 +6,7 @@ import { PropsTable, type PropRow } from '../../PropsTable'
 import { nodeText } from '../../nodeText'
 import { H, Segmented } from '../../pageKit'
 import { Control, Controls, FlowSection, Lead, SectionCode, UsulanPage, type TocEntry } from '../../usulanKit'
+import { fontClass, fontScopeStyle, readPlaygroundFont, usePlaygroundFont } from '../../usulanOptions'
 
 type Identity = 'guest' | 'authenticated' | 'none'
 type Theme = 'light' | 'dark'
@@ -149,7 +150,12 @@ function readConfig(): Config {
   return normalized({ platform: p.get('platform') === 'back-office' ? 'back-office' : 'front-office', identity: accountFixture ? 'authenticated' : p.get('identity') === 'authenticated' ? 'authenticated' : p.get('identity') === 'none' ? 'none' : 'guest', menuCount: fixture === 'overflow-disclosure' ? 10 : n >= 2 && n <= 10 ? n as Config['menuCount'] : 4, disclosure: fixture === 'overflow-disclosure' || p.get('disclosure') !== 'false', search: p.get('search') !== 'false', disabled: p.get('disabled') === 'true', icons: p.get('icons') !== 'false', notification: p.get('notification') !== 'false', drawer: p.get('drawer') !== 'false', theme: p.get('theme') === 'dark' ? 'dark' : 'light', fixture })
 }
 /** Current-source production fixture; static preview routes depend on this export. */
-export function NavbarPlaygroundPreview() { return <Preview config={readConfig()} /> }
+export function NavbarPlaygroundPreview() {
+  // Font pilihan kontrol Typography dikirim lewat URL, karena iframe tidak ikut mewarisi font halaman docs.
+  const font = readPlaygroundFont(new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('font'))
+  const preview = <Preview config={readConfig()} />
+  return font ? <div className={fontClass[font]} style={fontScopeStyle(font)}>{preview}</div> : preview
+}
 
 /** Docs-only fit presentation. The iframe itself retains the requested real viewport. */
 function PreviewFrame({ title, src, width, height = 220, stageHeight, showTitle = true, loading = 'eager', dark = false, interactive = true }: { title: string; src: string; width: number; height?: number; stageHeight?: number; showTitle?: boolean; loading?: 'eager' | 'lazy'; dark?: boolean; interactive?: boolean }) {
@@ -165,7 +171,9 @@ function PreviewFrame({ title, src, width, height = 220, stageHeight, showTitle 
     return () => observer.disconnect()
   }, [width])
   const usesSharedStage = stageHeight !== undefined
-  return <div className="space-y-2">{showTitle && <p className="text-sm font-semibold text-content">{title}</p>}<div className={`max-w-full overflow-hidden rounded-xl border p-3 ${dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'}`}><div ref={contentRef}><div className={usesSharedStage ? 'relative' : undefined} style={{ height: usesSharedStage ? stageHeight : height * scale }}><iframe title={title} src={src} loading={loading} tabIndex={interactive ? 0 : -1} className={interactive ? 'block border-0 bg-transparent' : 'pointer-events-none block border-0 bg-transparent'} style={usesSharedStage ? { position: 'absolute', top: '50%', left: 0, width, height, transform: `translateY(-50%) scale(${scale})`, transformOrigin: 'left center' } : { width, height, transform: `scale(${scale})`, transformOrigin: 'top left' }} /></div></div></div></div>
+  const font = usePlaygroundFont()
+  const frameSrc = font ? `${src}&font=${font}` : src
+  return <div className="space-y-2">{showTitle && <p className="text-sm font-semibold text-content">{title}</p>}<div className={`max-w-full overflow-hidden rounded-xl border p-3 ${dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'}`}><div ref={contentRef}><div className={usesSharedStage ? 'relative' : undefined} style={{ height: usesSharedStage ? stageHeight : height * scale }}><iframe title={title} src={frameSrc} loading={loading} tabIndex={interactive ? 0 : -1} className={interactive ? 'block border-0 bg-transparent' : 'pointer-events-none block border-0 bg-transparent'} style={usesSharedStage ? { position: 'absolute', top: '50%', left: 0, width, height, transform: `translateY(-50%) scale(${scale})`, transformOrigin: 'left center' } : { width, height, transform: `scale(${scale})`, transformOrigin: 'top left' }} /></div></div></div></div>
 }
 function usageItemsCode(config: Config) {
   const disabledIndex = disabledNavigationIndex(config.menuCount, config.disclosure)
