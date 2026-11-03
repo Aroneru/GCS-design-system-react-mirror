@@ -391,7 +391,7 @@ export function ComponentsOverview() {
       <OverviewCard
         route="/components/timeline"
         name="Timeline View"
-        desc="Riwayat kejadian berurutan dengan avatar, waktu, dan status di tiap langkah. Desainnya belum final."
+        desc="Riwayat kejadian berurutan dengan avatar, waktu, dan status di tiap langkah."
       >
         <div className="rounded-xl bg-surface-subtle p-5">
           <Timeline

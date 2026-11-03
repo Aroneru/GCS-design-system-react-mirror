@@ -317,8 +317,6 @@ function TimelineCard({
  * Timeline — riwayat kejadian berurutan: siapa, kapan, dan apa yang terjadi,
  * dengan avatar di sepanjang satu garis.
  *
- * Desainnya belum final, jadi nama prop dan ukurannya masih bisa berubah.
- *
  * Avatar dan status memakai komponen Avatar dan Badge kit. Warnanya dari token
  * semantik `border` dan `brand` serta token `--color-timeline-*`, jadi tema
  * gelap cukup mengganti nilai token lewat `data-theme`. `darkMode` memasang
