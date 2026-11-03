@@ -3,6 +3,8 @@ import { useHashRoute } from "./docs/useHashRoute";
 import { HomePage } from "./docs/pages/HomePage";
 import { ExamplePage } from "./docs/pages/ExamplePage";
 import { ExampleAppFrame } from "./docs/pages/example/ExampleAppFrame";
+import { PortalDashboardPage } from "./docs/pages/portal/PortalDashboardPage";
+import { PortalDashboard } from "./docs/pages/portal/PortalDashboard";
 
 import { FoundationsOverview } from "./docs/pages/foundations/FoundationsOverview";
 import { ColorsPage } from "./docs/pages/foundations/ColorsPage";
@@ -59,6 +61,7 @@ import { TimelinePage } from "./docs/pages/components/TimelinePage";
 const routes: Record<string, () => React.ReactElement> = {
   "/": HomePage,
   "/example": ExamplePage,
+  "/portal-dashboard": PortalDashboardPage,
 
   "/foundations": FoundationsOverview,
   "/foundations/colors": ColorsPage,
@@ -159,6 +162,16 @@ function App() {
   // (/example/app/pengajuan, .../pemohon, dst) yang dibaca ExampleAppFrame.
   if (path.startsWith("/example/app")) {
     return <ExampleAppFrame path={path} />;
+  }
+
+  // Portal Dashboard memakai bingkai yang sama: penuh layar, dengan tirai
+  // transisi dan tombol pulang ke pintu masuknya.
+  if (path.startsWith("/portal-dashboard/app")) {
+    return (
+      <ExampleAppFrame path={path} kembali="/portal-dashboard">
+        <PortalDashboard />
+      </ExampleAppFrame>
+    );
   }
 
   const Page = routes[path] ?? HomePage;

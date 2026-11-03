@@ -11,9 +11,11 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+## [0.5.0] - 2026-11-03
+
 Ada perubahan API yang memutus: migrasi tema dan aksen warna `simaya` ke
-`purple` pada seluruh komponen dan token — baca bagian **Diubah**. Komponen baru
-`Timeline` masih eksperimental karena desainnya belum final. Satu perbaikan
+`purple` pada seluruh komponen dan token — baca bagian **Diubah**. Ada komponen baru
+`Timeline`. Satu perbaikan
 token warna `Radio`. `ListView` dan Button kini memiliki penyesuaian baru untuk
 tema gelap. Situs dokumentasi ikut diperbarui: bagian Mulai cepat di
 beranda kini empat langkah, dengan langkah baru "Sambungkan Tailwind CSS ke Vite"
@@ -29,7 +31,8 @@ tombol preview — klik di mana pun pada kartu tetap membuka halamannya. Ada
 halaman baru Table of Contents. Setiap Playground kini punya kontrol Typography
 (Lato, Inter, Arial) dengan urutan kontrol yang sama: font, dark mode, lalu
 kontrol lain. Halaman Typography menandai ketebalan yang tidak dimiliki font
-yang dipilih.
+yang dipilih. Ada bagian baru Portal Dashboard: beranda portal pegawai yang
+dirakit dari komponen kit, dibuka penuh layar seperti Example.
 
 `Navbar` dan `Dropdown` sedang dikerjakan ulang dan belum final. Modal dan
 dokumentasinya sudah mencakup controlled state, dismissal controls, ambient
@@ -96,7 +99,7 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   tanpa mengubah ukuran atau API lainnya. Filled memakai gray-50 dengan teks
   gray-700; outline `tone="light"` memakai gray-50, sedangkan `tone="dark"`
   memakai gray-500. Saat hover keduanya berlatar putih dengan teks gray-700.
-- **`Timeline` (eksperimental).** Riwayat kejadian berurutan dengan avatar di
+- **`Timeline`.** Riwayat kejadian berurutan dengan avatar di
   sepanjang satu garis. Tiap item memuat nama, jabatan, waktu, lama proses,
   keterangan, Details, Attachments, dan status; selain `name`, semuanya
   opsional. `time` menerima `Date` dan selalu ditulis dengan format desain,
@@ -111,13 +114,32 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   `label`, dengan bawaan variant `success` ukuran `sm` seperti di desain.
   Tiap lampiran berisi `name` dan `href`, ditambah `target` untuk membukanya di
   tab baru atau `download` untuk mengunduhnya; tanpa `href` namanya tampil
-  sebagai teks biasa.
-  Desainnya belum final, jadi nama prop dan ukurannya masih bisa berubah di
-  rilis berikutnya. Halaman dokumentasinya: Components → Timeline View.
+  sebagai teks biasa. Halaman dokumentasinya: Components → Timeline View.
 - Token komponen `--color-timeline-surface`, `-content`, dan `-avatar`, berisi
   token terdekat dari warna desain Timeline. Garis, tepi kartu, dan latar
   avatar memakai token semantik `border`, sedangkan nama dan jabatan memakai
   `brand`.
+- **Komponen `TableOfContents`.** Daftar isi "On this page" yang menyorot
+  bagian yang sedang dibaca. Di layar 1024px ke atas tampil sebagai daftar,
+  di bawahnya sebagai tombol yang membuka Drawer dari kanan. Tipe yang
+  diekspor: `TableOfContentsItem`, `TableOfContentsItemElement`,
+  `TableOfContentsLayout`, dan `TableOfContentsProps`. Latarnya memakai token
+  baru `--color-toc-surface`.
+
+  ```tsx
+  <TableOfContents
+    className="sticky top-10"
+    items={[
+      { id: 'dasar', label: 'Tampilan dasar' },
+      { id: 'variasi', label: 'Variasi' },
+    ]}
+  />
+  ```
+
+- **Token ketebalan huruf `--font-weight-*`.** Sembilan token, `thin` (100)
+  sampai `black` (900), di `tokens.css`. Utility `font-thin` sampai
+  `font-black` kini mengambil nilainya dari token ini. Di CSS biasa pakai
+  langsung, mis. `font-weight: var(--font-weight-semibold)`.
 
 ### Diubah
 
@@ -150,7 +172,7 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
 
 - **`Clipboard` V2.** Sambungan varian `segmented` kini satu bidang rapi tanpa
   sisa lapisan latar di belakang tombol aksi. Warna terang dan metrik tipografi
-  Desktop diselaraskan ke Figma, sedangkan preset Mobile tetap mempertahankan
+  Desktop diselaraskan ke desain, sedangkan preset Mobile tetap mempertahankan
   ukurannya sendiri. Clipboard mengikuti `data-theme="light"`/`"dark"` secara
   ambient, termasuk nested scope, melalui token `--color-clipboard-*`;
   `darkMode` tetap menjadi override kompatibilitas yang deprecated. Saat
@@ -186,29 +208,10 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   dan `lg` 25px (sebelumnya 28px). Jarak ikon ke teks jadi 4px, dan ikon `lg`
   jadi 18px. Badge di tata letak yang ukurannya dikunci bisa sedikit bergeser.
 
-### Ditambahkan
-
-- **Komponen `TableOfContents`.** Daftar isi "On this page" yang menyorot
-  bagian yang sedang dibaca. Di layar 1024px ke atas tampil sebagai daftar,
-  di bawahnya sebagai tombol yang membuka Drawer dari kanan. Tipe yang
-  diekspor: `TableOfContentsItem`, `TableOfContentsItemElement`,
-  `TableOfContentsLayout`, dan `TableOfContentsProps`. Latarnya memakai token
-  baru `--color-toc-surface`.
-
-  ```tsx
-  <TableOfContents
-    className="sticky top-10"
-    items={[w
-      { id: 'dasar', label: 'Tampilan dasar' },
-      { id: 'variasi', label: 'Variasi' },
-    ]}
-  />
-  ```
-
-- **Token ketebalan huruf `--font-weight-*`.** Sembilan token, `thin` (100)
-  sampai `black` (900), di `tokens.css`. Utility `font-thin` sampai
-  `font-black` kini mengambil nilainya dari token ini. Di CSS biasa pakai
-  langsung, mis. `font-weight: var(--font-weight-semibold)`.
+- **`TextArea` editor di tema gelap mengikuti desain terbaru.** Bingkai editor
+  dan garis pemisah toolbar kini gray-600 di tema gelap; sebelumnya gray-300 di
+  kedua tema. Tampilan terang tidak berubah. Warnanya dari token baru
+  `--color-text-area-frame`.
 
 ### Diperbaiki
 
@@ -231,14 +234,30 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   dalam package (`dist/fonts/`, lisensi OFL), dengan kesembilan ketebalan.
   `styles.css` tidak lagi memuat Lato dari Google Fonts. Satu ketebalan
   berukuran sekitar 180 KB, dan browser hanya mengunduh yang dipakai halaman.
+- **Kontrol Typography di Playground kini mengubah semua teks di pratinjau.**
+  Perubahan ini hanya di situs dokumentasi, komponen library tidak berubah.
+  - Panggung Playground kembali memasang font pilihan. Kelas fontnya sempat
+    hilang saat merge.
+  - Komponen yang menulis font sendiri (`font-sans` di Navbar dan Avatar,
+    `font-alt` di judul Modal) kini ikut berganti. Di dalam panggung, token
+    `--font-sans`, `--font-alt`, dan `--font-alt-2` diarahkan ke font pilihan.
+  - Playground Container, Drawer, dan Navbar kini ikut berganti font. Navbar
+    menerima font lewat URL iframe.
+  - Menu Table yang dirender lewat portal masih memakai font halaman.
 - **`Sidebar`: perilaku submenu lebih konsisten.** Parent sekarang otomatis
-  terbuka saat dirinya atau salah satu subitem aktif. Saat Sidebar ringkas,
+  terbuka saat dirinya atau salah satu subitem aktif, dan tetap terbuka
+  selama masih aktif. Saat Sidebar ringkas,
   klik group membuka Sidebar lebih dulu bila `onCollapse` tersedia; tanpa
   callback tersebut tombol group dinonaktifkan agar tidak memberi kesan klik
   yang tidak bekerja. ID panel submenu kini unik per instance Sidebar untuk
   menjaga hubungan `aria-controls`. `href` pada parent yang memiliki
   `children` juga didokumentasikan sebagai nilai yang diabaikan karena parent
   berperan sebagai disclosure, bukan link.
+- **`Sidebar`: item nonaktif kini menampilkan cursor terlarang.** Item dan
+  subitem `disabled` tidak lagi memakai `pointer-events-none`, sehingga cursor
+  `not-allowed` terlihat saat hover; kliknya dicegah dan item dikeluarkan dari
+  urutan Tab. Tombol group yang dinonaktifkan saat Sidebar ringkas kini tampil
+  redup dengan cursor yang sama, begitu pula tombol collapse yang nonaktif.
 - **Navbar: status `current` pada navigasi utama tidak lagi memberi sorotan visual statis.**
   Status ini tetap diteruskan sebagai `aria-current="page"`; konteks halaman
   visual tetap menjadi tanggung jawab Breadcrumb atau navigasi consumer.
