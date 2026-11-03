@@ -182,7 +182,7 @@ export function TextAreaPage() {
         <Lead>
           Prop <Hl>darkMode</Hl> mengganti kotak, toolbar, dan area isian ke gray-700, dengan label dan teks
           yang diketik putih. Kotak polos tidak lagi bergaris, sedangkan bingkai editor dan garis pemisah
-          toolbarnya tetap gray-300. Tombol kirim memakai -600 (hover -700), satu tingkat lebih terang dari
+          toolbarnya menjadi gray-600. Tombol kirim memakai -600 (hover -700), satu tingkat lebih terang dari
           tampilan terang.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">

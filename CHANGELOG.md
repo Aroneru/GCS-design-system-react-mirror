@@ -11,6 +11,8 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+## [0.5.0] - 2026-11-03
+
 Ada perubahan API yang memutus: migrasi tema dan aksen warna `simaya` ke
 `purple` pada seluruh komponen dan token — baca bagian **Diubah**. Ada komponen baru
 `Timeline`. Satu perbaikan
@@ -29,7 +31,8 @@ tombol preview — klik di mana pun pada kartu tetap membuka halamannya. Ada
 halaman baru Table of Contents. Setiap Playground kini punya kontrol Typography
 (Lato, Inter, Arial) dengan urutan kontrol yang sama: font, dark mode, lalu
 kontrol lain. Halaman Typography menandai ketebalan yang tidak dimiliki font
-yang dipilih.
+yang dipilih. Ada bagian baru Portal Dashboard: beranda portal pegawai yang
+dirakit dari komponen kit, dibuka penuh layar seperti Example.
 
 `Navbar` dan `Dropdown` sedang dikerjakan ulang dan belum final. Modal dan
 dokumentasinya sudah mencakup controlled state, dismissal controls, ambient
@@ -204,6 +207,11 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
 - **`Badge` mengikuti ukuran desain.** `sm` kini tinggi 22px (sebelumnya 24px)
   dan `lg` 25px (sebelumnya 28px). Jarak ikon ke teks jadi 4px, dan ikon `lg`
   jadi 18px. Badge di tata letak yang ukurannya dikunci bisa sedikit bergeser.
+
+- **`TextArea` editor di tema gelap mengikuti desain terbaru.** Bingkai editor
+  dan garis pemisah toolbar kini gray-600 di tema gelap; sebelumnya gray-300 di
+  kedua tema. Tampilan terang tidak berubah. Warnanya dari token baru
+  `--color-text-area-frame`.
 
 ### Diperbaiki
 

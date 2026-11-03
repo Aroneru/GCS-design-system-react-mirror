@@ -124,13 +124,13 @@
     --color-border: var(--color-gray-200);
     --color-surface: #ffffff;
     --color-surface-subtle: var(--color-gray-50);
-    /* Avatar mengikuti nilai Figma yang sedikit berbeda dari gray-800/900 repository. */
+    /* Avatar mengikuti nilai desain yang sedikit berbeda dari gray-800/900 repository. */
     --color-avatar-surface: #f3f4f6;
     --color-avatar-content: #111928;
     --avatar-profile-light-display: block;
     --avatar-profile-dark-display: none;
 
-    /* Clipboard memakai nilai Figma yang tidak seluruhnya sama dengan field generik. */
+    /* Clipboard memakai nilai desain yang tidak seluruhnya sama dengan field generik. */
     --color-clipboard-field: #f9fafb;
     --color-clipboard-border: #d1d5db;
     --color-clipboard-label: #111928;
@@ -421,6 +421,7 @@
 
 /* Text Area */
 @theme static {
+    --color-text-area-frame: var(--color-gray-300);
     --color-text-area-tool-hover: var(--color-gray-800);
     --color-text-area-helper: var(--color-gray-500);
     --color-text-area-submit: var(--color-primary-700);
@@ -430,6 +431,7 @@
 }
 
 [data-theme='dark'] {
+    --color-text-area-frame: var(--color-gray-600);
     --color-text-area-tool-hover: var(--color-gray-200);
     --color-text-area-helper: var(--color-gray-100);
     --color-text-area-submit: var(--color-primary-600);
@@ -440,6 +442,7 @@
 
 [data-theme='light'],
 .ds-theme-light {
+    --color-text-area-frame: var(--color-gray-300);
     --color-text-area-tool-hover: var(--color-gray-800);
     --color-text-area-helper: var(--color-gray-500);
     --color-text-area-submit: var(--color-primary-700);

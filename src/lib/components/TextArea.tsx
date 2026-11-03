@@ -54,19 +54,19 @@ const accents: Record<TextAreaApplication, { focus: string; submit: string }> = 
 /**
  * Warna tiap bagian dari token di tokens.css, jadi tema gelap cukup mengganti
  * nilai token lewat `data-theme`. Desain gelap: kotak default tanpa garis yang
- * terlihat, sedangkan bingkai editor dan pemisah toolbarnya tetap gray-300 di
- * kedua tampilan. Toolbar dan area isian editor sama-sama gray-700. Teks yang
- * diketik putih seperti label.
+ * terlihat, sedangkan bingkai editor dan pemisah toolbarnya gray-600 (gray-300
+ * di tampilan terang). Toolbar dan area isian editor sama-sama gray-700. Teks
+ * yang diketik putih seperti label.
  */
 const colors = {
   label: 'text-content',
   hint: 'text-gray-500',
   field: 'text-content placeholder:text-content-muted disabled:text-content-disabled',
   box: 'border-field-border bg-field',
-  frame: 'border-gray-300',
+  frame: 'border-text-area-frame',
   toolbar: 'bg-field',
   tool: 'text-content-muted hover:text-text-area-tool-hover',
-  divider: 'bg-gray-300',
+  divider: 'bg-text-area-frame',
   body: 'bg-surface',
   helper: 'text-text-area-helper',
 }
