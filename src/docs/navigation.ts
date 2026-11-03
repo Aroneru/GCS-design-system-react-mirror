@@ -4,7 +4,7 @@
  * supaya berkas komponen hanya mengekspor komponen (syarat react-refresh).
  */
 
-export type Section = "home" | "components" | "form" | "foundations" | "example";
+export type Section = "home" | "components" | "form" | "foundations" | "example" | "portal";
 
 /** Pintasan pencarian halaman untuk ditampilkan, mengikuti sistem operasi pembaca. */
 export const pintasanCari =
@@ -42,6 +42,13 @@ export const rail: { key: Section; label: string; route: string; icon: string; k
     route: "/example",
     icon: "M4 5.5h16v13H4v-13Zm0 4h16M7.5 13h5m-5 2.5h8",
     keywords: "contoh aplikasi demo",
+  },
+  {
+    key: "portal",
+    label: "Portal Dashboard",
+    route: "/portal-dashboard",
+    icon: "M4 4h7v9H4V4Zm9 0h7v5h-7V4ZM4 15h7v5H4v-5Zm9-4h7v9h-7v-9Z",
+    keywords: "dasbor beranda pegawai contoh kalender presensi anggaran wiki",
   },
 ];
 
