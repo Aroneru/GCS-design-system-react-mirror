@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { ArrowRight } from '../../lib/icons/outline'
 import { useHashRoute } from '../useHashRoute'
 import { Aurora, Magnetic, SplitWords, gsap, useGsap } from '../motion'
@@ -21,8 +21,30 @@ import {
  * Halaman ini sengaja hampir kosong: satu tombol di tengah. Isi demonstrasinya
  * ada di `/example/app`, yang dirender penuh layar tanpa kerangka dokumentasi
  * supaya terlihat seperti aplikasi sungguhan, bukan preview di dalam docs.
+ *
+ * Teks dan tujuannya bisa diganti lewat props, supaya pintu masuk lain yang
+ * berpola sama (Portal Dashboard) memakai tirai transisi yang sama. Tanpa
+ * props, ini pintu masuk Example.
  */
-export function ExamplePage() {
+export function ExamplePage({
+  eyebrow = 'Example',
+  judul = 'Lihat kit ini bekerja sebagai aplikasi utuh',
+  deskripsi = (
+    <>
+      Satu portal layanan lengkap — navigasi, formulir, tabel, dialog, dan notifikasi — dirakit
+      hanya dari komponen <code className="font-mono text-sm">@ceplok-ui/design-kit-react</code>.
+    </>
+  ),
+  labelTombol = 'Buka contoh aplikasi',
+  tujuan = '/example/app',
+}: {
+  eyebrow?: string
+  judul?: string
+  deskripsi?: ReactNode
+  labelTombol?: string
+  /** Rute aplikasi penuh layar yang dibuka tombolnya. */
+  tujuan?: string
+} = {}) {
   const [, navigate] = useHashRoute()
   const tirai = useRef<HTMLDivElement>(null)
   // Dua lapisan gaya `riak`. Tetap null pada gaya `tunggal` — divnya memang
@@ -84,19 +106,18 @@ export function ExamplePage() {
 
         <div ref={konten} className="relative z-10 max-w-2xl text-center">
           <p data-intro className="ds-eyebrow">
-            Example
+            {eyebrow}
           </p>
 
           <SplitWords
             as="h1"
-            text="Lihat kit ini bekerja sebagai aplikasi utuh"
+            text={judul}
             className="mt-4 text-heading-1 font-black text-gray-900"
             delay={0.25}
           />
 
           <p data-intro className="mx-auto mt-5 max-w-xl text-body text-gray-600">
-            Satu portal layanan lengkap — navigasi, formulir, tabel, dialog, dan notifikasi — dirakit
-            hanya dari komponen <code className="font-mono text-sm">@ceplok-ui/design-kit-react</code>.
+            {deskripsi}
           </p>
 
           <div data-intro className="mt-10 flex justify-center">
@@ -122,12 +143,12 @@ export function ExamplePage() {
                     [tirai.current, riakPutih.current, riakBiru.current],
                     konten.current,
                     titikTengah(e.currentTarget),
-                    () => navigate('/example/app'),
+                    () => navigate(tujuan),
                   )
                 }}
                 className="group inline-flex items-center gap-3 rounded-full bg-primary-700 px-8 py-4 text-base font-black text-white shadow-lg transition-colors hover:bg-primary-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:cursor-default disabled:hover:bg-primary-700"
               >
-                Buka contoh aplikasi
+                {labelTombol}
                 <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
               </button>
             </Magnetic>

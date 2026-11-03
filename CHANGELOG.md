@@ -11,6 +11,260 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+## [0.5.0] - 2026-11-03
+
+Ada perubahan API yang memutus: migrasi tema dan aksen warna `simaya` ke
+`purple` pada seluruh komponen dan token — baca bagian **Diubah**. Ada komponen baru
+`Timeline`. Satu perbaikan
+token warna `Radio`. `ListView` dan Button kini memiliki penyesuaian baru untuk
+tema gelap. Situs dokumentasi ikut diperbarui: bagian Mulai cepat di
+beranda kini empat langkah, dengan langkah baru "Sambungkan Tailwind CSS ke Vite"
+(pasang `tailwindcss` dan `@tailwindcss/vite`, lalu daftarkan `tailwindcss()` di
+`vite.config.ts`). Tombol outline kini selalu di kiri tombol filled di halaman
+contoh, dan contoh kode footer di halaman Modal kini sama dengan demonya.
+Deskripsi Button dan Alert di Components Overview kini sesuai komponennya,
+tabel props Search kini memuat `trigger`, `debounce`, `showButton`, dan
+platform `compact`, dan tinggi logo di halaman Footer kini ditulis sesuai
+kodenya: 48px, 60px saat footer ≥ 768px. Kartu di halaman Overview kini `<div>`
+dengan judul sebagai tautannya, bukan satu `<a>` besar yang memuat tautan dan
+tombol preview — klik di mana pun pada kartu tetap membuka halamannya. Ada
+halaman baru Table of Contents. Setiap Playground kini punya kontrol Typography
+(Lato, Inter, Arial) dengan urutan kontrol yang sama: font, dark mode, lalu
+kontrol lain. Halaman Typography menandai ketebalan yang tidak dimiliki font
+yang dipilih. Ada bagian baru Portal Dashboard: beranda portal pegawai yang
+dirakit dari komponen kit, dibuka penuh layar seperti Example.
+
+`Navbar` dan `Dropdown` sedang dikerjakan ulang dan belum final. Modal dan
+dokumentasinya sudah mencakup controlled state, dismissal controls, ambient
+theme, dan contoh Nested Modal.
+
+### Dalam pengerjaan
+
+Perubahan di bagian ini sudah ada di kode, tetapi belum selesai. API dan
+tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
+
+- **`Navbar` V2.** Ditulis ulang dengan API baru untuk Front Office dan Back
+  Office. Tipe lama (`NavbarItem`, `NavbarContextItem`, `NavbarSubItem`,
+  `NavbarSearchConfig`, `NavbarAction`, `NavbarUser`, `NavbarNotification`,
+  `NavbarMenuPosition`, `NavbarVariant`) sudah tidak diekspor. Panduan migrasi
+  menyusul saat API-nya final.
+- **`Dropdown`.** Isi bisa berupa fungsi yang menerima `close`, prop baru
+  `actionsRef`, `closeOnSelect`, dan `align`, serta item yang menerima
+  `target`, `rel`, `onClick`, dan `current`. Warnanya kini dari token
+  `--color-dropdown-*`; shadow panel kini memakai `--shadow-dropdown` sesuai
+  dua layer elevasi desain.
+- **`Popover`.** Contoh Penggunaan merapatkan ikon informasi ke teks. Tampilan
+  gelap kini mengikuti `data-theme` ambient dan memakai token lokal
+  `--color-popover-*` untuk surface, border, header, serta teks; `darkMode`
+  tetap menjadi override kompatibilitas.
+- **`Spinner`.** README kini mendokumentasikan ukuran 50px/100px, atribut SVG
+  yang diteruskan, reduced motion, serta pola aksesibel standalone dan bersama
+  teks loading.
+- **`Clipboard`.** Value Light pada varian `segmented` kini memakai gray-500,
+  sementara varian default tetap gray-400, sesuai referensi desain; nilai Dark
+  tidak berubah.
+- **`Modal`.** Tampilan disesuaikan dengan desain: judul Inter 18px semibold,
+  isi 16px medium, dan latar popup gray-600 di tema gelap.
+
+### Ditambahkan
+
+- **Progressive Load More pada overflow Navbar desktop.** Dropdown `Lainnya`
+  menentukan jumlah item awal dari tinggi panel dan tinggi baris yang benar-benar
+  dirender, lalu `Muat lebih banyak` menampilkan batch berikutnya berdasarkan
+  tinggi konten. Item yang sudah terlihat tidak disembunyikan kembali selama
+  dropdown masih terbuka, dan state disclosure tetap dipertahankan saat item
+  tambahan dimuat.
+
+- **`Avatar` V2.** Prop `name` menambahkan nama aksesibel sekaligus menghasilkan
+  inisial Unicode-aware; `initials` tetap menjadi override manual. Fallback
+  dapat dipilih lewat `fallback="initials" | "profile"`: foto yang tersedia
+  selalu diprioritaskan, lalu inisial manual, inisial nama, ilustrasi gender,
+  dan ikon User netral. `gender="female" | "male"` dipilih eksplisit, tidak
+  pernah diturunkan dari nama; `fallback="profile"` memilih ilustrasi tersebut
+  meski `name` tersedia. Empat SVG Male/Female Light/Dark ikut dibundle sebagai
+  asset package-local. Avatar kini mengikuti scope ambient `data-theme`,
+  termasuk nested scope; `darkMode` tetap didukung sebagai prop deprecated.
+  `alt` mengatur nama aksesibel (`alt=""` menjadikan Avatar dekoratif), dan
+  foto gagal kembali ke fallback yang sama. Ukuran API tetap `small`, `default`,
+  dan `large` (S/M/L: 24/32/80px, dengan M sebagai bawaan).
+
+- **`ListView`** — daftar item dengan dua varian: `simple` untuk informasi
+  ringkas berikon, badge, dekorasi aksen, dan aksi; serta `article` untuk
+  artikel atau diskusi dengan subject, kategori, waktu, pin, judul, dan metrik
+  interaksi. `simple` mendukung platform `desktop` dan `mobile` serta ukuran
+  `S`, `M`, dan `L`; `article` mendukung ukuran `S` hingga `XL`, memakai garis
+  aksen vertikal secara permanen, dan mendukung `darkMode`. `ListView`,
+  `ListViewItem`, `ListViewArticle`, serta tipe props-nya ikut diekspor.
+- **`Button`: prop `darkMode`** — menyesuaikan warna tombol untuk latar gelap
+  tanpa mengubah ukuran atau API lainnya. Filled memakai gray-50 dengan teks
+  gray-700; outline `tone="light"` memakai gray-50, sedangkan `tone="dark"`
+  memakai gray-500. Saat hover keduanya berlatar putih dengan teks gray-700.
+- **`Timeline`.** Riwayat kejadian berurutan dengan avatar di
+  sepanjang satu garis. Tiap item memuat nama, jabatan, waktu, lama proses,
+  keterangan, Details, Attachments, dan status; selain `name`, semuanya
+  opsional. `time` menerima `Date` dan selalu ditulis dengan format desain,
+  mis. `01 Jan 2026 · 09:05`, dalam jam lokal browser; formatnya tidak
+  mengikuti bahasa browser, dan singkatan bulannya diganti lewat
+  `labels.months`. `platform` memilih `desktop` (kartu berselang-seling kiri dan
+  kanan garis) atau `mobile` (garis di kiri), `size` memilih `large` atau
+  `small`, `labels` mengganti label tetapnya, dan `darkMode` atau
+  `data-theme="dark"` di pembungkus menyalakan tema gelap. Avatar-nya memakai
+  komponen `Avatar`, dengan foto (`avatar`), `initials`, atau siluet bawaan.
+  Status memakai komponen `Badge`: `status` menerima prop Badge ditambah
+  `label`, dengan bawaan variant `success` ukuran `sm` seperti di desain.
+  Tiap lampiran berisi `name` dan `href`, ditambah `target` untuk membukanya di
+  tab baru atau `download` untuk mengunduhnya; tanpa `href` namanya tampil
+  sebagai teks biasa. Halaman dokumentasinya: Components → Timeline View.
+- Token komponen `--color-timeline-surface`, `-content`, dan `-avatar`, berisi
+  token terdekat dari warna desain Timeline. Garis, tepi kartu, dan latar
+  avatar memakai token semantik `border`, sedangkan nama dan jabatan memakai
+  `brand`.
+- **Komponen `TableOfContents`.** Daftar isi "On this page" yang menyorot
+  bagian yang sedang dibaca. Di layar 1024px ke atas tampil sebagai daftar,
+  di bawahnya sebagai tombol yang membuka Drawer dari kanan. Tipe yang
+  diekspor: `TableOfContentsItem`, `TableOfContentsItemElement`,
+  `TableOfContentsLayout`, dan `TableOfContentsProps`. Latarnya memakai token
+  baru `--color-toc-surface`.
+
+  ```tsx
+  <TableOfContents
+    className="sticky top-10"
+    items={[
+      { id: 'dasar', label: 'Tampilan dasar' },
+      { id: 'variasi', label: 'Variasi' },
+    ]}
+  />
+  ```
+
+- **Token ketebalan huruf `--font-weight-*`.** Sembilan token, `thin` (100)
+  sampai `black` (900), di `tokens.css`. Utility `font-thin` sampai
+  `font-black` kini mengambil nilainya dari token ini. Di CSS biasa pakai
+  langsung, mis. `font-weight: var(--font-weight-semibold)`.
+
+### Diubah
+
+- **Navbar desktop dan mobile disempurnakan.** Alokasi navigasi desktop kini
+  dihitung ulang saat komposisi Search, account, guest action, atau notifikasi
+  berubah sehingga transisi identitas FO/BO tidak menampilkan susunan sementara
+  yang keliru. Panel `Lainnya` memakai lebar responsif yang stabil, sedangkan
+  disclosure mandiri tetap mengikuti lebar trigger dan ruang viewport. Label
+  navigasi dapat membungkus hingga dua baris dengan tooltip hanya ketika teks
+  benar-benar terpotong. Disclosure di dalam `Lainnya` kembali tertutup setelah
+  parent dropdown ditutup. Header mobile FO dan BO kini memakai tinggi luar
+  yang konsisten tanpa mengubah susunan khusus platform.
+
+- **Dokumentasi Navbar diperbarui.** Playground menambahkan tinggi viewport
+  custom yang independen dari lebarnya, menghapus Brand Fixture, dan menghasilkan
+  snippet FO/BO yang mengikuti konfigurasi aktif dengan import consumer minimal
+  serta penyorotan prop yang konsisten. Preview responsive dan Dark Mode kini
+  sejajar, memakai stage yang sama, dan background dokumentasi yang konsisten.
+  Shared Example kini menunjukkan destination, disclosure, Search, account, dan
+  Drawer BO menggunakan API production. README memuat panduan consumer terbaru
+  untuk item navigasi, perbedaan platform, integrasi, tema ambient, dan perilaku
+  responsif.
+
+- **Dokumentasi `Dropdown` V2.** Playground kini memisahkan contoh Action,
+  Navigation, dan Selection, dengan kontrol `align` serta `closeOnSelect` yang
+  tercermin pada generated snippet. Contoh `children({ close })` dan
+  `actionsRef.close()` dikumpulkan dalam section Kontrol Penutupan, sedangkan
+  contoh Dark Mode konsisten memakai ambient `data-theme="dark"`. Perubahan ini
+  hanya menyelaraskan dokumentasi; tidak menambahkan API atau token production.
+
+- **`Clipboard` V2.** Sambungan varian `segmented` kini satu bidang rapi tanpa
+  sisa lapisan latar di belakang tombol aksi. Warna terang dan metrik tipografi
+  Desktop diselaraskan ke desain, sedangkan preset Mobile tetap mempertahankan
+  ukurannya sendiri. Clipboard mengikuti `data-theme="light"`/`"dark"` secara
+  ambient, termasuk nested scope, melalui token `--color-clipboard-*`;
+  `darkMode` tetap menjadi override kompatibilitas yang deprecated. Saat
+  `disabled`, aksi salin, tooltip, dan pemilihan/copy/cut melalui UI tidak aktif;
+  hasil async lama juga tidak dapat lagi memicu callback atau feedback. Ikon
+  Clipboard dan Check pada aksi bersegmen kini 20px dalam tombol 42px. Tooltip
+  dipusatkan pada tombol, mendukung fokus keyboard dan Escape, hilang sepanjang
+  status Copied, lalu menunggu hover/fokus baru setelah feedback direset.
+  Dokumentasi, Playground, dan snippet penggunaan kini mencerminkan kontrak
+  tersebut.
+
+- **Memutus — Penyelarasan tema dan token `simaya` menjadi `purple`.**
+  Seluruh komponen dan token yang sebelumnya menerima nilai `"simaya"` kini distandarkan menjadi `"purple"` sebagai nama warna netral:
+  - Komponen Form (`InputField`, `FloatingLabel`, `TextArea`, `Select`, `Checkbox`, `Radio`, `Toggle`, `Upload`, `Search`): prop `application?: 'default' | 'simaya'` diubah menjadi `application?: 'default' | 'purple'`.
+  - Komponen General & Navigasi:
+    - `Button`: `ButtonTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+    - `Pagination`: `PaginationTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+    - `Drawer`: `DrawerNavItemTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+    - `Table`: `TableActionTheme` kini menggunakan `"purple"` menggantikan `"simaya"`.
+  - Token CSS di `tokens.css`:
+    - `--color-floating-label-accent-simaya` diubah menjadi `--color-floating-label-accent-purple`.
+    - `--color-text-area-submit-simaya` dan `-hover` diubah menjadi `--color-text-area-submit-purple` dan `-hover`.
+
+  ```diff
+  - <Button theme="simaya">Kirim</Button>
+  + <Button theme="purple">Kirim</Button>
+
+  - <InputField application="simaya" label="Nama" />
+  + <InputField application="purple" label="Nama" />
+  ```
+
+- **`Badge` mengikuti ukuran desain.** `sm` kini tinggi 22px (sebelumnya 24px)
+  dan `lg` 25px (sebelumnya 28px). Jarak ikon ke teks jadi 4px, dan ikon `lg`
+  jadi 18px. Badge di tata letak yang ukurannya dikunci bisa sedikit bergeser.
+
+- **`TextArea` editor di tema gelap mengikuti desain terbaru.** Bingkai editor
+  dan garis pemisah toolbar kini gray-600 di tema gelap; sebelumnya gray-300 di
+  kedua tema. Tampilan terang tidak berubah. Warnanya dari token baru
+  `--color-text-area-frame`.
+
+### Diperbaiki
+
+- **Interaksi Navbar desktop.** Destination primary yang disabled kini tetap
+  menampilkan cursor terlarang tanpa meneruskan pointer ke elemen di belakangnya.
+  Pengamatan tooltip overflow ikut diperbarui ketika jumlah item yang terlihat
+  berubah, sehingga label baru dari Progressive Load More mendapat tooltip hanya
+  bila benar-benar terpotong.
+
+- **Dokumentasi `Avatar`.** Halaman komponen kini mencakup fallback foto,
+  inisial otomatis dan override, profile Male/Female/netral, S/M/L, tema
+  ambient, Playground, generated snippet, dan contoh kode menurut fitur.
+  Preview Dark memakai scope `data-theme="dark"`; inisial dipusatkan lewat
+  line-height yang konsisten dan asset Dark tidak lagi memiliki halo terang
+  akibat rect latar SVG yang bertumpuk.
+
+- **`font-medium` dan `font-semibold` kini tampil sesuai ketebalannya di Lato.**
+  Lato dari Google Fonts hanya punya 100, 300, 400, 700, dan 900, jadi medium
+  tampil 400 dan semibold tampil 700. Lato kini memakai Lato 2.0 yang ikut
+  dalam package (`dist/fonts/`, lisensi OFL), dengan kesembilan ketebalan.
+  `styles.css` tidak lagi memuat Lato dari Google Fonts. Satu ketebalan
+  berukuran sekitar 180 KB, dan browser hanya mengunduh yang dipakai halaman.
+- **`Sidebar`: perilaku submenu lebih konsisten.** Parent sekarang otomatis
+  terbuka saat dirinya atau salah satu subitem aktif, dan tetap terbuka
+  selama masih aktif. Saat Sidebar ringkas,
+  klik group membuka Sidebar lebih dulu bila `onCollapse` tersedia; tanpa
+  callback tersebut tombol group dinonaktifkan agar tidak memberi kesan klik
+  yang tidak bekerja. ID panel submenu kini unik per instance Sidebar untuk
+  menjaga hubungan `aria-controls`. `href` pada parent yang memiliki
+  `children` juga didokumentasikan sebagai nilai yang diabaikan karena parent
+  berperan sebagai disclosure, bukan link.
+- **`Sidebar`: item nonaktif kini menampilkan cursor terlarang.** Item dan
+  subitem `disabled` tidak lagi memakai `pointer-events-none`, sehingga cursor
+  `not-allowed` terlihat saat hover; kliknya dicegah dan item dikeluarkan dari
+  urutan Tab. Tombol group yang dinonaktifkan saat Sidebar ringkas kini tampil
+  redup dengan cursor yang sama, begitu pula tombol collapse yang nonaktif.
+- **Navbar: status `current` pada navigasi utama tidak lagi memberi sorotan visual statis.**
+  Status ini tetap diteruskan sebagai `aria-current="page"`; konteks halaman
+  visual tetap menjadi tanggung jawab Breadcrumb atau navigasi consumer.
+- **Navbar mobile meneruskan destination eksternal ke `Sidebar`.** Destination
+  utama maupun child Disclosure dengan `target="_blank"` kini memakai kontrak
+  `external` Sidebar, sehingga Sidebar merender target baru dengan rel aman
+  bawaan komponennya.
+- **Dokumentasi Navbar menambah fixture current dan overflow.** Preview dapat
+  merepresentasikan current child Disclosure, current/disabled/action account,
+  serta Disclosure bersarang di `Lainnya`; fixture tetap data consumer, bukan
+  router internal Navbar.
+- **Kelas `ds-theme-dark` kini ikut mengganti warna gelap `Radio`.**
+  Selector di `tokens.css` sebelumnya salah ketik (`.ds-theme-darkz`), jadi
+  token `Radio` tetap terang di dalam elemen berkelas `ds-theme-dark`, padahal
+  token `Select` dan `InputField` sudah ikut gelap. `data-theme="dark"` dan prop
+  `darkMode` tidak terdampak.
+
 ## [0.4.0] - 2026-10-15
 
 Ada perubahan API yang memutus pada `Button` dan `Upload`, dan banyak komponen
@@ -76,7 +330,7 @@ situs dokumentasi ikut diperbarui.
 - **`Radio` `darkMode` `inactive`: lingkaran kini gray-700 bergaris gray-800**,
   sebelumnya gray-800 seluruhnya.
 - **`Toggle`, `Checkbox`, `Radio`, `Select`, `InputField`, `FloatingLabel`,
-  `TextArea`, `Toast`, `Alert`, `Sidebar`, dan `Search` kini memakai token warna, seperti `Card`.**
+  `TextArea`, `Toast`, `Alert`, `Sidebar`, `Search`, dan `Breadcrumb` kini memakai token warna, seperti `Card`.**
   `darkMode` cukup memasang `data-theme="dark"` di pembungkus terluarnya. Tanpa
   prop itu komponen ikut tema pembungkusnya, mis. `<section data-theme="dark">`,
   dan kembali terang di dalam `data-theme="light"`. Warna terang dan gelapnya
@@ -88,6 +342,12 @@ situs dokumentasi ikut diperbarui.
   tema terang, gray-700 di tema gelap) untuk tombol kategori dan
   `--color-search-field-surface` (gray-50 di tema terang, gray-600 di tema gelap)
   untuk kolom pencarian.
+- **`Breadcrumb` kini memakai token warna komponen di `tokens.css`.**
+  Latar varian `bg` dikontrol lewat `--color-breadcrumb-surface` (gray-100 di tema
+  terang, gray-700 di tema gelap), teks item aktif memakai `--color-breadcrumb-active`
+  (gray-900 di tema terang, gray-300 di tema gelap), hover tautan memakai
+  `--color-breadcrumb-link-hover` (primary-700 di tema terang, putih di tema gelap),
+  serta item tidak aktif memakai token semantik `--color-content-muted`.
 - **`--color-feedback-error` kini red-500 di tema gelap**, tetap red-600 di
   tema terang. Error Input Field dan Floating Label gelap memakainya.
 - **Mengetik di daftar pilihan `Select` kini melompat ke pilihan yang cocok
@@ -153,13 +413,13 @@ situs dokumentasi ikut diperbarui.
   `--font-alt` dan `--font-alt-2` yang boleh ditimpa di `:root`. Inter dimuat
   `styles.css` dari Google Fonts seperti Lato; Arial font sistem, jadi tidak
   perlu diunduh.
-- **Token komponen `--color-sidebar-surface`, `--color-search-category-surface`, dan `--color-search-field-surface` di `tokens.css`.**
-  Menyediakan kontrol warna latar khusus untuk Sidebar serta kategori dan field Search pada tema terang dan gelap (`data-theme="dark"`).
+- **Token komponen `--color-sidebar-surface`, `--color-search-category-surface`, `--color-search-field-surface`, dan `--color-breadcrumb-*` di `tokens.css`.**
+  Menyediakan kontrol warna latar khusus untuk Sidebar, kategori dan field Search, serta Breadcrumb pada tema terang dan gelap (`data-theme="dark"`).
 - **`Sidebar`: menu dropdown profil akun dan link eksternal.**
   `SidebarUser` kini mendukung `items?: SidebarUserItem[]` dan `groups?: SidebarUserGroup[]`
   untuk menampilkan menu dropdown akun/profil (misalnya profil, pengaturan, dan
   keluar). Mendukung `tone="danger"` untuk aksi destruktif seperti Logout,
-  penutupan via klik luar (*pointerdown*) dan tombol `Escape`, rotasi chevron,
+  penutupan via klik luar (_pointerdown_) dan tombol `Escape`, rotasi chevron,
   serta tata letak flyout yang rapi saat sidebar dalam kondisi `collapsed`.
   Selain itu, `SidebarItem`, `SidebarSubItem`, dan `SidebarUser` kini mendukung
   prop `external?: boolean` yang otomatis membuka tab baru dengan
@@ -181,8 +441,8 @@ situs dokumentasi ikut diperbarui.
 - **Token komponen** untuk warna yang hanya dipakai satu komponen:
   `--color-toggle-*`, `--color-radio-*`, `--color-select-*`,
   `--color-input-field-*`, `--color-floating-label-*`, `--color-text-area-*`,
-  `--color-toast-*`, `--color-alert-*`, `--color-sidebar-surface`, dan
-  `--color-search-*`. Daftarnya ada di `COLOR.md`.
+  `--color-toast-*`, `--color-alert-*`, `--color-sidebar-surface`,
+  `--color-search-*`, dan `--color-breadcrumb-*`. Daftarnya ada di `COLOR.md`.
 - **Kelas `ds-theme-light`**, padanan `data-theme="light"` untuk elemen yang
   tidak bisa diberi atribut.
 - **`Datepicker`: tanggal bisa diketik saat kalender terbuka.** "17" ke tanggal
@@ -274,7 +534,7 @@ diperbarui: kini ada bagian Table, baris props Button sudah dibetulkan
   menu aktif berlatar gray-700 (gray-600 saat disorot).
 - **`Search`: `platform="compact"`** — kotak setinggi 37px dengan tombol cari
   25px, untuk dipasang di navbar. `SearchPlatform` kini `default | mobile |
-  compact`.
+compact`.
 
 ### Diperbaiki
 
@@ -484,6 +744,7 @@ Dibanding 0.2.0 ada enam perubahan yang memutus, termasuk nama paketnya.
 
   Tipe pendukung `DatepickerType`, `DateRange`, `DatepickerSingleProps`, dan
   `DatepickerRangeProps` ikut diekspor.
+
 - **`Drawer`** — panel yang meluncur dari tepi layar, dikendalikan lewat
   `open` + `onClose`; klik latar dan Esc menutupnya, kecuali dimatikan lewat
   `closeOnOverlayClick` dan `closeOnEsc`. Sisinya dipilih lewat `position`
@@ -516,6 +777,7 @@ Dibanding 0.2.0 ada enam perubahan yang memutus, termasuk nama paketnya.
 
   Tipe pendukung `DropdownItem`, `DropdownGroup`, dan `DropdownItemTone` ikut
   diekspor.
+
 - **`FloatingLabel`: prop `darkMode`** — tampilan gelap sesuai desain: kotak
   gray-800 dengan teks, ikon, dan tombol hapus gray-400. Garis aksen tidak
   berubah, tetapi label yang naik satu tingkat lebih terang (primary-500,

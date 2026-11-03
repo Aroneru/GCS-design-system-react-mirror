@@ -21,7 +21,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: SearchApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'simaya', label: 'simaya', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 /** Placeholder dan daftar kategori yang dipakai contoh-contoh di halaman ini. */
@@ -38,9 +38,12 @@ const searchProps: PropRow[] = [
   ['label', 'ReactNode', 'undefined', 'Teks label di atas field.'],
   ['helperText', 'ReactNode', 'undefined', 'Caption di bawah field.'],
   ['buttonLabel', 'string', 'Cari', 'Label tombol; pada varian kategori jadi label aksesibilitas tombol ikon.'],
-  ['onSearch', '(value, category) => void', 'undefined', 'Dipanggil saat tombol ditekan atau Enter di dalam field.'],
-  ['platform', "'default' | 'mobile'", 'default', 'Tinggi, ukuran ikon, teks, dan tombol. Tidak berlaku pada varian kategori.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna tombol cari dan garis saat field difokus.'],
+  ['onSearch', '(value, category) => void', 'undefined', 'Dipanggil saat tombol ditekan atau Enter di dalam field; dengan trigger change atau auto juga setiap isian dan kategori berubah.'],
+  ['trigger', "'enter' | 'change' | 'auto'", 'enter', 'Kapan onSearch dipanggil: enter hanya lewat tombol Enter dan tombol Cari; change dan auto juga setiap isian berubah (setelah jeda debounce) dan setiap kategori diganti.'],
+  ['debounce', 'number', '300', 'Jeda dalam milidetik sebelum onSearch dipanggil saat isian berubah, pada trigger change dan auto.'],
+  ['platform', "'default' | 'mobile' | 'compact'", 'default', 'Tinggi kotak, ukuran ikon, teks, dan tombol: 54px, 50px, atau 37px. compact untuk navbar. Tidak berlaku pada varian kategori.'],
+  ['showButton', 'boolean', 'true', 'Menampilkan tombol cari di kanan. Bawaannya false pada platform compact.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna tombol cari dan garis saat field difokus.'],
   ['categories', 'SearchCategory[]', 'undefined', 'Bila diisi, komponen berpindah ke varian dengan kategori.'],
   ['categoryPlaceholder', 'string', 'Kategori', 'Teks dropdown saat kategori belum dipilih.'],
   ['category / defaultCategory', 'string', 'undefined', 'Kategori terpilih, terkendali maupun tidak.'],
@@ -190,7 +193,7 @@ export function SearchPage() {
         <SectionCode>
           {'<Search '}
           <H>application</H>
-          {'="simaya" placeholder="Search Civitas, Organisasi…" />'}
+          {'="purple" placeholder="Search Civitas, Organisasi…" />'}
         </SectionCode>
       </FlowSection>
 
@@ -254,6 +257,18 @@ export function SearchPage() {
         </Stage>
 
         <Controls>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={theme}
+              onChange={(v) => setTheme(v as string)}
+              options={[
+                { value: 'light', label: 'Light' },
+                { value: 'dark', label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Application">
             <Segmented
               label="Pilih aplikasi"
@@ -300,18 +315,6 @@ export function SearchPage() {
               value={withHelper}
               onChange={(v) => setWithHelper(v as boolean)}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Mode">
-            <Segmented
-              label="Pilih mode"
-              value={theme}
-              onChange={(v) => setTheme(v as string)}
-              options={[
-                { value: 'light', label: 'Light' },
-                { value: 'dark', label: 'Dark' },
-              ]}
             />
           </Control>
         </Controls>

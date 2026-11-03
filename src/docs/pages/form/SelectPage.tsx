@@ -21,7 +21,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: SelectApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-500' },
-  { value: 'simaya', label: 'simaya', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 /** Contoh isi dropdown — dipakai berulang di seluruh halaman. */
@@ -81,7 +81,7 @@ const selectProps: PropRow[] = [
   ['placeholder', 'string', 'undefined', 'Teks saat belum ada pilihan, mis. "Pilih Apapun Itu".'],
   ['options', 'SelectOption[]', 'undefined', 'Daftar pilihan { value, label, disabled }. Bila kosong, <option> dan <optgroup> di children yang dipakai.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna ikon info dan garis saat difokus.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna ikon info dan garis saat difokus.'],
   ['darkMode', 'boolean', 'false', 'Tampilan gelap: field gray-700 dengan label terang; garisnya hanya terlihat saat inactive dan saat difokus. Panel daftar pilihannya tetap terang.'],
   ['…props', 'SelectHTMLAttributes', '—', 'Seluruh atribut <select> standar diteruskan (value, onChange, required, name, …).'],
 ]
@@ -216,7 +216,7 @@ export function SelectPage() {
           {'<Select\n'}
           {'    '}
           <H>application</H>
-          {'="simaya"\n'}
+          {'="purple"\n'}
           {'    label="Label"\n'}
           {'    options={provinsi}\n'}
           {'/>'}
@@ -354,10 +354,10 @@ export function SelectPage() {
               helperText="Wajib diisi."
             />
           </Demo>
-          <Demo label="simaya" dark>
+          <Demo label="Purple" dark>
             <Select
               darkMode
-              application="simaya"
+              application="purple"
               label="Label"
               info="Keterangan singkat."
               placeholder="Pilih Apapun Itu"
@@ -400,6 +400,18 @@ export function SelectPage() {
         </Stage>
 
         <Controls>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Application">
             <Segmented
               label="Pilih aplikasi"
@@ -449,18 +461,6 @@ export function SelectPage() {
               value={withHelper}
               onChange={setWithHelper}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Tampilan">
-            <Segmented
-              label="Pilih tampilan"
-              value={dark}
-              onChange={setDark}
-              options={[
-                { value: false, label: 'Light' },
-                { value: true, label: 'Dark' },
-              ]}
             />
           </Control>
         </Controls>

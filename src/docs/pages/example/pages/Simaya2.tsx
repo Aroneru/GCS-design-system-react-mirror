@@ -1,0 +1,245 @@
+import { useState } from "react";
+import {
+  Alert,
+  Badge,
+  Button,
+  Checkbox,
+  FloatingLabel,
+  Icon,
+  InputField,
+  Radio,
+  Select,
+  TextArea,
+  Toast,
+  Toggle,
+} from "../../../../lib";
+import { FileLines, InfoCircle, User } from "../../../../lib/icons/outline";
+
+/**
+ * Simaya bukan tema terpisah, melainkan aplikasi yang memanfaatkan nilai
+ * prop `application="purple"` yang diterima tujuh komponen form: InputField,
+ * FloatingLabel, Select, TextArea, Radio, Checkbox, dan Toggle. Yang berubah
+ * hanya warna aksen — garis saat difokus, cincin radio, kotak centang,
+ * jalur sakelar, dan tombol kirim editor — dari primary ke ungu. Struktur,
+ * ukuran, dan jaraknya identik.
+ *
+ * Komponen non-form tidak punya prop itu. Untuk menyelaraskannya, Button
+ * memakai `theme="purple"` dan Badge memakai kelas token yang sama.
+ */
+
+const KLASIFIKASI = [
+  { value: "biasa", label: "Biasa" },
+  { value: "terbatas", label: "Terbatas" },
+  { value: "rahasia", label: "Rahasia" },
+];
+
+export function Simaya2() {
+  const [perihal, setPerihal] = useState("");
+  const [tujuan, setTujuan] = useState("");
+  const [klasifikasi, setKlasifikasi] = useState("biasa");
+  const [sifat, setSifat] = useState("biasa");
+  const [isi, setIsi] = useState("");
+  const [ttd, setTtd] = useState(true);
+  const [tembusan, setTembusan] = useState(false);
+  const [terkirim, setTerkirim] = useState(false);
+
+  return (
+    <div className="space-y-8">
+      <Alert variant="purple" heading="Mode Simaya aktif" dismissible={false}>
+        Seluruh kontrol di halaman ini memakai{" "}
+        <code className="font-mono text-xs">application="purple"</code>.
+        Bandingkan dengan halaman Pengaturan yang memakai nilai bawaan —
+        strukturnya sama persis, hanya warna aksennya yang berbeda.
+      </Alert>
+
+      {/* 20px di ponsel agar toolbar editor Text Area (234px) muat di layar 320px. */}
+      <section className="ds-card p-5 sm:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="text-heading-3 font-black text-gray-900">
+              Naskah dinas baru
+            </h2>
+            <p className="mt-1 text-body-sm text-gray-500">
+              Formulir persuratan internal dengan aksen ungu khas Simaya.
+            </p>
+          </div>
+          <Badge variant="gray" className="bg-purple-100 text-purple-700">
+            Simaya
+          </Badge>
+        </div>
+
+        {/* Tiap baris memasangkan kontrol yang tingginya sama: FloatingLabel tanpa
+            label di atas berdiri sendiri, InputField berdampingan, dan Select
+            (37px) dipasangkan dengan grup radio. */}
+        <div className="mt-7 grid gap-5 sm:grid-cols-2">
+          <FloatingLabel
+            application="purple"
+            label="Unit tujuan"
+            icon={<User className="size-4" />}
+            value={tujuan}
+            onChange={(e) => setTujuan(e.target.value)}
+            className="sm:col-span-2"
+          />
+          <InputField
+            application="purple"
+            label="Perihal"
+            placeholder="Ringkasan isi naskah…"
+            icon={<FileLines className="size-4" />}
+            value={perihal}
+            onChange={(e) => setPerihal(e.target.value)}
+          />
+          <InputField
+            application="purple"
+            label="Nomor agenda"
+            placeholder="Otomatis bila dikosongkan"
+            helperText="Diisi sistem saat naskah disetujui."
+          />
+          <Select
+            application="purple"
+            label="Klasifikasi"
+            options={KLASIFIKASI}
+            value={klasifikasi}
+            onChange={(e) => setKlasifikasi(e.target.value)}
+          />
+          <fieldset>
+            <legend className="mb-2 text-sm font-bold text-gray-900">
+              Sifat naskah
+            </legend>
+            <div className="flex min-h-9.25 flex-wrap items-center gap-x-6 gap-y-2">
+              <Radio
+                application="purple"
+                name="sifat"
+                label="Biasa"
+                checked={sifat === "biasa"}
+                onChange={() => setSifat("biasa")}
+              />
+              <Radio
+                application="purple"
+                name="sifat"
+                label="Segera"
+                checked={sifat === "segera"}
+                onChange={() => setSifat("segera")}
+              />
+              <Radio
+                application="purple"
+                name="sifat"
+                label="Sangat segera"
+                checked={sifat === "sangat"}
+                onChange={() => setSifat("sangat")}
+              />
+            </div>
+          </fieldset>
+        </div>
+
+        <div className="mt-6">
+          <TextArea
+            application="purple"
+            type="editor"
+            label="Isi naskah"
+            hint={`${isi.length}/500`}
+            placeholder="Tulis isi naskah dinas…"
+            maxLength={500}
+            value={isi}
+            onChange={(e) => setIsi(e.target.value)}
+            submitLabel="Kirim naskah"
+            onSubmit={() => setTerkirim(true)}
+          />
+        </div>
+
+        <div className="mt-6 space-y-4">
+          <Toggle
+            application="purple"
+            label="Bubuhkan tanda tangan elektronik"
+            helperText="Memakai sertifikat elektronik yang terdaftar pada akun Anda."
+            checked={ttd}
+            onChange={(e) => setTtd(e.target.checked)}
+          />
+          <Checkbox
+            application="purple"
+            label="Kirim tembusan ke unit terkait"
+            helperText="Tembusan tidak memerlukan persetujuan tambahan."
+            checked={tembusan}
+            onChange={(e) => setTembusan(e.target.checked)}
+          />
+        </div>
+
+        <div className="mt-7 flex flex-wrap gap-3">
+          <Button variant="outline" theme="purple">
+            Simpan konsep
+          </Button>
+          <Button
+            type="submit"
+            theme="purple"
+            onClick={() => setTerkirim(true)}
+          >
+            Kirim naskah
+          </Button>
+        </div>
+      </section>
+
+      <section className="ds-card p-5 sm:p-8">
+        <div className="flex gap-3">
+          <Icon className="mt-0.5 shrink-0 text-purple-700">
+            <InfoCircle />
+          </Icon>
+          <div>
+            <h3 className="text-body font-black text-gray-900">
+              Perbandingan berdampingan
+            </h3>
+            <p className="mt-1 text-body-sm text-gray-500">
+              Kontrol yang sama, hanya berbeda nilai{" "}
+              <code className="font-mono text-xs">application</code>.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          <div className="space-y-4 rounded-xl bg-surface-subtle p-5">
+            <p className="text-caption font-bold tracking-wide text-gray-500 uppercase">
+              default
+            </p>
+            <InputField
+              label="Perihal"
+              placeholder="Klik untuk melihat garis fokus"
+            />
+            <Toggle label="Tanda tangan elektronik" defaultChecked />
+            <Checkbox label="Kirim tembusan" defaultChecked />
+          </div>
+
+          <div className="space-y-4 rounded-xl bg-surface-subtle p-5">
+            <p className="text-caption font-bold tracking-wide text-purple-700 uppercase">
+              simaya
+            </p>
+            <InputField
+              application="purple"
+              label="Perihal"
+              placeholder="Klik untuk melihat garis fokus"
+            />
+            <Toggle
+              application="purple"
+              label="Tanda tangan elektronik"
+              defaultChecked
+            />
+            <Checkbox
+              application="purple"
+              label="Kirim tembusan"
+              defaultChecked
+            />
+          </div>
+        </div>
+      </section>
+
+      {terkirim && (
+        <div className="fixed bottom-4 left-4 z-50">
+          <Toast
+            variant="purple"
+            heading="Naskah terkirim"
+            onDismiss={() => setTerkirim(false)}
+          >
+            Naskah diteruskan ke unit tujuan dan menunggu persetujuan pimpinan.
+          </Toast>
+        </div>
+      )}
+    </div>
+  );
+}

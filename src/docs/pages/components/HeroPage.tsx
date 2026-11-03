@@ -930,6 +930,18 @@ export function HeroPage() {
         </Stage>
 
         <Controls>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={darkMode}
+              onChange={setDarkMode}
+              options={[
+                { value: false, label: "Terang" },
+                { value: true, label: "Gelap" },
+              ]}
+            />
+          </Control>
+
           <Control label="Tipe">
             <Segmented
               label="Pilih tipe hero"
@@ -992,18 +1004,6 @@ export function HeroPage() {
               value={withButton}
               onChange={setWithButton}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Mode">
-            <Segmented
-              label="Pilih mode"
-              value={darkMode}
-              onChange={setDarkMode}
-              options={[
-                { value: false, label: "Terang" },
-                { value: true, label: "Gelap" },
-              ]}
             />
           </Control>
         </Controls>

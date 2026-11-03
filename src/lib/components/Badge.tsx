@@ -27,13 +27,14 @@ const variants: Record<BadgeVariant, { light: string; dark: string; close?: stri
 }
 
 /**
- * Tinggi dikunci (24px / 28px, sama dengan sebelumnya) karena teksnya dipangkas
- * ke tinggi huruf kapital (lihat `label` di bawah), jadi tinggi badge tidak lagi
- * datang dari line-height. Jarak ikon–teks 6px / 8px; 4px terlalu rapat.
+ * Ukuran mengikuti desain: sm (mobile) tinggi 22px dengan padding 10px × 2px,
+ * lg tinggi 25px dengan padding 12px × 2px; keduanya radius 6px dan jarak 4px.
+ * Tinggi dikunci karena teksnya dipangkas ke tinggi huruf kapital (lihat
+ * `label` di bawah), jadi tinggi badge tidak datang dari line-height.
  */
 const sizes: Record<BadgeSize, { root: string; icon: string; close: string }> = {
-  sm: { root: 'h-6 gap-1.5 text-sm', icon: 'size-3.5', close: 'size-3.5' },
-  lg: { root: 'h-7 gap-2 text-base', icon: 'size-5', close: 'size-4' },
+  sm: { root: 'h-[22px] gap-1 px-2.5 py-0.5 text-sm', icon: 'size-3.5', close: 'size-3.5' },
+  lg: { root: 'h-[25px] gap-1 px-3 py-0.5 text-base', icon: 'size-4.5', close: 'size-4' },
 }
 
 /**
@@ -92,7 +93,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
     <span
       ref={ref}
       className={cn(
-        'inline-flex items-center rounded-md px-3',
+        'inline-flex items-center rounded-md',
         s.root,
         darkMode ? v.dark : v.light,
         dismissible && 'transition-opacity duration-200',

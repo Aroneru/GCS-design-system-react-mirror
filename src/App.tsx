@@ -3,6 +3,8 @@ import { useHashRoute } from "./docs/useHashRoute";
 import { HomePage } from "./docs/pages/HomePage";
 import { ExamplePage } from "./docs/pages/ExamplePage";
 import { ExampleAppFrame } from "./docs/pages/example/ExampleAppFrame";
+import { PortalDashboardPage } from "./docs/pages/portal/PortalDashboardPage";
+import { PortalDashboard } from "./docs/pages/portal/PortalDashboard";
 
 import { FoundationsOverview } from "./docs/pages/foundations/FoundationsOverview";
 import { ColorsPage } from "./docs/pages/foundations/ColorsPage";
@@ -47,14 +49,19 @@ import {
   NavbarDesktopPreview,
   NavbarMobilePreview,
   NavbarPage,
+  NavbarPlaygroundPreview,
 } from "./docs/pages/components/NavbarPage";
 import { BreadcrumbPage } from "./docs/pages/components/BreadcrumbPage";
 import { PaginationPage } from "./docs/pages/components/PaginationPage";
 import { TablePage } from "./docs/pages/components/TablePage";
+import { TableOfContentsPage } from "./docs/pages/components/TableOfContentsPage";
+import { ListViewPage } from "./docs/pages/components/ListViewPage";
+import { TimelinePage } from "./docs/pages/components/TimelinePage";
 
 const routes: Record<string, () => React.ReactElement> = {
   "/": HomePage,
   "/example": ExamplePage,
+  "/portal-dashboard": PortalDashboardPage,
 
   "/foundations": FoundationsOverview,
   "/foundations/colors": ColorsPage,
@@ -97,16 +104,24 @@ const routes: Record<string, () => React.ReactElement> = {
   "/components/breadcrumb": BreadcrumbPage,
   "/components/pagination": PaginationPage,
   "/components/sidebar": SidebarPage,
-  // Komponen Table belum ada, jadi halamannya masih placeholder.
+  "/components/table-of-contents": TableOfContentsPage,
+  "/components/list-view": ListViewPage,
   "/components/table": TablePage,
+  "/components/timeline": TimelinePage,
 };
 
 function renderNavbarPreview(path: string) {
+  if (path.startsWith("/preview/navbar/playground")) {
+    return <NavbarPlaygroundPreview />;
+  }
+
   switch (path) {
     case "/preview/navbar/mobile-guest":
       return <NavbarMobilePreview variant="guest" />;
     case "/preview/navbar/mobile-authenticated":
       return <NavbarMobilePreview variant="authenticated" />;
+    case "/preview/navbar/mobile-back-office":
+      return <NavbarMobilePreview variant="authenticated" platform="back-office" />;
     case "/preview/navbar/desktop-guest-5":
       return <NavbarDesktopPreview variant="guest" menuCount={5} />;
     case "/preview/navbar/desktop-guest-4":
@@ -127,6 +142,8 @@ function renderNavbarPreview(path: string) {
       return <NavbarDesktopPreview variant="authenticated" menuCount={4} />;
     case "/preview/navbar/desktop-authenticated-3":
       return <NavbarDesktopPreview variant="authenticated" menuCount={3} />;
+    case "/preview/navbar/desktop-back-office":
+      return <NavbarDesktopPreview variant="authenticated" menuCount={3} platform="back-office" />;
     default:
       return null;
   }
@@ -145,6 +162,16 @@ function App() {
   // (/example/app/pengajuan, .../pemohon, dst) yang dibaca ExampleAppFrame.
   if (path.startsWith("/example/app")) {
     return <ExampleAppFrame path={path} />;
+  }
+
+  // Portal Dashboard memakai bingkai yang sama: penuh layar, dengan tirai
+  // transisi dan tombol pulang ke pintu masuknya.
+  if (path.startsWith("/portal-dashboard/app")) {
+    return (
+      <ExampleAppFrame path={path} kembali="/portal-dashboard">
+        <PortalDashboard />
+      </ExampleAppFrame>
+    );
   }
 
   const Page = routes[path] ?? HomePage;

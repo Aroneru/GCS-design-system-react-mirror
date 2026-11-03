@@ -164,6 +164,9 @@ export function Pengaturan() {
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
+          <Button type="button" variant="outline" theme="gray">
+            Batalkan
+          </Button>
           <Modal
             trigger={<Button type="button">Simpan perubahan</Button>}
             title="Simpan perubahan?"
@@ -207,9 +210,6 @@ export function Pengaturan() {
               </div>
             )}
           </Modal>
-          <Button type="button" variant="outline" theme="gray">
-            Batalkan
-          </Button>
         </div>
       </section>
 

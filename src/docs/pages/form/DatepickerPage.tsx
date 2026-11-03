@@ -449,6 +449,18 @@ export function DatepickerPage() {
         </p>
 
         <Controls>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Type">
             <Segmented label="Pilih bentuk" value={type} onChange={setType} options={types} />
           </Control>
@@ -487,18 +499,6 @@ export function DatepickerPage() {
               options={[
                 { value: false, label: 'Tidak ada' },
                 { value: true, label: 'Hari ini – setahun lagi' },
-              ]}
-            />
-          </Control>
-
-          <Control label="Tampilan">
-            <Segmented
-              label="Pilih tampilan"
-              value={dark}
-              onChange={setDark}
-              options={[
-                { value: false, label: 'Light' },
-                { value: true, label: 'Dark' },
               ]}
             />
           </Control>

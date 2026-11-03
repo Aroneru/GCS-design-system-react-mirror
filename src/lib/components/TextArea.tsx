@@ -24,7 +24,7 @@ export type TextAreaType = 'default' | 'editor'
 export type TextAreaPlatform = 'default' | 'mobile'
 
 /** Warna aksen per aplikasi — dipakai garis saat difokus dan tombol kirim. */
-export type TextAreaApplication = 'default' | 'simaya'
+export type TextAreaApplication = 'default' | 'purple'
 
 /** Tinggi kotak isian pada type `default`: 162px di desktop, 120px di mobile. */
 const boxes: Record<TextAreaPlatform, string> = {
@@ -44,29 +44,29 @@ const accents: Record<TextAreaApplication, { focus: string; submit: string }> = 
     focus: 'focus-within:border-primary-600',
     submit: 'bg-text-area-submit! hover:bg-text-area-submit-hover! focus-visible:outline-text-area-submit',
   },
-  simaya: {
+  purple: {
     focus: 'focus-within:border-purple-700',
     submit:
-      'bg-text-area-submit-simaya! hover:bg-text-area-submit-simaya-hover! focus-visible:outline-text-area-submit-simaya',
+      'bg-text-area-submit-purple! hover:bg-text-area-submit-purple-hover! focus-visible:outline-text-area-submit-purple',
   },
 }
 
 /**
  * Warna tiap bagian dari token di tokens.css, jadi tema gelap cukup mengganti
  * nilai token lewat `data-theme`. Desain gelap: kotak default tanpa garis yang
- * terlihat, sedangkan bingkai editor dan pemisah toolbarnya tetap gray-300 di
- * kedua tampilan. Toolbar dan area isian editor sama-sama gray-700. Teks yang
- * diketik putih seperti label.
+ * terlihat, sedangkan bingkai editor dan pemisah toolbarnya gray-600 (gray-300
+ * di tampilan terang). Toolbar dan area isian editor sama-sama gray-700. Teks
+ * yang diketik putih seperti label.
  */
 const colors = {
   label: 'text-content',
   hint: 'text-gray-500',
   field: 'text-content placeholder:text-content-muted disabled:text-content-disabled',
   box: 'border-field-border bg-field',
-  frame: 'border-gray-300',
+  frame: 'border-text-area-frame',
   toolbar: 'bg-field',
   tool: 'text-content-muted hover:text-text-area-tool-hover',
-  divider: 'bg-gray-300',
+  divider: 'bg-text-area-frame',
   body: 'bg-surface',
   helper: 'text-text-area-helper',
 }

@@ -558,6 +558,18 @@ export function CardPage() {
         </Stage>
 
         <Controls>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={darkMode}
+              onChange={setDarkMode}
+              options={[
+                { value: false, label: "Terang" },
+                { value: true, label: "Gelap" },
+              ]}
+            />
+          </Control>
+
           <Control label="Lebar kolom">
             <Segmented
               label="Pilih lebar kolom"
@@ -587,18 +599,6 @@ export function CardPage() {
               options={actionChoices}
               itemClassName="px-2.5"
               wrap
-            />
-          </Control>
-
-          <Control label="Mode">
-            <Segmented
-              label="Pilih mode"
-              value={darkMode}
-              onChange={setDarkMode}
-              options={[
-                { value: false, label: "Terang" },
-                { value: true, label: "Gelap" },
-              ]}
             />
           </Control>
         </Controls>

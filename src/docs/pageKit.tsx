@@ -87,20 +87,34 @@ export function Section({ title, children }: { title: string; children: ReactNod
   )
 }
 
-/** Kartu contoh: label kecil di atas, lalu isi di dalam kotak berlatar netral. */
-export function Demo({ children, label, dark }: { children: ReactNode; label?: string; dark?: boolean }) {
+/**
+ * Kartu contoh: label kecil di atas, lalu isi di dalam kotak berlatar netral.
+ *
+ * `minWidth` untuk isi yang tidak boleh lebih sempit dari lebar tertentu, mis.
+ * Timeline desktop. Di layar yang lebih sempit kotaknya digeser ke samping
+ * seperti tabel props, alih-alih isinya diperas.
+ */
+export function Demo({
+  children,
+  label,
+  dark,
+  minWidth,
+}: {
+  children: ReactNode
+  label?: string
+  dark?: boolean
+  minWidth?: string
+}) {
   return (
     <div>
       {label && <p className="mb-2 text-sm font-black text-gray-900">{label}</p>}
       {/* `dark` untuk komponen yang punya tampilan gelap — latarnya ikut gelap. */}
       <div
-        className={
-          dark
-            ? 'rounded-xl border border-gray-800 bg-gray-900 p-5'
-            : 'rounded-xl border border-border bg-surface-subtle p-5'
-        }
+        className={`rounded-xl border p-5 ${minWidth ? 'ds-scroll-x overflow-x-auto' : ''} ${
+          dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
+        }`}
       >
-        {children}
+        {minWidth ? <div style={{ minWidth }}>{children}</div> : children}
       </div>
     </div>
   )
@@ -239,7 +253,14 @@ const ArrowRight = () => (
   </svg>
 )
 
-/** Kartu tautan pada halaman Overview: preview di atas, judul + deskripsi di bawah. */
+/**
+ * Kartu tautan pada halaman Overview: preview di atas, judul + deskripsi di bawah.
+ *
+ * Kartunya <div>, bukan <a>: preview seperti Footer dan Navbar berisi tautannya
+ * sendiri, dan <a> di dalam <a> tidak sah — parser HTML memecahnya. Yang membuat
+ * seluruh kartu bisa diklik adalah ::after milik tautan judul (stretched link).
+ * Preview-nya `inert`, jadi tidak ikut diklik, difokus, atau dibacakan.
+ */
 export function OverviewCard({
   route,
   name,
@@ -270,9 +291,7 @@ export function OverviewCard({
       sekeliling kotak preview — kotak previewnya sendiri tetap berlatar netral.
     */
     <SpotlightCard
-      as="a"
-      href={`#${route}`}
-      className={`ds-card group flex flex-col p-6 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg ${wide ? 'sm:col-span-2' : ''}`}
+      className={`ds-card group flex flex-col p-6 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-primary-600 ${wide ? 'sm:col-span-2' : ''}`}
     >
       {/*
         Grid meregangkan tiap kartu setinggi baris, jadi kartu berisi sedikit
@@ -281,10 +300,22 @@ export function OverviewCard({
         kotak preview di dalamnya, supaya yang melar latarnya — bukan ruang
         kosong di sekelilingnya.
       */}
-      <div className="grid flex-1">{children}</div>
-      <h2 className="mt-4 text-heading-4 font-black text-gray-900">{name}</h2>
+      <div className="grid flex-1" inert>
+        {children}
+      </div>
+      <h2 className="mt-4 text-heading-4 font-black text-gray-900">
+        <a
+          href={`#${route}`}
+          className="rounded-sm after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none"
+        >
+          {name}
+        </a>
+      </h2>
       <p className="mt-1.5 text-body-sm text-gray-500">{desc}</p>
-      <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary-700">
+      <span
+        className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary-700"
+        aria-hidden="true"
+      >
         Lihat detail
         <ArrowRight />
       </span>

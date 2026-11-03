@@ -126,7 +126,7 @@ const sections: { route: string; name: string; desc: string; badge: string }[] =
     },
   ];
 
-/* ---------- Tiga langkah pemasangan ---------- */
+/* ---------- Langkah pemasangan ---------- */
 
 const steps: { title: string; desc: string; label?: string; code: string }[] = [
   {
@@ -136,9 +136,22 @@ const steps: { title: string; desc: string; label?: string; code: string }[] = [
     code: INSTALL,
   },
   {
+    title: "Sambungkan Tailwind CSS ke Vite",
+    desc: "Khusus proyek Vite. Pasang plugin Tailwind, lalu daftarkan di vite.config.ts. Tanpa plugin ini, class Tailwind di komponen tidak diproses dan tampilannya polos. Lewati langkah ini bila proyekmu sudah memakai Tailwind v4.",
+    label: "vite.config.ts",
+    code: `// Pasang dulu: npm install -D tailwindcss @tailwindcss/vite
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+})`,
+  },
+  {
     title: "Sambungkan stylesheet-nya",
     desc: "Sekali saja di stylesheet utama. Baris @source yang membuat Tailwind ikut memindai berkas package.",
-    label: "CSS",
+    label: "app.css",
     code: `/* Sekali saja, di stylesheet utama proyek */
 @import '@ceplok-ui/design-kit-react/styles.css';
 
@@ -252,7 +265,7 @@ const SNIPPETS: Snippet[] = [
         { t: "={[" },
         { t: "'default'", cls: STR },
         { t: ", " },
-        { t: "'simaya'", cls: STR },
+        { t: "'purple'", cls: STR },
         { t: "]}" },
       ],
       [{ t: "/>", cls: KEY }],
@@ -455,8 +468,7 @@ function CodeWindow() {
       // potongan baris yang terlihat, jadi cukup menyalakan kursor di baris aktif.
       const place = (line: number, col: number) => {
         lineEls.forEach((el, i) => {
-          const width =
-            i < line ? lineText[i].length : i === line ? col : 0;
+          const width = i < line ? lineText[i].length : i === line ? col : 0;
           el.style.width = `${width}ch`;
           carets[i].style.visibility = i === line ? "visible" : "hidden";
         });
@@ -476,7 +488,13 @@ function CodeWindow() {
       const blink = gsap.fromTo(
         carets,
         { opacity: 1 },
-        { opacity: 0, duration: 0.53, repeat: -1, yoyo: true, ease: "steps(1)" },
+        {
+          opacity: 0,
+          duration: 0.53,
+          repeat: -1,
+          yoyo: true,
+          ease: "steps(1)",
+        },
       );
 
       const { keys, end } = planTyping(lineText);
@@ -557,7 +575,6 @@ function CodeWindow() {
               {snippet.file}
             </span>
           </span>
-
         </div>
 
         <pre className="ds-scroll-x relative z-10 overflow-x-auto p-5 font-mono text-xs leading-6 text-gray-300 sm:p-6">
@@ -902,14 +919,14 @@ export function HomePage() {
                 delay={0.65}
                 className="mt-4 flex flex-wrap items-center gap-3"
               >
-                <Magnetic>
-                  <Button as="anchor" href="#/components" variant="filled">
-                    Mulai pakai
-                  </Button>
-                </Magnetic>
                 <Magnetic strength={12}>
                   <Button as="anchor" href="#/foundations" variant="outline">
                     Lihat Foundations
+                  </Button>
+                </Magnetic>
+                <Magnetic>
+                  <Button as="anchor" href="#/components" variant="filled">
+                    Mulai pakai
                   </Button>
                 </Magnetic>
               </Reveal>
@@ -1029,11 +1046,11 @@ export function HomePage() {
               route="/components/button"
               span="lg:col-span-2"
             >
-              <Button variant="filled" size="s">
-                Simpan
-              </Button>
               <Button variant="outline" size="s">
                 Batal
+              </Button>
+              <Button variant="filled" size="s">
+                Simpan
               </Button>
             </ShowcaseTile>
 
@@ -1092,20 +1109,21 @@ export function HomePage() {
       {/*
         ══ Mulai cepat ══
 
-        Sebelumnya tiga blok kode ditumpuk tanpa penanda apa pun, sehingga
-        urutannya harus disimpulkan sendiri dari isinya. Sekarang ketiganya
+        Sebelumnya blok kode ditumpuk tanpa penanda apa pun, sehingga
+        urutannya harus disimpulkan sendiri dari isinya. Sekarang semuanya
         menjadi langkah bernomor pada satu garis vertikal: nomornya menyatakan
         urutan, judulnya menyatakan tujuan tiap langkah, dan garisnya menyatakan
-        bahwa ketiganya satu rangkaian yang dikerjakan sekali di awal.
+        bahwa semuanya satu rangkaian yang dikerjakan sekali di awal.
       */}
       <Container className="py-14 lg:py-20">
         <SectionTitle
           eyebrow="Mulai cepat"
-          title="Tiga baris untuk komponen pertama"
+          title="Empat langkah untuk komponen pertama"
         >
-          Pasang package-nya, sambungkan stylesheet-nya sekali di proyek, lalu
-          impor komponen yang dibutuhkan dan pakai seperti elemen React biasa.
-          Tidak ada provider atau konfigurasi tambahan.
+          Pasang package-nya, sambungkan Tailwind ke Vite, sambungkan
+          stylesheet-nya sekali di proyek, lalu impor komponen yang dibutuhkan
+          dan pakai seperti elemen React biasa. Tidak ada provider atau
+          konfigurasi tambahan.
         </SectionTitle>
 
         <ol className="relative ml-4 border-l border-border pl-8 sm:ml-5 sm:pl-10">

@@ -8,7 +8,7 @@ export type CheckboxPlatform = "default" | "mobile";
 export type CheckboxState = "default" | "inactive";
 
 /** Warna aksen per aplikasi — dipakai kotak saat tercentang. */
-export type CheckboxApplication = "default" | "simaya";
+export type CheckboxApplication = "default" | "purple";
 
 /**
  * Ukuran kotak, jarak turun agar sejajar tengah baris label, dan ukuran teks
@@ -22,7 +22,7 @@ const platforms: Record<CheckboxPlatform, { box: string; offset: string; label: 
 /** Warna kotak tercentang sama di tampilan terang dan gelap. */
 const accents: Record<CheckboxApplication, string> = {
   default: "checked:border-primary-700 checked:bg-primary-700 focus-visible:outline-primary-700",
-  simaya: "checked:border-purple-500 checked:bg-purple-500 focus-visible:outline-purple-500",
+  purple: "checked:border-purple-500 checked:bg-purple-500 focus-visible:outline-purple-500",
 };
 
 /**

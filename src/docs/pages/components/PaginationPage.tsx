@@ -15,7 +15,7 @@ import {
 const themeOptions: { value: PaginationTheme; label: string }[] = [
   { value: "default", label: "Default" },
   { value: "primary", label: "Primary" },
-  { value: "simaya", label: "Simaya" },
+  { value: "purple", label: "Purple" },
 ];
 
 const totalPageOptions = [25, 50, 75, 100].map((value) => ({
@@ -32,7 +32,7 @@ const paginationProps: PropRow[] = [
     "—",
     "Callback yang dijalankan ketika pengguna berpindah halaman.",
   ],
-  ["theme", '"default" | "primary" | "simaya"', "primary", "Menentukan warna pagination."],
+  ["theme", '"default" | "primary" | "purple"', "primary", "Menentukan warna pagination."],
   ["size", '"base" | "s" | "responsive"', "base", "Ukuran kotak: 40px atau 32px. `responsive` memakai 32px lalu 40px saat container induk ≥ 512px; butuh induk ber-`@container`, seperti di Table."],
   ["darkMode", "boolean", "false", "Menentukan apakah pagination dirender dalam mode gelap."],
 ];
@@ -122,10 +122,10 @@ export function PaginationPage() {
             </div>
 
             <div>
-              <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} theme="simaya" />
+              <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} theme="purple" />
 
               <p className="mt-2 mb-5 text-sm text-gray-600">
-                <Hl>Simaya</Hl> digunakan ketika pagination membutuhkan aksen ungu.
+                <Hl>Purple</Hl> digunakan ketika pagination membutuhkan aksen ungu.
               </p>
             </div>
           </Demo>
@@ -159,8 +159,8 @@ export function PaginationPage() {
             <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="primary" darkMode />
           </Demo>
 
-          <Demo label="Simaya" dark>
-            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="simaya" darkMode />
+          <Demo label="Purple" dark>
+            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="purple" darkMode />
           </Demo>
         </div>
 
@@ -195,6 +195,17 @@ export function PaginationPage() {
         </Stage>
 
         <Controls>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={mode}
+              onChange={(value) => setMode(value as string)}
+              options={[
+                { value: "light", label: "Light" },
+                { value: "dark", label: "Dark" },
+              ]}
+            />
+          </Control>
           <Control label="Theme">
             <Segmented
               label="Pilih theme"
@@ -212,17 +223,6 @@ export function PaginationPage() {
                 setCurrentPage((page) => Math.min(page, value));
               }}
               options={totalPageOptions}
-            />
-          </Control>
-          <Control label="Mode">
-            <Segmented
-              label="Pilih mode"
-              value={mode}
-              onChange={(value) => setMode(value as string)}
-              options={[
-                { value: "light", label: "Light" },
-                { value: "dark", label: "Dark" },
-              ]}
             />
           </Control>
         </Controls>

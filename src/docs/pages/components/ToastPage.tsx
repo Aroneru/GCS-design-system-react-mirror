@@ -274,6 +274,18 @@ export function ToastPage() {
         </div>
 
         <Controls>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Variant">
             <Segmented
               label="Pilih variant"
@@ -305,18 +317,6 @@ export function ToastPage() {
               options={[
                 { value: false, label: 'Pesan singkat' },
                 { value: true, label: 'Heading + aksi' },
-              ]}
-            />
-          </Control>
-
-          <Control label="Tampilan">
-            <Segmented
-              label="Pilih tampilan"
-              value={dark}
-              onChange={setDark}
-              options={[
-                { value: false, label: 'Light' },
-                { value: true, label: 'Dark' },
               ]}
             />
           </Control>

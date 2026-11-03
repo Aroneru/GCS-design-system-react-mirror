@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { ChevronDown } from "flowbite-react-icons/outline";
 import { cn } from "../../utils/cn";
 import type { SidebarGroup, SidebarItem } from "./SidebarTypes";
@@ -8,19 +8,34 @@ interface SidebarNavigationProps {
   groups?: SidebarGroup[];
   items?: SidebarItem[];
   collapsed: boolean;
+  /** Meminta Sidebar induk dibuka sebelum submenu dapat ditampilkan. */
+  onExpandSidebar?: () => void;
   darkMode?: boolean;
 }
 
-function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean; darkMode?: boolean }) {
+function MenuItem({
+  item,
+  collapsed,
+  onExpandSidebar,
+}: {
+  item: SidebarItem;
+  collapsed: boolean;
+  onExpandSidebar?: () => void;
+  darkMode?: boolean;
+}) {
   const hasChildren = Boolean(item.children?.length);
-  const [open, setOpen] = useState(Boolean(item.defaultOpen || item.active));
-  const itemId = item.id ?? item.label;
+  const hasActiveChild = Boolean(item.children?.some((child) => child.active));
+  const [open, setOpen] = useState(Boolean(item.defaultOpen));
+  const submenuId = `sidebar-submenu-${useId()}`;
+  // Status aktif selalu menang atas state manual, sehingga route yang berubah
+  // langsung menampilkan lokasi aktif tanpa render tambahan.
+  const isOpen = open || item.active || hasActiveChild;
   const className = cn(
     "group flex w-full rounded-lg text-sm font-medium transition-colors",
     "text-content hover:bg-gray-100 in-data-[theme=dark]:hover:bg-gray-600",
     collapsed ? "justify-center px-2 py-2.5" : "items-center gap-3 px-3 py-2.5",
     item.active && "bg-gray-100 in-data-[theme=dark]:bg-gray-600 text-content",
-    item.disabled && "pointer-events-none cursor-not-allowed opacity-50",
+    item.disabled && "cursor-not-allowed opacity-50",
   );
 
   if (!hasChildren) {
@@ -30,8 +45,13 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean; 
         className={className}
         aria-current={item.active ? "page" : undefined}
         aria-disabled={item.disabled || undefined}
+        tabIndex={item.disabled ? -1 : undefined}
         title={collapsed ? item.label : undefined}
         onClick={(e) => {
+          if (item.disabled) {
+            e.preventDefault();
+            return;
+          }
           if (!item.href || item.href === "#") {
             e.preventDefault();
           }
@@ -61,16 +81,28 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean; 
     );
   }
 
+  const toggleDisabled = Boolean(item.disabled || item.submenuToggleDisabled || (collapsed && !onExpandSidebar));
+  const handleSubmenuToggle = () => {
+    // Submenu tidak dirender saat ringkas. Bila Sidebar dapat dikendalikan,
+    // buka dulu agar klik ikon memiliki hasil yang terlihat.
+    if (collapsed) {
+      onExpandSidebar?.();
+      return;
+    }
+    setOpen((current) => !current);
+  };
+
   return (
     <div>
       <button
         type="button"
-        className={className}
-        onClick={() => setOpen((current) => !current)}
-        aria-expanded={open}
-        aria-controls={`sidebar-submenu-${itemId}`}
-        disabled={item.disabled || item.submenuToggleDisabled}
-        aria-disabled={item.disabled || item.submenuToggleDisabled || undefined}
+        className={cn(className, toggleDisabled && "cursor-not-allowed opacity-50")}
+        onClick={handleSubmenuToggle}
+        aria-expanded={collapsed ? undefined : isOpen}
+        aria-controls={collapsed ? undefined : submenuId}
+        aria-label={collapsed ? `Buka sidebar untuk melihat submenu ${item.label}` : undefined}
+        disabled={toggleDisabled}
+        aria-disabled={toggleDisabled || undefined}
         title={collapsed ? item.label : undefined}
       >
         {item.icon && (
@@ -96,15 +128,15 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean; 
             <ChevronDown
               className={cn(
                 "w-[28px] h-[28px] shrink-0 text-content transition-transform",
-                open && "rotate-180",
+                isOpen && "rotate-180",
               )}
             />
           </>
         )}
       </button>
 
-      {!collapsed && open && (
-        <ul id={`sidebar-submenu-${itemId}`} className="mt-1 space-y-1 pl-8">
+      {!collapsed && isOpen && (
+        <ul id={submenuId} className="mt-1 space-y-1 pl-8">
           {item.children?.map((child) => (
             <li key={child.id ?? child.label}>
               <a
@@ -113,11 +145,16 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean; 
                   "group flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                   "text-content-subtle hover:bg-gray-100 hover:text-content in-data-[theme=dark]:hover:bg-gray-600",
                   child.active && "bg-gray-100 font-medium text-content in-data-[theme=dark]:bg-gray-600",
-                  child.disabled && "pointer-events-none cursor-not-allowed opacity-50",
+                  child.disabled && "cursor-not-allowed opacity-50",
                 )}
                 aria-current={child.active ? "page" : undefined}
                 aria-disabled={child.disabled || undefined}
+                tabIndex={child.disabled ? -1 : undefined}
                 onClick={(e) => {
+                  if (child.disabled) {
+                    e.preventDefault();
+                    return;
+                  }
                   if (!child.href || child.href === "#") {
                     e.preventDefault();
                   }
@@ -147,7 +184,7 @@ function MenuItem({ item, collapsed }: { item: SidebarItem; collapsed: boolean; 
   );
 }
 
-export function SidebarNavigation({ groups, items, collapsed, darkMode }: SidebarNavigationProps) {
+export function SidebarNavigation({ groups, items, collapsed, onExpandSidebar, darkMode }: SidebarNavigationProps) {
   const resolvedGroups: SidebarGroup[] = groups?.length
     ? groups
     : [{ id: "default", items: items ?? [] }];
@@ -171,7 +208,7 @@ export function SidebarNavigation({ groups, items, collapsed, darkMode }: Sideba
           <ul className="space-y-1">
             {group.items.map((item) => (
               <li key={item.id ?? item.label}>
-                <MenuItem item={item} collapsed={collapsed} darkMode={darkMode} />
+                <MenuItem item={item} collapsed={collapsed} onExpandSidebar={onExpandSidebar} darkMode={darkMode} />
               </li>
             ))}
           </ul>

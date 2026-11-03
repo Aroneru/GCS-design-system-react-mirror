@@ -20,7 +20,7 @@ const footerProps: PropRow[] = [
     'logo',
     'string',
     'undefined',
-    'URL berkas gambar logo, dirender sebagai <img> setinggi 64px (80px saat footer ≥ 768px) dengan lebar mengikuti rasio aslinya. Bila diisi, logoContent diabaikan.',
+    'URL berkas gambar logo, dirender sebagai <img> setinggi 48px (60px saat footer ≥ 768px) dengan lebar mengikuti rasio aslinya. Bila diisi, logoContent diabaikan.',
   ],
   [
     'logoAlt',

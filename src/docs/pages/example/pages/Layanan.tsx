@@ -3,6 +3,7 @@ import {
   Badge,
   Button,
   Card,
+  ListViewItem,
   Modal,
   Toast,
 } from '../../../../lib'
@@ -15,66 +16,108 @@ export function Layanan() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-heading-3 font-black text-gray-900">Layanan tersedia</h2>
-        <p className="mt-1 text-body-sm text-gray-500">
-          Tiga layanan yang paling sering diajukan bulan ini.
-        </p>
-      </div>
+      <div className="grid items-start gap-8 xl:grid-cols-[minmax(0,410px)_minmax(0,1fr)]">
+        {/* Informasi pendukung: di bawah layanan pada mobile agar aksi utama
+            (memilih layanan) selalu ditemukan lebih dahulu. */}
+        <section className="order-2 xl:order-1">
+          <h2 className="text-heading-3 font-black text-gray-900">Informasi layanan</h2>
+          <p className="mt-1 text-body-sm text-gray-500">
+            Pembaruan terbaru seputar layanan yang tersedia.
+          </p>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {LAYANAN.map((l) => (
-          <Card
-            key={l.slug}
-            image={asset('/images/card-sample.svg')}
-            imageAlt=""
-            title={l.judul}
-            description={l.deskripsi}
-            actions={
-              <div className="flex w-full flex-wrap items-center justify-between gap-3">
-                <Badge variant="brand" icon={<Clock />}>
-                  {l.durasi}
-                </Badge>
-                <Modal
-                  trigger={<Button size="xs">Ajukan</Button>}
-                  title={l.judul}
-                  footer={({ close }) => (
-                    <>
-                      <Button variant="outline" theme="gray" size="xs" onClick={close}>
-                        Batal
-                      </Button>
-                      <Button
-                        size="xs"
-                        onClick={() => {
-                          setTerkirim(true)
-                          close()
-                        }}
-                      >
-                        Lanjutkan
-                      </Button>
-                    </>
-                  )}
-                >
-                  <p>{l.deskripsi}</p>
-                  <dl className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-surface-subtle p-4">
-                    <div>
-                      <dt className="text-caption font-bold tracking-wide text-gray-500 uppercase">
-                        Estimasi
-                      </dt>
-                      <dd className="mt-1 text-body-sm font-bold text-gray-900">{l.durasi}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-caption font-bold tracking-wide text-gray-500 uppercase">
-                        Biaya
-                      </dt>
-                      <dd className="mt-1 text-body-sm font-bold text-gray-900">{l.biaya}</dd>
-                    </div>
-                  </dl>
-                </Modal>
-              </div>
-            }
-          />
-        ))}
+          <div className="mt-5 space-y-3">
+            <ListViewItem
+              size="s"
+              platform="desktop"
+              decoration
+              title="Legalisasi dokumen online"
+              metadata={["Pengumuman", "Hari ini, 09:00 WIB"]}
+              badge={<Badge variant="brand" size="sm">Terbaru</Badge>}
+              actionLabel="Buka"
+            />
+            <ListViewItem
+              size="s"
+              platform="desktop"
+              decoration
+              title="Perpanjangan izin usaha"
+              metadata={["Pembaruan", "Kemarin, 14:30 WIB"]}
+              badge={<Badge variant="success" size="sm">Tersedia</Badge>}
+              actionLabel="Buka"
+            />
+            <ListViewItem
+              size="s"
+              platform="desktop"
+              decoration
+              title="Pantau status pengaduan"
+              metadata={["Informasi", "24 Okt 2026, 10:15 WIB"]}
+              badge={<Badge variant="gray" size="sm">Bantuan</Badge>}
+              actionLabel="Buka"
+            />
+          </div>
+        </section>
+
+        <section className="order-1 xl:order-2">
+          <h2 className="text-heading-3 font-black text-gray-900">Layanan utama</h2>
+          <p className="mt-1 text-body-sm text-gray-500">
+            Pilih layanan yang ingin Anda ajukan.
+          </p>
+
+          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+            {LAYANAN.slice(0, 2).map((l) => (
+              <Card
+                key={l.slug}
+                image={asset('/images/card-sample.svg')}
+                imageAlt=""
+                title={l.judul}
+                description={l.deskripsi}
+                actions={
+                  <div className="flex w-full flex-wrap items-center justify-between gap-3">
+                    <Badge variant="brand" icon={<Clock />}>
+                      {l.durasi}
+                    </Badge>
+                    <Modal
+                      trigger={<Button size="xs">Ajukan</Button>}
+                      title={l.judul}
+                      footer={({ close }) => (
+                        <>
+                          <Button variant="outline" theme="gray" size="xs" onClick={close}>
+                            Batal
+                          </Button>
+                          <Button
+                            size="xs"
+                            onClick={() => {
+                              setTerkirim(true)
+                              close()
+                            }}
+                          >
+                            Lanjutkan
+                          </Button>
+                        </>
+                      )}
+                    >
+                      <p>{l.deskripsi}</p>
+                      <dl className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-surface-subtle p-4">
+                        <div>
+                          <dt className="text-caption font-bold tracking-wide text-gray-500 uppercase">
+                            Estimasi
+                          </dt>
+                          <dd className="mt-1 text-body-sm font-bold text-gray-900">{l.durasi}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-caption font-bold tracking-wide text-gray-500 uppercase">
+                            Biaya
+                          </dt>
+                          <dd className="mt-1 text-body-sm font-bold text-gray-900">{l.biaya}</dd>
+                        </div>
+                      </dl>
+                    </Modal>
+                  </div>
+                }
+              />
+            ))}
+          </div>
+
+        </section>
       </div>
 
       {terkirim && (

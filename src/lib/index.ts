@@ -15,7 +15,7 @@ export { Clipboard } from "./components/Clipboard";
 export type { ClipboardProps, ClipboardVariant, ClipboardPlatform } from "./components/Clipboard";
 
 export { Avatar } from "./components/Avatar";
-export type { AvatarProps, AvatarSize } from "./components/Avatar";
+export type { AvatarFallback, AvatarGender, AvatarProps, AvatarSize } from "./components/Avatar";
 
 export { Badge } from "./components/Badge";
 export type { BadgeProps, BadgeSize, BadgeVariant } from "./components/Badge";
@@ -32,6 +32,9 @@ export type {
   DropdownItem,
   DropdownGroup,
   DropdownItemTone,
+  DropdownCloseOnSelect,
+  DropdownRenderProps,
+  DropdownHandle,
 } from "./components/Dropdown";
 
 export { Modal } from "./components/Modal";
@@ -73,6 +76,17 @@ export type { ToastProps, ToastVariant } from "./components/Toast";
 
 export { Card } from "./components/Card";
 export type { CardProps } from "./components/Card";
+
+export { ListView, ListViewItem, ListViewArticle } from "./components/listview";
+export type {
+  ListViewProps,
+  ListViewItemProps,
+  ListViewItemVariant,
+  ListViewSize,
+  ListViewPlatform,
+  ListViewArticleProps,
+  ListViewArticleSize,
+} from "./components/listview";
 
 export { Container } from "./components/Container";
 export type { ContainerProps, ContainerSize } from "./components/Container";
@@ -177,16 +191,20 @@ export type { FooterProps, FooterMenu, FooterSocial } from "./components/Footer"
 export { Navbar } from "./components/Navbar";
 export type {
   NavbarProps,
-  NavbarItem,
-  NavbarContextItem,
-  NavbarSubItem,
-  NavbarSearchConfig,
-  NavbarAction,
+  NavbarPlatform,
+  NavbarBrand,
+  NavbarDestination,
+  NavbarDisclosure,
+  NavbarPrimaryItem,
+  NavbarAccountDestination,
+  NavbarAccountAction,
+  NavbarAccountItem,
+  NavbarAccount,
+  NavbarGuestLink,
   NavbarGuestActions,
-  NavbarUser,
-  NavbarNotification,
-  NavbarMenuPosition,
-  NavbarVariant,
+  NavbarMobileDrawer,
+  NavbarFrontOfficeProps,
+  NavbarBackOfficeProps,
 } from "./components/Navbar";
 
 export { Breadcrumb } from "./components/Breadcrumb";
@@ -237,5 +255,23 @@ export type {
   SidebarUserItem,
   SidebarUserItemTone,
 } from "./components/sidebar/Sidebar";
+
+export { TableOfContents } from "./components/TableOfContents";
+export type {
+  TableOfContentsItem,
+  TableOfContentsItemElement,
+  TableOfContentsLayout,
+  TableOfContentsProps,
+} from "./components/TableOfContents";
+export { Timeline } from "./components/Timeline";
+export type {
+  TimelineProps,
+  TimelineItem,
+  TimelineAttachment,
+  TimelineStatus,
+  TimelineLabels,
+  TimelineSize,
+  TimelinePlatform,
+} from "./components/Timeline";
 
 export { cn } from "./utils/cn";

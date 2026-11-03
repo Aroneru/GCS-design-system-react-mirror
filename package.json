@@ -1,7 +1,7 @@
 {
   "name": "@ceplok-ui/design-kit-react",
   "private": false,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Design tokens, tipografi, dan komponen React (Tailwind v4) untuk Ceplok Design System",
   "keywords": [
     "design-system",
@@ -47,7 +47,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:lib": "vite build --config vite.lib.config.ts && cp src/lib/styles.css src/lib/tokens.css dist/",
+    "build:lib": "vite build --config vite.lib.config.ts && cp src/lib/styles.css src/lib/tokens.css dist/ && cp -r src/lib/fonts dist/",
     "preview": "vite preview",
     "lint": "eslint .",
     "prepublishOnly": "npm run build:lib"

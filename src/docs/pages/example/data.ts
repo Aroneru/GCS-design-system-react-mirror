@@ -15,6 +15,7 @@ export type HalamanDemo =
   | 'simaya'
   | 'modifikasi'
   | 'pengaturan'
+  | 'simaya2'
 
 export const JUDUL_HALAMAN: Record<HalamanDemo, string> = {
   dasbor: 'Dasbor',
@@ -24,6 +25,7 @@ export const JUDUL_HALAMAN: Record<HalamanDemo, string> = {
   simaya: 'Simaya',
   modifikasi: 'Modifikasi',
   pengaturan: 'Pengaturan',
+  simaya2: 'Simaya2 Digunakan Sebagai Contoh Menu Panjang',
 }
 
 export type StatusPengajuan = 'Selesai' | 'Diproses' | 'Menunggu' | 'Ditolak'

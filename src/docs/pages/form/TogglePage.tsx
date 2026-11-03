@@ -16,7 +16,7 @@ import { adaTidakAda } from '../../usulanOptions'
 
 const applications: { value: ToggleApplication; label: string; token: string }[] = [
   { value: 'default', label: 'Default', token: 'primary-700' },
-  { value: 'simaya', label: 'simaya', token: 'purple-500' },
+  { value: 'purple', label: 'Purple', token: 'purple-500' },
 ]
 
 const toggleProps: PropRow[] = [
@@ -24,7 +24,7 @@ const toggleProps: PropRow[] = [
   ['helperText', 'ReactNode', 'undefined', 'Caption 12px di bawah label.'],
   ['platform', "'default' | 'mobile'", 'default', 'Ukuran sakelar: 40×20px atau 36×18px.'],
   ['state', "'default' | 'inactive'", 'default', 'Inactive meredupkan tampilan sekaligus menonaktifkan kontrol.'],
-  ['application', "'default' | 'simaya'", 'default', 'Warna jalur saat sakelar menyala.'],
+  ['application', "'default' | 'purple'", 'default', 'Warna jalur saat sakelar menyala.'],
   ['darkMode', 'boolean', 'false', 'Tampilan gelap: jalur gray-600 dengan bulatan gray-400 yang memutih saat menyala, dan label putih; inactive meredupkan label ke gray-500.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input type="checkbox"> diteruskan (name, checked, defaultChecked, onChange, …).'],
 ]
@@ -172,13 +172,13 @@ export function TogglePage() {
           {'{/* Default — tanpa prop application */}\n'}
           {'<Toggle label="Menyala" helperText="bg-primary-700" defaultChecked />\n'}
           {'<Toggle label="Mati" />\n\n'}
-          {'{/* simaya */}\n'}
+          {'{/* Purple */}\n'}
           {'<Toggle '}
           <H>application</H>
-          {'="simaya" label="Menyala" helperText="bg-purple-500" defaultChecked />\n'}
+          {'="purple" label="Menyala" helperText="bg-purple-500" defaultChecked />\n'}
           {'<Toggle '}
           <H>application</H>
-          {'="simaya" label="Mati" />'}
+          {'="purple" label="Mati" />'}
         </SectionCode>
       </FlowSection>
 
@@ -247,6 +247,18 @@ export function TogglePage() {
         </Stage>
 
         <Controls>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={dark}
+              onChange={setDark}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
+          </Control>
+
           <Control label="Platform">
             <Segmented
               label="Pilih platform"
@@ -287,18 +299,6 @@ export function TogglePage() {
               value={withCaption}
               onChange={setWithCaption}
               options={adaTidakAda}
-            />
-          </Control>
-
-          <Control label="Tampilan">
-            <Segmented
-              label="Pilih tampilan"
-              value={dark}
-              onChange={setDark}
-              options={[
-                { value: false, label: 'Light' },
-                { value: true, label: 'Dark' },
-              ]}
             />
           </Control>
         </Controls>

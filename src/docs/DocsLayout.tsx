@@ -22,7 +22,9 @@ const footerMenus: FooterMenu[] = rail.map((r) => ({ label: r.label, url: `#${r.
  */
 const railItemClass = (active: boolean) =>
   [
-    "group flex w-full flex-col items-center gap-1 rounded-lg py-0.5 text-[11px] font-bold transition-colors",
+    // text-center: label dua kata ("Portal Dashboard") turun ke baris kedua
+    // dan harus tetap di tengah, di bawah ikonnya.
+    "group flex w-full flex-col items-center gap-1 rounded-lg py-0.5 text-center text-[11px] font-bold transition-colors",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
     active ? "text-primary-700" : "text-gray-500 hover:text-gray-800",
   ].join(" ");
@@ -58,6 +60,7 @@ function sectionOf(path: string): Section {
   if (path.startsWith("/components")) return "components";
   if (path.startsWith("/form")) return "form";
   if (path.startsWith("/example")) return "example";
+  if (path.startsWith("/portal-dashboard")) return "portal";
   return "home";
 }
 
