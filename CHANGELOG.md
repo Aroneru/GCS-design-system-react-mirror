@@ -11,6 +11,20 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+## [0.5.1] - 2026-11-03
+
+### Diperbaiki
+- **Kontrol Typography di Playground kini mengubah semua teks di pratinjau.**
+  Perubahan ini hanya di situs dokumentasi, komponen library tidak berubah.
+  - Panggung Playground kembali memasang font pilihan. Kelas fontnya sempat
+    hilang saat merge.
+  - Komponen yang menulis font sendiri (`font-sans` di Navbar dan Avatar,
+    `font-alt` di judul Modal) kini ikut berganti. Di dalam panggung, token
+    `--font-sans`, `--font-alt`, dan `--font-alt-2` diarahkan ke font pilihan.
+  - Playground Container, Drawer, dan Navbar kini ikut berganti font. Navbar
+    menerima font lewat URL iframe.
+  - Menu Table yang dirender lewat portal masih memakai font halaman.
+
 ## [0.5.0] - 2026-11-03
 
 Ada perubahan API yang memutus: migrasi tema dan aksen warna `simaya` ke

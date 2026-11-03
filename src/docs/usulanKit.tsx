@@ -1,5 +1,4 @@
 import {
-  createContext,
   useContext,
   useEffect,
   useState,
@@ -7,7 +6,13 @@ import {
   type ReactNode,
 } from 'react'
 import { CodeBlock, ControlLabel, Segmented } from './pageKit'
-import { fontClass, typographyOptions, type PlaygroundFont } from './usulanOptions'
+import {
+  PlaygroundFontContext,
+  fontClass,
+  fontScopeStyle,
+  typographyOptions,
+  type PlaygroundFont,
+} from './usulanOptions'
 
 /**
  * Kerangka halaman dokumentasi: judul ber-anchor, blok kode menempel di tiap
@@ -91,11 +96,6 @@ function useActiveSection(toc: TocEntry[]) {
  * state tambahan di tiap halaman. Di luar bagian Playground konteksnya kosong,
  * sehingga contoh-contoh lain di halaman tidak ikut berubah font.
  */
-const PlaygroundFontContext = createContext<{
-  font: PlaygroundFont
-  setFont: (font: PlaygroundFont) => void
-} | null>(null)
-
 function PlaygroundFontProvider({ children }: { children: ReactNode }) {
   const [font, setFont] = useState<PlaygroundFont>('sans')
   return (
@@ -116,7 +116,11 @@ export function PlaygroundFontScope({
 }) {
   const ctx = useContext(PlaygroundFontContext)
   const cls = [className, ctx ? fontClass[ctx.font] : ''].filter(Boolean).join(' ')
-  return <div className={cls || undefined}>{children}</div>
+  return (
+    <div className={cls || undefined} style={ctx ? fontScopeStyle(ctx.font) : undefined}>
+      {children}
+    </div>
+  )
 }
 
 /** Pola satu bagian: judul ber-anchor, lalu isi. */
@@ -218,7 +222,7 @@ export function Stage({
         className={`mx-auto transition-[max-width] duration-300 ease-out ${maxWidth} ${
           activeFont ? fontClass[activeFont] : ''
         }`}
-        style={{ minWidth }}
+        style={{ minWidth, ...(activeFont ? fontScopeStyle(activeFont) : {}) }}
       >
         {children}
       </div>

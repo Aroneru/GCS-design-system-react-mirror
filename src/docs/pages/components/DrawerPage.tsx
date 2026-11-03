@@ -31,6 +31,7 @@ import {
     Controls,
     FlowSection,
     Lead,
+    PlaygroundFontScope,
     SectionCode,
     UsulanPage,
     type TocEntry,
@@ -530,7 +531,7 @@ export function DrawerPage() {
             <FlowSection id="playground" title="Playground">
                 <Lead>Uji coba perilaku dan variasi konfigurasi Drawer secara langsung pada tampilan mobile.</Lead>
 
-                <div className={`ds-scroll-x h-[580px] w-full overflow-x-auto rounded-2xl border border-border py-4 ${playgroundDarkMode ? 'bg-gray-900' : 'bg-gray-50/80'}`}>
+                <PlaygroundFontScope className={`ds-scroll-x h-[580px] w-full overflow-x-auto rounded-2xl border border-border py-4 ${playgroundDarkMode ? 'bg-gray-900' : 'bg-gray-50/80'}`}>
                     {/* Mobile Screen Canvas */}
                     <div
                         style={{ minWidth: playgroundCanvasMinWidth }}
@@ -597,7 +598,7 @@ export function DrawerPage() {
                             </DrawerContext.Provider>
                         )}
                     </div>
-                </div>
+                </PlaygroundFontScope>
 
                 <Controls>
                     <Control label="Mode">
