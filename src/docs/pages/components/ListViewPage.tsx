@@ -164,6 +164,12 @@ const listViewItemProps: PropRow[] = [
     "Alamat tautan jika tombol aksi bertindak sebagai tautan.",
   ],
   [
+    "actionDisabled",
+    "boolean",
+    "false",
+    "Menonaktifkan tombol aksi bawaan pada varian simple, di semua ukuran dan platform.",
+  ],
+  [
     "actionButtonSize",
     "ButtonSize",
     "undefined",

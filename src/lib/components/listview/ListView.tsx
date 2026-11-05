@@ -169,6 +169,8 @@ export interface ListViewItemProps
   onAction?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
   /** Tautan untuk tombol aksi bawaan. */
   actionHref?: string;
+  /** Menonaktifkan tombol aksi bawaan. Berlaku untuk semua ukuran dan platform varian simple. */
+  actionDisabled?: boolean;
   /** Ukuran tombol aksi bawaan. Mengikuti `size` item bila tidak diisi. */
   actionButtonSize?: ButtonSize;
   /** Tautan jika seluruh item bertindak sebagai tautan. */
@@ -236,6 +238,7 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
       actionLabel,
       onAction,
       actionHref,
+      actionDisabled = false,
       actionButtonSize,
       href,
       target,
@@ -325,8 +328,15 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
           size={actionButtonSize ?? currentSize.defaultButtonSize}
           theme="primary"
           variant="filled"
+          aria-disabled={actionDisabled || undefined}
+          tabIndex={actionDisabled ? -1 : undefined}
+          className={actionDisabled ? "pointer-events-none opacity-50" : undefined}
           onClick={(e) => {
             e.stopPropagation();
+            if (actionDisabled) {
+              e.preventDefault();
+              return;
+            }
             onAction?.(e);
           }}
         >
@@ -337,8 +347,10 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
           size={actionButtonSize ?? currentSize.defaultButtonSize}
           theme="primary"
           variant="filled"
+          disabled={actionDisabled}
           onClick={(e) => {
             e.stopPropagation();
+            if (actionDisabled) return;
             onAction?.(e);
           }}
         >
