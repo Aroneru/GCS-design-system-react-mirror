@@ -11,6 +11,34 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+### Ditambahkan
+- **`Table` punya prop `darkMode`.** Prop ini memasang `data-theme="dark"` di
+  tabel.
+  - Toolbar berlatar gray-800, header gray-600, footer gray-700.
+  - Baris gray-700. Dengan `striped`, baris mulai dari gray-700 lalu gray-800.
+  - Pagination, tombol Filter, dan Dropdown ikut gelap.
+- **Token baru `--color-table-*`.** Semua warna Table kini dari token ini,
+  dengan nilai terang dan gelap. Timpa di CSS project bila perlu, mis.
+  `[data-theme='dark'] { --color-table-toolbar: #1f2a37; }`.
+- **`Table` otomatis `compact` di mobile.** Bila lebar tabel di bawah 640px,
+  tabel memakai `compact` apa pun nilai `size`. Yang diukur lebar tabel, bukan
+  lebar layar.
+
+### Diubah
+- **Footer `Table` disusun ulang.**
+  - Pemilih jumlah baris di kiri, Pagination di kanan.
+  - Labelnya kini "Menampilkan [n] Data", sebelumnya "Baris per halaman".
+  - Tombol pemilih jumlah baris kini berlatar abu-abu tanpa garis.
+  - Ringkasan "Menampilkan 1–10 dari 50 data" tidak tampil lagi, jadi prop
+    `pagination.summary` belum berpengaruh.
+- **Warna gelap `Pagination` (`darkMode`).**
+  - Kotak nomor gray-700 dengan garis gray-600, sebelumnya gray-800 dengan
+    garis gray-700.
+  - Halaman aktif tema `primary` kini primary-900, `purple` kini purple-900,
+    `default` kini gray-600.
+- **Situs dokumentasi.** Halaman Table punya bagian baru "Mode gelap", dan
+  Playground-nya punya kontrol Mode (Light/Dark) setelah Typography.
+
 ## [0.5.1] - 2026-11-03
 
 ### Diperbaiki
