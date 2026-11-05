@@ -750,6 +750,76 @@
     --color-timeline-avatar: var(--color-gray-900);
 }
 
+/*
+ * Table. Gelap dari desain: toolbar gray-800, header gray-600, zebra
+ * gray-700 lalu gray-800, footer gray-700.
+ */
+@theme static {
+    --color-table-surface: #ffffff;
+    /* bingkai dan footer */
+    --color-table-toolbar: #ffffff;
+    --color-table-border: var(--color-gray-200);
+    --color-table-head: var(--color-gray-50);
+    --color-table-head-compact: #ffffff;
+    --color-table-head-content: var(--color-gray-500);
+    --color-table-head-content-active: var(--color-gray-900);
+    --color-table-row: #ffffff;
+    --color-table-row-hover: var(--color-gray-50);
+    --color-table-row-striped: var(--color-gray-50);
+    --color-table-row-striped-hover: var(--color-gray-100);
+    --color-table-content: var(--color-gray-500);
+    --color-table-content-strong: var(--color-gray-900);
+    --color-table-footer-content: var(--color-gray-700);
+    --color-table-picker: var(--color-gray-100);
+    /* pemilih jumlah baris */
+    --color-table-picker-hover: var(--color-gray-200);
+    --color-table-scrollbar: var(--color-gray-300);
+    --color-table-scrollbar-track: var(--color-gray-100);
+}
+
+[data-theme='dark'] {
+    --color-table-surface: var(--color-gray-700);
+    --color-table-toolbar: var(--color-gray-800);
+    --color-table-border: var(--color-gray-600);
+    --color-table-head: var(--color-gray-600);
+    --color-table-head-compact: var(--color-gray-600);
+    --color-table-head-content: var(--color-gray-200);
+    --color-table-head-content-active: #ffffff;
+    --color-table-row: var(--color-gray-700);
+    --color-table-row-hover: var(--color-gray-600);
+    --color-table-row-striped: var(--color-gray-800);
+    --color-table-row-striped-hover: var(--color-gray-600);
+    --color-table-content: var(--color-gray-200);
+    --color-table-content-strong: #ffffff;
+    --color-table-footer-content: #ffffff;
+    --color-table-picker: var(--color-gray-600);
+    --color-table-picker-hover: var(--color-gray-500);
+    --color-table-scrollbar: var(--color-gray-500);
+    --color-table-scrollbar-track: var(--color-gray-800);
+}
+
+[data-theme='light'],
+.ds-theme-light {
+    --color-table-surface: #ffffff;
+    --color-table-toolbar: #ffffff;
+    --color-table-border: var(--color-gray-200);
+    --color-table-head: var(--color-gray-50);
+    --color-table-head-compact: #ffffff;
+    --color-table-head-content: var(--color-gray-500);
+    --color-table-head-content-active: var(--color-gray-900);
+    --color-table-row: #ffffff;
+    --color-table-row-hover: var(--color-gray-50);
+    --color-table-row-striped: var(--color-gray-50);
+    --color-table-row-striped-hover: var(--color-gray-100);
+    --color-table-content: var(--color-gray-500);
+    --color-table-content-strong: var(--color-gray-900);
+    --color-table-footer-content: var(--color-gray-700);
+    --color-table-picker: var(--color-gray-100);
+    --color-table-picker-hover: var(--color-gray-200);
+    --color-table-scrollbar: var(--color-gray-300);
+    --color-table-scrollbar-track: var(--color-gray-100);
+}
+
 @media (max-width: 639px) {
     :root {
         --text-display: 2.25rem;

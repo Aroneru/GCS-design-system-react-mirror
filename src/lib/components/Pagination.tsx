@@ -45,21 +45,21 @@ const themeClasses: Record<
   default: {
     active: "bg-gray-50",
     activeText: "text-gray-500",
-    darkActive: "bg-gray-700",
+    darkActive: "bg-gray-600",
     darkActiveText: "text-gray-300",
   },
 
   primary: {
     active: "bg-primary-50",
     activeText: "text-primary-500",
-    darkActive: "bg-gray-700",
+    darkActive: "bg-primary-900",
     darkActiveText: "text-primary-500",
   },
 
   purple: {
     active: "bg-purple-50",
     activeText: "text-purple-500",
-    darkActive: "bg-gray-700",
+    darkActive: "bg-purple-900",
     darkActiveText: "text-purple-400",
   },
 };
@@ -91,7 +91,7 @@ export function Pagination({
       className={cn(
         "inline-flex overflow-hidden rounded-lg",
         sizing.nav,
-        darkMode ? "border border-gray-700 bg-gray-800" : "border border-gray-300 bg-white",
+        darkMode ? "border border-gray-600 bg-gray-700" : "border border-gray-300 bg-white",
         className,
       )}
       {...props}
@@ -106,7 +106,7 @@ export function Pagination({
           "flex shrink-0 items-center justify-center transition-colors",
           sizing.cell,
           darkMode
-            ? "border-r border-gray-700 text-gray-400 hover:bg-gray-700"
+            ? "border-r border-gray-600 text-gray-400 hover:bg-gray-600"
             : "border-r border-gray-300 text-gray-500 hover:bg-gray-50",
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}
@@ -124,7 +124,7 @@ export function Pagination({
                 "flex shrink-0 items-center justify-center text-sm",
                 sizing.cell,
                 darkMode
-                  ? "border-r border-gray-700 text-gray-400"
+                  ? "border-r border-gray-600 text-gray-400"
                   : "border-r border-gray-300 text-gray-500",
               )}
             >
@@ -145,7 +145,7 @@ export function Pagination({
               "flex shrink-0 items-center justify-center text-sm font-normal transition-colors",
               sizing.cell,
               darkMode
-                ? "border-r border-gray-700 hover:bg-gray-700"
+                ? "border-r border-gray-600 hover:bg-gray-600"
                 : "border-r border-gray-300 hover:bg-gray-50",
               isActive && (darkMode ? colors.darkActive : colors.active),
               isActive
@@ -168,7 +168,7 @@ export function Pagination({
           "flex shrink-0 items-center justify-center transition-colors",
           sizing.cell,
           darkMode
-            ? "border-r border-gray-700 text-gray-400 hover:bg-gray-700"
+            ? "border-r border-gray-600 text-gray-400 hover:bg-gray-600"
             : "border-r border-gray-300 text-gray-500 hover:bg-gray-50",
           "disabled:cursor-not-allowed disabled:opacity-50",
         )}

@@ -1,7 +1,9 @@
 import {
   Fragment,
   useId,
+  useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type HTMLAttributeAnchorTarget,
   type HTMLAttributes,
@@ -231,7 +233,7 @@ export interface TablePaginationConfig {
   defaultPageSize?: number;
   /**
    * Pilihan jumlah baris per halaman, mis. `[5, 10, 25, 50, 100]`. Bila diisi,
-   * muncul pemilih "Baris per halaman" di samping pagination.
+   * muncul pemilih "Menampilkan [n] Data" di kiri, pagination di kanan.
    */
   pageSizeOptions?: number[];
   /** Dipanggil saat jumlah baris diganti. Halaman kembali ke 1. */
@@ -259,6 +261,10 @@ export interface TableProps<T> extends Omit<HTMLAttributes<HTMLDivElement>, "chi
   /** Kunci unik tiap baris — nama field atau fungsi. Dipakai juga oleh seleksi. */
   rowKey: keyof T | ((row: T) => Key);
 
+  /**
+   * Bawaannya `normal`. Selebar di bawah 640px (mobile) tabel selalu memakai
+   * `compact`, apa pun nilai prop ini.
+   */
   size?: TableSize;
   sticky?: TableSticky;
 
@@ -296,8 +302,16 @@ export interface TableProps<T> extends Omit<HTMLAttributes<HTMLDivElement>, "chi
   /**
    * Baris zebra: baris genap diberi latar gray-50 supaya baris panjang mudah
    * diikuti mata. Hover jadi gray-100 agar tetap terlihat di baris genap.
+   * Di `darkMode` barisnya gray-700 lalu gray-800.
    */
   striped?: boolean;
+
+  /**
+   * Memasang `data-theme="dark"` di tabel ini: toolbar gray-800, header
+   * gray-600, baris gray-700, dan Pagination ikut gelap. Warnanya dari token
+   * `--color-table-*`.
+   */
+  darkMode?: boolean;
 
   loading?: boolean;
   emptyText?: ReactNode;
@@ -305,12 +319,18 @@ export interface TableProps<T> extends Omit<HTMLAttributes<HTMLDivElement>, "chi
 
 /** Latar baris dan sel menempel, dengan dan tanpa zebra. */
 const rowBg = {
-  plain: { row: "hover:bg-gray-50", cell: "bg-white group-hover:bg-gray-50" },
+  plain: {
+    row: "bg-table-row hover:bg-table-row-hover",
+    cell: "bg-table-row group-hover:bg-table-row-hover",
+  },
   striped: {
-    row: "even:bg-gray-50 hover:bg-gray-100",
-    cell: "bg-white group-even:bg-gray-50 group-hover:bg-gray-100",
+    row: "bg-table-row even:bg-table-row-striped hover:bg-table-row-striped-hover",
+    cell: "bg-table-row group-even:bg-table-row-striped group-hover:bg-table-row-striped-hover",
   },
 };
+
+/** Di bawah lebar ini (px) tabel otomatis `compact`. */
+const MOBILE_WIDTH = 640;
 
 const aligns: Record<TableAlign, string> = {
   left: "text-left",
@@ -342,21 +362,21 @@ const sizes: Record<
   normal: {
     head: "px-4 py-3",
     cell: "px-4 py-4",
-    headBg: "bg-gray-50",
+    headBg: "bg-table-head",
     headText: "text-xs uppercase",
-    border: "border-gray-200",
-    headTop: "border-t-gray-200",
+    border: "border-table-border",
+    headTop: "border-t-table-border",
     cellText: null,
     check: "default",
   },
   compact: {
     head: "h-16 px-4 py-2",
     cell: "h-16 px-4 py-2",
-    headBg: "bg-white",
+    headBg: "bg-table-head-compact",
     headText: "text-sm",
-    border: "border-gray-200",
+    border: "border-table-border",
     headTop: "border-t-transparent",
-    cellText: "text-gray-900",
+    cellText: "text-table-content-strong",
     thumb: "size-8 rounded-md",
     check: "mobile",
   },
@@ -404,7 +424,7 @@ const actionColors: Record<
     },
     dark: {
       filled: "bg-green-800 text-white hover:bg-green-700",
-      outline: "border border-green-800 text-green-800 hover:bg-green-50",
+      outline: "border border-green-800 text-grsn-800 hover:bg-green-50",
     },
   },
   gray: {
@@ -414,7 +434,7 @@ const actionColors: Record<
     },
     dark: {
       filled: "bg-gray-700 text-white hover:bg-gray-500",
-      outline: "border border-gray-700 text-gray-700 hover:bg-gray-100 hover:text-gray-900",
+      outline: "border border-gray-500 text-gray-700 hover:bg-gray-100 hover:text-gray-900",
     },
   },
   purple: {
@@ -488,7 +508,7 @@ const defaultSortIcon: TableSortIcon = (direction) => {
 };
 
 /**
- * Kotak pencarian toolbar: tinggi 40px, latar gray-50, ikon kaca pembesar di
+ * Kotak pencarian toolbar: tinggi 40px, latar token field, ikon kaca pembesar di
  * kiri. Selebar penuh di tabel sempit, minimal 22rem mulai 576px.
  */
 function TableSearch({
@@ -501,14 +521,14 @@ function TableSearch({
   return (
     <label
       className={cn(
-        "flex h-10 w-full items-center gap-2 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm transition-colors",
+        "flex h-10 w-full items-center gap-2 rounded-lg border border-field-border bg-field px-3 text-sm transition-colors",
         "focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500",
         "@xl:w-auto @xl:min-w-[22rem]",
         disabled && "cursor-not-allowed opacity-60",
         className,
       )}
     >
-      <SearchIcon aria-hidden="true" className="size-4 shrink-0 text-gray-500" />
+      <SearchIcon aria-hidden="true" className="size-4 shrink-0 text-content-muted" />
       <input
         type="search"
         placeholder={placeholder}
@@ -516,7 +536,7 @@ function TableSearch({
         // Tanpa label terlihat, pembaca layar memakai placeholder sebagai nama.
         aria-label={ariaLabel ?? placeholder}
         className={cn(
-          "min-w-0 flex-1 bg-transparent text-gray-900 outline-none placeholder:text-gray-500",
+          "min-w-0 flex-1 bg-transparent text-content outline-none placeholder:text-content-muted",
           "disabled:cursor-not-allowed",
           // Tombol silang bawaan type="search" di Chrome/Safari bukan bagian rancangan.
           "[&::-webkit-search-cancel-button]:appearance-none",
@@ -567,7 +587,7 @@ function SelectAllBox({
           "peer/all absolute inset-0 size-full cursor-pointer appearance-none rounded border transition-colors",
           "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700",
           "disabled:cursor-not-allowed disabled:opacity-50",
-          filled ? "border-primary-700 bg-primary-700" : "border-gray-300 bg-gray-50",
+          filled ? "border-primary-700 bg-primary-700" : "border-field-border bg-field",
         )}
       />
       {filled && (
@@ -602,19 +622,19 @@ function SelectAllBox({
     </span>
   );
 }
-
+  
 const resolve = <T, V>(value: V | ((row: T) => V), row: T): V =>
   typeof value === "function" ? (value as (row: T) => V)(row) : value;
 
-const defaultSummary = ({ from, to, total }: { from: number; to: number; total: number }) => (
-  <>
-    Menampilkan{" "}
-    <span className="font-bold text-gray-900">
-      {from}–{to}
-    </span>{" "}
-    dari <span className="font-bold text-gray-900">{total}</span> data
-  </>
-);
+// const defaultSummary = ({ from, to, total }: { from: number; to: number; total: number }) => (
+//   <>
+//     Menampilkan{" "}
+//     <span className="font-bold text-gray-900">
+//       {from}–{to}
+//     </span>{" "}
+//     dari <span className="font-bold text-gray-900">{total}</span> data
+//   </>
+// );
 
 /** Membaca field `key` dari baris tanpa memaksa `T` punya index signature. */
 const readField = <T,>(row: T, key: string): unknown => (row as Record<string, unknown>)[key];
@@ -838,7 +858,7 @@ export function TableFile({ name, href, type, preview = true }: TableFileProps) 
     </>
   );
   const linkClass = cn(
-    "inline-flex max-w-full items-center gap-3 rounded text-left transition-colors hover:text-gray-900 hover:underline",
+    "inline-flex max-w-full items-center gap-3 rounded text-left transition-colors hover:text-table-content-strong hover:underline",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
   );
 
@@ -958,7 +978,7 @@ export function Table<T>({
   columns: columnsProp,
   data,
   rowKey,
-  size = "normal",
+  size: sizeProp = "normal",
   sticky,
   search,
   filter,
@@ -975,11 +995,26 @@ export function Table<T>({
   pagination,
   manual,
   striped = false,
+  darkMode = false,
   loading,
   emptyText = "Tidak ada data",
   className,
   ...props
 }: TableProps<T>) {
+  // Lebar tabel, bukan lebar layar, supaya pratinjau mobile di halaman lebar
+  // ikut compact. useLayoutEffect: diukur sebelum tampil, jadi tidak berkedip.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [narrow, setNarrow] = useState(false);
+  useLayoutEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const measure = () => setNarrow(el.getBoundingClientRect().width < MOBILE_WIDTH);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  const size: TableSize = narrow ? "compact" : sizeProp;
   const density = sizes[size];
 
   const firstRow = data[0];
@@ -1229,38 +1264,42 @@ export function Table<T>({
       // Sel menempel butuh latar sendiri supaya isi yang tergulir tidak tembus.
       head ? density.headBg : cn("transition-colors", bg.cell),
       isStart && (selectable ? "left-12" : "left-0"),
-      isStart && "shadow-[inset_-1px_0_0_var(--color-gray-200)]",
-      isEnd && "right-0 shadow-[inset_1px_0_0_var(--color-gray-200)]",
+      isStart && "shadow-[inset_-1px_0_0_var(--color-table-border)]",
+      isEnd && "right-0 shadow-[inset_1px_0_0_var(--color-table-border)]",
     );
   };
 
   const hasToolbar = Boolean(search || filter || actions);
   const colSpan = Math.max(1, columns.length + (selectable ? 1 : 0));
-  const from = total === 0 ? 0 : (page - 1) * pageSize + 1;
-  const to = Math.min(page * pageSize, total);
+  // const from = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  // const to = Math.min(page * pageSize, total);
 
   return (
     <div
       // `@container`: toolbar, footer, dan Pagination menyesuaikan lebar tabel ini,
       // bukan lebar layar — tetap benar di kolom sempit maupun pratinjau mobile.
       className={cn(
-        "@container overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm",
+        "@container overflow-hidden rounded-lg border border-table-border bg-table-surface shadow-sm",
         className,
       )}
+      data-theme={darkMode ? "dark" : undefined}
       {...props}
+      ref={rootRef}
     >
       {hasToolbar && (
-        <div className="flex flex-wrap items-center gap-4 p-4">
+        <div className="flex flex-wrap items-center gap-4 bg-table-toolbar p-4">
           {search && <TableSearch {...search} />}
 
           {filter && (
             <Dropdown
               contentClassName="w-60"
+              darkMode={darkMode}
               trigger={
                 <Button
                   variant="outline"
                   theme="gray"
                   size="s"
+                  darkMode={darkMode}
                   leftIcon={<AdjustmentsHorizontal />}
                 >
                   {filter.label ?? "Filter Data"}
@@ -1268,7 +1307,7 @@ export function Table<T>({
               }
             >
               <div className="p-3">
-                <p className="mb-2 text-xs font-medium text-gray-500">
+                <p className="mb-2 text-xs font-medium text-content-muted">
                   {filter.title ?? "Tampilkan kolom"}
                 </p>
                 <div className="flex max-h-72 flex-col gap-2 overflow-y-auto">
@@ -1302,10 +1341,10 @@ export function Table<T>({
           Chromium/Safari memakai ::-webkit-scrollbar. */}
       <div
         className={cn(
-          "overflow-x-auto [scrollbar-color:var(--color-gray-300)_var(--color-gray-100)] [scrollbar-width:thin]",
+          "overflow-x-auto [scrollbar-color:var(--color-table-scrollbar)_var(--color-table-scrollbar-track)] [scrollbar-width:thin]",
           "[&::-webkit-scrollbar]:h-1.5",
-          "[&::-webkit-scrollbar-track]:mx-4 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100",
-          "[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300",
+          "[&::-webkit-scrollbar-track]:mx-4 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-table-scrollbar-track",
+          "[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-table-scrollbar",
         )}
       >
         <table
@@ -1358,7 +1397,7 @@ export function Table<T>({
                         key={headColumn.key}
                         scope="colgroup"
                         colSpan={colSpan}
-                        className={cn(common, "pb-0 text-gray-500")}
+                        className={cn(common, "pb-0 text-table-head-content")}
                       >
                         {headColumn.header}
                       </th>
@@ -1389,7 +1428,7 @@ export function Table<T>({
                         // sebaris dengan judul daun di bawah judul induk.
                         rowSpan > 1 && "align-bottom",
                         density.border,
-                        isSorted ? "text-gray-900" : "text-gray-500",
+                        isSorted ? "text-table-head-content-active" : "text-table-head-content",
                         stickyClass(leafIndex, true),
                       )}
                     >
@@ -1398,7 +1437,7 @@ export function Table<T>({
                           type="button"
                           onClick={() => toggleSort(column)}
                           className={cn(
-                            "flex w-full items-center gap-2 transition-colors hover:text-gray-900",
+                            "flex w-full items-center gap-2 transition-colors hover:text-table-head-content-active",
                             // Rata kiri: ikon sort di ujung kanan judul, di kedua size.
                             sortJustify[headAlignOf(column, headerAlign)],
                             size !== "compact" && "uppercase",
@@ -1421,13 +1460,13 @@ export function Table<T>({
           <tbody className="[&>tr:last-child>td]:border-b-0">
             {loading ? (
               <tr>
-                <td colSpan={colSpan} className="border-b border-gray-200 py-12">
+                <td colSpan={colSpan} className="border-b border-table-border py-12">
                   <Spinner className="mx-auto" aria-label="Memuat data" />
                 </td>
               </tr>
             ) : rows.length === 0 ? (
               <tr>
-                <td colSpan={colSpan} className="border-b border-gray-200 py-12 text-center text-gray-500">
+                <td colSpan={colSpan} className="border-b border-table-border py-12 text-center text-table-content">
                   {emptyText}
                 </td>
               </tr>
@@ -1468,7 +1507,7 @@ export function Table<T>({
                           cellBorder,
                           density.cell,
                           aligns[column.align ?? "center"],
-                          density.cellText ?? (column.emphasis ? "text-gray-900" : "text-gray-500"),
+                          density.cellText ?? (column.emphasis ? "text-table-content-strong" : "text-table-content"),
                           !column.wrap && "whitespace-nowrap",
                           stickyClass(i, false),
                         )}
@@ -1485,56 +1524,58 @@ export function Table<T>({
       </div>
 
       {pagination && (
-        // Kiri hanya info (ringkasan), kanan semua kontrol (jumlah baris +
-        // halaman). Sempit: kontrol di atas, ringkasan di bawahnya, rata kiri.
-        <div className="flex flex-col-reverse items-start gap-3 border-t border-gray-200 p-4 @lg:flex-row @lg:items-center @lg:justify-between">
-          <p className="text-sm text-gray-500">
+        // Kiri pemilih jumlah baris, kanan nomor halaman. Sempit: bertumpuk,
+        // rata kiri.
+        <div className="flex flex-col items-start gap-3 border-t border-table-border p-4 @lg:flex-row @lg:items-center @lg:justify-between">
+          {/* <p className="text-sm text-gray-500">
             {(pagination.summary ?? defaultSummary)({ from, to, total })}
-          </p>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            {pagination.pageSizeOptions && (
-              <div className="inline-flex items-center gap-2 text-sm whitespace-nowrap text-gray-500">
-                <span id={`${pageSizeId}-label`}>Baris per halaman</span>
-                {/* Daftar pilihan memakai Dropdown (mode listbox) supaya rupanya
-                    sama dengan Dropdown lain; <select> bawaan tidak bisa diberi gaya.
-                    Tinggi, sudut, dan garis tombolnya disamakan dengan Pagination. */}
-                <Dropdown
-                  contentLabel="Baris per halaman"
-                  trigger={
-                    <button
-                      type="button"
-                      disabled={loading}
-                      aria-labelledby={`${pageSizeId}-label ${pageSizeId}-value`}
-                      className="inline-flex h-8 min-w-[4.5rem] items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white pr-2 pl-3 text-sm text-gray-900 transition-colors hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:opacity-50 @lg:h-10"
-                    >
-                      <span id={`${pageSizeId}-value`}>{pageSize}</span>
-                      <ChevronDown className="size-4 text-gray-500" aria-hidden="true" />
-                    </button>
-                  }
-                  items={pagination.pageSizeOptions.map((n) => ({
-                    id: String(n),
-                    label: (
-                      <span className="flex items-center justify-between gap-3">
-                        {n}
-                        {n === pageSize && (
-                          <Check className="size-4 text-primary-700" aria-hidden="true" />
-                        )}
-                      </span>
-                    ),
-                    selected: n === pageSize,
-                    onClick: () => changePageSize(n),
-                  }))}
-                />
-              </div>
-            )}
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={changePage}
-              theme={pagination.theme}
-              size="responsive"
-            />
-          </div>
+          </p> */}
+          {pagination.pageSizeOptions && (
+            <div className="inline-flex items-center gap-2 text-sm whitespace-nowrap text-table-footer-content">
+              <span id={`${pageSizeId}-label`}>Menampilkan</span>
+              {/* Daftar pilihan memakai Dropdown (mode listbox) supaya rupanya
+                  sama dengan Dropdown lain; <select> bawaan tidak bisa diberi gaya.
+                  Tinggi dan sudut tombolnya disamakan dengan Pagination. */}
+              <Dropdown
+                contentLabel="Baris per halaman"
+                darkMode={darkMode}
+                trigger={
+                  <button
+                    type="button"
+                    disabled={loading}
+                    aria-labelledby={`${pageSizeId}-label ${pageSizeId}-value`}
+                    className="inline-flex h-8 min-w-[4.5rem] items-center justify-between gap-2 rounded-lg bg-table-picker pr-2 pl-3 text-sm text-table-content-strong transition-colors hover:bg-table-picker-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:opacity-50 @lg:h-10"
+                  >
+                    <span id={`${pageSizeId}-value`}>{pageSize}</span>
+                    <ChevronDown className="size-4 text-table-content" aria-hidden="true" />
+                  </button>
+                }
+                items={pagination.pageSizeOptions.map((n) => ({
+                  id: String(n),
+                  label: (
+                    <span className="flex items-center justify-between gap-3">
+                      {n}
+                      {n === pageSize && (
+                        <Check className="size-4 text-primary-700" aria-hidden="true" />
+                      )}
+                    </span>
+                  ),
+                  selected: n === pageSize,
+                  onClick: () => changePageSize(n),
+                }))}
+              />
+              <span aria-hidden="true">Data</span>
+            </div>
+          )}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={changePage}
+            theme={pagination.theme}
+            size="responsive"
+            darkMode={darkMode}
+            className="@lg:ml-auto"
+          />
         </div>
       )}
     </div>
