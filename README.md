@@ -125,7 +125,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Toast`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Card`       | `image`, `title`, `description`, `href`, `linkLabel`, `actions`, `darkMode`                                          |
-| `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `darkMode` |
+| `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `actionLabel`, `actionDisabled`, `darkMode` |
 | `Container`  | `as` (default `div`), `padded` (default `true`), `darkMode`                                                          |
 | `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
 | `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, ambient `data-theme`, `darkMode` (override kompatibilitas) |
@@ -285,7 +285,10 @@ varian berubah menjadi latar putih dengan teks gray-700.
 dan mobile. Varian `simple` dapat memakai ikon, badge, dekorasi aksen, dan aksi;
 varian `article` tersedia hingga `XL`, selalu memakai garis aksen vertikal, dan
 menampilkan subject, metadata, pin, judul, serta metrik interaksi. Gunakan
-`darkMode` pada pembungkus atau item untuk tampilan gelap.
+`actionDisabled` bersama `actionLabel` untuk menonaktifkan tombol aksi simple di
+semua ukuran dan platform; bila aksi memakai `actionHref`, tautannya juga tidak
+dapat difokuskan atau dinavigasi. Gunakan `darkMode` pada pembungkus atau item
+untuk tampilan gelap.
 
 ### Form
 
