@@ -1,4 +1,5 @@
 import {
+  useContext,
   useEffect,
   useId,
   useCallback,
@@ -8,6 +9,7 @@ import {
   useState,
   type HTMLAttributeAnchorTarget,
   type HTMLAttributes,
+  type KeyboardEvent,
   type MouseEventHandler,
   type MouseEvent,
   type ReactNode,
@@ -20,6 +22,10 @@ import { Avatar } from './Avatar'
 import { Button } from './Button'
 import { Drawer } from './Drawer'
 import { Dropdown, type DropdownItem } from './Dropdown'
+import {
+  DropdownDismissalContext,
+  type DropdownDismissalScopeValue,
+} from './dropdown/DropdownDismissalContext'
 import { Sidebar, type SidebarItem } from './sidebar/Sidebar'
 import { BarsFromLeft } from '../icons/outline'
 
@@ -441,11 +447,16 @@ function OverflowPanel({
   spacingMode: DesktopSpacingMode
 }) {
   const panelId = useId()
+  const panelRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const measurementRef = useRef<HTMLDivElement>(null)
   const measurementFrameRef = useRef(0)
   const focusFrameRef = useRef(0)
+  const restoreFocusRef = useRef(false)
+  const typeaheadRef = useRef({ text: '', time: 0 })
+  const heldSpaceRef = useRef(false)
   const pendingScrollRef = useRef<{ scrollTop: number } | null>(null)
+  const dismissalScope = useContext(DropdownDismissalContext)
   const [parentOpen, setParentOpen] = useState(false)
   const [visibleItemCount, setVisibleItemCount] = useState(() => Math.min(1, items.length))
   const [capacityReady, setCapacityReady] = useState(false)
@@ -463,35 +474,98 @@ function OverflowPanel({
   const currentVisibleCount = Math.min(visibleItemCount, items.length)
   const truncatedLabels = useTruncatedNavbarLabels(contentRef, 'data-navbar-overflow-label', `${labelKey}|${expandedKey}|${currentVisibleCount}`)
 
-  const readMeasurementMetrics = useCallback(() => {
+  const positionPanel = useCallback(() => {
+    const panel = panelRef.current
+    const trigger = triggerRef.current
     const content = contentRef.current
-    const panel = content?.closest<HTMLElement>('[popover]')
-    if (!content || !panel || !panel.matches(':popover-open')) return null
+    if (!panel || !trigger?.isConnected || !content) return
+
+    const gutter = 4
+    const gap = 4
+    const triggerRect = trigger.getBoundingClientRect()
+    const safeWidth = Math.max(0, window.innerWidth - gutter * 2)
+    panel.style.maxWidth = `${safeWidth}px`
+
+    const panelWidth = panel.offsetWidth || Math.min(304, safeWidth)
+    panel.style.left = `${Math.max(gutter, Math.min(triggerRect.right - panelWidth, window.innerWidth - panelWidth - gutter))}px`
+
+    const spaceBelow = Math.max(0, window.innerHeight - gutter - (triggerRect.bottom + gap))
+    const spaceAbove = Math.max(0, triggerRect.top - gutter - gap)
+    const naturalHeight = Math.max(panel.scrollHeight, panel.offsetHeight)
+    const opensAbove = naturalHeight > spaceBelow && spaceAbove > spaceBelow
+    const selectedSpace = opensAbove ? spaceAbove : spaceBelow
+    panel.style.maxHeight = `${selectedSpace}px`
+    const panelHeight = panel.offsetHeight
+    panel.style.top = opensAbove
+      ? `${Math.max(gutter, triggerRect.top - gap - panelHeight)}px`
+      : `${triggerRect.bottom + gap}px`
 
     const panelStyle = window.getComputedStyle(panel)
-    const maxHeight = Number.parseFloat(panelStyle.maxHeight)
     const padding = Number.parseFloat(panelStyle.paddingTop) + Number.parseFloat(panelStyle.paddingBottom)
-    const availableHeight = Math.max(0, (Number.isFinite(maxHeight) ? maxHeight : panel.clientHeight) - padding)
-    return { width: content.clientWidth, availableHeight }
-  }, [])
-
-  const syncMeasurementMetrics = useCallback(() => {
-    const next = readMeasurementMetrics()
-    if (!next || next.width <= 0 || next.availableHeight <= 0) return
+    const next = {
+      width: content.clientWidth,
+      availableHeight: Math.max(0, selectedSpace - padding),
+    }
+    if (next.width <= 0 || next.availableHeight <= 0) return
     setMeasurementMetrics((current) => (
       current && Math.abs(current.width - next.width) < 0.5 && Math.abs(current.availableHeight - next.availableHeight) < 0.5
         ? current
         : next
     ))
-  }, [readMeasurementMetrics])
+  }, [triggerRef])
 
   const scheduleMeasurement = useCallback(() => {
     if (measurementFrameRef.current) return
     measurementFrameRef.current = window.requestAnimationFrame(() => {
       measurementFrameRef.current = 0
-      syncMeasurementMetrics()
+      positionPanel()
     })
-  }, [syncMeasurementMetrics])
+  }, [positionPanel])
+
+  const close = useCallback(() => {
+    const panel = panelRef.current
+    if (panel?.isConnected && panel.matches(':popover-open')) panel.hidePopover()
+  }, [])
+
+  useEffect(() => dismissalScope?.register(close), [close, dismissalScope])
+
+  const handleTypeahead = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key.length !== 1 || event.ctrlKey || event.metaKey || event.altKey) return
+    const typing = typeaheadRef.current.text !== '' && Date.now() - typeaheadRef.current.time < 1000
+    if (event.key === ' ' && !typing) return
+
+    event.preventDefault()
+    if (event.key === ' ') heldSpaceRef.current = true
+    const normalized = (typing ? typeaheadRef.current.text : '') + event.key
+    const query = normalized
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/\s+/g, ' ')
+      .toLowerCase()
+    typeaheadRef.current = { text: query, time: Date.now() }
+
+    const rows = Array.from(
+      contentRef.current?.querySelectorAll<HTMLElement>(
+        '[data-baris]:not([aria-disabled="true"]):not(:disabled)',
+      ) ?? [],
+    )
+    const current = rows.indexOf(document.activeElement as HTMLElement)
+    const repeated = [...query].every((character) => character === query[0])
+    const needle = repeated ? query[0] : query
+    const start = repeated ? current + 1 : Math.max(current, 0)
+    const ordered = [...rows.slice(start), ...rows.slice(0, start)]
+    const match = ordered.find((row) => {
+      const label = (row.textContent ?? '').replace(/\s+/g, ' ').trim().toLowerCase()
+      return label.startsWith(needle) || label.split(/[\s/(),.-]/).some((word) => word.startsWith(needle))
+    })
+    match?.focus()
+  }
+
+  const releaseHeldSpace = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== ' ' || !heldSpaceRef.current) return
+    event.preventDefault()
+    heldSpaceRef.current = false
+  }
 
   const measuredHeights = useCallback(() => {
     const measurement = measurementRef.current
@@ -551,16 +625,25 @@ function OverflowPanel({
   }, [items.length, measuredHeights])
 
   useEffect(() => {
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (!panel) return
+
+    const handleBeforeToggle = (event: Event) => {
+      const newState = (event as Event & { newState?: string }).newState
+      if (newState === 'open') {
+        panel.style.visibility = 'hidden'
+        positionPanel()
+      } else if (newState === 'closed') {
+        restoreFocusRef.current = panel.contains(document.activeElement)
+      }
+    }
 
     const handleParentToggle = (event: Event) => {
       const newState = (event as Event & { newState?: string }).newState
       if (newState === 'open') {
-        panel.style.visibility = 'hidden'
         setParentOpen(true)
         setCapacityReady(false)
-        scheduleMeasurement()
+        positionPanel()
         return
       }
       if (newState !== 'closed') return
@@ -571,6 +654,8 @@ function OverflowPanel({
       setVisibleItemCount(Math.min(1, items.length))
       setFocusTransferIndex(null)
       setExpanded((current) => current.size === 0 ? current : new Set())
+      typeaheadRef.current = { text: '', time: 0 }
+      heldSpaceRef.current = false
       pendingScrollRef.current = null
       if (measurementFrameRef.current) {
         window.cancelAnimationFrame(measurementFrameRef.current)
@@ -580,10 +665,21 @@ function OverflowPanel({
         window.cancelAnimationFrame(focusFrameRef.current)
         focusFrameRef.current = 0
       }
+      if (
+        restoreFocusRef.current &&
+        triggerRef.current?.isConnected &&
+        triggerRef.current.getClientRects().length > 0
+      ) {
+        restoreFocusRef.current = false
+        triggerRef.current.focus({ preventScroll: true })
+      }
+      restoreFocusRef.current = false
     }
 
+    panel.addEventListener('beforetoggle', handleBeforeToggle)
     panel.addEventListener('toggle', handleParentToggle)
     return () => {
+      panel.removeEventListener('beforetoggle', handleBeforeToggle)
       panel.removeEventListener('toggle', handleParentToggle)
       if (measurementFrameRef.current) {
         window.cancelAnimationFrame(measurementFrameRef.current)
@@ -594,17 +690,20 @@ function OverflowPanel({
         focusFrameRef.current = 0
       }
     }
-  }, [items.length, scheduleMeasurement])
+  }, [items.length, positionPanel, triggerRef])
 
   useEffect(() => {
     if (!parentOpen) return
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (!panel) return
 
     const observer = new ResizeObserver(scheduleMeasurement)
     observer.observe(panel)
+    if (triggerRef.current) observer.observe(triggerRef.current)
     if (contentRef.current) observer.observe(contentRef.current)
+    const handleScroll = () => positionPanel()
     window.addEventListener('resize', scheduleMeasurement)
+    window.addEventListener('scroll', handleScroll, true)
     let active = true
     void document.fonts.ready.then(() => {
       if (!active) return
@@ -616,8 +715,9 @@ function OverflowPanel({
       active = false
       observer.disconnect()
       window.removeEventListener('resize', scheduleMeasurement)
+      window.removeEventListener('scroll', handleScroll, true)
     }
-  }, [parentOpen, scheduleMeasurement])
+  }, [parentOpen, positionPanel, scheduleMeasurement, triggerRef])
 
   useEffect(() => {
     if (!parentOpen || !measurementMetrics) return
@@ -631,7 +731,7 @@ function OverflowPanel({
 
   useLayoutEffect(() => {
     if (!parentOpen || !capacityReady) return
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (panel) panel.style.visibility = 'visible'
   }, [capacityReady, parentOpen])
 
@@ -639,14 +739,14 @@ function OverflowPanel({
     const pending = pendingScrollRef.current
     if (!pending) return
     pendingScrollRef.current = null
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (!panel) return
     panel.scrollTop = pending.scrollTop
   }, [visibleItemCount])
 
   useEffect(() => {
     if (focusTransferIndex === null || visibleItemCount < items.length) return
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (!panel) return
     const scrollTop = panel.scrollTop
     focusFrameRef.current = window.requestAnimationFrame(() => {
@@ -678,7 +778,7 @@ function OverflowPanel({
   }
 
   const loadMore = (event: MouseEvent<HTMLButtonElement>) => {
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (!panel) return
     const currentVisibleCount = Math.min(visibleItemCount, items.length)
     const next = Math.min(items.length, nextVisibleCount(currentVisibleCount))
@@ -698,58 +798,64 @@ function OverflowPanel({
 
   return (
     <>
-      <Dropdown
-        align="end"
-        trigger={
-          <button
-            ref={triggerRef}
-            type="button"
-            aria-controls={panelId}
-            className={cn(
-              'inline-flex items-center gap-1 whitespace-nowrap rounded py-1.5 font-sans text-base leading-[1.5] font-semibold text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-              desktopItemPadding[spacingMode],
-            )}
-          >
-            Lainnya
-            <ChevronDownIcon />
-          </button>
-        }
-        contentClassName="w-[min(clamp(240px,21vw,304px),calc(100vw-48px))] p-2"
-      >
-        {({ close }) => (
-          <div
-            ref={contentRef}
-            id={panelId}
-            role="region"
-            aria-label="Navigasi lainnya"
-            className={cn('w-full min-w-0', !capacityReady && 'invisible')}
-          >
-            {visibleItems.map((item, index) => (
-              <OverflowItemBlock
-                key={item.id}
-                item={item}
-                index={index}
-                panelId={panelId}
-                expanded={item.type === 'disclosure' && expanded.has(item.id)}
-                measurement={false}
-                truncatedLabels={truncatedLabels}
-                close={close}
-                onToggle={toggleDisclosure}
-              />
-            ))}
-            {(hasMoreItems || focusTransferIndex !== null) && (
-              <button
-                type="button"
-                className={loadMoreClass}
-                disabled={!hasMoreItems}
-                onClick={loadMore}
-              >
-                <span className={navbarLabelClass}>Muat lebih banyak</span>
-              </button>
-            )}
-          </div>
+      <button
+        ref={triggerRef}
+        type="button"
+        popoverTarget={panelId}
+        popoverTargetAction="toggle"
+        aria-controls={panelId}
+        aria-expanded={parentOpen}
+        onKeyDown={(event) => {
+          if (parentOpen) handleTypeahead(event)
+        }}
+        onKeyUp={releaseHeldSpace}
+        className={cn(
+          'inline-flex items-center gap-1 whitespace-nowrap rounded py-1.5 font-sans text-base leading-[1.5] font-semibold text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+          desktopItemPadding[spacingMode],
         )}
-      </Dropdown>
+      >
+        Lainnya
+        <ChevronDownIcon />
+      </button>
+      <div
+        ref={panelRef}
+        id={panelId}
+        popover="auto"
+        aria-label="Navigasi lainnya"
+        onKeyDown={handleTypeahead}
+        onKeyUp={releaseHeldSpace}
+        className="fixed inset-auto m-0 w-[min(clamp(240px,21vw,304px),calc(100vw-48px))] overflow-x-hidden overflow-y-auto overscroll-contain rounded-lg bg-dropdown-surface p-2 text-dropdown-content shadow-dropdown [overflow-wrap:anywhere]"
+      >
+        <div
+          ref={contentRef}
+          role="region"
+          className={cn('w-full min-w-0', !capacityReady && 'invisible')}
+        >
+          {visibleItems.map((item, index) => (
+            <OverflowItemBlock
+              key={item.id}
+              item={item}
+              index={index}
+              panelId={panelId}
+              expanded={item.type === 'disclosure' && expanded.has(item.id)}
+              measurement={false}
+              truncatedLabels={truncatedLabels}
+              close={close}
+              onToggle={toggleDisclosure}
+            />
+          ))}
+          {(hasMoreItems || focusTransferIndex !== null) && (
+            <button
+              type="button"
+              className={loadMoreClass}
+              disabled={!hasMoreItems}
+              onClick={loadMore}
+            >
+              <span className={navbarLabelClass}>Muat lebih banyak</span>
+            </button>
+          )}
+        </div>
+      </div>
       {measurementMetrics && (
         <div
           ref={measurementRef}
@@ -1356,17 +1462,29 @@ export function Navbar(props: NavbarProps) {
     ...headerProps
   } = props
   const dialogId = useId()
-  const headerRef = useRef<HTMLElement>(null)
   const [desktopRow, setDesktopRow] = useState<HTMLDivElement | null>(null)
   const desktopRowRef = useCallback((node: HTMLDivElement | null) => {
     setDesktopRow(node)
   }, [])
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const dropdownClosersRef = useRef(new Set<() => void>())
   const mobileTriggerRef = useRef<HTMLButtonElement>(null)
   const mobileCloseRef = useRef<HTMLButtonElement>(null)
   const wasMobileOpenRef = useRef(false)
   const [internalMobileOpen, setInternalMobileOpen] = useState(false)
   const mobileOpen = mobileNavigationOpen ?? internalMobileOpen
+  const dropdownDismissalScope = useMemo<DropdownDismissalScopeValue>(
+    () => ({
+      register: (close) => {
+        dropdownClosersRef.current.add(close)
+        return () => dropdownClosersRef.current.delete(close)
+      },
+    }),
+    [],
+  )
+  const closeNavbarDropdowns = useCallback(() => {
+    for (const close of dropdownClosersRef.current) close()
+  }, [])
   const requestMobileOpen = useCallback(
     (open: boolean) => {
       if (mobileNavigationOpen === undefined) setInternalMobileOpen(open)
@@ -1410,9 +1528,7 @@ export function Navbar(props: NavbarProps) {
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1024px)')
     const synchronize = () => {
-      headerRef.current
-        ?.querySelectorAll<HTMLElement>('[popover]:popover-open')
-        .forEach((panel) => panel.hidePopover())
+      closeNavbarDropdowns()
       if (!desktop.matches) return
       if (mobileOpen) requestMobileOpen(false)
       if (mobileDrawer?.open) mobileDrawer.onOpenChange(false)
@@ -1421,7 +1537,7 @@ export function Navbar(props: NavbarProps) {
     synchronize()
     desktop.addEventListener('change', synchronize)
     return () => desktop.removeEventListener('change', synchronize)
-  }, [mobileDrawer, mobileOpen, requestMobileOpen])
+  }, [closeNavbarDropdowns, mobileDrawer, mobileOpen, requestMobileOpen])
 
   const closeMobileNavigation = useCallback(
     () => requestMobileOpen(false),
@@ -1440,8 +1556,8 @@ export function Navbar(props: NavbarProps) {
   }
 
   return (
+    <DropdownDismissalContext.Provider value={dropdownDismissalScope}>
     <header
-      ref={headerRef}
       className={cn('border-b border-border bg-surface text-content', className)}
       style={platform === 'back-office' ? { ...style, containerType: 'inline-size' } : style}
       {...headerProps}
@@ -1619,5 +1735,6 @@ export function Navbar(props: NavbarProps) {
         </div>
       </dialog>
     </header>
+    </DropdownDismissalContext.Provider>
   )
 }
