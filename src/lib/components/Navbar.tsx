@@ -9,6 +9,7 @@ import {
   useState,
   type HTMLAttributeAnchorTarget,
   type HTMLAttributes,
+  type ButtonHTMLAttributes,
   type KeyboardEvent,
   type MouseEventHandler,
   type MouseEvent,
@@ -17,10 +18,11 @@ import {
   type SyntheticEvent,
 } from 'react'
 import { ArrowRightToBracket, Bars, Edit } from 'flowbite-react-icons/outline'
+import { Bell } from 'flowbite-react-icons/solid'
 import { cn } from '../utils/cn'
 import { Avatar } from './Avatar'
 import { Button } from './Button'
-import { Drawer } from './Drawer'
+import { Drawer, type DrawerMenuItem } from './Drawer'
 import { Dropdown, type DropdownItem } from './Dropdown'
 import {
   DropdownDismissalContext,
@@ -103,11 +105,9 @@ export interface NavbarGuestActions {
   signUp?: NavbarGuestLink
 }
 
-export interface NavbarMobileDrawer {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  controls: string
-  ariaLabel?: string
+export interface NavbarNotificationTrigger extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label' | 'children'> {
+  ariaLabel: string
+  badge?: ReactNode
 }
 
 interface NavbarBaseProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
@@ -122,7 +122,7 @@ type FrontOfficeIdentity =
   | {
       account: NavbarAccount
       guestActions?: never
-      notificationTrigger?: ReactNode
+      notificationTrigger?: NavbarNotificationTrigger
     }
   | {
       account?: undefined
@@ -133,14 +133,16 @@ type FrontOfficeIdentity =
 export type NavbarFrontOfficeProps = NavbarBaseProps &
   FrontOfficeIdentity & {
     platform: 'front-office'
-    mobileDrawer?: never
+    sidebarItems?: never
   }
 
 export interface NavbarBackOfficeProps extends NavbarBaseProps {
   platform: 'back-office'
   account?: NavbarAccount
-  notificationTrigger?: never
-  mobileDrawer?: NavbarMobileDrawer
+  /** Konfigurasi trigger notifikasi, independen dari account karena identitas BO dapat berada di Sidebar. */
+  notificationTrigger?: NavbarNotificationTrigger
+  /** Sumber navigasi Sidebar aplikasi yang digunakan Navbar pada komposisi mobile. */
+  sidebarItems?: SidebarItem[]
   guestActions?: never
 }
 
@@ -174,7 +176,9 @@ function Brand({ brand }: { brand: NavbarBrand }) {
   )
 }
 
-const navbarLabelClass = 'min-w-0 max-w-[304px] line-clamp-2 break-words font-sans text-base leading-[1.5] font-semibold'
+const navbarLabelBaseClass = 'font-sans text-base leading-[1.5] font-semibold'
+const primaryNavbarLabelClass = cn(navbarLabelBaseClass, 'block shrink-0 whitespace-nowrap')
+const overflowNavbarLabelClass = cn(navbarLabelBaseClass, 'min-w-0 max-w-[304px] line-clamp-2 break-words')
 
 function useTruncatedNavbarLabels<T extends HTMLElement>(
   containerRef: RefObject<T | null>,
@@ -235,7 +239,7 @@ function NavbarLabel({
 }: {
   label: string
   measurementKey: string
-  scope: 'primary' | 'overflow'
+  scope: 'primary' | 'overflow' | 'menu'
   truncated: boolean
   className?: string
 }) {
@@ -243,7 +247,7 @@ function NavbarLabel({
     <span
       data-navbar-primary-label={scope === 'primary' ? measurementKey : undefined}
       data-navbar-overflow-label={scope === 'overflow' ? measurementKey : undefined}
-      className={cn(navbarLabelClass, className)}
+      className={cn(scope === 'primary' ? primaryNavbarLabelClass : overflowNavbarLabelClass, className)}
       title={truncated ? label : undefined}
     >
       {label}
@@ -290,7 +294,7 @@ function OverflowLabel({
   measurement: boolean
   truncated: boolean
 }) {
-  if (measurement) return <span className={cn(navbarLabelClass, 'flex-1')}>{label}</span>
+  if (measurement) return <span className={cn(overflowNavbarLabelClass, 'flex-1')}>{label}</span>
   return (
     <NavbarLabel
       label={label}
@@ -851,7 +855,7 @@ function OverflowPanel({
               disabled={!hasMoreItems}
               onClick={loadMore}
             >
-              <span className={navbarLabelClass}>Muat lebih banyak</span>
+              <span className={overflowNavbarLabelClass}>Muat lebih banyak</span>
             </button>
           )}
         </div>
@@ -876,7 +880,7 @@ function OverflowPanel({
             </div>
           ))}
           <div data-navbar-overflow-measure-more="" className={loadMoreClass}>
-            <span className={navbarLabelClass}>Muat lebih banyak</span>
+            <span className={overflowNavbarLabelClass}>Muat lebih banyak</span>
           </div>
         </div>
       )}
@@ -896,14 +900,14 @@ function MeasurementItem({
   if (item.type === 'destination') {
     return (
       <span className={cn('inline-flex items-center py-1.5', padding)}>
-        <span className={navbarLabelClass}>{item.label}</span>
+        <span className={primaryNavbarLabelClass}>{item.label}</span>
       </span>
     )
   }
 
   return (
     <span className={cn('inline-flex items-center gap-1 py-1.5', padding)}>
-      <span className={navbarLabelClass}>{item.label}</span>
+      <span className={primaryNavbarLabelClass}>{item.label}</span>
       <ChevronDownIcon />
     </span>
   )
@@ -998,7 +1002,7 @@ function CapacityAwareDesktopNavigation({
       const navigationGap = Number.parseFloat(computedList.columnGap) || 0
       const fixedGroupCount = 1 + (brand ? 1 : 0) + (search ? 1 : 0) + (identity ? 1 : 0)
       const fixedWidth = (brand?.getBoundingClientRect().width ?? 0)
-        + (search ? 180 : 0)
+        + (search?.getBoundingClientRect().width ?? 0)
         + (identity?.getBoundingClientRect().width ?? 0)
         + majorGap * Math.max(0, fixedGroupCount - 1)
       const navigationBudget = Math.max(0, maximumRowWidth - fixedWidth)
@@ -1125,7 +1129,7 @@ function CapacityAwareDesktopNavigation({
                   }
                   items={item.children.map((child) => {
                     const measurementKey = `primary:child:${item.id}:${child.id}`
-                    return toDropdownDestination(child, <NavbarLabel label={child.label} measurementKey={measurementKey} scope="primary" truncated={truncatedLabels.has(measurementKey)} />)
+                    return toDropdownDestination(child, <NavbarLabel label={child.label} measurementKey={measurementKey} scope="menu" truncated={truncatedLabels.has(measurementKey)} />)
                   })}
                 />
               )}
@@ -1246,6 +1250,27 @@ function AccountMenu({ account, constrainName = false }: { account: NavbarAccoun
   )
 }
 
+function NotificationTrigger({ ariaLabel, badge, className, type = 'button', ...buttonProps }: NavbarNotificationTrigger) {
+  return (
+    <button
+      {...buttonProps}
+      type={type}
+      aria-label={ariaLabel}
+      className={cn(
+        'relative grid size-10 shrink-0 place-items-center rounded-lg text-gray-800 transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand in-data-[theme=dark]:text-gray-400',
+        className,
+      )}
+    >
+      <Bell className="size-6" aria-hidden="true" />
+      {badge != null && (
+        <span className="absolute right-0.5 top-0.5 min-w-4 rounded-full bg-feedback-error px-1 text-center text-[10px] leading-4 text-white">
+          {badge}
+        </span>
+      )}
+    </button>
+  )
+}
+
 function ordinaryActivation(event: MouseEvent<HTMLElement>) {
   return (
     !event.defaultPrevented &&
@@ -1291,6 +1316,72 @@ function toSidebarItem(item: NavbarPrimaryItem, close: () => void): SidebarItem 
       disabled: child.disabled,
       onClick: (event) => {
         child.onClick?.(event)
+        if (ordinaryActivation(event)) close()
+      },
+    })),
+  }
+}
+
+function toMobileSidebarItem(item: SidebarItem, close: () => void): SidebarItem {
+  return {
+    ...item,
+    onClick: (event) => {
+      item.onClick?.(event)
+      if (ordinaryActivation(event)) close()
+    },
+    children: item.children?.map((child) => ({
+      ...child,
+      onClick: (event) => {
+        child.onClick?.(event)
+        if (ordinaryActivation(event)) close()
+      },
+    })),
+  }
+}
+
+function callAnchorClick(
+  handler: MouseEventHandler<HTMLAnchorElement> | undefined,
+  event: MouseEvent<HTMLElement>,
+) {
+  if (!(event.currentTarget instanceof HTMLAnchorElement)) return
+  handler?.(event as MouseEvent<HTMLAnchorElement>)
+}
+
+function toMobileDrawerItem(item: NavbarPrimaryItem, close: () => void): DrawerMenuItem {
+  if (item.type === 'destination') {
+    return {
+      id: item.id,
+      label: item.label,
+      icon: item.icon,
+      href: item.disabled ? undefined : item.href,
+      target: item.disabled ? undefined : item.target,
+      rel: item.disabled ? undefined : (item.target === '_blank' ? (item.rel ?? 'noopener noreferrer') : item.rel),
+      active: item.current,
+      disabled: item.disabled,
+      onClick: (event) => {
+        callAnchorClick(item.onClick, event)
+        if (ordinaryActivation(event)) close()
+      },
+    }
+  }
+
+  return {
+    id: item.id,
+    label: item.label,
+    icon: item.icon,
+    active: item.children.some((child) => child.current),
+    disabled: item.disabled,
+    defaultExpanded: item.children.some((child) => child.current),
+    children: item.children.map((child) => ({
+      id: child.id,
+      label: child.label,
+      href: child.disabled ? undefined : child.href,
+      target: child.disabled ? undefined : child.target,
+      rel: child.disabled ? undefined : (child.target === '_blank' ? (child.rel ?? 'noopener noreferrer') : child.rel),
+      active: child.current,
+      disabled: child.disabled,
+      onClick: (event) => {
+        callAnchorClick(child.onClick, event)
         if (ordinaryActivation(event)) close()
       },
     })),
@@ -1406,11 +1497,11 @@ function DesktopIdentity({
   notificationTrigger,
   guestActions,
 }: Pick<NavbarProps, 'platform' | 'account' | 'notificationTrigger' | 'guestActions'>) {
-  if (account) {
+  if (account || notificationTrigger) {
     return (
       <div data-navbar-identity="" className="flex shrink-0 items-center gap-3">
-        {notificationTrigger}
-        <AccountMenu account={account} constrainName />
+        {notificationTrigger && <NotificationTrigger {...notificationTrigger} />}
+        {account && <AccountMenu account={account} constrainName />}
       </div>
     )
   }
@@ -1458,10 +1549,11 @@ export function Navbar(props: NavbarProps) {
     account,
     guestActions,
     notificationTrigger,
-    mobileDrawer,
+    sidebarItems,
     ...headerProps
   } = props
   const dialogId = useId()
+  const internalDrawerId = useId()
   const [desktopRow, setDesktopRow] = useState<HTMLDivElement | null>(null)
   const desktopRowRef = useCallback((node: HTMLDivElement | null) => {
     setDesktopRow(node)
@@ -1472,7 +1564,10 @@ export function Navbar(props: NavbarProps) {
   const mobileCloseRef = useRef<HTMLButtonElement>(null)
   const wasMobileOpenRef = useRef(false)
   const [internalMobileOpen, setInternalMobileOpen] = useState(false)
+  const [internalDrawerOpen, setInternalDrawerOpen] = useState(false)
   const mobileOpen = mobileNavigationOpen ?? internalMobileOpen
+  const drawerOpen = internalDrawerOpen
+  const drawerId = internalDrawerId
   const dropdownDismissalScope = useMemo<DropdownDismissalScopeValue>(
     () => ({
       register: (close) => {
@@ -1494,16 +1589,17 @@ export function Navbar(props: NavbarProps) {
   )
   const requestMobileNavigationOpen = useCallback(
     (open: boolean) => {
-      if (open && mobileDrawer?.open) mobileDrawer.onOpenChange(false)
+      if (open && drawerOpen) setInternalDrawerOpen(false)
       requestMobileOpen(open)
     },
-    [mobileDrawer, requestMobileOpen],
+    [drawerOpen, requestMobileOpen],
   )
-  const hasMobileNavigation = items.length > 0 || Boolean(account) || Boolean(guestActions)
-
-  useEffect(() => {
-    if (mobileOpen && mobileDrawer?.open) mobileDrawer.onOpenChange(false)
-  }, [mobileDrawer, mobileOpen])
+  const requestDrawerOpen = useCallback(
+    (open: boolean) => setInternalDrawerOpen(open),
+    [],
+  )
+  const mobileNavigationItems = platform === 'back-office' ? (sidebarItems ?? []) : items
+  const hasMobileNavigation = mobileNavigationItems.length > 0 || Boolean(account) || Boolean(guestActions)
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -1531,21 +1627,28 @@ export function Navbar(props: NavbarProps) {
       closeNavbarDropdowns()
       if (!desktop.matches) return
       if (mobileOpen) requestMobileOpen(false)
-      if (mobileDrawer?.open) mobileDrawer.onOpenChange(false)
+      if (drawerOpen) requestDrawerOpen(false)
     }
 
     synchronize()
     desktop.addEventListener('change', synchronize)
     return () => desktop.removeEventListener('change', synchronize)
-  }, [closeNavbarDropdowns, mobileDrawer, mobileOpen, requestMobileOpen])
+  }, [closeNavbarDropdowns, drawerOpen, mobileOpen, requestDrawerOpen, requestMobileOpen])
 
   const closeMobileNavigation = useCallback(
     () => requestMobileOpen(false),
     [requestMobileOpen],
   )
   const mobileItems = useMemo(
-    () => items.map((item) => toSidebarItem(item, () => closeMobileNavigation())),
-    [closeMobileNavigation, items],
+    () =>
+      platform === 'back-office'
+        ? (sidebarItems ?? []).map((item) => toMobileSidebarItem(item, closeMobileNavigation))
+        : items.map((item) => toSidebarItem(item, closeMobileNavigation)),
+    [closeMobileNavigation, items, platform, sidebarItems],
+  )
+  const mobileDrawerItems = useMemo(
+    () => items.map((item) => toMobileDrawerItem(item, () => requestDrawerOpen(false))),
+    [items, requestDrawerOpen],
   )
   const handleDialogCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     event.preventDefault()
@@ -1575,7 +1678,12 @@ export function Navbar(props: NavbarProps) {
         {search && (
           <div
             data-navbar-search=""
-            className="min-w-[180px] w-[348px] max-w-[348px] flex-[0_1_348px] in-data-[theme=dark]:[--color-field-border:var(--color-gray-600)]"
+            className={cn(
+              'in-data-[theme=dark]:[--color-field-border:var(--color-gray-600)]',
+              platform === 'back-office'
+                ? 'min-w-[360px] w-[420px] max-w-[480px] flex-[0_1_420px]'
+                : 'min-w-[180px] w-[348px] max-w-[348px] flex-[0_1_348px]',
+            )}
           >
             {search}
           </div>
@@ -1587,7 +1695,7 @@ export function Navbar(props: NavbarProps) {
           compositionKey={[
             search ? 'search' : 'no-search',
             account ? 'account' : platform === 'front-office' && guestActions ? 'guest' : 'no-identity',
-            account && notificationTrigger ? 'notification' : 'no-notification',
+            notificationTrigger ? 'notification' : 'no-notification',
           ].join('|')}
         />
         <DesktopIdentity
@@ -1606,6 +1714,7 @@ export function Navbar(props: NavbarProps) {
             <div className="flex min-h-10 items-center gap-3">
               <Brand brand={brand} />
               <div className="ml-auto flex items-center gap-3">
+                {notificationTrigger && <NotificationTrigger {...notificationTrigger} />}
                 {account && (
                   <Avatar
                     src={account.avatarSrc}
@@ -1634,8 +1743,8 @@ export function Navbar(props: NavbarProps) {
         ) : (
           <div
             className={cn(
-              'grid min-h-10 grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-3 min-[440px]:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto]',
-              search && 'grid-rows-[minmax(40px,auto)_auto] min-[440px]:grid-rows-none',
+              'grid min-h-10 grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-x-3 gap-y-3 min-[576px]:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto_auto]',
+              search && 'grid-rows-[minmax(40px,auto)_auto] min-[576px]:grid-rows-none',
             )}
           >
             {hasMobileNavigation && (
@@ -1655,12 +1764,17 @@ export function Navbar(props: NavbarProps) {
               <Brand brand={brand} />
             </div>
             {search && (
-              <div className="col-span-4 row-start-2 min-w-0 min-[440px]:col-span-1 min-[440px]:col-start-3 min-[440px]:row-start-1">
+              <div className="col-span-5 row-start-2 min-w-0 min-[576px]:col-span-1 min-[576px]:col-start-3 min-[576px]:row-start-1">
                 {search}
               </div>
             )}
             {account && (
-              <div className="col-start-3 row-start-1 min-[440px]:col-start-4">
+              <div className={cn(
+                'row-start-1',
+                notificationTrigger
+                  ? 'col-start-4 min-[576px]:col-start-5'
+                  : 'col-start-3 min-[576px]:col-start-4',
+              )}>
                 <Avatar
                   src={account.avatarSrc}
                   alt={account.name}
@@ -1669,12 +1783,24 @@ export function Navbar(props: NavbarProps) {
                 />
               </div>
             )}
-            {mobileDrawer && (
-              <div className="col-start-4 row-start-1 min-[440px]:col-start-5">
+            {notificationTrigger && (
+              <div className="col-start-3 row-start-1 min-[576px]:col-start-4">
+                <NotificationTrigger {...notificationTrigger} />
+              </div>
+            )}
+            {items.length > 0 && (
+              <div className={cn(
+                'row-start-1',
+                account && notificationTrigger
+                  ? 'col-start-5 min-[576px]:col-start-6'
+                  : account || notificationTrigger
+                    ? 'col-start-4 min-[576px]:col-start-5'
+                    : 'col-start-3 min-[576px]:col-start-4',
+              )}>
                 <Drawer.Trigger
-                  aria-label={mobileDrawer.ariaLabel ?? 'Buka navigasi kontekstual'}
-                  aria-controls={mobileDrawer.controls}
-                  aria-expanded={mobileDrawer.open}
+                  aria-label="Buka navigasi Navbar"
+                  aria-controls={drawerId}
+                  aria-expanded={drawerOpen}
                   className="size-9 in-data-[theme=dark]:text-gray-400 in-data-[theme=dark]:hover:bg-gray-700 in-data-[theme=dark]:hover:text-white"
                   icon={
                     <BarsFromLeft
@@ -1684,12 +1810,12 @@ export function Navbar(props: NavbarProps) {
                     />
                   }
                   onClick={() => {
-                    if (mobileDrawer.open) {
-                      mobileDrawer.onOpenChange(false)
+                    if (drawerOpen) {
+                      requestDrawerOpen(false)
                       return
                     }
                     if (mobileOpen) requestMobileOpen(false)
-                    mobileDrawer.onOpenChange(true)
+                    requestDrawerOpen(true)
                   }}
                 />
               </div>
@@ -1734,6 +1860,20 @@ export function Navbar(props: NavbarProps) {
           </button>
         </div>
       </dialog>
+
+      {platform === 'back-office' && items.length > 0 && (
+        <Drawer
+          id={drawerId}
+          open={drawerOpen}
+          onClose={() => requestDrawerOpen(false)}
+          position="right"
+          size="s"
+          eyebrow="Navigasi Navbar"
+          header={<Drawer.Title>Menu aplikasi</Drawer.Title>}
+          items={mobileDrawerItems}
+          className="lg:hidden"
+        />
+      )}
     </header>
     </DropdownDismissalContext.Provider>
   )

@@ -1,13 +1,12 @@
-import { useId, useState, type MouseEvent } from "react";
+import { useState } from "react";
 import {
   Breadcrumb,
   Container,
-  Drawer,
   Hero,
   Navbar,
   Search,
   Sidebar,
-  type DrawerMenuItem,
+  type SidebarItem,
 } from "../../../lib";
 import {
   ChartMixed,
@@ -71,29 +70,7 @@ const DESKRIPSI: Record<HalamanDemo, string> = {
   simaya2: "Simaya-simayaan.",
 };
 
-const RUTE_KONTEKSTUAL: Record<HalamanDemo, HalamanDemo[]> = {
-  dasbor: ["pengajuan", "layanan"],
-  pengajuan: ["pemohon", "layanan"],
-  pemohon: ["pengajuan", "layanan"],
-  layanan: ["pengajuan", "pengaturan"],
-  simaya: ["pengajuan", "pengaturan"],
-  modifikasi: ["layanan", "pengaturan"],
-  pengaturan: ["pemohon", "modifikasi"],
-  simaya2: ["simaya", "pengaturan"],
-};
-
 const RUTE_LAYANAN = ["pengajuan", "pemohon", "layanan"] as const;
-
-function isAcceptedNavigation(event: MouseEvent<HTMLElement>) {
-  return (
-    !event.defaultPrevented &&
-    event.button === 0 &&
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.metaKey &&
-    !event.shiftKey
-  );
-}
 
 function Isi({ halaman }: { halaman: HalamanDemo }) {
   switch (halaman) {
@@ -119,12 +96,9 @@ function Isi({ halaman }: { halaman: HalamanDemo }) {
 export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
   const [ringkas, setRingkas] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [contextualDrawerPage, setContextualDrawerPage] = useState<HalamanDemo | null>(null);
   const [searchFeedback, setSearchFeedback] = useState("");
-  const contextualDrawerOpen = contextualDrawerPage === halaman;
-  const contextualDrawerId = useId();
 
-  const menu = RUTE.map(({ halaman: h, ikon, badge }) => ({
+  const menu: SidebarItem[] = RUTE.map(({ halaman: h, ikon, badge }) => ({
     id: h,
     label: JUDUL_HALAMAN[h],
     href: href(h),
@@ -155,20 +129,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
     },
     ...(["simaya", "modifikasi", "pengaturan", "simaya2"] as const).map(navbarDestination),
   ];
-  const contextualMenu: DrawerMenuItem[] = [halaman, ...RUTE_KONTEKSTUAL[halaman]].map((h) => {
-    const route = RUTE.find(({ halaman: routePage }) => routePage === h);
-
-    return {
-      id: h,
-      label: JUDUL_HALAMAN[h],
-      href: href(h),
-      icon: route?.ikon,
-      active: h === halaman,
-      onClick: (event) => {
-        if (isAcceptedNavigation(event)) setContextualDrawerPage(null);
-      },
-    };
-  });
+  const searchCategories = menu.map(({ id, label }) => ({ value: id ?? label, label }));
 
   return (
     // Kolom, bukan baris: Sidebar dan konten berdampingan di dalam satu baris,
@@ -226,16 +187,23 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
               ariaLabel: "CEPLOK — Dasbor",
             }}
             items={navbarItems}
+            sidebarItems={menu}
             search={
               <Search
                 platform="compact"
-                showButton={false}
+                showButton
                 trigger="enter"
                 aria-label="Cari pengajuan atau pemohon"
                 placeholder="Cari pengajuan, pemohon ..."
-                onSearch={(value) => setSearchFeedback(`Pencarian demo: ${value}`)}
+                categories={searchCategories}
+                categoryPlaceholder="Kategori"
+                onSearch={(value, category) => setSearchFeedback(`Pencarian demo: ${value}${category ? ` (${category})` : ""}`)}
               />
             }
+            notificationTrigger={{
+              ariaLabel: "Buka notifikasi",
+              onClick: () => setSearchFeedback("Aksi demo: Buka notifikasi"),
+            }}
             account={{
               name: "Rafli Arandhana",
               initials: "RA",
@@ -258,12 +226,6 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             }}
             mobileNavigationOpen={mobileSidebarOpen}
             onMobileNavigationOpenChange={setMobileSidebarOpen}
-            mobileDrawer={{
-              open: contextualDrawerOpen,
-              onOpenChange: (open) => setContextualDrawerPage(open ? halaman : null),
-              controls: contextualDrawerId,
-              ariaLabel: `Buka navigasi kontekstual ${JUDUL_HALAMAN[halaman]}`,
-            }}
           />
 
           {searchFeedback && (
@@ -322,16 +284,6 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             </Container>
           </main>
 
-          <Drawer
-            id={contextualDrawerId}
-            open={contextualDrawerOpen}
-            onClose={() => setContextualDrawerPage(null)}
-            position="right"
-            size="s"
-            eyebrow="Navigasi kontekstual"
-            header={<Drawer.Title>{JUDUL_HALAMAN[halaman]}</Drawer.Title>}
-            items={contextualMenu}
-          />
         </div>
       </div>
 
