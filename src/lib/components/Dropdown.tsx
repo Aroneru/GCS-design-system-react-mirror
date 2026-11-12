@@ -7,6 +7,7 @@ import {
   useId,
   useImperativeHandle,
   useLayoutEffect,
+  useContext,
   useRef,
   useState,
   type ButtonHTMLAttributes,
@@ -21,6 +22,7 @@ import {
   type Ref,
 } from 'react'
 import { cn } from '../utils/cn'
+import { DropdownDismissalContext } from './dropdown/DropdownDismissalContext'
 
 /** Warna semantik satu aksi. */
 export type DropdownItemTone = 'default' | 'danger'
@@ -56,9 +58,9 @@ export interface DropdownItem {
    * dengan panah alih-alih Tab. Bentuk inilah yang dipakai Select dan Search
    * untuk daftar pilihannya.
    *
-   * Rupanya tidak berubah sama sekali — tidak ada warna baru untuk baris
-   * terpilih. Yang aktif dikenali pembaca layar lewat `aria-selected`, dan
-   * terlihat karena panel membuka dengan fokus sudah berada di sana.
+   * Rupanya tidak berubah — baris aktif dikenali pembaca layar lewat
+   * `aria-selected`, dan terlihat karena panel membuka dengan fokus pada
+   * pilihan tersebut.
    */
   selected?: boolean
 }
@@ -168,17 +170,13 @@ function resolveAriaCurrent(current: DropdownItem['current']) {
 /**
  * Dropdown — panel yang dibuka dari sebuah tombol.
  *
- * Isinya ditentukan prop, bukan subkomponen: `trigger` untuk tombolnya,
- * `items` atau `groups` untuk daftar barisnya. Itu mengikuti komponen lain di
- * kit ini — Sidebar memakai `items` + `groups` dengan `separator` yang sama
- * persis artinya, Select memakai `options` — sehingga tidak ada satu komponen
- * pun yang dipakai dengan cara yang berbeda dari tetangganya.
+ * Isinya ditentukan prop, bukan subkomponen: `trigger` untuk tombolnya serta
+ * `items` atau `groups` untuk daftar barisnya.
  *
  * Punya dua peran. Bawaannya menu aksi: tiap baris sebuah tombol atau tautan,
  * ditelusuri dengan Tab. Begitu ada baris yang memakai `selected`, ia jadi
  * daftar pilihan — `listbox` berisi `option` yang ditelusuri dengan panah,
- * Home/End, atau dengan mengetik huruf awalnya. Peran kedua itulah yang
- * dipakai Select dan Search, jadi panel di seluruh kit hanya ada satu.
+ * Home/End, atau dengan mengetik huruf awalnya.
  *
  * Visibilitasnya diurus HTML Popover API: peramban yang menutup panel saat
  * pengguna menekan di luar atau menekan Escape, mengangkatnya ke top layer,
@@ -213,6 +211,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
   const ketikan = useRef({ teks: '', waktu: 0 })
   const spasiDitahanRef = useRef(false)
   const [terbuka, setTerbuka] = useState(false)
+  const dismissalScope = useContext(DropdownDismissalContext)
 
   const pasangWrap = (node: HTMLDivElement | null) => {
     wrapRef.current = node
@@ -233,6 +232,8 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
   }, [])
 
   useImperativeHandle(actionsRef, () => ({ close: tutup }), [tutup])
+
+  useEffect(() => dismissalScope?.register(tutup), [dismissalScope, tutup])
 
   /** Panel top-layer diukur dari tombol dan selalu dijaga di dalam viewport. */
   const tempatkan = useCallback(() => {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import {
   ArrowRightToBracket,
   ChevronDown,
@@ -102,7 +102,7 @@ const toc: TocEntry[] = [
   { id: 'disable', label: 'Disable' },
   { id: 'navigation', label: 'Navigation' },
   { id: 'selection', label: 'Selection' },
-  { id: 'kontrol-penutupan', label: 'Kontrol Penutupan' },
+  { id: 'kontrol-penutupan', label: 'Menutup Dropdown dari Luar' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
@@ -114,7 +114,7 @@ const dropdownProps: PropRow[] = [
   ['items', 'DropdownItem[]', 'undefined', 'Daftar aksi tanpa pengelompokan.'],
   ['groups', 'DropdownGroup[]', 'undefined', 'Aksi terkelompok, lengkap dengan label dan pemisah antar-kelompok.'],
   ['children', 'ReactNode | (({ close }) => ReactNode)', 'undefined', 'Isi panel kustom. Render function menyediakan close() untuk dismissal eksplisit. Diabaikan selama items atau groups terisi.'],
-  ['actionsRef', 'Ref<DropdownHandle>', 'undefined', 'Handle opsional untuk meminta close() dari kondisi eksternal tanpa mengakses DOM Popover.'],
+  ['actionsRef', 'Ref<DropdownHandle>', 'undefined', 'Handle opsional untuk meminta close() dari kondisi eksternal.'],
   ['align', "'start' | 'center' | 'end'", "'start'", 'Menentukan perataan horizontal panel terhadap trigger sebelum penyesuaian batas viewport.'],
   ['closeOnSelect', 'boolean', 'true', 'Bila true, item generated yang enabled menutup panel setelah diaktifkan. Bila false, panel tetap terbuka.'],
   ['data-theme', "'light' | 'dark'", 'inherit', 'Boundary tema eksplisit. Jika tidak diisi, Dropdown mewarisi data-theme consumer terdekat. darkMode={true} selalu memaksa dark.'],
@@ -422,22 +422,21 @@ function ManualCloseDemo() {
 function ExternalCloseTypeExample() {
   const actionsRef = useRef<DropdownHandle>(null)
 
-  useEffect(() => {
-    const mobile = window.matchMedia('(max-width: 767px)')
-    const closeForMobile = () => {
-      if (mobile.matches) actionsRef.current?.close()
-    }
-
-    mobile.addEventListener('change', closeForMobile)
-    return () => mobile.removeEventListener('change', closeForMobile)
-  }, [])
-
   return (
-    <Dropdown
-      actionsRef={actionsRef}
-      trigger={trigger('Navigasi akun')}
-      items={[{ label: 'Profil', href: '/profil' }]}
-    />
+    <div className="flex items-center gap-3">
+      <Dropdown
+        actionsRef={actionsRef}
+        trigger={trigger('Buka aksi')}
+        items={[{ label: 'Simpan draf' }, { label: 'Publikasikan' }]}
+      />
+      <button
+        type="button"
+        className="rounded-md border border-border px-3 py-2 text-sm font-medium text-content hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+        onClick={() => actionsRef.current?.close()}
+      >
+        Tutup Dropdown
+      </button>
+    </div>
   )
 }
 
@@ -966,74 +965,19 @@ export function DropdownPage() {
     mode === 'selection' || example === 'actions' || example === 'icons'
   const activeDarkMode = darkMode
 
-  /*
-   * Panelnya dibuka sejak halaman dimuat, dan dibuka lagi setelah kontrolnya
-   * diganti — kalau tidak, setiap penggantian menutup panel dan variasinya
-   * tidak bisa dibandingkan.
-   *
-   * Tombol dan panelnya dicari dari DOM pembungkus, bukan lewat ref ke
-   * masing-masing: sejak API-nya rata, panel itu urusan dalam komponen dan
-   * tidak lagi punya ref sendiri. Ini halaman dokumentasi yang mengintip
-   * DOM-nya sendiri, bukan pemakaian yang dianjurkan.
-   */
-  const panggung = useRef<HTMLDivElement>(null)
-  const bukaLagi = useRef(false)
-  const frame = useRef(0)
-  const sudahDibuka = useRef(false)
-
-  const panel = () => panggung.current?.querySelector<HTMLDivElement>('[popover]') ?? null
-  const triggerElement = () => panggung.current?.querySelector('button') ?? null
-
-  useEffect(() => {
-    if (sudahDibuka.current) return
-    sudahDibuka.current = true
-
-    const p = panel()
-    const t = triggerElement()
-    if (p && t && !p.matches(':popover-open')) p.showPopover({ source: t })
-
-    return () => {
-      if (frame.current) window.cancelAnimationFrame(frame.current)
-      frame.current = 0
-    }
-  }, [])
-
-  const ingatKeadaan = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return
-    bukaLagi.current = panel()?.matches(':popover-open') ?? false
-  }
-
-  const ubah = (update: () => void) => {
-    const perluDibuka = bukaLagi.current
-    bukaLagi.current = false
-    update()
-
-    if (!perluDibuka) return
-    if (frame.current) window.cancelAnimationFrame(frame.current)
-
-    // Satu frame ditunggu supaya panel yang baru sudah terpasang sebelum
-    // diminta terbuka.
-    frame.current = window.requestAnimationFrame(() => {
-      frame.current = 0
-      const p = panel()
-      const t = triggerElement()
-      if (p?.isConnected && t && !p.matches(':popover-open')) p.showPopover({ source: t })
-    })
-  }
-
   return (
     <UsulanPage
       eyebrow="Components · Dropdown"
       title="Dropdown"
-      description="Panel aksi yang dibuka dari sebuah tombol. Isinya ditentukan prop — trigger untuk tombolnya, items atau groups untuk daftarnya — seperti Sidebar dan Select."
+      description="Panel berisi daftar aksi yang ditampilkan ketika pengguna menekan sebuah tombol. Mendukung item aksi, navigasi, pemilihan, dan pengelompokan."
       toc={toc}
     >
       <FlowSection id="dropdown" title="Dropdown">
         <Lead>
-          <Hl>trigger</Hl> menerima satu tombol milik Anda; <Hl>items</Hl> menerima daftar aksinya. Panel
-          ditutup lewat trigger, klik di luar, atau Escape — semuanya diurus HTML Popover API, jadi
-          tidak ada state buka/tutup yang bisa melenceng. Aksi menutup panel setelah ditekan;
-          kontrol seperti Radio dan Checkbox tetap terbuka saat pilihannya berubah.
+          <Hl>trigger</Hl> menerima tombol pembuka, sedangkan <Hl>items</Hl> atau <Hl>groups</Hl>{' '}
+          menyediakan daftar isinya. Panel dapat ditutup melalui trigger, klik di luar, atau Escape.
+          Item aksi menutup panel setelah diaktifkan; konten kustom tetap terbuka sampai consumer
+          menutupnya.
         </Lead>
         <Stage maxWidth="max-w-xl">
           <div className="flex min-h-72 items-start justify-center pt-10">
@@ -1060,9 +1004,8 @@ export function DropdownPage() {
       <FlowSection id="kelompok" title="Kelompok">
         <Lead>
           Aksi yang perlu dipisah disusun lewat <Hl>groups</Hl>. Prop <Hl>separator</Hl> menambahkan
-          garis sebelum sebuah kelompok — artinya sama persis dengan <Hl>SidebarGroup</Hl>, jadi tidak
-          ada yang perlu dihafal ulang. Untuk panel berisi kontrol bebas, pakai <Hl>&lt;hr&gt;</Hl>
-          biasa.
+          garis sebelum sebuah kelompok. Untuk panel berisi konten kustom, gunakan pemisah visual
+          yang sesuai di dalam <Hl>children</Hl>.
         </Lead>
         <div className="grid gap-6 sm:grid-cols-2">
           <CompositionDemo
@@ -1221,7 +1164,7 @@ export function DropdownPage() {
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="kontrol-penutupan" title="Kontrol Penutupan">
+      <FlowSection id="kontrol-penutupan" title="Menutup Dropdown dari Luar">
         <div className="space-y-8">
           <div>
             <h3 className="mb-2 text-sm font-black text-gray-900">Menutup konten kustom</h3>
@@ -1229,8 +1172,7 @@ export function DropdownPage() {
               Item generated menutup panel otomatis setelah dijalankan. Kontrol kustom tetap terbuka
               agar form, Radio, atau Checkbox dapat digunakan berulang kali. Ketika aksi final perlu
               menutup panel, gunakan <Hl>close</Hl> dari render function. Fokus dikembalikan ke trigger
-              bila penutupan terjadi saat fokus masih berada di panel; Escape dan klik di luar tetap
-              ditangani Popover native.
+              bila penutupan terjadi saat fokus masih berada di panel.
             </Lead>
             <Demo>
               <div className="flex min-h-56 items-start justify-center pt-10">
@@ -1244,10 +1186,9 @@ export function DropdownPage() {
           <div>
             <h3 className="mb-2 text-sm font-black text-gray-900">Menutup dari kondisi eksternal</h3>
             <Lead>
-              Gunakan <Hl>actionsRef</Hl> ketika kondisi di luar Dropdown perlu menutup panel, misalnya
-              trigger desktop disembunyikan setelah viewport berpindah ke mobile. Native Popover tetap
-              menjadi sumber keadaan; <Hl>close()</Hl> hanya meminta dismissal dan aman dipanggil saat
-              panel sudah tertutup.
+              Gunakan <Hl>actionsRef</Hl> ketika aksi di luar panel perlu menutup Dropdown. Buat ref
+              bertipe <Hl>DropdownHandle</Hl>, teruskan ke Dropdown, lalu panggil <Hl>close()</Hl>.
+              Pemanggilan tetap aman ketika panel sudah tertutup.
             </Lead>
             <Demo>
               <div className="flex min-h-56 items-start justify-center pt-10">
@@ -1255,19 +1196,19 @@ export function DropdownPage() {
               </div>
             </Demo>
             <SectionCode>
-              {"import { useEffect, useRef } from 'react'\n"}
+              {"import { useRef } from 'react'\n"}
               {"import { Dropdown, type DropdownHandle } from '@ceplok-ui/design-kit-react'\n\n"}
-              {'function ResponsiveDropdown() {\n  const actionsRef = useRef<DropdownHandle>(null)\n\n  useEffect(() => {\n    const mobile = window.matchMedia(\'(max-width: 767px)\')\n    const closeForMobile = () => {\n      if (mobile.matches) '}
+              {'function ClosableDropdown() {\n  const actionsRef = useRef<DropdownHandle>(null)\n\n  return (\n    <>\n      <Dropdown\n        '}
+              <H>actionsRef</H>
+              {'={actionsRef}\n        trigger={trigger}\n        items={items}\n      />\n      <button\n        type="button"\n        onClick={() => '}
               <H>actionsRef</H>
               {'.current?.'}
               <H>close</H>
-              {'()\n    }\n\n    mobile.addEventListener(\'change\', closeForMobile)\n    return () => mobile.removeEventListener(\'change\', closeForMobile)\n  }, [])\n\n  return (\n    <Dropdown\n      '}
-              <H>actionsRef</H>
-              {'={actionsRef}\n      trigger={trigger}\n      items={navigationItems}\n    />\n  )\n}'}
+              {'()}\n      >\n        Tutup Dropdown\n      </button>\n    </>\n  )\n}'}
             </SectionCode>
             <p className="mt-4 max-w-2xl text-body-sm text-gray-500">
-              Forwarded <Hl>ref</Hl> lama tetap menunjuk wrapper <Hl>div</Hl>. Handle lifecycle tersedia
-              terpisah agar integrasi yang sudah memakai DOM ref tidak berubah.
+              Forwarded <Hl>ref</Hl> tetap menunjuk wrapper <Hl>div</Hl>; <Hl>actionsRef</Hl> khusus
+              menyediakan handle penutupan.
             </p>
           </div>
         </div>
@@ -1306,13 +1247,12 @@ export function DropdownPage() {
         <Lead>
           Action menjalankan perintah, Navigation memakai link native melalui item generated, dan
           Selection memakai <Hl>selected</Hl> untuk membentuk listbox. Navigation adalah kategori
-          contoh pada Docs, bukan prop atau mode baru pada API Dropdown. Pratinjaunya dibuka sejak
-          halaman dimuat supaya tiap variasi mudah dibandingkan.
+          contoh pada Docs, bukan prop atau mode baru pada API Dropdown. Gunakan trigger pada preview
+          untuk membuka panel setelah mengubah konfigurasi.
         </Lead>
 
         <Stage maxWidth="max-w-xl" dark={activeDarkMode}>
           <div
-            ref={panggung}
             data-theme={activeDarkMode ? 'dark' : 'light'}
             className="flex min-h-80 items-start justify-center pt-10"
           >
@@ -1350,48 +1290,40 @@ export function DropdownPage() {
 
         <Controls>
           <Control label="Tampilan">
-            <div onPointerDownCapture={ingatKeadaan}>
-              <Segmented
-                label="Pilih tampilan"
-                value={darkMode}
-                onChange={(value) => ubah(() => setDarkMode(value))}
-                options={[
-                  { value: false, label: 'Light' },
-                  { value: true, label: 'Dark' },
-                ]}
-              />
-            </div>
+            <Segmented
+              label="Pilih tampilan"
+              value={darkMode}
+              onChange={setDarkMode}
+              options={[
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
+              ]}
+            />
           </Control>
           <Control label="Mode">
-            <div onPointerDownCapture={ingatKeadaan}>
-              <Segmented
-                label="Pilih mode Dropdown"
-                value={mode}
-                onChange={(value) => ubah(() => setMode(value))}
-                options={modes}
-              />
-            </div>
+            <Segmented
+              label="Pilih mode Dropdown"
+              value={mode}
+              onChange={setMode}
+              options={modes}
+            />
           </Control>
           <Control label="Align">
-            <div onPointerDownCapture={ingatKeadaan}>
-              <Segmented
-                label="Pilih perataan Dropdown"
-                value={align}
-                onChange={(value) => ubah(() => setAlign(value))}
-                options={alignOptions}
-              />
-            </div>
+            <Segmented
+              label="Pilih perataan Dropdown"
+              value={align}
+              onChange={setAlign}
+              options={alignOptions}
+            />
           </Control>
           <Control label="Close on select">
-            <div onPointerDownCapture={ingatKeadaan}>
-              <Segmented
-                label="Tutup setelah item dipilih"
-                value={closeOnSelect}
-                onChange={(value) => ubah(() => setCloseOnSelect(value))}
-                options={closeOnSelectOptions}
-                disabled={customActionExample}
-              />
-            </div>
+            <Segmented
+              label="Tutup setelah item dipilih"
+              value={closeOnSelect}
+              onChange={setCloseOnSelect}
+              options={closeOnSelectOptions}
+              disabled={customActionExample}
+            />
             {customActionExample && (
               <p className="mt-2 text-xs text-gray-500">
                 Hanya berlaku pada item generated; konten kustom menutup panel secara eksplisit.
@@ -1399,15 +1331,13 @@ export function DropdownPage() {
             )}
           </Control>
           <Control label="Kelompok">
-            <div onPointerDownCapture={ingatKeadaan}>
-              <Segmented
-                label="Tampilkan kelompok"
-                value={withSeparator}
-                onChange={(value) => ubah(() => setWithSeparator(value))}
-                options={booleanOptions}
-                disabled={mode === 'navigation'}
-              />
-            </div>
+            <Segmented
+              label="Tampilkan kelompok"
+              value={withSeparator}
+              onChange={setWithSeparator}
+              options={booleanOptions}
+              disabled={mode === 'navigation'}
+            />
             <p className="mt-2 text-xs text-gray-500">
               {mode === 'navigation'
                 ? 'Navigation memakai satu daftar items agar contoh link tetap ringkas.'
@@ -1417,37 +1347,31 @@ export function DropdownPage() {
             </p>
           </Control>
           <Control label="Keterangan">
-            <div onPointerDownCapture={ingatKeadaan}>
-              <Segmented
-                label="Tampilkan keterangan"
-                value={withDescription}
-                onChange={(value) => ubah(() => setWithDescription(value))}
-                options={booleanOptions}
-              />
-            </div>
+            <Segmented
+              label="Tampilkan keterangan"
+              value={withDescription}
+              onChange={setWithDescription}
+              options={booleanOptions}
+            />
           </Control>
           <Control label="Disable">
-            <div onPointerDownCapture={ingatKeadaan}>
-              <Segmented
-                label="Matikan satu pilihan"
-                value={withDisabled}
-                onChange={(value) => ubah(() => setWithDisabled(value))}
-                options={booleanOptions}
-              />
-            </div>
+            <Segmented
+              label="Matikan satu pilihan"
+              value={withDisabled}
+              onChange={setWithDisabled}
+              options={booleanOptions}
+            />
           </Control>
           <Control label="Contoh">
-            <div onPointerDownCapture={ingatKeadaan}>
-              <Segmented
-                label="Pilih contoh Dropdown"
-                value={example}
-                onChange={(value) => ubah(() => setExample(value))}
-                options={examples}
-                itemClassName="basis-1/2 justify-center px-2.5 sm:basis-1/3"
-                disabled={mode !== 'action'}
-                wrap
-              />
-            </div>
+            <Segmented
+              label="Pilih contoh Dropdown"
+              value={example}
+              onChange={setExample}
+              options={examples}
+              itemClassName="basis-1/2 justify-center px-2.5 sm:basis-1/3"
+              disabled={mode !== 'action'}
+              wrap
+            />
             {mode !== 'action' && (
               <p className="mt-2 text-xs text-gray-500">
                 Contoh custom content hanya tersedia pada Action. Navigation dan Selection memakai

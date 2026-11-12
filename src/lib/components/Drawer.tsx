@@ -12,6 +12,7 @@ import {
   type ButtonHTMLAttributes,
   type DialogHTMLAttributes,
   type ForwardedRef,
+  type HTMLAttributeAnchorTarget,
   type HTMLAttributes,
   type KeyboardEvent,
   type KeyboardEventHandler,
@@ -33,6 +34,8 @@ export interface DrawerMenuSubItem {
   label: ReactNode;
   active?: boolean;
   href?: string;
+  target?: HTMLAttributeAnchorTarget;
+  rel?: string;
   disabled?: boolean;
   onClick?: (e: MouseEvent<HTMLElement>) => void;
 }
@@ -51,6 +54,8 @@ export interface DrawerMenuItem {
   collapsible?: boolean;
   theme?: DrawerNavItemTheme;
   href?: string;
+  target?: HTMLAttributeAnchorTarget;
+  rel?: string;
   badge?: ReactNode;
   disabled?: boolean;
   onClick?: (e: MouseEvent<HTMLElement>) => void;
@@ -100,6 +105,8 @@ export interface DrawerNavItemProps extends Omit<HTMLAttributes<HTMLDivElement>,
   collapsible?: boolean;
   theme?: DrawerNavItemTheme;
   href?: string;
+  target?: HTMLAttributeAnchorTarget;
+  rel?: string;
   badge?: ReactNode;
   disabled?: boolean;
   onClick?: (e: MouseEvent<HTMLElement>) => void;
@@ -111,6 +118,8 @@ export interface DrawerSubItemProps extends Omit<HTMLAttributes<HTMLElement>, "o
   active?: boolean;
   theme?: DrawerNavItemTheme;
   href?: string;
+  target?: HTMLAttributeAnchorTarget;
+  rel?: string;
   disabled?: boolean;
   onClick?: (e: MouseEvent<HTMLElement>) => void;
 }
@@ -234,6 +243,8 @@ function DrawerMenuItemRenderer({
       // Tujuan navigasi harus ditempatkan sebagai subitem agar satu klik tidak
       // sekaligus membuka submenu dan berpindah halaman.
       href={hasChildren ? undefined : item.href}
+      target={hasChildren ? undefined : item.target}
+      rel={hasChildren ? undefined : item.rel}
       badge={item.badge}
       disabled={item.disabled}
       onClick={handleClick}
@@ -247,6 +258,8 @@ function DrawerMenuItemRenderer({
             label={sub.label}
             active={isSubActive}
             href={sub.href}
+            target={sub.target}
+            rel={sub.rel}
             disabled={sub.disabled}
             theme={item.theme ?? theme}
             onClick={(e) => {
@@ -610,6 +623,8 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
     collapsible = false,
     theme = "primary",
     href,
+    target,
+    rel,
     badge,
     disabled = false,
     onClick,
@@ -657,6 +672,8 @@ export const DrawerNavItem = forwardRef<HTMLDivElement, DrawerNavItemProps>(func
     <div ref={ref} className={cn("w-full", className)} {...props}>
       <Component
         href={disabled ? undefined : destinationHref}
+        target={disabled || !destinationHref ? undefined : target}
+        rel={disabled || !destinationHref ? undefined : rel}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         type={destinationHref ? undefined : "button"}
@@ -747,6 +764,8 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
     active = false,
     theme = "primary",
     href,
+    target,
+    rel,
     disabled = false,
     onClick,
     onKeyDown,
@@ -802,6 +821,8 @@ export const DrawerSubItem = forwardRef<HTMLElement, DrawerSubItemProps>(functio
       <a
         ref={ref as ForwardedRef<HTMLAnchorElement>}
         href={disabled ? undefined : href}
+        target={disabled ? undefined : target}
+        rel={disabled ? undefined : rel}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         aria-disabled={disabled || undefined}
