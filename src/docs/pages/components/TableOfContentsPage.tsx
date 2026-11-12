@@ -29,7 +29,7 @@ const tocProps: PropRow[] = [
   ['onItemClick', '(item, event) => void', '—', 'Dipanggil saat entri diklik, sebelum tautan berjalan.'],
   ['darkMode', 'boolean', 'false', 'Sama dengan data-theme="dark". Latar jadi gray-800.'],
   ['maxHeight', 'number | string', '—', 'Tinggi maksimum daftar. Daftar yang lebih panjang bisa digulir dan mengikuti entri aktif.'],
-  ['layout', "'auto' | 'list' | 'drawer'", "'auto'", 'auto: daftar biasa (teks 12px) mulai 1024px, di bawahnya tombol yang membuka Drawer dari kanan (teks 14px). list dan drawer memaksa salah satunya.'],
+  ['layout', "'auto' | 'list' | 'drawer' | 'collapsible'", "'auto'", 'auto: daftar biasa mulai 1024px dan Drawer di bawahnya. list dan drawer memaksa salah satunya; collapsible memakai trigger TOC untuk membuka daftar inline.'],
   ['anchor', 'boolean', 'true', 'Entri berupa tautan <a href> yang melompat ke bagiannya, dengan scroll-spy. false menjadikan entri <button>: klik hanya memindahkan sorotan, tanpa berpindah atau menggulir.'],
   ['drawerContained', 'boolean', 'false', 'Drawer muncul di dalam pembungkus terdekat yang relative, bukan menutupi seluruh layar. Untuk pratinjau di dalam bingkai, mis. playground.'],
   ['scrollContainer', 'RefObject<HTMLElement>', '—', 'Wadah gulir isi halaman bila bukan window. Scroll-spy dan klik entri bekerja di dalam wadah ini.'],

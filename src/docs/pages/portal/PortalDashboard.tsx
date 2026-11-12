@@ -1,16 +1,16 @@
-import { useId, useState, type MouseEvent, type ReactNode } from 'react'
+import { useEffect, useId, useState, type MouseEvent, type ReactNode } from 'react'
 import {
   Alert,
   Badge,
   Button,
   Card,
-  Container,
   Drawer,
   Icon,
   ListView,
   Search,
   Select,
   Sidebar,
+  Toast,
   cn,
   type DrawerMenuItem,
   type SidebarItem,
@@ -23,8 +23,6 @@ import {
   Bullhorn,
   CalendarMonth,
   Cash,
-  ChevronLeft,
-  ChevronRight,
   ClipboardList,
   Clock,
   CodeBranch,
@@ -35,7 +33,6 @@ import {
   Messages,
   Newspaper,
   QuestionCircle,
-  Search as SearchIcon,
   User,
 } from '../../../lib/icons/outline'
 import { asset } from '../../asset'
@@ -124,6 +121,16 @@ const ANGGARAN: Record<string, { label: string; pagu: string; realisasi: string;
   },
 }
 
+/**
+ * Padding isi mengikuti rasio desain: kolom konten 1350px berisi isi 1080px
+ * dengan padding 135px kiri-kanan, yaitu 10% : 80% : 10%. Dalam persen,
+ * rasio itu sama di layar selebar apa pun; lebar kartu ikut, karena grid-nya
+ * juga proporsional. Ditulis di sini, bukan lewat Container, karena lebar dan
+ * padding bawaan Container (1126px, padding sampai 56px) tidak mengikuti
+ * rasio ini. Di bawah xl padding-nya tetap kecil supaya kartu masih lega.
+ */
+const LEBAR_ISI = 'w-full px-5 sm:px-6 xl:px-[10%]'
+
 const sama = (a: Date, b: Date) =>
   a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
 
@@ -180,10 +187,36 @@ function Hiasan() {
   )
 }
 
+/** Panah 16×12 milik panel Datepicker, untuk berpindah bulan. */
+function Panah({ kanan }: { kanan?: boolean }) {
+  return (
+    <svg
+      className={cn('h-3 w-4', kanan && 'rotate-180')}
+      viewBox="0 0 16 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M14.8 6H1.2m0 0 4.5 4.8M1.2 6l4.5-4.8" />
+    </svg>
+  )
+}
+
 /**
- * Kalender bulanan selalu terbuka. Kit belum punya bentuk ini — Datepicker
- * hanya field dengan panel — jadi grid-nya dirakit di sini. Enam baris tetap
- * seperti desainnya: sisa minggu diisi tanggal bulan sebelum dan sesudahnya.
+ * Kalender bulanan selalu terbuka, bergaya kalender di panel Datepicker: panah
+ * yang sama, judul dan tanggal text-xs, nama hari tiga huruf gray-500, tanggal
+ * luar bulan gray-500, dan hari ini bertanda seperti tanggal terpilih
+ * (bg-primary-700). Datepicker belum punya bentuk tanpa field, jadi
+ * tampilannya disalin di sini. Bedanya satu, mengikuti desain: Minggu dan
+ * Sabtu di bulan itu merah.
+ *
+ * Jaraknya mengikuti desain: kisi 7 kolom selebar 240px di tengah kartu, judul
+ * 21px dari tepi atas, baris tanggal 25px, dan baris terakhir 23px dari tepi
+ * bawah. Enam baris tetap: sisa minggu diisi tanggal bulan sebelum dan
+ * sesudahnya.
  */
 function Kalender({ className }: { className?: string }) {
   const [bulan, setBulan] = useState(() => new Date(HARI_INI.getFullYear(), HARI_INI.getMonth(), 1))
@@ -191,79 +224,87 @@ function Kalender({ className }: { className?: string }) {
   const indeks = bulan.getMonth()
   const geserAwal = new Date(tahun, indeks, 1).getDay()
   const sel = Array.from({ length: 42 }, (_, i) => new Date(tahun, indeks, i - geserAwal + 1))
-  const tombol =
-    'grid size-8 place-items-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle hover:text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand'
+  // Tombol panah seperti di Datepicker: area tekannya 6px lebih besar ke segala
+  // arah, lalu ditarik kembali dengan margin negatif.
+  const panah =
+    '-m-1.5 justify-self-center rounded-lg p-1.5 text-gray-900 transition-colors hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand'
 
   return (
     <Card className={className}>
-      <div className="flex items-center justify-between gap-3">
-        <button
-          type="button"
-          aria-label="Bulan sebelumnya"
-          onClick={() => setBulan(new Date(tahun, indeks - 1, 1))}
-          className={tombol}
-        >
-          <ChevronLeft className="size-4" />
-        </button>
-        <h2 aria-live="polite" className="text-body font-bold text-content">
-          {BULAN[indeks]} {tahun}
-        </h2>
-        <button
-          type="button"
-          aria-label="Bulan berikutnya"
-          onClick={() => setBulan(new Date(tahun, indeks + 1, 1))}
-          className={tombol}
-        >
-          <ChevronRight className="size-4" />
-        </button>
-      </div>
+      {/* Margin negatif menarik kalender ke jarak desain, yang lebih rapat dari
+          padding bawaan Card (16px, lalu 24px mulai kartu 320px). */}
+      <div className="mx-auto -mt-1 -mb-2 w-full max-w-60 @xs:-mt-3 @xs:-mb-4">
+        {/* Header ikut kisi 7 kolom, supaya panahnya tepat di atas kolom Min dan Sab. */}
+        <div className="grid h-4.5 grid-cols-7 items-center">
+          <button
+            type="button"
+            aria-label="Bulan sebelumnya"
+            onClick={() => setBulan(new Date(tahun, indeks - 1, 1))}
+            className={panah}
+          >
+            <Panah />
+          </button>
+          <h2 aria-live="polite" className="col-span-5 text-center text-xs font-bold text-gray-900">
+            {BULAN[indeks]} {tahun}
+          </h2>
+          <button
+            type="button"
+            aria-label="Bulan berikutnya"
+            onClick={() => setBulan(new Date(tahun, indeks + 1, 1))}
+            className={panah}
+          >
+            <Panah kanan />
+          </button>
+        </div>
 
-      <table className="w-full table-fixed text-center text-body-sm">
-        <caption className="sr-only">
-          Kalender {BULAN[indeks]} {tahun}
-        </caption>
-        <thead>
-          <tr>
-            {HARI.map((hari) => (
-              <th key={hari} scope="col" className="pb-1 text-caption font-medium text-content-muted">
-                {hari}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {Array.from({ length: 6 }, (_, baris) => (
-            <tr key={baris}>
-              {sel.slice(baris * 7, baris * 7 + 7).map((tanggal, kolom) => {
-                const diLuar = tanggal.getMonth() !== indeks
-                const hariIni = sama(tanggal, HARI_INI)
-                // Minggu dan Sabtu merah, seperti desainnya; tanggal di luar bulan tetap pudar.
-                const akhirPekan = kolom === 0 || kolom === 6
-
-                return (
-                  <td key={tanggal.getTime()}>
-                    <span
-                      aria-current={hariIni ? 'date' : undefined}
-                      className={cn(
-                        'mx-auto grid size-7 place-items-center rounded-full',
-                        diLuar
-                          ? 'text-gray-300'
-                          : hariIni
-                            ? 'bg-primary-100 font-bold text-primary-700'
-                            : akhirPekan
-                              ? 'text-red-600'
-                              : 'text-content',
-                      )}
-                    >
-                      {tanggal.getDate()}
-                    </span>
-                  </td>
-                )
-              })}
+        <table className="mt-2.5 w-full table-fixed text-center text-xs">
+          <caption className="sr-only">
+            Kalender {BULAN[indeks]} {tahun}
+          </caption>
+          <thead>
+            {/* Baris 30px: pb-1 menaruh nama hari 13px dari atasnya, dan sisanya
+                menjadi jarak ke baris tanggal pertama, seperti desainnya. */}
+            <tr className="h-7.5">
+              {HARI.map((hari) => (
+                <th key={hari} scope="col" className="pb-1 font-medium text-gray-500">
+                  {hari}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {Array.from({ length: 6 }, (_, baris) => (
+              <tr key={baris} className="h-6.25">
+                {sel.slice(baris * 7, baris * 7 + 7).map((tanggal, kolom) => {
+                  const diLuar = tanggal.getMonth() !== indeks
+                  const hariIni = sama(tanggal, HARI_INI)
+                  const akhirPekan = kolom === 0 || kolom === 6
+
+                  return (
+                    <td key={tanggal.getTime()} className="p-0">
+                      <span
+                        aria-current={hariIni ? 'date' : undefined}
+                        className={cn(
+                          'mx-auto flex size-6.25 items-center justify-center rounded-lg font-semibold',
+                          hariIni
+                            ? 'bg-primary-700 text-white'
+                            : diLuar
+                              ? 'text-gray-500'
+                              : akhirPekan
+                                ? 'text-red-600'
+                                : 'text-gray-900',
+                        )}
+                      >
+                        {tanggal.getDate()}
+                      </span>
+                    </td>
+                  )
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Card>
   )
 }
@@ -271,25 +312,36 @@ function Kalender({ className }: { className?: string }) {
 export function PortalDashboard() {
   const [ringkas, setRingkas] = useState(false)
   const [menuSeluler, setMenuSeluler] = useState(false)
-  const [umpan, setUmpan] = useState('')
+  // Pesan demo tampil sebagai Toast di kanan atas lalu hilang sendiri. Teksnya
+  // disimpan terpisah dari `tampil` supaya tidak lenyap sebelum Toast selesai
+  // memudar, dan `kali` membuat pesan yang sama pun memulai ulang hitungannya.
+  const [umpan, setUmpan] = useState({ teks: '', tampil: false, kali: 0 })
   const [kata, setKata] = useState('')
   const [kategori, setKategori] = useState('')
   const [sumber, setSumber] = useState('monsakti')
   const idMenuSeluler = useId()
   const anggaran = ANGGARAN[sumber]
 
-  // Hanya Dashboard yang dirancang; menu lain memberi tahu lewat baris status
-  // alih-alih membuka halaman kosong.
+  useEffect(() => {
+    if (!umpan.tampil) return
+    const tutup = window.setTimeout(() => setUmpan((u) => ({ ...u, tampil: false })), 4000)
+    return () => window.clearTimeout(tutup)
+  }, [umpan.kali, umpan.tampil])
+
+  const kabari = (teks: string) => setUmpan((u) => ({ teks, tampil: true, kali: u.kali + 1 }))
+
+  // Hanya Dashboard yang dirancang; menu lain memberi tahu lewat Toast alih-alih
+  // membuka halaman kosong.
   const menuDemo = (label: string) => (e: MouseEvent<HTMLElement>) => {
     e.preventDefault()
     setMenuSeluler(false)
-    setUmpan(`Halaman ${label} belum ada di contoh ini.`)
+    kabari(`Halaman ${label} belum ada di contoh ini.`)
   }
 
-  const cari = (teks: string) => {
+  const cari = (teks: string, kat: string) => {
     const kunci = teks.trim()
-    const area = KATEGORI.find(({ value }) => value === kategori)?.label ?? 'semua menu'
-    setUmpan(kunci ? `Pencarian demo: "${kunci}" di ${area}.` : 'Ketik kata kunci dulu untuk mencari.')
+    const area = KATEGORI.find(({ value }) => value === kat)?.label ?? 'semua menu'
+    kabari(kunci ? `Pencarian demo: "${kunci}" di ${area}.` : 'Ketik kata kunci dulu untuk mencari.')
   }
 
   const menuSidebar: SidebarItem[] = [
@@ -320,7 +372,7 @@ export function PortalDashboard() {
   }))
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-surface">
       {/* Di bawah lg Sidebar disembunyikan; menunya pindah ke Drawer dari tombol di header. */}
       <div className="hidden lg:block">
         <Sidebar
@@ -330,7 +382,7 @@ export function PortalDashboard() {
             name: NAMA,
             profileLabel: 'Lihat Profile',
             avatarSrc: asset('/images/avatar-sample.svg'),
-            onClick: () => setUmpan('Halaman profil belum ada di contoh ini.'),
+            onClick: () => kabari('Halaman profil belum ada di contoh ini.'),
           }}
           items={menuSidebar}
           sticky
@@ -356,80 +408,63 @@ export function PortalDashboard() {
           </Button>
           <img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="size-8 lg:hidden" />
 
-          {/* Lebar diatur pembungkusnya: pembungkus terluar Select selalu
-              membawa w-full, jadi kelas lebar yang dititipkan ke sana bisa kalah. */}
-          <div role="search" className="ml-auto hidden items-center gap-2 md:flex">
-            <div className="w-44 shrink-0 xl:w-56">
-              <Search
-                platform="compact"
-                showButton={false}
-                trigger="enter"
-                placeholder="Pencarian"
-                aria-label="Pencarian"
-                value={kata}
-                onChange={(e) => setKata(e.target.value)}
-                onSearch={cari}
-              />
-            </div>
-            <div className="w-40 shrink-0">
-              <Select
-                placeholder="Pilih"
-                aria-label="Cari di menu"
-                options={KATEGORI}
-                value={kategori}
-                onChange={(e) => setKategori(e.target.value)}
-              />
-            </div>
-            <Button iconOnly size="s" className="shrink-0" aria-label="Cari" onClick={() => cari(kata)}>
-              <SearchIcon />
-            </Button>
+          {/* Search berkategori di kiri, selebar slot search Navbar back-office:
+              348px, menyusut sampai 180px bila ruangnya kurang. Varian kategori
+              membawa role="search" sendiri, jadi pembungkus ini tidak. */}
+          <div className="hidden w-87 max-w-87 min-w-45 flex-[0_1_348px] md:block">
+            <Search
+              categories={KATEGORI}
+              categoryPlaceholder="Pilih"
+              category={kategori}
+              onCategoryChange={setKategori}
+              placeholder="Pencarian"
+              aria-label="Pencarian"
+              buttonLabel="Cari"
+              trigger="enter"
+              value={kata}
+              onChange={(e) => setKata(e.target.value)}
+              onSearch={cari}
+            />
           </div>
 
-          <span aria-hidden="true" className="ml-auto h-8 w-px bg-border md:ml-2" />
-
+          {/* Lonceng bergaya notificationTrigger Navbar front-office: ikon 20px
+              gray-500 dalam kotak 36px, tanpa angka. */}
           <button
             type="button"
-            aria-label="Notifikasi, 5 belum dibaca"
-            onClick={() => setUmpan('Ada 5 notifikasi baru.')}
-            className="relative grid size-10 place-items-center rounded-lg text-primary-700 transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            aria-label="Notifikasi"
+            onClick={() => kabari('Ada 5 notifikasi baru.')}
+            className="ml-auto grid size-9 shrink-0 place-items-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           >
-            <Bell className="size-6" />
-            <span
-              aria-hidden="true"
-              className="absolute top-1 right-1 grid h-4.5 min-w-4.5 place-items-center rounded bg-red-600 px-1 text-caption leading-none font-bold text-white"
-            >
-              5
-            </span>
+            <Bell className="size-5" aria-hidden="true" />
           </button>
         </header>
 
-        {umpan && (
-          <div className="border-b border-border bg-surface">
-            <Container>
-              <p role="status" aria-live="polite" className="py-2 text-body-sm text-content-subtle">
-                {umpan}
-              </p>
-            </Container>
-          </div>
-        )}
+        {/* Toast di kanan atas, tepat di bawah header. */}
+        <div className="fixed top-22 right-4 z-30 w-80 max-w-[calc(100vw-2rem)] sm:right-6">
+          <Toast open={umpan.tampil} onDismiss={() => setUmpan((u) => ({ ...u, tampil: false }))}>
+            {umpan.teks}
+          </Toast>
+        </div>
 
-        <main className="flex-1">
-          <Container>
-            <div className="space-y-6 py-8">
+        <main className="flex-1 bg-blue-50">
+          <div className={LEBAR_ISI}>
+            <div className="space-y-5 py-8">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <h1 className="text-heading-3 font-bold text-content">Dashboard</h1>
                 <Button
                   variant="outline"
                   size="s"
-                  onClick={() => setUmpan('Pengaturan layout belum ada di contoh ini.')}
+                  onClick={() => kabari('Pengaturan layout belum ada di contoh ini.')}
                 >
                   Pengaturan Layout
                 </Button>
               </div>
 
               {/* Satu kolom di layar sempit, dua kolom di md, lalu grid 12 kolom di xl
-                  dengan pembagian seperti desainnya: 8/4, 5/7, 5/7. */}
-              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-12">
+                  dengan pembagian seperti desainnya: 8/4, 5/7, 5/7. Jarak antarkartu
+                  14px; di desain, baris ketiga berjarak 20px, jadi kartunya diberi
+                  tambahan 6px di xl. */}
+              <div className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-12">
                 <section
                   aria-labelledby="portal-sapaan"
                   className="relative isolate flex min-h-56 flex-col overflow-hidden rounded-lg bg-primary-700 p-6 text-white shadow-soft md:col-span-2 xl:col-span-8"
@@ -459,7 +494,7 @@ export function PortalDashboard() {
                       href="#/portal-dashboard/app"
                       onClick={(e) => {
                         e.preventDefault()
-                        setUmpan('Daftar wiki belum ada di contoh ini.')
+                        kabari('Daftar wiki belum ada di contoh ini.')
                       }}
                       className="text-body-sm font-medium text-brand underline underline-offset-2 hover:text-brand-hover"
                     >
@@ -529,7 +564,7 @@ export function PortalDashboard() {
                   />
                 </Card>
 
-                <Card className="xl:col-span-5">
+                <Card className="xl:col-span-5 xl:mt-1.5">
                   <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
                     <h2 className="text-body font-bold text-content">Presensi Harian</h2>
                     <Badge variant="brand" size="sm">
@@ -566,7 +601,7 @@ export function PortalDashboard() {
                   </div>
                 </Card>
 
-                <Card className="md:col-span-2 xl:col-span-7">
+                <Card className="md:col-span-2 xl:col-span-7 xl:mt-1.5">
                   <JudulKartu
                     ikon={
                       <Icon className="mt-0.5 text-orange-600">
@@ -582,7 +617,7 @@ export function PortalDashboard() {
                 </Card>
               </div>
             </div>
-          </Container>
+          </div>
         </main>
       </div>
 

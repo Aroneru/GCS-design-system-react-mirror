@@ -1,13 +1,12 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import {
   Breadcrumb,
   Container,
-  Drawer,
   Hero,
   Navbar,
   Search,
   Sidebar,
-  type DrawerMenuItem,
+  type SidebarItem,
 } from "../../../lib";
 import {
   ChartMixed,
@@ -31,6 +30,7 @@ import { Pengajuan } from "./pages/Pengajuan";
 import { Pengaturan } from "./pages/Pengaturan";
 import { Simaya } from "./pages/Simaya";
 import { BeritaLayananDigital } from "./pages/BeritaLayananDigital";
+import { BERITA_LAYANAN_DIGITAL_TOC } from "./pages/BeritaLayananDigitalToc";
 
 /**
  * Kerangka aplikasi demo.
@@ -98,11 +98,9 @@ function Isi({ halaman }: { halaman: HalamanDemo }) {
 export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
   const [ringkas, setRingkas] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [navbarDrawerOpen, setNavbarDrawerOpen] = useState(false);
   const [searchFeedback, setSearchFeedback] = useState("");
-  const navbarDrawerId = useId();
 
-  const menu = RUTE.map(({ halaman: h, ikon, badge }) => ({
+  const menu: SidebarItem[] = RUTE.map(({ halaman: h, ikon, badge }) => ({
     id: h,
     label: JUDUL_HALAMAN[h],
     href: href(h),
@@ -133,29 +131,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
     },
     ...(["simaya", "modifikasi", "pengaturan", "simaya2"] as const).map(navbarDestination),
   ];
-  const navbarDrawerDestination = (h: HalamanDemo): DrawerMenuItem => {
-    const route = RUTE.find(({ halaman: routePage }) => routePage === h);
-
-    return {
-      id: h,
-      label: JUDUL_HALAMAN[h],
-      href: href(h),
-      icon: route?.ikon,
-      active: h === halaman,
-      onClick: () => setNavbarDrawerOpen(false),
-    };
-  };
-  const navbarDrawerItems: DrawerMenuItem[] = [
-    navbarDrawerDestination("dasbor"),
-    {
-      id: "layanan-digital",
-      label: "Layanan Digital",
-      icon: <GridPlus className="size-5" />,
-      active: RUTE_LAYANAN.includes(halaman as (typeof RUTE_LAYANAN)[number]),
-      children: RUTE_LAYANAN.map((h) => navbarDrawerDestination(h)),
-    },
-    ...(["simaya", "modifikasi", "pengaturan", "simaya2"] as const).map(navbarDrawerDestination),
-  ];
+  const searchCategories = menu.map(({ id, label }) => ({ value: id ?? label, label }));
 
   return (
     // Kolom, bukan baris: Sidebar dan konten berdampingan di dalam satu baris,
@@ -212,17 +188,27 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
               ariaLabel: "CEPLOK — Dasbor",
             }}
             items={navbarItems}
-            mobileNavigationItems={menu}
+            sidebarItems={menu}
+            tableOfContents={halaman === "simaya2" ? {
+              label: "Daftar isi",
+              items: BERITA_LAYANAN_DIGITAL_TOC,
+            } : undefined}
             search={
               <Search
                 platform="compact"
-                showButton={false}
+                showButton
                 trigger="enter"
                 aria-label="Cari pengajuan atau pemohon"
                 placeholder="Cari pengajuan, pemohon ..."
-                onSearch={(value) => setSearchFeedback(`Pencarian demo: ${value}`)}
+                categories={searchCategories}
+                categoryPlaceholder="Kategori"
+                onSearch={(value, category) => setSearchFeedback(`Pencarian demo: ${value}${category ? ` (${category})` : ""}`)}
               />
             }
+            notificationTrigger={{
+              ariaLabel: "Buka notifikasi",
+              onClick: () => setSearchFeedback("Aksi demo: Buka notifikasi"),
+            }}
             account={{
               name: "Rafli Arandhana",
               initials: "RA",
@@ -245,12 +231,6 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             }}
             mobileNavigationOpen={mobileSidebarOpen}
             onMobileNavigationOpenChange={setMobileSidebarOpen}
-            mobileDrawer={{
-              open: navbarDrawerOpen,
-              onOpenChange: setNavbarDrawerOpen,
-              controls: navbarDrawerId,
-              ariaLabel: "Buka menu utama",
-            }}
           />
 
           {searchFeedback && (
@@ -309,16 +289,6 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             </Container>
           </main>
 
-          <Drawer
-            id={navbarDrawerId}
-            open={navbarDrawerOpen}
-            onClose={() => setNavbarDrawerOpen(false)}
-            position="right"
-            size="s"
-            eyebrow="Menu utama"
-            header={<Drawer.Title>Navigasi</Drawer.Title>}
-            items={navbarDrawerItems}
-          />
         </div>
       </div>
 

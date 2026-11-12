@@ -1,20 +1,14 @@
-import { Badge, TableOfContents, type TableOfContentsItem } from "../../../../lib";
-
-const DAFTAR_ISI: TableOfContentsItem[] = [
-  { id: "latar-belakang", label: "Latar belakang pembaruan" },
-  { id: "perubahan-utama", label: "Perubahan utama" },
-  { id: "dampak-bagi-warga", label: "Dampak bagi warga dan petugas" },
-  { id: "tahap-selanjutnya", label: "Tahap selanjutnya" },
-];
+import { Badge, TableOfContents } from "../../../../lib";
+import { BERITA_LAYANAN_DIGITAL_TOC } from "./BeritaLayananDigitalToc";
 
 /** Artikel dummy panjang; ID bagian disiapkan sebagai target TableOfContents. */
 export function BeritaLayananDigital() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 lg:flex-row lg:items-start">
       <TableOfContents
-        items={DAFTAR_ISI}
-        getHref={(id) => `#/example/app/simaya2#${id}`}
-        className="order-first shrink-0 lg:order-last lg:sticky lg:top-6"
+        items={BERITA_LAYANAN_DIGITAL_TOC}
+        layout="list"
+        className="order-first hidden shrink-0 lg:order-last lg:sticky lg:top-6 lg:block"
       />
 
     <article className="min-w-0 flex-1 [&_p]:text-justify">

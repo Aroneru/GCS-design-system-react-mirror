@@ -131,10 +131,10 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, ambient `data-theme`, `darkMode` (override kompatibilitas) |
 | `Dropdown`   | `trigger`, `items`/`groups` atau `children`, `align`, `closeOnSelect`, `actionsRef`, `contentLabel`, `contentClassName`, `data-theme`, `darkMode` |
 | `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape`, `showCloseButton`, `closeLabel` |
-| `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `theme`, `darkMode`   |
+| `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `afterItems`, `theme`, `darkMode`   |
 | `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
-| `Navbar`     | `platform`, `brand`, `items`, `search`, `guestActions` (FO), `account`, `notificationTrigger` (FO authenticated), `mobileNavigationOpen`, `onMobileNavigationOpenChange`, `mobileDrawer` (BO) |
+| `Navbar`     | `platform`, `brand`, `items`, `sidebarItems`/`tableOfContents` (BO), `search`, `guestActions` (FO), `account`, `notificationTrigger` (FO authenticated / BO), `mobileNavigationOpen`, `onMobileNavigationOpenChange` |
 | `Hero`       | `type`, `centeredContent`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`    |
 | `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user` (profil + menu dropdown), `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
@@ -508,10 +508,12 @@ ambient:
 
 ### Navbar
 
-Navbar menyediakan navigasi responsif untuk aplikasi Front Office (FO) dan
-Back Office (BO). Komponen menangani komposisi desktop dan mobile, sedangkan
-consumer tetap memiliki brand, status route, perilaku pencarian, identitas,
-notifikasi, dan Drawer kontekstual.
+Navbar adalah header navigasi global aplikasi Front Office (FO) dan Back Office
+(BO). Komponen menyatukan brand, navigasi utama, Search, tombol notifikasi, dan
+akses akun, lalu otomatis mengganti komposisi desktop dan mobile. Consumer tetap
+memiliki data brand, status route, hasil pencarian, aksi dan data notifikasi,
+identitas akun, serta Drawer kontekstual custom. Navbar BO memiliki Drawer
+navigasi mobile sendiri yang bersumber dari `items`.
 
 #### Penggunaan dasar — Front Office
 
@@ -601,8 +603,9 @@ export function FrontOfficeNavbar() {
 ```
 
 Untuk FO guest, ganti `account` dengan `guestActions` yang berisi `signIn` dan
-opsional `signUp`. `notificationTrigger` hanya valid pada FO authenticated
-bersama `account` dan merupakan slot yang dirender consumer.
+opsional `signUp`. Pada FO, `notificationTrigger` hanya valid untuk authenticated
+bersama `account`. Navbar merender tombol Bell, sedangkan consumer mengatur aksi,
+state panel, badge, dan atribut aksesibilitasnya.
 
 Navbar bersifat router-agnostic dan berpindah antara komposisi desktop dan
 mobile secara internal. Consumer tidak perlu mengirim ukuran viewport atau
@@ -626,14 +629,16 @@ tampilan current dari kontrak komponennya masing-masing.
 - Setiap item memerlukan `id` dan `label`. Consumer bertanggung jawab
   memperbarui `current` ketika route berubah.
 
-#### Back Office — contextual Drawer milik consumer
+#### Back Office — Sidebar dan Drawer navigasi responsif
 
 ```tsx
-import { useState } from 'react'
 import {
-  Drawer,
   Navbar,
+  Search,
+  Sidebar,
   type NavbarPrimaryItem,
+  type SidebarItem,
+  type TableOfContentsItem,
 } from '@ceplok-ui/design-kit-react'
 
 const brand = {
@@ -652,37 +657,104 @@ const items = [
   },
 ] satisfies NavbarPrimaryItem[]
 
-export function BackOfficeNavbar() {
-  const [drawerOpen, setDrawerOpen] = useState(false)
+// Sumber navigasi Sidebar aplikasi: dipakai Sidebar desktop dan Navbar mobile.
+const sidebarItems = [
+  { id: 'dashboard', label: 'Dashboard', href: '/', active: true },
+  { id: 'pengajuan', label: 'Pengajuan', href: '/pengajuan' },
+] satisfies SidebarItem[]
 
+const tableOfContentsItems = [
+  { id: 'summary', label: 'Ringkasan', href: '/reports#summary' },
+  { id: 'details', label: 'Rincian', href: '/reports#details' },
+] satisfies TableOfContentsItem[]
+
+// Urutan dan identitas kategori mengikuti sumber Sidebar yang sama.
+const searchCategories = sidebarItems.map(({ id, label, disabled }) => ({
+  value: id ?? label,
+  label,
+  disabled,
+}))
+
+const notificationTrigger = {
+  ariaLabel: 'Buka notifikasi',
+  onClick: () => setNotificationOpen(true),
+}
+
+export function BackOfficeNavbar() {
   return (
-    <>
-      <Navbar
-        platform="back-office"
-        brand={brand}
-        items={items}
-        mobileDrawer={{
-          open: drawerOpen,
-          onOpenChange: setDrawerOpen,
-          controls: 'contextual-drawer',
-          ariaLabel: 'Buka navigasi kontekstual',
-        }}
-      />
-      <Drawer
-        id="contextual-drawer"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        position="right"
-        size="s"
-        items={[{ id: 'ringkasan', label: 'Ringkasan', href: '/ringkasan' }]}
-      />
-    </>
+    <div className="flex">
+      <div className="hidden lg:block">
+        <Sidebar items={sidebarItems} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <Navbar
+          platform="back-office"
+          brand={brand}
+          items={items}
+          sidebarItems={sidebarItems}
+          tableOfContents={{ label: 'Daftar isi', items: tableOfContentsItems }}
+          notificationTrigger={notificationTrigger}
+          search={
+            <Search
+              platform="compact"
+              showButton
+              categories={searchCategories}
+              categoryPlaceholder="Kategori"
+              onSearch={(query, category) => searchBackOffice(query, category)}
+            />
+          }
+        />
+      </div>
+    </div>
   )
 }
 ```
 
-`mobileDrawer` bukan isi Drawer. Consumer memiliki state, elemen `<Drawer>`,
-serta kontennya; Navbar hanya menghubungkan trigger kontekstual pada mobile.
+Pada BO, Navbar otomatis menyajikan `items` melalui Drawer navigasi ketika
+viewport mobile. Navbar memiliki trigger, state, lifecycle, dan isi Drawer
+navigasi tersebut. Drawer kontekstual atau custom tetap dirender consumer
+secara terpisah memakai komponen `<Drawer>`, bukan dimasukkan ke Navbar.
+
+`sidebarItems` adalah sumber Sidebar aplikasi: consumer merender `<Sidebar>`
+pada desktop, sedangkan Navbar memakai data yang sama di dialog Sidebar mobile.
+
+`tableOfContents` khusus BO menambahkan disclosure terakhir di Drawer Navbar
+mobile. Disclosure tertutup secara default dan merender komponen
+`TableOfContents` yang sama setelah dibuka, termasuk styling daftar,
+scroll-spy, dan penanda aktifnya. Toggle juga memakai visual bawaan TOC melalui
+`layout="collapsible"`, dengan separator setelah menu Navbar. Pada desktop,
+consumer tetap merender
+`<TableOfContents layout="list">` di dalam layout halaman; sembunyikan versi
+desktop itu di bawah breakpoint yang sama agar tidak ada trigger TOC ganda.
+
+Drawer custom tidak memakai prop Navbar. Render komponen tersebut secara
+terpisah beserta trigger dan state milik consumer:
+
+```tsx
+import { useState } from 'react'
+import { Button, Drawer, Navbar } from '@ceplok-ui/design-kit-react'
+
+export function ReportsPage() {
+  const [filterOpen, setFilterOpen] = useState(false)
+
+  return <>
+    <Navbar
+      platform="back-office"
+      brand={brand}
+      items={items}
+      sidebarItems={sidebarItems}
+    />
+    <Button onClick={() => setFilterOpen(true)}>Filter</Button>
+    <Drawer
+      open={filterOpen}
+      onClose={() => setFilterOpen(false)}
+      header={<Drawer.Title>Filter laporan</Drawer.Title>}
+    >
+      <FilterForm />
+    </Drawer>
+  </>
+}
+```
 
 #### Perbedaan platform dan integrasi
 
@@ -690,20 +762,32 @@ serta kontennya; Navbar hanya menghubungkan trigger kontekstual pada mobile.
 | --- | --- |
 | Front Office guest | `guestActions` untuk tautan Masuk dan Daftar; tanpa `account` atau `notificationTrigger`. |
 | Front Office authenticated | `account` dan opsional `notificationTrigger`; tanpa `guestActions`. |
-| Back Office | Opsional `account` dan `mobileDrawer`; tanpa `guestActions` atau `notificationTrigger`. |
+| Back Office | `items` untuk Navbar desktop/Drawer navigasi mobile, `sidebarItems` untuk Sidebar aplikasi desktop/mobile, opsional `tableOfContents` sebagai disclosure terakhir Drawer, serta opsional `account` dan `notificationTrigger` yang independen; tanpa `guestActions`. |
 
 `brand` wajib pada kedua platform. Isi visualnya tetap dimiliki consumer
 melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
 
-- `search` menerima `ReactNode`. Gunakan `Search` dengan
-  `platform="compact"`, `showButton={false}`, dan `trigger="enter"` untuk pola
-  Navbar.
+- `search` menerima `ReactNode`. Gunakan `Search` dengan `platform="compact"`
+  dan `trigger="enter"`. FO umumnya memakai `showButton={false}`; Search BO
+  berkategori memakai `showButton` agar tombol ikon pada ruas kanan tersedia.
+- Pada BO, gunakan `Search.categories` dan turunkan kategori dari
+  `sidebarItems`. Consumer boleh memetakan `label`, `value`, `disabled`, atau
+  menyaring item sesuai domain pencarian, tetapi jangan memelihara array
+  kategori navigasi kedua yang terpisah.
 - `account` berisi identitas pengguna dan daftar destination atau action pada
   menu akun.
-- `notificationTrigger` adalah slot milik consumer dan hanya berlaku pada FO
-  authenticated.
-- `mobileDrawer` hanya berlaku pada BO dan menghubungkan `open`,
-  `onOpenChange`, serta `controls` ke Drawer milik consumer.
+- `sidebarItems` hanya berlaku pada BO. Navbar tidak merender Sidebar desktop;
+  consumer merender komponen tersebut di layout aplikasi dan memberikan data
+  yang sama kepada Navbar untuk komposisi mobile.
+- `tableOfContents` hanya berlaku pada BO dan hanya ditampilkan di Drawer mobile.
+  Gunakan entri `TableOfContentsItem` yang sama untuk TOC desktop dan Drawer agar
+  label, tujuan anchor, styling, dan status aktif tetap konsisten.
+- `notificationTrigger` mengonfigurasi tombol Bell bawaan Navbar. Consumer
+  mengatur aksi, state panel, badge, dan atribut ARIA; pada FO hanya berlaku
+  untuk authenticated bersama `account`, sedangkan pada BO dapat digunakan
+  dengan atau tanpa `account` karena identitas dapat berada di Sidebar.
+- Drawer navigasi BO tidak memerlukan prop tersendiri: trigger dan isinya muncul
+  otomatis pada mobile saat `items` tidak kosong.
 
 Tema mengikuti boundary ambient `data-theme` milik consumer; Navbar tidak
 memerlukan prop tema khusus.

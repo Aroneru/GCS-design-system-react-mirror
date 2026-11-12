@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react'
-import { Bell } from 'flowbite-react-icons/solid'
 import { Home, InfoCircle } from 'flowbite-react-icons/outline'
-import { Drawer, Navbar, Search, type NavbarAccountItem, type NavbarPrimaryItem, type NavbarProps } from '../../../lib'
+import { Navbar, Search, type NavbarAccountItem, type NavbarPrimaryItem, type NavbarProps, type SidebarItem } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { nodeText } from '../../nodeText'
 import { H, Segmented } from '../../pageKit'
@@ -11,7 +10,7 @@ import { fontClass, fontScopeStyle, readPlaygroundFont, usePlaygroundFont } from
 type Identity = 'guest' | 'authenticated' | 'none'
 type Theme = 'light' | 'dark'
 type RegressionFixture = 'default' | 'disclosure-first-current' | 'disclosure-second-current' | 'account-current' | 'account-disabled' | 'account-actions' | 'overflow-disclosure'
-interface Config { platform: 'front-office' | 'back-office'; identity: Identity; menuCount: 2|3|4|5|6|7|8|9|10; disclosure: boolean; search: boolean; disabled: boolean; icons: boolean; notification: boolean; drawer: boolean; theme: Theme; fixture: RegressionFixture }
+interface Config { platform: 'front-office' | 'back-office'; identity: Identity; menuCount: 2|3|4|5|6|7|8|9|10; disclosure: boolean; search: boolean; disabled: boolean; icons: boolean; notification: boolean; theme: Theme; fixture: RegressionFixture }
 
 const toc: TocEntry[] = [
   { id: 'navbar', label: 'Navbar' }, { id: 'front-office', label: 'Platform' }, { id: 'back-office', label: 'Identity & Account' }, { id: 'navigation', label: 'Navigation & Disclosure' }, { id: 'slots', label: 'Search & consumer slots' }, { id: 'responsive', label: 'Responsive behavior' }, { id: 'dark-mode', label: 'Dark mode' }, { id: 'playground', label: 'Playground' }, { id: 'penggunaan', label: 'Penggunaan' }, { id: 'properties', label: 'Properties' },
@@ -19,18 +18,20 @@ const toc: TocEntry[] = [
 const bool = [{ value: true, label: 'Ada' }, { value: false, label: 'Tidak Ada' }]
 const widths = [375, 412, 440, 768, 1024, 1280, 1440] as const
 const navbarCodeHighlights = [
-  'Navbar', 'Search', 'Drawer', 'NavbarAccount', 'NavbarPrimaryItem',
-  'platform', 'brand', 'items', 'mobileNavigationItems', 'search', 'guestActions', 'account', 'notificationTrigger', 'mobileDrawer',
+  'Navbar', 'Search', 'NavbarAccount', 'NavbarPrimaryItem', 'NavbarNotificationTrigger', 'NavbarTableOfContents', 'SidebarItem',
+  'platform', 'brand', 'items', 'navbarItems', 'sidebarItems', 'tableOfContents', 'search', 'searchCategories', 'guestActions', 'account', 'notificationTrigger',
   'type', 'children', 'id', 'label', 'href', 'current', 'disabled', 'icon', 'tone',
-  'data-theme', 'open', 'onOpenChange', 'controls', 'ariaLabel', 'trigger', 'showButton', 'onClose', 'position', 'size',
+  'data-theme', 'open', 'onOpenChange', 'controls', 'ariaLabel', 'trigger', 'showButton', 'categories', 'categoryPlaceholder', 'onClose', 'position', 'size',
 ]
 
-function highlightNavbarCode(code: ReactNode): ReactNode {
+function highlightNavbarCode(code: ReactNode, highlights: readonly string[] = navbarCodeHighlights): ReactNode {
   const source = nodeText(code)
-  const tokens = [...navbarCodeHighlights].sort((left, right) => right.length - left.length)
+  const tokens = [...highlights].sort((left, right) => right.length - left.length)
+  if (tokens.length === 0) return source
   const tokenSet = new Set(tokens)
+  const identifierCharacter = '[A-Za-z0-9_$]'
   const pattern = new RegExp(
-    `(${tokens.map((token) => token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`,
+    `(?<!${identifierCharacter})(${tokens.map((token) => token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(?!${identifierCharacter})`,
     'g',
   )
 
@@ -42,15 +43,15 @@ function highlightNavbarCode(code: ReactNode): ReactNode {
 const navbarProps: PropRow[] = [
   ['platform', "'front-office' | 'back-office'", 'required', 'Menentukan kontrak platform, bukan deteksi viewport.'],
   ['brand', 'NavbarBrand', 'required', 'Brand consumer. Pada BO desktop, Sidebar aplikasi yang merendernya.'],
-  ['items', 'NavbarPrimaryItem[]', '[]', 'Destination atau disclosure satu tingkat.'],
-  ['mobileNavigationItems', 'SidebarItem[]', 'undefined', 'Menu khusus Sidebar yang dibuka hamburger mobile. Bila tidak diisi, Navbar memakai items.'],
-  ['search', 'ReactNode', 'undefined', 'Slot Search milik consumer.'],
+  ['items', 'NavbarPrimaryItem[]', '[]', 'Navigasi Navbar desktop. Pada BO, Navbar otomatis menyajikannya di Drawer mobile.'],
+  ['sidebarItems', 'SidebarItem[]', 'undefined', 'Khusus BO: navigasi Sidebar aplikasi yang dipakai Navbar pada mobile. Sidebar desktop tetap dirender consumer.'],
+  ['tableOfContents', 'NavbarTableOfContents', 'undefined', 'Khusus BO: TableOfContents collapsible setelah separator di bagian terbawah Drawer mobile. TOC desktop tetap dirender consumer.'],
+  ['search', 'ReactNode', 'undefined', 'Slot Search milik consumer. Pada BO gunakan varian kategori dengan pilihan yang diturunkan dari sidebarItems.'],
   ['guestActions', 'NavbarGuestActions', 'undefined', 'Hanya FO guest; tidak dapat dikombinasikan dengan account atau notificationTrigger.'],
   ['account', 'NavbarAccount', 'undefined', 'FO authenticated atau BO. Pada FO, tidak dapat dikombinasikan dengan guestActions.'],
-  ['notificationTrigger', 'ReactNode', 'undefined', 'Hanya FO authenticated bersama account.'],
+  ['notificationTrigger', 'NavbarNotificationTrigger', 'undefined', 'Konfigurasi tombol notifikasi bawaan. FO authenticated atau BO; pada BO independen dari account.'],
   ['mobileNavigationOpen', 'boolean', 'undefined', 'State terkontrol navigasi mobile. Jika tidak diisi, Navbar mengelola state internal.'],
   ['onMobileNavigationOpenChange', '(open: boolean) => void', 'undefined', 'Callback perubahan navigasi mobile.'],
-  ['mobileDrawer', 'NavbarMobileDrawer', 'undefined', 'Hanya BO: kontrol Drawer kontekstual consumer pada mobile.'],
   ['className / HTML attributes', 'HTMLAttributes<HTMLElement>', 'undefined', 'Atribut header standar, selain children.'],
 ]
 const supportingTypes: PropRow[] = [
@@ -60,10 +61,12 @@ const supportingTypes: PropRow[] = [
   ['NavbarAccount', '{ name; items; description?; avatarSrc?; initials? }', '—', 'Identitas dan menu account.'],
   ['NavbarAccountItem', "NavbarAccountDestination | NavbarAccountAction", '—', 'Destination atau action; keduanya mendukung tone default atau danger.'],
   ['NavbarGuestActions', '{ signIn; signUp? }', '—', 'Aksi guest; setiap link berisi label, href, dan onClick opsional.'],
-  ['NavbarMobileDrawer', '{ open; onOpenChange; controls; ariaLabel? }', '—', 'Kontrak state dan aksesibilitas Drawer kontekstual BO.'],
+  ['NavbarNotificationTrigger', '{ ariaLabel; onClick?; badge?; …buttonProps }', '—', 'Konfigurasi tombol Bell bawaan; consumer mengelola interaksi dan state panel.'],
+  ['NavbarTableOfContents', '{ label?; items: TableOfContentsItem[] }', '—', 'Data untuk TableOfContents di disclosure mobile; gunakan items dan href yang sama dengan TOC desktop.'],
+  ['SidebarItem', '{ id?; label; href?; children?; active?; disabled?; … }', '—', 'Data navigasi Sidebar BO yang dimiliki layout consumer dan dipakai Navbar pada mobile.'],
 ]
 
-function normalized(c: Config): Config { return c.platform === 'back-office' ? { ...c, identity: c.identity === 'guest' ? 'none' : c.identity, notification: false } : c }
+function normalized(c: Config): Config { return c.platform === 'back-office' ? { ...c, identity: c.identity === 'guest' ? 'none' : c.identity } : c }
 /** Direct-preview-only consumer data used by regression acceptance; never passed to Navbar. */
 function readFixture(value: string | null): RegressionFixture {
   switch (value) {
@@ -75,8 +78,6 @@ function Brand({ compact = false }: { compact?: boolean }) {
   if (compact) return <img src="/images/ceplok.svg" alt="" className="size-7 shrink-0 object-contain lg:size-9" />
   return <span className="flex h-9 w-[114px] items-center gap-2 text-sm font-black tracking-wide text-content lg:h-[46px] lg:w-36 lg:text-base"><img src="/images/ceplok.svg" alt="" className="size-7 shrink-0 object-contain lg:size-9" /><span>CEPLOK</span></span>
 }
-function Notification() { return <a href="/notifikasi" aria-label="Buka pengaturan notifikasi" className="grid size-9 shrink-0 place-items-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"><Bell className="size-5" aria-hidden="true" /></a> }
-
 const navigationData = [
   { id: 'home', type: 'destination', label: 'Beranda', href: '/beranda' },
   { id: 'digital-services', type: 'disclosure', label: 'Layanan Digital', children: [
@@ -122,9 +123,15 @@ function items(count: number, c: Config): NavbarPrimaryItem[] {
   })
 }
 
+const backOfficeSidebarItems: SidebarItem[] = [
+  { id: 'dashboard', label: 'Dasbor', href: '/admin', icon: <Home /> },
+  { id: 'submissions', label: 'Pengajuan', href: '/admin/pengajuan', icon: <InfoCircle /> },
+  { id: 'applicants', label: 'Pemohon', href: '/admin/pemohon', icon: <Home /> },
+  { id: 'settings', label: 'Pengaturan', href: '/admin/pengaturan', icon: <InfoCircle /> },
+]
+
 function Preview({ config }: { config: Config }) {
   const [feedback, setFeedback] = useState('')
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const navItems = useMemo(() => items(config.menuCount, config), [config])
   const accountItems = useMemo<NavbarAccountItem[]>(() => [
     { id: 'profile', type: 'destination', label: 'Profil', href: '/profil', current: config.fixture === 'account-current', disabled: config.fixture === 'account-disabled' },
@@ -132,23 +139,24 @@ function Preview({ config }: { config: Config }) {
     { id: 'logout', type: 'action', label: 'Logout', tone: 'danger', onClick: () => setFeedback('Aksi demo: Logout') },
   ], [config.fixture])
   const brand = { content: <Brand compact={config.platform === 'back-office'} />, href: '/', ariaLabel: 'CEPLOK — Beranda' }
-  const search = config.search ? <Search platform="compact" showButton={false} trigger="enter" aria-label="Cari dokumentasi" placeholder="Cari dokumentasi ..." onSearch={(v) => setFeedback(`Pencarian demo: ${v}`)} /> : undefined
+  const searchCategories = backOfficeSidebarItems.map(({ id, label }) => ({ value: id ?? label, label }))
+  const search = config.search ? <Search platform="compact" showButton={config.platform === 'back-office'} trigger="enter" aria-label="Cari dokumentasi" placeholder="Cari dokumentasi ..." categories={config.platform === 'back-office' ? searchCategories : undefined} categoryPlaceholder="Kategori" onSearch={(value, category) => setFeedback(`Pencarian demo: ${value}${category ? ` (${category})` : ''}`)} /> : undefined
   const common = { brand, items: navItems, search }
   const intercept = (e: MouseEvent<HTMLDivElement>) => { const a = e.target instanceof Element ? e.target.closest('a') : null; if (!a || a.getAttribute('aria-disabled') === 'true') return; e.preventDefault(); setFeedback(`Navigasi demo: ${a.getAttribute('aria-label') || a.textContent?.trim() || 'Tautan'}`) }
   return <div data-theme={config.theme} data-navbar-platform={config.platform} className="overflow-hidden bg-surface text-content" onClick={intercept}>
-    {config.platform === 'front-office' ? (config.identity === 'authenticated' ? <Navbar platform="front-office" {...common} notificationTrigger={config.notification ? <Notification /> : undefined} account={{ name: 'User CEPLOK', initials: 'US', items: accountItems }} /> : <Navbar platform="front-office" {...common} guestActions={config.identity === 'guest' ? { signIn: { label: 'Masuk', href: '/masuk' }, signUp: { label: 'Daftar', href: '/daftar' } } : undefined} />) : <><Navbar platform="back-office" {...common} account={config.identity === 'authenticated' ? { name: 'Admin CEPLOK', initials: 'AC', items: accountItems } : undefined} mobileDrawer={config.drawer ? { open: drawerOpen, onOpenChange: setDrawerOpen, controls: 'navbar-preview-contextual-drawer', ariaLabel: 'Buka navigasi kontekstual' } : undefined} />{config.drawer && <Drawer id="navbar-preview-contextual-drawer" open={drawerOpen} onClose={() => setDrawerOpen(false)} position="right" size="s" darkMode={config.theme === 'dark'} eyebrow="Navigasi kontekstual" header={<Drawer.Title>Layanan aktif</Drawer.Title>} items={[{ id: 'overview', label: 'Ringkasan', href: '/ringkasan', onClick: () => setDrawerOpen(false) }, { id: 'settings', label: 'Pengaturan', href: '/pengaturan', onClick: () => setDrawerOpen(false) }]} />}</>}
+    {config.platform === 'front-office' ? (config.identity === 'authenticated' ? <Navbar platform="front-office" {...common} notificationTrigger={config.notification ? { ariaLabel: 'Buka pengaturan notifikasi', onClick: () => setFeedback('Aksi demo: Notifikasi') } : undefined} account={{ name: 'User CEPLOK', initials: 'US', items: accountItems }} /> : <Navbar platform="front-office" {...common} guestActions={config.identity === 'guest' ? { signIn: { label: 'Masuk', href: '/masuk' }, signUp: { label: 'Daftar', href: '/daftar' } } : undefined} />) : <Navbar platform="back-office" {...common} sidebarItems={backOfficeSidebarItems} notificationTrigger={config.notification ? { ariaLabel: 'Buka pengaturan notifikasi', onClick: () => setFeedback('Aksi demo: Notifikasi') } : undefined} account={config.identity === 'authenticated' ? { name: 'Admin CEPLOK', initials: 'AC', items: accountItems } : undefined} />}
     {feedback && <p role="status" aria-live="polite" className="border-t border-border bg-surface-subtle px-4 py-2 text-body-sm text-content-subtle">{feedback}</p>}
   </div>
 }
 
-const base = (platform: NavbarProps['platform'], identity: Identity, menuCount: Config['menuCount']): Config => normalized({ platform, identity, menuCount, disclosure: true, search: true, disabled: false, icons: true, notification: identity === 'authenticated', drawer: platform === 'back-office', theme: 'light', fixture: 'default' })
+const base = (platform: NavbarProps['platform'], identity: Identity, menuCount: Config['menuCount']): Config => normalized({ platform, identity, menuCount, disclosure: true, search: true, disabled: false, icons: true, notification: identity === 'authenticated', theme: 'light', fixture: 'default' })
 export function NavbarDesktopPreview({ variant, menuCount, platform = 'front-office' }: { variant: 'guest'|'no-button'|'authenticated'; menuCount: 2|3|4|5; platform?: NavbarProps['platform'] }) { return <Preview config={base(platform, variant === 'authenticated' ? 'authenticated' : variant === 'guest' ? 'guest' : 'none', menuCount)} /> }
 export function NavbarMobilePreview({ variant, platform = 'front-office' }: { variant: 'guest'|'authenticated'; platform?: NavbarProps['platform'] }) { return <Preview config={base(platform, variant, 4)} /> }
 
 function readConfig(): Config {
   const p = new URLSearchParams(window.location.hash.split('?')[1] ?? ''); const n = Number(p.get('items')); const fixture = readFixture(p.get('fixture'))
   const accountFixture = fixture === 'account-current' || fixture === 'account-disabled' || fixture === 'account-actions'
-  return normalized({ platform: p.get('platform') === 'back-office' ? 'back-office' : 'front-office', identity: accountFixture ? 'authenticated' : p.get('identity') === 'authenticated' ? 'authenticated' : p.get('identity') === 'none' ? 'none' : 'guest', menuCount: fixture === 'overflow-disclosure' ? 10 : n >= 2 && n <= 10 ? n as Config['menuCount'] : 4, disclosure: fixture === 'overflow-disclosure' || p.get('disclosure') !== 'false', search: p.get('search') !== 'false', disabled: p.get('disabled') === 'true', icons: p.get('icons') !== 'false', notification: p.get('notification') !== 'false', drawer: p.get('drawer') !== 'false', theme: p.get('theme') === 'dark' ? 'dark' : 'light', fixture })
+  return normalized({ platform: p.get('platform') === 'back-office' ? 'back-office' : 'front-office', identity: accountFixture ? 'authenticated' : p.get('identity') === 'authenticated' ? 'authenticated' : p.get('identity') === 'none' ? 'none' : 'guest', menuCount: fixture === 'overflow-disclosure' ? 10 : n >= 2 && n <= 10 ? n as Config['menuCount'] : 4, disclosure: fixture === 'overflow-disclosure' || p.get('disclosure') !== 'false', search: p.get('search') !== 'false', disabled: p.get('disabled') === 'true', icons: p.get('icons') !== 'false', notification: p.get('notification') !== 'false', theme: p.get('theme') === 'dark' ? 'dark' : 'light', fixture })
 }
 /** Current-source production fixture; static preview routes depend on this export. */
 export function NavbarPlaygroundPreview() {
@@ -159,7 +167,7 @@ export function NavbarPlaygroundPreview() {
 }
 
 /** Docs-only fit presentation. The iframe itself retains the requested real viewport. */
-function PreviewFrame({ title, src, width, height = 220, stageHeight, showTitle = true, loading = 'eager', dark = false, interactive = true }: { title: string; src: string; width: number; height?: number; stageHeight?: number; showTitle?: boolean; loading?: 'eager' | 'lazy'; dark?: boolean; interactive?: boolean }) {
+function PreviewFrame({ title, src, width, height = 220, stageHeight, showTitle = true, loading = 'eager', dark = false, interactive = true, centered = false }: { title: string; src: string; width: number; height?: number; stageHeight?: number; showTitle?: boolean; loading?: 'eager' | 'lazy'; dark?: boolean; interactive?: boolean; centered?: boolean }) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
   useEffect(() => {
@@ -174,7 +182,7 @@ function PreviewFrame({ title, src, width, height = 220, stageHeight, showTitle 
   const usesSharedStage = stageHeight !== undefined
   const font = usePlaygroundFont()
   const frameSrc = font ? `${src}&font=${font}` : src
-  return <div className="space-y-2">{showTitle && <p className="text-sm font-semibold text-content">{title}</p>}<div className={`max-w-full overflow-hidden rounded-xl border p-3 ${dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'}`}><div ref={contentRef}><div className={usesSharedStage ? 'relative' : undefined} style={{ height: usesSharedStage ? stageHeight : height * scale }}><iframe title={title} src={frameSrc} loading={loading} tabIndex={interactive ? 0 : -1} className={interactive ? 'block border-0 bg-transparent' : 'pointer-events-none block border-0 bg-transparent'} style={usesSharedStage ? { position: 'absolute', top: '50%', left: 0, width, height, transform: `translateY(-50%) scale(${scale})`, transformOrigin: 'left center' } : { width, height, transform: `scale(${scale})`, transformOrigin: 'top left' }} /></div></div></div></div>
+  return <div className="space-y-2">{showTitle && <p className="text-sm font-semibold text-content">{title}</p>}<div className={`max-w-full overflow-hidden rounded-xl border p-3 ${dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'}`}><div ref={contentRef}><div className={usesSharedStage ? 'relative' : centered ? 'flex justify-center' : undefined} style={{ height: usesSharedStage ? stageHeight : height * scale }}><iframe title={title} src={frameSrc} loading={loading} tabIndex={interactive ? 0 : -1} className={interactive ? 'block shrink-0 border-0 bg-transparent' : 'pointer-events-none block shrink-0 border-0 bg-transparent'} style={usesSharedStage ? { position: 'absolute', top: '50%', left: 0, width, height, transform: `translateY(-50%) scale(${scale})`, transformOrigin: 'left center' } : { width, height, transform: `scale(${scale})`, transformOrigin: centered ? 'top center' : 'top left' }} /></div></div></div></div>
 }
 function usageItemsCode(config: Config) {
   const disabledIndex = disabledNavigationIndex(config.menuCount, config.disclosure)
@@ -189,39 +197,131 @@ function usageItemsCode(config: Config) {
   }).join('\n')
 }
 
+function usageAccountCode(config: Config) {
+  const profileState = config.fixture === 'account-current'
+    ? ', current: true'
+    : config.fixture === 'account-disabled'
+      ? ', disabled: true'
+      : ''
+  return `const account = {
+  name: '${config.platform === 'back-office' ? 'Admin CEPLOK' : 'User CEPLOK'}',
+  initials: '${config.platform === 'back-office' ? 'AC' : 'US'}',
+  items: [
+    { id: 'profile', type: 'destination', label: 'Profil', href: '/profil'${profileState} },
+    { id: 'settings', type: 'destination', label: 'Pengaturan akun', href: '/pengaturan-akun' },
+    { id: 'logout', type: 'action', label: 'Logout', tone: 'danger', onClick: () => {} },
+  ],
+} satisfies NavbarAccount
+
+`
+}
+
 function PlaygroundUsageCode({ config }: { config: Config }) {
+  if (config.platform === 'back-office') {
+    const hasAccount = config.identity === 'authenticated'
+    const imports = ['Navbar', ...(config.search ? ['Search'] : []), ...(hasAccount ? ['type NavbarAccount'] : []), 'type NavbarPrimaryItem', 'type SidebarItem'].join(', ')
+    const searchCode = config.search
+      ? 'const searchCategories = sidebarItems.map(({ id, label }) => ({ value: id ?? label, label }))\n\n'
+      : ''
+    const code = `import { ${imports} } from '@ceplok-ui/design-kit-react'
+import { Home, InfoCircle } from 'flowbite-react-icons/outline'
+
+const brand = {
+  content: <span>CEPLOK</span>,
+  href: '/',
+  ariaLabel: 'CEPLOK — Beranda',
+}
+
+const navbarItems = [
+${usageItemsCode(config)}
+] satisfies NavbarPrimaryItem[]
+
+const sidebarItems = [
+  { id: 'dashboard', label: 'Dasbor', href: '/admin', icon: <Home /> },
+  { id: 'submissions', label: 'Pengajuan', href: '/admin/pengajuan', icon: <InfoCircle /> },
+  { id: 'applicants', label: 'Pemohon', href: '/admin/pemohon', icon: <Home /> },
+  { id: 'settings', label: 'Pengaturan', href: '/admin/pengaturan', icon: <InfoCircle /> },
+] satisfies SidebarItem[]
+
+${searchCode}${hasAccount ? usageAccountCode(config) : ''}${config.notification ? "const notificationTrigger = { ariaLabel: 'Buka notifikasi', onClick: () => {} }\n" : ''}
+
+export function BackOfficeNavbar() {
+  return (
+    <Navbar
+      platform="back-office"
+      brand={brand}
+      items={navbarItems}
+      sidebarItems={sidebarItems}
+${config.search ? '      search={<Search platform="compact" showButton categories={searchCategories} categoryPlaceholder="Kategori" />}\n' : ''}${config.notification ? '      notificationTrigger={notificationTrigger}\n' : ''}${hasAccount ? '      account={account}\n' : ''}    />
+  )
+}`
+    return <SectionCode flush>{highlightNavbarCode(code)}</SectionCode>
+  }
+
   const hasSearch = config.search
   const hasAccount = config.identity === 'authenticated'
   const hasGuestActions = config.platform === 'front-office' && config.identity === 'guest'
   const hasNotification = config.platform === 'front-office' && hasAccount && config.notification
-  const hasDrawer = config.platform === 'back-office' && config.drawer
   const hasIcons = config.icons
   const darkWrapper = config.theme === 'dark'
   const itemCode = usageItemsCode(config)
-  const code = <>{hasDrawer ? "import { useState } from 'react'\n" : ''}{"import { "}{hasDrawer ? 'Drawer, ' : ''}{'Navbar'}{hasSearch ? ', Search' : ''}{hasAccount ? ', type NavbarAccount' : ''}{", type NavbarPrimaryItem } from '@ceplok-ui/design-kit-react'\n"}{hasIcons ? "import { Home, InfoCircle } from 'flowbite-react-icons/outline'\n" : ''}{'\n'}{'const brand = {\n'}{"  content: <span>CEPLOK</span>,\n  href: '/',\n  ariaLabel: 'CEPLOK — Beranda',\n}\n\n"}{'const items = [\n'}{itemCode}{'\n] satisfies NavbarPrimaryItem[]\n\n'}{hasSearch ? <>{'const search = (\n  <Search platform="compact" showButton={false} trigger="enter" aria-label="Cari dokumentasi" />\n)\n\n'}</> : null}{hasGuestActions ? <>{"const guestActions = {\n  signIn: { label: 'Masuk', href: '/masuk' },\n  signUp: { label: 'Daftar', href: '/daftar' },\n}\n\n"}</> : null}{hasAccount ? <>{`const account = {\n  name: '${config.platform === 'front-office' ? 'User CEPLOK' : 'Admin CEPLOK'}',\n  initials: '${config.platform === 'front-office' ? 'US' : 'AC'}',\n  items: [\n    { id: 'profile', type: 'destination', label: 'Profil', href: '/profil' },\n    { id: 'logout', type: 'destination', label: 'Logout', href: '/logout', tone: 'danger' },\n  ],\n} satisfies NavbarAccount\n\n`}</> : null}{hasNotification ? <>{"const notificationTrigger = <a href=\"/notifikasi\">Notifikasi</a>\n\n"}</> : null}{'export function NavbarExample() {\n'}{hasDrawer ? <>{'  const [drawerOpen, setDrawerOpen] = useState(false)\n  const contextualDrawer = {\n    open: drawerOpen,\n    onOpenChange: setDrawerOpen,\n    controls: \'reports-drawer\',\n    ariaLabel: \'Buka navigasi kontekstual\',\n  }\n\n'}</> : null}{'  return (\n'}{darkWrapper ? <>{'    <div '}<H>data-theme</H>{'="dark">\n'}</> : null}{hasDrawer ? '      <>\n' : ''}{'      <Navbar\n        '}<H>platform</H>{`="${config.platform}"\n        `}<H>brand</H>{'={brand}\n        '}<H>items</H>{'={items}\n'}{hasSearch ? <>{'        '}<H>search</H>{'={search}\n'}</> : null}{hasGuestActions ? <>{'        '}<H>guestActions</H>{'={guestActions}\n'}</> : null}{hasAccount ? <>{'        '}<H>account</H>{'={account}\n'}</> : null}{hasNotification ? <>{'        '}<H>notificationTrigger</H>{'={notificationTrigger}\n'}</> : null}{hasDrawer ? <>{'        '}<H>mobileDrawer</H>{'={contextualDrawer}\n'}</> : null}{'      />\n'}{hasDrawer ? <>{'      <Drawer\n        id="reports-drawer"\n        open={drawerOpen}\n        onClose={() => setDrawerOpen(false)}\n        position="right"\n        size="s"\n      />\n      </>\n'}</> : null}{darkWrapper ? '    </div>\n' : ''}{'  )\n}'}</>
+  const imports = ['Navbar', ...(hasSearch ? ['Search'] : []), ...(hasAccount ? ['type NavbarAccount'] : []), 'type NavbarPrimaryItem'].join(', ')
+  const searchCode = hasSearch ? 'const search = (\n  <Search platform="compact" showButton={false} trigger="enter" aria-label="Cari dokumentasi" />\n)\n\n' : ''
+  const guestCode = hasGuestActions ? "const guestActions = {\n  signIn: { label: 'Masuk', href: '/masuk' },\n  signUp: { label: 'Daftar', href: '/daftar' },\n}\n\n" : ''
+  const accountCode = hasAccount ? usageAccountCode(config) : ''
+  const notificationCode = hasNotification ? "const notificationTrigger = { ariaLabel: 'Buka notifikasi', onClick: () => {} }\n\n" : ''
+  const propsCode = [
+    '        platform="front-office"',
+    '        brand={brand}',
+    '        items={items}',
+    ...(hasSearch ? ['        search={search}'] : []),
+    ...(hasGuestActions ? ['        guestActions={guestActions}'] : []),
+    ...(hasAccount ? ['        account={account}'] : []),
+    ...(hasNotification ? ['        notificationTrigger={notificationTrigger}'] : []),
+  ].join('\n')
+  const navbarCode = `      <Navbar\n${propsCode}\n      />`
+  const code = `import { ${imports} } from '@ceplok-ui/design-kit-react'\n${hasIcons ? "import { Home, InfoCircle } from 'flowbite-react-icons/outline'\n" : ''}\nconst brand = {\n  content: <span>CEPLOK</span>,\n  href: '/',\n  ariaLabel: 'CEPLOK — Beranda',\n}\n\nconst items = [\n${itemCode}\n] satisfies NavbarPrimaryItem[]\n\n${searchCode}${guestCode}${accountCode}${notificationCode}export function NavbarExample() {\n  return (\n${darkWrapper ? `    <div data-theme="dark">\n${navbarCode}\n    </div>` : navbarCode}\n  )\n}`
   return <SectionCode flush>{highlightNavbarCode(code)}</SectionCode>
 }
 
-function fixtureSrc(config: Config) { return `#/preview/navbar/playground?${new URLSearchParams({ platform: config.platform, identity: config.identity, items: String(config.menuCount), disclosure: String(config.disclosure), search: String(config.search), disabled: String(config.disabled), icons: String(config.icons), notification: String(config.notification), drawer: String(config.drawer), theme: config.theme, fixture: config.fixture })}` }
-function StaticExample({ title, config, width, height, stageHeight, children, loading = 'lazy' }: { title: string; config: Config; width: number; height: number; stageHeight?: number; children: ReactNode; loading?: 'eager' | 'lazy' }) { return <section><p className="mb-2 text-sm font-black text-gray-900">{title}</p><PreviewFrame title={title} src={fixtureSrc(config)} width={width} height={height} stageHeight={stageHeight} showTitle={false} loading={loading} dark={config.theme === 'dark'} interactive={false} /><div className="mt-4"><SectionCode>{highlightNavbarCode(children)}</SectionCode></div></section> }
+function fixtureSrc(config: Config) { return `#/preview/navbar/playground?${new URLSearchParams({ platform: config.platform, identity: config.identity, items: String(config.menuCount), disclosure: String(config.disclosure), search: String(config.search), disabled: String(config.disabled), icons: String(config.icons), notification: String(config.notification), theme: config.theme, fixture: config.fixture })}` }
+const staticExampleHighlights: Record<string, readonly string[]> = {
+  'Front Office': ['platform'],
+  'Back Office': ['platform'],
+  'FO guest': ['guestActions'],
+  'FO authenticated': ['account'],
+  'Back Office account': ['account'],
+  Destination: ['type'],
+  Disclosure: ['type', 'children'],
+  Disabled: ['disabled'],
+  'Front Office Search & notification': ['search', 'notificationTrigger'],
+  'Back Office categorized Search & automatic navigation Drawer': ['Search', 'categories', 'categoryPlaceholder', 'sidebarItems', 'search'],
+  'FO desktop Dark': ['data-theme'],
+  'BO desktop Dark': ['data-theme'],
+}
+
+function StaticExample({ title, config, width, height, stageHeight, highlights, children, loading = 'lazy' }: { title: string; config: Config; width: number; height: number; stageHeight?: number; highlights?: readonly string[]; children: ReactNode; loading?: 'eager' | 'lazy' }) {
+  const relevantHighlights = highlights ?? staticExampleHighlights[title] ?? []
+  return <section><p className="mb-2 text-sm font-black text-gray-900">{title}</p><PreviewFrame title={title} src={fixtureSrc(config)} width={width} height={height} stageHeight={stageHeight} showTitle={false} loading={loading} dark={config.theme === 'dark'} interactive={false} /><div className="mt-4"><SectionCode>{highlightNavbarCode(children, relevantHighlights)}</SectionCode></div></section>
+}
 
 export function NavbarPage() {
   const [config, setConfig] = useState<Config>(() => base('front-office', 'guest', 4)); const [width, setWidth] = useState(1440); const [customWidth, setCustomWidth] = useState('1440'); const [height, setHeight] = useState(220); const [customHeight, setCustomHeight] = useState('220')
   const update = <K extends keyof Config>(key: K, value: Config[K]) => setConfig((c) => normalized({ ...c, [key]: value }))
-  const src = useMemo(() => `#/preview/navbar/playground?${new URLSearchParams({ platform: config.platform, identity: config.identity, items: String(config.menuCount), disclosure: String(config.disclosure), search: String(config.search), disabled: String(config.disabled), icons: String(config.icons), notification: String(config.notification), drawer: String(config.drawer), theme: config.theme, fixture: config.fixture })}`, [config])
+  const src = useMemo(() => `#/preview/navbar/playground?${new URLSearchParams({ platform: config.platform, identity: config.identity, items: String(config.menuCount), disclosure: String(config.disclosure), search: String(config.search), disabled: String(config.disabled), icons: String(config.icons), notification: String(config.notification), theme: config.theme, fixture: config.fixture })}`, [config])
   const validWidth = /^\d+$/.test(customWidth) && Number(customWidth) >= 320 && Number(customWidth) <= 2560
   const validHeight = /^\d+$/.test(customHeight) && Number(customHeight) >= 94 && Number(customHeight) <= 1200
-  return <UsulanPage eyebrow="Components · Navbar" title="Navbar" description="Header responsif untuk Front Office dan Back Office, dibangun dari foundation Search, Button, Avatar, Dropdown, Sidebar, dan Drawer." toc={toc}>
-    <FlowSection id="navbar" title="Navbar"><Lead>Navbar mengatur komposisi navigasi responsif. Consumer tetap memiliki Brand, route state, Search behavior, notification destination, dan konten Drawer.</Lead><StaticExample title="Front Office" config={base('front-office', 'guest', 4)} width={1440} height={94} loading="eager">{'<Navbar\n  '}<H>platform</H>{'="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  guestActions={guestActions}\n/>'}</StaticExample></FlowSection>
-    <FlowSection id="front-office" title="Platform"><Lead>Komposisi Front Office dan Back Office memakai kontrak prop yang berbeda; keduanya dirender sebagai Navbar produksi pada viewport referensi.</Lead><div className="space-y-8"><StaticExample title="Front Office" config={base('front-office', 'guest', 4)} width={1440} height={94}>{'<Navbar\n  '}<H>platform</H>{'="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  guestActions={guestActions}\n/>'}</StaticExample><StaticExample title="Back Office" config={base('back-office', 'authenticated', 4)} width={1184} height={94}>{'<Navbar\n  '}<H>platform</H>{'="back-office"\n  brand={brand}\n  items={items}\n  search={search}\n  account={account}\n  mobileDrawer={contextualDrawer}\n/>'}</StaticExample></div></FlowSection>
-    <FlowSection id="back-office" title="Identity & Account"><Lead>State identitas Front Office adalah konfigurasi consumer yang berbeda, bukan toggle dokumentasi.</Lead><div className="space-y-8"><StaticExample title="Guest" config={base('front-office', 'guest', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  '}<H>guestActions</H>{'={guestActions}\n/>'}</StaticExample><StaticExample title="Authenticated" config={base('front-office', 'authenticated', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  '}<H>account</H>{'={account}\n  '}<H>notificationTrigger</H>{'={notificationLink}\n/>'}</StaticExample><StaticExample title="No actions" config={base('front-office', 'none', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n/>'}</StaticExample></div></FlowSection>
-    <FlowSection id="navigation" title="Navigation & Disclosure"><Lead>Destination memakai anchor native; Disclosure, Lainnya, dan trigger mobile memakai button native. Pada destination utama, current diteruskan sebagai aria-current; Breadcrumb menyediakan konteks halaman secara visual. Dropdown tetap menangani tampilan current untuk baris menu sesuai kontraknya. Item yang tidak muat berpindah ke Lainnya tanpa dibuang. Disclosure dan panel yang dibuka dari trigger mendukung Escape serta mengembalikan fokus ke trigger yang masih terlihat; consumer tetap menangani route transition dan current state.</Lead><div className="space-y-8"><StaticExample title="Destination" config={normalized({ ...base('front-office', 'authenticated', 4), disclosure: false })} width={1440} height={94}>{"const items = [{ id: 'home', "}<H>type</H>{": 'destination', label: 'Beranda', href: '/beranda' }]"}</StaticExample><StaticExample title="Disclosure" config={base('front-office', 'authenticated', 4)} width={1440} height={94}>{"const items = [{ id: 'digital-services', "}<H>type</H>{": 'disclosure', label: 'Layanan Digital', "}<H>children</H>{": destinations }]"}</StaticExample><StaticExample title="Disabled" config={normalized({ ...base('front-office', 'authenticated', 4), disclosure: false, disabled: true })} width={1440} height={94}>{"const items = [{ id: 'public-information', type: 'destination', label: 'Informasi Publik', href: '/informasi-publik', "}<H>disabled</H>{': true }]'} </StaticExample></div><p className="mt-4 text-body-sm text-content-muted">Gunakan ariaLabel yang bermakna untuk Brand dan trigger contextual Drawer. Jangan gunakan role menu/menuitem tanpa model keyboard menu lengkap.</p></FlowSection>
-    <FlowSection id="slots" title="Search & consumer slots"><Lead>Search, notification, dan BO contextual Drawer adalah komposisi consumer. Contoh desktop ditumpuk agar Navbar tetap terbaca pada viewport referensinya.</Lead><div className="space-y-8"><StaticExample title="Front Office Search & notification" config={base('front-office', 'authenticated', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  '}<H>search</H>{'={search}\n  '}<H>account</H>{'={account}\n  '}<H>notificationTrigger</H>{'={notificationLink}\n/>'}</StaticExample><StaticExample title="Back Office Search & contextual Drawer" config={base('back-office', 'authenticated', 4)} width={1184} height={94}>{'<Navbar\n  platform="back-office"\n  brand={brand}\n  items={items}\n  '}<H>search</H>{'={search}\n  '}<H>account</H>{'={account}\n  '}<H>mobileDrawer</H>{'={contextualDrawer}\n/>'}</StaticExample></div></FlowSection>
-    <FlowSection id="responsive" title="Responsive behavior"><Lead>Viewport berasal dari environment consumer, bukan prop Navbar. FO mobile memakai dua baris; BO menggunakan layout produksi pada 458px. Navbar memiliki Sidebar mobile, sedangkan consumer memiliki konten dan state contextual Drawer Back Office melalui mobileDrawer.</Lead><div className="grid gap-5 lg:grid-cols-2"><StaticExample title="FO mobile · 412px" config={base('front-office', 'authenticated', 4)} width={412} height={122} stageHeight={122}>{'<Navbar\n  '}<H>platform</H>{'="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  account={account}\n/>'}</StaticExample><StaticExample title="BO mobile · 458px" config={base('back-office', 'authenticated', 4)} width={458} height={79} stageHeight={122}>{'<Navbar\n  '}<H>platform</H>{'="back-office"\n  brand={brand}\n  items={items}\n  search={search}\n  account={account}\n  '}<H>mobileDrawer</H>{'={contextualDrawer}\n/>'}</StaticExample></div></FlowSection>
-    <FlowSection id="dark-mode" title="Dark mode"><Lead>Contoh ini memakai production Navbar di dalam boundary consumer <H>data-theme</H>{'="dark"'}. Fixture mewarisi token tema untuk surface, teks, border, Search, Button, dan Dropdown; bingkai preview juga memakai surface gelap agar seluruh konteks komponen terbaca tanpa menggelapkan halaman Docs.</Lead><div className="space-y-8"><StaticExample title="FO desktop Dark" config={{ ...base('front-office', 'guest', 4), theme: 'dark' }} width={1440} height={94}>{'<div '}<H>data-theme</H>{'="dark">\n  <Navbar platform="front-office" brand={brand} items={items} guestActions={guestActions} />\n</div>'}</StaticExample><StaticExample title="BO desktop Dark" config={{ ...base('back-office', 'authenticated', 4), theme: 'dark' }} width={1184} height={94}>{'<div '}<H>data-theme</H>{'="dark">\n  <Navbar platform="back-office" brand={brand} items={items} account={account} />\n</div>'}</StaticExample><div className="grid gap-5 lg:grid-cols-2"><PreviewFrame title="FO mobile Dark" src={fixtureSrc({ ...base('front-office', 'authenticated', 4), theme: 'dark' })} width={412} height={122} stageHeight={122} loading="lazy" dark interactive={false} /><PreviewFrame title="BO mobile Dark" src={fixtureSrc({ ...base('back-office', 'authenticated', 4), theme: 'dark' })} width={458} height={79} stageHeight={122} loading="lazy" dark interactive={false} /></div></div></FlowSection>
+  return <UsulanPage eyebrow="Components · Navbar" title="Navbar" description="Header navigasi global yang menyatukan brand, navigasi utama, pencarian, notifikasi, dan akses akun dalam komposisi Front Office atau Back Office yang responsif." toc={toc}>
+    <FlowSection id="navbar" title="Navbar"><Lead>Navbar adalah header navigasi global aplikasi. Komponen menyusun brand, navigasi utama, Search, tombol notifikasi, dan identitas atau aksi pengguna, lalu otomatis mengganti komposisi desktop dan mobile. Navbar tidak menangani routing, hasil pencarian, data notifikasi, atau isi panel custom: consumer memasok datanya, memperbarui current route, dan mengelola interaksinya.</Lead><StaticExample title="Front Office" config={base('front-office', 'guest', 4)} width={1440} height={94} loading="eager">{'<Navbar\n  '}<H>platform</H>{'="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  guestActions={guestActions}\n/>'}</StaticExample></FlowSection>
+    <FlowSection id="front-office" title="Platform"><Lead>Front Office dan Back Office memiliki kontrak komposisi berbeda. Pada BO, items adalah navigasi Navbar desktop sekaligus Drawer navigasi mobile, sedangkan sidebarItems berasal dari Sidebar aplikasi yang dirender consumer pada desktop dan dipakai Navbar pada mobile.</Lead><div className="space-y-8"><StaticExample title="Front Office" config={base('front-office', 'guest', 4)} width={1440} height={94}>{'<Navbar\n  '}<H>platform</H>{'="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  guestActions={guestActions}\n/>'}</StaticExample><StaticExample title="Back Office" config={base('back-office', 'authenticated', 4)} width={1184} height={94}>{'<Navbar\n  '}<H>platform</H>{'="back-office"\n  brand={brand}\n  items={navbarItems}\n  sidebarItems={sidebarItems}\n  search={search}\n  notificationTrigger={notificationTrigger}\n  account={account}\n/>'}</StaticExample></div></FlowSection>
+    <FlowSection id="back-office" title="Identity & Account"><Lead>FO guest memakai guestActions, sedangkan FO authenticated dan BO dapat memakai account. Identitas BO juga dapat ditempatkan pada Sidebar aplikasi.</Lead><div className="space-y-8"><StaticExample title="FO guest" config={base('front-office', 'guest', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  '}<H>guestActions</H>{'={guestActions}\n/>'}</StaticExample><StaticExample title="FO authenticated" config={base('front-office', 'authenticated', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  '}<H>account</H>{'={account}\n/>'}</StaticExample><StaticExample title="Back Office account" config={normalized({ ...base('back-office', 'authenticated', 4), notification: false })} width={1184} height={94}>{'<Navbar platform="back-office" account={account} />'}</StaticExample></div></FlowSection>
+    <FlowSection id="navigation" title="Navigation & Disclosure"><Lead>Destination memakai anchor native; Disclosure, Lainnya, dan trigger mobile memakai button native. Pada destination utama, current diteruskan sebagai aria-current; Breadcrumb menyediakan konteks halaman secara visual. Dropdown tetap menangani tampilan current untuk baris menu sesuai kontraknya. Item yang tidak muat berpindah ke Lainnya tanpa dibuang. Disclosure dan panel yang dibuka dari trigger mendukung Escape serta mengembalikan fokus ke trigger yang masih terlihat; consumer tetap menangani route transition dan current state.</Lead><div className="space-y-8"><StaticExample title="Destination" config={normalized({ ...base('front-office', 'authenticated', 4), disclosure: false })} width={1440} height={94}>{"const items = [{ id: 'home', "}<H>type</H>{": 'destination', label: 'Beranda', href: '/beranda' }]"}</StaticExample><StaticExample title="Disclosure" config={base('front-office', 'authenticated', 4)} width={1440} height={94}>{"const items = [{ id: 'digital-services', "}<H>type</H>{": 'disclosure', label: 'Layanan Digital', "}<H>children</H>{": destinations }]"}</StaticExample><StaticExample title="Disabled" config={normalized({ ...base('front-office', 'authenticated', 4), disclosure: false, disabled: true })} width={1440} height={94}>{"const items = [{ id: 'public-information', type: 'destination', label: 'Informasi Publik', href: '/informasi-publik', "}<H>disabled</H>{': true }]'} </StaticExample></div><p className="mt-4 text-body-sm text-content-muted">Pada BO, items yang sama mempertahankan href, target, rel, disabled, dan current ketika dirender melalui Drawer mobile. Jangan gunakan role menu/menuitem tanpa model keyboard menu lengkap.</p></FlowSection>
+    <FlowSection id="slots" title="Search & consumer slots"><Lead>Search adalah slot consumer, sedangkan notificationTrigger mengonfigurasi tombol Bell bawaan Navbar. Pada BO, gunakan Search berkategori dan turunkan urutan kategori dari sidebarItems agar Sidebar desktop, dialog Sidebar mobile, dan filter pencarian memakai satu sumber navigasi. Navbar otomatis membentuk Drawer dari items; tableOfContents opsional ditambahkan sebagai disclosure terakhir untuk viewport mobile.</Lead><div className="space-y-8"><StaticExample title="Front Office Search & notification" config={base('front-office', 'authenticated', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  '}<H>search</H>{'={search}\n  '}<H>account</H>{'={account}\n  '}<H>notificationTrigger</H>{'={notificationTrigger}\n/>'}</StaticExample><StaticExample title="Back Office categorized Search & automatic navigation Drawer" config={base('back-office', 'authenticated', 4)} width={1184} height={94}>{"const searchCategories = sidebarItems.map(({ id, label }) => ({ value: id ?? label, label }))\n\n<Search categories={searchCategories} categoryPlaceholder=\"Kategori\" />\n\n<Navbar\n  platform=\"back-office\"\n  brand={brand}\n  items={navbarItems}\n  sidebarItems={sidebarItems}\n  tableOfContents={tableOfContents}\n  search={searchWithSidebarCategories}\n  account={account}\n/>"}</StaticExample></div><p className="mt-4 text-body-sm text-content-muted">Consumer boleh memetakan label, value, menonaktifkan, atau menyaring kategori sesuai kebutuhan pencarian, tetapi sumber dasarnya tetap sidebarItems—bukan array navigasi kedua yang di-hardcode. Untuk filter, detail, atau panel kontekstual lain, render Drawer di luar Navbar.</p></FlowSection>
+    <FlowSection id="responsive" title="Responsive behavior"><Lead>Viewport berasal dari environment consumer, bukan prop Navbar. Pada BO desktop, consumer merender Sidebar aplikasi dan TOC halaman di layout konten. Pada mobile, Navbar merender sidebarItems di dialog Sidebar, menyajikan items melalui Drawer navigasi, lalu menaruh tableOfContents sebagai disclosure terakhir yang tertutup secara default. Saat dibuka, disclosure merender komponen TableOfContents yang sama agar styling dan status aktif konsisten dengan desktop. Search kategori BO tetap di baris kedua di bawah 576px; mulai 576px Search kembali ke baris utama agar ruang horizontal dipakai lebih efisien.</Lead><div className="grid gap-5 lg:grid-cols-2"><StaticExample title="FO mobile · 412px" config={base('front-office', 'authenticated', 4)} width={412} height={140} stageHeight={140}>{'<Navbar\n  '}<H>platform</H>{'="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  account={account}\n/>'}</StaticExample><StaticExample title="BO mobile · 458px" config={base('back-office', 'authenticated', 4)} width={458} height={140} stageHeight={140}>{'<Navbar\n  '}<H>platform</H>{'="back-office"\n  brand={brand}\n  items={navbarItems}\n  sidebarItems={sidebarItems}\n  tableOfContents={tableOfContents}\n  search={searchWithSidebarCategories}\n  account={account}\n/>'}</StaticExample></div></FlowSection>
+    <FlowSection id="dark-mode" title="Dark mode"><Lead>Contoh ini memakai production Navbar di dalam boundary consumer <H>data-theme</H>{'="dark"'}. Fixture mewarisi token tema untuk surface, teks, border, Search, Button, dan Dropdown; bingkai preview juga memakai surface gelap agar seluruh konteks komponen terbaca tanpa menggelapkan halaman Docs.</Lead><div className="space-y-8"><StaticExample title="FO desktop Dark" config={{ ...base('front-office', 'guest', 4), theme: 'dark' }} width={1440} height={94}>{'<div '}<H>data-theme</H>{'="dark">\n  <Navbar platform="front-office" brand={brand} items={items} guestActions={guestActions} />\n</div>'}</StaticExample><StaticExample title="BO desktop Dark" config={{ ...base('back-office', 'authenticated', 4), theme: 'dark' }} width={1184} height={94}>{'<div '}<H>data-theme</H>{'="dark">\n  <Navbar platform="back-office" brand={brand} items={items} account={account} />\n</div>'}</StaticExample><div className="grid gap-5 lg:grid-cols-2"><PreviewFrame title="FO mobile Dark" src={fixtureSrc({ ...base('front-office', 'authenticated', 4), theme: 'dark' })} width={412} height={140} stageHeight={140} loading="lazy" dark interactive={false} /><PreviewFrame title="BO mobile Dark" src={fixtureSrc({ ...base('back-office', 'authenticated', 4), theme: 'dark' })} width={458} height={140} stageHeight={140} loading="lazy" dark interactive={false} /></div></div></FlowSection>
     <FlowSection id="playground" title="Playground">
       <Lead>Playground merender Navbar produksi melalui iframe hash-route. Controls hanya mengubah consumer fixture dan viewport; tidak ada allocator dokumentasi atau prop produksi tambahan.</Lead>
-      <PreviewFrame title="Navbar Playground" src={src} width={width} height={height} dark={config.theme === 'dark'} />
+      <PreviewFrame title="Navbar Playground" src={src} width={width} height={height} dark={config.theme === 'dark'} centered />
       <Controls>
         <Control label="Theme"><Segmented label="Theme" value={config.theme} onChange={(v) => update('theme', v)} options={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} /></Control>
         <Control label="Platform"><Segmented label="Platform" value={config.platform} onChange={(v) => update('platform', v)} options={[{ value: 'front-office', label: 'Front Office' }, { value: 'back-office', label: 'Back Office' }]} /></Control>
@@ -231,8 +331,7 @@ export function NavbarPage() {
         <Control label="Disclosure"><Segmented label="Disclosure" value={config.disclosure} onChange={(v) => update('disclosure', v)} options={bool} /></Control>
         <Control label="Search"><Segmented label="Search" value={config.search} onChange={(v) => update('search', v)} options={bool} /></Control>
         <Control label="Disabled item"><Segmented label="Disabled item" value={config.disabled} onChange={(v) => update('disabled', v)} options={bool} /></Control>
-        {config.platform === 'front-office' && config.identity === 'authenticated' && <Control label="Notification"><Segmented label="Notification" value={config.notification} onChange={(v) => update('notification', v)} options={bool} /></Control>}
-        {config.platform === 'back-office' && <Control label="Contextual Drawer"><Segmented label="Contextual Drawer" value={config.drawer} onChange={(v) => update('drawer', v)} options={bool} /></Control>}
+        {((config.platform === 'front-office' && config.identity === 'authenticated') || config.platform === 'back-office') && <Control label="Notification"><Segmented label="Notification" value={config.notification} onChange={(v) => update('notification', v)} options={bool} /></Control>}
       </Controls>
     </FlowSection>
     <FlowSection id="penggunaan" title="Penggunaan">
@@ -243,7 +342,7 @@ export function NavbarPage() {
       <Lead>NavbarProps adalah discriminated union berdasarkan platform. Tabel pertama mencakup prop publik Navbar; tabel kedua merangkum bentuk data yang dipasok consumer.</Lead>
       <div className="space-y-8">
         <div><h3 className="mb-3 text-heading-4 font-bold text-content">NavbarProps</h3><PropsTable rows={navbarProps} minWidth="54rem" /></div>
-        <p className="text-body-sm leading-6 text-content-muted">Front Office memakai mode guest atau authenticated: guestActions hanya untuk guest, sedangkan account dan notificationTrigger hanya untuk authenticated. Back Office memakai kontrak sendiri: account dan mobileDrawer tersedia, sementara guestActions dan notificationTrigger tidak tersedia.</p>
+        <p className="text-body-sm leading-6 text-content-muted">Front Office memakai mode guest atau authenticated. Pada Back Office, items dan sidebarItems sengaja berbeda: items untuk baris Navbar desktop/Drawer navigasi mobile, sidebarItems untuk Sidebar aplikasi desktop/mobile. tableOfContents menambahkan disclosure TOC terakhir hanya pada Drawer mobile. notificationTrigger dapat digunakan dengan atau tanpa account. Sidebar dan TOC desktop tetap dimiliki consumer; Drawer navigasi dirender Navbar.</p>
         <div><h3 className="mb-3 text-heading-4 font-bold text-content">Supporting types</h3><PropsTable rows={supportingTypes} minWidth="54rem" /></div>
         <p className="text-body-sm leading-6 text-content-muted">NavbarPrimaryItem adalah NavbarDestination atau NavbarDisclosure. Untuk struktur field lengkap dan signature callback, gunakan tipe publik yang diekspor dari package.</p>
       </div>

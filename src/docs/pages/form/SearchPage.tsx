@@ -44,7 +44,7 @@ const searchProps: PropRow[] = [
   ['platform', "'default' | 'mobile' | 'compact'", 'default', 'Tinggi kotak, ukuran ikon, teks, dan tombol: 54px, 50px, atau 37px. compact untuk navbar. Tidak berlaku pada varian kategori.'],
   ['showButton', 'boolean', 'true', 'Menampilkan tombol cari di kanan. Bawaannya false pada platform compact.'],
   ['application', "'default' | 'purple'", 'default', 'Warna tombol cari dan garis saat field difokus.'],
-  ['categories', 'SearchCategory[]', 'undefined', 'Bila diisi, komponen berpindah ke varian dengan kategori.'],
+  ['categories', 'SearchCategory[]', 'undefined', 'Bila diisi, komponen berpindah ke varian dengan ruas kategori tetap 113px; label panjang dipotong tanpa mempersempit field pencarian.'],
   ['categoryPlaceholder', 'string', 'Kategori', 'Teks dropdown saat kategori belum dipilih.'],
   ['category / defaultCategory', 'string', 'undefined', 'Kategori terpilih, terkendali maupun tidak.'],
   ['onCategoryChange', '(value: string) => void', 'undefined', 'Dipanggil saat kategori berganti.'],
@@ -169,7 +169,8 @@ export function SearchPage() {
         <p className="mt-2 text-body-sm text-gray-500">
           Daftar kategorinya panel Dropdown, sama dengan daftar pilihan Regular Select Form. Nilai
           kategorinya dibawa elemen <Hl>&lt;select&gt;</Hl> di belakang tombolnya, dan itulah yang
-          diteruskan ke <Hl>onCategoryChange</Hl> serta argumen kedua <Hl>onSearch</Hl>.
+          diteruskan ke <Hl>onCategoryChange</Hl> serta argumen kedua <Hl>onSearch</Hl>. Option yang
+          panjang tidak mengubah lebar ruas 113px; label pada trigger dipotong dengan ellipsis.
         </p>
       </FlowSection>
 

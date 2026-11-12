@@ -7,6 +7,7 @@ import {
   useId,
   useRef,
   useState,
+  type ButtonHTMLAttributes,
   type HTMLAttributes,
   type MouseEvent,
   type ReactElement,
@@ -18,8 +19,8 @@ export type PopoverSide = 'top' | 'right' | 'bottom' | 'left'
 
 export interface PopoverProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'popover' | 'onBeforeToggle'> {
-  /** Satu elemen button-like yang meneruskan prop native ke elemen DOM fokusabel. */
-  trigger: ReactElement
+  /** Satu elemen native `<button>` yang menjadi trigger Popover. */
+  trigger: ReactElement<ButtonHTMLAttributes<HTMLButtonElement>, 'button'>
   /** Judul pada area header Popover. */
   title: ReactNode
   /** Preferensi posisi panel terhadap trigger. Dapat berbalik agar tetap aman di viewport. */
@@ -37,15 +38,6 @@ export interface PopoverProps
   children: ReactNode
 }
 
-type TriggerProps = {
-  id?: string
-  disabled?: boolean
-  onClick?: (event: MouseEvent<HTMLElement>) => void
-  'aria-controls'?: string
-  'aria-disabled'?: boolean | 'true' | 'false'
-  'aria-expanded'?: boolean
-}
-
 type Placement = {
   side: PopoverSide
   arrowOffset: number
@@ -60,6 +52,9 @@ const ARROW_WRAPPER_HALF = 8
 const ARROW_VISUAL_HALF = (10 * Math.SQRT2) / 2
 const ARROW_DIVIDER_GAP = 1
 const DEFAULT_PANEL_WIDTH = 255
+
+const TRIGGER_CONTRACT_ERROR =
+  '[Popover] `trigger` must be a native <button> element. Div/span elements, Fragments, wrapped buttons, and custom components are not supported.'
 
 const oppositeSide: Record<PopoverSide, PopoverSide> = {
   top: 'bottom',
@@ -94,7 +89,7 @@ const isFocusableTrigger = (element: HTMLElement) =>
   )
 
 /**
- * Popover informasi non-modal yang ditambatkan pada satu trigger button-like.
+ * Popover informasi non-modal yang ditambatkan pada satu trigger native button.
  * Browser mengurus top layer, Escape, dan light dismiss melalui HTML Popover API.
  */
 export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover(
@@ -114,11 +109,18 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
   },
   forwardedRef,
 ) {
+  if (
+    !isValidElement<ButtonHTMLAttributes<HTMLButtonElement>>(trigger) ||
+    trigger.type !== 'button'
+  ) {
+    throw new Error(TRIGGER_CONTRACT_ERROR)
+  }
+
   const generatedPanelId = useId()
   const generatedTriggerId = useId()
   const panelId = id ?? generatedPanelId
-  const triggerElement = isValidElement(trigger) ? (trigger as ReactElement<TriggerProps>) : null
-  const suppliedTriggerId = triggerElement?.props.id?.trim()
+  const triggerElement = trigger
+  const suppliedTriggerId = triggerElement.props.id?.trim()
   const triggerId = suppliedTriggerId || generatedTriggerId
   const controlled = open !== undefined
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen)
@@ -132,7 +134,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
   })
 
   const panelRef = useRef<HTMLDivElement | null>(null)
-  const anchorRef = useRef<HTMLElement | null>(null)
+  const anchorRef = useRef<HTMLButtonElement | null>(null)
   const frameRef = useRef(0)
   const expectedToggleRef = useRef<boolean | null>(null)
   const anchorOutsideRef = useRef(false)
@@ -158,8 +160,8 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
     const cached = anchorRef.current
     if (cached?.isConnected) return cached
     const resolved = document.getElementById(triggerId)
-    anchorRef.current = resolved
-    return resolved
+    anchorRef.current = resolved instanceof HTMLButtonElement ? resolved : null
+    return anchorRef.current
   }, [triggerId])
 
   const positionPanel = useCallback(() => {
@@ -375,8 +377,6 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
     if (nativeOpen) schedulePosition()
   }, [nativeOpen, schedulePosition, side, children, title])
 
-  if (!triggerElement) return null
-
   const triggerControls = Array.from(
     new Set([...(triggerElement.props['aria-controls']?.split(/\s+/) ?? []), panelId]),
   )
@@ -386,7 +386,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
     id: triggerId,
     'aria-controls': triggerControls,
     'aria-expanded': desiredOpen,
-    onClick: (event: MouseEvent<HTMLElement>) => {
+    onClick: (event: MouseEvent<HTMLButtonElement>) => {
       triggerElement.props.onClick?.(event)
       if (event.defaultPrevented || isDisabledTrigger(event.currentTarget)) return
       anchorRef.current = event.currentTarget

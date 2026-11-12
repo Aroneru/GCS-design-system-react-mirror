@@ -57,6 +57,7 @@ const drawerProps: PropRow[] = [
     ['eyebrow', 'string', 'optional', 'Label kapital bagian atas header (mis. "MENU").'],
     ['header', 'ReactNode', 'optional', 'Elemen kustom untuk konten header.'],
     ['items', 'DrawerMenuItem[]', 'optional', 'Daftar konfigurasi menu item (otomatis merender DrawerHeader & DrawerNavItem jika tidak menggunakan children JSX).'],
+    ['afterItems', 'ReactNode', 'optional', 'Konten tambahan setelah seluruh items, di dalam DrawerBody data-driven yang sama.'],
     ['theme', "'primary' | 'purple' | 'blue' | 'gray'", "'primary'", 'Skema warna item yang aktif.'],
     ['darkMode', 'boolean', 'false', 'Mengaktifkan tema gelap (latar gray-800, teks gray-50).'],
     ['children', 'ReactNode', 'optional', 'Komponen anak opsional (DrawerHeader, DrawerBody, dll) untuk layout kustom.'],
