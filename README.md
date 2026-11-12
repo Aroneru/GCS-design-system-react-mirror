@@ -125,7 +125,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Toast`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Card`       | `image`, `title`, `description`, `href`, `linkLabel`, `actions`, `darkMode`                                          |
-| `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `actionLabel`, `actionDisabled`, `darkMode` |
+| `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `actionLabel`, `actionDisabled`, `interactiveFeedback`, `darkMode` |
 | `Container`  | `as` (default `div`), `padded` (default `true`), `darkMode`                                                          |
 | `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
 | `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, ambient `data-theme`, `darkMode` (override kompatibilitas) |
@@ -284,10 +284,26 @@ varian berubah menjadi latar putih dengan teks gray-700.
 `ListView` menyediakan daftar item berukuran `S`, `M`, atau `L` untuk desktop
 dan mobile. Varian `simple` dapat memakai ikon, badge, dekorasi aksen, dan aksi;
 varian `article` tersedia hingga `XL`, selalu memakai garis aksen vertikal, dan
-menampilkan subject, metadata, pin, judul, serta metrik interaksi. Gunakan
-`actionDisabled` bersama `actionLabel` untuk menyembunyikan tombol aksi simple
-di semua ukuran dan platform. Gunakan `darkMode` pada pembungkus atau item untuk
-tampilan gelap.
+menampilkan subject, metadata, pin, judul, serta metrik interaksi. Setiap item
+memenuhi lebar kontainer daftar dan menggunakan teks rata kiri. Pada varian
+`simple`, gunakan `actionDisabled` bersama `actionLabel` untuk
+menyembunyikan tombol aksi di semua ukuran dan platform. Bila `actionHref` atau
+`onAction` juga tersedia, aksi otomatis dialihkan ke seluruh item selama item
+belum memiliki `href` atau `onClick`; `actionHref` menghasilkan anchor dan
+`onAction` secara default menghasilkan button. `href`/`onClick` item yang
+eksplisit selalu diprioritaskan. `interactiveFeedback={false}` hanya mematikan
+perubahan border, shadow, dan scale saat hover/active; item tetap dapat diklik.
+Gunakan `darkMode` pada pembungkus atau item untuk tampilan gelap.
+
+```tsx
+<ListViewItem
+  title="Integrasi dan Template Standar"
+  actionLabel="Buka"
+  actionDisabled
+  onAction={() => bukaDetail()}
+  interactiveFeedback={false}
+/>
+```
 
 ### Form
 

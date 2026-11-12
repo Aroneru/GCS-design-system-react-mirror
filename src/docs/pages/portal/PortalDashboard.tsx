@@ -1,10 +1,9 @@
-import { useEffect, useId, useState, type MouseEvent, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode, type SyntheticEvent } from 'react'
 import {
   Alert,
   Badge,
   Button,
   Card,
-  Drawer,
   Icon,
   ListView,
   Search,
@@ -12,7 +11,6 @@ import {
   Sidebar,
   Toast,
   cn,
-  type DrawerMenuItem,
   type SidebarItem,
 } from '../../../lib'
 import {
@@ -320,6 +318,7 @@ export function PortalDashboard() {
   const [kategori, setKategori] = useState('')
   const [sumber, setSumber] = useState('monsakti')
   const idMenuSeluler = useId()
+  const sidebarSelulerRef = useRef<HTMLDialogElement>(null)
   const anggaran = ANGGARAN[sumber]
 
   useEffect(() => {
@@ -327,6 +326,13 @@ export function PortalDashboard() {
     const tutup = window.setTimeout(() => setUmpan((u) => ({ ...u, tampil: false })), 4000)
     return () => window.clearTimeout(tutup)
   }, [umpan.kali, umpan.tampil])
+
+  useEffect(() => {
+    const dialog = sidebarSelulerRef.current
+    if (!dialog) return
+    if (menuSeluler && !dialog.open) dialog.showModal()
+    if (!menuSeluler && dialog.open) dialog.close()
+  }, [menuSeluler])
 
   const kabari = (teks: string) => setUmpan((u) => ({ teks, tampil: true, kali: u.kali + 1 }))
 
@@ -351,7 +357,7 @@ export function PortalDashboard() {
       href: '#/portal-dashboard/app',
       icon: <Ikon className="size-5" />,
       active: id === 'dashboard',
-      onClick: id === 'dashboard' ? undefined : menuDemo(label),
+      onClick: id === 'dashboard' ? () => setMenuSeluler(false) : menuDemo(label),
     })),
     {
       id: 'keluar',
@@ -359,31 +365,28 @@ export function PortalDashboard() {
       href: '#/portal-dashboard',
       // Sidebar belum punya tone danger untuk item menu; ikonnya saja yang merah.
       icon: <ArrowRightToBracket className="size-5 text-red-600" />,
+      onClick: () => setMenuSeluler(false),
     },
   ]
 
-  const menuDrawer: DrawerMenuItem[] = menuSidebar.map(({ id, label, href, icon, active }) => ({
-    id,
-    label,
-    href,
-    icon,
-    active,
-    onClick: id === 'dashboard' || id === 'keluar' ? () => setMenuSeluler(false) : menuDemo(label),
-  }))
+  const sidebarLogo = <img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="h-8 w-auto" />
+  const sidebarCollapsedLogo = <img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="size-8" />
+  const sidebarUser = {
+    name: NAMA,
+    profileLabel: 'Lihat Profile',
+    avatarSrc: asset('/images/avatar-sample.svg'),
+    onClick: () => kabari('Halaman profil belum ada di contoh ini.'),
+  }
 
   return (
     <div className="flex min-h-screen bg-surface">
-      {/* Di bawah lg Sidebar disembunyikan; menunya pindah ke Drawer dari tombol di header. */}
+      {/* Desktop dan mobile memakai komponen, akun, dan item Sidebar yang sama.
+          Di bawah lg instance mobile tampil sebagai panel modal dari kiri. */}
       <div className="hidden lg:block">
         <Sidebar
-          logo={<img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="h-8 w-auto" />}
-          collapsedLogo={<img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="size-8" />}
-          user={{
-            name: NAMA,
-            profileLabel: 'Lihat Profile',
-            avatarSrc: asset('/images/avatar-sample.svg'),
-            onClick: () => kabari('Halaman profil belum ada di contoh ini.'),
-          }}
+          logo={sidebarLogo}
+          collapsedLogo={sidebarCollapsedLogo}
+          user={sidebarUser}
           items={menuSidebar}
           sticky
           collapsed={ringkas}
@@ -525,6 +528,10 @@ export function PortalDashboard() {
                           {ruang}
                         </Badge>
                       ),
+                      actionLabel: 'Buka',
+                      actionDisabled: true,
+                      onAction: () => kabari(`Detail wiki "${judul}" belum ada di contoh ini.`),
+                      interactiveFeedback: false,
                     }))}
                   />
                 </Card>
@@ -621,16 +628,32 @@ export function PortalDashboard() {
         </main>
       </div>
 
-      <Drawer
+      <dialog
+        ref={sidebarSelulerRef}
         id={idMenuSeluler}
-        open={menuSeluler}
-        onClose={() => setMenuSeluler(false)}
-        position="left"
-        size="s"
-        eyebrow="Portal Dashboard"
-        header={<Drawer.Title>Menu</Drawer.Title>}
-        items={menuDrawer}
-      />
+        aria-label="Navigasi Portal Dashboard"
+        className="fixed inset-y-0 left-0 right-auto m-0 h-full max-h-full w-[280px] max-w-[calc(100vw-2rem)] overflow-visible border-0 bg-transparent p-0 shadow-none backdrop:bg-gray-900/50 lg:hidden"
+        onCancel={(event: SyntheticEvent<HTMLDialogElement>) => {
+          event.preventDefault()
+          setMenuSeluler(false)
+        }}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) setMenuSeluler(false)
+        }}
+        onClose={() => {
+          if (menuSeluler) setMenuSeluler(false)
+        }}
+      >
+        <Sidebar
+          logo={sidebarLogo}
+          collapsedLogo={sidebarCollapsedLogo}
+          user={sidebarUser}
+          items={menuSidebar}
+          collapsed={false}
+          onCollapse={() => setMenuSeluler(false)}
+          className="h-full !min-h-0 max-w-full shadow-2xl"
+        />
+      </dialog>
     </div>
   )
 }
