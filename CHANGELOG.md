@@ -23,6 +23,12 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 - **`Table` otomatis `compact` di mobile.** Bila lebar tabel di bawah 640px,
   tabel memakai `compact` apa pun nilai `size`. Yang diukur lebar tabel, bukan
   lebar layar.
+- **Button dan Badge ikut `darkMode` milik `Table`.** Tidak perlu lagi memberi
+  `darkMode` ke tiap Button atau Badge di toolbar maupun di sel.
+  - Badge: semua varian ikut gelap.
+  - Button: hanya theme `gray` yang ikut gelap. Theme berwarna, mis. tombol
+    "Tambah Data" (primary), tetap berwarna.
+  - Prop `darkMode` yang diisi langsung tetap menang, termasuk `false`.
 
 ### Diubah
 
@@ -62,8 +68,17 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
     garis gray-700.
   - Halaman aktif tema `primary` kini primary-900, `purple` kini purple-900,
     `default` kini gray-600.
+- **Tampilan mobile `Table`** (lebar tabel di bawah 576px).
+  - Toolbar: kotak pencarian satu baris penuh, lalu tombol dua per baris
+    dengan lebar sama. Tombol ganjil terakhir, mis. "Hapus Data", melebar
+    penuh. Mulai 576px kembali satu baris seperti sebelumnya.
+  - Footer: pemilih jumlah baris dan Pagination rata tengah, sebelumnya rata
+    kiri.
+  - Mode gelap di bawah 640px: toolbar, baris, dan footer gray-800, header
+    tetap gray-600. Dengan `striped`, baris berganti gray-800 lalu gray-700.
 - **Situs dokumentasi.** Halaman Table punya bagian baru "Mode gelap", dan
-  Playground-nya punya kontrol Mode (Light/Dark) setelah Typography.
+  Playground-nya punya kontrol Mode (Light/Dark) setelah Typography, serta
+  kontrol Tampilan (Desktop/Mobile) untuk melihat tabel selebar 390px.
 
 ## [0.5.1] - 2026-11-03
 
