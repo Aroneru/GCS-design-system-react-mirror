@@ -322,7 +322,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
         <div role="search" className="group flex h-[39px] items-stretch">
           <div
             className={cn(
-              'relative flex shrink-0 items-center rounded-l-lg border transition-colors',
+              'relative flex w-[113px] shrink-0 items-center rounded-l-lg border transition-colors',
               'border-field-border bg-search-category-surface',
               !disabled && accent.groupFocus,
             )}
@@ -334,12 +334,10 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               aria-hidden="true"
               tabIndex={-1}
               onChange={(event) => pilihKategori(event.target.value)}
-              // Pembawa nilai saja, tapi tetap di alur: lebar ruas kategori
-              // ditentukan pilihan terpanjangnya, bukan yang sedang aktif —
-              // kalau ia dicabut, kotaknya melebar-menyempit tiap kali memilih.
-              // Karena itu kelas ukurannya dipertahankan, sementara ia sendiri
-              // tak terlihat dan tak bisa disentuh.
-              className="pointer-events-none h-full appearance-none pr-10 pl-5 text-sm opacity-0"
+              // Pembawa nilai saja. Ruas kategori mengikuti lebar tetap 113px
+              // pada desain; select dikeluarkan dari alur agar option panjang
+              // tidak menghabiskan ruang field pencarian di sebelahnya.
+              className="pointer-events-none absolute inset-0 h-full w-full appearance-none opacity-0"
             >
               <option value="">{categoryPlaceholder}</option>
               {categories?.map((option) => (

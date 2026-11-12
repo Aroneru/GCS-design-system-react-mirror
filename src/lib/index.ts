@@ -197,6 +197,7 @@ export type {
   NavbarDisclosure,
   NavbarPrimaryItem,
   NavbarNotificationTrigger,
+  NavbarTableOfContents,
   NavbarAccountDestination,
   NavbarAccountAction,
   NavbarAccountItem,

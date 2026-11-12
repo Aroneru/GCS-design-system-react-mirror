@@ -155,13 +155,25 @@ const listViewItemProps: PropRow[] = [
     "onAction",
     "(e: MouseEvent) => void",
     "undefined",
-    "Callback saat tombol aksi bawaan diklik.",
+    "Callback tombol aksi. Dengan actionDisabled dan tanpa href/onClick item, callback dialihkan ke seluruh item.",
   ],
   [
     "actionHref",
     "string",
     "undefined",
-    "Alamat tautan jika tombol aksi bertindak sebagai tautan.",
+    "Alamat tombol aksi. Dengan actionDisabled dan tanpa href/onClick item, tautan dialihkan ke seluruh item.",
+  ],
+  [
+    "actionDisabled",
+    "boolean",
+    "false",
+    "Menyembunyikan tombol aksi bawaan pada varian simple. Jika actionHref/onAction tersedia dan item belum memiliki href/onClick, aksinya dialihkan ke seluruh item; href/onClick eksplisit tetap diprioritaskan.",
+  ],
+  [
+    "interactiveFeedback",
+    "boolean",
+    "true",
+    "Menampilkan feedback border, shadow, dan scale pada item simple yang interaktif. Tidak mengubah clickability item.",
   ],
   [
     "actionButtonSize",

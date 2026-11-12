@@ -125,16 +125,16 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Toast`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Card`       | `image`, `title`, `description`, `href`, `linkLabel`, `actions`, `darkMode`                                          |
-| `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `darkMode` |
+| `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `actionLabel`, `actionDisabled`, `interactiveFeedback`, `darkMode` |
 | `Container`  | `as` (default `div`), `padded` (default `true`), `darkMode`                                                          |
 | `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
 | `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, ambient `data-theme`, `darkMode` (override kompatibilitas) |
 | `Dropdown`   | `trigger`, `items`/`groups` atau `children`, `align`, `closeOnSelect`, `actionsRef`, `contentLabel`, `contentClassName`, `data-theme`, `darkMode` |
 | `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape`, `showCloseButton`, `closeLabel` |
-| `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `theme`, `darkMode`   |
+| `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `afterItems`, `theme`, `darkMode`   |
 | `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
-| `Navbar`     | `platform`, `brand`, `items`, `sidebarItems` (BO), `search`, `guestActions` (FO), `account`, `notificationTrigger` (FO authenticated / BO), `mobileNavigationOpen`, `onMobileNavigationOpenChange` |
+| `Navbar`     | `platform`, `brand`, `items`, `sidebarItems`/`tableOfContents` (BO), `search`, `guestActions` (FO), `account`, `notificationTrigger` (FO authenticated / BO), `mobileNavigationOpen`, `onMobileNavigationOpenChange` |
 | `Hero`       | `type`, `centeredContent`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`    |
 | `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user` (profil + menu dropdown), `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
@@ -284,8 +284,26 @@ varian berubah menjadi latar putih dengan teks gray-700.
 `ListView` menyediakan daftar item berukuran `S`, `M`, atau `L` untuk desktop
 dan mobile. Varian `simple` dapat memakai ikon, badge, dekorasi aksen, dan aksi;
 varian `article` tersedia hingga `XL`, selalu memakai garis aksen vertikal, dan
-menampilkan subject, metadata, pin, judul, serta metrik interaksi. Gunakan
-`darkMode` pada pembungkus atau item untuk tampilan gelap.
+menampilkan subject, metadata, pin, judul, serta metrik interaksi. Setiap item
+memenuhi lebar kontainer daftar dan menggunakan teks rata kiri. Pada varian
+`simple`, gunakan `actionDisabled` bersama `actionLabel` untuk
+menyembunyikan tombol aksi di semua ukuran dan platform. Bila `actionHref` atau
+`onAction` juga tersedia, aksi otomatis dialihkan ke seluruh item selama item
+belum memiliki `href` atau `onClick`; `actionHref` menghasilkan anchor dan
+`onAction` secara default menghasilkan button. `href`/`onClick` item yang
+eksplisit selalu diprioritaskan. `interactiveFeedback={false}` hanya mematikan
+perubahan border, shadow, dan scale saat hover/active; item tetap dapat diklik.
+Gunakan `darkMode` pada pembungkus atau item untuk tampilan gelap.
+
+```tsx
+<ListViewItem
+  title="Integrasi dan Template Standar"
+  actionLabel="Buka"
+  actionDisabled
+  onAction={() => bukaDetail()}
+  interactiveFeedback={false}
+/>
+```
 
 ### Form
 
@@ -636,6 +654,7 @@ import {
   Sidebar,
   type NavbarPrimaryItem,
   type SidebarItem,
+  type TableOfContentsItem,
 } from '@ceplok-ui/design-kit-react'
 
 const brand = {
@@ -659,6 +678,11 @@ const sidebarItems = [
   { id: 'dashboard', label: 'Dashboard', href: '/', active: true },
   { id: 'pengajuan', label: 'Pengajuan', href: '/pengajuan' },
 ] satisfies SidebarItem[]
+
+const tableOfContentsItems = [
+  { id: 'summary', label: 'Ringkasan', href: '/reports#summary' },
+  { id: 'details', label: 'Rincian', href: '/reports#details' },
+] satisfies TableOfContentsItem[]
 
 // Urutan dan identitas kategori mengikuti sumber Sidebar yang sama.
 const searchCategories = sidebarItems.map(({ id, label, disabled }) => ({
@@ -684,6 +708,7 @@ export function BackOfficeNavbar() {
           brand={brand}
           items={items}
           sidebarItems={sidebarItems}
+          tableOfContents={{ label: 'Daftar isi', items: tableOfContentsItems }}
           notificationTrigger={notificationTrigger}
           search={
             <Search
@@ -708,6 +733,15 @@ secara terpisah memakai komponen `<Drawer>`, bukan dimasukkan ke Navbar.
 
 `sidebarItems` adalah sumber Sidebar aplikasi: consumer merender `<Sidebar>`
 pada desktop, sedangkan Navbar memakai data yang sama di dialog Sidebar mobile.
+
+`tableOfContents` khusus BO menambahkan disclosure terakhir di Drawer Navbar
+mobile. Disclosure tertutup secara default dan merender komponen
+`TableOfContents` yang sama setelah dibuka, termasuk styling daftar,
+scroll-spy, dan penanda aktifnya. Toggle juga memakai visual bawaan TOC melalui
+`layout="collapsible"`, dengan separator setelah menu Navbar. Pada desktop,
+consumer tetap merender
+`<TableOfContents layout="list">` di dalam layout halaman; sembunyikan versi
+desktop itu di bawah breakpoint yang sama agar tidak ada trigger TOC ganda.
 
 Drawer custom tidak memakai prop Navbar. Render komponen tersebut secara
 terpisah beserta trigger dan state milik consumer:
@@ -744,7 +778,7 @@ export function ReportsPage() {
 | --- | --- |
 | Front Office guest | `guestActions` untuk tautan Masuk dan Daftar; tanpa `account` atau `notificationTrigger`. |
 | Front Office authenticated | `account` dan opsional `notificationTrigger`; tanpa `guestActions`. |
-| Back Office | `items` untuk Navbar desktop/Drawer navigasi mobile, `sidebarItems` untuk Sidebar aplikasi desktop/mobile, serta opsional `account` dan `notificationTrigger` yang independen; tanpa `guestActions`. |
+| Back Office | `items` untuk Navbar desktop/Drawer navigasi mobile, `sidebarItems` untuk Sidebar aplikasi desktop/mobile, opsional `tableOfContents` sebagai disclosure terakhir Drawer, serta opsional `account` dan `notificationTrigger` yang independen; tanpa `guestActions`. |
 
 `brand` wajib pada kedua platform. Isi visualnya tetap dimiliki consumer
 melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
@@ -761,6 +795,9 @@ melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
 - `sidebarItems` hanya berlaku pada BO. Navbar tidak merender Sidebar desktop;
   consumer merender komponen tersebut di layout aplikasi dan memberikan data
   yang sama kepada Navbar untuk komposisi mobile.
+- `tableOfContents` hanya berlaku pada BO dan hanya ditampilkan di Drawer mobile.
+  Gunakan entri `TableOfContentsItem` yang sama untuk TOC desktop dan Drawer agar
+  label, tujuan anchor, styling, dan status aktif tetap konsisten.
 - `notificationTrigger` mengonfigurasi tombol Bell bawaan Navbar. Consumer
   mengatur aksi, state panel, badge, dan atribut ARIA; pada FO hanya berlaku
   untuk authenticated bersama `account`, sedangkan pada BO dapat digunakan

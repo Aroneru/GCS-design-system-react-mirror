@@ -11,6 +11,24 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+### Ditambahkan
+
+- **`ListViewItem`: prop `actionDisabled` dan `interactiveFeedback`.** Tombol
+  aksi bawaan pada varian `simple` kini dapat disembunyikan di seluruh ukuran
+  dan platform. Saat `actionHref`/`onAction` tersedia tanpa `href`/`onClick`
+  item, aksinya dialihkan ke seluruh item sebagai anchor/button. Aksi item yang
+  eksplisit tetap diprioritaskan, sedangkan feedback hover/active dapat
+  dimatikan secara terpisah tanpa menonaktifkan klik.
+- **Navbar Back Office: TOC responsif di Drawer.** Prop `tableOfContents`
+  menambahkan disclosure daftar isi sebagai item terakhir Drawer Navbar mobile.
+  Daftar tetap tertutup sampai dipilih, lalu merender komponen
+  `TableOfContents` yang sama dengan tampilan desktop sehingga styling,
+  scroll-spy, dan penanda aktifnya konsisten. Toggle memakai mode
+  `layout="collapsible"` bawaan TOC dan dipisahkan dari menu Navbar oleh garis.
+  TOC desktop tetap dirender oleh consumer pada konten halaman.
+- **Drawer: slot `afterItems`.** Konten kustom kini dapat ditambahkan setelah
+  menu `items` tanpa mengganti `DrawerBody` data-driven bawaan.
+
 ### Diubah
 
 - **Sumber navigasi Back Office dipisahkan.** `items` mengisi navigasi Navbar
@@ -38,6 +56,20 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   pada BO dengan atau tanpa `account`. Navbar merender ikon Bell 24px berwarna
   gray-800 pada light dan gray-400 pada dark; consumer tetap mengatur aksi,
   state panel, badge, dan atribut tombolnya.
+- **Portal Dashboard memakai Sidebar yang sama di semua viewport.** Navigasi
+  mobile tidak lagi dikonversi menjadi Drawer. Sidebar yang sama ditampilkan
+  sebagai panel modal dari kiri, sehingga logo, akun, dan menu tetap konsisten
+  dengan desktop. Item wiki memakai aksi pada seluruh baris tanpa tombol dan
+  tanpa feedback hover/active.
+
+### Diperbaiki
+
+- **Lebar `ListViewItem` interaktif.** Item `simple` yang aksinya dialihkan ke
+  elemen button kini tetap memenuhi lebar `ListView` dan mempertahankan teks
+  rata kiri, sehingga panjang konten tidak mengubah lebar setiap baris.
+- **Lebar kategori pada `Search`.** Ruas kategori kini tetap 113px sesuai
+  desain SVG. Option panjang tidak lagi memperlebar kategori sampai field query
+  menghilang; label trigger dipotong dan input tetap mengisi sisa ruang.
 
 ## [0.5.1] - 2026-11-03
 

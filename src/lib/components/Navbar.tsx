@@ -24,6 +24,7 @@ import { Avatar } from './Avatar'
 import { Button } from './Button'
 import { Drawer, type DrawerMenuItem } from './Drawer'
 import { Dropdown, type DropdownItem } from './Dropdown'
+import { TableOfContents, type TableOfContentsItem } from './TableOfContents'
 import {
   DropdownDismissalContext,
   type DropdownDismissalScopeValue,
@@ -110,6 +111,13 @@ export interface NavbarNotificationTrigger extends Omit<ButtonHTMLAttributes<HTM
   badge?: ReactNode
 }
 
+export interface NavbarTableOfContents {
+  /** Label disclosure TOC di bagian paling bawah Drawer. Bawaan: "Daftar isi". */
+  label?: ReactNode
+  /** Entri anchor yang sama dengan TableOfContents desktop. */
+  items: TableOfContentsItem[]
+}
+
 interface NavbarBaseProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
   brand: NavbarBrand
   items?: NavbarPrimaryItem[]
@@ -134,6 +142,7 @@ export type NavbarFrontOfficeProps = NavbarBaseProps &
   FrontOfficeIdentity & {
     platform: 'front-office'
     sidebarItems?: never
+    tableOfContents?: never
   }
 
 export interface NavbarBackOfficeProps extends NavbarBaseProps {
@@ -143,6 +152,8 @@ export interface NavbarBackOfficeProps extends NavbarBaseProps {
   notificationTrigger?: NavbarNotificationTrigger
   /** Sumber navigasi Sidebar aplikasi yang digunakan Navbar pada komposisi mobile. */
   sidebarItems?: SidebarItem[]
+  /** Daftar isi halaman yang ditambahkan sebagai disclosure terakhir di Drawer Navbar mobile. */
+  tableOfContents?: NavbarTableOfContents
   guestActions?: never
 }
 
@@ -1491,6 +1502,29 @@ function MobileIdentity({
   )
 }
 
+function NavbarDrawerTableOfContents({
+  tableOfContents,
+  onItemClick,
+  separated,
+}: {
+  tableOfContents: NavbarTableOfContents
+  onItemClick: () => void
+  separated: boolean
+}) {
+  if (!tableOfContents.items.length) return null
+
+  return (
+    <div className={cn(separated && 'mt-3 border-t border-border pt-3')}>
+      <TableOfContents
+        items={tableOfContents.items}
+        layout="collapsible"
+        title={tableOfContents.label ?? 'Daftar isi'}
+        onItemClick={onItemClick}
+      />
+    </div>
+  )
+}
+
 function DesktopIdentity({
   platform,
   account,
@@ -1550,6 +1584,7 @@ export function Navbar(props: NavbarProps) {
     guestActions,
     notificationTrigger,
     sidebarItems,
+    tableOfContents,
     ...headerProps
   } = props
   const dialogId = useId()
@@ -1646,10 +1681,11 @@ export function Navbar(props: NavbarProps) {
         : items.map((item) => toSidebarItem(item, closeMobileNavigation)),
     [closeMobileNavigation, items, platform, sidebarItems],
   )
-  const mobileDrawerItems = useMemo(
+  const mobileDrawerItems = useMemo<DrawerMenuItem[]>(
     () => items.map((item) => toMobileDrawerItem(item, () => requestDrawerOpen(false))),
     [items, requestDrawerOpen],
   )
+  const hasMobileDrawerContent = mobileDrawerItems.length > 0 || Boolean(tableOfContents?.items.length)
   const handleDialogCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     event.preventDefault()
     closeMobileNavigation()
@@ -1788,7 +1824,7 @@ export function Navbar(props: NavbarProps) {
                 <NotificationTrigger {...notificationTrigger} />
               </div>
             )}
-            {items.length > 0 && (
+            {hasMobileDrawerContent && (
               <div className={cn(
                 'row-start-1',
                 account && notificationTrigger
@@ -1861,16 +1897,24 @@ export function Navbar(props: NavbarProps) {
         </div>
       </dialog>
 
-      {platform === 'back-office' && items.length > 0 && (
+      {platform === 'back-office' && hasMobileDrawerContent && (
         <Drawer
           id={drawerId}
           open={drawerOpen}
           onClose={() => requestDrawerOpen(false)}
           position="right"
           size="s"
-          eyebrow="Navigasi Navbar"
-          header={<Drawer.Title>Menu aplikasi</Drawer.Title>}
+          header={<Drawer.Title>Menu Navbar</Drawer.Title>}
           items={mobileDrawerItems}
+          afterItems={
+            tableOfContents ? (
+              <NavbarDrawerTableOfContents
+                tableOfContents={tableOfContents}
+                onItemClick={() => requestDrawerOpen(false)}
+                separated={mobileDrawerItems.length > 0}
+              />
+            ) : undefined
+          }
           className="lg:hidden"
         />
       )}

@@ -15,6 +15,7 @@ import {
   FileLines,
   GridPlus,
   Home,
+  Newspaper,
   Palette,
   UsersGroup,
 } from "../../../lib/icons/outline";
@@ -28,7 +29,8 @@ import { Pemohon } from "./pages/Pemohon";
 import { Pengajuan } from "./pages/Pengajuan";
 import { Pengaturan } from "./pages/Pengaturan";
 import { Simaya } from "./pages/Simaya";
-import { Simaya2 } from "./pages/Simaya2";
+import { BeritaLayananDigital } from "./pages/BeritaLayananDigital";
+import { BERITA_LAYANAN_DIGITAL_TOC } from "./pages/BeritaLayananDigitalToc";
 
 /**
  * Kerangka aplikasi demo.
@@ -53,7 +55,7 @@ const RUTE: { halaman: HalamanDemo; ikon: React.ReactNode; badge?: string }[] = 
   { halaman: "simaya", ikon: <Envelope className="size-5" /> },
   { halaman: "modifikasi", ikon: <Palette className="size-5" /> },
   { halaman: "pengaturan", ikon: <Cog className="size-5" /> },
-  { halaman: "simaya2", ikon: <Cog className="size-5" />, },
+  { halaman: "simaya2", ikon: <Newspaper className="size-5" /> },
 ];
 
 /** Sub-rute nyata, bukan state palsu — jadi Sidebar dan Navbar bekerja sebagai tautan. */
@@ -67,7 +69,7 @@ const DESKRIPSI: Record<HalamanDemo, string> = {
   simaya: "Persuratan internal dengan aksen Simaya — prop application pada tujuh komponen form.",
   modifikasi: "Tiga tingkat penyesuaian komponen: varian bawaan, slot, lalu className.",
   pengaturan: "Data profil dan preferensi pemberitahuan akun Anda.",
-  simaya2: "Simaya-simayaan.",
+  simaya2: "Berita dan pembaruan terbaru seputar Portal Layanan Terpadu.",
 };
 
 const RUTE_LAYANAN = ["pengajuan", "pemohon", "layanan"] as const;
@@ -83,7 +85,7 @@ function Isi({ halaman }: { halaman: HalamanDemo }) {
     case "simaya":
       return <Simaya />;
     case "simaya2":
-      return <Simaya2 />;
+      return <BeritaLayananDigital />;
     case "modifikasi":
       return <Modifikasi />;
     case "pengaturan":
@@ -137,8 +139,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
     // selebar layar, ikut menutupi kolom di bawah Sidebar.
     <div className="flex min-h-screen flex-col bg-surface-subtle">
       <div className="flex flex-1">
-        {/* Disembunyikan di bawah lg: di layar sempit Navbar sudah menyediakan
-            panel navigasinya sendiri, jadi dua navigasi akan bertumpuk. */}
+        {/* Pada mobile, menu Sidebar ini dipindahkan ke hamburger kiri Navbar. */}
         <div className="hidden lg:block">
           <Sidebar
             logo={
@@ -188,6 +189,10 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             }}
             items={navbarItems}
             sidebarItems={menu}
+            tableOfContents={halaman === "simaya2" ? {
+              label: "Daftar isi",
+              items: BERITA_LAYANAN_DIGITAL_TOC,
+            } : undefined}
             search={
               <Search
                 platform="compact"
