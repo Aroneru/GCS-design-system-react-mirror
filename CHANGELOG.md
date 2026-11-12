@@ -11,6 +11,34 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+### Diubah
+
+- **Sumber navigasi Back Office dipisahkan.** `items` mengisi navigasi Navbar
+  desktop dan otomatis menjadi isi Drawer navigasi mobile milik Navbar.
+  Prop BO baru `sidebarItems` membawa data Sidebar aplikasi ke dialog Sidebar
+  mobile; Sidebar desktop tetap dirender dan dimiliki layout consumer. Kontrak
+  lama `mobileDrawer` dihapus karena trigger, state, lifecycle, dan isi Drawer
+  navigasi sekarang sepenuhnya dimiliki Navbar. Drawer custom tetap digunakan
+  consumer sebagai komponen terpisah.
+- **Tautan Drawer mempertahankan konteks navigasi.** Item dan subitem Drawer
+  data-driven kini meneruskan `target` serta `rel`, sehingga destination Navbar
+  yang berpindah ke Drawer mobile tidak kehilangan perilaku tautannya.
+- **Search Back Office memakai kategori Sidebar.** Contoh consumer menurunkan
+  `Search.categories` dari `sidebarItems`, sementara ruang Search desktop BO
+  diperlebar agar dropdown kategori dan field tetap nyaman dibaca. Pada mobile,
+  Search memakai baris penuh di bawah 576px dan kembali ke baris utama mulai
+  576px.
+- **Navbar desktop memakai label satu baris.** Destination dan Disclosure pada
+  baris utama tidak membungkus; item yang tidak cukup ruang dipindahkan ke
+  `Lainnya`, yang tetap mendukung label dua baris. Allocator juga memakai lebar
+  Search aktual agar Search BO berkategori tidak membuat navigasi atau action
+  di sisi kanan terpotong.
+- **Notification Back Office independen dari Account.** `notificationTrigger`
+  kini menerima `NavbarNotificationTrigger`, bukan `ReactNode`, dan tersedia
+  pada BO dengan atau tanpa `account`. Navbar merender ikon Bell 24px berwarna
+  gray-800 pada light dan gray-400 pada dark; consumer tetap mengatur aksi,
+  state panel, badge, dan atribut tombolnya.
+
 ## [0.5.1] - 2026-11-03
 
 ### Diperbaiki
