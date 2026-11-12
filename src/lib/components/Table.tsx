@@ -22,6 +22,7 @@ import {
 } from "flowbite-react-icons/outline";
 import { File as FileIcon, FilePdf, Image as ImageIcon } from "flowbite-react-icons/solid";
 import { cn } from "../utils/cn";
+import { DarkModeContext } from "../utils/darkModeContext";
 import { Button } from "./Button";
 import { Checkbox } from "./Checkbox";
 import { Dropdown } from "./Dropdown";
@@ -308,8 +309,9 @@ export interface TableProps<T> extends Omit<HTMLAttributes<HTMLDivElement>, "chi
 
   /**
    * Memasang `data-theme="dark"` di tabel ini: toolbar gray-800, header
-   * gray-600, baris gray-700, dan Pagination ikut gelap. Warnanya dari token
-   * `--color-table-*`.
+   * gray-600, baris gray-700 (mobile: gray-800), dan Pagination ikut gelap.
+   * Warnanya dari token `--color-table-*`. Badge dan Button theme `gray` di
+   * dalam tabel ikut gelap otomatis.
    */
   darkMode?: boolean;
 
@@ -1275,6 +1277,9 @@ export function Table<T>({
   // const to = Math.min(page * pageSize, total);
 
   return (
+    // Button dan Badge di dalam tabel — toolbar maupun sel — ikut `darkMode`
+    // tanpa perlu diberi prop sendiri.
+    <DarkModeContext.Provider value={darkMode}>
     <div
       // `@container`: toolbar, footer, dan Pagination menyesuaikan lebar tabel ini,
       // bukan lebar layar — tetap benar di kolom sempit maupun pratinjau mobile.
@@ -1283,15 +1288,22 @@ export function Table<T>({
         className,
       )}
       data-theme={darkMode ? "dark" : undefined}
+      // Penanda mobile untuk token: tema gelap mobile memakai latar gray-800.
+      data-table-mobile={narrow || undefined}
       {...props}
       ref={rootRef}
     >
       {hasToolbar && (
-        <div className="flex flex-wrap items-center gap-4 bg-table-toolbar p-4">
+        // Sempit: pencarian satu baris penuh, lalu tombol-tombol dua per baris
+        // dan sama lebar; tombol ganjil terakhir melebar sendiri. Pembungkus
+        // `actions` dibuat `contents` supaya tombolnya ikut tata letak ini.
+        // Mulai 576px: satu baris, tombol aksi di kanan.
+        <div className="flex flex-wrap items-center gap-2 bg-table-toolbar p-4 @xl:gap-4">
           {search && <TableSearch {...search} />}
 
           {filter && (
             <Dropdown
+              className="grow basis-[40%] @xl:grow-0 @xl:basis-auto"
               contentClassName="w-60"
               darkMode={darkMode}
               trigger={
@@ -1300,6 +1312,7 @@ export function Table<T>({
                   theme="gray"
                   size="s"
                   darkMode={darkMode}
+                  className="w-full"
                   leftIcon={<AdjustmentsHorizontal />}
                 >
                   {filter.label ?? "Filter Data"}
@@ -1332,7 +1345,18 @@ export function Table<T>({
             </Dropdown>
           )}
 
-          {actions && <div className="ml-auto flex flex-wrap items-center gap-3">{actions}</div>}
+          {actions && (
+            <div
+              className={cn(
+                "contents @xl:ml-auto @xl:flex @xl:flex-wrap @xl:items-center @xl:gap-3",
+                // `:not(dialog)`: Modal merender `<dialog>` di samping tombolnya.
+                "[&>:not(dialog)]:grow [&>:not(dialog)]:basis-[40%]",
+                "@xl:[&>:not(dialog)]:grow-0 @xl:[&>:not(dialog)]:basis-auto",
+              )}
+            >
+              {actions}
+            </div>
+          )}
         </div>
       )}
 
@@ -1525,8 +1549,8 @@ export function Table<T>({
 
       {pagination && (
         // Kiri pemilih jumlah baris, kanan nomor halaman. Sempit: bertumpuk,
-        // rata kiri.
-        <div className="flex flex-col items-start gap-3 border-t border-table-border p-4 @lg:flex-row @lg:items-center @lg:justify-between">
+        // rata tengah.
+        <div className="flex flex-col items-center gap-3 border-t border-table-border p-4 @lg:flex-row @lg:justify-between">
           {/* <p className="text-sm text-gray-500">
             {(pagination.summary ?? defaultSummary)({ from, to, total })}
           </p> */}
@@ -1579,6 +1603,7 @@ export function Table<T>({
         </div>
       )}
     </div>
+    </DarkModeContext.Provider>
   );
 }
 

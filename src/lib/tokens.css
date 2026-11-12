@@ -798,6 +798,15 @@
     --color-table-scrollbar-track: var(--color-gray-800);
 }
 
+/* Mobile gelap: toolbar, baris, dan footer satu warna gray-800; header tetap gray-600. */
+[data-theme='dark'][data-table-mobile] {
+    --color-table-surface: var(--color-gray-800);
+    --color-table-row: var(--color-gray-800);
+    --color-table-row-hover: var(--color-gray-700);
+    --color-table-row-striped: var(--color-gray-700);
+    --color-table-row-striped-hover: var(--color-gray-600);
+}
+
 [data-theme='light'],
 .ds-theme-light {
     --color-table-surface: #ffffff;

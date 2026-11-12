@@ -369,7 +369,7 @@ const tableProps: PropRow[] = [
   ["pagination", "TablePaginationConfig", "undefined", "Membagi data per halaman. Tanpa ini semua baris tampil."],
   ["manual", "boolean", "false", "Pasang kalau urutan dan halaman diurus server."],
   ["striped", "boolean", "false", "Baris zebra: baris genap diberi latar abu-abu muda."],
-  ["darkMode", "boolean", "false", "Tampilan gelap: toolbar gray-800, header gray-600, baris gray-700, Pagination ikut gelap."],
+  ["darkMode", "boolean", "false", "Tampilan gelap: toolbar gray-800, header gray-600, baris gray-700 (mobile gray-800), Pagination ikut gelap. Badge dan Button theme gray di dalam tabel ikut gelap otomatis."],
   ["loading", "boolean", "false", "Menampilkan ikon memuat sebagai ganti isi tabel."],
   ["emptyText", "ReactNode", "Tidak ada data", "Tulisan yang tampil kalau data kosong."],
 ];
@@ -1040,6 +1040,9 @@ export function TablePage() {
   const [withToolbarActions, setWithToolbarActions] = useState(false);
   const [striped, setStriped] = useState(true);
   const [mode, setMode] = useState<"light" | "dark">("light");
+  // Table tidak punya prop platform: rupa mobile muncul sendiri saat tabel
+  // lebih sempit dari 640px, jadi pratinjaunya cukup menyempitkan panggung.
+  const [view, setView] = useState<"desktop" | "mobile">("desktop");
   const [theme, setTheme] = useState<PaginationTheme>("primary");
   const [size, setSize] = useState<TableSize>("normal");
   const [withPagination, setWithPagination] = useState(true);
@@ -1822,7 +1825,7 @@ export function TablePage() {
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth="max-w-[1024px]" dark={mode === "dark"}>
+        <Stage maxWidth={view === "mobile" ? "max-w-[390px]" : "max-w-[1024px]"} dark={mode === "dark"}>
           <PlaygroundTable
             key={count}
             count={count}
@@ -1852,6 +1855,17 @@ export function TablePage() {
               options={[
                 { value: "light", label: "Light" },
                 { value: "dark", label: "Dark" },
+              ]}
+            />
+          </Control>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={view}
+              onChange={(v) => setView(v as "desktop" | "mobile")}
+              options={[
+                { value: "desktop", label: "Desktop" },
+                { value: "mobile", label: "Mobile" },
               ]}
             />
           </Control>

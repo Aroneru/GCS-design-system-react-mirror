@@ -1,6 +1,7 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { Close } from 'flowbite-react-icons/outline'
 import { cn } from '../utils/cn'
+import { useInheritedDarkMode } from '../utils/darkModeContext'
 import { useDismissible } from '../utils/useDismissible'
 
 export type BadgeVariant = 'gray' | 'brand' | 'danger' | 'warning' | 'success'
@@ -59,7 +60,10 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   onDismiss?: () => void
   /** Kendalikan tampil/sembunyi dari luar; tanpa ini Badge mengurusnya sendiri. */
   open?: boolean
-  /** Tampilan gelap: latar -900 dengan teks -300. */
+  /**
+   * Tampilan gelap: latar -900 dengan teks -300. Bila tidak diisi, Badge di
+   * dalam Table ber-`darkMode` ikut gelap otomatis.
+   */
   darkMode?: boolean
 }
 
@@ -71,13 +75,15 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
     dismissible = false,
     onDismiss,
     open,
-    darkMode = false,
+    darkMode: darkModeProp,
     className,
     children,
     ...props
   },
   ref,
 ) {
+  const inheritedDark = useInheritedDarkMode()
+  const darkMode = darkModeProp ?? inheritedDark
   const { mounted, visible, close } = useDismissible(open)
   const v = variants[variant]
   const s = sizes[size]
