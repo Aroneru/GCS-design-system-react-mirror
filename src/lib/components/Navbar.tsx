@@ -107,6 +107,11 @@ export interface NavbarMobileDrawer {
 interface NavbarBaseProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
   brand: NavbarBrand
   items?: NavbarPrimaryItem[]
+  /**
+   * Menu untuk Sidebar yang dibuka hamburger pada mobile. Bila tidak diisi,
+   * Navbar mengubah `items` menjadi menu Sidebar seperti perilaku bawaan.
+   */
+  mobileNavigationItems?: SidebarItem[]
   search?: ReactNode
   mobileNavigationOpen?: boolean
   onMobileNavigationOpenChange?: (open: boolean) => void
@@ -1343,6 +1348,7 @@ export function Navbar(props: NavbarProps) {
   const {
     brand,
     items = [],
+    mobileNavigationItems,
     search,
     mobileNavigationOpen,
     onMobileNavigationOpenChange,
@@ -1381,7 +1387,8 @@ export function Navbar(props: NavbarProps) {
     },
     [mobileDrawer, requestMobileOpen],
   )
-  const hasMobileNavigation = items.length > 0 || Boolean(account) || Boolean(guestActions)
+  const hasMobileNavigation =
+    (mobileNavigationItems?.length ?? items.length) > 0 || Boolean(account) || Boolean(guestActions)
 
   useEffect(() => {
     if (mobileOpen && mobileDrawer?.open) mobileDrawer.onOpenChange(false)
@@ -1428,8 +1435,29 @@ export function Navbar(props: NavbarProps) {
     [requestMobileOpen],
   )
   const mobileItems = useMemo(
-    () => items.map((item) => toSidebarItem(item, () => closeMobileNavigation())),
-    [closeMobileNavigation, items],
+    () => {
+      if (!mobileNavigationItems) {
+        return items.map((item) => toSidebarItem(item, () => closeMobileNavigation()))
+      }
+
+      // Menu Sidebar yang dipasok consumer tetap menutup panel setelah tautan
+      // dipilih, setara dengan menu hasil konversi otomatis dari `items`.
+      return mobileNavigationItems.map((item) => ({
+        ...item,
+        onClick: (event: MouseEvent<HTMLAnchorElement>) => {
+          item.onClick?.(event)
+          if (!event.defaultPrevented) closeMobileNavigation()
+        },
+        children: item.children?.map((child) => ({
+          ...child,
+          onClick: (event: MouseEvent<HTMLAnchorElement>) => {
+            child.onClick?.(event)
+            if (!event.defaultPrevented) closeMobileNavigation()
+          },
+        })),
+      }))
+    },
+    [closeMobileNavigation, items, mobileNavigationItems],
   )
   const handleDialogCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     event.preventDefault()

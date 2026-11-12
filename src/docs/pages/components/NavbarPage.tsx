@@ -20,7 +20,7 @@ const bool = [{ value: true, label: 'Ada' }, { value: false, label: 'Tidak Ada' 
 const widths = [375, 412, 440, 768, 1024, 1280, 1440] as const
 const navbarCodeHighlights = [
   'Navbar', 'Search', 'Drawer', 'NavbarAccount', 'NavbarPrimaryItem',
-  'platform', 'brand', 'items', 'search', 'guestActions', 'account', 'notificationTrigger', 'mobileDrawer',
+  'platform', 'brand', 'items', 'mobileNavigationItems', 'search', 'guestActions', 'account', 'notificationTrigger', 'mobileDrawer',
   'type', 'children', 'id', 'label', 'href', 'current', 'disabled', 'icon', 'tone',
   'data-theme', 'open', 'onOpenChange', 'controls', 'ariaLabel', 'trigger', 'showButton', 'onClose', 'position', 'size',
 ]
@@ -43,6 +43,7 @@ const navbarProps: PropRow[] = [
   ['platform', "'front-office' | 'back-office'", 'required', 'Menentukan kontrak platform, bukan deteksi viewport.'],
   ['brand', 'NavbarBrand', 'required', 'Brand consumer. Pada BO desktop, Sidebar aplikasi yang merendernya.'],
   ['items', 'NavbarPrimaryItem[]', '[]', 'Destination atau disclosure satu tingkat.'],
+  ['mobileNavigationItems', 'SidebarItem[]', 'undefined', 'Menu khusus Sidebar yang dibuka hamburger mobile. Bila tidak diisi, Navbar memakai items.'],
   ['search', 'ReactNode', 'undefined', 'Slot Search milik consumer.'],
   ['guestActions', 'NavbarGuestActions', 'undefined', 'Hanya FO guest; tidak dapat dikombinasikan dengan account atau notificationTrigger.'],
   ['account', 'NavbarAccount', 'undefined', 'FO authenticated atau BO. Pada FO, tidak dapat dikombinasikan dengan guestActions.'],

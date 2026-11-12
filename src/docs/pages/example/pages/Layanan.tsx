@@ -34,6 +34,7 @@ export function Layanan() {
               metadata={["Pengumuman", "Hari ini, 09:00 WIB"]}
               badge={<Badge variant="brand" size="sm">Terbaru</Badge>}
               actionLabel="Buka"
+              actionDisabled
             />
             <ListViewItem
               size="s"
@@ -43,6 +44,7 @@ export function Layanan() {
               metadata={["Pembaruan", "Kemarin, 14:30 WIB"]}
               badge={<Badge variant="success" size="sm">Tersedia</Badge>}
               actionLabel="Buka"
+              actionDisabled
             />
             <ListViewItem
               size="s"
@@ -52,6 +54,57 @@ export function Layanan() {
               metadata={["Informasi", "24 Okt 2026, 10:15 WIB"]}
               badge={<Badge variant="gray" size="sm">Bantuan</Badge>}
               actionLabel="Buka"
+              actionDisabled
+            />
+            <ListViewItem
+              size="s"
+              platform="desktop"
+              decoration
+              title="Pendaftaran akun layanan"
+              metadata={["Panduan", "21 Okt 2026, 08:30 WIB"]}
+              badge={<Badge variant="warning" size="sm">Penting</Badge>}
+              actionLabel="Buka"
+              actionDisabled
+            />
+            <ListViewItem
+              size="s"
+              platform="desktop"
+              decoration
+              title="Jadwal pemeliharaan portal"
+              metadata={["Pemberitahuan", "18 Okt 2026, 17:00 WIB"]}
+              badge={<Badge variant="gray" size="sm">Terjadwal</Badge>}
+              actionLabel="Buka"
+              actionDisabled
+            />
+            <ListViewItem
+              size="s"
+              platform="desktop"
+              decoration
+              title="Panduan unggah dokumen persyaratan"
+              metadata={["Panduan", "15 Okt 2026, 13:45 WIB"]}
+              badge={<Badge variant="brand" size="sm">Terbaru</Badge>}
+              actionLabel="Buka"
+              actionDisabled
+            />
+            <ListViewItem
+              size="s"
+              platform="desktop"
+              decoration
+              title="Perubahan estimasi waktu layanan"
+              metadata={["Pembaruan", "12 Okt 2026, 09:20 WIB"]}
+              badge={<Badge variant="warning" size="sm">Perhatian</Badge>}
+              actionLabel="Buka"
+              actionDisabled
+            />
+            <ListViewItem
+              size="s"
+              platform="desktop"
+              decoration
+              title="Kanal bantuan layanan terpadu"
+              metadata={["Informasi", "08 Okt 2026, 16:00 WIB"]}
+              badge={<Badge variant="success" size="sm">Aktif</Badge>}
+              actionLabel="Buka"
+              actionDisabled
             />
           </div>
         </section>
@@ -63,7 +116,7 @@ export function Layanan() {
           </p>
 
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
-            {LAYANAN.slice(0, 2).map((l) => (
+            {LAYANAN.map((l) => (
               <Card
                 key={l.slug}
                 image={asset('/images/card-sample.svg')}

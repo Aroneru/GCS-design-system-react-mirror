@@ -167,7 +167,7 @@ const listViewItemProps: PropRow[] = [
     "actionDisabled",
     "boolean",
     "false",
-    "Menonaktifkan tombol aksi bawaan pada varian simple, di semua ukuran dan platform.",
+    "Menyembunyikan tombol aksi bawaan pada varian simple, di semua ukuran dan platform.",
   ],
   [
     "actionButtonSize",

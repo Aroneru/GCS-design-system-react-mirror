@@ -1,4 +1,4 @@
-import { useId, useState, type MouseEvent } from "react";
+import { useId, useState } from "react";
 import {
   Breadcrumb,
   Container,
@@ -16,6 +16,7 @@ import {
   FileLines,
   GridPlus,
   Home,
+  Newspaper,
   Palette,
   UsersGroup,
 } from "../../../lib/icons/outline";
@@ -29,7 +30,7 @@ import { Pemohon } from "./pages/Pemohon";
 import { Pengajuan } from "./pages/Pengajuan";
 import { Pengaturan } from "./pages/Pengaturan";
 import { Simaya } from "./pages/Simaya";
-import { Simaya2 } from "./pages/Simaya2";
+import { BeritaLayananDigital } from "./pages/BeritaLayananDigital";
 
 /**
  * Kerangka aplikasi demo.
@@ -54,7 +55,7 @@ const RUTE: { halaman: HalamanDemo; ikon: React.ReactNode; badge?: string }[] = 
   { halaman: "simaya", ikon: <Envelope className="size-5" /> },
   { halaman: "modifikasi", ikon: <Palette className="size-5" /> },
   { halaman: "pengaturan", ikon: <Cog className="size-5" /> },
-  { halaman: "simaya2", ikon: <Cog className="size-5" />, },
+  { halaman: "simaya2", ikon: <Newspaper className="size-5" /> },
 ];
 
 /** Sub-rute nyata, bukan state palsu — jadi Sidebar dan Navbar bekerja sebagai tautan. */
@@ -68,32 +69,10 @@ const DESKRIPSI: Record<HalamanDemo, string> = {
   simaya: "Persuratan internal dengan aksen Simaya — prop application pada tujuh komponen form.",
   modifikasi: "Tiga tingkat penyesuaian komponen: varian bawaan, slot, lalu className.",
   pengaturan: "Data profil dan preferensi pemberitahuan akun Anda.",
-  simaya2: "Simaya-simayaan.",
-};
-
-const RUTE_KONTEKSTUAL: Record<HalamanDemo, HalamanDemo[]> = {
-  dasbor: ["pengajuan", "layanan"],
-  pengajuan: ["pemohon", "layanan"],
-  pemohon: ["pengajuan", "layanan"],
-  layanan: ["pengajuan", "pengaturan"],
-  simaya: ["pengajuan", "pengaturan"],
-  modifikasi: ["layanan", "pengaturan"],
-  pengaturan: ["pemohon", "modifikasi"],
-  simaya2: ["simaya", "pengaturan"],
+  simaya2: "Berita dan pembaruan terbaru seputar Portal Layanan Terpadu.",
 };
 
 const RUTE_LAYANAN = ["pengajuan", "pemohon", "layanan"] as const;
-
-function isAcceptedNavigation(event: MouseEvent<HTMLElement>) {
-  return (
-    !event.defaultPrevented &&
-    event.button === 0 &&
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.metaKey &&
-    !event.shiftKey
-  );
-}
 
 function Isi({ halaman }: { halaman: HalamanDemo }) {
   switch (halaman) {
@@ -106,7 +85,7 @@ function Isi({ halaman }: { halaman: HalamanDemo }) {
     case "simaya":
       return <Simaya />;
     case "simaya2":
-      return <Simaya2 />;
+      return <BeritaLayananDigital />;
     case "modifikasi":
       return <Modifikasi />;
     case "pengaturan":
@@ -119,10 +98,9 @@ function Isi({ halaman }: { halaman: HalamanDemo }) {
 export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
   const [ringkas, setRingkas] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [contextualDrawerPage, setContextualDrawerPage] = useState<HalamanDemo | null>(null);
+  const [navbarDrawerOpen, setNavbarDrawerOpen] = useState(false);
   const [searchFeedback, setSearchFeedback] = useState("");
-  const contextualDrawerOpen = contextualDrawerPage === halaman;
-  const contextualDrawerId = useId();
+  const navbarDrawerId = useId();
 
   const menu = RUTE.map(({ halaman: h, ikon, badge }) => ({
     id: h,
@@ -155,7 +133,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
     },
     ...(["simaya", "modifikasi", "pengaturan", "simaya2"] as const).map(navbarDestination),
   ];
-  const contextualMenu: DrawerMenuItem[] = [halaman, ...RUTE_KONTEKSTUAL[halaman]].map((h) => {
+  const navbarDrawerDestination = (h: HalamanDemo): DrawerMenuItem => {
     const route = RUTE.find(({ halaman: routePage }) => routePage === h);
 
     return {
@@ -164,11 +142,20 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
       href: href(h),
       icon: route?.ikon,
       active: h === halaman,
-      onClick: (event) => {
-        if (isAcceptedNavigation(event)) setContextualDrawerPage(null);
-      },
+      onClick: () => setNavbarDrawerOpen(false),
     };
-  });
+  };
+  const navbarDrawerItems: DrawerMenuItem[] = [
+    navbarDrawerDestination("dasbor"),
+    {
+      id: "layanan-digital",
+      label: "Layanan Digital",
+      icon: <GridPlus className="size-5" />,
+      active: RUTE_LAYANAN.includes(halaman as (typeof RUTE_LAYANAN)[number]),
+      children: RUTE_LAYANAN.map((h) => navbarDrawerDestination(h)),
+    },
+    ...(["simaya", "modifikasi", "pengaturan", "simaya2"] as const).map(navbarDrawerDestination),
+  ];
 
   return (
     // Kolom, bukan baris: Sidebar dan konten berdampingan di dalam satu baris,
@@ -176,8 +163,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
     // selebar layar, ikut menutupi kolom di bawah Sidebar.
     <div className="flex min-h-screen flex-col bg-surface-subtle">
       <div className="flex flex-1">
-        {/* Disembunyikan di bawah lg: di layar sempit Navbar sudah menyediakan
-            panel navigasinya sendiri, jadi dua navigasi akan bertumpuk. */}
+        {/* Pada mobile, menu Sidebar ini dipindahkan ke hamburger kiri Navbar. */}
         <div className="hidden lg:block">
           <Sidebar
             logo={
@@ -226,6 +212,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
               ariaLabel: "CEPLOK — Dasbor",
             }}
             items={navbarItems}
+            mobileNavigationItems={menu}
             search={
               <Search
                 platform="compact"
@@ -259,10 +246,10 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             mobileNavigationOpen={mobileSidebarOpen}
             onMobileNavigationOpenChange={setMobileSidebarOpen}
             mobileDrawer={{
-              open: contextualDrawerOpen,
-              onOpenChange: (open) => setContextualDrawerPage(open ? halaman : null),
-              controls: contextualDrawerId,
-              ariaLabel: `Buka navigasi kontekstual ${JUDUL_HALAMAN[halaman]}`,
+              open: navbarDrawerOpen,
+              onOpenChange: setNavbarDrawerOpen,
+              controls: navbarDrawerId,
+              ariaLabel: "Buka menu utama",
             }}
           />
 
@@ -323,14 +310,14 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
           </main>
 
           <Drawer
-            id={contextualDrawerId}
-            open={contextualDrawerOpen}
-            onClose={() => setContextualDrawerPage(null)}
+            id={navbarDrawerId}
+            open={navbarDrawerOpen}
+            onClose={() => setNavbarDrawerOpen(false)}
             position="right"
             size="s"
-            eyebrow="Navigasi kontekstual"
-            header={<Drawer.Title>{JUDUL_HALAMAN[halaman]}</Drawer.Title>}
-            items={contextualMenu}
+            eyebrow="Menu utama"
+            header={<Drawer.Title>Navigasi</Drawer.Title>}
+            items={navbarDrawerItems}
           />
         </div>
       </div>

@@ -14,9 +14,7 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 ### Ditambahkan
 
 - **`ListViewItem`: prop `actionDisabled`.** Tombol aksi bawaan pada varian
-  `simple` kini dapat dinonaktifkan di seluruh ukuran dan platform. Pada aksi
-  berbentuk tautan, komponen juga mengatur `aria-disabled`, mengeluarkannya dari
-  urutan fokus, dan mencegah navigasi.
+  `simple` kini dapat disembunyikan di seluruh ukuran dan platform.
 
 ## [0.5.1] - 2026-11-03
 

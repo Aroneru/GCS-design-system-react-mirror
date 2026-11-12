@@ -285,10 +285,9 @@ varian berubah menjadi latar putih dengan teks gray-700.
 dan mobile. Varian `simple` dapat memakai ikon, badge, dekorasi aksen, dan aksi;
 varian `article` tersedia hingga `XL`, selalu memakai garis aksen vertikal, dan
 menampilkan subject, metadata, pin, judul, serta metrik interaksi. Gunakan
-`actionDisabled` bersama `actionLabel` untuk menonaktifkan tombol aksi simple di
-semua ukuran dan platform; bila aksi memakai `actionHref`, tautannya juga tidak
-dapat difokuskan atau dinavigasi. Gunakan `darkMode` pada pembungkus atau item
-untuk tampilan gelap.
+`actionDisabled` bersama `actionLabel` untuk menyembunyikan tombol aksi simple
+di semua ukuran dan platform. Gunakan `darkMode` pada pembungkus atau item untuk
+tampilan gelap.
 
 ### Form
 
