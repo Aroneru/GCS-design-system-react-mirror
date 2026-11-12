@@ -34,7 +34,9 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 - **Sumber navigasi Back Office dipisahkan.** `items` mengisi navigasi Navbar
   desktop dan otomatis menjadi isi Drawer navigasi mobile milik Navbar.
   Prop BO baru `sidebarItems` membawa data Sidebar aplikasi ke dialog Sidebar
-  mobile; Sidebar desktop tetap dirender dan dimiliki layout consumer. Kontrak
+  mobile, sedangkan `sidebarUser` membawa identitas dan aksi akun Sidebar yang
+  sama. Sidebar desktop tetap dirender dan dimiliki layout consumer. `account`
+  kini khusus Front Office; Back Office menempatkan akun hanya di Sidebar. Kontrak
   lama `mobileDrawer` dihapus karena trigger, state, lifecycle, dan isi Drawer
   navigasi sekarang sepenuhnya dimiliki Navbar. Drawer custom tetap digunakan
   consumer sebagai komponen terpisah.
@@ -53,13 +55,14 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   di sisi kanan terpotong.
 - **Notification Back Office independen dari Account.** `notificationTrigger`
   kini menerima `NavbarNotificationTrigger`, bukan `ReactNode`, dan tersedia
-  pada BO dengan atau tanpa `account`. Navbar merender ikon Bell 24px berwarna
+  pada BO tanpa bergantung pada identitas Sidebar. Navbar merender ikon Bell 24px berwarna
   gray-800 pada light dan gray-400 pada dark; consumer tetap mengatur aksi,
   state panel, badge, dan atribut tombolnya.
-- **Portal Dashboard memakai Sidebar yang sama di semua viewport.** Navigasi
-  mobile tidak lagi dikonversi menjadi Drawer. Sidebar yang sama ditampilkan
-  sebagai panel modal dari kiri, sehingga logo, akun, dan menu tetap konsisten
-  dengan desktop. Item wiki memakai aksi pada seluruh baris tanpa tombol dan
+- **Portal Dashboard memakai kontrak Navbar Back Office.** Menu aplikasi dan
+  identitas akun berasal dari Sidebar yang sama pada desktop/mobile, sedangkan
+  navigasi global berada di Navbar desktop dan Drawer mobile. Header dan dialog
+  mobile buatan contoh dihapus; Search kategori serta notifikasi memakai slot
+  Navbar. Item wiki tetap memakai aksi pada seluruh baris tanpa tombol dan
   tanpa feedback hover/active.
 
 ### Diperbaiki

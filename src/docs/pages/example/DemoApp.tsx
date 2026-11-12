@@ -72,7 +72,8 @@ const DESKRIPSI: Record<HalamanDemo, string> = {
   simaya2: "Berita dan pembaruan terbaru seputar Portal Layanan Terpadu.",
 };
 
-const RUTE_LAYANAN = ["pengajuan", "pemohon", "layanan"] as const;
+const RUTE_SIDEBAR = ["dasbor", "pengajuan", "pemohon", "modifikasi", "pengaturan"] as const;
+const RUTE_LAYANAN = ["layanan", "simaya"] as const;
 
 function Isi({ halaman }: { halaman: HalamanDemo }) {
   switch (halaman) {
@@ -100,14 +101,17 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [searchFeedback, setSearchFeedback] = useState("");
 
-  const menu: SidebarItem[] = RUTE.map(({ halaman: h, ikon, badge }) => ({
-    id: h,
-    label: JUDUL_HALAMAN[h],
-    href: href(h),
-    icon: ikon,
-    badge,
-    active: h === halaman,
-  }));
+  const menu: SidebarItem[] = RUTE_SIDEBAR.map((h) => {
+    const route = RUTE.find(({ halaman: routePage }) => routePage === h);
+    return {
+      id: h,
+      label: JUDUL_HALAMAN[h],
+      href: href(h),
+      icon: route?.ikon,
+      badge: route?.badge,
+      active: h === halaman,
+    };
+  });
   const navbarDestination = (h: HalamanDemo) => {
     const route = RUTE.find(({ halaman: routePage }) => routePage === h);
 
@@ -121,7 +125,6 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
     };
   };
   const navbarItems = [
-    navbarDestination("dasbor"),
     {
       id: "layanan-digital",
       type: "disclosure" as const,
@@ -129,9 +132,29 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
       icon: <GridPlus className="size-5" />,
       children: RUTE_LAYANAN.map(navbarDestination),
     },
-    ...(["simaya", "modifikasi", "pengaturan", "simaya2"] as const).map(navbarDestination),
+    {
+      ...navbarDestination("simaya2"),
+      label: "Berita & Pembaruan",
+    },
   ];
   const searchCategories = menu.map(({ id, label }) => ({ value: id ?? label, label }));
+  const sidebarUser = {
+    name: "Rafli Arandhana",
+    profileLabel: "Administrator",
+    items: [
+      {
+        id: "account-settings",
+        label: "Pengaturan akun",
+        href: href("pengaturan"),
+      },
+      {
+        id: "logout",
+        label: "Keluar",
+        tone: "danger" as const,
+        onClick: () => setSearchFeedback("Aksi demo: Keluar"),
+      },
+    ],
+  };
 
   return (
     // Kolom, bukan baris: Sidebar dan konten berdampingan di dalam satu baris,
@@ -156,7 +179,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
              */
             collapsedLogo={<img src={asset("/images/ceplok.svg")} alt="CEPLOK" className="size-8" />}
             items={menu}
-            user={{ name: "Rafli Arandhana", profileLabel: "Administrator" }}
+            user={sidebarUser}
             sticky
             collapsed={ringkas}
             onCollapse={() => setRingkas((v) => !v)}
@@ -189,6 +212,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             }}
             items={navbarItems}
             sidebarItems={menu}
+            sidebarUser={sidebarUser}
             tableOfContents={halaman === "simaya2" ? {
               label: "Daftar isi",
               items: BERITA_LAYANAN_DIGITAL_TOC,
@@ -208,26 +232,6 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             notificationTrigger={{
               ariaLabel: "Buka notifikasi",
               onClick: () => setSearchFeedback("Aksi demo: Buka notifikasi"),
-            }}
-            account={{
-              name: "Rafli Arandhana",
-              initials: "RA",
-              items: [
-                {
-                  id: "account-settings",
-                  type: "destination",
-                  label: "Pengaturan akun",
-                  href: href("pengaturan"),
-                  current: halaman === "pengaturan",
-                },
-                {
-                  id: "logout",
-                  type: "action",
-                  label: "Keluar",
-                  tone: "danger",
-                  onClick: () => setSearchFeedback("Aksi demo: Keluar"),
-                },
-              ],
             }}
             mobileNavigationOpen={mobileSidebarOpen}
             onMobileNavigationOpenChange={setMobileSidebarOpen}
