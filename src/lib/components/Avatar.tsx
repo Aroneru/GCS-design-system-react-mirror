@@ -1,5 +1,4 @@
 import { forwardRef, useState, type HTMLAttributes, type ReactNode } from 'react'
-import { User } from 'flowbite-react-icons/outline'
 import femaleDark from '../assets/avatar/Female-Dark.svg'
 import femaleLight from '../assets/avatar/Female-Light.svg'
 import maleDark from '../assets/avatar/Male-Dark.svg'
@@ -8,8 +7,7 @@ import { cn } from '../utils/cn'
 
 /** Tiga diameter lingkaran: 24px, 32px, dan 80px. */
 export type AvatarSize = 'small' | 'default' | 'large'
-export type AvatarGender = 'male' | 'female'
-export type AvatarFallback = 'initials' | 'profile'
+export type AvatarFallback = 'initials' | 'female' | 'male'
 
 /**
  * Diameter lingkaran beserta ukuran teks isinya.
@@ -23,7 +21,7 @@ const sizes: Record<AvatarSize, string> = {
   large: 'size-20 text-3xl',
 }
 
-export interface AvatarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+interface AvatarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /** Alamat gambar. Bila kosong — atau gagal dimuat — isian teks yang tampil. */
   src?: string
   /**
@@ -39,20 +37,26 @@ export interface AvatarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'child
    * Isi lingkaran saat tidak ada gambar — umumnya satu atau dua huruf inisial.
    * Bisa juga diisi ikon kecil bila memang tidak ada nama yang bisa disingkat.
    */
-  initials?: ReactNode
   size?: AvatarSize
-  /** Ilustrasi profil yang dipakai ketika fallback tidak menghasilkan inisial. */
-  gender?: AvatarGender
-  /** Memilih fallback inisial atau langsung menampilkan ilustrasi profil. */
-  fallback?: AvatarFallback
   /** @deprecated Gunakan scope ambient `data-theme="dark"`. */
   darkMode?: boolean
 }
 
+type AvatarInitialsFallback =
+  | { fallback?: 'initials'; name: string; initials?: ReactNode }
+  | { fallback?: 'initials'; name?: string; initials: ReactNode }
+
+type AvatarProfileFallback = {
+  fallback: 'female' | 'male'
+  initials?: never
+}
+
+export type AvatarProps = AvatarBaseProps & (AvatarInitialsFallback | AvatarProfileFallback)
+
 const profileAssets = {
   male: { light: maleLight, dark: maleDark },
   female: { light: femaleLight, dark: femaleDark },
-} satisfies Record<AvatarGender, { light: string; dark: string }>
+} satisfies Record<Exclude<AvatarFallback, 'initials'>, { light: string; dark: string }>
 
 function graphemes(value: string): string[] {
   if (typeof Intl.Segmenter === 'function') {
@@ -77,12 +81,8 @@ function hasInitials(value: ReactNode): boolean {
   return value !== undefined && value !== null && value !== false && value !== ''
 }
 
-function ProfileFallback({ gender }: { gender?: AvatarGender }) {
-  if (!gender) {
-    return <User className="size-[60%]" aria-hidden="true" />
-  }
-
-  const assets = profileAssets[gender]
+function ProfileFallback({ fallback }: { fallback: Exclude<AvatarFallback, 'initials'> }) {
+  const assets = profileAssets[fallback]
   return (
     <>
       <img
@@ -104,11 +104,10 @@ function ProfileFallback({ gender }: { gender?: AvatarGender }) {
 /**
  * Avatar — lingkaran identitas berisi foto atau inisial.
  *
- * Bentuknya ditentukan oleh isinya, bukan oleh prop terpisah: ada `src` berarti
- * foto, tidak ada berarti inisial. Memisahkannya jadi prop `type` sendiri hanya
- * akan membuka keadaan yang mustahil — "type foto tanpa gambar".
+ * Foto selalu diprioritaskan ketika `src` tersedia. Jika foto kosong atau gagal,
+ * satu prop `fallback` memilih inisial, ilustrasi female, atau ilustrasi male.
  *
- * Gambar yang gagal dimuat juga jatuh kembali ke inisial. Alamat foto profil
+ * Gambar yang gagal dimuat juga jatuh kembali ke fallback tersebut. Alamat foto profil
  * paling sering datang dari sistem lain dan bisa mati kapan saja; tanpa
  * penanganan ini yang tersisa hanya ikon gambar rusak.
  */
@@ -119,7 +118,6 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
     name,
     initials,
     size = 'default',
-    gender,
     fallback = 'initials',
     darkMode = false,
     className,
@@ -133,7 +131,8 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
   const pakaiGambar = Boolean(src) && gagal !== src
   const inisialOtomatis = initialsFromName(name)
   const isiInisial = hasInitials(initials) ? initials : inisialOtomatis
-  const pakaiProfil = !pakaiGambar && (fallback === 'profile' || !hasInitials(isiInisial))
+  const pakaiProfil = !pakaiGambar && fallback !== 'initials'
+  const pakaiInisial = !pakaiGambar && !pakaiProfil && hasInitials(isiInisial)
 
   const namaAksesibel = alt ?? name ?? ''
 
@@ -159,15 +158,15 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
         />
       ) : pakaiProfil ? (
         <span className="grid size-full place-items-center" aria-hidden="true">
-          <ProfileFallback gender={gender} />
+          <ProfileFallback fallback={fallback} />
         </span>
-      ) : (
+      ) : pakaiInisial ? (
         // Inisial disembunyikan dari pembaca layar: dieja huruf per huruf ia
         // tidak berarti apa-apa, dan namanya sudah diwakili aria-label di atas.
         <span className="leading-none" aria-hidden="true">
           {isiInisial}
         </span>
-      )}
+      ) : null}
     </div>
   )
 })

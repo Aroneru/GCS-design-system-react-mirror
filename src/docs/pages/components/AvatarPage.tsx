@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Avatar, type AvatarFallback, type AvatarGender, type AvatarSize } from '../../../lib'
+import { Avatar, type AvatarFallback, type AvatarSize } from '../../../lib'
 import { asset } from '../../asset'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
@@ -18,8 +18,7 @@ const avatarProps: PropRow[] = [
   ['name', 'string', 'undefined', 'Nama untuk accessible name dan inisial otomatis.'],
   ['alt', 'string', 'name atau ""', 'Override accessible name. String kosong menjadikan Avatar dekoratif.'],
   ['initials', 'ReactNode', 'undefined', 'Override isi inisial ketika foto tidak tersedia.'],
-  ['fallback', "'initials' | 'profile'", 'initials', 'Gunakan inisial atau langsung ilustrasi profil.'],
-  ['gender', "'male' | 'female'", 'undefined', 'Ilustrasi profil gender; tidak pernah ditebak dari name.'],
+  ['fallback', "'initials' | 'female' | 'male'", 'initials', 'Memilih fallback secara eksplisit; initials memerlukan name atau initials.'],
   ['size', "'small' | 'default' | 'large'", 'default (M)', 'Diameter lingkaran: 24px, 32px, atau 80px.'],
   ['darkMode', 'boolean', 'false', 'Deprecated. Gunakan scope ambient data-theme="dark".'],
   ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut <div> standar diteruskan, termasuk className.'],
@@ -28,7 +27,7 @@ const avatarProps: PropRow[] = [
 const toc: TocEntry[] = [
   { id: 'avatar', label: 'Avatar' },
   { id: 'inisial', label: 'Inisial' },
-  { id: 'profile', label: 'Default profile' },
+  { id: 'profile', label: 'Profile fallback' },
   { id: 'sizes', label: 'Sizes' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
@@ -39,10 +38,9 @@ const toc: TocEntry[] = [
 export function AvatarPage() {
   const [size, setSize] = useState<AvatarSize>('default')
   const [content, setContent] = useState<'photo' | 'auto' | 'override' | 'profile'>('auto')
-  const [gender, setGender] = useState<AvatarGender>('female')
+  const [profileFallback, setProfileFallback] = useState<Exclude<AvatarFallback, 'initials'>>('female')
   const [name, setName] = useState('Putri Handayani')
   const [dark, setDark] = useState(false)
-  const fallback: AvatarFallback = content === 'profile' ? 'profile' : 'initials'
 
   return (
     <UsulanPage
@@ -54,7 +52,8 @@ export function AvatarPage() {
       <FlowSection id="avatar" title="Avatar">
         <Lead>
           Foto dari <Hl>src</Hl> selalu menjadi pilihan pertama. Jika kosong atau gagal dimuat,
-          Avatar berpindah ke fallback tanpa mengubah ukuran, crop, atau bentuk lingkarannya.
+          Avatar berpindah ke fallback tanpa mengubah ukuran dan bentuk lingkarannya.
+          Foto memakai crop tengah <Hl>object-cover</Hl>, sehingga rasio tetap terjaga.
         </Lead>
         <Demo label="Default Avatar / foto">
           <div className="flex items-center gap-4">
@@ -118,42 +117,29 @@ export function AvatarPage() {
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="profile" title="Default profile">
+      <FlowSection id="profile" title="Profile fallback">
         <Lead>
-          <Hl>fallback=&quot;profile&quot;</Hl> menampilkan ilustrasi walaupun <Hl>name</Hl>{' '}
-          tersedia. Gender dipilih eksplisit dan tidak pernah ditebak dari nama. Tanpa gender,
-          Avatar memakai ikon User netral.
+          <Hl>fallback=&quot;female&quot;</Hl> atau <Hl>fallback=&quot;male&quot;</Hl> menampilkan
+          ilustrasi profil walaupun <Hl>name</Hl> tersedia. Varian tidak pernah ditebak dari
+          nama. <Hl>fallback=&quot;initials&quot;</Hl> adalah bawaan dan memerlukan name atau initials.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-3">
           <Demo label="Female">
-            <Avatar name="Putri Handayani" fallback="profile" gender="female" size="large" />
+            <Avatar name="Putri Handayani" fallback="female" size="large" />
           </Demo>
           <Demo label="Male">
-            <Avatar name="Rafli Arandhana" fallback="profile" gender="male" size="large" />
+            <Avatar name="Rafli Arandhana" fallback="male" size="large" />
           </Demo>
-          <Demo label="Neutral">
-            <Avatar name="Pengguna" fallback="profile" size="large" />
+          <Demo label="Default → initials">
+            <Avatar name="Pengguna" size="large" />
           </Demo>
         </div>
         <SectionCode>
           {'<Avatar '}
-          <H>gender</H>
-          {'="female" '}
-          <H>fallback</H>
-          {'="profile" />\n<Avatar '}
-          <H>gender</H>
-          {'="male" '}
-          <H>fallback</H>
-          {'="profile" />'}
-        </SectionCode>
-        <SectionCode>
-          {'<Avatar '}
           <H>name</H>
           {'="Putri Handayani" '}
-          <H>gender</H>
-          {'="female" '}
           <H>fallback</H>
-          {'="profile" />'}
+          {'="female" />'}
         </SectionCode>
       </FlowSection>
 
@@ -167,7 +153,7 @@ export function AvatarPage() {
             <Demo key={u.value} label={u.label + ' — ' + u.diameter}>
               <div className="flex items-center gap-3">
                 <Avatar name="Putri Handayani" size={u.value} />
-                <Avatar name="Putri Handayani" fallback="profile" gender="female" size={u.value} />
+                <Avatar name="Putri Handayani" fallback="female" size={u.value} />
               </div>
             </Demo>
           ))}
@@ -178,9 +164,7 @@ export function AvatarPage() {
         <SectionCode>
           {'<Avatar '}
           <H>size</H>
-          {'="small" name="Putri Handayani" />\n<Avatar name="Putri Handayani" />\n<Avatar '}
-          <H>size</H>
-          {'="large" name="Putri Handayani" />'}
+          {'="small" name="Putri Handayani" />'}
         </SectionCode>
       </FlowSection>
 
@@ -192,8 +176,8 @@ export function AvatarPage() {
         <Stage maxWidth="max-w-full" dark>
           <div data-theme="dark" className="flex flex-wrap items-center gap-4">
             <Avatar name="Putri Handayani" size="large" />
-            <Avatar name="Putri Handayani" fallback="profile" gender="female" size="large" />
-            <Avatar name="Rafli Arandhana" fallback="profile" gender="male" size="large" />
+            <Avatar name="Putri Handayani" fallback="female" size="large" />
+            <Avatar name="Rafli Arandhana" fallback="male" size="large" />
           </div>
         </Stage>
         <SectionCode>
@@ -204,7 +188,7 @@ export function AvatarPage() {
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
-        <Lead>Ubah tema, ukuran, isi, gender, dan nama. Preview memakai komponen production yang sama.</Lead>
+        <Lead>Ubah tema, ukuran, isi, fallback profil, dan nama. Preview memakai komponen production yang sama.</Lead>
         <Stage maxWidth="max-w-[360px]" dark={dark}>
           <div
             data-theme={dark ? 'dark' : 'light'}
@@ -216,8 +200,7 @@ export function AvatarPage() {
               name={name}
               alt=""
               initials={content === 'override' ? 'UI' : undefined}
-              fallback={fallback}
-              gender={content === 'profile' ? gender : undefined}
+              fallback={content === 'profile' ? profileFallback : 'initials'}
             />
             <span className="text-sm text-content">{name || 'Tanpa nama'}</span>
           </div>
@@ -257,11 +240,11 @@ export function AvatarPage() {
               ]}
             />
           </Control>
-          <Control label="Gender">
+          <Control label="Profile fallback">
             <Segmented
-              label="Pilih gender profile"
-              value={gender}
-              onChange={setGender}
+              label="Pilih ilustrasi profile"
+              value={profileFallback}
+              onChange={setProfileFallback}
               disabled={content !== 'profile'}
               options={[
                 { value: 'female', label: 'Female' },
@@ -283,20 +266,10 @@ export function AvatarPage() {
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Gunakan urutan berikut untuk memilih konfigurasi Avatar yang sesuai kebutuhan consumer.
+          Blok ini mengikuti kontrol di Playground. Prop yang masih memakai nilai bawaan sengaja
+          tidak ditulis. Fallback <Hl>initials</Hl> selalu membutuhkan <Hl>name</Hl> atau{' '}
+          <Hl>initials</Hl>.
         </Lead>
-        <ol className="mb-4 list-decimal space-y-2 pl-5 text-body-sm text-gray-500">
-          <li>Tentukan apakah Avatar memakai foto melalui <Hl>src</Hl> atau tanpa foto.</li>
-          <li>Berikan <Hl>name</Hl> untuk identitas dan inisial otomatis.</li>
-          <li>
-            Untuk ilustrasi Male/Female, gunakan <Hl>gender</Hl> bersama{' '}
-            <Hl>fallback=&quot;profile&quot;</Hl>.
-          </li>
-          <li>Gunakan <Hl>initials</Hl> hanya saat membutuhkan override.</li>
-          <li>
-            Atur <Hl>size</Hl> bila bukan M, dan pilih <Hl>alt</Hl> sesuai konteks aksesibilitas.
-          </li>
-        </ol>
         <SectionCode flush>
           {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
           {dark && '<section data-theme="dark">\n'}
@@ -334,10 +307,7 @@ export function AvatarPage() {
             <>
               {'    '}
               <H>fallback</H>
-              {'="profile"\n'}
-              {'    '}
-              <H>gender</H>
-              {'="' + gender + '"\n'}
+              {'="' + profileFallback + '"\n'}
             </>
           )}
           {dark ? '  />\n</section>' : '/>'}
@@ -346,8 +316,8 @@ export function AvatarPage() {
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Seluruh prop public Avatar. Native attributes dan ref tetap diteruskan ke wrapper{' '}
-          <Hl>&lt;div&gt;</Hl>.
+          Seluruh prop yang diterima Avatar, beserta tipe dan nilai bawaannya. Atribut{' '}
+          <Hl>&lt;div&gt;</Hl> standar dan ref juga diteruskan apa adanya.
         </Lead>
         <PropsTable rows={avatarProps} minWidth="52rem" />
       </FlowSection>

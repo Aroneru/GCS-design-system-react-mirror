@@ -119,7 +119,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | ------------ | -------------------------------------------------------------------------------------------------------------------- |
 | `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| submit \| reset`, `iconOnly`, `as`: `button \| anchor`, `darkMode` |
 | `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
-| `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| profile`, `gender`: `male \| female`, `size`: `small \| default \| large`, `darkMode` (deprecated) |
+| `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| female \| male`, `size`: `small \| default \| large`, `darkMode` (deprecated) |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
 | `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `disabled`, `onCopySuccess`, `onCopyError`, `darkMode` (deprecated) |
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
@@ -152,22 +152,23 @@ Button dirender sebagai `<a>`.
 
 #### Avatar
 
-Avatar memprioritaskan foto dari `src`. Bila foto tidak ada atau gagal dimuat,
-fallback bawaannya adalah `initials` manual, lalu inisial Unicode-aware dari
-`name`, ilustrasi `gender`, dan akhirnya ikon User netral. `initials` tetap
-tersedia untuk override:
+Avatar memprioritaskan foto dari `src`. Foto mempertahankan rasio melalui
+`object-cover`; bagian yang melebihi lingkaran dipotong dari tengah. Bila foto
+tidak ada atau gagal dimuat, `fallback` menentukan representasinya. Nilai
+bawaan `initials` memakai `initials` manual lalu inisial Unicode-aware dari
+`name`. Karena tidak ada varian netral, salah satunya wajib tersedia:
 
 ```tsx
 <Avatar src={user.avatarUrl} name={user.name} />
 <Avatar name="Putri Handayani" initials="PT" />
 ```
 
-Untuk langsung memakai ilustrasi profile, pilih gender secara eksplisit — kami
-menyediakan asset Male/Female untuk tema terang dan gelap:
+Untuk langsung memakai ilustrasi profile, pilih fallback secara eksplisit —
+tersedia asset Female/Male untuk tema terang dan gelap:
 
 ```tsx
-<Avatar gender="female" fallback="profile" />
-<Avatar gender="male" fallback="profile" />
+<Avatar name="Putri Handayani" fallback="female" />
+<Avatar name="Rafli Arandhana" fallback="male" />
 ```
 
 Avatar mengikuti `data-theme` dari pembungkusnya, termasuk scope bertingkat.

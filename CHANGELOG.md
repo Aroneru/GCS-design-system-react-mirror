@@ -31,6 +31,13 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ### Diubah
 
+- **Fallback Avatar disederhanakan.** Prop `gender` dan nilai ambigu
+  `fallback="profile"` dihapus. Satu prop `fallback="initials" | "female" |
+  "male"` kini memilih representasi ketika foto kosong atau gagal dimuat.
+  `initials` menjadi bawaan dan secara tipe memerlukan `name` atau `initials`;
+  tidak ada fallback netral. Foto tetap memakai `object-cover` dengan crop
+  tengah. Perubahan ini memutus consumer API Avatar V2 sebelumnya.
+
 - **Sumber navigasi Back Office dipisahkan.** `items` mengisi navigasi Navbar
   desktop dan otomatis menjadi isi Drawer navigasi mobile milik Navbar.
   Prop BO baru `sidebarItems` membawa data Sidebar aplikasi ke dialog Sidebar
@@ -153,16 +160,14 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   tambahan dimuat.
 
 - **`Avatar` V2.** Prop `name` menambahkan nama aksesibel sekaligus menghasilkan
-  inisial Unicode-aware; `initials` tetap menjadi override manual. Fallback
-  dapat dipilih lewat `fallback="initials" | "profile"`: foto yang tersedia
-  selalu diprioritaskan, lalu inisial manual, inisial nama, ilustrasi gender,
-  dan ikon User netral. `gender="female" | "male"` dipilih eksplisit, tidak
-  pernah diturunkan dari nama; `fallback="profile"` memilih ilustrasi tersebut
-  meski `name` tersedia. Empat SVG Male/Female Light/Dark ikut dibundle sebagai
+  inisial Unicode-aware; `initials` tetap menjadi override manual. Foto yang
+  tersedia selalu diprioritaskan. `fallback="female" | "male"` dipilih
+  eksplisit untuk ilustrasi profil dan tidak pernah diturunkan dari nama;
+  `fallback="initials"` memakai inisial manual atau nama. Empat SVG Male/Female Light/Dark ikut dibundle sebagai
   asset package-local. Avatar kini mengikuti scope ambient `data-theme`,
   termasuk nested scope; `darkMode` tetap didukung sebagai prop deprecated.
   `alt` mengatur nama aksesibel (`alt=""` menjadikan Avatar dekoratif), dan
-  foto gagal kembali ke fallback yang sama. Ukuran API tetap `small`, `default`,
+  foto gagal kembali ke representasi yang sesuai. Ukuran API tetap `small`, `default`,
   dan `large` (S/M/L: 24/32/80px, dengan M sebagai bawaan).
 
 - **`ListView`** — daftar item dengan dua varian: `simple` untuk informasi
