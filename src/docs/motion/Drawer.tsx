@@ -133,7 +133,7 @@ export function Drawer({
       />
       <aside
         data-drawer-panel
-        className="ds-scroll-y absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-white shadow-2xl"
+        className="ds-scroll-y absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto bg-white shadow-2xl dark:bg-gray-800"
       >
         {children}
       </aside>

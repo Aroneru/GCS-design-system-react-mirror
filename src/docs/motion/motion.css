@@ -10,9 +10,10 @@
 /* ── Kisi halus di latar hero ───────────────────────────────────────────── */
 
 .ds-grid {
+    --ds-grid-line: var(--color-gray-200);
     background-image:
-        linear-gradient(to right, var(--color-gray-200) 1px, transparent 1px),
-        linear-gradient(to bottom, var(--color-gray-200) 1px, transparent 1px);
+        linear-gradient(to right, var(--ds-grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--ds-grid-line) 1px, transparent 1px);
     background-size: 56px 56px;
     /* Kisinya hanya boleh terbaca di tengah lalu larut ke tepi; tanpa mask, ia
        berhenti mendadak di batas elemen dan terlihat seperti tabel. */
@@ -20,17 +21,30 @@
     opacity: 0.55;
 }
 
+/* Mode gelap docs (lihat docs.css): garis gray-200 terlalu terang di atas abu-abu tua. */
+[data-docs-theme='dark'] .ds-grid {
+    --ds-grid-line: var(--color-gray-700);
+}
+
 /* ── Sapuan sinar diagonal ──────────────────────────────────────────────── */
 
 .ds-beam {
+    --ds-beam-tint: color-mix(in oklab, var(--color-primary-100) 55%, transparent);
+    --ds-beam-core: color-mix(in oklab, #fff 70%, transparent);
     background: linear-gradient(
         105deg,
         transparent 32%,
-        color-mix(in oklab, var(--color-primary-100) 55%, transparent) 46%,
-        color-mix(in oklab, #fff 70%, transparent) 52%,
+        var(--ds-beam-tint) 46%,
+        var(--ds-beam-core) 52%,
         transparent 66%
     );
     opacity: 0.85;
+}
+
+/* Di mode gelap sinarnya diredam: putih 70% terbaca sebagai pita silau, bukan cahaya. */
+[data-docs-theme='dark'] .ds-beam {
+    --ds-beam-tint: color-mix(in oklab, var(--color-primary-400) 10%, transparent);
+    --ds-beam-core: color-mix(in oklab, var(--color-primary-200) 8%, transparent);
 }
 
 /* ── Kartu dengan sorotan mengikuti kursor ──────────────────────────────── */

@@ -28,6 +28,18 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   TOC desktop tetap dirender oleh consumer pada konten halaman.
 - **Drawer: slot `afterItems`.** Konten kustom kini dapat ditambahkan setelah
   menu `items` tanpa mengganti `DrawerBody` data-driven bawaan.
+- **Mode gelap situs dokumentasi (uji coba).** Tombol bulan/matahari ada di
+  ujung bawah rail dan di top bar mobile, dan pilihannya disimpan di browser.
+  Baru berlaku di Home, Form Overview, Input Field Form, Search Form, dan
+  Portal Dashboard, termasuk rail, panel samping, dan jendela pencarian
+  halaman. Di halaman lain situs tetap terang dan tombolnya diredupkan.
+  Komponen di pratinjau ikut gelap lewat `darkMode` miliknya dan kembali
+  terang di mode terang. Cuplikan kode di Search Form ikut menulis `darkMode`,
+  mode Playground-nya mengikuti mode docs, dan bagian Dark mode-nya bertukar
+  menjadi Light mode selama docs gelap. Aplikasi Portal Dashboard
+  memasang `data-theme="dark"` di akarnya dan punya tombol tema sendiri di
+  header. Perubahan ini hanya di situs dokumentasi: komponen library dan
+  `styles.css` paket tidak berubah.
 
 ### Diubah
 
@@ -86,6 +98,9 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   mobile buatan contoh dihapus; Search kategori serta notifikasi memakai slot
   Navbar. Item wiki tetap memakai aksi pada seluruh baris tanpa tombol dan
   tanpa feedback hover/active.
+- **Kalender Portal Dashboard memenuhi kartunya.** Kisi tanggalnya kini selebar
+  kartu, bukan 240px di tengah, dan barisnya ikut memanjang bila kartunya lebih
+  tinggi dari isinya.
 
 ### Diperbaiki
 

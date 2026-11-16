@@ -16,6 +16,7 @@ import { ReactLogo } from "../../lib/brandIcons";
 import { sidebars } from "../navigation";
 import { asset } from "../asset";
 import { DocUsage } from "../DocUsage";
+import { useDocsDark } from "../docsTheme";
 import { useCopy } from "../useCopy";
 import {
   Aurora,
@@ -563,7 +564,7 @@ function CodeWindow() {
       */}
       <div
         ref={ref}
-        className="relative overflow-hidden rounded-2xl bg-gray-900 shadow-[0_2px_4px_rgb(17_24_39/0.06),0_12px_28px_rgb(17_24_39/0.12),0_36px_64px_rgb(17_24_39/0.16)] ring-1 ring-gray-900/10"
+        className="relative overflow-hidden rounded-2xl bg-gray-900 shadow-[0_2px_4px_rgb(17_24_39/0.06),0_12px_28px_rgb(17_24_39/0.12),0_36px_64px_rgb(17_24_39/0.16)] ring-1 ring-gray-900/10 dark:ring-gray-700"
       >
         <div className="relative z-10 flex items-center gap-3 bg-gray-800/70 px-4 py-3">
           <WindowDots />
@@ -646,6 +647,10 @@ function CodeWindow() {
  * benar-benar dibaca orang dalam kondisi gagal kontras. Jadi kedua ujungnya
  * dibuat lolos WCAG AA: gray-500 (4.8:1) menyala menjadi gray-800. Yang
  * dianimasikan penekanan, bukan keterbacaan.
+ *
+ * Di mode gelap arahnya dibalik, gray-400 (7:1 di atas gray-900) menyala
+ * menjadi gray-100. Warnanya dibaca GSAP saat tween dibuat, jadi `dark` ikut
+ * jadi dependensi: berganti mode berarti tween dibangun ulang dengan warna baru.
  */
 function SectionTitle({
   eyebrow,
@@ -658,6 +663,7 @@ function SectionTitle({
   children?: ReactNode;
   center?: boolean;
 }) {
+  const dark = useDocsDark();
   const ref = useGsap<HTMLDivElement>(
     ({ scope, q }) => {
       const words = q("[data-lit]");
@@ -665,9 +671,9 @@ function SectionTitle({
 
       gsap.fromTo(
         words,
-        { color: "var(--color-gray-500)" },
+        { color: dark ? "var(--color-gray-400)" : "var(--color-gray-500)" },
         {
-          color: "var(--color-gray-800)",
+          color: dark ? "var(--color-gray-100)" : "var(--color-gray-800)",
           ease: "none",
           stagger: 0.4,
           scrollTrigger: {
@@ -679,7 +685,7 @@ function SectionTitle({
         },
       );
     },
-    [children],
+    [children, dark],
   );
 
   return (
@@ -689,12 +695,12 @@ function SectionTitle({
     >
       <Reveal stagger>
         <p className="ds-eyebrow">{eyebrow}</p>
-        <h2 className="mt-2 text-heading-2 font-black tracking-tight text-gray-900">
+        <h2 className="mt-2 text-heading-2 font-black tracking-tight text-gray-900 dark:text-white">
           {title}
         </h2>
       </Reveal>
       {children && (
-        <p className="mt-3 text-body-sm leading-6 text-gray-500">
+        <p className="mt-3 text-body-sm leading-6 text-gray-500 dark:text-gray-400">
           {/*
             Hanya string biasa yang dipecah per kata. Kalimat pengantar yang
             mengandung elemen (misalnya <code>) dibiarkan utuh — memecahnya akan
@@ -750,12 +756,13 @@ function ShowcaseTile({
         href={`#${route}`}
         className="ds-card group flex h-full flex-col gap-4 p-5 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg"
       >
-        <div className="flex min-h-[92px] flex-wrap items-center gap-3 rounded-xl bg-surface-subtle p-4">
+        {/* Gelap di mode gelap docs; komponen di dalamnya ikut memakai `darkMode`. */}
+        <div className="flex min-h-[92px] flex-wrap items-center gap-3 rounded-xl bg-surface-subtle p-4 dark:bg-gray-900">
           {children}
         </div>
         <div className="mt-auto flex items-center justify-between">
-          <span className="text-sm font-black text-gray-900">{name}</span>
-          <span className="text-xs font-bold text-primary-700 transition-transform group-hover:translate-x-0.5">
+          <span className="text-sm font-black text-gray-900 dark:text-white">{name}</span>
+          <span className="text-xs font-bold text-primary-700 transition-transform group-hover:translate-x-0.5 dark:text-primary-400">
             Lihat →
           </span>
         </div>
@@ -789,7 +796,7 @@ function StatsRow() {
     // akan menunjuk hubungan antarkolom yang sudah tidak ada lagi.
     <dl
       ref={ref}
-      className="grid grid-cols-2 gap-x-6 gap-y-8 lg:grid-cols-4 lg:gap-y-0 lg:divide-x lg:divide-border"
+      className="grid grid-cols-2 gap-x-6 gap-y-8 lg:grid-cols-4 lg:gap-y-0 lg:divide-x lg:divide-border dark:divide-gray-700"
     >
       {stats.map((s) => (
         <div
@@ -797,16 +804,16 @@ function StatsRow() {
           data-stat
           className="group relative lg:px-8 lg:first:pl-0 lg:last:pr-0"
         >
-          <dd className="text-heading-2 font-black tracking-tight text-primary-700">
+          <dd className="text-heading-2 font-black tracking-tight text-primary-700 dark:text-primary-400">
             <CountUp value={s.value} />
           </dd>
-          <dt className="mt-1 text-sm font-black text-gray-900">{s.label}</dt>
-          <p className="mt-1 text-xs leading-5 text-gray-500">{s.desc}</p>
+          <dt className="mt-1 text-sm font-black text-gray-900 dark:text-white">{s.label}</dt>
+          <p className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">{s.desc}</p>
           {/* Garis yang memanjang saat kolomnya disentuh — penanda hover yang
               tidak menggeser apa pun di sekitarnya. */}
           <span
             aria-hidden="true"
-            className="mt-3 block h-0.5 w-8 origin-left scale-x-100 rounded-full bg-primary-200 transition-transform duration-500 group-hover:scale-x-[3]"
+            className="mt-3 block h-0.5 w-8 origin-left scale-x-100 rounded-full bg-primary-200 transition-transform duration-500 group-hover:scale-x-[3] dark:bg-primary-800"
           />
         </div>
       ))}
@@ -816,13 +823,18 @@ function StatsRow() {
 
 export function HomePage() {
   const [copied, copy] = useCopy(INSTALL);
+  // Komponen kit di halaman ini hanya pajangan tanpa cuplikan kode, jadi ikut
+  // memakai `darkMode` di mode gelap docs. Container dibiarkan: di sini ia
+  // pembungkus tata letak, dan versi gelapnya memberi latar gray-700.
+  const dark = useDocsDark();
 
   return (
     <>
       <ScrollProgress />
 
       {/* ══ Hero ══ */}
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-primary-50 via-white to-white px-5 py-16 sm:px-8 lg:px-12 lg:py-24 xl:px-14">
+      {/* Ujung bawah gradiennya sewarna section angka di bawahnya, terang maupun gelap. */}
+      <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-primary-50 via-white to-white px-5 py-16 sm:px-8 lg:px-12 lg:py-24 xl:px-14 dark:border-gray-700 dark:from-primary-900/60 dark:via-gray-800 dark:to-gray-800">
         <Aurora />
 
         {/*
@@ -851,11 +863,11 @@ export function HomePage() {
                 as="h1"
                 delay={0.15}
                 text="Menyatukan layanan digital lewat desain dan kode"
-                className="mt-5 text-[clamp(2.25rem,5vw,3.5rem)] leading-[1.05] font-black tracking-tight text-gray-900"
+                className="mt-5 text-[clamp(2.25rem,5vw,3.5rem)] leading-[1.05] font-black tracking-tight text-gray-900 dark:text-white"
               />
 
               <Reveal delay={0.5}>
-                <p className="mt-5 max-w-xl text-body-lg text-gray-600">
+                <p className="mt-5 max-w-xl text-body-lg text-gray-600 dark:text-gray-300">
                   Satu sumber visual dan komponen yang konsisten untuk membangun
                   layanan yang jelas, inklusif, dan mudah dikenali. Token,
                   komponen, dan dokumentasinya tinggal dipakai — tidak perlu
@@ -868,12 +880,12 @@ export function HomePage() {
                 <button
                   type="button"
                   onClick={copy}
-                  className="mt-8 inline-flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-2.5 font-mono text-sm text-gray-700 transition-colors hover:border-primary-300 hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                  className="mt-8 inline-flex items-center gap-3 rounded-lg border border-border bg-surface px-4 py-2.5 font-mono text-sm text-gray-700 transition-colors hover:border-primary-300 hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:border-primary-700 dark:hover:bg-gray-900"
                   aria-label={
                     copied ? "Perintah tersalin" : `Salin perintah: ${INSTALL}`
                   }
                 >
-                  <span className="text-gray-400">$</span>
+                  <span className="text-gray-400 dark:text-gray-500">$</span>
                   <span>{INSTALL}</span>
                   {/*
                     Ikon salin dan ceklis ditumpuk di sel grid yang sama, lalu
@@ -903,7 +915,7 @@ export function HomePage() {
                       stroke="currentColor"
                       strokeWidth={2.4}
                       aria-hidden="true"
-                      className={`text-green-600 ${copied ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}
+                      className={`text-green-600 dark:text-green-400 ${copied ? "scale-100 opacity-100" : "scale-50 opacity-0"}`}
                     >
                       <path
                         strokeLinecap="round"
@@ -920,12 +932,12 @@ export function HomePage() {
                 className="mt-4 flex flex-wrap items-center gap-3"
               >
                 <Magnetic strength={12}>
-                  <Button as="anchor" href="#/foundations" variant="outline">
+                  <Button as="anchor" href="#/foundations" variant="outline" darkMode={dark}>
                     Lihat Foundations
                   </Button>
                 </Magnetic>
                 <Magnetic>
-                  <Button as="anchor" href="#/components" variant="filled">
+                  <Button as="anchor" href="#/components" variant="filled" darkMode={dark}>
                     Mulai pakai
                   </Button>
                 </Magnetic>
@@ -940,7 +952,7 @@ export function HomePage() {
       </section>
 
       {/* ══ Angka ringkas ══ */}
-      <section className="border-b border-border bg-surface">
+      <section className="border-b border-border bg-surface dark:border-gray-700 dark:bg-gray-800">
         <Container className="py-10">
           <StatsRow />
         </Container>
@@ -970,13 +982,13 @@ export function HomePage() {
             </SectionTitle>
           </div>
 
-          <Reveal stagger as="ol" className="border-t border-border">
+          <Reveal stagger as="ol" className="border-t border-border dark:border-gray-700">
             {features.map((f, i) => (
               <li
                 key={f.title}
-                className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 border-b border-border py-7"
+                className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 border-b border-border py-7 dark:border-gray-700"
               >
-                <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary-50 text-primary-700">
+                <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary-50 text-primary-700 dark:bg-primary-900 dark:text-primary-300">
                   <svg
                     className="size-5"
                     fill="none"
@@ -1003,11 +1015,11 @@ export function HomePage() {
                     >
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <h3 className="text-heading-4 font-black text-gray-900">
+                    <h3 className="text-heading-4 font-black text-gray-900 dark:text-white">
                       {f.title}
                     </h3>
                   </div>
-                  <p className="mt-2 max-w-2xl text-body-sm leading-6 text-gray-500">
+                  <p className="mt-2 max-w-2xl text-body-sm leading-6 text-gray-500 dark:text-gray-400">
                     {f.desc}
                   </p>
                 </div>
@@ -1018,7 +1030,7 @@ export function HomePage() {
       </Container>
 
       {/* ══ Komponen hidup ══ */}
-      <section className="border-y border-border bg-surface-subtle">
+      <section className="border-y border-border bg-surface-subtle dark:border-gray-700 dark:bg-gray-900">
         <Container className="py-12 lg:py-16">
           <SectionTitle
             eyebrow="Komponen"
@@ -1026,7 +1038,7 @@ export function HomePage() {
           >
             Yang tampil di bawah ini adalah komponen yang benar-benar dirender
             dari{" "}
-            <code className="text-xs font-bold text-gray-700">
+            <code className="text-xs font-bold text-gray-700 dark:text-gray-300">
               @ceplok-ui/design-kit-react
             </code>{" "}
             — sama persis dengan yang akan kamu impor. Klik untuk membuka
@@ -1046,10 +1058,10 @@ export function HomePage() {
               route="/components/button"
               span="lg:col-span-2"
             >
-              <Button variant="outline" size="s">
+              <Button variant="outline" size="s" darkMode={dark}>
                 Batal
               </Button>
-              <Button variant="filled" size="s">
+              <Button variant="filled" size="s" darkMode={dark}>
                 Simpan
               </Button>
             </ShowcaseTile>
@@ -1059,10 +1071,10 @@ export function HomePage() {
               route="/components/badge"
               span="lg:col-span-2"
             >
-              <Badge variant="success">Aktif</Badge>
-              <Badge variant="warning">Menunggu</Badge>
-              <Badge variant="danger">Ditolak</Badge>
-              <Badge variant="gray">Draf</Badge>
+              <Badge variant="success" darkMode={dark}>Aktif</Badge>
+              <Badge variant="warning" darkMode={dark}>Menunggu</Badge>
+              <Badge variant="danger" darkMode={dark}>Ditolak</Badge>
+              <Badge variant="gray" darkMode={dark}>Draf</Badge>
             </ShowcaseTile>
 
             <ShowcaseTile
@@ -1071,8 +1083,8 @@ export function HomePage() {
               span="lg:col-span-2"
             >
               <div className="space-y-3">
-                <Checkbox label="Kirim salinan ke email" defaultChecked />
-                <Toggle label="Notifikasi permohonan" defaultChecked />
+                <Checkbox label="Kirim salinan ke email" defaultChecked darkMode={dark} />
+                <Toggle label="Notifikasi permohonan" defaultChecked darkMode={dark} />
               </div>
             </ShowcaseTile>
 
@@ -1086,6 +1098,7 @@ export function HomePage() {
                   label="Nama lengkap"
                   placeholder="Masukkan nama lengkap"
                   helperText="Sesuai yang tertera pada KTP."
+                  darkMode={dark}
                 />
               </div>
             </ShowcaseTile>
@@ -1099,6 +1112,7 @@ export function HomePage() {
                 <Card
                   title="Kartu ringkas"
                   description="Judul, deskripsi, dan aksi yang semuanya opsional."
+                  darkMode={dark}
                 />
               </div>
             </ShowcaseTile>
@@ -1126,7 +1140,7 @@ export function HomePage() {
           konfigurasi tambahan.
         </SectionTitle>
 
-        <ol className="relative ml-4 border-l border-border pl-8 sm:ml-5 sm:pl-10">
+        <ol className="relative ml-4 border-l border-border pl-8 sm:ml-5 sm:pl-10 dark:border-gray-700">
           {steps.map((step, i) => (
             <Reveal
               as="li"
@@ -1137,15 +1151,15 @@ export function HomePage() {
                   ditarik ke kiri dari tepi konten, ditambah 1px tebal garisnya. */}
               <span
                 aria-hidden="true"
-                className="absolute top-0 -left-[calc(2rem+1rem+0.5px)] inline-flex size-8 items-center justify-center rounded-full border border-border bg-surface font-mono text-xs font-black text-primary-700 sm:-left-[calc(2.5rem+1rem+0.5px)]"
+                className="absolute top-0 -left-[calc(2rem+1rem+0.5px)] inline-flex size-8 items-center justify-center rounded-full border border-border bg-surface font-mono text-xs font-black text-primary-700 sm:-left-[calc(2.5rem+1rem+0.5px)] dark:border-gray-700 dark:bg-gray-800 dark:text-primary-400"
               >
                 {i + 1}
               </span>
 
-              <h3 className="text-heading-4 font-black text-gray-900">
+              <h3 className="text-heading-4 font-black text-gray-900 dark:text-white">
                 {step.title}
               </h3>
-              <p className="mt-1 mb-4 text-body-sm leading-6 text-gray-500">
+              <p className="mt-1 mb-4 text-body-sm leading-6 text-gray-500 dark:text-gray-400">
                 {step.desc}
               </p>
               <DocUsage flush label={step.label} code={step.code} />
@@ -1155,7 +1169,7 @@ export function HomePage() {
       </Container>
 
       {/* ══ Jelajahi ══ */}
-      <section className="border-t border-border bg-surface-subtle">
+      <section className="border-t border-border bg-surface-subtle dark:border-gray-700 dark:bg-gray-900">
         <Container className="py-12 lg:py-16">
           <SectionTitle eyebrow="Jelajahi" title="Mulai dari mana?">
             Empat pintu masuk, tergantung yang sedang kamu kerjakan.
@@ -1170,15 +1184,15 @@ export function HomePage() {
                 className="ds-card group flex flex-col p-6 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <h3 className="text-heading-4 font-black text-gray-900">
+                  <h3 className="text-heading-4 font-black text-gray-900 dark:text-white">
                     {s.name}
                   </h3>
-                  <Badge variant="gray">{s.badge}</Badge>
+                  <Badge variant="gray" darkMode={dark}>{s.badge}</Badge>
                 </div>
-                <p className="mt-2 flex-1 text-body-sm leading-6 text-gray-500">
+                <p className="mt-2 flex-1 text-body-sm leading-6 text-gray-500 dark:text-gray-400">
                   {s.desc}
                 </p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary-700">
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary-700 dark:text-primary-400">
                   Buka
                   <span className="transition-transform group-hover:translate-x-1">
                     →

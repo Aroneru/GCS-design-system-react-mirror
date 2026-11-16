@@ -33,22 +33,23 @@ export function DocUsage({
       {title && (
         <div className="mb-5">
           <p className="ds-eyebrow">Cara pakai</p>
-          <h3 className="mt-2 text-heading-3 font-black text-gray-900">{title}</h3>
-          {description && <p className="mt-2 max-w-2xl text-body-sm text-gray-500">{description}</p>}
+          <h3 className="mt-2 text-heading-3 font-black text-gray-900 dark:text-white">{title}</h3>
+          {description && <p className="mt-2 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">{description}</p>}
         </div>
       )}
 
       <article className="ds-card overflow-hidden">
-        <div className="flex items-center justify-between border-b border-border bg-surface-subtle px-4 py-2.5">
+        {/* Di mode gelap kepalanya sewarna kartu: latar kodenya sendiri sudah gray-900. */}
+        <div className="flex items-center justify-between border-b border-border bg-surface-subtle px-4 py-2.5 dark:border-gray-700 dark:bg-gray-800">
           <span className="text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">{label}</span>
           <button
             type="button"
             onClick={copy}
-            className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+            className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
             aria-label={copied ? 'Kode tersalin' : 'Salin kode'}
           >
             {copied ? (
-              <svg className="size-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2} aria-hidden="true">
+              <svg className="size-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2} aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4.5 4.5L19 7" />
               </svg>
             ) : (
