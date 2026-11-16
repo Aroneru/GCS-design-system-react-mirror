@@ -12,11 +12,11 @@ export function DocHero({
   children?: ReactNode
 }) {
   return (
-    <header className="border-b border-border bg-white px-5 py-10 sm:px-8 lg:px-12 lg:py-12 xl:px-14">
+    <header className="border-b border-border bg-white px-5 py-10 sm:px-8 lg:px-12 lg:py-12 xl:px-14 dark:border-gray-700 dark:bg-gray-800">
       <div className="mx-auto max-w-5xl">
         {eyebrow && <p className="ds-eyebrow">{eyebrow}</p>}
-        <h1 className="mt-2 text-heading-1 font-black tracking-tight text-gray-900">{title}</h1>
-        {description && <p className="mt-3 max-w-2xl text-body text-gray-500">{description}</p>}
+        <h1 className="mt-2 text-heading-1 font-black tracking-tight text-gray-900 dark:text-white">{title}</h1>
+        {description && <p className="mt-3 max-w-2xl text-body text-gray-500 dark:text-gray-400">{description}</p>}
         {children}
       </div>
     </header>

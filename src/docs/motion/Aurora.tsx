@@ -15,7 +15,15 @@ import { useGsap } from './useGsap'
  * jadi tidak ada satu pun lapisan yang bisa menghalangi klik atau terbaca
  * pembaca layar.
  */
-export function Aurora() {
+export function Aurora({
+  darkFade = 'dark:to-gray-800',
+}: {
+  /**
+   * Warna ujung peredam tepi bawah di mode gelap docs: latar yang menyambung
+   * di bawah hero. Bawaannya gray-800, section angka di Home.
+   */
+  darkFade?: string
+} = {}) {
   const ref = useGsap<HTMLDivElement>(({ scope, q }) => {
     // ── Parallax: satu timeline yang di-scrub mengikuti posisi gulir ──
     const layers = q('[data-depth]')
@@ -64,19 +72,22 @@ export function Aurora() {
         menghasilkan pelangi latar yang tidak dimiliki merek ini dan menarik
         perhatian ke tempat yang tidak ada isinya; menahannya di satu keluarga
         warna membuat latar terbaca sebagai cahaya, bukan sebagai hiasan.
+
+        Di mode gelap docs tangganya dibalik ke ujung gelap: rona muda yang
+        lembut di atas putih justru menyilaukan di atas abu-abu tua.
       */}
       <div data-depth="1" className="absolute inset-[-30%]">
         <div
           data-blob
-          className="absolute top-[6%] left-[2%] size-[34rem] rounded-full bg-primary-200/40 blur-[110px]"
+          className="absolute top-[6%] left-[2%] size-[34rem] rounded-full bg-primary-200/40 blur-[110px] dark:bg-primary-700/25"
         />
         <div
           data-blob
-          className="absolute right-[4%] bottom-[2%] size-[30rem] rounded-full bg-primary-100/50 blur-[120px]"
+          className="absolute right-[4%] bottom-[2%] size-[30rem] rounded-full bg-primary-100/50 blur-[120px] dark:bg-primary-800/30"
         />
         <div
           data-blob
-          className="absolute top-[38%] left-[46%] size-[22rem] rounded-full bg-primary-50/60 blur-[90px]"
+          className="absolute top-[38%] left-[46%] size-[22rem] rounded-full bg-primary-50/60 blur-[90px] dark:bg-primary-900/40"
         />
       </div>
 
@@ -85,9 +96,10 @@ export function Aurora() {
 
       {/*
         Peredam di tepi bawah: menyatukan hero dengan section putih di bawahnya
-        supaya batasnya tidak terlihat sebagai garis potong yang tegas.
+        supaya batasnya tidak terlihat sebagai garis potong yang tegas. Di mode
+        gelap docs warnanya dari `darkFade`.
       */}
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-white" />
+      <div className={`absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-white ${darkFade}`} />
     </div>
   )
 }

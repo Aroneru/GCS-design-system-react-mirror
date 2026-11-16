@@ -29,8 +29,10 @@ import {
   Home,
   Lightbulb,
   Messages,
+  Moon,
   Newspaper,
   QuestionCircle,
+  Sun,
   User,
 } from '../../../lib/icons/outline'
 import { asset } from '../../asset'
@@ -47,6 +49,10 @@ import { asset } from '../../asset'
  * Bagian yang belum punya komponen di kit dirakit dari token warnanya:
  * kalender bulanan (Datepicker hanya punya bentuk field + panel), kartu
  * sapaan, dan hiasannya.
+ *
+ * Mode gelapnya dipasang seperti di aplikasi consumer: `data-theme="dark"` di
+ * akar, `darkMode` di setiap komponen kit, dan varian `in-data-[theme=dark]:`
+ * untuk bagian yang dirakit sendiri.
  */
 
 /** Ditulis kapital, seperti di desain. */
@@ -211,12 +217,17 @@ function Panah({ kanan }: { kanan?: boolean }) {
  * tampilannya disalin di sini. Bedanya satu, mengikuti desain: Minggu dan
  * Sabtu di bulan itu merah.
  *
- * Jaraknya mengikuti desain: kisi 7 kolom selebar 240px di tengah kartu, judul
- * 21px dari tepi atas, baris tanggal 25px, dan baris terakhir 23px dari tepi
- * bawah. Enam baris tetap: sisa minggu diisi tanggal bulan sebelum dan
+ * Kisinya memenuhi kartu: tujuh kolom selebar kartu, dan baris tanggal ikut
+ * memanjang bila kartu lebih tinggi dari isinya, mis. saat bersebelahan
+ * dengan kartu wiki di layar md. Jarak lainnya mengikuti desain: judul 21px
+ * dari tepi atas, baris tanggal minimal 25px, dan baris terakhir 23px dari
+ * tepi bawah. Enam baris tetap: sisa minggu diisi tanggal bulan sebelum dan
  * sesudahnya.
+ *
+ * Di mode gelap warnanya mengikuti panel gelap Datepicker. Akhir pekan memakai
+ * red-400, karena red-600 terlalu redup di atas kartu gray-700.
  */
-function Kalender({ className }: { className?: string }) {
+function Kalender({ className, darkMode }: { className?: string; darkMode?: boolean }) {
   const [bulan, setBulan] = useState(() => new Date(HARI_INI.getFullYear(), HARI_INI.getMonth(), 1))
   const tahun = bulan.getFullYear()
   const indeks = bulan.getMonth()
@@ -225,13 +236,14 @@ function Kalender({ className }: { className?: string }) {
   // Tombol panah seperti di Datepicker: area tekannya 6px lebih besar ke segala
   // arah, lalu ditarik kembali dengan margin negatif.
   const panah =
-    '-m-1.5 justify-self-center rounded-lg p-1.5 text-gray-900 transition-colors hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand'
+    '-m-1.5 justify-self-center rounded-lg p-1.5 text-gray-900 transition-colors hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand in-data-[theme=dark]:text-white in-data-[theme=dark]:hover:bg-gray-600'
 
   return (
-    <Card className={className}>
+    <Card className={className} darkMode={darkMode}>
       {/* Margin negatif menarik kalender ke jarak desain, yang lebih rapat dari
-          padding bawaan Card (16px, lalu 24px mulai kartu 320px). */}
-      <div className="mx-auto -mt-1 -mb-2 w-full max-w-60 @xs:-mt-3 @xs:-mb-4">
+          padding bawaan Card (16px, lalu 24px mulai kartu 320px). `flex-1`
+          mengisi sisa tinggi kartu, dan tabelnya membaginya ke baris tanggal. */}
+      <div className="-mt-1 -mb-2 flex w-full flex-1 flex-col @xs:-mt-3 @xs:-mb-4">
         {/* Header ikut kisi 7 kolom, supaya panahnya tepat di atas kolom Min dan Sab. */}
         <div className="grid h-4.5 grid-cols-7 items-center">
           <button
@@ -242,7 +254,10 @@ function Kalender({ className }: { className?: string }) {
           >
             <Panah />
           </button>
-          <h2 aria-live="polite" className="col-span-5 text-center text-xs font-bold text-gray-900">
+          <h2
+            aria-live="polite"
+            className="col-span-5 text-center text-xs font-bold text-gray-900 in-data-[theme=dark]:text-white"
+          >
             {BULAN[indeks]} {tahun}
           </h2>
           <button
@@ -255,7 +270,7 @@ function Kalender({ className }: { className?: string }) {
           </button>
         </div>
 
-        <table className="mt-2.5 w-full table-fixed text-center text-xs">
+        <table className="mt-2.5 w-full flex-1 table-fixed text-center text-xs">
           <caption className="sr-only">
             Kalender {BULAN[indeks]} {tahun}
           </caption>
@@ -264,7 +279,11 @@ function Kalender({ className }: { className?: string }) {
                 menjadi jarak ke baris tanggal pertama, seperti desainnya. */}
             <tr className="h-7.5">
               {HARI.map((hari) => (
-                <th key={hari} scope="col" className="pb-1 font-medium text-gray-500">
+                <th
+                  key={hari}
+                  scope="col"
+                  className="pb-1 font-medium text-gray-500 in-data-[theme=dark]:text-gray-400"
+                >
                   {hari}
                 </th>
               ))}
@@ -285,12 +304,12 @@ function Kalender({ className }: { className?: string }) {
                         className={cn(
                           'mx-auto flex size-6.25 items-center justify-center rounded-lg font-semibold',
                           hariIni
-                            ? 'bg-primary-700 text-white'
+                            ? 'bg-primary-700 text-white in-data-[theme=dark]:bg-primary-600'
                             : diLuar
                               ? 'text-gray-500'
                               : akhirPekan
-                                ? 'text-red-600'
-                                : 'text-gray-900',
+                                ? 'text-red-600 in-data-[theme=dark]:text-red-400'
+                                : 'text-gray-900 in-data-[theme=dark]:text-white',
                         )}
                       >
                         {tanggal.getDate()}
@@ -307,7 +326,15 @@ function Kalender({ className }: { className?: string }) {
   )
 }
 
-export function PortalDashboard() {
+export function PortalDashboard({
+  darkMode = false,
+  onDarkModeChange,
+}: {
+  /** Tampilan gelap seluruh dasbor. */
+  darkMode?: boolean
+  /** Dipanggil tombol tema di header. Tanpa prop ini tombolnya tidak dirender. */
+  onDarkModeChange?: (darkMode: boolean) => void
+} = {}) {
   const [ringkas, setRingkas] = useState(false)
   const [menuSeluler, setMenuSeluler] = useState(false)
   // Pesan demo tampil sebagai Toast di kanan atas lalu hilang sendiri. Teksnya
@@ -379,7 +406,7 @@ export function PortalDashboard() {
   }
 
   return (
-    <div className="flex min-h-screen bg-surface">
+    <div data-theme={darkMode ? 'dark' : undefined} className="flex min-h-screen bg-surface">
       {/* Desktop dan mobile memakai komponen, akun, dan item Sidebar yang sama.
           Di bawah lg instance mobile tampil sebagai panel modal dari kiri. */}
       <div className="hidden lg:block">
@@ -391,6 +418,7 @@ export function PortalDashboard() {
           sticky
           collapsed={ringkas}
           onCollapse={() => setRingkas((v) => !v)}
+          darkMode={darkMode}
         />
       </div>
 
@@ -406,6 +434,7 @@ export function PortalDashboard() {
             aria-expanded={menuSeluler}
             aria-controls={idMenuSeluler}
             onClick={() => setMenuSeluler(true)}
+            darkMode={darkMode}
           >
             <Bars />
           </Button>
@@ -413,8 +442,13 @@ export function PortalDashboard() {
 
           {/* Search berkategori di kiri, selebar slot search Navbar back-office:
               348px, menyusut sampai 180px bila ruangnya kurang. Varian kategori
-              membawa role="search" sendiri, jadi pembungkus ini tidak. */}
-          <div className="hidden w-87 max-w-87 min-w-45 flex-[0_1_348px] md:block">
+              membawa role="search" sendiri, jadi pembungkus ini tidak.
+
+              Seperti slot search Navbar, garis field-nya gray-600 di mode gelap.
+              Tanpa itu ruas kategorinya (gray-700) lebur dengan header gray-700.
+              Yang ditimpa variabel palet gelapnya, karena Search ber-`darkMode`
+              memasang `data-theme` sendiri dan akan menimpa token biasa. */}
+          <div className="hidden w-87 max-w-87 min-w-45 flex-[0_1_348px] [--color-field-border-dark:var(--color-gray-600)] md:block">
             <Search
               categories={KATEGORI}
               categoryPlaceholder="Pilih"
@@ -427,8 +461,28 @@ export function PortalDashboard() {
               value={kata}
               onChange={(e) => setKata(e.target.value)}
               onSearch={cari}
+              darkMode={darkMode}
             />
           </div>
+
+          {/* Tombol tema, bergaya sama dengan lonceng di sebelahnya. Ikonnya
+              menunjukkan hasil bila ditekan: bulan saat terang, matahari saat gelap. */}
+          {onDarkModeChange && (
+            <button
+              type="button"
+              aria-label="Mode gelap"
+              aria-pressed={darkMode}
+              title={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
+              onClick={() => onDarkModeChange(!darkMode)}
+              className="ml-auto grid size-9 shrink-0 place-items-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            >
+              {darkMode ? (
+                <Sun className="size-5" aria-hidden="true" />
+              ) : (
+                <Moon className="size-5" aria-hidden="true" />
+              )}
+            </button>
+          )}
 
           {/* Lonceng bergaya notificationTrigger Navbar front-office: ikon 20px
               gray-500 dalam kotak 36px, tanpa angka. */}
@@ -436,7 +490,10 @@ export function PortalDashboard() {
             type="button"
             aria-label="Notifikasi"
             onClick={() => kabari('Ada 5 notifikasi baru.')}
-            className="ml-auto grid size-9 shrink-0 place-items-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            className={cn(
+              'grid size-9 shrink-0 place-items-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+              !onDarkModeChange && 'ml-auto',
+            )}
           >
             <Bell className="size-5" aria-hidden="true" />
           </button>
@@ -444,12 +501,17 @@ export function PortalDashboard() {
 
         {/* Toast di kanan atas, tepat di bawah header. */}
         <div className="fixed top-22 right-4 z-30 w-80 max-w-[calc(100vw-2rem)] sm:right-6">
-          <Toast open={umpan.tampil} onDismiss={() => setUmpan((u) => ({ ...u, tampil: false }))}>
+          <Toast
+            open={umpan.tampil}
+            onDismiss={() => setUmpan((u) => ({ ...u, tampil: false }))}
+            darkMode={darkMode}
+          >
             {umpan.teks}
           </Toast>
         </div>
 
-        <main className="flex-1 bg-blue-50">
+        {/* Latar halaman gray-800 di mode gelap, setingkat di bawah kartu gray-700. */}
+        <main className="flex-1 bg-blue-50 in-data-[theme=dark]:bg-gray-800">
           <div className={LEBAR_ISI}>
             <div className="space-y-5 py-8">
               <div className="flex flex-wrap items-center justify-between gap-4">
@@ -458,6 +520,7 @@ export function PortalDashboard() {
                   variant="outline"
                   size="s"
                   onClick={() => kabari('Pengaturan layout belum ada di contoh ini.')}
+                  darkMode={darkMode}
                 >
                   Pengaturan Layout
                 </Button>
@@ -482,12 +545,14 @@ export function PortalDashboard() {
                   </p>
                 </section>
 
-                <Kalender className="xl:col-span-4" />
+                <Kalender className="xl:col-span-4" darkMode={darkMode} />
 
-                <Card className="xl:col-span-5">
+                <Card className="xl:col-span-5" darkMode={darkMode}>
+                  {/* Ikon judul kartu naik ke tangga 400 di mode gelap: tangga
+                      600–700 terlalu redup di atas kartu gray-700. */}
                   <JudulKartu
                     ikon={
-                      <Icon className="mt-0.5 text-orange-600">
+                      <Icon className="mt-0.5 text-orange-600 in-data-[theme=dark]:text-orange-400">
                         <BookOpen />
                       </Icon>
                     }
@@ -508,6 +573,7 @@ export function PortalDashboard() {
                     size="sm"
                     decoration
                     gap="md"
+                    darkMode={darkMode}
                     items={WIKI.map(({ judul, tanggal, penulis, ruang }) => ({
                       title: judul,
                       icon: <FileLines className="size-4" aria-hidden="true" />,
@@ -536,10 +602,10 @@ export function PortalDashboard() {
                   />
                 </Card>
 
-                <Card className="relative xl:col-span-7">
+                <Card className="relative xl:col-span-7" darkMode={darkMode}>
                   <JudulKartu
                     ikon={
-                      <Icon className="mt-0.5 text-green-700">
+                      <Icon className="mt-0.5 text-green-700 in-data-[theme=dark]:text-green-400">
                         <Cash />
                       </Icon>
                     }
@@ -551,6 +617,7 @@ export function PortalDashboard() {
                       className="w-full sm:w-72"
                       value={sumber}
                       onChange={(e) => setSumber(e.target.value)}
+                      darkMode={darkMode}
                     />
                   </JudulKartu>
                   <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-body text-content">
@@ -564,17 +631,20 @@ export function PortalDashboard() {
                   <p className="text-body-sm text-content-subtle">Data Anggaran Per Tanggal 13 Oct 2026</p>
                   {/* Pola titik hiasan di pojok kanan bawah, seperti desainnya. Hanya di
                       xl: di sana kartu ini memanjang setinggi kartu wiki dan punya ruang
-                      kosong; di layout satu kolom titiknya menimpa angka dan catatan. */}
+                      kosong; di layout satu kolom titiknya menimpa angka dan catatan.
+                      Titik gray-200 terlalu terang di mode gelap, jadi diganti gray-600. */}
                   <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute right-5 bottom-5 hidden h-12 w-44 xl:block bg-[radial-gradient(var(--color-gray-200)_2px,transparent_2px)] bg-size-[16px_16px]"
+                    className="pointer-events-none absolute right-5 bottom-5 hidden h-12 w-44 xl:block bg-[radial-gradient(var(--color-gray-200)_2px,transparent_2px)] bg-size-[16px_16px] in-data-[theme=dark]:bg-[radial-gradient(var(--color-gray-600)_2px,transparent_2px)]"
                   />
                 </Card>
 
-                <Card className="xl:col-span-5 xl:mt-1.5">
-                  <div className="flex items-center justify-between gap-3 border-b border-border pb-3">
+                <Card className="xl:col-span-5 xl:mt-1.5" darkMode={darkMode}>
+                  {/* Di mode gelap token `border` sewarna kartu (gray-700), jadi
+                      garisnya memakai gray-600 supaya tetap terlihat. */}
+                  <div className="flex items-center justify-between gap-3 border-b border-border pb-3 in-data-[theme=dark]:border-gray-600">
                     <h2 className="text-body font-bold text-content">Presensi Harian</h2>
-                    <Badge variant="brand" size="sm">
+                    <Badge variant="brand" size="sm" darkMode={darkMode}>
                       Kantor (WFO)
                     </Badge>
                   </div>
@@ -584,17 +654,17 @@ export function PortalDashboard() {
                   </p>
                   <p className="flex items-center gap-2">
                     <span className="text-heading-2 font-bold text-content">14:03:52</span>
-                    <Badge variant="gray" size="sm">
+                    <Badge variant="gray" size="sm" darkMode={darkMode}>
                       WIB
                     </Badge>
                   </p>
-                  <Alert variant="info" icon={<QuestionCircle />} dismissible={false}>
+                  <Alert variant="info" icon={<QuestionCircle />} dismissible={false} darkMode={darkMode}>
                     Rekomendasi waktu Check-In Anda adalah pukul 05.00 - Batas waktu Check-Out Anda adalah
                     pukul 22.00
                   </Alert>
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <span className="grid size-10 place-items-center rounded-lg bg-green-100 text-green-700">
+                      <span className="grid size-10 place-items-center rounded-lg bg-green-100 text-green-700 in-data-[theme=dark]:bg-green-900 in-data-[theme=dark]:text-green-400">
                         <Clock className="size-5" aria-hidden="true" />
                       </span>
                       <div>
@@ -602,23 +672,23 @@ export function PortalDashboard() {
                         <p className="text-body-sm font-bold text-content">07:12:45 WIB</p>
                       </div>
                     </div>
-                    <Button theme="gray" size="s" disabled>
+                    <Button theme="gray" size="s" disabled darkMode={darkMode}>
                       SUDAH CHECK IN
                     </Button>
                   </div>
                 </Card>
 
-                <Card className="md:col-span-2 xl:col-span-7 xl:mt-1.5">
+                <Card className="md:col-span-2 xl:col-span-7 xl:mt-1.5" darkMode={darkMode}>
                   <JudulKartu
                     ikon={
-                      <Icon className="mt-0.5 text-orange-600">
+                      <Icon className="mt-0.5 text-orange-600 in-data-[theme=dark]:text-orange-400">
                         <ClipboardList />
                       </Icon>
                     }
                     judul="Rencana dan Realisasi Kegiatan Harian"
                     keterangan="Selasa, 13 Oktober 2026"
                   />
-                  <Alert variant="danger" icon={<ExclamationCircle />} dismissible={false}>
+                  <Alert variant="danger" icon={<ExclamationCircle />} dismissible={false} darkMode={darkMode}>
                     Pengisian Rencana dan Realisasi Kegiatan tidak diaktifkan untuk hari ini.
                   </Alert>
                 </Card>
@@ -652,6 +722,7 @@ export function PortalDashboard() {
           collapsed={false}
           onCollapse={() => setMenuSeluler(false)}
           className="h-full !min-h-0 max-w-full shadow-2xl"
+          darkMode={darkMode}
         />
       </dialog>
     </div>

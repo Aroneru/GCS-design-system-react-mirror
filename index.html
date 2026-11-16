@@ -13,6 +13,17 @@
     <link rel="apple-touch-icon" href="/images/favicon-180.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ceplok Design Kit — React</title>
+    <!-- Mode gelap docs dipasang sebelum frame pertama, supaya pembaca yang
+         memilihnya tidak melihat kilatan terang selama skrip aplikasi dimuat.
+         DocsLayout menyesuaikannya lagi untuk halaman yang belum punya tampilan
+         gelap (lihat src/docs/docsTheme.ts). -->
+    <script>
+      try {
+        if (localStorage.getItem('ceplok-docs-theme') === 'dark') {
+          document.documentElement.dataset.docsTheme = 'dark'
+        }
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

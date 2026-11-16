@@ -5,6 +5,7 @@ import {
   type MouseEvent,
   type ReactNode,
 } from 'react'
+import { useDocsDark } from './docsTheme'
 import { CodeBlock, ControlLabel, Segmented } from './pageKit'
 import {
   PlaygroundFontContext,
@@ -135,14 +136,14 @@ export function FlowSection({
 }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <h2 className="group flex items-baseline gap-2 text-heading-3 font-black text-gray-900">
+      <h2 className="group flex items-baseline gap-2 text-heading-3 font-black text-gray-900 dark:text-white">
         {title}
         <a
           href={sectionHref(id)}
           onClick={handleSectionClick(id)}
           title="Tautan ke bagian ini"
           aria-label={`Tautan ke bagian ${title}`}
-          className="rounded text-primary-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-primary-600 focus-visible:opacity-100"
+          className="rounded text-primary-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-primary-600 focus-visible:opacity-100 dark:text-primary-800 dark:hover:text-primary-400"
         >
           #
         </a>
@@ -156,7 +157,7 @@ export function FlowSection({
 
 /** Paragraf pengantar tiap bagian. */
 export function Lead({ children }: { children: ReactNode }) {
-  return <p className="mb-4 max-w-2xl text-body-sm text-gray-500">{children}</p>
+  return <p className="mb-4 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">{children}</p>
 }
 
 /** Blok kode di bawah pratinjau — jaraknya seragam di semua bagian. */
@@ -212,10 +213,16 @@ export function Stage({
 }) {
   const ctx = useContext(PlaygroundFontContext)
   const activeFont = font ?? ctx?.font
+  const docsDark = useDocsDark()
   return (
+    // Panggung mengikuti kontrol Mode Playground, bukan mode docs. Bila
+    // pembaca memilih Light di mode gelap docs, panggungnya tetap terang:
+    // `data-theme="light"` mengembalikan color-scheme terang dan
+    // `dark:text-content` warna teks yang diwarisi komponen.
     <div
+      data-theme={docsDark && !dark ? 'light' : undefined}
       className={`rounded-2xl border p-6 transition-colors sm:p-10 ${minWidth ? 'ds-scroll-x overflow-x-auto' : ''} ${
-        dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
+        dark ? 'border-gray-800 bg-gray-900 dark:border-gray-700' : 'border-border bg-surface-subtle dark:text-content'
       }`}
     >
       <div
@@ -302,11 +309,11 @@ export function UsulanPage({
 
   return (
     <>
-      <header className="border-b border-border bg-white px-5 py-10 sm:px-8 lg:px-12 lg:py-12 xl:px-14">
+      <header className="border-b border-border bg-white px-5 py-10 sm:px-8 lg:px-12 lg:py-12 xl:px-14 dark:border-gray-700 dark:bg-gray-800">
         <div className="mx-auto max-w-[78.5rem]">
           <p className="ds-eyebrow">{eyebrow}</p>
-          <h1 className="mt-2 text-heading-1 font-black tracking-tight text-gray-900">{title}</h1>
-          <p className="mt-3 max-w-2xl text-body text-gray-500">{description}</p>
+          <h1 className="mt-2 text-heading-1 font-black tracking-tight text-gray-900 dark:text-white">{title}</h1>
+          <p className="mt-3 max-w-2xl text-body text-gray-500 dark:text-gray-400">{description}</p>
           {actions && <div className="mt-6">{actions}</div>}
         </div>
       </header>
@@ -320,7 +327,7 @@ export function UsulanPage({
               <p className="text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">
                 On this page
               </p>
-              <nav className="mt-3 border-l border-border" aria-label="Daftar isi halaman">
+              <nav className="mt-3 border-l border-border dark:border-gray-700" aria-label="Daftar isi halaman">
                 {toc.map((t) => (
                   <a
                     key={t.id}
@@ -329,8 +336,8 @@ export function UsulanPage({
                     aria-current={active === t.id ? 'true' : undefined}
                     className={`-ml-px block w-full border-l-2 py-1.5 pl-3 text-left text-[13px] transition-colors ${
                       active === t.id
-                        ? 'border-primary-600 font-bold text-primary-700'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800'
+                        ? 'border-primary-600 font-bold text-primary-700 dark:border-primary-400 dark:text-primary-400'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:text-gray-100'
                     }`}
                   >
                     {t.label}

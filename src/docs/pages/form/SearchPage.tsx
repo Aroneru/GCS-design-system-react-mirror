@@ -5,6 +5,7 @@ import {
   type SearchCategory,
   type SearchPlatform,
 } from '../../../lib'
+import { useDocsDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -63,13 +64,35 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+/**
+ * Daftar isi di mode gelap docs: bagian Dark mode bertukar menjadi Light mode.
+ * Id-nya tetap `dark-mode` supaya tautan ke bagian itu tidak putus. Ditulis di
+ * level modul seperti `toc`, karena observer daftar isi dipasang ulang setiap
+ * kali daftarnya berganti.
+ */
+const tocDark: TocEntry[] = toc.map((t) => (t.id === 'dark-mode' ? { ...t, label: 'Light mode' } : t))
+
 export function SearchPage() {
+  // Contoh di halaman ini mengikuti mode docs: di mode gelap komponennya
+  // memakai `darkMode`, dan cuplikan kodenya ikut menuliskannya supaya tetap
+  // sama dengan pratinjaunya.
+  const dark = useDocsDark()
   const [application, setApplication] = useState<SearchApplication>('default')
   const [platform, setPlatform] = useState<SearchPlatform>('default')
   const [withCategory, setWithCategory] = useState(false)
   const [withLabel, setWithLabel] = useState(false)
   const [withHelper, setWithHelper] = useState(false)
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState(dark ? 'dark' : 'light')
+
+  // Mode Playground mulai dari mode docs dan ikut berganti bersamanya, tapi
+  // tetap bisa diubah sendiri lewat kontrol Mode. Diselaraskan saat render,
+  // sama seperti `kept` di SidebarPanel: perbandingan boolean, jadi setelah
+  // satu render ulang nilainya sudah sama dan cabang ini tidak berputar.
+  const [syncedDark, setSyncedDark] = useState(dark)
+  if (dark !== syncedDark) {
+    setSyncedDark(dark)
+    setTheme(dark ? 'dark' : 'light')
+  }
 
   const [value, setValue] = useState('')
   const [category, setCategory] = useState('')
@@ -80,7 +103,7 @@ export function SearchPage() {
       eyebrow="Form"
       title="Search Form"
       description="Kolom pencarian dengan tombol cari. Tersedia sebagai satu kotak polos atau tiga ruas menyatu dengan dropdown kategori di kiri, memakai warna, radius, dan jarak dari Foundations."
-      toc={toc}
+      toc={dark ? tocDark : toc}
     >
       <FlowSection id="search-form" title="Search Form">
         <Lead>
@@ -89,7 +112,7 @@ export function SearchPage() {
           jelas bahwa hasil baru berganti setelah ditekan, bukan sambil diketik.
         </Lead>
         <Demo label="Default">
-          <Search placeholder={PLACEHOLDER} onSearch={(v) => setTerakhir(v)} />
+          <Search placeholder={PLACEHOLDER} onSearch={(v) => setTerakhir(v)} darkMode={dark} />
         </Demo>
         <SectionCode>
           {"import { Search } from '@ceplok-ui/design-kit-react'\n\n"}
@@ -98,6 +121,7 @@ export function SearchPage() {
           {'    '}
           <H>onSearch</H>
           {'={(value) => cari(value)}\n'}
+          {dark && '    darkMode\n'}
           {'/>'}
         </SectionCode>
       </FlowSection>
@@ -110,18 +134,18 @@ export function SearchPage() {
         </Lead>
         <div className="grid gap-5">
           <Demo label="Default — 54px">
-            <Search placeholder={PLACEHOLDER} />
+            <Search placeholder={PLACEHOLDER} darkMode={dark} />
           </Demo>
           <Demo label="Mobile — 50px">
             <div className="max-w-[348px]">
-              <Search platform="mobile" placeholder={PLACEHOLDER} />
+              <Search platform="mobile" placeholder={PLACEHOLDER} darkMode={dark} />
             </div>
           </Demo>
         </div>
         <SectionCode>
           {'<Search '}
           <H>platform</H>
-          {'="mobile" placeholder="Search Civitas, Organisasi…" />'}
+          {`="mobile" placeholder="Search Civitas, Organisasi…"${dark ? ' darkMode' : ''} />`}
         </SectionCode>
       </FlowSection>
 
@@ -138,6 +162,7 @@ export function SearchPage() {
                 categories={kategori}
                 placeholder={PLACEHOLDER}
                 onSearch={(v, c) => setTerakhir(c ? `${v} · ${c}` : v)}
+                darkMode={dark}
               />
             </div>
           </Demo>
@@ -147,6 +172,7 @@ export function SearchPage() {
                 categories={kategori}
                 placeholder={PLACEHOLDER}
                 onSearch={(v, c) => setTerakhir(c ? `${v} · ${c}` : v)}
+                darkMode={dark}
               />
             </div>
           </Demo>
@@ -158,15 +184,16 @@ export function SearchPage() {
           {'={[{ value: "civitas", label: "Civitas" }]}\n'}
           {'    placeholder="Search Civitas, Organisasi…"\n'}
           {'    onSearch={(value, category) => cari(value, category)}\n'}
+          {dark && '    darkMode\n'}
           {'/>'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Kedua ukuran di atas isinya sama persis: tinggi 39px, ruas kategori 113px, dan tombol
           44px. Yang berbeda cuma isian di tengah — ia memanjang mengikuti wadahnya, dari 382px di
           ponsel sampai 882px di layar lebar. Karena itu prop <Hl>platform</Hl> tidak dipakai bentuk
           ini; cukup atur lebar wadahnya.
         </p>
-        <p className="mt-2 text-body-sm text-gray-500">
+        <p className="mt-2 text-body-sm text-gray-500 dark:text-gray-400">
           Daftar kategorinya panel Dropdown, sama dengan daftar pilihan Regular Select Form. Nilai
           kategorinya dibawa elemen <Hl>&lt;select&gt;</Hl> di belakang tombolnya, dan itulah yang
           diteruskan ke <Hl>onCategoryChange</Hl> serta argumen kedua <Hl>onSearch</Hl>. Option yang
@@ -187,6 +214,7 @@ export function SearchPage() {
                 application={a.value}
                 placeholder={PLACEHOLDER}
                 helperText={`bg-${a.token}`}
+                darkMode={dark}
               />
             </Demo>
           ))}
@@ -194,32 +222,51 @@ export function SearchPage() {
         <SectionCode>
           {'<Search '}
           <H>application</H>
-          {'="purple" placeholder="Search Civitas, Organisasi…" />'}
+          {`="purple" placeholder="Search Civitas, Organisasi…"${dark ? ' darkMode' : ''} />`}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
+      {/*
+        Bagian ini selalu menunjukkan mode yang sedang tidak dipakai docs. Di
+        mode terang ia memperagakan `darkMode`; di mode gelap, ketika semua
+        contoh lain sudah gelap, ia bertukar menjadi Light mode: versi terang
+        di kotak terang, dengan cuplikan tanpa `darkMode`.
+      */}
+      <FlowSection id="dark-mode" title={dark ? 'Light mode' : 'Dark mode'}>
         <Lead>
-          Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, dan batas.
+          {dark ? (
+            <>
+              Dokumentasi sedang dalam mode gelap, jadi contoh lain di halaman ini memakai <Hl>darkMode</Hl>,
+              begitu pula cuplikan kodenya. Tanpa prop itu Search Form tampil terang, seperti di bawah ini.
+            </>
+          ) : (
+            <>
+              Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, dan batas.
+            </>
+          )}
         </Lead>
         <div className="grid gap-5">
-          <Demo label="Default" dark>
-            <Search placeholder={PLACEHOLDER} darkMode />
+          <Demo label="Default" dark={!dark} light={dark}>
+            <Search placeholder={PLACEHOLDER} darkMode={!dark} />
           </Demo>
-          <Demo label="Dengan Kategori" dark>
+          <Demo label="Dengan Kategori" dark={!dark} light={dark}>
             <div className="max-w-[882px]">
               <Search
                 categories={kategori}
                 placeholder={PLACEHOLDER}
-                darkMode
+                darkMode={!dark}
               />
             </div>
           </Demo>
         </div>
         <SectionCode>
           {'<Search '}
-          <H>darkMode</H>
-          {' placeholder="Search Civitas, Organisasi…" />'}
+          {!dark && (
+            <>
+              <H>darkMode</H>{' '}
+            </>
+          )}
+          {'placeholder="Search Civitas, Organisasi…" />'}
         </SectionCode>
       </FlowSection>
 
@@ -320,7 +367,7 @@ export function SearchPage() {
           </Control>
         </Controls>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Pencarian terakhir:{' '}
           {terakhir === null ? (
             <em>belum ada</em>

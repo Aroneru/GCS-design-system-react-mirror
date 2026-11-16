@@ -29,14 +29,14 @@ import { gsap, prefersReducedMotion } from '../../motion'
 const DASAR_TIRAI =
   'pointer-events-none fixed top-0 left-0 z-[100] aspect-square w-[300vmax] rounded-full'
 
-export const KELAS_TIRAI = `${DASAR_TIRAI} bg-gradient-to-br from-primary-100 to-primary-300`
+export const KELAS_TIRAI = `${DASAR_TIRAI} bg-gradient-to-br from-primary-100 to-primary-300 dark:from-primary-900 dark:to-primary-800`
 
 /**
  * Lapisan putih di gaya `riak`. Geometrinya sama persis dengan gelembung
  * biru — hanya isiannya yang berbeda — supaya keduanya tumbuh sebangun dan
  * pitanya selebar jeda waktu, bukan selebar selisih ukuran.
  */
-export const KELAS_TIRAI_PUTIH = `${DASAR_TIRAI} bg-white`
+export const KELAS_TIRAI_PUTIH = `${DASAR_TIRAI} bg-white dark:bg-gray-900`
 
 /**
  * Warna dan kecepatan di sini dipilih untuk kenyamanan mata, bukan untuk
@@ -47,6 +47,11 @@ export const KELAS_TIRAI_PUTIH = `${DASAR_TIRAI} bg-white`
  * dengan halaman putih di baliknya sehingga tidak ada kilatan. Bandingkan
  * dengan primary-700 (#1a56db) yang dipakai semula: warnanya sama, jenuhnya
  * yang menyakitkan.
+ *
+ * Alasan yang sama berlaku terbalik di mode gelap docs (Portal Dashboard):
+ * gradien biru muda di atas halaman gelap justru menjadi kilatan. Karena itu
+ * tirai dan panelnya memakai ujung gelap tangga yang sama, primary-900 →
+ * primary-800, dan lapisan putihnya menjadi gray-900.
  *
  * Easing-nya `sine.inOut`, bukan `power2.inOut`: kurva sinus tidak punya
  * puncak percepatan yang tajam, jadi bidang sebesar layar tidak pernah
@@ -194,7 +199,7 @@ export function titikTengah(el: HTMLElement | null): Titik | null {
  * terbaca sebagai satu gerakan menaik, bukan dua kejadian terpisah.
  */
 export const KELAS_PANEL =
-  'pointer-events-none fixed inset-0 z-[100] bg-gradient-to-b from-primary-100 to-primary-300'
+  'pointer-events-none fixed inset-0 z-[100] bg-gradient-to-b from-primary-100 to-primary-300 dark:from-primary-900 dark:to-primary-800'
 
 /**
  * Dari mana halaman yang sedang dimuat didatangi.
