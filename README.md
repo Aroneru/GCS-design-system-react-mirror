@@ -121,7 +121,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
 | `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| female \| male`, `size`: `small \| default \| large`, `darkMode` (deprecated) |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
-| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `disabled`, `onCopySuccess`, `onCopyError`, `darkMode` (deprecated) |
+| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label` / `aria-label` / `aria-labelledby` (salah satu wajib), `helperText`, `platform`, `disabled`, `onCopySuccess`, `onCopyError`, `darkMode` (deprecated) |
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Toast`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Card`       | `image`, `title`, `description`, `href`, `linkLabel`, `actions`, `darkMode`                                          |
