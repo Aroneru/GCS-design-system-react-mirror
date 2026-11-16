@@ -9,7 +9,7 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 > kompatibilitas masuk di rilis **minor**. Jadi jangan anggap `0.x` aman dinaikkan
 > begitu saja — baca bagian **Diubah** sebelum memperbarui.
 
-## [Belum dirilis]
+## [0.6.0] - 2026-11-16
 
 ### Ditambahkan
 - **`Table` punya prop `darkMode`.** Prop ini memasang `data-theme="dark"` di
