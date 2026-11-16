@@ -1,8 +1,7 @@
 # @ceplok-ui/design-kit-react
 
-Design tokens, tipografi, dan komponen **React (Tailwind v4)** untuk
-Ceplok Design System. Dipindahkan 1:1 dari versi Laravel/Blade
-(`tpl/design-kit`) ke komponen React yang bisa dipublish lewat NPM.
+Design token, tipografi, dan komponen **React (Tailwind v4)** dari Ceplok
+Design System. Pasang lewat NPM, lalu pakai langsung di aplikasi React Anda.
 
 ## Isi
 

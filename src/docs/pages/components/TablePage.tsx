@@ -353,7 +353,7 @@ const tableProps: PropRow[] = [
   ["columns", "TableColumn<T>[]", "dari data", "Daftar kolom yang tampil. Kalau tidak diisi, kolom dibuat otomatis dari data."],
   ["data", "T[]", "—", "Isi tabel. Dengan `manual`, cukup baris halaman yang sedang tampil."],
   ["rowKey", "keyof T | (row) => Key", "—", "Field yang nilainya unik di tiap baris, biasanya `\"id\"`."],
-  ["size", '"normal" | "compact"', "normal", "Ukuran tabel. `compact` lebih rapat dan teksnya lebih kecil."],
+  ["size", '"normal" | "compact"', "normal", "Ukuran tabel. `compact` lebih rapat dan teksnya lebih kecil. Di bawah lebar 640px (mobile) tabel otomatis `compact`."],
   ["search", "TableSearchConfig", "undefined", "Menampilkan kotak pencarian di kiri atas."],
   ["filter", "TableFilterConfig", "undefined", "Menampilkan tombol \"Filter Data\" untuk memilih kolom yang tampil. Isi `{}` untuk memakai pengaturan bawaan."],
   ["actions", "ReactNode", "undefined", "Tombol di kanan atas tabel, mis. \"Tambah Data\"."],
@@ -369,6 +369,7 @@ const tableProps: PropRow[] = [
   ["pagination", "TablePaginationConfig", "undefined", "Membagi data per halaman. Tanpa ini semua baris tampil."],
   ["manual", "boolean", "false", "Pasang kalau urutan dan halaman diurus server."],
   ["striped", "boolean", "false", "Baris zebra: baris genap diberi latar abu-abu muda."],
+  ["darkMode", "boolean", "false", "Tampilan gelap: toolbar gray-800, header gray-600, baris gray-700 (mobile gray-800), Pagination ikut gelap. Badge dan Button theme gray di dalam tabel ikut gelap otomatis."],
   ["loading", "boolean", "false", "Menampilkan ikon memuat sebagai ganti isi tabel."],
   ["emptyText", "ReactNode", "Tidak ada data", "Tulisan yang tampil kalau data kosong."],
 ];
@@ -501,6 +502,7 @@ const toc: TocEntry[] = [
   { id: "states", label: "States" },
   { id: "size", label: "Size" },
   { id: "zebra", label: "Baris zebra" },
+  { id: "mode-gelap", label: "Mode gelap" },
   { id: "aksi", label: "Tombol aksi" },
   { id: "posisi", label: "Posisi judul" },
   { id: "gambar", label: "Gambar" },
@@ -914,6 +916,7 @@ function PlaygroundTable({
   grouped,
   headerAlign,
   striped,
+  darkMode,
   withToolbarActions,
 }: {
   count: number;
@@ -921,6 +924,7 @@ function PlaygroundTable({
   withSearch: boolean;
   withFilter: boolean;
   striped: boolean;
+  darkMode: boolean;
   withToolbarActions: boolean;
   theme: PaginationTheme;
   size: TableSize;
@@ -974,6 +978,7 @@ function PlaygroundTable({
       size={size}
       headerAlign={headerAlign}
       striped={striped}
+      darkMode={darkMode}
       selectable={selectable}
       selectedKeys={selected}
       onSelectionChange={setSelected}
@@ -1034,6 +1039,10 @@ export function TablePage() {
   const [withFilter, setWithFilter] = useState(false);
   const [withToolbarActions, setWithToolbarActions] = useState(false);
   const [striped, setStriped] = useState(true);
+  const [mode, setMode] = useState<"light" | "dark">("light");
+  // Table tidak punya prop platform: rupa mobile muncul sendiri saat tabel
+  // lebih sempit dari 640px, jadi pratinjaunya cukup menyempitkan panggung.
+  const [view, setView] = useState<"desktop" | "mobile">("desktop");
   const [theme, setTheme] = useState<PaginationTheme>("primary");
   const [size, setSize] = useState<TableSize>("normal");
   const [withPagination, setWithPagination] = useState(true);
@@ -1185,6 +1194,35 @@ export function TablePage() {
           {"<Table columns={columns} data={rows} rowKey=\"id\" "}
           <H>striped</H>
           {" />"}
+        </SectionCode>
+      </FlowSection>
+
+      <FlowSection id="mode-gelap" title="Mode gelap">
+        <Lead>
+          Isi <Hl>darkMode</Hl> untuk tampilan gelap. Toolbar berlatar gray-800, header gray-600,
+          dan footer gray-700. Bila digabung dengan <Hl>striped</Hl>, baris mulai dari gray-700 lalu
+          gray-800. Pagination, tombol Filter, dan Dropdown ikut gelap.
+        </Lead>
+
+        <Demo label="Gelap">
+          <Table
+            columns={columns}
+            data={allRows.slice(0, 12)}
+            rowKey="id"
+            striped
+            darkMode
+            search={{ placeholder: "Cari Tabel..." }}
+            filter={{}}
+            pagination={{ defaultPageSize: 4, pageSizeOptions: [4, 10, 25] }}
+          />
+        </Demo>
+
+        <SectionCode>
+          {"<Table columns={columns} data={rows} rowKey=\"id\" striped "}
+          <H>darkMode</H>
+          {" />\n\n"}
+          {"// Warna bisa ditimpa lewat token, mis. di CSS project:\n"}
+          {"[data-theme='dark'] { --color-table-toolbar: #1f2a37; }"}
         </SectionCode>
       </FlowSection>
 
@@ -1787,7 +1825,7 @@ export function TablePage() {
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth="max-w-[1024px]">
+        <Stage maxWidth={view === "mobile" ? "max-w-[390px]" : "max-w-[1024px]"} dark={mode === "dark"}>
           <PlaygroundTable
             key={count}
             count={count}
@@ -1803,14 +1841,38 @@ export function TablePage() {
             grouped={grouped}
             headerAlign={headerAlign}
             striped={striped}
+            darkMode={mode === "dark"}
             withToolbarActions={withToolbarActions}
           />
         </Stage>
 
         <Controls>
+          <Control label="Mode">
+            <Segmented
+              label="Pilih mode"
+              value={mode}
+              onChange={(v) => setMode(v as "light" | "dark")}
+              options={[
+                { value: "light", label: "Light" },
+                { value: "dark", label: "Dark" },
+              ]}
+            />
+          </Control>
+          <Control label="Tampilan">
+            <Segmented
+              label="Pilih tampilan"
+              value={view}
+              onChange={(v) => setView(v as "desktop" | "mobile")}
+              options={[
+                { value: "desktop", label: "Desktop" },
+                { value: "mobile", label: "Mobile" },
+              ]}
+            />
+          </Control>
           <Control label="Jumlah data">
             <Segmented label="Jumlah data" value={count} onChange={(v) => setCount(Number(v))} options={countOptions} />
           </Control>
+          
           <Control label="Size">
             <Segmented label="Pilih size" value={size} onChange={(v) => setSize(v as TableSize)} options={sizeOptions} />
           </Control>
@@ -1967,6 +2029,13 @@ export function TablePage() {
             <>
               {"    "}
               <H>striped</H>
+              {"\n"}
+            </>
+          )}
+          {mode === "dark" && (
+            <>
+              {"    "}
+              <H>darkMode</H>
               {"\n"}
             </>
           )}

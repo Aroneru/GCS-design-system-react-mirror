@@ -9,9 +9,26 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 > kompatibilitas masuk di rilis **minor**. Jadi jangan anggap `0.x` aman dinaikkan
 > begitu saja — baca bagian **Diubah** sebelum memperbarui.
 
-## [Belum dirilis]
+## [0.6.0] - 2026-11-16
 
 ### Ditambahkan
+- **`Table` punya prop `darkMode`.** Prop ini memasang `data-theme="dark"` di
+  tabel.
+  - Toolbar berlatar gray-800, header gray-600, footer gray-700.
+  - Baris gray-700. Dengan `striped`, baris mulai dari gray-700 lalu gray-800.
+  - Pagination, tombol Filter, dan Dropdown ikut gelap.
+- **Token baru `--color-table-*`.** Semua warna Table kini dari token ini,
+  dengan nilai terang dan gelap. Timpa di CSS project bila perlu, mis.
+  `[data-theme='dark'] { --color-table-toolbar: #1f2a37; }`.
+- **`Table` otomatis `compact` di mobile.** Bila lebar tabel di bawah 640px,
+  tabel memakai `compact` apa pun nilai `size`. Yang diukur lebar tabel, bukan
+  lebar layar.
+- **Button dan Badge ikut `darkMode` milik `Table`.** Tidak perlu lagi memberi
+  `darkMode` ke tiap Button atau Badge di toolbar maupun di sel.
+  - Badge: semua varian ikut gelap.
+  - Button: hanya theme `gray` yang ikut gelap. Theme berwarna, mis. tombol
+    "Tambah Data" (primary), tetap berwarna.
+  - Prop `darkMode` yang diisi langsung tetap menang, termasuk `false`.
 
 - **`ListViewItem`: prop `actionDisabled` dan `interactiveFeedback`.** Tombol
   aksi bawaan pada varian `simple` kini dapat disembunyikan di seluruh ukuran
@@ -92,6 +109,28 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   pada BO tanpa bergantung pada identitas Sidebar. Navbar merender ikon Bell 24px berwarna
   gray-800 pada light dan gray-400 pada dark; consumer tetap mengatur aksi,
   state panel, badge, dan atribut tombolnya.
+- **Footer `Table` disusun ulang.**
+  - Pemilih jumlah baris di kiri, Pagination di kanan.
+  - Labelnya kini "Menampilkan [n] Data", sebelumnya "Baris per halaman".
+  - Tombol pemilih jumlah baris kini berlatar abu-abu tanpa garis.
+  - Ringkasan "Menampilkan 1–10 dari 50 data" tidak tampil lagi, jadi prop
+    `pagination.summary` belum berpengaruh.
+- **Warna gelap `Pagination` (`darkMode`).**
+  - Kotak nomor gray-700 dengan garis gray-600, sebelumnya gray-800 dengan
+    garis gray-700.
+  - Halaman aktif tema `primary` kini primary-900, `purple` kini purple-900,
+    `default` kini gray-600.
+- **Tampilan mobile `Table`** (lebar tabel di bawah 576px).
+  - Toolbar: kotak pencarian satu baris penuh, lalu tombol dua per baris
+    dengan lebar sama. Tombol ganjil terakhir, mis. "Hapus Data", melebar
+    penuh. Mulai 576px kembali satu baris seperti sebelumnya.
+  - Footer: pemilih jumlah baris dan Pagination rata tengah, sebelumnya rata
+    kiri.
+  - Mode gelap di bawah 640px: toolbar, baris, dan footer gray-800, header
+    tetap gray-600. Dengan `striped`, baris berganti gray-800 lalu gray-700.
+- **Situs dokumentasi.** Halaman Table punya bagian baru "Mode gelap", dan
+  Playground-nya punya kontrol Mode (Light/Dark) setelah Typography, serta
+  kontrol Tampilan (Desktop/Mobile) untuk melihat tabel selebar 390px.
 - **Portal Dashboard memakai kontrak Navbar Back Office.** Menu aplikasi dan
   identitas akun berasal dari Sidebar yang sama pada desktop/mobile, sedangkan
   navigasi global berada di Navbar desktop dan Drawer mobile. Header dan dialog

@@ -1,5 +1,6 @@
 import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../utils/cn";
+import { useInheritedDarkMode } from "../utils/darkModeContext";
 
 export type ButtonVariant = "filled" | "outline";
 
@@ -19,7 +20,12 @@ interface CommonProps {
   className?: string;
   theme?: ButtonTheme;
   tone?: ButtonTone;
-  /** Menyesuaikan warna Button untuk permukaan bertema gelap. */
+  /**
+   * Menyesuaikan warna Button untuk permukaan bertema gelap. Bila tidak diisi,
+   * Button di dalam Table ber-`darkMode` ikut gelap otomatis — tetapi hanya
+   * theme `gray`; theme berwarna (mis. primary, orange) tetap berwarna supaya
+   * tombol utama seperti "Tambah Data" tetap menonjol.
+   */
   darkMode?: boolean;
 }
 
@@ -168,13 +174,15 @@ export function Button({
   size = "base",
   theme = "primary",
   tone = "light",
-  darkMode = false,
+  darkMode: darkModeProp,
   leftIcon,
   rightIcon,
   className,
   ...props
 }: ButtonProps) {
   const currentSize = sizeClasses[size];
+  const inheritedDark = useInheritedDarkMode();
+  const darkMode = darkModeProp ?? (inheritedDark && theme === "gray");
 
   const classes = cn(
     "inline-flex items-center justify-center",

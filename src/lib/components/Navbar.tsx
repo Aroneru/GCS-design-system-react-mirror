@@ -142,6 +142,7 @@ export type NavbarFrontOfficeProps = NavbarBaseProps &
   FrontOfficeIdentity & {
     platform: 'front-office'
     sidebarItems?: never
+    sidebarUser?: never
     tableOfContents?: never
   }
 
