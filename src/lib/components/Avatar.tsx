@@ -1,4 +1,4 @@
-import { forwardRef, useState, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useState, type ForwardedRef, type HTMLAttributes, type ReactNode } from 'react'
 import femaleDark from '../assets/avatar/Female-Dark.svg'
 import femaleLight from '../assets/avatar/Female-Light.svg'
 import maleDark from '../assets/avatar/Male-Dark.svg'
@@ -37,13 +37,15 @@ interface AvatarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children
    * Isi lingkaran saat tidak ada gambar — umumnya satu atau dua huruf inisial.
    * Bisa juga diisi ikon kecil bila memang tidak ada nama yang bisa disingkat.
    */
+  initials?: ReactNode
+  /** Diameter Avatar: `small` 24px, `default` 32px, atau `large` 80px. */
   size?: AvatarSize
   /** @deprecated Gunakan scope ambient `data-theme="dark"`. */
   darkMode?: boolean
 }
 
 type AvatarInitialsFallback =
-  | { fallback?: 'initials'; name: string; initials?: ReactNode }
+  | { fallback?: 'initials'; name: string }
   | { fallback?: 'initials'; name?: string; initials: ReactNode }
 
 type AvatarProfileFallback = {
@@ -101,17 +103,7 @@ function ProfileFallback({ fallback }: { fallback: Exclude<AvatarFallback, 'init
   )
 }
 
-/**
- * Avatar — lingkaran identitas berisi foto atau inisial.
- *
- * Foto selalu diprioritaskan ketika `src` tersedia. Jika foto kosong atau gagal,
- * satu prop `fallback` memilih inisial, ilustrasi female, atau ilustrasi male.
- *
- * Gambar yang gagal dimuat juga jatuh kembali ke fallback tersebut. Alamat foto profil
- * paling sering datang dari sistem lain dan bisa mati kapan saja; tanpa
- * penanganan ini yang tersisa hanya ikon gambar rusak.
- */
-export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
+function AvatarInstance(
   {
     src,
     alt,
@@ -121,14 +113,11 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
     fallback = 'initials',
     darkMode = false,
     className,
+    ref,
     ...props
-  },
-  ref,
-) {
-  // Yang diingat adalah alamat yang gagal, bukan sekadar "pernah gagal", supaya
-  // pergantian src berikutnya tetap dicoba lagi.
-  const [gagal, setGagal] = useState<string | null>(null)
-  const pakaiGambar = Boolean(src) && gagal !== src
+  }: AvatarProps & { ref: ForwardedRef<HTMLDivElement> }) {
+  const [gagal, setGagal] = useState(false)
+  const pakaiGambar = Boolean(src) && !gagal
   const inisialOtomatis = initialsFromName(name)
   const isiInisial = hasInitials(initials) ? initials : inisialOtomatis
   const pakaiProfil = !pakaiGambar && fallback !== 'initials'
@@ -136,6 +125,8 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
 
   const namaAksesibel = alt ?? name ?? ''
 
+  // Konsisten dengan komponen lain: atribut native root boleh meng-override
+  // role, aria-label, dan data-theme yang dihitung komponen.
   return (
     <div
       ref={ref}
@@ -154,7 +145,7 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
           src={src}
           alt={namaAksesibel}
           className="size-full object-cover"
-          onError={() => setGagal(src ?? null)}
+          onError={() => setGagal(true)}
         />
       ) : pakaiProfil ? (
         <span className="grid size-full place-items-center" aria-hidden="true">
@@ -169,6 +160,18 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
       ) : null}
     </div>
   )
+}
+
+/**
+ * Avatar — lingkaran identitas berisi foto atau inisial.
+ *
+ * Foto selalu diprioritaskan ketika `src` tersedia. Jika foto kosong atau gagal,
+ * satu prop `fallback` memilih inisial, ilustrasi female, atau ilustrasi male.
+ * Kunci internal pada `src` membuat URL yang pernah gagal dicoba lagi saat URL
+ * tersebut dipakai kembali.
+ */
+export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(props, ref) {
+  return <AvatarInstance key={props.src} {...props} ref={ref} />
 })
 
 Avatar.displayName = 'Avatar'

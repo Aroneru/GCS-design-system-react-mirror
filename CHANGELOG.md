@@ -31,6 +31,21 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ### Diubah
 
+- **`Clipboard`: runtime callback dan feedback.** Hasil Clipboard API kini
+  terpisah dari callback consumer: error sinkron maupun Promise rejection dari
+  `onCopySuccess`/`onCopyError` diabaikan, tidak mengubah feedback operasi, dan
+  tidak menghasilkan unhandled rejection. Reset feedback tidak lagi memanggil
+  state setter saat render; hasil write lama tetap ditolak saat `value` berubah
+  atau Clipboard dinonaktifkan.
+- **`Clipboard`: kontrak nama aksesibel.** Consumer kini wajib memberi salah
+  satu `label`, `aria-label`, atau `aria-labelledby`; tidak ada fallback nama
+  dari `value`. Ini perubahan tipe yang dapat memerlukan penambahan nama pada
+  pemakaian lama tanpa label.
+- **Dokumentasi dan test runtime `Clipboard`.** Playground, Penggunaan, dan
+  Properties menjelaskan kontrak nama aksesibel serta isolasi error callback;
+  harness runtime mencakup lifecycle copy, feedback, disabled, tema ambient,
+  dan preset platform.
+
 - **Fallback Avatar disederhanakan.** Prop `gender` dan nilai ambigu
   `fallback="profile"` dihapus. Satu prop `fallback="initials" | "female" |
   "male"` kini memilih representasi ketika foto kosong atau gagal dimuat.
@@ -73,6 +88,12 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   tanpa feedback hover/active.
 
 ### Diperbaiki
+
+- **`Avatar`: retry foto gagal.** State error dibuat baru setiap `src` berubah,
+  sehingga URL yang pernah gagal tetap dicoba lagi saat dipakai kembali.
+- **Dokumentasi `Avatar`.** Demo, Playground, dan generated snippet kini sama
+  dalam penggunaan initials override `UI`, fallback valid saat nama kosong, dan
+  pola aksesibilitas Avatar dekoratif beserta teks nama pendampingnya.
 
 - **Lebar `ListViewItem` interaktif.** Item `simple` yang aksinya dialihkan ke
   elemen button kini tetap memenuhi lebar `ListView` dan mempertahankan teks

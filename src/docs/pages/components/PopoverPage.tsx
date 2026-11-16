@@ -203,8 +203,9 @@ export function PopoverPage() {
             </article>
           ))}
         </div>
-        <h3 className="mt-8 mb-3 text-sm font-black text-gray-900">Code Example</h3>
-        <PositionCode />
+        <div className="mt-8">
+          <PositionCode />
+        </div>
       </FlowSection>
 
       <FlowSection id="dark-mode" title="Dark mode">
