@@ -408,8 +408,8 @@ export function PortalDashboard({
 
   return (
     <div data-theme={darkMode ? 'dark' : undefined} className="flex min-h-screen bg-surface">
-      {/* Desktop dan mobile memakai komponen, akun, dan item Sidebar yang sama.
-          Di bawah lg instance mobile tampil sebagai panel modal dari kiri. */}
+      {/* Sidebar desktop. Di bawah lg, Navbar memakai item dan akun Sidebar
+          yang sama untuk panel navigasi selulernya. */}
       <div className="hidden lg:block">
         <Sidebar
           logo={sidebarLogo}
@@ -424,32 +424,22 @@ export function PortalDashboard({
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-18 items-center gap-3 border-b border-border bg-surface px-4 sm:px-6">
-          <Button
-            iconOnly
-            variant="outline"
-            theme="gray"
-            size="s"
-            className="lg:hidden"
-            aria-label="Buka menu"
-            aria-expanded={menuSeluler}
-            aria-controls={idMenuSeluler}
-            onClick={() => setMenuSeluler(true)}
-            darkMode={darkMode}
-          >
-            <Bars />
-          </Button>
-          <img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="size-8 lg:hidden" />
-
-          {/* Search berkategori di kiri, selebar slot search Navbar back-office:
-              348px, menyusut sampai 180px bila ruangnya kurang. Varian kategori
-              membawa role="search" sendiri, jadi pembungkus ini tidak.
-
-              Seperti slot search Navbar, garis field-nya gray-600 di mode gelap.
-              Tanpa itu ruas kategorinya (gray-700) lebur dengan header gray-700.
-              Yang ditimpa variabel palet gelapnya, karena Search ber-`darkMode`
-              memasang `data-theme` sendiri dan akan menimpa token biasa. */}
-          <div className="hidden w-87 max-w-87 min-w-45 flex-[0_1_348px] [--color-field-border-dark:var(--color-gray-600)] md:block">
+        {/* Navbar ikut gelap lewat `data-theme` di akar. Garis field Search
+            gray-600 di mode gelap; yang ditimpa variabel palet gelapnya, karena
+            Search ber-`darkMode` memasang `data-theme` sendiri dan akan menimpa
+            token biasa. Tanpa itu ruas kategorinya lebur dengan header gray-700. */}
+        <Navbar
+          platform="back-office"
+          className="[--color-field-border-dark:var(--color-gray-600)]"
+          brand={{
+            content: <img src={asset('/images/ceplok.svg')} alt="" className="size-8" />,
+            href: '#/portal-dashboard/app',
+            ariaLabel: 'CEPLOK — Dashboard',
+          }}
+          items={navbarItems}
+          sidebarItems={menuSidebar}
+          sidebarUser={sidebarUser}
+          search={
             <Search
               categories={KATEGORI}
               categoryPlaceholder="Pilih"
@@ -464,41 +454,13 @@ export function PortalDashboard({
               onSearch={cari}
               darkMode={darkMode}
             />
-          </div>
-
-          {/* Tombol tema, bergaya sama dengan lonceng di sebelahnya. Ikonnya
-              menunjukkan hasil bila ditekan: bulan saat terang, matahari saat gelap. */}
-          {onDarkModeChange && (
-            <button
-              type="button"
-              aria-label="Mode gelap"
-              aria-pressed={darkMode}
-              title={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
-              onClick={() => onDarkModeChange(!darkMode)}
-              className="ml-auto grid size-9 shrink-0 place-items-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-            >
-              {darkMode ? (
-                <Sun className="size-5" aria-hidden="true" />
-              ) : (
-                <Moon className="size-5" aria-hidden="true" />
-              )}
-            </button>
-          )}
-
-          {/* Lonceng bergaya notificationTrigger Navbar front-office: ikon 20px
-              gray-500 dalam kotak 36px, tanpa angka. */}
-          <button
-            type="button"
-            aria-label="Notifikasi"
-            onClick={() => kabari('Ada 5 notifikasi baru.')}
-            className={cn(
-              'grid size-9 shrink-0 place-items-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-              !onDarkModeChange && 'ml-auto',
-            )}
-          >
-            <Bell className="size-5" aria-hidden="true" />
-          </button>
-        </header>
+          }
+          notificationTrigger={{
+            ariaLabel: 'Notifikasi',
+            badge: 5,
+            onClick: () => kabari('Ada 5 notifikasi baru.'),
+          }}
+        />
 
         {/* Toast di kanan atas, tepat di bawah header. */}
         <div className="fixed top-22 right-4 z-30 w-80 max-w-[calc(100vw-2rem)] sm:right-6">
@@ -517,14 +479,33 @@ export function PortalDashboard({
             <div className="space-y-5 py-8">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <h1 className="text-heading-3 font-bold text-content">Dashboard</h1>
-                <Button
-                  variant="outline"
-                  size="s"
-                  onClick={() => kabari('Pengaturan layout belum ada di contoh ini.')}
-                  darkMode={darkMode}
-                >
-                  Pengaturan Layout
-                </Button>
+                <div className="flex items-center gap-2">
+                  {/* Tombol tema. Navbar belum punya slot aksi tambahan, jadi
+                      tombolnya di sini. Ikonnya menunjukkan hasil bila ditekan:
+                      bulan saat terang, matahari saat gelap. */}
+                  {onDarkModeChange && (
+                    <Button
+                      iconOnly
+                      variant="outline"
+                      size="s"
+                      aria-label="Mode gelap"
+                      aria-pressed={darkMode}
+                      title={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
+                      onClick={() => onDarkModeChange(!darkMode)}
+                      darkMode={darkMode}
+                    >
+                      {darkMode ? <Sun /> : <Moon />}
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="s"
+                    onClick={() => kabari('Pengaturan layout belum ada di contoh ini.')}
+                    darkMode={darkMode}
+                  >
+                    Pengaturan Layout
+                  </Button>
+                </div>
               </div>
 
               {/* Satu kolom di layar sempit, dua kolom di md, lalu grid 12 kolom di xl
@@ -698,34 +679,6 @@ export function PortalDashboard({
           </div>
         </main>
       </div>
-
-      <dialog
-        ref={sidebarSelulerRef}
-        id={idMenuSeluler}
-        aria-label="Navigasi Portal Dashboard"
-        className="fixed inset-y-0 left-0 right-auto m-0 h-full max-h-full w-[280px] max-w-[calc(100vw-2rem)] overflow-visible border-0 bg-transparent p-0 shadow-none backdrop:bg-gray-900/50 lg:hidden"
-        onCancel={(event: SyntheticEvent<HTMLDialogElement>) => {
-          event.preventDefault()
-          setMenuSeluler(false)
-        }}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) setMenuSeluler(false)
-        }}
-        onClose={() => {
-          if (menuSeluler) setMenuSeluler(false)
-        }}
-      >
-        <Sidebar
-          logo={sidebarLogo}
-          collapsedLogo={sidebarCollapsedLogo}
-          user={sidebarUser}
-          items={menuSidebar}
-          collapsed={false}
-          onCollapse={() => setMenuSeluler(false)}
-          className="h-full !min-h-0 max-w-full shadow-2xl"
-          darkMode={darkMode}
-        />
-      </dialog>
     </div>
   )
 }
