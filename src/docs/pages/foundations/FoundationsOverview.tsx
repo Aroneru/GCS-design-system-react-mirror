@@ -18,7 +18,7 @@ export function FoundationsOverview() {
         desc="Delapan palet primitive dan lapisan semantic token yang memisahkan makna dari nilai warna."
         wide
       >
-        <div className="rounded-xl bg-surface-subtle p-5">
+        <div className="rounded-xl bg-surface-subtle p-5 dark:bg-gray-900">
           <div className="flex gap-2">
             {swatches.map((bg) => (
               <span key={bg} className={`${bg} h-12 flex-1 rounded-lg`} />
@@ -32,9 +32,9 @@ export function FoundationsOverview() {
         name="Typography"
         desc="Skala tipe Lato dari Display hingga Caption, lengkap dengan bobot dan tinggi baris."
       >
-        <div className="rounded-xl bg-surface-subtle p-5">
-          <p className="text-heading-2 leading-none font-black text-gray-900">Aa</p>
-          <p className="mt-2 text-body-sm text-gray-500">Lato · 48 → 12px</p>
+        <div className="rounded-xl bg-surface-subtle p-5 dark:bg-gray-900">
+          <p className="text-heading-2 leading-none font-black text-gray-900 dark:text-white">Aa</p>
+          <p className="mt-2 text-body-sm text-gray-500 dark:text-gray-400">Lato · 48 → 12px</p>
         </div>
       </OverviewCard>
 
@@ -43,7 +43,7 @@ export function FoundationsOverview() {
         name="Spacing"
         desc="Skala jarak berbasis 4px untuk padding, margin, dan gap di seluruh produk."
       >
-        <div className="flex flex-col justify-center gap-1.5 rounded-xl bg-surface-subtle p-5">
+        <div className="flex flex-col justify-center gap-1.5 rounded-xl bg-surface-subtle p-5 dark:bg-gray-900">
           {['w-6', 'w-12', 'w-20', 'w-32'].map((w) => (
             <span key={w} className={`${w} h-2.5 rounded-xs bg-primary-600`} />
           ))}
@@ -55,7 +55,7 @@ export function FoundationsOverview() {
         name="Border"
         desc="Radius sudut, ketebalan garis, dan gaya garis yang membentuk kontur komponen."
       >
-        <div className="flex items-center gap-3 rounded-xl bg-surface-subtle p-5">
+        <div className="flex items-center gap-3 rounded-xl bg-surface-subtle p-5 dark:bg-gray-900">
           <span className="size-12 rounded-sm bg-primary-600" />
           <span className="size-12 rounded-lg bg-primary-600" />
           <span className="size-12 rounded-2xl bg-primary-600" />
@@ -68,11 +68,11 @@ export function FoundationsOverview() {
         name="Elevation"
         desc="Enam tingkat bayangan untuk menyusun hierarki kedalaman antarpermukaan."
       >
-        <div className="flex items-center gap-4 rounded-xl bg-surface-subtle p-5">
-          <span className="size-12 rounded-lg bg-white shadow-sm" />
-          <span className="size-12 rounded-lg bg-white shadow-md" />
-          <span className="size-12 rounded-lg bg-white shadow-lg" />
-          <span className="size-12 rounded-lg bg-white shadow-xl" />
+        <div className="flex items-center gap-4 rounded-xl bg-surface-subtle p-5 dark:bg-gray-900">
+          <span className="size-12 rounded-lg bg-white shadow-sm dark:bg-gray-700" />
+          <span className="size-12 rounded-lg bg-white shadow-md dark:bg-gray-700" />
+          <span className="size-12 rounded-lg bg-white shadow-lg dark:bg-gray-700" />
+          <span className="size-12 rounded-lg bg-white shadow-xl dark:bg-gray-700" />
         </div>
       </OverviewCard>
 
@@ -82,12 +82,12 @@ export function FoundationsOverview() {
         desc="Set ikon solid dan outline, plus 30 logo brand — semuanya diekspor ulang oleh design kit."
         wide
       >
-        <div className="flex flex-wrap items-center gap-4 rounded-xl bg-surface-subtle p-5 text-gray-700">
+        <div className="flex flex-wrap items-center gap-4 rounded-xl bg-surface-subtle p-5 text-gray-700 dark:bg-gray-900 dark:text-gray-300">
           <OutlineIcons.Home className="size-6" />
           <OutlineIcons.Search className="size-6" />
           <OutlineIcons.BellRing className="size-6" />
           <OutlineIcons.UserSettings className="size-6" />
-          <span className="h-6 w-px bg-border" />
+          <span className="h-6 w-px bg-border dark:bg-gray-700" />
           <Github className="size-6" />
           <Instagram className="size-6" />
         </div>

@@ -5,6 +5,7 @@ import {
   type CheckboxPlatform,
   type CheckboxState,
 } from '../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -12,6 +13,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -51,23 +53,43 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc)
+
 export function CheckboxPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [platform, setPlatform] = useState<CheckboxPlatform>('default')
   const [state, setState] = useState<CheckboxState>('default')
   const [application, setApplication] = useState<CheckboxApplication>('default')
   const [withCaption, setWithCaption] = useState(false)
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = usePlaygroundDark()
   const [dipilih, setDipilih] = useState<string[]>(['ktp'])
 
   const toggle = (value: string) =>
     setDipilih((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]))
+
+  // Potongan `darkMode` di cuplikan bagian Dark mode, sebagai atribut sebaris
+  // dan sebagai baris sendiri. Hilang selama bagian itu menjadi Light mode.
+  const atributDarkMode = !docsDark && (
+    <>
+      <H>darkMode</H>{' '}
+    </>
+  )
+  const barisDarkMode = !docsDark && (
+    <>
+      {'    '}
+      <H>darkMode</H>
+      {'\n'}
+    </>
+  )
 
   return (
     <UsulanPage
       eyebrow="Form"
       title="Checkbox"
       description="Pilihan ganda yang bisa dicentang secara mandiri. Dibangun di atas <input type='checkbox'> bawaan supaya keyboard dan pembaca layar tetap berfungsi, dengan warna, ukuran, dan jarak dari Foundations. Tersedia juga dalam tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="checkbox" title="Checkbox">
         <Lead>
@@ -76,25 +98,32 @@ export function CheckboxPage() {
         </Lead>
         <Demo>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <Checkbox label="Belum dicentang" />
-            <Checkbox label="Sudah dicentang" defaultChecked />
-            <Checkbox state="inactive" label="Tidak aktif" />
-            <Checkbox state="inactive" label="Tidak aktif, tercentang" defaultChecked />
+            <Checkbox label="Belum dicentang" darkMode={docsDark} />
+            <Checkbox label="Sudah dicentang" defaultChecked darkMode={docsDark} />
+            <Checkbox state="inactive" label="Tidak aktif" darkMode={docsDark} />
+            <Checkbox state="inactive" label="Tidak aktif, tercentang" defaultChecked darkMode={docsDark} />
           </div>
         </Demo>
         <SectionCode>
           {"import { Checkbox } from '@ceplok-ui/design-kit-react'\n\n"}
-          {'<Checkbox label="Belum dicentang" />\n'}
+          {'<Checkbox label="Belum dicentang"'}
+          {dm.inline}
+          {' />\n'}
           {'<Checkbox label="Sudah dicentang" '}
           <H>defaultChecked</H>
+          {dm.inline}
           {' />\n\n'}
           {'{/* Inactive — teks meredup sekaligus nonaktif */}\n'}
           {'<Checkbox '}
           <H>state</H>
-          {'="inactive" label="Tidak aktif" />\n'}
+          {'="inactive" label="Tidak aktif"'}
+          {dm.inline}
+          {' />\n'}
           {'<Checkbox '}
           <H>state</H>
-          {'="inactive" label="Tidak aktif, tercentang" defaultChecked />'}
+          {'="inactive" label="Tidak aktif, tercentang" defaultChecked'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -109,10 +138,12 @@ export function CheckboxPage() {
               label="Saya menyetujui syarat dan ketentuan"
               helperText="Termasuk pemrosesan data pribadi sesuai kebijakan privasi."
               defaultChecked
+              darkMode={docsDark}
             />
             <Checkbox
               label="Kirim salinan ke email"
               helperText="Tanda terima dikirim setelah permohonan tersimpan."
+              darkMode={docsDark}
             />
           </div>
         </Demo>
@@ -123,12 +154,14 @@ export function CheckboxPage() {
           <H>helperText</H>
           {'="Termasuk pemrosesan data pribadi sesuai kebijakan privasi."\n'}
           {'    defaultChecked\n'}
+          {dm.line}
           {'/>\n'}
           {'<Checkbox\n'}
           {'    label="Kirim salinan ke email"\n'}
           {'    '}
           <H>helperText</H>
           {'="Tanda terima dikirim setelah permohonan tersimpan."\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
@@ -142,7 +175,7 @@ export function CheckboxPage() {
           <Demo label="Desktop · 16px">
             <div className="space-y-3">
               {berkas.map((b) => (
-                <Checkbox key={b.value} label={b.label} defaultChecked={b.value === 'ktp'} />
+                <Checkbox key={b.value} label={b.label} defaultChecked={b.value === 'ktp'} darkMode={docsDark} />
               ))}
             </div>
           </Demo>
@@ -154,6 +187,7 @@ export function CheckboxPage() {
                   platform="mobile"
                   label={b.label}
                   defaultChecked={b.value === 'ktp'}
+                  darkMode={docsDark}
                 />
               ))}
             </div>
@@ -161,19 +195,31 @@ export function CheckboxPage() {
         </div>
         <SectionCode>
           {'{/* Desktop — platform bawaan, tanpa prop */}\n'}
-          {'<Checkbox label="KTP elektronik" defaultChecked />\n'}
-          {'<Checkbox label="Kartu keluarga" />\n'}
-          {'<Checkbox label="NPWP" />\n\n'}
+          {'<Checkbox label="KTP elektronik" defaultChecked'}
+          {dm.inline}
+          {' />\n'}
+          {'<Checkbox label="Kartu keluarga"'}
+          {dm.inline}
+          {' />\n'}
+          {'<Checkbox label="NPWP"'}
+          {dm.inline}
+          {' />\n\n'}
           {'{/* Mobile */}\n'}
           {'<Checkbox '}
           <H>platform</H>
-          {'="mobile" label="KTP elektronik" defaultChecked />\n'}
+          {'="mobile" label="KTP elektronik" defaultChecked'}
+          {dm.inline}
+          {' />\n'}
           {'<Checkbox '}
           <H>platform</H>
-          {'="mobile" label="Kartu keluarga" />\n'}
+          {'="mobile" label="Kartu keluarga"'}
+          {dm.inline}
+          {' />\n'}
           {'<Checkbox '}
           <H>platform</H>
-          {'="mobile" label="NPWP" />'}
+          {'="mobile" label="NPWP"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -191,39 +237,57 @@ export function CheckboxPage() {
                   label="Tercentang"
                   helperText={`bg-${a.token}`}
                   defaultChecked
+                  darkMode={docsDark}
                 />
-                <Checkbox application={a.value} label="Kosong" />
+                <Checkbox application={a.value} label="Kosong" darkMode={docsDark} />
               </div>
             </Demo>
           ))}
         </div>
         <SectionCode>
           {'{/* Default — tanpa prop application */}\n'}
-          {'<Checkbox label="Tercentang" helperText="bg-primary-700" defaultChecked />\n'}
-          {'<Checkbox label="Kosong" />\n\n'}
+          {'<Checkbox label="Tercentang" helperText="bg-primary-700" defaultChecked'}
+          {dm.inline}
+          {' />\n'}
+          {'<Checkbox label="Kosong"'}
+          {dm.inline}
+          {' />\n\n'}
           {'{/* Purple */}\n'}
           {'<Checkbox '}
           <H>application</H>
-          {'="purple" label="Tercentang" helperText="bg-purple-500" defaultChecked />\n'}
+          {'="purple" label="Tercentang" helperText="bg-purple-500" defaultChecked'}
+          {dm.inline}
+          {' />\n'}
           {'<Checkbox '}
           <H>application</H>
-          {'="purple" label="Kosong" />'}
+          {'="purple" label="Kosong"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> mengganti kotak ke gray-700 bergaris gray-600, dengan label putih dan caption
-          gray-400. Kotak yang tercentang tetap memakai warna aplikasi. State <Hl>inactive</Hl> meredupkan
-          label dan caption ke gray-500; kotaknya tetap, kecuali saat tercentang yang terisi gray-500.
-        </Lead>
-        <Demo dark>
+      <ModeSection
+        name="Checkbox"
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengganti kotak ke gray-700 bergaris gray-600, dengan label putih dan caption
+            gray-400. Kotak yang tercentang tetap memakai warna aplikasi. State <Hl>inactive</Hl> meredupkan
+            label dan caption ke gray-500; kotaknya tetap, kecuali saat tercentang yang terisi gray-500.
+          </>
+        }
+      >
+        <Demo dark={!docsDark} light={docsDark}>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <Checkbox darkMode label="Belum dicentang" helperText="Keterangan singkat." />
-            <Checkbox darkMode label="Sudah dicentang" helperText="Keterangan singkat." defaultChecked />
-            <Checkbox darkMode state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />
+            <Checkbox darkMode={!docsDark} label="Belum dicentang" helperText="Keterangan singkat." />
+            <Checkbox darkMode={!docsDark} label="Sudah dicentang" helperText="Keterangan singkat." defaultChecked />
             <Checkbox
-              darkMode
+              darkMode={!docsDark}
+              state="inactive"
+              label="Tidak aktif"
+              helperText="Keterangan singkat."
+            />
+            <Checkbox
+              darkMode={!docsDark}
               state="inactive"
               label="Tidak aktif, tercentang"
               helperText="Keterangan singkat."
@@ -233,26 +297,24 @@ export function CheckboxPage() {
         </Demo>
         <SectionCode>
           {'<Checkbox '}
-          <H>darkMode</H>
-          {' label="Belum dicentang" helperText="Keterangan singkat." />\n'}
+          {atributDarkMode}
+          {'label="Belum dicentang" helperText="Keterangan singkat." />\n'}
           {'<Checkbox '}
-          <H>darkMode</H>
-          {' label="Sudah dicentang" helperText="Keterangan singkat." defaultChecked />\n\n'}
+          {atributDarkMode}
+          {'label="Sudah dicentang" helperText="Keterangan singkat." defaultChecked />\n\n'}
           {'{/* Inactive */}\n'}
           {'<Checkbox '}
-          <H>darkMode</H>
-          {' state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />\n'}
+          {atributDarkMode}
+          {'state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />\n'}
           {'<Checkbox\n'}
-          {'    '}
-          <H>darkMode</H>
-          {'\n'}
+          {barisDarkMode}
           {'    state="inactive"\n'}
           {'    label="Tidak aktif, tercentang"\n'}
           {'    helperText="Keterangan singkat."\n'}
           {'    defaultChecked\n'}
           {'/>'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -336,7 +398,7 @@ export function CheckboxPage() {
           </Control>
         </Controls>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Berbeda dengan Radio, tiap Checkbox berdiri sendiri — pakai <Hl>name</Hl> yang sama hanya bila
           server Anda memang mengharapkan satu daftar nilai dari satu nama.
         </p>

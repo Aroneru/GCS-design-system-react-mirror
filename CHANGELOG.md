@@ -9,6 +9,23 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 > kompatibilitas masuk di rilis **minor**. Jadi jangan anggap `0.x` aman dinaikkan
 > begitu saja — baca bagian **Diubah** sebelum memperbarui.
 
+## [Belum dirilis]
+
+### Diubah
+- **Mode gelap situs dokumentasi meluas.** Selain halaman di 0.6.0, mode gelap
+  kini berlaku di semua halaman Form, Components Overview, Alert, Toast,
+  Timeline View, Foundations Overview, Spacing, Border, Elevation, dan Icons.
+  Aturannya sama: komponen di pratinjau dan kartu Overview memakai `darkMode`
+  selama docs gelap, cuplikan kodenya ikut menuliskannya, mode Playground
+  mengikuti mode docs, dan bagian Dark mode bertukar menjadi Light mode.
+  Perubahan ini hanya di situs dokumentasi: komponen library dan `styles.css`
+  paket tidak berubah.
+
+### Diperbaiki
+- **Jarak kartu versi di panel samping docs.** Kartu "Foundation v1.0" di
+  ujung bawah panel tidak lagi menempel ke menu terakhir saat daftar menunya
+  memenuhi panel, mis. di area Components.
+
 ## [0.6.0] - 2026-11-16
 
 ### Ditambahkan

@@ -96,7 +96,7 @@ function FlowbiteGrid({ entries, q }: { entries: [string, IconCmp][]; q: string 
         <div
           key={name}
           title={`<${name} />`}
-          className="flex aspect-square items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-primary-50 hover:text-primary-700"
+          className="flex aspect-square items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-primary-50 hover:text-primary-700 dark:text-gray-300 dark:hover:bg-primary-900 dark:hover:text-primary-300"
         >
           <Cmp className="size-5" />
         </div>
@@ -115,7 +115,7 @@ function Petak({ name, children }: { name: string; children: ReactNode }) {
   return (
     <span
       title={name}
-      className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-primary-50"
+      className="flex size-9 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 dark:hover:bg-gray-700"
     >
       {children}
     </span>
@@ -131,7 +131,7 @@ function BrandGrid({ q }: { q: string }) {
         <div
           key={name}
           title={name}
-          className="flex aspect-square items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-primary-50 hover:text-primary-700"
+          className="flex aspect-square items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-primary-50 hover:text-primary-700 dark:text-gray-300 dark:hover:bg-primary-900 dark:hover:text-primary-300"
         >
           <Cmp className="size-5" />
         </div>
@@ -166,7 +166,7 @@ export function IconsPage() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Cari ikon… (mis. arrow, user, chart)"
-            className="w-full rounded-lg border border-border bg-surface py-2.5 pr-4 pl-9 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none"
+            className="w-full rounded-lg border border-border bg-surface py-2.5 pr-4 pl-9 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-primary-800"
           />
         </div>
       </div>
@@ -227,21 +227,23 @@ export function IconsPage() {
         <article className="ds-card overflow-hidden">
           <div className="ds-scroll-x overflow-x-auto">
             <table className="w-full min-w-[34rem] text-left text-sm">
-              <thead className="border-b border-border bg-surface-subtle text-xs font-black tracking-wide text-gray-500 uppercase">
+              <thead className="border-b border-border bg-surface-subtle text-xs font-black tracking-wide text-gray-500 uppercase dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400">
                 <tr>
                   <th className="px-5 py-3">Set</th>
                   <th className="px-5 py-3">Import path</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border dark:divide-gray-700">
                 {[
                   ['Solid', '@ceplok-ui/design-kit-react/icons/solid'],
                   ['Outline', '@ceplok-ui/design-kit-react/icons/outline'],
                   ['Logo brand', '@ceplok-ui/design-kit-react'],
                 ].map(([set, path]) => (
                   <tr key={set}>
-                    <td className="px-5 py-3 font-bold text-gray-900">{set}</td>
-                    <td className="px-5 py-3"><code className="text-xs font-bold text-primary-700">{path}</code></td>
+                    <td className="px-5 py-3 font-bold text-gray-900 dark:text-white">{set}</td>
+                    <td className="px-5 py-3">
+                      <code className="text-xs font-bold text-primary-700 dark:text-primary-400">{path}</code>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -262,8 +264,9 @@ export function IconsPage() {
             code={snippets.component}
             description={<>Komponen React — ukuran diatur lewat class <C>size-*</C>.</>}
             preview={
+              // Cuplikannya tidak menulis warna, jadi di mode gelap docs ikonnya ikut teks terang.
               <Petak name="<Home />">
-                <OutlineIcons.Home className="size-6 text-gray-700" />
+                <OutlineIcons.Home className="size-6 text-gray-700 dark:text-gray-300" />
               </Petak>
             }
           />
@@ -305,7 +308,7 @@ export function IconsPage() {
             description="Logo brand dalam warna netral — ikut warna teks di sekitarnya, cocok untuk deretan tautan sosial yang tidak ingin mencolok."
             preview={
               <Petak name="<Github />">
-                <Github className="size-6 text-gray-700" />
+                <Github className="size-6 text-gray-700 dark:text-gray-300" />
               </Petak>
             }
           />

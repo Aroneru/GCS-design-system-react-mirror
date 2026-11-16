@@ -14,7 +14,7 @@ const radiusScale: [string, string][] = [
 ]
 
 const borderWidths: [string, string, string][] = [
-  ['border-0', '0px', 'outline outline-dashed outline-gray-300'],
+  ['border-0', '0px', 'outline outline-dashed outline-gray-300 dark:outline-gray-500'],
   ['border', '1px', ''], ['border-2', '2px', ''], ['border-4', '4px', ''], ['border-8', '8px', ''],
 ]
 
@@ -62,11 +62,12 @@ export function BorderPage() {
           mayoritas kebutuhan.
         </Lead>
 
+        {/* Di mode gelap docs petaknya gray-700, sama dengan petak Elevation; garisnya tetap primary-300. */}
         <article className="ds-card p-5 sm:p-7">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {borderWidths.map(([cls, value, extra]) => (
-              <div key={cls} className={`${cls} ${extra} flex aspect-6/7 flex-col items-center justify-center gap-1 rounded-lg border-primary-300 bg-white text-center`}>
-                <code className="text-sm font-bold break-all text-primary-700">.{cls}</code>
+              <div key={cls} className={`${cls} ${extra} flex aspect-6/7 flex-col items-center justify-center gap-1 rounded-lg border-primary-300 bg-white text-center dark:bg-gray-700`}>
+                <code className="text-sm font-bold break-all text-primary-700 dark:text-primary-300">.{cls}</code>
                 <code className="text-xs text-gray-400">{value}</code>
               </div>
             ))}
@@ -86,7 +87,8 @@ export function BorderPage() {
 
         <article className="ds-card p-5 sm:p-7">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            <div className="flex aspect-6/7 flex-col items-center justify-center gap-1 rounded-lg border-2 border-solid border-white bg-primary-500 text-center ring-1 ring-gray-200">
+            {/* Cincin gray-200 hanya menampakkan garis putihnya di atas kartu putih; di kartu gelap cukup gray-700. */}
+            <div className="flex aspect-6/7 flex-col items-center justify-center gap-1 rounded-lg border-2 border-solid border-white bg-primary-500 text-center ring-1 ring-gray-200 dark:ring-gray-700">
               <code className="text-sm font-bold break-all text-white">.border-solid</code>
               <code className="text-xs text-primary-100">solid</code>
             </div>

@@ -5,6 +5,7 @@ import {
   type SelectOption,
   type SelectState,
 } from '../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -12,6 +13,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -98,13 +100,18 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc)
+
 export function SelectPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [application, setApplication] = useState<SelectApplication>('default')
   const [state, setState] = useState<SelectState>('default')
   const [withInfo, setWithInfo] = useState(true)
   const [withHelper, setWithHelper] = useState(true)
   const [narrow, setNarrow] = useState(false)
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = usePlaygroundDark()
   const [value, setValue] = useState('')
 
   return (
@@ -112,7 +119,7 @@ export function SelectPage() {
       eyebrow="Form"
       title="Regular Select Form"
       description="Dropdown satu pilihan dengan label, ikon info, dan caption. Daftar pilihannya panel Dropdown yang sama dengan menu lain di kit ini, sedangkan nilainya tetap dibawa elemen <select> — jadi formulir, keyboard, dan pembaca layar bekerja apa adanya. Tersedia juga dalam tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="select-input" title="Select Input">
         <Lead>
@@ -127,6 +134,7 @@ export function SelectPage() {
               placeholder="Pilih Apapun Itu"
               options={provinsi}
               helperText="Wajib diisi."
+              darkMode={docsDark}
             />
           </Demo>
           <Demo label="Sudah dipilih">
@@ -137,6 +145,7 @@ export function SelectPage() {
               options={provinsi}
               defaultValue="jabar"
               helperText="Wajib diisi."
+              darkMode={docsDark}
             />
           </Demo>
         </div>
@@ -154,9 +163,12 @@ export function SelectPage() {
           <H>options</H>
           {'={[{ value: "dki", label: "DKI Jakarta" }]}\n'}
           {'    helperText="Wajib diisi."\n'}
+          {dm.line}
           {'/>\n\n'}
           {'{/* Tanpa prop options: pakai <option> sendiri */}\n'}
-          {'<Select label="Label" placeholder="Pilih Apapun Itu">\n'}
+          {'<Select label="Label" placeholder="Pilih Apapun Itu"'}
+          {dm.inline}
+          {'>\n'}
           {'    <option value="dki">DKI Jakarta</option>\n'}
           {'</Select>'}
         </SectionCode>
@@ -174,6 +186,7 @@ export function SelectPage() {
               info="Keterangan singkat."
               placeholder="Pilih Apapun Itu"
               options={provinsi}
+              darkMode={docsDark}
             />
           </Demo>
           <Demo label="Inactive">
@@ -183,13 +196,16 @@ export function SelectPage() {
               info="Keterangan singkat."
               placeholder="Pilih Apapun Itu"
               options={provinsi}
+              darkMode={docsDark}
             />
           </Demo>
         </div>
         <SectionCode>
           {'<Select '}
           <H>state</H>
-          {'="inactive" label="Label" placeholder="Pilih Apapun Itu" options={provinsi} />'}
+          {'="inactive" label="Label" placeholder="Pilih Apapun Itu" options={provinsi}'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -208,6 +224,7 @@ export function SelectPage() {
                 placeholder="Pilih Apapun Itu"
                 options={provinsi}
                 helperText={`text-${a.token}`}
+                darkMode={docsDark}
               />
             </Demo>
           ))}
@@ -219,6 +236,7 @@ export function SelectPage() {
           {'="purple"\n'}
           {'    label="Label"\n'}
           {'    options={provinsi}\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
@@ -231,10 +249,10 @@ export function SelectPage() {
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Lewat options">
-            <Select label="Provinsi" placeholder="Pilih provinsi" options={provinsi} />
+            <Select label="Provinsi" placeholder="Pilih provinsi" options={provinsi} darkMode={docsDark} />
           </Demo>
           <Demo label="Lewat <option> dan <optgroup>">
-            <Select label="Provinsi" placeholder="Pilih provinsi">
+            <Select label="Provinsi" placeholder="Pilih provinsi" darkMode={docsDark}>
               <optgroup label="Jawa">
                 <option value="jabar">Jawa Barat</option>
                 <option value="jateng">Jawa Tengah</option>
@@ -248,7 +266,9 @@ export function SelectPage() {
           </Demo>
         </div>
         <SectionCode>
-          {'<Select label="Provinsi" placeholder="Pilih provinsi">\n'}
+          {'<Select label="Provinsi" placeholder="Pilih provinsi"'}
+          {dm.inline}
+          {'>\n'}
           {'    '}
           <H>{'<optgroup label="Jawa">'}</H>
           {'\n'}
@@ -260,7 +280,7 @@ export function SelectPage() {
           {'    …\n'}
           {'</Select>'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Di balik panelnya tetap ada elemen <Hl>&lt;select&gt;</Hl> yang membawa nilainya, jadi{' '}
           <Hl>value</Hl>, <Hl>onChange</Hl>, <Hl>name</Hl>, <Hl>ref</Hl>, dan pengiriman formulir bekerja seperti
           pada <Hl>&lt;select&gt;</Hl> biasa. <Hl>&lt;option&gt;</Hl> yang Anda tulis sendiri dibaca komponen
@@ -281,10 +301,11 @@ export function SelectPage() {
               placeholder="Pilih provinsi"
               options={semuaProvinsi}
               helperText="Buka, lalu ketik nama provinsinya."
+              darkMode={docsDark}
             />
           </Demo>
-          <div className="space-y-3 text-body-sm text-gray-600">
-            <p className="font-bold text-gray-900">Coba ketik:</p>
+          <div className="space-y-3 text-body-sm text-gray-600 dark:text-gray-300">
+            <p className="font-bold text-gray-900 dark:text-white">Coba ketik:</p>
             <ul className="space-y-2">
               <li>
                 <Hl>jawa t</Hl> → Jawa Tengah. Ketikan dengan jeda di bawah satu detik digabung jadi satu
@@ -311,20 +332,26 @@ export function SelectPage() {
           {']\n\n'}
           {'<Select label="Provinsi" placeholder="Pilih provinsi" '}
           <H>options</H>
-          {'={provinsi} />'}
+          {'={provinsi}'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> mengganti field ke gray-700 dengan label terang. Pada state default garisnya
-          menyatu dengan latar dan baru terlihat saat difokus (warna aplikasi); pada <Hl>inactive</Hl> garisnya
-          gray-300, dengan teks dan panah gray-500. Panel daftar pilihannya untuk saat ini tetap terang.
-        </Lead>
+      <ModeSection
+        name="Select"
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengganti field ke gray-700 dengan label terang. Pada state default garisnya
+            menyatu dengan latar dan baru terlihat saat difokus (warna aplikasi); pada <Hl>inactive</Hl> garisnya
+            gray-300, dengan teks dan panah gray-500. Panel daftar pilihannya untuk saat ini tetap terang.
+          </>
+        }
+      >
         <div className="grid gap-5 sm:grid-cols-2">
-          <Demo label="Default" dark>
+          <Demo label="Default" dark={!docsDark} light={docsDark}>
             <Select
-              darkMode
+              darkMode={!docsDark}
               label="Label"
               info="Keterangan singkat."
               placeholder="Pilih Apapun Itu"
@@ -332,9 +359,9 @@ export function SelectPage() {
               helperText="Wajib diisi."
             />
           </Demo>
-          <Demo label="Inactive" dark>
+          <Demo label="Inactive" dark={!docsDark} light={docsDark}>
             <Select
-              darkMode
+              darkMode={!docsDark}
               state="inactive"
               label="Label"
               info="Keterangan singkat."
@@ -343,9 +370,9 @@ export function SelectPage() {
               helperText="Wajib diisi."
             />
           </Demo>
-          <Demo label="Sudah dipilih" dark>
+          <Demo label="Sudah dipilih" dark={!docsDark} light={docsDark}>
             <Select
-              darkMode
+              darkMode={!docsDark}
               label="Label"
               info="Keterangan singkat."
               placeholder="Pilih Apapun Itu"
@@ -354,9 +381,9 @@ export function SelectPage() {
               helperText="Wajib diisi."
             />
           </Demo>
-          <Demo label="Purple" dark>
+          <Demo label="Purple" dark={!docsDark} light={docsDark}>
             <Select
-              darkMode
+              darkMode={!docsDark}
               application="purple"
               label="Label"
               info="Keterangan singkat."
@@ -368,15 +395,19 @@ export function SelectPage() {
         </div>
         <SectionCode>
           {'<Select\n'}
-          {'    '}
-          <H>darkMode</H>
-          {'\n'}
+          {!docsDark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
+            </>
+          )}
           {'    label="Label"\n'}
           {'    placeholder="Pilih Apapun Itu"\n'}
           {'    options={provinsi}\n'}
           {'/>'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -465,7 +496,7 @@ export function SelectPage() {
           </Control>
         </Controls>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Kontrol <em>Lebar wadah</em> tidak mengubah prop apa pun — varian Mobile hanya menyempitkan
           wadahnya (340px, dari 348px), sedangkan tinggi, jarak, dan ukuran teksnya sama persis. Karena itu
           Select tidak punya prop <Hl>platform</Hl>.

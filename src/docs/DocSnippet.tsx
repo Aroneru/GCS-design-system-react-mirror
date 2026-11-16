@@ -48,15 +48,15 @@ export function DocSnippet({
 
         {/* Contoh hasil render, di samping kode */}
         {preview && (
-          <div className="grid shrink-0 place-items-center border-t border-border bg-surface-subtle px-6 py-5 sm:w-32 sm:border-t-0 sm:border-l">
+          <div className="grid shrink-0 place-items-center border-t border-border bg-surface-subtle px-6 py-5 sm:w-32 sm:border-t-0 sm:border-l dark:border-gray-700 dark:bg-gray-900">
             {preview}
           </div>
         )}
       </div>
 
       {description && (
-        <div className="border-t border-border px-4 py-3">
-          <p className="text-xs leading-5 text-gray-500">{description}</p>
+        <div className="border-t border-border px-4 py-3 dark:border-gray-700">
+          <p className="text-xs leading-5 text-gray-500 dark:text-gray-400">{description}</p>
         </div>
       )}
     </article>
