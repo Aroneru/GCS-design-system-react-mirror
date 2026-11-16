@@ -29,7 +29,7 @@ import {
   DropdownDismissalContext,
   type DropdownDismissalScopeValue,
 } from './dropdown/DropdownDismissalContext'
-import { Sidebar, type SidebarItem } from './sidebar/Sidebar'
+import { Sidebar, type SidebarItem, type SidebarUser } from './sidebar/Sidebar'
 import { BarsFromLeft } from '../icons/outline'
 
 export type NavbarPlatform = 'front-office' | 'back-office'
@@ -147,11 +147,14 @@ export type NavbarFrontOfficeProps = NavbarBaseProps &
 
 export interface NavbarBackOfficeProps extends NavbarBaseProps {
   platform: 'back-office'
-  account?: NavbarAccount
+  /** Identitas dan aksi akun BO dimiliki Sidebar, bukan Navbar. */
+  account?: never
   /** Konfigurasi trigger notifikasi, independen dari account karena identitas BO dapat berada di Sidebar. */
   notificationTrigger?: NavbarNotificationTrigger
   /** Sumber navigasi Sidebar aplikasi yang digunakan Navbar pada komposisi mobile. */
   sidebarItems?: SidebarItem[]
+  /** Identitas dan aksi akun Sidebar BO yang digunakan kembali pada komposisi mobile. */
+  sidebarUser?: SidebarUser
   /** Daftar isi halaman yang ditambahkan sebagai disclosure terakhir di Drawer Navbar mobile. */
   tableOfContents?: NavbarTableOfContents
   guestActions?: never
@@ -1584,9 +1587,11 @@ export function Navbar(props: NavbarProps) {
     guestActions,
     notificationTrigger,
     sidebarItems,
+    sidebarUser,
     tableOfContents,
     ...headerProps
   } = props
+  const navbarAccount = platform === 'front-office' ? account : undefined
   const dialogId = useId()
   const internalDrawerId = useId()
   const [desktopRow, setDesktopRow] = useState<HTMLDivElement | null>(null)
@@ -1634,7 +1639,7 @@ export function Navbar(props: NavbarProps) {
     [],
   )
   const mobileNavigationItems = platform === 'back-office' ? (sidebarItems ?? []) : items
-  const hasMobileNavigation = mobileNavigationItems.length > 0 || Boolean(account) || Boolean(guestActions)
+  const hasMobileNavigation = mobileNavigationItems.length > 0 || Boolean(navbarAccount) || Boolean(guestActions)
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -1730,13 +1735,13 @@ export function Navbar(props: NavbarProps) {
           platform={platform}
           compositionKey={[
             search ? 'search' : 'no-search',
-            account ? 'account' : platform === 'front-office' && guestActions ? 'guest' : 'no-identity',
+            navbarAccount ? 'account' : platform === 'front-office' && guestActions ? 'guest' : 'no-identity',
             notificationTrigger ? 'notification' : 'no-notification',
           ].join('|')}
         />
         <DesktopIdentity
           platform={platform}
-          account={account}
+          account={navbarAccount}
           guestActions={guestActions}
           notificationTrigger={notificationTrigger}
         />
@@ -1751,11 +1756,11 @@ export function Navbar(props: NavbarProps) {
               <Brand brand={brand} />
               <div className="ml-auto flex items-center gap-3">
                 {notificationTrigger && <NotificationTrigger {...notificationTrigger} />}
-                {account && (
+                {navbarAccount && (
                   <Avatar
-                    src={account.avatarSrc}
-                    alt={account.name}
-                    initials={account.initials}
+                    src={navbarAccount.avatarSrc}
+                    alt={navbarAccount.name}
+                    initials={navbarAccount.initials}
                     size="small"
                   />
                 )}
@@ -1779,7 +1784,7 @@ export function Navbar(props: NavbarProps) {
         ) : (
           <div
             className={cn(
-              'grid min-h-10 grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-x-3 gap-y-3 min-[576px]:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto_auto]',
+              'grid min-h-10 grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-3 min-[576px]:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto]',
               search && 'grid-rows-[minmax(40px,auto)_auto] min-[576px]:grid-rows-none',
             )}
           >
@@ -1800,23 +1805,8 @@ export function Navbar(props: NavbarProps) {
               <Brand brand={brand} />
             </div>
             {search && (
-              <div className="col-span-5 row-start-2 min-w-0 min-[576px]:col-span-1 min-[576px]:col-start-3 min-[576px]:row-start-1">
+              <div className="col-span-4 row-start-2 min-w-0 min-[576px]:col-span-1 min-[576px]:col-start-3 min-[576px]:row-start-1">
                 {search}
-              </div>
-            )}
-            {account && (
-              <div className={cn(
-                'row-start-1',
-                notificationTrigger
-                  ? 'col-start-4 min-[576px]:col-start-5'
-                  : 'col-start-3 min-[576px]:col-start-4',
-              )}>
-                <Avatar
-                  src={account.avatarSrc}
-                  alt={account.name}
-                  initials={account.initials}
-                  size="small"
-                />
               </div>
             )}
             {notificationTrigger && (
@@ -1827,9 +1817,7 @@ export function Navbar(props: NavbarProps) {
             {hasMobileDrawerContent && (
               <div className={cn(
                 'row-start-1',
-                account && notificationTrigger
-                  ? 'col-start-5 min-[576px]:col-start-6'
-                  : account || notificationTrigger
+                notificationTrigger
                     ? 'col-start-4 min-[576px]:col-start-5'
                     : 'col-start-3 min-[576px]:col-start-4',
               )}>
@@ -1876,10 +1864,11 @@ export function Navbar(props: NavbarProps) {
             className="h-full !min-h-0 shadow-soft"
             logo={<Brand brand={brand} />}
             items={mobileItems}
+            user={platform === 'back-office' ? sidebarUser : undefined}
             footer={
               <MobileIdentity
                 platform={platform}
-                account={account}
+                account={navbarAccount}
                 guestActions={guestActions}
                 close={() => closeMobileNavigation()}
               />

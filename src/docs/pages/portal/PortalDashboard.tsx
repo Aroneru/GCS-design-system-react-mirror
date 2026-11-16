@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode, type SyntheticEvent } from 'react'
+import { useEffect, useState, type MouseEvent, type ReactNode } from 'react'
 import {
   Alert,
   Badge,
@@ -6,17 +6,17 @@ import {
   Card,
   Icon,
   ListView,
+  Navbar,
   Search,
   Select,
   Sidebar,
   Toast,
   cn,
   type SidebarItem,
+  type NavbarPrimaryItem,
 } from '../../../lib'
 import {
   ArrowRightToBracket,
-  Bars,
-  Bell,
   BookOpen,
   Bullhorn,
   CalendarMonth,
@@ -89,6 +89,9 @@ const MENU = [
   { id: 'berita', label: 'Berita', Ikon: Newspaper },
   { id: 'event', label: 'Event', Ikon: CalendarMonth },
 ]
+
+const MENU_SIDEBAR = MENU.filter(({ id }) => id === 'dashboard' || id === 'kms')
+const MENU_NAVBAR = MENU.filter(({ id }) => id !== 'dashboard' && id !== 'kms')
 
 const KATEGORI = MENU.filter(({ id }) => id !== 'dashboard').map(({ id, label }) => ({
   value: id,
@@ -336,7 +339,6 @@ export function PortalDashboard({
   onDarkModeChange?: (darkMode: boolean) => void
 } = {}) {
   const [ringkas, setRingkas] = useState(false)
-  const [menuSeluler, setMenuSeluler] = useState(false)
   // Pesan demo tampil sebagai Toast di kanan atas lalu hilang sendiri. Teksnya
   // disimpan terpisah dari `tampil` supaya tidak lenyap sebelum Toast selesai
   // memudar, dan `kali` membuat pesan yang sama pun memulai ulang hitungannya.
@@ -344,8 +346,6 @@ export function PortalDashboard({
   const [kata, setKata] = useState('')
   const [kategori, setKategori] = useState('')
   const [sumber, setSumber] = useState('monsakti')
-  const idMenuSeluler = useId()
-  const sidebarSelulerRef = useRef<HTMLDialogElement>(null)
   const anggaran = ANGGARAN[sumber]
 
   useEffect(() => {
@@ -354,20 +354,12 @@ export function PortalDashboard({
     return () => window.clearTimeout(tutup)
   }, [umpan.kali, umpan.tampil])
 
-  useEffect(() => {
-    const dialog = sidebarSelulerRef.current
-    if (!dialog) return
-    if (menuSeluler && !dialog.open) dialog.showModal()
-    if (!menuSeluler && dialog.open) dialog.close()
-  }, [menuSeluler])
-
   const kabari = (teks: string) => setUmpan((u) => ({ teks, tampil: true, kali: u.kali + 1 }))
 
   // Hanya Dashboard yang dirancang; menu lain memberi tahu lewat Toast alih-alih
   // membuka halaman kosong.
   const menuDemo = (label: string) => (e: MouseEvent<HTMLElement>) => {
     e.preventDefault()
-    setMenuSeluler(false)
     kabari(`Halaman ${label} belum ada di contoh ini.`)
   }
 
@@ -378,13 +370,13 @@ export function PortalDashboard({
   }
 
   const menuSidebar: SidebarItem[] = [
-    ...MENU.map(({ id, label, Ikon }) => ({
+    ...MENU_SIDEBAR.map(({ id, label, Ikon }) => ({
       id,
       label,
       href: '#/portal-dashboard/app',
       icon: <Ikon className="size-5" />,
       active: id === 'dashboard',
-      onClick: id === 'dashboard' ? () => setMenuSeluler(false) : menuDemo(label),
+      onClick: id === 'dashboard' ? undefined : menuDemo(label),
     })),
     {
       id: 'keluar',
@@ -392,9 +384,17 @@ export function PortalDashboard({
       href: '#/portal-dashboard',
       // Sidebar belum punya tone danger untuk item menu; ikonnya saja yang merah.
       icon: <ArrowRightToBracket className="size-5 text-red-600" />,
-      onClick: () => setMenuSeluler(false),
     },
   ]
+
+  const navbarItems: NavbarPrimaryItem[] = MENU_NAVBAR.map(({ id, label, Ikon }) => ({
+    id,
+    type: 'destination',
+    label,
+    href: '#/portal-dashboard/app',
+    icon: <Ikon className="size-5" />,
+    onClick: menuDemo(label),
+  }))
 
   const sidebarLogo = <img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="h-8 w-auto" />
   const sidebarCollapsedLogo = <img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="size-8" />
@@ -403,6 +403,7 @@ export function PortalDashboard({
     profileLabel: 'Lihat Profile',
     avatarSrc: asset('/images/avatar-sample.svg'),
     onClick: () => kabari('Halaman profil belum ada di contoh ini.'),
+    items: [{ id: 'logout', label: 'Keluar', tone: 'danger' as const, href: '#/portal-dashboard' }],
   }
 
   return (

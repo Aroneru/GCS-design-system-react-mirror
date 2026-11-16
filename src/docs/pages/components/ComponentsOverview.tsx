@@ -98,7 +98,7 @@ export function ComponentsOverview() {
         desc="Lingkaran identitas berisi foto profil, atau inisial namanya bila fotonya tidak ada."
       >
         <div className="flex items-center justify-center gap-4 rounded-xl bg-surface-subtle p-5">
-          <Avatar src={asset("/images/avatar-sample.svg")} alt="" size="large" />
+          <Avatar src={asset("/images/avatar-sample.svg")} name="Putri Handayani" alt="" size="large" />
           <Avatar initials="PH" />
           <Avatar initials="PH" size="small" />
         </div>
