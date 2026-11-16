@@ -119,9 +119,9 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | ------------ | -------------------------------------------------------------------------------------------------------------------- |
 | `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| submit \| reset`, `iconOnly`, `as`: `button \| anchor`, `darkMode` |
 | `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
-| `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| profile`, `gender`: `male \| female`, `size`: `small \| default \| large`, `darkMode` (deprecated) |
+| `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| female \| male`, `size`: `small \| default \| large`, `darkMode` (deprecated) |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
-| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label`, `helperText`, `platform`, `disabled`, `onCopySuccess`, `onCopyError`, `darkMode` (deprecated) |
+| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label` / `aria-label` / `aria-labelledby` (salah satu wajib), `helperText`, `platform`, `disabled`, `onCopySuccess`, `onCopyError`, `darkMode` (deprecated) |
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Toast`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Card`       | `image`, `title`, `description`, `href`, `linkLabel`, `actions`, `darkMode`                                          |
@@ -134,7 +134,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `afterItems`, `theme`, `darkMode`   |
 | `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
-| `Navbar`     | `platform`, `brand`, `items`, `sidebarItems`/`tableOfContents` (BO), `search`, `guestActions` (FO), `account`, `notificationTrigger` (FO authenticated / BO), `mobileNavigationOpen`, `onMobileNavigationOpenChange` |
+| `Navbar`     | `platform`, `brand`, `items`, `sidebarItems`/`sidebarUser`/`tableOfContents` (BO), `search`, `guestActions`/`account` (FO), `notificationTrigger`, `mobileNavigationOpen`, `onMobileNavigationOpenChange` |
 | `Hero`       | `type`, `centeredContent`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`    |
 | `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user` (profil + menu dropdown), `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
@@ -152,22 +152,23 @@ Button dirender sebagai `<a>`.
 
 #### Avatar
 
-Avatar memprioritaskan foto dari `src`. Bila foto tidak ada atau gagal dimuat,
-fallback bawaannya adalah `initials` manual, lalu inisial Unicode-aware dari
-`name`, ilustrasi `gender`, dan akhirnya ikon User netral. `initials` tetap
-tersedia untuk override:
+Avatar memprioritaskan foto dari `src`. Foto mempertahankan rasio melalui
+`object-cover`; bagian yang melebihi lingkaran dipotong dari tengah. Bila foto
+tidak ada atau gagal dimuat, `fallback` menentukan representasinya. Nilai
+bawaan `initials` memakai `initials` manual lalu inisial Unicode-aware dari
+`name`. Karena tidak ada varian netral, salah satunya wajib tersedia:
 
 ```tsx
 <Avatar src={user.avatarUrl} name={user.name} />
 <Avatar name="Putri Handayani" initials="PT" />
 ```
 
-Untuk langsung memakai ilustrasi profile, pilih gender secara eksplisit — kami
-menyediakan asset Male/Female untuk tema terang dan gelap:
+Untuk langsung memakai ilustrasi profile, pilih fallback secara eksplisit —
+tersedia asset Female/Male untuk tema terang dan gelap:
 
 ```tsx
-<Avatar gender="female" fallback="profile" />
-<Avatar gender="male" fallback="profile" />
+<Avatar name="Putri Handayani" fallback="female" />
+<Avatar name="Rafli Arandhana" fallback="male" />
 ```
 
 Avatar mengikuti `data-theme` dari pembungkusnya, termasuk scope bertingkat.
@@ -654,6 +655,7 @@ import {
   Sidebar,
   type NavbarPrimaryItem,
   type SidebarItem,
+  type SidebarUser,
   type TableOfContentsItem,
 } from '@ceplok-ui/design-kit-react'
 
@@ -679,6 +681,12 @@ const sidebarItems = [
   { id: 'pengajuan', label: 'Pengajuan', href: '/pengajuan' },
 ] satisfies SidebarItem[]
 
+const sidebarUser = {
+  name: 'Admin CEPLOK',
+  profileLabel: 'Administrator',
+  items: [{ id: 'logout', label: 'Keluar', tone: 'danger', onClick: logout }],
+} satisfies SidebarUser
+
 const tableOfContentsItems = [
   { id: 'summary', label: 'Ringkasan', href: '/reports#summary' },
   { id: 'details', label: 'Rincian', href: '/reports#details' },
@@ -700,7 +708,7 @@ export function BackOfficeNavbar() {
   return (
     <div className="flex">
       <div className="hidden lg:block">
-        <Sidebar items={sidebarItems} />
+        <Sidebar items={sidebarItems} user={sidebarUser} />
       </div>
       <div className="min-w-0 flex-1">
         <Navbar
@@ -708,6 +716,7 @@ export function BackOfficeNavbar() {
           brand={brand}
           items={items}
           sidebarItems={sidebarItems}
+          sidebarUser={sidebarUser}
           tableOfContents={{ label: 'Daftar isi', items: tableOfContentsItems }}
           notificationTrigger={notificationTrigger}
           search={
@@ -731,8 +740,9 @@ viewport mobile. Navbar memiliki trigger, state, lifecycle, dan isi Drawer
 navigasi tersebut. Drawer kontekstual atau custom tetap dirender consumer
 secara terpisah memakai komponen `<Drawer>`, bukan dimasukkan ke Navbar.
 
-`sidebarItems` adalah sumber Sidebar aplikasi: consumer merender `<Sidebar>`
-pada desktop, sedangkan Navbar memakai data yang sama di dialog Sidebar mobile.
+`sidebarItems` dan `sidebarUser` adalah sumber Sidebar aplikasi: consumer
+merender `<Sidebar>` pada desktop, sedangkan Navbar memakai data dan identitas
+yang sama di dialog Sidebar mobile. Account BO tidak dirender pada baris Navbar.
 
 `tableOfContents` khusus BO menambahkan disclosure terakhir di Drawer Navbar
 mobile. Disclosure tertutup secara default dan merender komponen
@@ -778,7 +788,7 @@ export function ReportsPage() {
 | --- | --- |
 | Front Office guest | `guestActions` untuk tautan Masuk dan Daftar; tanpa `account` atau `notificationTrigger`. |
 | Front Office authenticated | `account` dan opsional `notificationTrigger`; tanpa `guestActions`. |
-| Back Office | `items` untuk Navbar desktop/Drawer navigasi mobile, `sidebarItems` untuk Sidebar aplikasi desktop/mobile, opsional `tableOfContents` sebagai disclosure terakhir Drawer, serta opsional `account` dan `notificationTrigger` yang independen; tanpa `guestActions`. |
+| Back Office | `items` untuk Navbar desktop/Drawer navigasi mobile, `sidebarItems` dan `sidebarUser` untuk Sidebar aplikasi desktop/mobile, opsional `tableOfContents`, serta `notificationTrigger` yang independen; tanpa `account` atau `guestActions`. |
 
 `brand` wajib pada kedua platform. Isi visualnya tetap dimiliki consumer
 melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
@@ -786,12 +796,11 @@ melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
 - `search` menerima `ReactNode`. Gunakan `Search` dengan `platform="compact"`
   dan `trigger="enter"`. FO umumnya memakai `showButton={false}`; Search BO
   berkategori memakai `showButton` agar tombol ikon pada ruas kanan tersedia.
-- Pada BO, gunakan `Search.categories` dan turunkan kategori dari
-  `sidebarItems`. Consumer boleh memetakan `label`, `value`, `disabled`, atau
-  menyaring item sesuai domain pencarian, tetapi jangan memelihara array
-  kategori navigasi kedua yang terpisah.
-- `account` berisi identitas pengguna dan daftar destination atau action pada
-  menu akun.
+- Pada BO, `Search.categories` boleh diturunkan dari `sidebarItems` ketika
+  domain pencarian sama. Jika domainnya berbeda, consumer boleh memberikan
+  kategori custom dari satu sumber data pencarian yang terpisah.
+- `account` hanya untuk FO authenticated. Identitas dan aksi akun BO berada
+  pada `Sidebar.user`, lalu diteruskan sebagai `sidebarUser` untuk mobile.
 - `sidebarItems` hanya berlaku pada BO. Navbar tidak merender Sidebar desktop;
   consumer merender komponen tersebut di layout aplikasi dan memberikan data
   yang sama kepada Navbar untuk komposisi mobile.
@@ -800,8 +809,8 @@ melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
   label, tujuan anchor, styling, dan status aktif tetap konsisten.
 - `notificationTrigger` mengonfigurasi tombol Bell bawaan Navbar. Consumer
   mengatur aksi, state panel, badge, dan atribut ARIA; pada FO hanya berlaku
-  untuk authenticated bersama `account`, sedangkan pada BO dapat digunakan
-  dengan atau tanpa `account` karena identitas dapat berada di Sidebar.
+  untuk authenticated bersama `account`, sedangkan pada BO biasanya diberikan
+  berdasarkan sesi yang sama dengan `Sidebar.user`.
 - Drawer navigasi BO tidak memerlukan prop tersendiri: trigger dan isinya muncul
   otomatis pada mobile saat `items` tidak kosong.
 

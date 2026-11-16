@@ -31,10 +31,34 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ### Diubah
 
+- **`Clipboard`: runtime callback dan feedback.** Hasil Clipboard API kini
+  terpisah dari callback consumer: error sinkron maupun Promise rejection dari
+  `onCopySuccess`/`onCopyError` diabaikan, tidak mengubah feedback operasi, dan
+  tidak menghasilkan unhandled rejection. Reset feedback tidak lagi memanggil
+  state setter saat render; hasil write lama tetap ditolak saat `value` berubah
+  atau Clipboard dinonaktifkan.
+- **`Clipboard`: kontrak nama aksesibel.** Consumer kini wajib memberi salah
+  satu `label`, `aria-label`, atau `aria-labelledby`; tidak ada fallback nama
+  dari `value`. Ini perubahan tipe yang dapat memerlukan penambahan nama pada
+  pemakaian lama tanpa label.
+- **Dokumentasi dan test runtime `Clipboard`.** Playground, Penggunaan, dan
+  Properties menjelaskan kontrak nama aksesibel serta isolasi error callback;
+  harness runtime mencakup lifecycle copy, feedback, disabled, tema ambient,
+  dan preset platform.
+
+- **Fallback Avatar disederhanakan.** Prop `gender` dan nilai ambigu
+  `fallback="profile"` dihapus. Satu prop `fallback="initials" | "female" |
+  "male"` kini memilih representasi ketika foto kosong atau gagal dimuat.
+  `initials` menjadi bawaan dan secara tipe memerlukan `name` atau `initials`;
+  tidak ada fallback netral. Foto tetap memakai `object-cover` dengan crop
+  tengah. Perubahan ini memutus consumer API Avatar V2 sebelumnya.
+
 - **Sumber navigasi Back Office dipisahkan.** `items` mengisi navigasi Navbar
   desktop dan otomatis menjadi isi Drawer navigasi mobile milik Navbar.
   Prop BO baru `sidebarItems` membawa data Sidebar aplikasi ke dialog Sidebar
-  mobile; Sidebar desktop tetap dirender dan dimiliki layout consumer. Kontrak
+  mobile, sedangkan `sidebarUser` membawa identitas dan aksi akun Sidebar yang
+  sama. Sidebar desktop tetap dirender dan dimiliki layout consumer. `account`
+  kini khusus Front Office; Back Office menempatkan akun hanya di Sidebar. Kontrak
   lama `mobileDrawer` dihapus karena trigger, state, lifecycle, dan isi Drawer
   navigasi sekarang sepenuhnya dimiliki Navbar. Drawer custom tetap digunakan
   consumer sebagai komponen terpisah.
@@ -53,16 +77,23 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   di sisi kanan terpotong.
 - **Notification Back Office independen dari Account.** `notificationTrigger`
   kini menerima `NavbarNotificationTrigger`, bukan `ReactNode`, dan tersedia
-  pada BO dengan atau tanpa `account`. Navbar merender ikon Bell 24px berwarna
+  pada BO tanpa bergantung pada identitas Sidebar. Navbar merender ikon Bell 24px berwarna
   gray-800 pada light dan gray-400 pada dark; consumer tetap mengatur aksi,
   state panel, badge, dan atribut tombolnya.
-- **Portal Dashboard memakai Sidebar yang sama di semua viewport.** Navigasi
-  mobile tidak lagi dikonversi menjadi Drawer. Sidebar yang sama ditampilkan
-  sebagai panel modal dari kiri, sehingga logo, akun, dan menu tetap konsisten
-  dengan desktop. Item wiki memakai aksi pada seluruh baris tanpa tombol dan
+- **Portal Dashboard memakai kontrak Navbar Back Office.** Menu aplikasi dan
+  identitas akun berasal dari Sidebar yang sama pada desktop/mobile, sedangkan
+  navigasi global berada di Navbar desktop dan Drawer mobile. Header dan dialog
+  mobile buatan contoh dihapus; Search kategori serta notifikasi memakai slot
+  Navbar. Item wiki tetap memakai aksi pada seluruh baris tanpa tombol dan
   tanpa feedback hover/active.
 
 ### Diperbaiki
+
+- **`Avatar`: retry foto gagal.** State error dibuat baru setiap `src` berubah,
+  sehingga URL yang pernah gagal tetap dicoba lagi saat dipakai kembali.
+- **Dokumentasi `Avatar`.** Demo, Playground, dan generated snippet kini sama
+  dalam penggunaan initials override `UI`, fallback valid saat nama kosong, dan
+  pola aksesibilitas Avatar dekoratif beserta teks nama pendampingnya.
 
 - **Lebar `ListViewItem` interaktif.** Item `simple` yang aksinya dialihkan ke
   elemen button kini tetap memenuhi lebar `ListView` dan mempertahankan teks
@@ -150,16 +181,14 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   tambahan dimuat.
 
 - **`Avatar` V2.** Prop `name` menambahkan nama aksesibel sekaligus menghasilkan
-  inisial Unicode-aware; `initials` tetap menjadi override manual. Fallback
-  dapat dipilih lewat `fallback="initials" | "profile"`: foto yang tersedia
-  selalu diprioritaskan, lalu inisial manual, inisial nama, ilustrasi gender,
-  dan ikon User netral. `gender="female" | "male"` dipilih eksplisit, tidak
-  pernah diturunkan dari nama; `fallback="profile"` memilih ilustrasi tersebut
-  meski `name` tersedia. Empat SVG Male/Female Light/Dark ikut dibundle sebagai
+  inisial Unicode-aware; `initials` tetap menjadi override manual. Foto yang
+  tersedia selalu diprioritaskan. `fallback="female" | "male"` dipilih
+  eksplisit untuk ilustrasi profil dan tidak pernah diturunkan dari nama;
+  `fallback="initials"` memakai inisial manual atau nama. Empat SVG Male/Female Light/Dark ikut dibundle sebagai
   asset package-local. Avatar kini mengikuti scope ambient `data-theme`,
   termasuk nested scope; `darkMode` tetap didukung sebagai prop deprecated.
   `alt` mengatur nama aksesibel (`alt=""` menjadikan Avatar dekoratif), dan
-  foto gagal kembali ke fallback yang sama. Ukuran API tetap `small`, `default`,
+  foto gagal kembali ke representasi yang sesuai. Ukuran API tetap `small`, `default`,
   dan `large` (S/M/L: 24/32/80px, dengan M sebagai bawaan).
 
 - **`ListView`** — daftar item dengan dua varian: `simple` untuk informasi

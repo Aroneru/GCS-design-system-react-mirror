@@ -24,7 +24,6 @@ interface ClipboardCommonProps {
   platform?: ClipboardPlatform
   /** @deprecated Gunakan scope ambient `data-theme="dark"`. */
   darkMode?: boolean
-  label?: ReactNode
   helperText?: ReactNode
   disabled?: boolean
   className?: string
@@ -36,7 +35,25 @@ interface ClipboardCommonProps {
   'aria-describedby'?: string
 }
 
-export type ClipboardProps = ClipboardCommonProps & (
+type ClipboardAccessibleNameProps =
+  | {
+      /** Label terlihat yang juga memberi nama aksesibel input. */
+      label: ReactNode
+      'aria-label'?: string
+      'aria-labelledby'?: string
+    }
+  | {
+      label?: ReactNode
+      'aria-label': string
+      'aria-labelledby'?: string
+    }
+  | {
+      label?: ReactNode
+      'aria-label'?: string
+      'aria-labelledby': string
+    }
+
+export type ClipboardProps = ClipboardCommonProps & ClipboardAccessibleNameProps & (
   | { variant?: 'default'; prefix?: never }
   | { variant: 'segmented'; prefix?: ReactNode }
 )
@@ -87,6 +104,33 @@ const FAILURE = 'Could not copy. Select the text and copy it manually.'
 const actionClasses = 'inline-flex shrink-0 items-center justify-center bg-primary-700 font-medium text-white transition-colors enabled:hover:bg-primary-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:opacity-50'
 const useClientLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
+/** ReactNode yang tidak menghasilkan konten terlihat tidak membentuk bagian UI opsional. */
+function hasContent(content: ReactNode | undefined): boolean {
+  if (content === null || content === undefined || content === false) return false
+  return typeof content !== 'string' || content.trim().length > 0
+}
+
+function hasAccessibleName(label: ReactNode | undefined, ariaLabel: string | undefined, labelledBy: string | undefined) {
+  return hasContent(label) || Boolean(ariaLabel?.trim()) || Boolean(labelledBy?.trim())
+}
+
+/**
+ * Callback consumer adalah notifikasi saja: kegagalan sinkron maupun Promise
+ * rejection sengaja diabaikan agar hasil Clipboard dan event handler React
+ * tidak berubah atau menghasilkan unhandled rejection.
+ */
+function notifyConsumer(callback: (() => unknown) | undefined) {
+  if (!callback) return
+  try {
+    const result = callback()
+    if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
+      void Promise.resolve(result).catch(() => undefined)
+    }
+  } catch {
+    // Callback tidak boleh mengubah status operasi Clipboard.
+  }
+}
+
 /** Nilai hanya-baca dengan aksi salin; prefix hanya untuk tampilan. */
 export const Clipboard = forwardRef<HTMLInputElement, ClipboardProps>(function Clipboard(
   { value, variant = 'default', platform = 'default', darkMode = false, prefix, label, helperText, disabled = false, className,
@@ -105,7 +149,9 @@ export const Clipboard = forwardRef<HTMLInputElement, ClipboardProps>(function C
   const inputRef = useRef<HTMLInputElement | null>(null)
   const writing = useRef(false)
   const disabledRef = useRef(disabled)
+  const latestValueRef = useRef(value)
   disabledRef.current = disabled
+  latestValueRef.current = value
   const generation = useRef(0)
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
@@ -115,14 +161,16 @@ export const Clipboard = forwardRef<HTMLInputElement, ClipboardProps>(function C
     else if (ref) ref.current = node
   }, [ref])
 
-  // Reset feedback synchronously when `value` changes or copying is disabled,
-  // so stale copy status is never rendered for an unavailable action.
-  if (feedback.value !== value || (disabled && feedback.message)) {
-    setFeedback({ value, message: '' })
+  if (!hasAccessibleName(label, ariaLabel, labelledBy)) {
+    throw new Error('[Clipboard] Provide a non-empty label, aria-label, or aria-labelledby.')
   }
 
   useClientLayoutEffect(() => {
     const current = ++generation.current
+    clearTimeout(timer.current)
+    setFeedback((previous) =>
+      previous.value === value && !previous.message ? previous : { value, message: '' },
+    )
     return () => {
       if (generation.current === current) generation.current++
       clearTimeout(timer.current)
@@ -150,13 +198,14 @@ export const Clipboard = forwardRef<HTMLInputElement, ClipboardProps>(function C
     clearTimeout(timer.current)
     setFeedback({ value, message: '' })
     const requestGeneration = generation.current
+    const copiedValue = value
     let failed = false
     let failure: unknown
     try {
       if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
         throw new Error('Clipboard API is unavailable.')
       }
-      await navigator.clipboard.writeText(value)
+      await navigator.clipboard.writeText(copiedValue)
     } catch (error) {
       failed = true
       failure = error
@@ -164,22 +213,30 @@ export const Clipboard = forwardRef<HTMLInputElement, ClipboardProps>(function C
       writing.current = false
       if (mounted.current) setPending(false)
     }
-    if (!mounted.current || disabledRef.current || generation.current !== requestGeneration) return
+    if (
+      !mounted.current ||
+      disabledRef.current ||
+      latestValueRef.current !== copiedValue ||
+      generation.current !== requestGeneration
+    ) return
     if (!failed) setTooltipDismissed(true)
     setFeedback({ value, message: failed ? FAILURE : SUCCESS })
     if (!failed) {
       timer.current = setTimeout(() => setFeedback({ value, message: '' }), FEEDBACK_DURATION)
     }
-    // Consumer callback errors are not clipboard failures.
-    if (failed) onCopyError?.(failure)
-    else onCopySuccess?.(value)
+    if (failed) notifyConsumer(() => onCopyError?.(failure))
+    else notifyConsumer(() => onCopySuccess?.(copiedValue))
+  }
+
+  function requestCopy() {
+    void copy().catch(() => undefined)
   }
 
   const segmented = variant === 'segmented'
   const size = platforms[platform]
-  const hasPrefix = segmented && prefix != null && prefix !== false
-  const hasLabel = label != null && label !== false
-  const hasHelper = helperText != null && helperText !== false
+  const hasPrefix = segmented && hasContent(prefix)
+  const hasLabel = hasContent(label)
+  const hasHelper = hasContent(helperText)
   const message = !disabled && feedback.value === value ? feedback.message : ''
   const tooltip = (hovered || focusVisible) && !tooltipDismissed && message !== SUCCESS && !disabled && segmented
 
@@ -248,7 +305,7 @@ export const Clipboard = forwardRef<HTMLInputElement, ClipboardProps>(function C
               disabled={disabled}
               aria-disabled={pending || undefined}
               aria-label="Copy to clipboard"
-              onClick={() => { void copy() }}
+              onClick={requestCopy}
               onPointerDown={() => setFocusVisible(false)}
               onFocus={(event) => {
                 const isFocusVisible = event.currentTarget.matches(':focus-visible')
@@ -270,7 +327,7 @@ export const Clipboard = forwardRef<HTMLInputElement, ClipboardProps>(function C
             )}
           </div>
         ) : (
-          <button type="button" disabled={disabled} aria-disabled={pending || undefined} onClick={() => { void copy() }} className={cn(actionClasses, 'rounded-lg', size.actionSize, size.action)}>
+          <button type="button" disabled={disabled} aria-disabled={pending || undefined} onClick={requestCopy} className={cn(actionClasses, 'rounded-lg', size.actionSize, size.action)}>
             Copy
           </button>
         )}

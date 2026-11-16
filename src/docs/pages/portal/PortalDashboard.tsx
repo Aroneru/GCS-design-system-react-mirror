@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode, type SyntheticEvent } from 'react'
+import { useEffect, useState, type MouseEvent, type ReactNode } from 'react'
 import {
   Alert,
   Badge,
@@ -6,17 +6,17 @@ import {
   Card,
   Icon,
   ListView,
+  Navbar,
   Search,
   Select,
   Sidebar,
   Toast,
   cn,
   type SidebarItem,
+  type NavbarPrimaryItem,
 } from '../../../lib'
 import {
   ArrowRightToBracket,
-  Bars,
-  Bell,
   BookOpen,
   Bullhorn,
   CalendarMonth,
@@ -83,6 +83,9 @@ const MENU = [
   { id: 'berita', label: 'Berita', Ikon: Newspaper },
   { id: 'event', label: 'Event', Ikon: CalendarMonth },
 ]
+
+const MENU_SIDEBAR = MENU.filter(({ id }) => id === 'dashboard' || id === 'kms')
+const MENU_NAVBAR = MENU.filter(({ id }) => id !== 'dashboard' && id !== 'kms')
 
 const KATEGORI = MENU.filter(({ id }) => id !== 'dashboard').map(({ id, label }) => ({
   value: id,
@@ -309,7 +312,6 @@ function Kalender({ className }: { className?: string }) {
 
 export function PortalDashboard() {
   const [ringkas, setRingkas] = useState(false)
-  const [menuSeluler, setMenuSeluler] = useState(false)
   // Pesan demo tampil sebagai Toast di kanan atas lalu hilang sendiri. Teksnya
   // disimpan terpisah dari `tampil` supaya tidak lenyap sebelum Toast selesai
   // memudar, dan `kali` membuat pesan yang sama pun memulai ulang hitungannya.
@@ -317,8 +319,6 @@ export function PortalDashboard() {
   const [kata, setKata] = useState('')
   const [kategori, setKategori] = useState('')
   const [sumber, setSumber] = useState('monsakti')
-  const idMenuSeluler = useId()
-  const sidebarSelulerRef = useRef<HTMLDialogElement>(null)
   const anggaran = ANGGARAN[sumber]
 
   useEffect(() => {
@@ -327,20 +327,12 @@ export function PortalDashboard() {
     return () => window.clearTimeout(tutup)
   }, [umpan.kali, umpan.tampil])
 
-  useEffect(() => {
-    const dialog = sidebarSelulerRef.current
-    if (!dialog) return
-    if (menuSeluler && !dialog.open) dialog.showModal()
-    if (!menuSeluler && dialog.open) dialog.close()
-  }, [menuSeluler])
-
   const kabari = (teks: string) => setUmpan((u) => ({ teks, tampil: true, kali: u.kali + 1 }))
 
   // Hanya Dashboard yang dirancang; menu lain memberi tahu lewat Toast alih-alih
   // membuka halaman kosong.
   const menuDemo = (label: string) => (e: MouseEvent<HTMLElement>) => {
     e.preventDefault()
-    setMenuSeluler(false)
     kabari(`Halaman ${label} belum ada di contoh ini.`)
   }
 
@@ -351,13 +343,13 @@ export function PortalDashboard() {
   }
 
   const menuSidebar: SidebarItem[] = [
-    ...MENU.map(({ id, label, Ikon }) => ({
+    ...MENU_SIDEBAR.map(({ id, label, Ikon }) => ({
       id,
       label,
       href: '#/portal-dashboard/app',
       icon: <Ikon className="size-5" />,
       active: id === 'dashboard',
-      onClick: id === 'dashboard' ? () => setMenuSeluler(false) : menuDemo(label),
+      onClick: id === 'dashboard' ? undefined : menuDemo(label),
     })),
     {
       id: 'keluar',
@@ -365,9 +357,17 @@ export function PortalDashboard() {
       href: '#/portal-dashboard',
       // Sidebar belum punya tone danger untuk item menu; ikonnya saja yang merah.
       icon: <ArrowRightToBracket className="size-5 text-red-600" />,
-      onClick: () => setMenuSeluler(false),
     },
   ]
+
+  const navbarItems: NavbarPrimaryItem[] = MENU_NAVBAR.map(({ id, label, Ikon }) => ({
+    id,
+    type: 'destination',
+    label,
+    href: '#/portal-dashboard/app',
+    icon: <Ikon className="size-5" />,
+    onClick: menuDemo(label),
+  }))
 
   const sidebarLogo = <img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="h-8 w-auto" />
   const sidebarCollapsedLogo = <img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="size-8" />
@@ -376,6 +376,7 @@ export function PortalDashboard() {
     profileLabel: 'Lihat Profile',
     avatarSrc: asset('/images/avatar-sample.svg'),
     onClick: () => kabari('Halaman profil belum ada di contoh ini.'),
+    items: [{ id: 'logout', label: 'Keluar', tone: 'danger' as const, href: '#/portal-dashboard' }],
   }
 
   return (
@@ -395,26 +396,17 @@ export function PortalDashboard() {
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-18 items-center gap-3 border-b border-border bg-surface px-4 sm:px-6">
-          <Button
-            iconOnly
-            variant="outline"
-            theme="gray"
-            size="s"
-            className="lg:hidden"
-            aria-label="Buka menu"
-            aria-expanded={menuSeluler}
-            aria-controls={idMenuSeluler}
-            onClick={() => setMenuSeluler(true)}
-          >
-            <Bars />
-          </Button>
-          <img src={asset('/images/ceplok.svg')} alt="CEPLOK" className="size-8 lg:hidden" />
-
-          {/* Search berkategori di kiri, selebar slot search Navbar back-office:
-              348px, menyusut sampai 180px bila ruangnya kurang. Varian kategori
-              membawa role="search" sendiri, jadi pembungkus ini tidak. */}
-          <div className="hidden w-87 max-w-87 min-w-45 flex-[0_1_348px] md:block">
+        <Navbar
+          platform="back-office"
+          brand={{
+            content: <img src={asset('/images/ceplok.svg')} alt="" className="size-8" />,
+            href: '#/portal-dashboard/app',
+            ariaLabel: 'CEPLOK — Dashboard',
+          }}
+          items={navbarItems}
+          sidebarItems={menuSidebar}
+          sidebarUser={sidebarUser}
+          search={
             <Search
               categories={KATEGORI}
               categoryPlaceholder="Pilih"
@@ -428,19 +420,13 @@ export function PortalDashboard() {
               onChange={(e) => setKata(e.target.value)}
               onSearch={cari}
             />
-          </div>
-
-          {/* Lonceng bergaya notificationTrigger Navbar front-office: ikon 20px
-              gray-500 dalam kotak 36px, tanpa angka. */}
-          <button
-            type="button"
-            aria-label="Notifikasi"
-            onClick={() => kabari('Ada 5 notifikasi baru.')}
-            className="ml-auto grid size-9 shrink-0 place-items-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-          >
-            <Bell className="size-5" aria-hidden="true" />
-          </button>
-        </header>
+          }
+          notificationTrigger={sidebarUser ? {
+            ariaLabel: 'Notifikasi',
+            badge: 5,
+            onClick: () => kabari('Ada 5 notifikasi baru.'),
+          } : undefined}
+        />
 
         {/* Toast di kanan atas, tepat di bawah header. */}
         <div className="fixed top-22 right-4 z-30 w-80 max-w-[calc(100vw-2rem)] sm:right-6">
@@ -628,32 +614,6 @@ export function PortalDashboard() {
         </main>
       </div>
 
-      <dialog
-        ref={sidebarSelulerRef}
-        id={idMenuSeluler}
-        aria-label="Navigasi Portal Dashboard"
-        className="fixed inset-y-0 left-0 right-auto m-0 h-full max-h-full w-[280px] max-w-[calc(100vw-2rem)] overflow-visible border-0 bg-transparent p-0 shadow-none backdrop:bg-gray-900/50 lg:hidden"
-        onCancel={(event: SyntheticEvent<HTMLDialogElement>) => {
-          event.preventDefault()
-          setMenuSeluler(false)
-        }}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) setMenuSeluler(false)
-        }}
-        onClose={() => {
-          if (menuSeluler) setMenuSeluler(false)
-        }}
-      >
-        <Sidebar
-          logo={sidebarLogo}
-          collapsedLogo={sidebarCollapsedLogo}
-          user={sidebarUser}
-          items={menuSidebar}
-          collapsed={false}
-          onCollapse={() => setMenuSeluler(false)}
-          className="h-full !min-h-0 max-w-full shadow-2xl"
-        />
-      </dialog>
     </div>
   )
 }

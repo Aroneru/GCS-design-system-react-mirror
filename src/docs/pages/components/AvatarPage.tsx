@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Avatar, type AvatarFallback, type AvatarGender, type AvatarSize } from '../../../lib'
+import { Avatar, type AvatarFallback, type AvatarSize } from '../../../lib'
 import { asset } from '../../asset'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
@@ -18,17 +18,17 @@ const avatarProps: PropRow[] = [
   ['name', 'string', 'undefined', 'Nama untuk accessible name dan inisial otomatis.'],
   ['alt', 'string', 'name atau ""', 'Override accessible name. String kosong menjadikan Avatar dekoratif.'],
   ['initials', 'ReactNode', 'undefined', 'Override isi inisial ketika foto tidak tersedia.'],
-  ['fallback', "'initials' | 'profile'", 'initials', 'Gunakan inisial atau langsung ilustrasi profil.'],
-  ['gender', "'male' | 'female'", 'undefined', 'Ilustrasi profil gender; tidak pernah ditebak dari name.'],
+  ['fallback', "'initials' | 'female' | 'male'", 'initials', 'Memilih fallback secara eksplisit; initials memerlukan name atau initials.'],
   ['size', "'small' | 'default' | 'large'", 'default (M)', 'Diameter lingkaran: 24px, 32px, atau 80px.'],
   ['darkMode', 'boolean', 'false', 'Deprecated. Gunakan scope ambient data-theme="dark".'],
-  ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut <div> standar diteruskan, termasuk className.'],
+  ['ref', 'Ref<HTMLDivElement>', '—', 'Diteruskan ke elemen <div> root.'],
+  ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut root diteruskan; role, aria-label, dan data-theme dapat meng-override nilai terhitung. className digabungkan.'],
 ]
 
 const toc: TocEntry[] = [
   { id: 'avatar', label: 'Avatar' },
   { id: 'inisial', label: 'Inisial' },
-  { id: 'profile', label: 'Default profile' },
+  { id: 'profile', label: 'Profile fallback' },
   { id: 'sizes', label: 'Sizes' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
@@ -39,10 +39,19 @@ const toc: TocEntry[] = [
 export function AvatarPage() {
   const [size, setSize] = useState<AvatarSize>('default')
   const [content, setContent] = useState<'photo' | 'auto' | 'override' | 'profile'>('auto')
-  const [gender, setGender] = useState<AvatarGender>('female')
+  const [profileFallback, setProfileFallback] = useState<Exclude<AvatarFallback, 'initials'>>('female')
   const [name, setName] = useState('Putri Handayani')
   const [dark, setDark] = useState(false)
-  const fallback: AvatarFallback = content === 'profile' ? 'profile' : 'initials'
+  const nama = name.trim()
+  const initialsPlayground = content === 'override' || (content !== 'profile' && !nama) ? 'UI' : undefined
+
+  const previewAvatar = content === 'profile' ? (
+    <Avatar size={size} name={nama || undefined} alt="" fallback={profileFallback} />
+  ) : nama ? (
+    <Avatar size={size} src={content === 'photo' ? FOTO : undefined} name={nama} alt="" initials={initialsPlayground} />
+  ) : (
+    <Avatar size={size} src={content === 'photo' ? FOTO : undefined} alt="" initials="UI" />
+  )
 
   return (
     <UsulanPage
@@ -54,7 +63,8 @@ export function AvatarPage() {
       <FlowSection id="avatar" title="Avatar">
         <Lead>
           Foto dari <Hl>src</Hl> selalu menjadi pilihan pertama. Jika kosong atau gagal dimuat,
-          Avatar berpindah ke fallback tanpa mengubah ukuran, crop, atau bentuk lingkarannya.
+          Avatar berpindah ke fallback tanpa mengubah ukuran dan bentuk lingkarannya.
+          Foto memakai crop tengah <Hl>object-cover</Hl>, sehingga rasio tetap terjaga.
         </Lead>
         <Demo label="Default Avatar / foto">
           <div className="flex items-center gap-4">
@@ -74,12 +84,18 @@ export function AvatarPage() {
           Bila nama sudah ditampilkan sebagai teks di dekat Avatar, gunakan <Hl>alt=&quot;&quot;</Hl>{' '}
           agar tidak dibacakan dua kali.
         </p>
+        <Demo>
+          <div className="flex items-center gap-3">
+            <Avatar name="Putri Handayani" alt="" />
+            <span className="text-sm text-content">Putri Handayani</span>
+          </div>
+        </Demo>
         <SectionCode>
-          {'<Avatar '}
+          {'<div className="flex items-center gap-3">\n  <Avatar '}
           <H>name</H>
           {'="Putri Handayani" '}
           <H>alt</H>
-          {'="" />'}
+          {'="" />\n  <span>Putri Handayani</span>\n</div>'}
         </SectionCode>
       </FlowSection>
 
@@ -114,46 +130,33 @@ export function AvatarPage() {
           <H>name</H>
           {'="Putri Handayani" '}
           <H>initials</H>
-          {'="PT" />'}
+          {'="UI" />'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="profile" title="Default profile">
+      <FlowSection id="profile" title="Profile fallback">
         <Lead>
-          <Hl>fallback=&quot;profile&quot;</Hl> menampilkan ilustrasi walaupun <Hl>name</Hl>{' '}
-          tersedia. Gender dipilih eksplisit dan tidak pernah ditebak dari nama. Tanpa gender,
-          Avatar memakai ikon User netral.
+          <Hl>fallback=&quot;female&quot;</Hl> atau <Hl>fallback=&quot;male&quot;</Hl> menampilkan
+          ilustrasi profil walaupun <Hl>name</Hl> tersedia. Varian tidak pernah ditebak dari
+          nama. <Hl>fallback=&quot;initials&quot;</Hl> adalah bawaan dan memerlukan name atau initials.
         </Lead>
         <div className="grid gap-5 sm:grid-cols-3">
           <Demo label="Female">
-            <Avatar name="Putri Handayani" fallback="profile" gender="female" size="large" />
+            <Avatar name="Putri Handayani" fallback="female" size="large" />
           </Demo>
           <Demo label="Male">
-            <Avatar name="Rafli Arandhana" fallback="profile" gender="male" size="large" />
+            <Avatar name="Rafli Arandhana" fallback="male" size="large" />
           </Demo>
-          <Demo label="Neutral">
-            <Avatar name="Pengguna" fallback="profile" size="large" />
+          <Demo label="Default → initials">
+            <Avatar name="Pengguna" size="large" />
           </Demo>
         </div>
         <SectionCode>
           {'<Avatar '}
-          <H>gender</H>
-          {'="female" '}
-          <H>fallback</H>
-          {'="profile" />\n<Avatar '}
-          <H>gender</H>
-          {'="male" '}
-          <H>fallback</H>
-          {'="profile" />'}
-        </SectionCode>
-        <SectionCode>
-          {'<Avatar '}
           <H>name</H>
           {'="Putri Handayani" '}
-          <H>gender</H>
-          {'="female" '}
           <H>fallback</H>
-          {'="profile" />'}
+          {'="female" />'}
         </SectionCode>
       </FlowSection>
 
@@ -167,7 +170,7 @@ export function AvatarPage() {
             <Demo key={u.value} label={u.label + ' — ' + u.diameter}>
               <div className="flex items-center gap-3">
                 <Avatar name="Putri Handayani" size={u.value} />
-                <Avatar name="Putri Handayani" fallback="profile" gender="female" size={u.value} />
+                <Avatar name="Putri Handayani" fallback="female" size={u.value} />
               </div>
             </Demo>
           ))}
@@ -178,9 +181,7 @@ export function AvatarPage() {
         <SectionCode>
           {'<Avatar '}
           <H>size</H>
-          {'="small" name="Putri Handayani" />\n<Avatar name="Putri Handayani" />\n<Avatar '}
-          <H>size</H>
-          {'="large" name="Putri Handayani" />'}
+          {'="small" name="Putri Handayani" />'}
         </SectionCode>
       </FlowSection>
 
@@ -192,8 +193,8 @@ export function AvatarPage() {
         <Stage maxWidth="max-w-full" dark>
           <div data-theme="dark" className="flex flex-wrap items-center gap-4">
             <Avatar name="Putri Handayani" size="large" />
-            <Avatar name="Putri Handayani" fallback="profile" gender="female" size="large" />
-            <Avatar name="Rafli Arandhana" fallback="profile" gender="male" size="large" />
+            <Avatar name="Putri Handayani" fallback="female" size="large" />
+            <Avatar name="Rafli Arandhana" fallback="male" size="large" />
           </div>
         </Stage>
         <SectionCode>
@@ -204,22 +205,14 @@ export function AvatarPage() {
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
-        <Lead>Ubah tema, ukuran, isi, gender, dan nama. Preview memakai komponen production yang sama.</Lead>
+        <Lead>Ubah tema, ukuran, isi, fallback profil, dan nama. Preview memakai komponen production yang sama.</Lead>
         <Stage maxWidth="max-w-[360px]" dark={dark}>
           <div
             data-theme={dark ? 'dark' : 'light'}
             className="flex min-h-30 items-center justify-center gap-3"
           >
-            <Avatar
-              size={size}
-              src={content === 'photo' ? FOTO : undefined}
-              name={name}
-              alt=""
-              initials={content === 'override' ? 'UI' : undefined}
-              fallback={fallback}
-              gender={content === 'profile' ? gender : undefined}
-            />
-            <span className="text-sm text-content">{name || 'Tanpa nama'}</span>
+            {previewAvatar}
+            <span className="text-sm text-content">{nama || 'Tanpa nama'}</span>
           </div>
         </Stage>
 
@@ -257,11 +250,11 @@ export function AvatarPage() {
               ]}
             />
           </Control>
-          <Control label="Gender">
+          <Control label="Profile fallback">
             <Segmented
-              label="Pilih gender profile"
-              value={gender}
-              onChange={setGender}
+              label="Pilih ilustrasi profile"
+              value={profileFallback}
+              onChange={setProfileFallback}
               disabled={content !== 'profile'}
               options={[
                 { value: 'female', label: 'Female' },
@@ -276,6 +269,11 @@ export function AvatarPage() {
               aria-label="Nama untuk preview Avatar"
               className="mt-1 w-full rounded-lg border border-field-border bg-field px-3 py-2 text-sm text-content outline-none focus:border-brand"
             />
+            {content !== 'profile' && !nama && (
+              <p className="mt-1 text-xs text-feedback-error" role="status">
+                Nama kosong memakai initials UI agar fallback tetap valid.
+              </p>
+            )}
           </Control>
         </Controls>
 
@@ -283,25 +281,14 @@ export function AvatarPage() {
 
       <FlowSection id="penggunaan" title="Penggunaan">
         <Lead>
-          Gunakan urutan berikut untuk memilih konfigurasi Avatar yang sesuai kebutuhan consumer.
+          Blok ini mengikuti kontrol di Playground. Prop yang masih memakai nilai bawaan sengaja
+          tidak ditulis. Fallback <Hl>initials</Hl> selalu membutuhkan <Hl>name</Hl> atau{' '}
+          <Hl>initials</Hl>.
         </Lead>
-        <ol className="mb-4 list-decimal space-y-2 pl-5 text-body-sm text-gray-500">
-          <li>Tentukan apakah Avatar memakai foto melalui <Hl>src</Hl> atau tanpa foto.</li>
-          <li>Berikan <Hl>name</Hl> untuk identitas dan inisial otomatis.</li>
-          <li>
-            Untuk ilustrasi Male/Female, gunakan <Hl>gender</Hl> bersama{' '}
-            <Hl>fallback=&quot;profile&quot;</Hl>.
-          </li>
-          <li>Gunakan <Hl>initials</Hl> hanya saat membutuhkan override.</li>
-          <li>
-            Atur <Hl>size</Hl> bila bukan M, dan pilih <Hl>alt</Hl> sesuai konteks aksesibilitas.
-          </li>
-        </ol>
         <SectionCode flush>
           {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
           {dark && '<section data-theme="dark">\n'}
-          {dark && '  '}
-          {'<Avatar\n'}
+          {'<div className="flex items-center gap-3">\n  <Avatar\n'}
           {size !== 'default' && (
             <>
               {'    '}
@@ -316,14 +303,14 @@ export function AvatarPage() {
               {'="/foto/putri.jpg"\n'}
             </>
           )}
-          {name && (
+          {nama && (
             <>
               {'    '}
               <H>name</H>
-              {'=' + JSON.stringify(name) + '\n'}
+              {'=' + JSON.stringify(nama) + '\n'}
             </>
           )}
-          {content === 'override' && (
+          {initialsPlayground && (
             <>
               {'    '}
               <H>initials</H>
@@ -334,20 +321,21 @@ export function AvatarPage() {
             <>
               {'    '}
               <H>fallback</H>
-              {'="profile"\n'}
-              {'    '}
-              <H>gender</H>
-              {'="' + gender + '"\n'}
+              {'="' + profileFallback + '"\n'}
             </>
           )}
-          {dark ? '  />\n</section>' : '/>'}
+          {'    '}
+          <H>alt</H>
+          {'=""\n  />\n  <span>' + (nama || 'Tanpa nama') + '</span>\n</div>'}
+          {dark && '\n</section>'}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
         <Lead>
-          Seluruh prop public Avatar. Native attributes dan ref tetap diteruskan ke wrapper{' '}
-          <Hl>&lt;div&gt;</Hl>.
+          Seluruh prop yang diterima Avatar, beserta tipe dan nilai bawaannya. Atribut{' '}
+          <Hl>&lt;div&gt;</Hl> standar dan ref juga diteruskan; atribut root dapat meng-override
+          nilai aksesibilitas atau tema yang dihitung komponen.
         </Lead>
         <PropsTable rows={avatarProps} minWidth="52rem" />
       </FlowSection>
