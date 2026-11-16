@@ -17,6 +17,9 @@ function parse(): { path: string; section: string } {
   return { path: raw.slice(0, i) || '/', section: raw.slice(i + 1) }
 }
 
+/** Rute yang sedang dibuka, untuk kode di luar komponen (mis. main.tsx). */
+export const currentPath = () => parse().path
+
 /** Menggulir ke bagian ber-id tersebut setelah elemennya sempat dirender. */
 function scrollToSection(id: string) {
   requestAnimationFrame(() => {

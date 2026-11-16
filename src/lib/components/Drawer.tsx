@@ -75,6 +75,8 @@ export interface DrawerProps extends Omit<
   eyebrow?: string;
   header?: ReactNode;
   items?: DrawerMenuItem[];
+  /** Konten tambahan setelah seluruh item data-driven, di dalam DrawerBody yang sama. */
+  afterItems?: ReactNode;
   theme?: DrawerNavItemTheme;
   darkMode?: boolean;
   children?: ReactNode;
@@ -291,6 +293,7 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
     eyebrow,
     header,
     items,
+    afterItems,
     theme = "primary",
     darkMode = false,
     className,
@@ -428,15 +431,16 @@ const DrawerRoot = forwardRef<HTMLDialogElement, DrawerProps>(function Drawer(
         {children ?? (
           <>
             {hasHeaderProps && <DrawerHeader eyebrow={eyebrow}>{header}</DrawerHeader>}
-            {items && items.length > 0 && (
+            {((items && items.length > 0) || afterItems) && (
               <DrawerBody className="p-3 space-y-1">
-                {items.map((item, index) => (
+                {items?.map((item, index) => (
                   <DrawerMenuItemRenderer
                     key={item.id ?? index}
                     item={item}
                     theme={item.theme ?? theme}
                   />
                 ))}
+                {afterItems}
               </DrawerBody>
             )}
           </>

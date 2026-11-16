@@ -1,13 +1,19 @@
 import { FloatingLabel, InputField, TextArea } from '../../../lib'
 import { User } from '../../../lib/icons/solid'
+import { useDocsDark } from '../../docsTheme'
 import { OverviewCard, OverviewPage } from '../../pageKit'
 
-/** Pembungkus preview kartu overview — latar netral seragam. */
+/**
+ * Pembungkus preview kartu overview — latar netral seragam, gelap di mode
+ * gelap docs. Sama seperti di FormOverview, isinya ikut memakai `darkMode`.
+ */
 function Preview({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-xl bg-surface-subtle p-5">{children}</div>
+  return <div className="rounded-xl bg-surface-subtle p-5 dark:bg-gray-900">{children}</div>
 }
 
 export function InputFieldFormPage() {
+  const dark = useDocsDark()
+
   return (
     <OverviewPage
       eyebrow="Form · Overview"
@@ -24,6 +30,7 @@ export function InputFieldFormPage() {
             label="Nama lengkap"
             placeholder="Masukkan nama lengkap"
             icon={<User className="size-4" />}
+            darkMode={dark}
           />
         </Preview>
       </OverviewCard>
@@ -39,6 +46,7 @@ export function InputFieldFormPage() {
             defaultValue="Budi Santoso"
             state="active"
             icon={<User className="size-4" />}
+            darkMode={dark}
           />
         </Preview>
       </OverviewCard>
@@ -50,7 +58,7 @@ export function InputFieldFormPage() {
         wide
       >
         <Preview>
-          <TextArea platform="mobile" placeholder="Tulis keterangan tambahan…" />
+          <TextArea platform="mobile" placeholder="Tulis keterangan tambahan…" darkMode={dark} />
         </Preview>
       </OverviewCard>
     </OverviewPage>

@@ -93,7 +93,7 @@ export function ExampleAppFrame({
               tandaiAsal('app')
               tutupKeAtas(panel.current, isi.current, () => navigate(kembali))
             }}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-lg transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:cursor-default disabled:hover:text-gray-700"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-lg transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:cursor-default disabled:hover:text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:text-primary-300 dark:disabled:hover:text-gray-200"
           >
             <ArrowLeft className="size-4" />
             Kembali ke dokumentasi

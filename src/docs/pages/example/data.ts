@@ -25,7 +25,7 @@ export const JUDUL_HALAMAN: Record<HalamanDemo, string> = {
   simaya: 'Simaya',
   modifikasi: 'Modifikasi',
   pengaturan: 'Pengaturan',
-  simaya2: 'Simaya2 Digunakan Sebagai Contoh Menu Panjang',
+  simaya2: 'Berita Pembaruan Transformasi Layanan Digital Terpadu untuk Masyarakat dan Pelaku Usaha',
 }
 
 export type StatusPengajuan = 'Selesai' | 'Diproses' | 'Menunggu' | 'Ditolak'
@@ -118,6 +118,13 @@ export const LAYANAN: Layanan[] = [
     judul: 'Pengaduan Layanan',
     deskripsi: 'Sampaikan keluhan atau masukan, lalu pantau tindak lanjutnya secara terbuka.',
     durasi: '2 hari kerja',
+    biaya: 'Gratis',
+  },
+  {
+    slug: 'konsultasi',
+    judul: 'Konsultasi Layanan',
+    deskripsi: 'Dapatkan panduan awal mengenai persyaratan dan alur layanan yang sesuai kebutuhan.',
+    durasi: '1 hari kerja',
     biaya: 'Gratis',
   },
 ]

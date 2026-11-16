@@ -11,14 +11,21 @@ import {
   Upload,
 } from '../../../lib'
 import { Envelope, User } from '../../../lib/icons/outline'
+import { useDocsDark } from '../../docsTheme'
 import { OverviewCard, OverviewPage } from '../../pageKit'
 
-/** Pembungkus preview kartu overview — latar netral seragam. */
+/**
+ * Pembungkus preview kartu overview — latar netral seragam, gelap di mode
+ * gelap docs. Pratinjau di sini tidak disertai cuplikan kode, jadi isinya
+ * ikut memakai `darkMode` dan tampil dengan desain gelapnya sendiri.
+ */
 function Preview({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-xl bg-surface-subtle p-5">{children}</div>
+  return <div className="rounded-xl bg-surface-subtle p-5 dark:bg-gray-900">{children}</div>
 }
 
 export function FormOverview() {
+  const dark = useDocsDark()
+
   return (
     <OverviewPage
       eyebrow="Form · Overview"
@@ -50,17 +57,20 @@ export function FormOverview() {
                 placeholder="Masukkan nama lengkap"
                 helperText="Sesuai yang tertera pada KTP."
                 icon={<User className="size-4" />}
+                darkMode={dark}
               />
               <FloatingLabel
                 label="Alamat surel"
                 type="email"
                 defaultValue="yermi@contoh.id"
                 icon={<Envelope className="size-4" />}
+                darkMode={dark}
               />
             </div>
             <TextArea
               label="Keterangan"
               placeholder="Tulis keterangan tambahan di sini…"
+              darkMode={dark}
             />
           </div>
         </Preview>
@@ -80,6 +90,7 @@ export function FormOverview() {
               { value: 'dki', label: 'DKI Jakarta' },
               { value: 'jabar', label: 'Jawa Barat' },
             ]}
+            darkMode={dark}
           />
         </Preview>
       </OverviewCard>
@@ -95,7 +106,7 @@ export function FormOverview() {
             selebar setengah kisi, dan pada lebar itu varian desktop membuat
             placeholder-nya terpotong sebelum tombol Cari.
           */}
-          <Search platform="mobile" placeholder="Search Civitas…" />
+          <Search platform="mobile" placeholder="Search Civitas…" darkMode={dark} />
         </Preview>
       </OverviewCard>
 
@@ -117,9 +128,9 @@ export function FormOverview() {
           */}
           <div className="grid gap-5 md:grid-cols-2">
             <div className="flex flex-col justify-center">
-              <Upload label="Unggah dokumen" helperText="PDF atau JPG, maksimal 2 MB." />
+              <Upload label="Unggah dokumen" helperText="PDF atau JPG, maksimal 2 MB." darkMode={dark} />
             </div>
-            <Upload type="attach" />
+            <Upload type="attach" darkMode={dark} />
           </div>
         </Preview>
       </OverviewCard>
@@ -131,8 +142,8 @@ export function FormOverview() {
       >
         <Preview>
           <div className="space-y-3">
-            <Radio name="ds-overview-radio" label="Warga negara Indonesia" defaultChecked />
-            <Radio name="ds-overview-radio" label="Warga negara asing" />
+            <Radio name="ds-overview-radio" label="Warga negara Indonesia" defaultChecked darkMode={dark} />
+            <Radio name="ds-overview-radio" label="Warga negara asing" darkMode={dark} />
           </div>
         </Preview>
       </OverviewCard>
@@ -144,8 +155,8 @@ export function FormOverview() {
       >
         <Preview>
           <div className="space-y-3">
-            <Toggle label="Notifikasi aktif" defaultChecked />
-            <Toggle label="Notifikasi nonaktif" />
+            <Toggle label="Notifikasi aktif" defaultChecked darkMode={dark} />
+            <Toggle label="Notifikasi nonaktif" darkMode={dark} />
           </div>
         </Preview>
       </OverviewCard>
@@ -157,8 +168,8 @@ export function FormOverview() {
       >
         <Preview>
           <div className="flex flex-wrap gap-6">
-            <Checkbox label="Saya menyetujui syarat" defaultChecked />
-            <Checkbox label="Kirim salinan ke email" />
+            <Checkbox label="Saya menyetujui syarat" defaultChecked darkMode={dark} />
+            <Checkbox label="Kirim salinan ke email" darkMode={dark} />
           </div>
         </Preview>
       </OverviewCard>
@@ -169,7 +180,7 @@ export function FormOverview() {
         desc="Pemilih tanggal dengan kalender: satu tanggal, pintasan periode, atau rentang dua kalender."
       >
         <Preview>
-          <Datepicker label="Tanggal pengajuan" defaultValue={new Date(2021, 5, 25)} />
+          <Datepicker label="Tanggal pengajuan" defaultValue={new Date(2021, 5, 25)} darkMode={dark} />
         </Preview>
       </OverviewCard>
     </OverviewPage>

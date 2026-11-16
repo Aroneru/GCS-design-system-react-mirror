@@ -10,6 +10,7 @@ const toc: TocEntry[] = [
   { id: 'platform', label: 'Platform' },
   { id: 'segmen', label: 'Dengan segmen' },
   { id: 'states', label: 'States' },
+  { id: 'callbacks', label: 'Callback' },
   { id: 'dark-mode', label: 'Dark mode' },
   { id: 'playground', label: 'Playground' },
   { id: 'penggunaan', label: 'Penggunaan' },
@@ -29,7 +30,7 @@ const previewWidths: Record<ClipboardVariant, Record<ClipboardPlatform, string>>
 
 const clipboardProps: PropRow[] = [
   ['value', 'string', '— (wajib)', 'Nilai yang ditampilkan dan disalin.'],
-  ['label', 'ReactNode', 'undefined', 'Label yang ditampilkan di atas nilai.'],
+  ['label', 'ReactNode', 'undefined', 'Label di atas nilai sekaligus nama aksesibel input; gunakan aria-label atau aria-labelledby bila label tidak ditampilkan.'],
   ['helperText', 'ReactNode', 'undefined', 'Keterangan tambahan yang ditampilkan di bawah field.'],
   ['prefix', 'ReactNode', 'undefined', 'Konten sebelum nilai pada tampilan bersegmen. Prefix tidak ikut disalin.'],
   ['variant', "'default' | 'segmented'", 'default', 'Menentukan susunan Clipboard.'],
@@ -37,8 +38,8 @@ const clipboardProps: PropRow[] = [
   ['darkMode', 'boolean', 'false', 'Deprecated. Gunakan scope ambient data-theme="dark".'],
   ['disabled', 'boolean', 'false', 'Menonaktifkan aksi salin dan interaksi pemilihan nilai melalui UI.'],
   ['className', 'string', 'undefined', 'Kelas CSS untuk pembungkus terluar Clipboard.'],
-  ['onCopySuccess', '(value: string) => void', 'undefined', 'Dipanggil setelah nilai berhasil disalin.'],
-  ['onCopyError', '(error: unknown) => void', 'undefined', 'Dipanggil ketika proses salin gagal.'],
+  ['onCopySuccess', '(value: string) => void', 'undefined', 'Dipanggil setelah nilai berhasil disalin. Error callback diabaikan dan tidak mengubah hasil salin.'],
+  ['onCopyError', '(error: unknown) => void', 'undefined', 'Dipanggil ketika proses salin gagal. Error callback diabaikan dan tidak mengubah feedback gagal.'],
   ['Atribut input', 'id, aria-label, aria-labelledby, aria-describedby: string', 'undefined', 'Hanya atribut ini diteruskan. ID dibuat otomatis jika kosong; deskripsi digabung dengan helperText.'],
 ]
 
@@ -66,7 +67,7 @@ export function ClipboardPage() {
   return (
     <UsulanPage eyebrow="Components · Clipboard" title="Clipboard" description="Menampilkan nilai yang dapat disalin melalui tombol aksi, dengan dukungan label dan keterangan tambahan." toc={toc}>
       <FlowSection id="default" title="Default">
-        <Lead>Clipboard menampilkan nilai hanya-baca yang dapat disalin melalui tombol aksi. Saat aktif, nilai tetap dapat dipilih untuk disalin secara manual.</Lead>
+        <Lead>Clipboard menampilkan nilai hanya-baca yang dapat disalin melalui tombol aksi. Saat aktif, nilai tetap dapat dipilih untuk disalin secara manual. Berikan nama aksesibel melalui label, aria-label, atau aria-labelledby.</Lead>
         <Demo label="Default">
           <div className={`mx-auto w-full ${previewWidths.default.default}`}>
             <Clipboard value="INV-2026-001" label="Nomor referensi" helperText="Gunakan nomor ini saat menghubungi layanan." />
@@ -103,6 +104,11 @@ export function ClipboardPage() {
         </div>
       </FlowSection>
 
+      <FlowSection id="callbacks" title="Callback">
+        <Lead>onCopySuccess dipanggil setelah Clipboard API berhasil, sedangkan onCopyError dipanggil saat API tidak tersedia atau menolak operasi. Error yang dilempar callback consumer—termasuk Promise rejection—diabaikan agar tidak mengubah feedback Clipboard atau menghasilkan unhandled rejection.</Lead>
+        <SectionCode>{'<Clipboard\n  value="INV-2026-001"\n  label="Nomor referensi"\n  '}<H>onCopySuccess</H>{'={(copiedValue) => saveAudit(copiedValue)}\n  '}<H>onCopyError</H>{'={(error) => reportCopyError(error)}\n/>'}</SectionCode>
+      </FlowSection>
+
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>Clipboard mengikuti scope ambient <H>data-theme</H>. Warna Dark diterapkan pada field, teks, prefix, dan tooltip tanpa prop tema baru.</Lead>
         <Demo label="Dark" dark>
@@ -110,7 +116,7 @@ export function ClipboardPage() {
             <Clipboard value="https://komdigi.go.id/" label="Alamat situs" helperText="Gunakan alamat ini untuk mengunjungi situs." variant="segmented" prefix="URL" />
           </div>
         </Demo>
-        <SectionCode>{'<section '}<H>data-theme</H>{'="dark">\n  <Clipboard value="https://komdigi.go.id/" variant="segmented" prefix="URL" />\n</section>'}</SectionCode>
+        <SectionCode>{'<section '}<H>data-theme</H>{'="dark">\n  <Clipboard\n    value="https://komdigi.go.id/"\n    '}<H>aria-label</H>{'="Alamat situs"\n    variant="segmented"\n    prefix="URL"\n  />\n</section>'}</SectionCode>
       </FlowSection>
 
       <FlowSection id="playground" title="Playground">
@@ -154,7 +160,7 @@ export function ClipboardPage() {
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
-        <Lead>Daftar prop, tipe, dan nilai bawaannya. Hanya <H>id</H> serta atribut penamaan atau deskripsi aksesibel yang diteruskan ke input hanya-baca. Ref mengarah ke input yang sama.</Lead>
+        <Lead>Daftar prop, tipe, dan nilai bawaannya. Clipboard memerlukan salah satu dari <H>label</H>, <H>aria-label</H>, atau <H>aria-labelledby</H>. Hanya <H>id</H> serta atribut penamaan atau deskripsi aksesibel yang diteruskan ke input hanya-baca. Ref mengarah ke input yang sama.</Lead>
         <PropsTable rows={clipboardProps} minWidth="46rem" />
       </FlowSection>
     </UsulanPage>

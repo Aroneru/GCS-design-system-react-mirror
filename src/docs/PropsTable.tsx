@@ -10,7 +10,7 @@ export function PropsTable({ rows, minWidth = '40rem' }: { rows: PropRow[]; minW
     <div className="ds-card overflow-hidden">
       <div className="ds-scroll-x overflow-x-auto">
         <table className="w-full text-left text-sm" style={{ minWidth }}>
-          <thead className="border-b border-border bg-surface-subtle text-xs font-black tracking-wide text-gray-500 uppercase">
+          <thead className="border-b border-border bg-surface-subtle text-xs font-black tracking-wide text-gray-500 uppercase dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400">
             <tr>
               <th className="px-5 py-3">Prop</th>
               <th className="px-5 py-3">Tipe</th>
@@ -18,17 +18,17 @@ export function PropsTable({ rows, minWidth = '40rem' }: { rows: PropRow[]; minW
               <th className="px-5 py-3">Keterangan</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-border dark:divide-gray-700">
             {rows.map(([name, type, def, desc]) => (
               <tr key={name}>
                 <td className="px-5 py-3">
-                  <code className="text-xs font-bold text-primary-700">{name}</code>
+                  <code className="text-xs font-bold text-primary-700 dark:text-primary-400">{name}</code>
                 </td>
-                <td className="px-5 py-3 text-gray-500">{type}</td>
+                <td className="px-5 py-3 text-gray-500 dark:text-gray-400">{type}</td>
                 <td className="px-5 py-3">
-                  <code className="text-xs text-gray-500">{def}</code>
+                  <code className="text-xs text-gray-500 dark:text-gray-400">{def}</code>
                 </td>
-                <td className="px-5 py-3 text-gray-600">{desc}</td>
+                <td className="px-5 py-3 text-gray-600 dark:text-gray-300">{desc}</td>
               </tr>
             ))}
           </tbody>

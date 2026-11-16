@@ -1,4 +1,6 @@
+import { useLayoutEffect } from "react";
 import { DocsLayout } from "./docs/DocsLayout";
+import { applyDocsTheme, hasDarkMode, setDarkPreference, useDarkPreference } from "./docs/docsTheme";
 import { useHashRoute } from "./docs/useHashRoute";
 import { HomePage } from "./docs/pages/HomePage";
 import { ExamplePage } from "./docs/pages/ExamplePage";
@@ -152,6 +154,16 @@ function renderNavbarPreview(path: string) {
 function App() {
   const [path] = useHashRoute();
 
+  // Mode gelap docs berlaku per halaman (lihat docs/docsTheme.ts). Dipasang di
+  // sini, bukan di DocsLayout, supaya ikut berlaku di Portal Dashboard yang
+  // tampil penuh layar di luar DocsLayout. Layout effect: atributnya harus
+  // terpasang sebelum frame digambar, supaya pindah halaman tidak sempat
+  // menampilkan warna tema halaman sebelumnya.
+  const dark = useDarkPreference() && hasDarkMode(path);
+  useLayoutEffect(() => {
+    applyDocsTheme(dark);
+  }, [dark]);
+
   if (path.startsWith("/preview/navbar/")) {
     return renderNavbarPreview(path);
   }
@@ -165,11 +177,12 @@ function App() {
   }
 
   // Portal Dashboard memakai bingkai yang sama: penuh layar, dengan tirai
-  // transisi dan tombol pulang ke pintu masuknya.
+  // transisi dan tombol pulang ke pintu masuknya. Mode gelapnya mengikuti
+  // pilihan yang sama dengan docs, dan tombol tema di header-nya mengubahnya.
   if (path.startsWith("/portal-dashboard/app")) {
     return (
       <ExampleAppFrame path={path} kembali="/portal-dashboard">
-        <PortalDashboard />
+        <PortalDashboard darkMode={dark} onDarkModeChange={setDarkPreference} />
       </ExampleAppFrame>
     );
   }

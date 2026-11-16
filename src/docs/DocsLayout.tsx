@@ -5,9 +5,16 @@ import { asset } from "./asset";
 import { pintasanCari, rail, sidebars, type NavItem, type Section } from "./navigation";
 import { Collapse, Drawer, prefersReducedMotion, SlideIn } from "./motion";
 import { DocsSearch } from "./DocsSearch";
+import { DocsDarkContext, hasDarkMode, setDarkPreference, useDarkPreference } from "./docsTheme";
 
 /** Ikon kaca pembesar untuk tombol Cari di rail dan top bar. */
 const ikonCari = "m20 20-4.5-4.5M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z";
+
+/** Ikon bulan dan matahari untuk tombol mode gelap, dari set ikon outline kit. */
+const ikonBulan =
+  "M12 21a9 9 0 0 1-.5-17.986V3c-.354.966-.5 1.911-.5 3a9 9 0 0 0 9 9c.239 0 .254.018.488 0A9 9 0 0 1 12 21";
+const ikonMatahari =
+  "M12 5V3m0 18v-2M7.05 7.05 5.636 5.636m12.728 12.728L16.95 16.95M5 12H3m18 0h-2M7.05 16.95l-1.414 1.414M18.364 5.636 16.95 7.05M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0";
 
 /**
  * Menu footer sama di seluruh halaman: kelima area utama, diturunkan dari
@@ -26,7 +33,9 @@ const railItemClass = (active: boolean) =>
     // dan harus tetap di tengah, di bawah ikonnya.
     "group flex w-full flex-col items-center gap-1 rounded-lg py-0.5 text-center text-[11px] font-bold transition-colors",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
-    active ? "text-primary-700" : "text-gray-500 hover:text-gray-800",
+    active
+      ? "text-primary-700 dark:text-primary-300"
+      : "text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100",
   ].join(" ");
 
 /**
@@ -38,7 +47,7 @@ function RailIcon({ path, active }: { path: string; active: boolean }) {
   return (
     <span
       className={`grid h-8 w-14 place-items-center rounded-lg transition-colors ${
-        active ? "bg-primary-50" : "group-hover:bg-gray-100"
+        active ? "bg-primary-50 dark:bg-primary-900" : "group-hover:bg-gray-100 dark:group-hover:bg-gray-700"
       }`}
     >
       <svg
@@ -52,6 +61,77 @@ function RailIcon({ path, active }: { path: string; active: boolean }) {
         <path strokeLinecap="round" strokeLinejoin="round" d={path} />
       </svg>
     </span>
+  );
+}
+
+/**
+ * Tombol mode gelap, di ujung bawah rail dan di top bar mobile.
+ *
+ * Namanya tetap "Mode gelap" dan keadaannya dibawa `aria-pressed`, jadi
+ * pembaca layar mendengar satu tombol yang menyala atau mati, bukan label yang
+ * berganti-ganti. Ikonnya menunjukkan hasil bila ditekan: bulan saat terang,
+ * matahari saat gelap. Keduanya ditumpuk di sel grid yang sama lalu bergantian
+ * lewat opacity, scale, dan rotate, sama seperti ikon salin di Home.
+ *
+ * Di halaman yang belum punya tampilan gelap tombolnya diredupkan. Dipakai
+ * `aria-disabled`, bukan `disabled`, supaya tetap bisa difokus dan tooltip
+ * alasannya tetap muncul saat disentuh.
+ */
+function ThemeToggle({
+  dark,
+  available,
+  className,
+  hoverClassName,
+}: {
+  /** Mode gelap yang sedang berlaku di halaman ini. */
+  dark: boolean;
+  /** Halaman ini sudah punya tampilan gelap. */
+  available: boolean;
+  className: string;
+  /** Hanya dipasang selama tombolnya bisa dipakai, supaya versi redupnya tidak menyala saat disentuh. */
+  hoverClassName: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        if (available) setDarkPreference(!dark);
+      }}
+      aria-pressed={dark}
+      aria-disabled={available ? undefined : true}
+      aria-label="Mode gelap"
+      title={
+        available
+          ? dark
+            ? "Matikan mode gelap"
+            : "Nyalakan mode gelap"
+          : "Mode gelap belum tersedia di halaman ini"
+      }
+      className={`${className} ${available ? hoverClassName : "cursor-not-allowed opacity-40"}`}
+    >
+      <span className="grid size-5 place-items-center *:col-start-1 *:row-start-1 *:size-5 *:transition-[opacity,scale,rotate] *:duration-300">
+        <svg
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          aria-hidden="true"
+          className={dark ? "scale-50 -rotate-90 opacity-0" : "scale-100 rotate-0 opacity-100"}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d={ikonBulan} />
+        </svg>
+        <svg
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          aria-hidden="true"
+          className={dark ? "scale-100 rotate-0 opacity-100" : "scale-50 rotate-90 opacity-0"}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d={ikonMatahari} />
+        </svg>
+      </span>
+    </button>
   );
 }
 
@@ -86,7 +166,7 @@ function NavLinks({ items, path }: { items: NavItem[]; path: string }) {
               {item.label}
             </a>
             {item.children && (
-              <div className="mt-1 ml-5 border-l border-border pl-2">
+              <div className="mt-1 ml-5 border-l border-border pl-2 dark:border-gray-700">
                 {item.children
                   .filter((child) => !child.soon)
                   .map((child) => (
@@ -192,8 +272,8 @@ function SidebarPanel({
 
   return (
     <aside
-      className={`sticky top-0 z-20 hidden h-screen shrink-0 overflow-hidden bg-white transition-[width] duration-300 ease-out lg:block ${
-        shown ? "w-[248px] border-r border-border" : "w-0"
+      className={`sticky top-0 z-20 hidden h-screen shrink-0 overflow-hidden bg-white transition-[width] duration-300 ease-out lg:block dark:bg-gray-800 ${
+        shown ? "w-[248px] border-r border-border dark:border-gray-700" : "w-0"
       }`}
       // Panel yang sedang menutup masih punya tautan yang bisa difokus dengan
       // Tab meski tak terlihat. `inert` menutup keduanya sekaligus: hilang dari
@@ -218,9 +298,9 @@ function SidebarPanel({
           <nav className="mt-2" aria-label={body.title}>
             <NavLinks items={body.items} path={path} />
           </nav>
-          <div data-slide-item className="mt-auto rounded-xl bg-gray-50 p-4">
-            <p className="text-xs font-bold text-gray-900">Foundation v1.0</p>
-            <p className="mt-1 text-xs leading-5 text-gray-500">
+          <div data-slide-item className="mt-auto rounded-xl bg-gray-50 p-4 dark:bg-gray-900">
+            <p className="text-xs font-bold text-gray-900 dark:text-white">Foundation v1.0</p>
+            <p className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">
               React · Vite
               <br />
               Tailwind CSS v4
@@ -256,18 +336,23 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
     return () => document.body.classList.remove("overflow-hidden");
   }, [drawer]);
 
+  // Pilihan pembaca hanya berlaku di halaman yang sudah punya tampilan gelap.
+  // Atributnya di <html> dipasang App; di sini nilainya untuk tombol dan halaman.
+  const darkAvailable = hasDarkMode(path);
+  const dark = useDarkPreference() && darkAvailable;
+
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900">
       {/* ══ Top bar — mobile ══ */}
-      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-white px-4 py-3 lg:hidden">
+      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-white px-4 py-3 lg:hidden dark:border-gray-700 dark:bg-gray-800">
         <a href="#/" className="flex items-center gap-2.5" aria-label="Beranda">
           <Logo small />
-          <span className="text-sm font-black tracking-tight text-gray-900">Design System</span>
+          <span className="text-sm font-black tracking-tight text-gray-900 dark:text-white">Design System</span>
         </a>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setCari(true)}
-            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             aria-label="Cari halaman"
           >
             <svg
@@ -280,9 +365,15 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
               <path strokeLinecap="round" d={ikonCari} />
             </svg>
           </button>
+          <ThemeToggle
+            dark={dark}
+            available={darkAvailable}
+            className="rounded-lg p-2 text-gray-600 dark:text-gray-300"
+            hoverClassName="hover:bg-gray-100 dark:hover:bg-gray-700"
+          />
           <button
             onClick={() => setDrawer(true)}
-            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+            className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             aria-label="Buka navigasi"
           >
             <svg
@@ -307,12 +398,12 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
       <Drawer open={drawer} onClose={() => setDrawer(false)} label="Navigasi">
         <div
           data-drawer-item
-          className="flex items-center justify-between border-b border-border px-5 py-4"
+          className="flex items-center justify-between border-b border-border px-5 py-4 dark:border-gray-700"
         >
-          <span className="text-sm font-black tracking-tight text-gray-900">Navigasi</span>
+          <span className="text-sm font-black tracking-tight text-gray-900 dark:text-white">Navigasi</span>
           <button
             onClick={() => setDrawer(false)}
-            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
             aria-label="Tutup navigasi"
           >
             <svg
@@ -402,7 +493,7 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
           membungkus ikon + label, jadi label panjang ("Components") membuat
           kotaknya hampir selebar rail dan terlihat mepet ke garis kanan.
         */}
-        <aside className="sticky top-0 z-30 hidden h-screen w-[88px] shrink-0 flex-col items-center border-r border-border bg-white px-2 py-5 lg:flex">
+        <aside className="sticky top-0 z-30 hidden h-screen w-[88px] shrink-0 flex-col items-center border-r border-border bg-white px-2 py-5 lg:flex dark:border-gray-700 dark:bg-gray-800">
           <a href="#/" aria-label="Beranda">
             <Logo />
           </a>
@@ -440,7 +531,7 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
           */}
           <button
             onClick={() => setSidebarOpen((v) => !v)}
-            className={`mt-auto grid size-10 place-items-center rounded-xl text-gray-400 transition-[opacity,transform,color,background-color] duration-300 hover:bg-gray-100 hover:text-gray-700 ${
+            className={`mt-auto grid size-10 place-items-center rounded-xl text-gray-400 transition-[opacity,transform,color,background-color] duration-300 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200 ${
               sidebar ? "opacity-100" : "pointer-events-none scale-75 opacity-0"
             }`}
             aria-expanded={sidebarOpen}
@@ -458,6 +549,13 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 9.5 13.5 12l2.5 2.5" />
             </svg>
           </button>
+          {/* Paling bawah, jadi letaknya sama di semua halaman meski tombol panel di atasnya sedang pudar. */}
+          <ThemeToggle
+            dark={dark}
+            available={darkAvailable}
+            className="mt-1 grid size-10 place-items-center rounded-xl text-gray-400 transition-colors duration-300"
+            hoverClassName="hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+          />
         </aside>
 
         {/* ══ Sidebar drawer — desktop ══ */}
@@ -471,7 +569,10 @@ export function DocsLayout({ path, children }: { path: string; children: ReactNo
         {/* ══ Konten ══ */}
         {/* min-w-0: tabel & blok kode lebar menggulung sendiri, tidak melebarkan baris. */}
         <div className="min-w-0 flex-1">
-          <main>{children}</main>
+          <main>
+            {/* Halaman membaca mode gelap dari sini untuk memberi `darkMode` pada pratinjaunya. */}
+            <DocsDarkContext.Provider value={dark}>{children}</DocsDarkContext.Provider>
+          </main>
         </div>
       </div>
 
