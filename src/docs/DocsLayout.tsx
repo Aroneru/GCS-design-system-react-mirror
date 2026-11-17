@@ -295,7 +295,11 @@ function SidebarPanel({
           >
             {body.title}
           </p>
-          <nav className="mt-2" aria-label={body.title}>
+          {/*
+            mb-6 menjaga jarak ke kartu versi saat daftar menu memenuhi panel:
+            mt-auto milik kartu hanya memberi jarak selama masih ada ruang sisa.
+          */}
+          <nav className="mt-2 mb-6" aria-label={body.title}>
             <NavLinks items={body.items} path={path} />
           </nav>
           <div data-slide-item className="mt-auto rounded-xl bg-gray-50 p-4 dark:bg-gray-900">

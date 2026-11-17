@@ -5,7 +5,7 @@ import {
   type SearchCategory,
   type SearchPlatform,
 } from '../../../lib'
-import { useDocsDark } from '../../docsTheme'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -13,6 +13,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -64,35 +65,18 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-/**
- * Daftar isi di mode gelap docs: bagian Dark mode bertukar menjadi Light mode.
- * Id-nya tetap `dark-mode` supaya tautan ke bagian itu tidak putus. Ditulis di
- * level modul seperti `toc`, karena observer daftar isi dipasang ulang setiap
- * kali daftarnya berganti.
- */
-const tocDark: TocEntry[] = toc.map((t) => (t.id === 'dark-mode' ? { ...t, label: 'Light mode' } : t))
+const tocDark = tocForDarkDocs(toc)
 
 export function SearchPage() {
-  // Contoh di halaman ini mengikuti mode docs: di mode gelap komponennya
-  // memakai `darkMode`, dan cuplikan kodenya ikut menuliskannya supaya tetap
-  // sama dengan pratinjaunya.
-  const dark = useDocsDark()
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [application, setApplication] = useState<SearchApplication>('default')
   const [platform, setPlatform] = useState<SearchPlatform>('default')
   const [withCategory, setWithCategory] = useState(false)
   const [withLabel, setWithLabel] = useState(false)
   const [withHelper, setWithHelper] = useState(false)
-  const [theme, setTheme] = useState(dark ? 'dark' : 'light')
-
-  // Mode Playground mulai dari mode docs dan ikut berganti bersamanya, tapi
-  // tetap bisa diubah sendiri lewat kontrol Mode. Diselaraskan saat render,
-  // sama seperti `kept` di SidebarPanel: perbandingan boolean, jadi setelah
-  // satu render ulang nilainya sudah sama dan cabang ini tidak berputar.
-  const [syncedDark, setSyncedDark] = useState(dark)
-  if (dark !== syncedDark) {
-    setSyncedDark(dark)
-    setTheme(dark ? 'dark' : 'light')
-  }
+  const [dark, setDark] = usePlaygroundDark()
 
   const [value, setValue] = useState('')
   const [category, setCategory] = useState('')
@@ -103,7 +87,7 @@ export function SearchPage() {
       eyebrow="Form"
       title="Search Form"
       description="Kolom pencarian dengan tombol cari. Tersedia sebagai satu kotak polos atau tiga ruas menyatu dengan dropdown kategori di kiri, memakai warna, radius, dan jarak dari Foundations."
-      toc={dark ? tocDark : toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="search-form" title="Search Form">
         <Lead>
@@ -112,7 +96,7 @@ export function SearchPage() {
           jelas bahwa hasil baru berganti setelah ditekan, bukan sambil diketik.
         </Lead>
         <Demo label="Default">
-          <Search placeholder={PLACEHOLDER} onSearch={(v) => setTerakhir(v)} darkMode={dark} />
+          <Search placeholder={PLACEHOLDER} onSearch={(v) => setTerakhir(v)} darkMode={docsDark} />
         </Demo>
         <SectionCode>
           {"import { Search } from '@ceplok-ui/design-kit-react'\n\n"}
@@ -121,7 +105,7 @@ export function SearchPage() {
           {'    '}
           <H>onSearch</H>
           {'={(value) => cari(value)}\n'}
-          {dark && '    darkMode\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
@@ -134,18 +118,20 @@ export function SearchPage() {
         </Lead>
         <div className="grid gap-5">
           <Demo label="Default — 54px">
-            <Search placeholder={PLACEHOLDER} darkMode={dark} />
+            <Search placeholder={PLACEHOLDER} darkMode={docsDark} />
           </Demo>
           <Demo label="Mobile — 50px">
             <div className="max-w-[348px]">
-              <Search platform="mobile" placeholder={PLACEHOLDER} darkMode={dark} />
+              <Search platform="mobile" placeholder={PLACEHOLDER} darkMode={docsDark} />
             </div>
           </Demo>
         </div>
         <SectionCode>
           {'<Search '}
           <H>platform</H>
-          {`="mobile" placeholder="Search Civitas, Organisasi…"${dark ? ' darkMode' : ''} />`}
+          {'="mobile" placeholder="Search Civitas, Organisasi…"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -162,7 +148,7 @@ export function SearchPage() {
                 categories={kategori}
                 placeholder={PLACEHOLDER}
                 onSearch={(v, c) => setTerakhir(c ? `${v} · ${c}` : v)}
-                darkMode={dark}
+                darkMode={docsDark}
               />
             </div>
           </Demo>
@@ -172,7 +158,7 @@ export function SearchPage() {
                 categories={kategori}
                 placeholder={PLACEHOLDER}
                 onSearch={(v, c) => setTerakhir(c ? `${v} · ${c}` : v)}
-                darkMode={dark}
+                darkMode={docsDark}
               />
             </div>
           </Demo>
@@ -184,7 +170,7 @@ export function SearchPage() {
           {'={[{ value: "civitas", label: "Civitas" }]}\n'}
           {'    placeholder="Search Civitas, Organisasi…"\n'}
           {'    onSearch={(value, category) => cari(value, category)}\n'}
-          {dark && '    darkMode\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
@@ -214,7 +200,7 @@ export function SearchPage() {
                 application={a.value}
                 placeholder={PLACEHOLDER}
                 helperText={`bg-${a.token}`}
-                darkMode={dark}
+                darkMode={docsDark}
               />
             </Demo>
           ))}
@@ -222,53 +208,44 @@ export function SearchPage() {
         <SectionCode>
           {'<Search '}
           <H>application</H>
-          {`="purple" placeholder="Search Civitas, Organisasi…"${dark ? ' darkMode' : ''} />`}
+          {'="purple" placeholder="Search Civitas, Organisasi…"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
-      {/*
-        Bagian ini selalu menunjukkan mode yang sedang tidak dipakai docs. Di
-        mode terang ia memperagakan `darkMode`; di mode gelap, ketika semua
-        contoh lain sudah gelap, ia bertukar menjadi Light mode: versi terang
-        di kotak terang, dengan cuplikan tanpa `darkMode`.
-      */}
-      <FlowSection id="dark-mode" title={dark ? 'Light mode' : 'Dark mode'}>
-        <Lead>
-          {dark ? (
-            <>
-              Dokumentasi sedang dalam mode gelap, jadi contoh lain di halaman ini memakai <Hl>darkMode</Hl>,
-              begitu pula cuplikan kodenya. Tanpa prop itu Search Form tampil terang, seperti di bawah ini.
-            </>
-          ) : (
-            <>
-              Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, dan batas.
-            </>
-          )}
-        </Lead>
+      <ModeSection
+        name="Search Form"
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, dan batas.
+          </>
+        }
+      >
         <div className="grid gap-5">
-          <Demo label="Default" dark={!dark} light={dark}>
-            <Search placeholder={PLACEHOLDER} darkMode={!dark} />
+          <Demo label="Default" dark={!docsDark} light={docsDark}>
+            <Search placeholder={PLACEHOLDER} darkMode={!docsDark} />
           </Demo>
-          <Demo label="Dengan Kategori" dark={!dark} light={dark}>
+          <Demo label="Dengan Kategori" dark={!docsDark} light={docsDark}>
             <div className="max-w-[882px]">
               <Search
                 categories={kategori}
                 placeholder={PLACEHOLDER}
-                darkMode={!dark}
+                darkMode={!docsDark}
               />
             </div>
           </Demo>
         </div>
         <SectionCode>
           {'<Search '}
-          {!dark && (
+          {!docsDark && (
             <>
               <H>darkMode</H>{' '}
             </>
           )}
           {'placeholder="Search Civitas, Organisasi…" />'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -277,7 +254,7 @@ export function SearchPage() {
         </Lead>
 
         <Stage
-          dark={theme === 'dark'}
+          dark={dark}
           maxWidth={
             withCategory
               ? platform === 'mobile'
@@ -295,7 +272,7 @@ export function SearchPage() {
             label={withLabel ? 'Cari data' : undefined}
             helperText={withHelper ? 'Tekan Enter atau tombol Cari.' : undefined}
             placeholder={PLACEHOLDER}
-            darkMode={theme === 'dark'}
+            darkMode={dark}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             category={withCategory ? category : undefined}
@@ -308,11 +285,11 @@ export function SearchPage() {
           <Control label="Mode">
             <Segmented
               label="Pilih mode"
-              value={theme}
-              onChange={(v) => setTheme(v as string)}
+              value={dark}
+              onChange={setDark}
               options={[
-                { value: 'light', label: 'Light' },
-                { value: 'dark', label: 'Dark' },
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
               ]}
             />
           </Control>
@@ -422,7 +399,7 @@ export function SearchPage() {
               {'="Tekan Enter atau tombol Cari."\n'}
             </>
           )}
-          {theme === 'dark' && (
+          {dark && (
             <>
               {'    '}
               <H>darkMode</H>

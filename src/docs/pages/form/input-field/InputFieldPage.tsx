@@ -6,6 +6,7 @@ import {
   type InputFieldPlatform,
   type InputFieldState,
 } from '../../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../../docsTheme'
 import { PropsTable, type PropRow } from '../../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../../pageKit'
 import {
@@ -13,6 +14,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -86,7 +88,12 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc)
+
 export function InputFieldPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [platform, setPlatform] = useState<InputFieldPlatform>('default')
   const [state, setState] = useState<InputFieldState>('default')
   const [application, setApplication] = useState<InputFieldApplication>('default')
@@ -94,7 +101,7 @@ export function InputFieldPage() {
   const [withHelper, setWithHelper] = useState(true)
   const [withClear, setWithClear] = useState(true)
   const [value, setValue] = useState('')
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = usePlaygroundDark()
   const [kind, setKind] = useState<'text' | 'password'>('text')
 
   const isPassword = kind === 'password'
@@ -117,7 +124,7 @@ export function InputFieldPage() {
       eyebrow="Form · Input Field Form"
       title="Input Field"
       description="Isian teks satu baris dengan label di atas field. Tinggi, warna, dan jaraknya memakai token yang sama dengan Foundations. Tersedia juga versi kata sandi dan tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="input-field" title="Input Field">
         <Lead>
@@ -131,6 +138,7 @@ export function InputFieldPage() {
               placeholder="Masukkan nama lengkap"
               helperText="Sesuai yang tertera pada KTP."
               icon={<User className="size-4" />}
+              darkMode={docsDark}
             />
           </Demo>
           <Demo label="Mobile · 40px">
@@ -140,6 +148,7 @@ export function InputFieldPage() {
               placeholder="Masukkan nama lengkap"
               helperText="Sesuai yang tertera pada KTP."
               icon={<User className="size-4" />}
+              darkMode={docsDark}
             />
           </Demo>
         </div>
@@ -151,11 +160,14 @@ export function InputFieldPage() {
           {'    placeholder="Masukkan nama lengkap"\n'}
           {'    helperText="Sesuai yang tertera pada KTP."\n'}
           {'    icon={<User className="size-4" />}\n'}
+          {dm.line}
           {'/>\n\n'}
           {'{/* Mobile — field 40px */}\n'}
           {'<InputField '}
           <H>platform</H>
-          {'="mobile" label="Nama lengkap" />'}
+          {'="mobile" label="Nama lengkap"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -173,6 +185,7 @@ export function InputFieldPage() {
                 placeholder="Masukkan nama lengkap"
                 helperText={s.value === 'failed' ? 'Nama lengkap wajib diisi.' : s.desc}
                 icon={<User className="size-4" />}
+                darkMode={docsDark}
               />
             </Demo>
           ))}
@@ -185,6 +198,7 @@ export function InputFieldPage() {
           {'="failed"\n'}
           {'    label="Nama lengkap"\n'}
           {'    helperText="Nama lengkap wajib diisi."\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
@@ -204,6 +218,7 @@ export function InputFieldPage() {
                 placeholder="Masukkan nama lengkap"
                 helperText={`border-${a.token}`}
                 icon={<User className="size-4" />}
+                darkMode={docsDark}
               />
             </Demo>
           ))}
@@ -215,6 +230,7 @@ export function InputFieldPage() {
           {'="purple"\n'}
           {'    state="typing"\n'}
           {'    label="Nama lengkap"\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
@@ -232,7 +248,7 @@ export function InputFieldPage() {
         <div className="grid gap-5 sm:grid-cols-2">
           {passwordDemos.map((d) => (
             <Demo key={d.label} label={d.label}>
-              <PasswordDemoField platform={d.platform} state={d.state} />
+              <PasswordDemoField platform={d.platform} state={d.state} dark={docsDark} />
             </Demo>
           ))}
         </div>
@@ -245,22 +261,27 @@ export function InputFieldPage() {
           {'    placeholder="••••••••"\n'}
           {'    helperText="Gunakan minimal 8 karakter."\n'}
           {'    autoComplete="current-password"\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> mengganti field ke gray-700 dengan label putih. Garisnya menyatu dengan latar
-          dan baru terlihat saat <Hl>typing</Hl> (warna aplikasi) atau <Hl>failed</Hl> (red-500). Teks yang
-          diketik putih, sedangkan placeholder, ikon, dan caption abu-abu. Tombol hapus (×) dan tombol mata
-          gray-400. Pada type password saat <Hl>failed</Hl>, gembok, placeholder, serta caption-nya red-500.
-        </Lead>
+      <ModeSection
+        name="Input Field"
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengganti field ke gray-700 dengan label putih. Garisnya menyatu dengan latar
+            dan baru terlihat saat <Hl>typing</Hl> (warna aplikasi) atau <Hl>failed</Hl> (red-500). Teks yang
+            diketik putih, sedangkan placeholder, ikon, dan caption abu-abu. Tombol hapus (×) dan tombol mata
+            gray-400. Pada type password saat <Hl>failed</Hl>, gembok, placeholder, serta caption-nya red-500.
+          </>
+        }
+      >
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
-            <Demo key={s.value} label={s.label} dark>
+            <Demo key={s.value} label={s.label} dark={!docsDark} light={docsDark}>
               <InputField
-                darkMode
+                darkMode={!docsDark}
                 state={s.value}
                 label="Nama lengkap"
                 placeholder="Masukkan nama lengkap"
@@ -273,21 +294,25 @@ export function InputFieldPage() {
           {passwordDemos
             .filter((d) => d.platform !== 'mobile')
             .map((d) => (
-              <Demo key={`password-${d.label}`} label={`Password · ${d.label}`} dark>
-                <PasswordDemoField platform={d.platform} state={d.state} dark />
+              <Demo key={`password-${d.label}`} label={`Password · ${d.label}`} dark={!docsDark} light={docsDark}>
+                <PasswordDemoField platform={d.platform} state={d.state} dark={!docsDark} />
               </Demo>
             ))}
         </div>
         <SectionCode>
           {'<InputField\n'}
-          {'    '}
-          <H>darkMode</H>
-          {'\n'}
+          {!docsDark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
+            </>
+          )}
           {'    label="Nama lengkap"\n'}
           {'    placeholder="Masukkan nama lengkap"\n'}
           {'/>'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -408,7 +433,7 @@ export function InputFieldPage() {
           </Control>
         </Controls>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Ketik pada field di atas untuk melihat state <em>typing</em> yang sesungguhnya — garisnya berubah
           lewat <Hl>focus-within</Hl>, tanpa perlu mengubah prop. Pada state <em>failed</em>, helper text
           otomatis berganti jadi pesan kesalahan.

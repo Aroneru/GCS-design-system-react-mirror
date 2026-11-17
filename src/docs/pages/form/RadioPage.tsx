@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Radio, type RadioApplication, type RadioPlatform, type RadioState } from '../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -7,6 +8,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -45,20 +47,35 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc)
+
 export function RadioPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [platform, setPlatform] = useState<RadioPlatform>('default')
   const [state, setState] = useState<RadioState>('default')
   const [application, setApplication] = useState<RadioApplication>('default')
   const [withCaption, setWithCaption] = useState(false)
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = usePlaygroundDark()
   const [pilihan, setPilihan] = useState('wni')
+
+  // Baris `darkMode` di cuplikan bagian Dark mode. Hilang selama bagian itu
+  // bertukar menjadi Light mode.
+  const barisDarkMode = !docsDark && (
+    <>
+      {'    '}
+      <H>darkMode</H>
+      {'\n'}
+    </>
+  )
 
   return (
     <UsulanPage
       eyebrow="Form"
       title="Radio Button"
       description="Pilihan tunggal dari beberapa opsi yang saling meniadakan. Dibangun di atas <input type='radio'> bawaan supaya navigasi panah dan pembaca layar tetap berfungsi, dengan warna, ukuran, dan jarak dari Foundations. Tersedia juga dalam tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="radio-button" title="Radio Button">
         <Lead>
@@ -68,14 +85,15 @@ export function RadioPage() {
         </Lead>
         <Demo>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <Radio name="ds-radio-dasar" label="Belum dipilih" />
-            <Radio name="ds-radio-dasar" label="Sedang dipilih" defaultChecked />
-            <Radio name="ds-radio-nonaktif" state="inactive" label="Tidak aktif" />
+            <Radio name="ds-radio-dasar" label="Belum dipilih" darkMode={docsDark} />
+            <Radio name="ds-radio-dasar" label="Sedang dipilih" defaultChecked darkMode={docsDark} />
+            <Radio name="ds-radio-nonaktif" state="inactive" label="Tidak aktif" darkMode={docsDark} />
             <Radio
               name="ds-radio-nonaktif-terpilih"
               state="inactive"
               label="Tidak aktif, terpilih"
               defaultChecked
+              darkMode={docsDark}
             />
           </div>
         </Demo>
@@ -84,17 +102,25 @@ export function RadioPage() {
           {'{/* Sekelompok pilihan: samakan name-nya */}\n'}
           {'<Radio '}
           <H>name</H>
-          {'="pilihan" label="Belum dipilih" />\n'}
+          {'="pilihan" label="Belum dipilih"'}
+          {dm.inline}
+          {' />\n'}
           {'<Radio '}
           <H>name</H>
-          {'="pilihan" label="Sedang dipilih" defaultChecked />\n\n'}
+          {'="pilihan" label="Sedang dipilih" defaultChecked'}
+          {dm.inline}
+          {' />\n\n'}
           {'{/* Inactive — meredup sekaligus nonaktif */}\n'}
           {'<Radio name="pilihan-nonaktif" '}
           <H>state</H>
-          {'="inactive" label="Tidak aktif" />\n'}
+          {'="inactive" label="Tidak aktif"'}
+          {dm.inline}
+          {' />\n'}
           {'<Radio name="pilihan-nonaktif" '}
           <H>state</H>
-          {'="inactive" label="Tidak aktif, terpilih" defaultChecked />'}
+          {'="inactive" label="Tidak aktif, terpilih" defaultChecked'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -110,11 +136,13 @@ export function RadioPage() {
               label="Warga negara Indonesia"
               helperText="Wajib melampirkan KTP elektronik yang masih berlaku."
               defaultChecked
+              darkMode={docsDark}
             />
             <Radio
               name="ds-radio-caption"
               label="Warga negara asing"
               helperText="Wajib melampirkan paspor dan izin tinggal."
+              darkMode={docsDark}
             />
           </div>
         </Demo>
@@ -126,6 +154,7 @@ export function RadioPage() {
           <H>helperText</H>
           {'="Wajib melampirkan KTP elektronik yang masih berlaku."\n'}
           {'    defaultChecked\n'}
+          {dm.line}
           {'/>\n'}
           {'<Radio\n'}
           {'    name="kewarganegaraan"\n'}
@@ -133,6 +162,7 @@ export function RadioPage() {
           {'    '}
           <H>helperText</H>
           {'="Wajib melampirkan paspor dan izin tinggal."\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
@@ -150,6 +180,7 @@ export function RadioPage() {
                   name="ds-radio-desktop"
                   label={o.label}
                   defaultChecked={o.value === 'wni'}
+                  darkMode={docsDark}
                 />
               ))}
             </div>
@@ -163,6 +194,7 @@ export function RadioPage() {
                   name="ds-radio-mobile"
                   label={o.label}
                   defaultChecked={o.value === 'wni'}
+                  darkMode={docsDark}
                 />
               ))}
             </div>
@@ -170,15 +202,23 @@ export function RadioPage() {
         </div>
         <SectionCode>
           {'{/* Desktop — platform bawaan, tanpa prop */}\n'}
-          {'<Radio name="wn-desktop" label="Warga negara Indonesia" defaultChecked />\n'}
-          {'<Radio name="wn-desktop" label="Warga negara asing" />\n\n'}
+          {'<Radio name="wn-desktop" label="Warga negara Indonesia" defaultChecked'}
+          {dm.inline}
+          {' />\n'}
+          {'<Radio name="wn-desktop" label="Warga negara asing"'}
+          {dm.inline}
+          {' />\n\n'}
           {'{/* Mobile */}\n'}
           {'<Radio '}
           <H>platform</H>
-          {'="mobile" name="wn-mobile" label="Warga negara Indonesia" defaultChecked />\n'}
+          {'="mobile" name="wn-mobile" label="Warga negara Indonesia" defaultChecked'}
+          {dm.inline}
+          {' />\n'}
           {'<Radio '}
           <H>platform</H>
-          {'="mobile" name="wn-mobile" label="Warga negara asing" />'}
+          {'="mobile" name="wn-mobile" label="Warga negara asing"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -197,16 +237,26 @@ export function RadioPage() {
                   label="Dipilih"
                   helperText={`border-${a.token}`}
                   defaultChecked
+                  darkMode={docsDark}
                 />
-                <Radio name={`ds-radio-${a.value}`} application={a.value} label="Belum dipilih" />
+                <Radio
+                  name={`ds-radio-${a.value}`}
+                  application={a.value}
+                  label="Belum dipilih"
+                  darkMode={docsDark}
+                />
               </div>
             </Demo>
           ))}
         </div>
         <SectionCode>
           {'{/* Default — tanpa prop application */}\n'}
-          {'<Radio name="pilihan-default" label="Dipilih" helperText="border-primary-700" defaultChecked />\n'}
-          {'<Radio name="pilihan-default" label="Belum dipilih" />\n\n'}
+          {'<Radio name="pilihan-default" label="Dipilih" helperText="border-primary-700" defaultChecked'}
+          {dm.inline}
+          {' />\n'}
+          {'<Radio name="pilihan-default" label="Belum dipilih"'}
+          {dm.inline}
+          {' />\n\n'}
           {'{/* Purple */}\n'}
           {'<Radio\n'}
           {'    name="pilihan-purple"\n'}
@@ -216,38 +266,50 @@ export function RadioPage() {
           {'    label="Dipilih"\n'}
           {'    helperText="border-purple-500"\n'}
           {'    defaultChecked\n'}
+          {dm.line}
           {'/>\n'}
           {'<Radio name="pilihan-purple" '}
           <H>application</H>
-          {'="purple" label="Belum dipilih" />'}
+          {'="purple" label="Belum dipilih"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> mengganti lingkaran ke gray-300 bergaris gray-400, dengan label terang dan
-          caption gray-400. Cincin pilihan aktif tetap memakai warna aplikasi. State <Hl>inactive</Hl> memakai
-          lingkaran gray-700 bergaris gray-800 dengan teks gray-600.
-        </Lead>
-        <Demo dark>
+      <ModeSection
+        name="Radio"
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengganti lingkaran ke gray-300 bergaris gray-400, dengan label terang dan
+            caption gray-400. Cincin pilihan aktif tetap memakai warna aplikasi. State <Hl>inactive</Hl> memakai
+            lingkaran gray-700 bergaris gray-800 dengan teks gray-600.
+          </>
+        }
+      >
+        <Demo dark={!docsDark} light={docsDark}>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <Radio darkMode name="ds-radio-gelap" label="Belum dipilih" helperText="Keterangan singkat." />
             <Radio
-              darkMode
+              darkMode={!docsDark}
+              name="ds-radio-gelap"
+              label="Belum dipilih"
+              helperText="Keterangan singkat."
+            />
+            <Radio
+              darkMode={!docsDark}
               name="ds-radio-gelap"
               label="Sedang dipilih"
               helperText="Keterangan singkat."
               defaultChecked
             />
             <Radio
-              darkMode
+              darkMode={!docsDark}
               name="ds-radio-gelap-nonaktif"
               state="inactive"
               label="Tidak aktif"
               helperText="Keterangan singkat."
             />
             <Radio
-              darkMode
+              darkMode={!docsDark}
               name="ds-radio-gelap-nonaktif-terpilih"
               state="inactive"
               label="Tidak aktif, terpilih"
@@ -258,12 +320,14 @@ export function RadioPage() {
         </Demo>
         <SectionCode>
           {'<Radio '}
-          <H>darkMode</H>
-          {' name="pilihan-gelap" label="Belum dipilih" helperText="Keterangan singkat." />\n'}
+          {!docsDark && (
+            <>
+              <H>darkMode</H>{' '}
+            </>
+          )}
+          {'name="pilihan-gelap" label="Belum dipilih" helperText="Keterangan singkat." />\n'}
           {'<Radio\n'}
-          {'    '}
-          <H>darkMode</H>
-          {'\n'}
+          {barisDarkMode}
           {'    name="pilihan-gelap"\n'}
           {'    label="Sedang dipilih"\n'}
           {'    helperText="Keterangan singkat."\n'}
@@ -271,18 +335,14 @@ export function RadioPage() {
           {'/>\n\n'}
           {'{/* Inactive */}\n'}
           {'<Radio\n'}
-          {'    '}
-          <H>darkMode</H>
-          {'\n'}
+          {barisDarkMode}
           {'    name="pilihan-gelap-nonaktif"\n'}
           {'    state="inactive"\n'}
           {'    label="Tidak aktif"\n'}
           {'    helperText="Keterangan singkat."\n'}
           {'/>\n'}
           {'<Radio\n'}
-          {'    '}
-          <H>darkMode</H>
-          {'\n'}
+          {barisDarkMode}
           {'    name="pilihan-gelap-nonaktif"\n'}
           {'    state="inactive"\n'}
           {'    label="Tidak aktif, terpilih"\n'}
@@ -290,7 +350,7 @@ export function RadioPage() {
           {'    defaultChecked\n'}
           {'/>'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -380,7 +440,7 @@ export function RadioPage() {
           </Control>
         </Controls>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Satu kelompok pilihan dibentuk dengan memberi <Hl>name</Hl> yang sama pada tiap Radio — sama seperti
           formulir HTML biasa, jadi panah atas/bawah otomatis berpindah antar-opsi.
         </p>

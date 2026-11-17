@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useDocsDark } from './docsTheme'
-import { CodeBlock, ControlLabel, Segmented } from './pageKit'
+import { CodeBlock, ControlLabel, Hl, Segmented } from './pageKit'
 import {
   PlaygroundFontContext,
   fontClass,
@@ -160,6 +160,44 @@ export function Lead({ children }: { children: ReactNode }) {
   return <p className="mb-4 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">{children}</p>
 }
 
+/**
+ * Bagian "Dark mode" di halaman komponen, yang selalu menunjukkan mode yang
+ * sedang tidak dipakai docs. Di mode terang ia memperagakan `darkMode` dengan
+ * `lead` milik halaman. Di mode gelap, ketika semua contoh lain sudah gelap, ia
+ * bertukar menjadi Light mode. Isinya ditulis halaman: komponen dengan
+ * `darkMode={!docsDark}` di dalam <Demo dark={!docsDark} light={docsDark}>,
+ * dan cuplikan yang menulis `darkMode` hanya di mode terang. Pasangannya di
+ * daftar isi: `tocForDarkDocs` di docsTheme.ts.
+ */
+export function ModeSection({
+  name,
+  lead,
+  children,
+}: {
+  /** Nama komponen di kalimat Light mode, mis. "Input Field". */
+  name: string
+  /** Pengantar bagian Dark mode, di mode terang docs. */
+  lead: ReactNode
+  children: ReactNode
+}) {
+  const docsDark = useDocsDark()
+  return (
+    <FlowSection id="dark-mode" title={docsDark ? 'Light mode' : 'Dark mode'}>
+      <Lead>
+        {docsDark ? (
+          <>
+            Dokumentasi sedang dalam mode gelap, jadi contoh lain di halaman ini memakai <Hl>darkMode</Hl>,
+            begitu pula cuplikan kodenya. Tanpa prop itu {name} tampil terang, seperti di bawah ini.
+          </>
+        ) : (
+          lead
+        )}
+      </Lead>
+      {children}
+    </FlowSection>
+  )
+}
+
 /** Blok kode di bawah pratinjau — jaraknya seragam di semua bagian. */
 export function SectionCode({ children, flush }: { children: ReactNode; flush?: boolean }) {
   return (
@@ -177,10 +215,10 @@ export function SectionCode({ children, flush }: { children: ReactNode; flush?: 
  */
 export function PrincipleList({ items }: { items: ReactNode[] }) {
   return (
-    <ul className="space-y-4 text-sm leading-6 text-gray-600">
+    <ul className="space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-300">
       {items.map((item, i) => (
         <li key={i} className="flex gap-3">
-          <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-600" />
+          <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-600 dark:bg-primary-400" />
           <span>{item}</span>
         </li>
       ))}

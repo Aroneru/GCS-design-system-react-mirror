@@ -167,7 +167,7 @@ export function CodeBlock({ children }: { children: ReactNode }) {
 
 /** Potongan kode inline di dalam paragraf. */
 export const C = ({ children }: { children: ReactNode }) => (
-  <code className="text-xs font-bold text-gray-700">{children}</code>
+  <code className="text-xs font-bold text-gray-700 dark:text-gray-300">{children}</code>
 )
 
 /**

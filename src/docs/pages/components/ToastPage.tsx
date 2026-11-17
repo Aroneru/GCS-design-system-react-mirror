@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Refresh } from '../../../lib/icons/outline'
 import { Button, Toast, type ToastVariant } from '../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -8,6 +9,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   UsulanPage,
   type TocEntry,
@@ -57,6 +59,8 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc)
+
 /**
  * Tombol contoh untuk slot `actions`. Ukuran xs (tinggi 34px, teks 12px,
  * radius 8px, primary-700) kebetulan persis tombol yang digambar di desain,
@@ -71,11 +75,14 @@ function AksiButton() {
 }
 
 export function ToastPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [variant, setVariant] = useState<ToastVariant>('success')
   const [lebar, setLebar] = useState<'mobile' | 'desktop'>('desktop')
   const [posisi, setPosisi] = useState<Sudut>('bottom-left')
   const [pakaiAksi, setPakaiAksi] = useState(false)
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = usePlaygroundDark()
 
   // Toast menutup dirinya sendiri; ganti key untuk memasangnya kembali dari nol.
   const [tayangan, setTayangan] = useState(0)
@@ -90,7 +97,7 @@ export function ToastPage() {
       eyebrow="Components"
       title="Toast"
       description="Notifikasi sekilas yang melayang di atas konten halaman — untuk konfirmasi aksi, pembaruan status, atau ajakan tindak lanjut. Berbeda dari Alert: kartu tetap netral, hanya badge ikon yang membawa warna variant. Tersedia juga dalam tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="toast" title="Toast">
         <Lead>
@@ -101,7 +108,7 @@ export function ToastPage() {
         <Demo>
           <div className="space-y-3">
             {variants.map((v) => (
-              <Toast key={v.value} variant={v.value} dismissible={false}>
+              <Toast key={v.value} variant={v.value} dismissible={false} darkMode={docsDark}>
                 {v.pesan}
               </Toast>
             ))}
@@ -111,7 +118,9 @@ export function ToastPage() {
           {"import { Toast } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Toast '}
           <H>variant</H>
-          {'="success">Sukses Membuat Data!</Toast>'}
+          {'="success"'}
+          {dm.inline}
+          {'>Sukses Membuat Data!</Toast>'}
         </SectionCode>
       </FlowSection>
 
@@ -127,6 +136,7 @@ export function ToastPage() {
             icon={<Refresh />}
             heading="Update 2FA sudah tersedia!"
             actions={<AksiButton />}
+            darkMode={docsDark}
           >
             Update Metode Password anda sekarang
           </Toast>
@@ -145,32 +155,37 @@ export function ToastPage() {
           {'    '}
           <H>actions</H>
           {'={<Button size="xs" className="w-full">Update 2FA</Button>}\n'}
+          {dm.line}
           {'>\n'}
           {'    Update Metode Password anda sekarang\n'}
           {'</Toast>'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> mengganti kartunya ke gray-700, heading dan pesan singkat ke gray-300, dan teks
-          pendukung di bawah heading ke gray-400. Badge ikon ikut memakai versi gelapnya — latar gelap dengan ikon
-          -400 — sedangkan tombol tutup tetap gray-400 dan tombol di <Hl>actions</Hl> tetap primary-700 di kedua
-          tampilan.
-        </Lead>
+      <ModeSection
+        name="Toast"
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengganti kartunya ke gray-700, heading dan pesan singkat ke gray-300, dan teks
+            pendukung di bawah heading ke gray-400. Badge ikon ikut memakai versi gelapnya — latar gelap dengan ikon
+            -400 — sedangkan tombol tutup tetap gray-400 dan tombol di <Hl>actions</Hl> tetap primary-700 di kedua
+            tampilan.
+          </>
+        }
+      >
         <div className="grid gap-5 lg:grid-cols-2">
-          <Demo label="Pesan singkat" dark>
+          <Demo label="Pesan singkat" dark={!docsDark} light={docsDark}>
             <div className="space-y-3">
               {variants.map((v) => (
-                <Toast key={v.value} darkMode variant={v.value} dismissible={false}>
+                <Toast key={v.value} darkMode={!docsDark} variant={v.value} dismissible={false}>
                   {v.pesan}
                 </Toast>
               ))}
             </div>
           </Demo>
-          <Demo label="Dengan heading & aksi" dark>
+          <Demo label="Dengan heading & aksi" dark={!docsDark} light={docsDark}>
             <Toast
-              darkMode
+              darkMode={!docsDark}
               variant="info"
               icon={<Refresh />}
               heading="Update 2FA sudah tersedia!"
@@ -182,14 +197,18 @@ export function ToastPage() {
         </div>
         <SectionCode>
           {'<Toast '}
-          <H>darkMode</H>
-          {' variant="success">Sukses Membuat Data!</Toast>'}
+          {!docsDark && (
+            <>
+              <H>darkMode</H>{' '}
+            </>
+          )}
+          {'variant="success">Sukses Membuat Data!</Toast>'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Warning dan purple belum punya versi gelap di desain, jadi keduanya mengikuti pola mayoritas: latar
           -800 dengan ikon -400.
         </p>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="posisi" title="Posisi & tumpukan">
         <Lead>
@@ -199,9 +218,15 @@ export function ToastPage() {
         </Lead>
         <Demo label="Tiga Toast dalam satu wadah">
           <div className="space-y-3">
-            <Toast variant="success">Sukses Membuat Data!</Toast>
-            <Toast variant="warning">Sesi Anda akan berakhir dalam 5 menit.</Toast>
-            <Toast variant="info">Data sedang diproses.</Toast>
+            <Toast variant="success" darkMode={docsDark}>
+              Sukses Membuat Data!
+            </Toast>
+            <Toast variant="warning" darkMode={docsDark}>
+              Sesi Anda akan berakhir dalam 5 menit.
+            </Toast>
+            <Toast variant="info" darkMode={docsDark}>
+              Data sedang diproses.
+            </Toast>
           </div>
         </Demo>
         <SectionCode>
@@ -209,8 +234,12 @@ export function ToastPage() {
           {'<div className="'}
           <H>fixed bottom-4 left-4 z-50</H>
           {' space-y-3">\n'}
-          {'    <Toast variant="success">Sukses Membuat Data!</Toast>\n'}
-          {'    <Toast variant="warning">Sesi Anda akan berakhir dalam 5 menit.</Toast>\n'}
+          {'    <Toast variant="success"'}
+          {dm.inline}
+          {'>Sukses Membuat Data!</Toast>\n'}
+          {'    <Toast variant="warning"'}
+          {dm.inline}
+          {'>Sesi Anda akan berakhir dalam 5 menit.</Toast>\n'}
           {'</div>'}
         </SectionCode>
       </FlowSection>
@@ -225,11 +254,14 @@ export function ToastPage() {
         {/*
           Bukan <Stage>: panggung Playground biasa hanya kartu berlatar netral,
           sedangkan di sini perlu tinggi tetap dan `relative` supaya Toast bisa
-          benar-benar ditempel ke sudut bingkainya.
+          benar-benar ditempel ke sudut bingkainya. Warnanya mengikuti kontrol
+          Tampilan seperti <Stage>, termasuk tetap terang bila Light dipilih di
+          mode gelap docs.
         */}
         <div
+          data-theme={docsDark && !dark ? 'light' : undefined}
           className={`relative h-72 overflow-hidden rounded-2xl border p-4 transition-colors sm:h-80 sm:p-6 ${
-            dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
+            dark ? 'border-gray-800 bg-gray-900 dark:border-gray-700' : 'border-border bg-surface-subtle dark:text-content'
           }`}
         >
           <div
@@ -323,7 +355,7 @@ export function ToastPage() {
 
           <Control label="Posisi">
             <div
-              className="inline-grid grid-cols-2 gap-1 rounded-lg border border-border bg-surface p-1"
+              className="inline-grid grid-cols-2 gap-1 rounded-lg border border-border bg-surface p-1 dark:border-gray-700 dark:bg-gray-800"
               role="group"
               aria-label="Pilih posisi toast"
             >
@@ -334,8 +366,8 @@ export function ToastPage() {
                   onClick={() => setPosisi(s.value)}
                   className={`grid size-9 place-items-center rounded-md transition-colors ${
                     posisi === s.value
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-gray-400 hover:text-gray-700'
+                      ? 'bg-primary-50 text-primary-700 dark:bg-primary-900 dark:text-primary-300'
+                      : 'text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   }`}
                   aria-pressed={posisi === s.value}
                   aria-label={s.label}
@@ -356,7 +388,7 @@ export function ToastPage() {
           Tampilkan Toast
         </button>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Lebar mobile memakai <Hl>inset-x-3</Hl> agar Toast merentang mengikuti layar; di desktop lebarnya
           dibatasi lalu ditempel ke satu sisi.
         </p>
