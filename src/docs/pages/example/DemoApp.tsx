@@ -219,8 +219,6 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             } : undefined}
             search={
               <Search
-                platform="compact"
-                showButton
                 trigger="enter"
                 aria-label="Cari pengajuan atau pemohon"
                 placeholder="Cari pengajuan, pemohon ..."

@@ -321,17 +321,22 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
       )}
 
       {withCategory ? (
-        // Bentuk kategori reguler tetap 39px sesuai desain awal. Di Navbar,
-        // platform compact menyamakan tingginya dengan field compact 37px.
+        // Bentuk kategori reguler 39px: isi tombol kanan setinggi 37px dengan
+        // sisa 1px di atas dan bawah. Di Navbar, platform compact tetap 37px.
         <div
           role="search"
-          className={cn('group flex items-stretch', compactCategory ? 'h-[37px]' : 'h-[39px]')}
+          className={cn(
+            'group flex items-stretch bg-search-category-surface',
+            compactCategory ? 'h-[37px] rounded-lg' : 'h-[39px] rounded-[10px]',
+          )}
         >
           <div
             className={cn(
               'relative flex shrink-0 items-center rounded-l-lg border transition-colors',
-              'w-[128px]',
-              'border-field-border bg-search-category-surface',
+              compactCategory
+                ? 'w-[128px] border-field-border'
+                : 'w-[113px] border-search-category-border',
+              'bg-search-category-surface',
               !disabled && accent.groupFocus,
             )}
           >
@@ -342,9 +347,8 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               aria-hidden="true"
               tabIndex={-1}
               onChange={(event) => pilihKategori(event.target.value)}
-              // Pembawa nilai saja. Ruas kategori memakai lebar 128px agar
-              // label sampai 12 karakter tetap punya ruang bersama chevron.
-              // Select dikeluarkan dari alur agar option panjang tidak
+              // Pembawa nilai saja. Ruas reguler mengikuti desain 113px;
+              // compact Navbar tetap 128px agar label panjang tidak langsung
               // menghabiskan ruang field pencarian di sebelahnya.
               className="pointer-events-none absolute inset-0 h-full w-full appearance-none opacity-0"
             >
@@ -409,7 +413,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
           <div
             className={cn(
               'flex min-w-0 flex-1 items-center border-y px-2.5 text-sm transition-colors',
-              'border-field-border bg-search-field-surface',
+              'border-field-border bg-search-category-field-surface',
               !disabled && accent.groupFocus,
               !hasButton && 'rounded-r-lg border-r',
             )}
@@ -425,7 +429,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               aria-label={buttonLabel}
               className={cn(
                 'flex shrink-0 items-center justify-center rounded-r-lg text-white transition-colors',
-                compactCategory ? 'w-[37px]' : 'w-11',
+                compactCategory ? 'w-[37px]' : 'my-px h-[37px] w-[42px]',
                 'focus-visible:outline-2 focus-visible:outline-offset-2',
                 'disabled:cursor-not-allowed disabled:opacity-50',
                 accent.solid,

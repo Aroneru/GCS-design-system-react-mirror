@@ -1,12 +1,20 @@
 import { useState } from "react";
 import { Messages } from "../../../lib/icons/solid";
 import { Button, type ButtonTheme, type ButtonVariant } from "../../../lib";
+import {
+  tocForDarkDocs,
+  useDarkModeSnippet,
+  useDocsDark,
+  usePlaygroundDark,
+} from "../../docsTheme";
 import { PropsTable, type PropRow } from "../../PropsTable";
-import { H, Hl, Segmented } from "../../pageKit";
+import { Demo, H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
   FlowSection,
+  Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -55,18 +63,22 @@ const toc: TocEntry[] = [
   { id: "icon-only", label: "Icon Only & Sizes" },
   { id: "variants", label: "Variants" },
   { id: "themes", label: "Themes" },
-  { id: "darkmode", label: "Dark Mode" },
+  { id: "dark-mode", label: "Dark mode" },
   { id: "playground", label: "Playground" },
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
 ];
 
+const tocDark = tocForDarkDocs(toc);
+
 export function ButtonPage() {
+  const docsDark = useDocsDark();
+  const dm = useDarkModeSnippet();
   const [selectedSize, setSelectedSize] = useState<ButtonSize>("base");
   const [variant, setVariant] = useState<ButtonVariant>("filled");
   const [theme, setTheme] = useState<ButtonTheme>("primary");
   const [tone, setTone] = useState<"light" | "dark">("light");
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = usePlaygroundDark();
   const [iconOnly, setIconOnly] = useState(false);
   const [showLeftIcon, setShowLeftIcon] = useState(true);
   const [showRightIcon, setShowRightIcon] = useState(true);
@@ -77,14 +89,14 @@ export function ButtonPage() {
       eyebrow="Components · Button"
       title="Button"
       description="Tombol untuk memicu aksi utama pada sebuah halaman atau form. Mendukung berbagai ukuran, warna, varian, dan penggunaan icon."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="button" title="Button & Sizes">
-        <p className="mb-4 text-body-sm text-gray-500">
+        <Lead>
           Tombol default dalam berbagai ukuran untuk membantu memilih <Hl>size</Hl> yang sesuai dengan
           ruang layout. Tombol ditampilkan menggunakan ikon untuk memberikan gambaran untuk tombol
           dengan ikon saat dipakai sebagai aksi utama.
-        </p>
+        </Lead>
 
         <div className="mb-4 flex flex-wrap items-start justify-start gap-6">
           {sizes.map((size) => (
@@ -94,13 +106,14 @@ export function ButtonPage() {
                 variant="filled"
                 theme="primary"
                 tone="light"
+                darkMode={docsDark}
                 leftIcon={<Messages className="size-4" />}
                 rightIcon={<Messages className="size-4" />}
               >
                 Button
               </Button>
 
-              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 {size}
               </span>
             </div>
@@ -111,6 +124,7 @@ export function ButtonPage() {
 
           <H>size</H>
           {'="base"\n'}
+          {dm.line}
           {'    leftIcon={<Messages className="size-3.5" />}\n'}
           {'    rightIcon={<Messages className="size-3.5" />}\n'}
           {"    >\n"}
@@ -120,11 +134,11 @@ export function ButtonPage() {
       </FlowSection>
 
       <FlowSection id="icon-only" title="Icon Only & Sizes">
-        <p className="mb-4 text-body-sm text-gray-500">
+        <Lead>
           Versi ringkas untuk aksi cepat seperti toolbar, floating action, menu, atau shortcut.
           Tersedia dengan beberapa ukuran dan digunakan saat label tidak diperlukan atau ruang
           layout yang sempit.
-        </p>
+        </Lead>
 
         <div className="mb-4 flex flex-wrap items-start justify-start gap-6">
           {sizes.map((size) => (
@@ -134,13 +148,14 @@ export function ButtonPage() {
                 variant="filled"
                 theme="primary"
                 tone="light"
+                darkMode={docsDark}
                 iconOnly
                 aria-label={`Icon ${size}`}
               >
                 <Messages className="size-4" />
               </Button>
 
-              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                 {size}
               </span>
             </div>
@@ -154,6 +169,7 @@ export function ButtonPage() {
           {"    "}
           <H>size</H>
           {'="base"\n'}
+          {dm.line}
           {"    >\n"}
           {'    <Messages className="size-4" />\n'}
           {"</Button>"}
@@ -161,26 +177,26 @@ export function ButtonPage() {
       </FlowSection>
 
       <FlowSection id="variants" title="Variants">
-        <p className="mb-4 text-body-sm text-gray-500">
+        <Lead>
           Variasi tombol yang ditentukan oleh <Hl>variant</Hl>. Gunakan <Hl>filled</Hl> untuk aksi utama
           yang perlu mendapat perhatian lebih, dan <Hl>outline</Hl> untuk tindakan pendukung yang
           tetap terlihat, namun tidak terlalu dominan.
-        </p>
+        </Lead>
 
         <div className="mb-6 grid gap-5 sm:grid-cols-2 sm:gap-8">
           <div>
-            <h3 className="mb-3 text-lg font-bold text-gray-900">Filled</h3>
+            <h3 className="mb-3 text-lg font-bold text-gray-900 dark:text-white">Filled</h3>
             <div className="flex min-h-[130px] items-center rounded-2xl border border-border bg-surface-subtle p-8">
-              <Button variant="filled" theme="primary" tone="light">
+              <Button variant="filled" theme="primary" tone="light" darkMode={docsDark}>
                 Simpan Perubahan
               </Button>
             </div>
           </div>
 
           <div>
-            <h3 className="mb-3 text-lg font-bold text-gray-900">Outline</h3>
+            <h3 className="mb-3 text-lg font-bold text-gray-900 dark:text-white">Outline</h3>
             <div className="flex min-h-[130px] items-center rounded-2xl border border-border bg-surface-subtle p-8">
-              <Button variant="outline" theme="primary" tone="light">
+              <Button variant="outline" theme="primary" tone="light" darkMode={docsDark}>
                 Lihat Detail
               </Button>
             </div>
@@ -192,6 +208,7 @@ export function ButtonPage() {
           {"    "}
           <H>variant</H>
           {'="outline"\n'}
+          {dm.line}
           {"    >\n"}
           {"    Lihat Detail\n"}
           {"</Button>"}
@@ -199,72 +216,72 @@ export function ButtonPage() {
       </FlowSection>
 
       <FlowSection id="themes" title="Themes">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Tema digunakan untuk membedakan konteks dan tingkat prioritas suatu aksi.
-        </p>
+        </Lead>
 
         <div className="mb-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <Button variant="filled" theme="primary" tone="light">
+            <Button variant="filled" theme="primary" tone="light" darkMode={docsDark}>
               Primary
             </Button>
 
-            <p className="mt-3 text-sm text-gray-600">
+            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
               <Hl>Primary</Hl> digunakan untuk tindakan utama atau aksi yang paling penting dalam
               suatu halaman.
             </p>
           </div>
 
           <div>
-            <Button variant="filled" theme="green" tone="light">
+            <Button variant="filled" theme="green" tone="light" darkMode={docsDark}>
               Green
             </Button>
 
-            <p className="mt-3 text-sm text-gray-600">
+            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
               <Hl>Green</Hl> digunakan untuk tindakan yang menunjukkan keberhasilan, konfirmasi, atau
               penyelesaian.
             </p>
           </div>
 
           <div>
-            <Button variant="filled" theme="gray" tone="light">
+            <Button variant="filled" theme="gray" tone="light" darkMode={docsDark}>
               Gray
             </Button>
 
-            <p className="mt-3 text-sm text-gray-600">
+            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
               <Hl>Gray</Hl> digunakan untuk tindakan sekunder atau aksi dengan tingkat prioritas
               rendah.
             </p>
           </div>
 
           <div>
-            <Button variant="filled" theme="purple" tone="light">
+            <Button variant="filled" theme="purple" tone="light" darkMode={docsDark}>
               Purple
             </Button>
 
-            <p className="mt-3 text-sm text-gray-600">
+            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
               <Hl>Purple</Hl> digunakan untuk tindakan atau fitur khusus yang membutuhkan penekanan
               visual berbeda.
             </p>
           </div>
 
           <div>
-            <Button variant="filled" theme="orange" tone="light">
+            <Button variant="filled" theme="orange" tone="light" darkMode={docsDark}>
               Orange
             </Button>
 
-            <p className="mt-3 text-sm text-gray-600">
+            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
               <Hl>Orange</Hl> digunakan untuk tindakan yang membutuhkan perhatian atau bersifat
               peringatan.
             </p>
           </div>
 
           <div>
-            <Button variant="filled" theme="yellow" tone="light">
+            <Button variant="filled" theme="yellow" tone="light" darkMode={docsDark}>
               Yellow
             </Button>
 
-            <p className="mt-3 text-sm text-gray-600">
+            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
               <Hl>Yellow</Hl> digunakan untuk informasi yang perlu diperhatikan tanpa menunjukkan
               kondisi kritis.
             </p>
@@ -280,60 +297,58 @@ export function ButtonPage() {
           {"    "}
           <H>tone</H>
           {'="light"\n'}
+          {dm.line}
           {"    >\n"}
           {"    Green\n"}
           {"</Button>"}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="darkmode" title="Dark Mode">
-        <p className="mb-6 text-body-sm text-gray-500">
-          Gunakan <Hl>darkMode</Hl> pada permukaan gelap agar tombol Filled tetap memiliki kontras tinggi.
-        </p>
+      <ModeSection
+        name="Button"
+        lead={
+          <>
+            Gunakan <Hl>darkMode</Hl> pada permukaan gelap agar tombol Filled tetap memiliki kontras tinggi.
+          </>
+        }
+      >
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Demo label="Filled" dark={!docsDark} light={docsDark}>
+            <Button
+              variant="filled"
+              darkMode={!docsDark}
+              leftIcon={<Messages className="size-4" />}
+            >
+              Simpan Perubahan
+            </Button>
+          </Demo>
 
-        <div className="mb-6 grid gap-5 sm:grid-cols-2 sm:gap-8">
-          <div>
-            <h3 className="mb-3 text-lg font-bold text-gray-900">Filled</h3>
-            <Stage maxWidth="max-w-none" dark>
-              <div className="flex min-h-[70px] items-center">
-                <Button variant="filled" darkMode leftIcon={<Messages className="size-4" />}>
-                  Simpan Perubahan
-                </Button>
-              </div>
-            </Stage>
-          </div>
-
-          <div>
-            <h3 className="mb-3 text-lg font-bold text-gray-900">Icon Only</h3>
-            <Stage maxWidth="max-w-none" dark>
-              <div className="flex min-h-[70px] items-center">
-                <Button variant="filled" darkMode iconOnly aria-label="Open messages">
-                  <Messages className="size-4" />
-                </Button>
-              </div>
-            </Stage>
-          </div>
+          <Demo label="Icon Only" dark={!docsDark} light={docsDark}>
+            <Button variant="filled" darkMode={!docsDark} iconOnly aria-label="Open messages">
+              <Messages className="size-4" />
+            </Button>
+          </Demo>
         </div>
 
         <SectionCode>
           {"<Button variant=\"filled\" "}
-          <H>darkMode</H>
-          {" leftIcon={<Messages className=\"size-4\" />}>\n"}
+          {!docsDark && <><H>darkMode</H>{" "}</>}
+          {"leftIcon={<Messages className=\"size-4\" />}>\n"}
           {"  Simpan Perubahan\n"}
           {"</Button>\n\n"}
           {"<Button variant=\"filled\" "}
-          <H>darkMode</H>
-          {" iconOnly aria-label=\"Open messages\">\n"}
+          {!docsDark && <><H>darkMode</H>{" "}</>}
+          {"iconOnly aria-label=\"Open messages\">\n"}
           {"  <Messages className=\"size-4\" />\n"}
           {"</Button>"}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Memungkinkan Anda mencoba kombinasi prop secara langsung untuk membantu menyesuaikan
           tombol dengan kebutuhan aplikasi Anda sebelum diimplementasikan.
-        </p>
+        </Lead>
 
         <Stage maxWidth="max-w-[380px]" dark={darkMode}>
           <div className="mx-auto flex min-h-[180px] items-center justify-center">
@@ -414,7 +429,7 @@ export function ButtonPage() {
             />
           </Control>
 
-          <Control label="Dark Mode">
+          <Control label="Tampilan">
             <Segmented
               label="Pilih mode tampilan"
               value={darkMode}
@@ -470,10 +485,10 @@ export function ButtonPage() {
       </FlowSection>
 
       <FlowSection id="penggunaan" title="Penggunaan">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Bagian ini menampilkan kode setelah Anda menggunakan Playground untuk kombinasi prop. Kode
           yang tampil di sini adalah kode yang siap diimplementasikan ke aplikasi.
-        </p>
+        </Lead>
         <SectionCode flush>
           {"import { Button } from '@ceplok-ui/design-kit-react'\n"}
           {"import { Messages } from '@ceplok-ui/design-kit-react/icons/solid'\n"}
@@ -558,10 +573,10 @@ export function ButtonPage() {
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Referensi semua prop yang tersedia. Digunakan untuk bisa memahami cara kerja komponen
           tanpa harus menebak implementasinya dari kode.
-        </p>
+        </Lead>
 
         <PropsTable rows={buttonProps} minWidth="46rem" />
       </FlowSection>

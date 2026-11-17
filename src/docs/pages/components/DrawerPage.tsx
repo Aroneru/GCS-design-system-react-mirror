@@ -16,6 +16,7 @@ import {
 } from '../../../lib'
 import { DrawerContext } from '../../../lib/components/DrawerContext'
 import { asset } from '../../asset'
+import { tocForDarkDocs, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 
 const drawerContextDummy = {
     onClose: () => { },
@@ -31,6 +32,7 @@ import {
     Controls,
     FlowSection,
     Lead,
+    ModeSection,
     PlaygroundFontScope,
     SectionCode,
     UsulanPage,
@@ -102,12 +104,14 @@ const triggerProps: PropRow[] = [
 
 const toc: TocEntry[] = [
     { id: 'variants', label: 'Variants' },
-    { id: 'dark-mode', label: 'Dark Mode' },
+    { id: 'dark-mode', label: 'Dark mode' },
     { id: 'menu', label: 'Menu' },
     { id: 'playground', label: 'Playground' },
     { id: 'penggunaan', label: 'Penggunaan' },
     { id: 'properties', label: 'Properties' },
 ]
+
+const tocDark = tocForDarkDocs(toc)
 
 function DummyPageContent({ darkMode = false, activeTitle = "Halaman Beranda" }: { darkMode?: boolean, activeTitle?: string }) {
     return (
@@ -134,10 +138,10 @@ function VariantPreview({
     minWidth?: string
 }) {
     return (
-        <article className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
-            <div className="shrink-0 border-b border-gray-200 bg-white px-4 py-3">
-                <h3 className="text-sm font-bold text-gray-900">{title}</h3>
-                <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
+        <article className={`flex flex-col overflow-hidden rounded-xl border shadow-xs ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+            <div className={`shrink-0 border-b px-4 py-3 ${darkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+                <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{title}</h3>
+                <p className={`mt-1 text-xs leading-5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{description}</p>
             </div>
             <div className={`h-[500px] w-full overflow-x-auto py-4 ${minWidth ? 'ds-scroll-x' : ''} ${darkMode ? 'bg-gray-900' : 'bg-gray-50/80'}`}>
                 <div style={{ minWidth }} className={`relative mx-auto flex h-full w-[420px] flex-col overflow-hidden rounded-none border-x shadow-md ${darkMode ? 'bg-gray-800 border-white/10 shadow-2xl' : 'bg-white border-gray-200'}`}>
@@ -237,10 +241,12 @@ function DrawerExampleCode({
 }
 
 export function DrawerPage() {
+    const docsDark = useDocsDark()
+    const inverseDark = !docsDark
     const [openPlayground, setOpenPlayground] = useState(true)
     const [playgroundTheme, setPlaygroundTheme] = useState<DrawerNavItemTheme>('primary')
     const [showIcons, setShowIcons] = useState<boolean>(true)
-    const [playgroundDarkMode, setPlaygroundDarkMode] = useState<boolean>(false)
+    const [playgroundDarkMode, setPlaygroundDarkMode] = usePlaygroundDark()
     const [expandedMenu2, setExpandedMenu2] = useState(false)
     const [expandedMenu3, setExpandedMenu3] = useState(true)
     const [expandedMenu5, setExpandedMenu5] = useState(false)
@@ -275,7 +281,7 @@ export function DrawerPage() {
         <UsulanPage
             eyebrow="Components · Drawer"
             title="Drawer"
-            toc={toc}
+            toc={docsDark ? tocDark : toc}
             description="Drawer adalah panel navigasi off-canvas di tepi layar yang slide-in untuk menampilkan menu navigasi dan submenu tanpa meninggalkan konteks utama halaman."
         >
             {/* SECTION 1: VARIANTS (Terbuka & Tertutup) */}
@@ -288,22 +294,24 @@ export function DrawerPage() {
                     <VariantPreview
                         title="1. Drawer Terbuka (Open Drawer)"
                         description="Drawer muncul dari sisi kanan secara mengambang (overlay) di atas tampilan layar mobile."
+                        darkMode={docsDark}
                         minWidth="420px"
                     >
                         <div className="flex flex-col w-full h-full">
-                            <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3.5">
+                            <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${docsDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
                                 <div className="flex items-center gap-2.5">
                                     <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
-                                    <span className="text-base font-bold tracking-tight text-gray-900">CEPLOK</span>
+                                    <span className={`text-base font-bold tracking-tight ${docsDark ? 'text-white' : 'text-gray-900'}`}>CEPLOK</span>
                                 </div>
-                                <DrawerTrigger />
+                                <DrawerTrigger darkMode={docsDark} />
                             </div>
-                            <DummyPageContent />
+                            <DummyPageContent darkMode={docsDark} />
                         </div>
-                        <div className="absolute inset-0 bg-gray-900/20 z-10 pointer-events-none" />
-                        <div className="absolute right-0 top-0 bottom-0 w-[250px] h-full border-l border-gray-200 bg-white flex flex-col rounded-none z-20 shadow-2xl">
-                            <DrawerHeader eyebrow="MENU" />
-                            <div className="p-3 space-y-1 flex-1 overflow-y-auto">
+                        <div className={`absolute inset-0 z-10 pointer-events-none ${docsDark ? 'bg-gray-900/40' : 'bg-gray-900/20'}`} />
+                        <DrawerContext.Provider value={{ ...drawerContextDummy, darkMode: docsDark }}>
+                            <div className={`absolute right-0 top-0 bottom-0 w-[250px] h-full border-l flex flex-col rounded-none z-20 shadow-2xl ${docsDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+                                <DrawerHeader eyebrow="MENU" />
+                                <div className="p-3 space-y-1 flex-1 overflow-y-auto">
                                 <DrawerNavItem icon={<ChartPie className="size-5" />} label="Menu 1" theme={playgroundTheme} />
                                 <DrawerNavItem
                                     icon={<FileLines className="size-5" />}
@@ -345,54 +353,60 @@ export function DrawerPage() {
                                     <DrawerSubItem label="sub menu 1" />
                                     <DrawerSubItem label="sub menu 2" />
                                 </DrawerNavItem>
+                                </div>
                             </div>
-                        </div>
+                        </DrawerContext.Provider>
                     </VariantPreview>
 
                     <VariantPreview
                         title="2. Drawer Tertutup (Closed State / Page View)"
                         description="Tampilan utama layar mobile dengan topbar header dan icon hamburger drawer di bagian kanan."
+                        darkMode={docsDark}
                         minWidth="420px"
                     >
                         <div className="flex flex-col w-full h-full">
-                            <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3.5">
+                            <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${docsDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
                                 <div className="flex items-center gap-2.5">
                                     <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
-                                    <span className="text-base font-bold tracking-tight text-gray-900">CEPLOK</span>
+                                    <span className={`text-base font-bold tracking-tight ${docsDark ? 'text-white' : 'text-gray-900'}`}>CEPLOK</span>
                                 </div>
-                                <DrawerTrigger />
+                                <DrawerTrigger darkMode={docsDark} />
                             </div>
-                            <DummyPageContent />
+                            <DummyPageContent darkMode={docsDark} />
                         </div>
                     </VariantPreview>
                 </div>
             </FlowSection>
 
-            <FlowSection id="dark-mode" title="Dark Mode">
-                <Lead>
-                    Tampilan Drawer dalam mode gelap (<Hl>darkMode={"{true}"}</Hl>), menyesuaikan warna latar belakang, teks, dan status aktif.
-                </Lead>
+            <ModeSection
+                name="Drawer"
+                lead={
+                    <>
+                        Tampilan Drawer dalam mode gelap (<Hl>darkMode={"{true}"}</Hl>), menyesuaikan warna latar belakang, teks, dan status aktif.
+                    </>
+                }
+            >
 
                 <div className="grid gap-6 lg:grid-cols-2">
                     <VariantPreview
                         title="1. Drawer Terbuka (Open Drawer)"
                         description="Drawer muncul dari sisi kanan secara mengambang (overlay) di atas tampilan layar mobile."
-                        darkMode
+                        darkMode={inverseDark}
                         minWidth="420px"
                     >
                         <div className="flex flex-col w-full h-full">
-                            <div className="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900 px-4 py-3.5">
+                            <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${inverseDark ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`}>
                                 <div className="flex items-center gap-2.5">
                                     <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
-                                    <span className="text-base font-bold tracking-tight text-white">CEPLOK</span>
+                                    <span className={`text-base font-bold tracking-tight ${inverseDark ? 'text-white' : 'text-gray-900'}`}>CEPLOK</span>
                                 </div>
-                                <DrawerTrigger darkMode />
+                                <DrawerTrigger darkMode={inverseDark} />
                             </div>
-                            <DummyPageContent darkMode />
+                            <DummyPageContent darkMode={inverseDark} />
                         </div>
-                        <div className="absolute inset-0 bg-gray-900/40 z-10 pointer-events-none" />
-                        <DrawerContext.Provider value={{ ...drawerContextDummy, darkMode: true }}>
-                            <div className="absolute right-0 top-0 bottom-0 w-[250px] h-full border-l border-gray-700 bg-gray-800 flex flex-col rounded-none z-20 shadow-2xl">
+                        <div className={`absolute inset-0 z-10 pointer-events-none ${inverseDark ? 'bg-gray-900/40' : 'bg-gray-900/20'}`} />
+                        <DrawerContext.Provider value={{ ...drawerContextDummy, darkMode: inverseDark }}>
+                            <div className={`absolute right-0 top-0 bottom-0 w-[250px] h-full border-l flex flex-col rounded-none z-20 shadow-2xl ${inverseDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
                                 <DrawerHeader eyebrow="MENU" />
                                 <div className="p-3 space-y-1 flex-1 overflow-y-auto">
                                     <DrawerNavItem icon={<ChartPie className="size-5" />} label="Menu 1" theme={playgroundTheme} />
@@ -444,22 +458,27 @@ export function DrawerPage() {
                     <VariantPreview
                         title="2. Drawer Tertutup (Closed State / Page View)"
                         description="Tampilan utama layar mobile dengan topbar header dan icon hamburger drawer di bagian kanan."
-                        darkMode
+                        darkMode={inverseDark}
                         minWidth="420px"
                     >
                         <div className="flex flex-col w-full h-full">
-                            <div className="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900 px-4 py-3.5">
+                            <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${inverseDark ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`}>
                                 <div className="flex items-center gap-2.5">
                                     <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
-                                    <span className="text-base font-bold tracking-tight text-white">CEPLOK</span>
+                                    <span className={`text-base font-bold tracking-tight ${inverseDark ? 'text-white' : 'text-gray-900'}`}>CEPLOK</span>
                                 </div>
-                                <DrawerTrigger darkMode />
+                                <DrawerTrigger darkMode={inverseDark} />
                             </div>
-                            <DummyPageContent darkMode />
+                            <DummyPageContent darkMode={inverseDark} />
                         </div>
                     </VariantPreview>
                 </div>
-            </FlowSection>
+                <SectionCode>
+                    {'<Drawer '}
+                    {inverseDark && <><H>darkMode</H>{' '}</>}
+                    {'open={open} onClose={() => setOpen(false)} />'}
+                </SectionCode>
+            </ModeSection>
 
             {/* SECTION 2: MENU NAVIGASI */}
             <FlowSection id="menu" title="Menu">
@@ -469,13 +488,15 @@ export function DrawerPage() {
 
                 <div className="grid gap-6 lg:grid-cols-2">
                     <div className="min-w-0">
-                        <h3 className="mb-3 text-sm font-bold text-gray-900">Menu</h3>
+                        <h3 className="mb-3 text-sm font-bold text-gray-900 dark:text-white">Menu</h3>
                         <div className="ds-scroll-x mb-4 overflow-x-auto">
-                            <div className="w-[300px] overflow-hidden rounded-xl border border-border bg-surface p-4 shadow-xs space-y-1">
-                                <DrawerNavItem icon={<ChartPie className="size-5" />} label="Menu 1" />
-                                <DrawerNavItem icon={<FileLines className="size-5" />} label="Menu 2" />
-                                <DrawerNavItem icon={<Inbox className="size-5" />} label="Menu 3" />
-                            </div>
+                            <DrawerContext.Provider value={{ ...drawerContextDummy, darkMode: docsDark }}>
+                                <div className={`w-[300px] overflow-hidden rounded-xl border p-4 shadow-xs space-y-1 ${docsDark ? 'border-gray-700 bg-gray-800' : 'border-border bg-surface'}`}>
+                                    <DrawerNavItem icon={<ChartPie className="size-5" />} label="Menu 1" />
+                                    <DrawerNavItem icon={<FileLines className="size-5" />} label="Menu 2" />
+                                    <DrawerNavItem icon={<Inbox className="size-5" />} label="Menu 3" />
+                                </div>
+                            </DrawerContext.Provider>
                         </div>
 
                         <SectionCode>
@@ -493,19 +514,21 @@ export function DrawerPage() {
                     </div>
 
                     <div className="min-w-0">
-                        <h3 className="mb-3 text-sm font-bold text-gray-900">Sub Menu</h3>
+                        <h3 className="mb-3 text-sm font-bold text-gray-900 dark:text-white">Sub Menu</h3>
                         <div className="ds-scroll-x mb-4 overflow-x-auto">
-                            <div className="w-[300px] overflow-hidden rounded-xl border border-border bg-surface p-4 shadow-xs">
-                                <DrawerNavItem
-                                icon={<Cart className="size-5" />}
-                                label="Menu 3"
-                                expanded
-                                theme={playgroundTheme}
-                            >
-                                <DrawerSubItem label="sub menu 1" />
-                                <DrawerSubItem label="sub menu 2" />
-                                </DrawerNavItem>
-                            </div>
+                            <DrawerContext.Provider value={{ ...drawerContextDummy, darkMode: docsDark }}>
+                                <div className={`w-[300px] overflow-hidden rounded-xl border p-4 shadow-xs ${docsDark ? 'border-gray-700 bg-gray-800' : 'border-border bg-surface'}`}>
+                                    <DrawerNavItem
+                                        icon={<Cart className="size-5" />}
+                                        label="Menu 3"
+                                        expanded
+                                        theme={playgroundTheme}
+                                    >
+                                        <DrawerSubItem label="sub menu 1" />
+                                        <DrawerSubItem label="sub menu 2" />
+                                    </DrawerNavItem>
+                                </div>
+                            </DrawerContext.Provider>
                         </div>
 
                         <SectionCode>
@@ -602,7 +625,7 @@ export function DrawerPage() {
                 </PlaygroundFontScope>
 
                 <Controls>
-                    <Control label="Mode">
+                    <Control label="Tampilan">
                         <Segmented
                             label="Pilih mode"
                             value={playgroundDarkMode ? 'dark' : 'light'}
@@ -646,27 +669,27 @@ export function DrawerPage() {
                 <Lead>Daftar lengkap props untuk komponen Drawer dan subkomponen pendukungnya.</Lead>
                 <div className="space-y-6">
                     <div>
-                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Drawer Props</h3>
+                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900 dark:text-white">Drawer Props</h3>
                         <PropsTable rows={drawerProps} />
                     </div>
 
                     <div>
-                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DrawerHeader Props</h3>
+                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900 dark:text-white">DrawerHeader Props</h3>
                         <PropsTable rows={headerProps} />
                     </div>
 
                     <div>
-                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DrawerNavItem Props</h3>
+                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900 dark:text-white">DrawerNavItem Props</h3>
                         <PropsTable rows={navItemProps} />
                     </div>
 
                     <div>
-                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DrawerSubItem Props</h3>
+                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900 dark:text-white">DrawerSubItem Props</h3>
                         <PropsTable rows={subItemProps} />
                     </div>
 
                     <div>
-                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900">DrawerTrigger Props</h3>
+                        <h3 className="mb-3 text-heading-4 font-bold text-gray-900 dark:text-white">DrawerTrigger Props</h3>
                         <PropsTable rows={triggerProps} />
                     </div>
                 </div>
