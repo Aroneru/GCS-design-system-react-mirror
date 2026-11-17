@@ -30,7 +30,10 @@ export interface FooterProps {
   className?: string
 }
 
-/** Footer — @container: tata letak mengikuti lebar footer, bukan viewport. */
+/**
+ * Footer — @container: tata letak mengikuti lebar footer, bukan viewport.
+ * Warnanya dari token komponen `--color-footer-*` (lihat tokens.css).
+ */
 export function Footer({
   logo,
   logoAlt = 'Logo',
@@ -48,7 +51,7 @@ export function Footer({
   }
 
   return (
-    <footer className={cn('@container bg-gray-800 text-gray-300', className)}>
+    <footer className={cn('@container bg-footer-surface text-footer-content', className)}>
       <div
         className={cn(
           'flex flex-col gap-8 px-6 py-16 @3xl:px-12',
@@ -85,7 +88,7 @@ export function Footer({
                       <li key={i}>
                         <a
                           href={menu.url ?? '#'}
-                          className="rounded text-center transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                          className="rounded text-center transition-colors hover:text-footer-content-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-footer-content-hover"
                         >
                           {menu.label}
                         </a>
@@ -100,7 +103,7 @@ export function Footer({
           <div></div>
         </div>
 
-        <hr className="border-white/15" />
+        <hr className="border-footer-divider" />
 
         <div className="flex flex-col gap-6 @xl:flex-row @xl:items-center @xl:justify-between">
           {copyright && <p className="text-base">{copyright}</p>}
@@ -114,7 +117,7 @@ export function Footer({
                   <li key={i}>
                     <a
                       href={url}
-                      className="block rounded text-gray-400 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                      className="block rounded text-footer-social transition-colors hover:text-footer-content-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-footer-content-hover"
                       aria-label={social.label ?? 'Media sosial'}
                       {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                     >

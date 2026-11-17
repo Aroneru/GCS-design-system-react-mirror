@@ -106,7 +106,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 - **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
   `--color-search-category-surface` dan `--color-search-field-surface` (Search),
-  `--color-breadcrumb-*` (Breadcrumb), `--color-clipboard-*` (Clipboard),
+  `--color-breadcrumb-*` (Breadcrumb), `--color-card-*` (Card), `--color-clipboard-*` (Clipboard), `--color-footer-*` (Footer),
   `--color-dropdown-*` (Dropdown), `--color-popover-*` (Popover), serta `--color-timeline-*` (Timeline). Panduan
   lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
 

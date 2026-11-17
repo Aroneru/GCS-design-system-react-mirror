@@ -11,6 +11,18 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+### Ditambahkan
+- **Token komponen `--color-card-*` di `tokens.css`.** Card kini memakai
+  `--color-card-surface`, `-border`, `-title`, `-description`, `-link`, dan
+  `-link-hover`, bukan token semantik umum. Nilainya sama dengan sebelumnya,
+  jadi tampilan Card tidak berubah. Warna kartu kini bisa ditimpa di CSS
+  aplikasi tanpa ikut mengubah komponen lain. Daftarnya ada di `COLOR.md`.
+- **Token komponen `--color-footer-*` di `tokens.css`.** Footer kini memakai
+  `--color-footer-surface`, `-content`, `-content-hover`, `-social`, dan
+  `-divider`, bukan kelas warna langsung (`bg-gray-800`, `text-white`, dan
+  lainnya). Nilainya sama dengan sebelumnya dan sama di kedua tema, karena
+  Footer selalu gelap.
+
 ### Diubah
 - **Mode gelap situs dokumentasi meluas.** Selain halaman di 0.6.0, mode gelap
   kini berlaku di semua halaman Form, Components Overview, Alert, Toast,
