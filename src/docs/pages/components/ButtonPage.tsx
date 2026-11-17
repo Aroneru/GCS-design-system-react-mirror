@@ -51,11 +51,10 @@ const buttonProps: PropRow[] = [
   ["iconOnly", "boolean", "false", "Jika true, gaya tombol disesuaikan menjadi khusus ikon."],
   ["size", '"xs" | "s" | "base" | "l" | "xl"', "base", "Menentukan ukuran tombol."],
   ["variant", '"filled" | "outline"', "filled", "Gaya utama tombol: solid atau outline."],
-  ["tone", '"light" | "dark"', "light", "Menyetel kontras warna untuk variant atau theme."],
-  ["darkMode", "boolean", "false", "Menyesuaikan warna Button untuk permukaan bertema gelap."],
+  ["darkMode", "boolean", "false", "Filled dengan theme memakai palet gelapnya; filled tanpa theme dan seluruh outline menjadi putih."],
   ["leftIcon", "ReactNode", "undefined", "Ikon di sisi kiri tombol."],
   ["rightIcon", "ReactNode", "undefined", "Ikon di sisi kanan tombol."],
-  ["theme", "ButtonTheme", "primary", "Warna aksen tombol."],
+  ["theme", "ButtonTheme", "primary (light mode)", "Warna aksen tombol. Pada dark mode, Button tanpa theme memakai fallback putih."],
 ];
 
 const toc: TocEntry[] = [
@@ -77,7 +76,6 @@ export function ButtonPage() {
   const [selectedSize, setSelectedSize] = useState<ButtonSize>("base");
   const [variant, setVariant] = useState<ButtonVariant>("filled");
   const [theme, setTheme] = useState<ButtonTheme>("primary");
-  const [tone, setTone] = useState<"light" | "dark">("light");
   const [darkMode, setDarkMode] = usePlaygroundDark();
   const [iconOnly, setIconOnly] = useState(false);
   const [showLeftIcon, setShowLeftIcon] = useState(true);
@@ -105,7 +103,6 @@ export function ButtonPage() {
                 size={size}
                 variant="filled"
                 theme="primary"
-                tone="light"
                 darkMode={docsDark}
                 leftIcon={<Messages className="size-4" />}
                 rightIcon={<Messages className="size-4" />}
@@ -147,7 +144,6 @@ export function ButtonPage() {
                 size={size}
                 variant="filled"
                 theme="primary"
-                tone="light"
                 darkMode={docsDark}
                 iconOnly
                 aria-label={`Icon ${size}`}
@@ -187,7 +183,7 @@ export function ButtonPage() {
           <div>
             <h3 className="mb-3 text-lg font-bold text-gray-900 dark:text-white">Filled</h3>
             <div className="flex min-h-[130px] items-center rounded-2xl border border-border bg-surface-subtle p-8">
-              <Button variant="filled" theme="primary" tone="light" darkMode={docsDark}>
+              <Button variant="filled" theme="primary" darkMode={docsDark}>
                 Simpan Perubahan
               </Button>
             </div>
@@ -196,7 +192,7 @@ export function ButtonPage() {
           <div>
             <h3 className="mb-3 text-lg font-bold text-gray-900 dark:text-white">Outline</h3>
             <div className="flex min-h-[130px] items-center rounded-2xl border border-border bg-surface-subtle p-8">
-              <Button variant="outline" theme="primary" tone="light" darkMode={docsDark}>
+              <Button variant="outline" theme="primary" darkMode={docsDark}>
                 Lihat Detail
               </Button>
             </div>
@@ -222,7 +218,7 @@ export function ButtonPage() {
 
         <div className="mb-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <Button variant="filled" theme="primary" tone="light" darkMode={docsDark}>
+            <Button variant="filled" theme="primary" darkMode={docsDark}>
               Primary
             </Button>
 
@@ -233,7 +229,7 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button variant="filled" theme="green" tone="light" darkMode={docsDark}>
+            <Button variant="filled" theme="green" darkMode={docsDark}>
               Green
             </Button>
 
@@ -244,7 +240,7 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button variant="filled" theme="gray" tone="light" darkMode={docsDark}>
+            <Button variant="filled" theme="gray" darkMode={docsDark}>
               Gray
             </Button>
 
@@ -255,7 +251,7 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button variant="filled" theme="purple" tone="light" darkMode={docsDark}>
+            <Button variant="filled" theme="purple" darkMode={docsDark}>
               Purple
             </Button>
 
@@ -266,7 +262,7 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button variant="filled" theme="orange" tone="light" darkMode={docsDark}>
+            <Button variant="filled" theme="orange" darkMode={docsDark}>
               Orange
             </Button>
 
@@ -277,7 +273,7 @@ export function ButtonPage() {
           </div>
 
           <div>
-            <Button variant="filled" theme="yellow" tone="light" darkMode={docsDark}>
+            <Button variant="filled" theme="yellow" darkMode={docsDark}>
               Yellow
             </Button>
 
@@ -294,9 +290,6 @@ export function ButtonPage() {
           {"    "}
           <H>theme</H>
           {'="green"\n'}
-          {"    "}
-          <H>tone</H>
-          {'="light"\n'}
           {dm.line}
           {"    >\n"}
           {"    Green\n"}
@@ -308,14 +301,15 @@ export function ButtonPage() {
         name="Button"
         lead={
           <>
-            Gunakan <Hl>darkMode</Hl> pada permukaan gelap agar tombol Filled tetap memiliki kontras tinggi.
+            Gunakan <Hl>darkMode</Hl> untuk menjaga kontras Button di atas permukaan gelap.
           </>
         }
       >
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Demo label="Filled" dark={!docsDark} light={docsDark}>
+        <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+          <Demo label="Filled · theme bawaan" dark={!docsDark} light={docsDark}>
             <Button
               variant="filled"
+              theme="primary"
               darkMode={!docsDark}
               leftIcon={<Messages className="size-4" />}
             >
@@ -323,23 +317,51 @@ export function ButtonPage() {
             </Button>
           </Demo>
 
+          <Demo label="Filled · fallback putih" dark={!docsDark} light={docsDark}>
+            <Button variant="filled" darkMode={!docsDark}>
+              Simpan Perubahan
+            </Button>
+          </Demo>
+
           <Demo label="Icon Only" dark={!docsDark} light={docsDark}>
-            <Button variant="filled" darkMode={!docsDark} iconOnly aria-label="Open messages">
+            <Button variant="filled" theme="primary" darkMode={!docsDark} iconOnly aria-label="Open messages">
               <Messages className="size-4" />
+            </Button>
+          </Demo>
+
+          <Demo label="Outline" dark={!docsDark} light={docsDark}>
+            <Button variant="outline" theme="purple" darkMode={!docsDark}>
+              Lihat detail
             </Button>
           </Demo>
         </div>
 
+        <p className="mt-5 text-sm leading-6 text-gray-600 dark:text-gray-300">
+          Catatan: Filled dengan salah satu dari enam theme bawaan memakai palet gelap theme
+          tersebut. Filled tanpa theme atau tanpa palet dark khusus memakai fallback putih. Outline
+          selalu memakai warna putih, apa pun theme-nya; Icon Only mengikuti aturan Filled.
+        </p>
+
         <SectionCode>
-          {"<Button variant=\"filled\" "}
+          {"<Button variant=\"filled\" theme=\"primary\" "}
           {!docsDark && <><H>darkMode</H>{" "}</>}
           {"leftIcon={<Messages className=\"size-4\" />}>\n"}
           {"  Simpan Perubahan\n"}
           {"</Button>\n\n"}
           {"<Button variant=\"filled\" "}
           {!docsDark && <><H>darkMode</H>{" "}</>}
+          {">\n"}
+          {"  Simpan Perubahan\n"}
+          {"</Button>\n\n"}
+          {"<Button variant=\"filled\" theme=\"primary\" "}
+          {!docsDark && <><H>darkMode</H>{" "}</>}
           {"iconOnly aria-label=\"Open messages\">\n"}
           {"  <Messages className=\"size-4\" />\n"}
+          {"</Button>\n\n"}
+          {"<Button variant=\"outline\" theme=\"purple\" "}
+          {!docsDark && <><H>darkMode</H>{" "}</>}
+          {">\n"}
+          {"  Lihat detail\n"}
           {"</Button>"}
         </SectionCode>
       </ModeSection>
@@ -359,7 +381,6 @@ export function ButtonPage() {
               size={selectedSize}
               variant={variant}
               theme={theme}
-              tone={tone}
               darkMode={darkMode}
               leftIcon={showLeftIcon ? <Messages className="size-4" /> : undefined}
               rightIcon={showRightIcon ? <Messages className="size-4" /> : undefined}
@@ -414,18 +435,6 @@ export function ButtonPage() {
               value={variant}
               onChange={(value) => setVariant(value as ButtonVariant)}
               options={variantOptions}
-            />
-          </Control>
-
-          <Control label="Tone">
-            <Segmented
-              label="Pilih tone"
-              value={tone}
-              onChange={(value) => setTone(value as "light" | "dark")}
-              options={[
-                { value: "light", label: "Light" },
-                { value: "dark", label: "Dark" },
-              ]}
             />
           </Control>
 
@@ -519,12 +528,6 @@ export function ButtonPage() {
             {"    "}
             <H>theme</H>
             {`="${theme}"\n`}
-          </>
-
-          <>
-            {"    "}
-            <H>tone</H>
-            {`="${tone}"\n`}
           </>
 
           {darkMode && (

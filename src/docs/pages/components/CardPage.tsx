@@ -85,13 +85,6 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
-/**
- * Tombol outline di kartu gelap. Outline bawaan Button memakai primary-700 yang
- * nyaris hilang di atas gray-700, jadi warnanya ditimpa ke primary-400 seperti
- * desain. Pakai `!` karena `cn` tidak menggabungkan kelas yang bentrok.
- */
-const darkOutlineClass = "border-primary-400! text-primary-400! hover:bg-primary-400/10!";
-
 const SampleButton = ({
   variant,
   dark = false,
@@ -101,7 +94,7 @@ const SampleButton = ({
 }) => {
   if (variant === "primary") {
     return (
-      <Button variant="filled" theme="primary" tone="light" size="s">
+      <Button variant="filled" theme="primary" size="s" darkMode={dark}>
         Button text
       </Button>
     );
@@ -109,14 +102,14 @@ const SampleButton = ({
 
   if (dark) {
     return (
-      <Button variant="outline" theme="primary" tone="light" size="s" className={darkOutlineClass}>
+      <Button variant="outline" theme="primary" size="s" darkMode>
         Button text
       </Button>
     );
   }
 
   return (
-    <Button variant="filled" theme="primary" tone="light" size="s">
+    <Button variant="filled" theme="primary" size="s">
       Button text
     </Button>
   );
@@ -127,10 +120,10 @@ function cardActions(action: CardAction, dark = false): ReactNode {
     return (
       <>
         <SampleButton variant="secondary" dark={dark} />
-        <SampleButton variant="primary" />
+        <SampleButton variant="primary" dark={dark} />
       </>
     );
-  if (action === "one") return <SampleButton variant="primary" />;
+  if (action === "one") return <SampleButton variant="primary" dark={dark} />;
   return undefined;
 }
 
