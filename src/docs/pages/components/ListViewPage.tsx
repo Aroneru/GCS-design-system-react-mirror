@@ -282,7 +282,7 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
-const tocDark = tocForDarkDocs(toc);
+const tocDark = tocForDarkDocs(toc, true);
 
 export function ListViewPage() {
   const docsDark = useDocsDark();
@@ -822,6 +822,7 @@ export function ListViewPage() {
       {/* 4. Dark mode Section */}
       <ModeSection
         name="List View"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengaktifkan tema gelap. Article memakai surface <Hl>gray-700</Hl>, teks bertingkat <Hl>gray-100</Hl> hingga <Hl>gray-300</Hl>, serta pin transparan beraksen primary.
@@ -838,10 +839,10 @@ export function ListViewPage() {
                   Desktop
                 </h4>
               </div>
-              <Demo dark={!docsDark} light={docsDark} minWidth="514px">
+              <Demo dark minWidth="514px">
                 <div className="w-[514px]">
                   <ListViewItem
-                    darkMode={!docsDark}
+                    darkMode
                     decoration
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
@@ -850,7 +851,7 @@ export function ListViewPage() {
                         variant="success"
                         size="sm"
                         icon={<Clock className="size-3.5" />}
-                        darkMode={!docsDark}
+                        darkMode
                       >
                         Badge
                       </Badge>
@@ -868,11 +869,11 @@ export function ListViewPage() {
                   Mobile
                 </h4>
               </div>
-              <Demo dark={!docsDark} light={docsDark} minWidth="348px">
+              <Demo dark minWidth="348px">
                 <div className="w-[348px]">
                   <ListViewItem
                     platform="mobile"
-                    darkMode={!docsDark}
+                    darkMode
                     decoration
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
@@ -881,7 +882,7 @@ export function ListViewPage() {
                         variant="success"
                         size="sm"
                         icon={<Clock className="size-3.5" />}
-                        darkMode={!docsDark}
+                        darkMode
                       >
                         Badge
                       </Badge>
@@ -898,7 +899,7 @@ export function ListViewPage() {
           {"import { Clock } from '@ceplok-ui/design-kit-react/icons/solid'\n\n"}
           {"{/* 1. Desktop — Dark Mode dengan Badge + Dekorasi */}\n"}
           {"<ListViewItem\n"}
-          {!docsDark && <>{"  "}<H>darkMode</H>{"\n"}</>}
+          {"  "}<H>darkMode</H>{"\n"}
           {"  "}
           <H>decoration</H>
           {"\n"}
@@ -914,7 +915,7 @@ export function ListViewPage() {
           {"  "}
           <H>platform</H>
           {'="mobile"\n'}
-          {!docsDark && <>{"  "}<H>darkMode</H>{"\n"}</>}
+          {"  "}<H>darkMode</H>{"\n"}
           {"  "}
           <H>decoration</H>
           {"\n"}

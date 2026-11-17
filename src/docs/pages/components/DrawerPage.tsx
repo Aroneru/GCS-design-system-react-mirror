@@ -111,7 +111,7 @@ const toc: TocEntry[] = [
     { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 function DummyPageContent({ darkMode = false, activeTitle = "Halaman Beranda" }: { darkMode?: boolean, activeTitle?: string }) {
     return (
@@ -242,7 +242,7 @@ function DrawerExampleCode({
 
 export function DrawerPage() {
     const docsDark = useDocsDark()
-    const inverseDark = !docsDark
+    const modeSectionDark = true
     const [openPlayground, setOpenPlayground] = useState(true)
     const [playgroundTheme, setPlaygroundTheme] = useState<DrawerNavItemTheme>('primary')
     const [showIcons, setShowIcons] = useState<boolean>(true)
@@ -380,6 +380,7 @@ export function DrawerPage() {
 
             <ModeSection
                 name="Drawer"
+                stayDark
                 lead={
                     <>
                         Tampilan Drawer dalam mode gelap (<Hl>darkMode={"{true}"}</Hl>), menyesuaikan warna latar belakang, teks, dan status aktif.
@@ -391,22 +392,22 @@ export function DrawerPage() {
                     <VariantPreview
                         title="1. Drawer Terbuka (Open Drawer)"
                         description="Drawer muncul dari sisi kanan secara mengambang (overlay) di atas tampilan layar mobile."
-                        darkMode={inverseDark}
+                        darkMode={modeSectionDark}
                         minWidth="420px"
                     >
                         <div className="flex flex-col w-full h-full">
-                            <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${inverseDark ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`}>
+                            <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${modeSectionDark ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`}>
                                 <div className="flex items-center gap-2.5">
                                     <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
-                                    <span className={`text-base font-bold tracking-tight ${inverseDark ? 'text-white' : 'text-gray-900'}`}>CEPLOK</span>
+                                    <span className={`text-base font-bold tracking-tight ${modeSectionDark ? 'text-white' : 'text-gray-900'}`}>CEPLOK</span>
                                 </div>
-                                <DrawerTrigger darkMode={inverseDark} />
+                                <DrawerTrigger darkMode={modeSectionDark} />
                             </div>
-                            <DummyPageContent darkMode={inverseDark} />
+                            <DummyPageContent darkMode={modeSectionDark} />
                         </div>
-                        <div className={`absolute inset-0 z-10 pointer-events-none ${inverseDark ? 'bg-gray-900/40' : 'bg-gray-900/20'}`} />
-                        <DrawerContext.Provider value={{ ...drawerContextDummy, darkMode: inverseDark }}>
-                            <div className={`absolute right-0 top-0 bottom-0 w-[250px] h-full border-l flex flex-col rounded-none z-20 shadow-2xl ${inverseDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+                        <div className={`absolute inset-0 z-10 pointer-events-none ${modeSectionDark ? 'bg-gray-900/40' : 'bg-gray-900/20'}`} />
+                        <DrawerContext.Provider value={{ ...drawerContextDummy, darkMode: modeSectionDark }}>
+                            <div className={`absolute right-0 top-0 bottom-0 w-[250px] h-full border-l flex flex-col rounded-none z-20 shadow-2xl ${modeSectionDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
                                 <DrawerHeader eyebrow="MENU" />
                                 <div className="p-3 space-y-1 flex-1 overflow-y-auto">
                                     <DrawerNavItem icon={<ChartPie className="size-5" />} label="Menu 1" theme={playgroundTheme} />
@@ -458,24 +459,24 @@ export function DrawerPage() {
                     <VariantPreview
                         title="2. Drawer Tertutup (Closed State / Page View)"
                         description="Tampilan utama layar mobile dengan topbar header dan icon hamburger drawer di bagian kanan."
-                        darkMode={inverseDark}
+                        darkMode={modeSectionDark}
                         minWidth="420px"
                     >
                         <div className="flex flex-col w-full h-full">
-                            <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${inverseDark ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`}>
+                            <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${modeSectionDark ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white'}`}>
                                 <div className="flex items-center gap-2.5">
                                     <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
-                                    <span className={`text-base font-bold tracking-tight ${inverseDark ? 'text-white' : 'text-gray-900'}`}>CEPLOK</span>
+                                    <span className={`text-base font-bold tracking-tight ${modeSectionDark ? 'text-white' : 'text-gray-900'}`}>CEPLOK</span>
                                 </div>
-                                <DrawerTrigger darkMode={inverseDark} />
+                                <DrawerTrigger darkMode={modeSectionDark} />
                             </div>
-                            <DummyPageContent darkMode={inverseDark} />
+                            <DummyPageContent darkMode={modeSectionDark} />
                         </div>
                     </VariantPreview>
                 </div>
                 <SectionCode>
                     {'<Drawer '}
-                    {inverseDark && <><H>darkMode</H>{' '}</>}
+                    <H>darkMode</H>{' '}
                     {'open={open} onClose={() => setOpen(false)} />'}
                 </SectionCode>
             </ModeSection>
@@ -555,14 +556,14 @@ export function DrawerPage() {
             <FlowSection id="playground" title="Playground">
                 <Lead>Uji coba perilaku dan variasi konfigurasi Drawer secara langsung pada tampilan mobile.</Lead>
 
-                <PlaygroundFontScope className={`ds-scroll-x h-[580px] w-full overflow-x-auto rounded-2xl border border-border py-4 ${playgroundDarkMode ? 'bg-gray-900' : 'bg-gray-50/80'}`}>
+                <PlaygroundFontScope className={`ds-scroll-x h-[580px] w-full overflow-x-auto rounded-2xl border py-4 ${playgroundDarkMode ? 'border-gray-700 bg-gray-900' : 'border-border bg-gray-50/80'}`}>
                     {/* Mobile Screen Canvas */}
                     <div
                         style={{ minWidth: playgroundCanvasMinWidth }}
-                        className={`relative mx-auto flex h-full w-[420px] flex-col overflow-hidden rounded-none border-x shadow-md ${playgroundDarkMode ? 'border-white/10 bg-gray-800 shadow-2xl' : 'border-gray-200 bg-white'}`}
+                        className={`relative mx-auto flex h-full w-[420px] flex-col overflow-hidden rounded-none border-x shadow-md ${playgroundDarkMode ? 'border-gray-700 bg-gray-800 shadow-2xl' : 'border-gray-200 bg-white'}`}
                     >
                         {/* Topbar Header */}
-                        <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${playgroundDarkMode ? 'border-white/10 bg-gray-800' : 'border-gray-200 bg-white'}`}>
+                        <div className={`flex shrink-0 items-center justify-between border-b px-4 py-3.5 ${playgroundDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}>
                             <div className="flex items-center gap-2.5">
                                 <img src={asset('/images/ceplok.svg')} alt="" aria-hidden="true" className="size-7 shrink-0 object-contain" />
                                 <span className={`text-base font-bold tracking-tight ${playgroundDarkMode ? 'text-white' : 'text-gray-900'}`}>CEPLOK</span>

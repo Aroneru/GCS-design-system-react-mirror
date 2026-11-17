@@ -55,7 +55,7 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
-const tocDark = tocForDarkDocs(toc);
+const tocDark = tocForDarkDocs(toc, true);
 
 export function PaginationPage() {
   const docsDark = useDocsDark();
@@ -163,6 +163,7 @@ export function PaginationPage() {
 
       <ModeSection
         name="Pagination"
+        stayDark
         lead={
           <>
             Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Pagination. Komponen secara otomatis menyesuaikan warna latar, teks, batas, dan tema yang aktif.
@@ -171,16 +172,16 @@ export function PaginationPage() {
       >
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">
-          <Demo label="Default" dark={!docsDark} light={docsDark}>
-            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="default" darkMode={!docsDark} />
+          <Demo label="Default" dark>
+            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="default" darkMode />
           </Demo>
 
-          <Demo label="Primary" dark={!docsDark} light={docsDark}>
-            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="primary" darkMode={!docsDark} />
+          <Demo label="Primary" dark>
+            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="primary" darkMode />
           </Demo>
 
-          <Demo label="Purple" dark={!docsDark} light={docsDark}>
-            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="purple" darkMode={!docsDark} />
+          <Demo label="Purple" dark>
+            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="purple" darkMode />
           </Demo>
         </div>
 
@@ -190,7 +191,7 @@ export function PaginationPage() {
           {'    totalPages={100}\n'}
           {'    onPageChange={setCurrentPage}\n'}
           {'    theme="primary"\n'}
-          {!docsDark && <>{'    '}<H>darkMode</H>{'\n'}</>}
+          {'    '}<H>darkMode</H>{'\n'}
           {'/>'}
         </SectionCode>
       </ModeSection>

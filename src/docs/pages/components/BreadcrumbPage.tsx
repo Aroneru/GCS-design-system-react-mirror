@@ -62,7 +62,7 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
-const tocDark = tocForDarkDocs(toc);
+const tocDark = tocForDarkDocs(toc, true);
 
 const allItems: BreadcrumbItem[] = [
   {
@@ -173,6 +173,7 @@ export function BreadcrumbPage() {
 
       <ModeSection
         name="Breadcrumb"
+        stayDark
         lead={
           <>
             Breadcrumb mengadopsi sistem token warna semantik dan token komponen (<H>--color-breadcrumb-surface</H>, <H>--color-breadcrumb-active</H>, dan <H>--color-breadcrumb-link-hover</H>). Mode gelap dapat diaktifkan lewat prop <H>darkMode</H> maupun pewarisan otomatis atribut <H>data-theme="dark"</H> dari kontainer pembungkusnya. Latar belakang (pada varian <H>bg</H>) menjadi <H>gray-700</H>, item aktif <H>gray-300</H>, serta item tidak aktif dan ikon pemisah (chevron) menggunakan <H>gray-400</H>.
@@ -181,12 +182,12 @@ export function BreadcrumbPage() {
       >
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">
-          <Demo label="Tanpa Background" dark={!docsDark} light={docsDark}>
-            <Breadcrumb darkMode={!docsDark} items={allItems.slice(0, 3)} size="base" background="none" />
+          <Demo label="Tanpa Background" dark>
+            <Breadcrumb darkMode items={allItems.slice(0, 3)} size="base" background="none" />
           </Demo>
 
-          <Demo label="Dengan Background" dark={!docsDark} light={docsDark}>
-            <Breadcrumb darkMode={!docsDark} items={allItems.slice(0, 3)} size="base" background="bg" />
+          <Demo label="Dengan Background" dark>
+            <Breadcrumb darkMode items={allItems.slice(0, 3)} size="base" background="bg" />
           </Demo>
         </div>
 
@@ -198,14 +199,14 @@ export function BreadcrumbPage() {
           {"]\n\n"}
           {"/*Tanpa background*/\n"}
           {"<Breadcrumb\n"}
-          {!docsDark && <>{"    "}<H>darkMode</H>{"\n"}</>}
+          {"    "}<H>darkMode</H>{"\n"}
           {"    items={items}\n"}
           {'    background="none"\n'}
           {"/>"}
           {"\n\n"}
           {"/*Dengan background*/\n"}
           {"<Breadcrumb\n"}
-          {!docsDark && <>{"    "}<H>darkMode</H>{"\n"}</>}
+          {"    "}<H>darkMode</H>{"\n"}
           {"    items={items}\n"}
           {'    background="bg"\n'}
           {"/>"}
@@ -232,7 +233,7 @@ export function BreadcrumbPage() {
         <Controls>
           <Control label="Tampilan">
             <Segmented
-              label="Pilih mode"
+              label="Pilih tampilan"
               value={dark}
               onChange={(value) => setDark(Boolean(value))}
               options={[

@@ -178,7 +178,7 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
-const tocDark = tocForDarkDocs(toc);
+const tocDark = tocForDarkDocs(toc, true);
 
 const baseItems = [
   {
@@ -710,6 +710,7 @@ export function SidebarPage() {
 
       <ModeSection
         name="Sidebar"
+        stayDark
         lead={
           <>
             Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Sidebar.
@@ -722,25 +723,25 @@ export function SidebarPage() {
           <VariantPreview
             title="1. Multi-level menu + icon, user info, logo web"
             description="Menu berikon dikelompokkan; separator membedakan area konten."
-            dark={!docsDark}
+            dark
             minWidth="280px"
           >
-            <SidebarVariant groups={iconGroups} darkMode={!docsDark} />
+            <SidebarVariant groups={iconGroups} darkMode />
           </VariantPreview>
 
           <VariantPreview
             title="2. Collapsed"
             description="Konfigurasi varian 1 dalam kondisi tertutup: icon, user, dan logo terlihat."
-            dark={!docsDark}
+            dark
             minWidth="72px"
           >
-            <SidebarVariant groups={iconGroups} collapsed darkMode={!docsDark} />
+            <SidebarVariant groups={iconGroups} collapsed darkMode />
           </VariantPreview>
         </div>
 
         <SectionCode>
           {"<Sidebar"}
-          {!docsDark && <>{" "}<H>darkMode</H></>}
+          {" "}<H>darkMode</H>
           {" groups={groups} />"}
         </SectionCode>
       </ModeSection>

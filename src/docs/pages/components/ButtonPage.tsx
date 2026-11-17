@@ -68,7 +68,7 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
-const tocDark = tocForDarkDocs(toc);
+const tocDark = tocForDarkDocs(toc, true);
 
 export function ButtonPage() {
   const docsDark = useDocsDark();
@@ -182,7 +182,7 @@ export function ButtonPage() {
         <div className="mb-6 grid gap-5 sm:grid-cols-2 sm:gap-8">
           <div>
             <h3 className="mb-3 text-lg font-bold text-gray-900 dark:text-white">Filled</h3>
-            <div className="flex min-h-[130px] items-center rounded-2xl border border-border bg-surface-subtle p-8">
+            <div className="flex min-h-[130px] items-center rounded-2xl border border-border bg-surface-subtle p-8 dark:border-gray-700 dark:bg-gray-900">
               <Button variant="filled" theme="primary" darkMode={docsDark}>
                 Simpan Perubahan
               </Button>
@@ -191,7 +191,7 @@ export function ButtonPage() {
 
           <div>
             <h3 className="mb-3 text-lg font-bold text-gray-900 dark:text-white">Outline</h3>
-            <div className="flex min-h-[130px] items-center rounded-2xl border border-border bg-surface-subtle p-8">
+            <div className="flex min-h-[130px] items-center rounded-2xl border border-border bg-surface-subtle p-8 dark:border-gray-700 dark:bg-gray-900">
               <Button variant="outline" theme="primary" darkMode={docsDark}>
                 Lihat Detail
               </Button>
@@ -299,6 +299,7 @@ export function ButtonPage() {
 
       <ModeSection
         name="Button"
+        stayDark
         lead={
           <>
             Gunakan <Hl>darkMode</Hl> untuk menjaga kontras Button di atas permukaan gelap.
@@ -306,31 +307,31 @@ export function ButtonPage() {
         }
       >
         <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-          <Demo label="Filled · theme bawaan" dark={!docsDark} light={docsDark}>
+          <Demo label="Filled · theme bawaan" dark>
             <Button
               variant="filled"
               theme="primary"
-              darkMode={!docsDark}
+              darkMode
               leftIcon={<Messages className="size-4" />}
             >
               Simpan Perubahan
             </Button>
           </Demo>
 
-          <Demo label="Filled · fallback putih" dark={!docsDark} light={docsDark}>
-            <Button variant="filled" darkMode={!docsDark}>
+          <Demo label="Filled · fallback putih" dark>
+            <Button variant="filled" darkMode>
               Simpan Perubahan
             </Button>
           </Demo>
 
-          <Demo label="Icon Only" dark={!docsDark} light={docsDark}>
-            <Button variant="filled" theme="primary" darkMode={!docsDark} iconOnly aria-label="Open messages">
+          <Demo label="Icon Only" dark>
+            <Button variant="filled" theme="primary" darkMode iconOnly aria-label="Open messages">
               <Messages className="size-4" />
             </Button>
           </Demo>
 
-          <Demo label="Outline" dark={!docsDark} light={docsDark}>
-            <Button variant="outline" theme="purple" darkMode={!docsDark}>
+          <Demo label="Outline" dark>
+            <Button variant="outline" theme="purple" darkMode>
               Lihat detail
             </Button>
           </Demo>
@@ -344,22 +345,22 @@ export function ButtonPage() {
 
         <SectionCode>
           {"<Button variant=\"filled\" theme=\"primary\" "}
-          {!docsDark && <><H>darkMode</H>{" "}</>}
+          <H>darkMode</H>{" "}
           {"leftIcon={<Messages className=\"size-4\" />}>\n"}
           {"  Simpan Perubahan\n"}
           {"</Button>\n\n"}
           {"<Button variant=\"filled\" "}
-          {!docsDark && <><H>darkMode</H>{" "}</>}
+          <H>darkMode</H>{" "}
           {">\n"}
           {"  Simpan Perubahan\n"}
           {"</Button>\n\n"}
           {"<Button variant=\"filled\" theme=\"primary\" "}
-          {!docsDark && <><H>darkMode</H>{" "}</>}
+          <H>darkMode</H>{" "}
           {"iconOnly aria-label=\"Open messages\">\n"}
           {"  <Messages className=\"size-4\" />\n"}
           {"</Button>\n\n"}
           {"<Button variant=\"outline\" theme=\"purple\" "}
-          {!docsDark && <><H>darkMode</H>{" "}</>}
+          <H>darkMode</H>{" "}
           {">\n"}
           {"  Lihat detail\n"}
           {"</Button>"}
