@@ -1,6 +1,12 @@
 import { type MouseEvent as ReactMouseEvent, type ReactNode, useState } from "react";
 import { ChartPie, Clipboard, Inbox, Layers, Lock, Cart } from "flowbite-react-icons/solid";
 import { Sidebar, type SidebarGroup, type SidebarItem } from "../../../lib";
+import {
+  tocForDarkDocs,
+  useDarkModeSnippet,
+  useDocsDark,
+  usePlaygroundDark,
+} from "../../docsTheme";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { asset } from "../../asset";
 import { H, Hl, Segmented } from "../../pageKit";
@@ -9,6 +15,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -171,6 +178,8 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
+const tocDark = tocForDarkDocs(toc, true);
+
 const baseItems = [
   {
     label: "Menu 1",
@@ -315,10 +324,10 @@ function VariantPreview({
   minWidth?: string;
 }) {
   return (
-    <article className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-      <div className="border-b border-gray-200 px-4 py-3">
-        <h3 className="text-sm font-bold text-gray-900">{title}</h3>
-        <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
+    <article className={`overflow-hidden rounded-xl border ${dark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white"}`}>
+      <div className={`border-b px-4 py-3 ${dark ? "border-gray-700" : "border-gray-200"}`}>
+        <h3 className={`text-sm font-bold ${dark ? "text-white" : "text-gray-900"}`}>{title}</h3>
+        <p className={`mt-1 text-xs leading-5 ${dark ? "text-gray-400" : "text-gray-500"}`}>{description}</p>
       </div>
       <div className={`h-[440px] overflow-y-auto overscroll-contain ${minWidth ? "ds-scroll-x overflow-x-auto" : ""} ${dark ? "bg-gray-900" : "bg-gray-50"}`}>
         <div className="h-full" style={{ minWidth }}>{children}</div>
@@ -354,6 +363,8 @@ function SidebarVariant({
 }
 
 export function SidebarPage() {
+  const docsDark = useDocsDark();
+  const dm = useDarkModeSnippet();
   const [collapse, setCollapse] = useState<CollapseOption>("expanded");
   const [badge, setBadge] = useState<BadgeOption>("show");
   const [menuIcon, setMenuIcon] = useState<MenuIconOption>("show");
@@ -361,7 +372,7 @@ export function SidebarPage() {
   const [userInfo, setUserInfo] = useState<VisibilityOption>("show");
   const [logoWeb, setLogoWeb] = useState<VisibilityOption>("show");
   const [collapseButton, setCollapseButton] = useState<VisibilityOption>("show");
-  const [theme, setTheme] = useState("light");
+  const [dark, setDark] = usePlaygroundDark();
   const [activeMenu, setActiveMenu] = useState("Menu 1");
 
   const resolvedCollapse = menuIcon === "hide" ? "expanded" : collapse;
@@ -438,7 +449,7 @@ export function SidebarPage() {
       : []),
     "",
     "<Sidebar",
-    ...(theme === "dark" ? ["  darkMode"] : []),
+    ...(dark ? ["  darkMode"] : []),
     ...(logoWeb === "show" ? ["  logo={<Logo />}", "  collapsedLogo={<LogoMark />}"] : []),
     ...(userInfo === "show"
       ? [
@@ -467,7 +478,7 @@ export function SidebarPage() {
     "sticky",
     ...(menuIcon === "show" ? ["icon"] : []),
     ...(badge === "show" ? ["badge"] : []),
-    ...(theme === "dark" ? ["darkMode"] : []),
+    ...(dark ? ["darkMode"] : []),
     ...(userInfo === "show" ? ["user"] : []),
     ...(logoWeb === "show" ? ["collapsedLogo", "logo"] : []),
     ...(resolvedCollapseButton === "show" ? ["onCollapse"] : []),
@@ -479,80 +490,85 @@ export function SidebarPage() {
       eyebrow="Components · Sidebar"
       title="Sidebar"
       description="Navigasi vertikal yang digunakan untuk menampilkan struktur menu utama aplikasi, profile pengguna, submenu, dan informasi tambahan."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="variants" title="Variants">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Sidebar tersedia dalam lima konfigurasi, dari navigasi sederhana sampai menu berikon yang
           dikelompokkan dengan content separator.
-        </p>
+        </Lead>
 
         <div className="mb-4 grid gap-4 lg:grid-cols-2">
           <VariantPreview
             title="1. Menu Only"
             description="Navigasi dasar tanpa logo dan informasi akun."
+            dark={docsDark}
             minWidth="280px"
           >
-            <Sidebar items={menuOnlyItems} />
+            <Sidebar items={menuOnlyItems} darkMode={docsDark} />
           </VariantPreview>
 
           <VariantPreview
             title="2. Menu, user info, logo web"
             description="Navigasi dasar dengan identitas aplikasi dan area akun."
+            dark={docsDark}
             minWidth="280px"
           >
-            <SidebarVariant items={standardItems} />
+            <SidebarVariant items={standardItems} darkMode={docsDark} />
           </VariantPreview>
 
           <VariantPreview
             title="3. Multi-level menu, user info, logo web"
             description="Menu anak dipakai untuk mengelompokkan navigasi yang berkaitan."
+            dark={docsDark}
             minWidth="280px"
           >
-            <SidebarVariant items={nestedItems} />
+            <SidebarVariant items={nestedItems} darkMode={docsDark} />
           </VariantPreview>
 
           <VariantPreview
             title="4. Multi-level menu + icon,user info, logo web"
             description="Menu berikon dikelompokkan; separator membedakan area konten."
+            dark={docsDark}
             minWidth="280px"
           >
-            <SidebarVariant groups={iconGroups} />
+            <SidebarVariant groups={iconGroups} darkMode={docsDark} />
           </VariantPreview>
 
           <VariantPreview
             title="5. Collapsed"
             description="Konfigurasi varian 4 dalam kondisi tertutup: icon, user, dan logo mark tetap terlihat."
+            dark={docsDark}
             minWidth="72px"
           >
-            <SidebarVariant groups={iconGroups} collapsed />
+            <SidebarVariant groups={iconGroups} collapsed darkMode={docsDark} />
           </VariantPreview>
         </div>
       </FlowSection>
 
       <FlowSection id="menu" title="Menu">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Menu digunakan sebagai navigasi utama pada Sidebar. Setiap item dapat memiliki ikon,
           label, tautan, dan state interaksi.
-        </p>
+        </Lead>
 
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="min-w-0">
-            <h3 className="mb-3 text-sm font-bold text-gray-900">Menu</h3>
+            <h3 className="mb-3 text-sm font-bold text-gray-900 dark:text-white">Menu</h3>
             <div className="ds-scroll-x mb-4 overflow-x-auto">
-              <div className="w-[280px] rounded-xl border border-gray-200 bg-white p-4">
+              <div className={cn("w-[280px] rounded-xl border p-4", docsDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white")}>
                 <div className="space-y-1">
-                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
+                <div className={cn("flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm", docsDark ? "text-gray-50" : "text-gray-700")}>
                   <ChartPie className="size-5" />
                   <span>Menu 1</span>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
+                <div className={cn("flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm", docsDark ? "text-gray-50" : "text-gray-700")}>
                   <Clipboard className="size-5" />
                   <span>Menu 2</span>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
+                <div className={cn("flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm", docsDark ? "text-gray-50" : "text-gray-700")}>
                   <Inbox className="size-5" />
                   <span>Menu 3</span>
                 </div>
@@ -582,11 +598,12 @@ export function SidebarPage() {
           </div>
 
           <div className="min-w-0">
-            <h3 className="mb-3 text-sm font-bold text-gray-900">Sub Menu</h3>
+            <h3 className="mb-3 text-sm font-bold text-gray-900 dark:text-white">Sub Menu</h3>
             <div className="ds-scroll-x mb-4 overflow-x-auto">
-              <div className="w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white">
+              <div className={cn("w-[280px] overflow-hidden rounded-xl border", docsDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white")}>
                 <Sidebar
                   className="!min-h-0"
+                  darkMode={docsDark}
                   items={[
                   {
                     label: "Menu 3",
@@ -627,14 +644,14 @@ export function SidebarPage() {
       </FlowSection>
 
       <FlowSection id="badge" title="Badge">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Badge dapat digunakan untuk menampilkan informasi singkat seperti jumlah notifikasi atau
           item baru pada menu tertentu.
-        </p>
+        </Lead>
 
         <div className="ds-scroll-x mb-4 overflow-x-auto">
-          <div className="w-[280px] rounded-xl border border-gray-200 bg-white p-4">
-            <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700">
+          <div className={cn("w-[280px] rounded-xl border p-4", docsDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white")}>
+            <div className={cn("flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm", docsDark ? "text-gray-50" : "text-gray-700")}>
             <Inbox className="size-5" />
 
             <span className="flex-1">Menu 4</span>
@@ -660,14 +677,14 @@ export function SidebarPage() {
       </FlowSection>
 
       <FlowSection id="separator" title="Content Separator">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Separator memisahkan kelompok menu yang berbeda. Tambahkan{" "}
           <Hl>separator: true</Hl> pada group yang ingin diberi garis pemisah di bagian atas.
-        </p>
+        </Lead>
 
         <div className="ds-scroll-x mb-4 overflow-x-auto">
-          <div className="w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white">
-            <Sidebar className="!min-h-0" groups={separatorGroups} />
+          <div className={cn("w-[280px] overflow-hidden rounded-xl border", docsDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white")}>
+            <Sidebar className="!min-h-0" groups={separatorGroups} darkMode={docsDark} />
           </div>
         </div>
 
@@ -685,15 +702,22 @@ export function SidebarPage() {
           {"      { label: 'Menu 7', href: '#', icon: <Layers /> },\n"}
           {"      { label: 'Menu 8', href: '#', icon: <ChartPie /> },\n"}
           {"    ],\n  },\n]\n\n"}
-          {"<Sidebar groups={groups} />"}
+          {"<Sidebar"}
+          {dm.inline}
+          {" groups={groups} />"}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <p className="mb-6 text-body-sm text-gray-500">
-          Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Sidebar.
-          Komponen secara otomatis menyesuaikan warna ikon, teks aktif/inaktif, badge, profil, dan border untuk menjaga rasio kontras.
-        </p>
+      <ModeSection
+        name="Sidebar"
+        stayDark
+        lead={
+          <>
+            Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Sidebar.
+            Komponen secara otomatis menyesuaikan warna ikon, teks aktif/inaktif, badge, profil, dan border untuk menjaga rasio kontras.
+          </>
+        }
+      >
 
         <div className="mb-4 grid gap-4 lg:grid-cols-2">
           <VariantPreview
@@ -714,25 +738,31 @@ export function SidebarPage() {
             <SidebarVariant groups={iconGroups} collapsed darkMode />
           </VariantPreview>
         </div>
-      </FlowSection>
+
+        <SectionCode>
+          {"<Sidebar"}
+          {" "}<H>darkMode</H>
+          {" groups={groups} />"}
+        </SectionCode>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Coba konfigurasi Sidebar melalui kontrol di bawah ini untuk melihat perubahan mode
           collapse, badge, separator, logo, user info, dan tombol collapse.
-        </p>
+        </Lead>
 
-        <Stage maxWidth="max-w-[768px]" minWidth="768px" dark={theme === "dark"}>
+        <Stage maxWidth="max-w-[768px]" minWidth="768px" dark={dark}>
           <div
             className={cn(
               "flex min-h-[760px] w-full items-stretch overflow-hidden border",
-              theme === "dark" ? "border-gray-700 bg-gray-900" : "border-gray-200 bg-white"
+              dark ? "border-gray-700 bg-gray-900" : "border-gray-200 bg-white"
             )}
           >
             <Sidebar
               key={separator}
               collapsed={collapsed}
-              darkMode={theme === "dark"}
+              darkMode={dark}
               onCollapse={
                 resolvedCollapseButton === "show"
                   ? () =>
@@ -768,7 +798,7 @@ export function SidebarPage() {
                 <h1
                   className={cn(
                     "text-xl font-bold",
-                    theme === "dark" ? "text-white" : "text-gray-900"
+                    dark ? "text-white" : "text-gray-900"
                   )}
                 >
                   {activeMenu}
@@ -776,7 +806,7 @@ export function SidebarPage() {
                 <p
                   className={cn(
                     "text-sm",
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    dark ? "text-gray-400" : "text-gray-500"
                   )}
                 >
                   Ini adalah simulasi konten untuk halaman {activeMenu}. Anda bisa menaruh konten aplikasi yang sebenarnya di sini.
@@ -790,11 +820,11 @@ export function SidebarPage() {
           <Control label="Tampilan">
             <Segmented
               label="Pilih mode"
-              value={theme}
-              onChange={(v) => setTheme(String(v))}
+              value={dark}
+              onChange={(value) => setDark(Boolean(value))}
               options={[
-                { value: "light", label: "Light" },
-                { value: "dark", label: "Dark" },
+                { value: false, label: "Light" },
+                { value: true, label: "Dark" },
               ]}
             />
           </Control>
@@ -866,10 +896,10 @@ export function SidebarPage() {
       </FlowSection>
 
       <FlowSection id="penggunaan" title="Penggunaan">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Bagian ini menampilkan contoh penggunaan Sidebar berdasarkan konfigurasi yang dipilih pada
           Playground.
-        </p>
+        </Lead>
 
         <SectionCode flush>{highlightCode(usageCode, usageHighlights)}</SectionCode>
       </FlowSection>
@@ -882,22 +912,22 @@ export function SidebarPage() {
 
         <div className="space-y-6">
           <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">Sidebar Props</h3>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900 dark:text-white">Sidebar Props</h3>
             <PropsTable rows={sidebarProps} minWidth="46rem" />
           </div>
 
           <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">SidebarItem Props</h3>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900 dark:text-white">SidebarItem Props</h3>
             <PropsTable rows={sidebarItemProps} minWidth="46rem" />
           </div>
 
           <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">SidebarUser Props</h3>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900 dark:text-white">SidebarUser Props</h3>
             <PropsTable rows={sidebarUserProps} minWidth="46rem" />
           </div>
 
           <div>
-            <h3 className="mb-3 text-heading-4 font-bold text-gray-900">SidebarUserItem Props</h3>
+            <h3 className="mb-3 text-heading-4 font-bold text-gray-900 dark:text-white">SidebarUserItem Props</h3>
             <PropsTable rows={sidebarUserItemProps} minWidth="46rem" />
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Container, type ContainerSize } from "../../../lib";
-import { useDarkModeSnippet, useDocsDark, usePlaygroundDark } from "../../docsTheme";
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from "../../docsTheme";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { H, Hl, Mark, Segmented } from "../../pageKit";
 import {
@@ -8,6 +8,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   PlaygroundFontScope,
   SectionCode,
   UsulanPage,
@@ -177,6 +178,8 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
+const tocDark = tocForDarkDocs(toc, true);
+
 type View = "mobile" | "desktop" | "custom";
 
 const MIN_WIDTH = 320;
@@ -312,7 +315,7 @@ export function ContainerPage() {
       eyebrow="Components"
       title="Container"
       description="Pembungkus paling luar untuk isi halaman. Tugasnya satu: menjaga konten berhenti di lebar yang sama di mana pun ia dipakai — 380px saat ruangnya sempit dan 1126px saat lapang — lalu memusatkannya. Tingginya selalu mengikuti konten."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="size" title="size">
         <Lead>
@@ -493,15 +496,20 @@ export function ContainerPage() {
         </SectionCode>
       </FlowSection>
 
-      {/* Bagian ini selalu memperagakan darkMode, di mode docs apa pun. */}
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> memberi elemen dalam latar dari token{" "}
-          <Hl>--color-container</Hl> (gray-700) dan teks bawaan gray-300. Lebar,
-          padding, dan pemusatan tidak berubah. Di ruang sempit sudut rounded-xl
-          ikut terlihat karena sekarang ada latarnya. Tanpa <Hl>darkMode</Hl>,
-          Container tetap transparan.
-        </Lead>
+      {/* stayDark: bagian ini selalu memperagakan darkMode, di mode docs apa pun. */}
+      <ModeSection
+        name="Container"
+        stayDark
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> memberi elemen dalam latar dari token{" "}
+            <Hl>--color-container</Hl> (gray-700) dan teks bawaan gray-300. Lebar,
+            padding, dan pemusatan tidak berubah. Di ruang sempit sudut rounded-xl
+            ikut terlihat karena sekarang ada latarnya. Tanpa <Hl>darkMode</Hl>,
+            Container tetap transparan.
+          </>
+        }
+      >
 
         {/* Keterangan tiga lapis di contoh, supaya jelas bidang mana Container-nya. */}
         <ul className="mb-2 flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-gray-400">
@@ -550,7 +558,7 @@ export function ContainerPage() {
           <Mark>darkMode</Mark>
           {' className="py-12">\n    ...\n</Container>'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="spesifikasi" title="Angka per ambang">
         <Lead>

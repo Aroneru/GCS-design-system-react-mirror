@@ -1,12 +1,20 @@
 import { useState } from "react";
 import { Home } from "flowbite-react-icons/solid";
 import { Breadcrumb, type BreadcrumbSize, type BreadcrumbItem } from "../../../lib";
+import {
+  tocForDarkDocs,
+  useDarkModeSnippet,
+  useDocsDark,
+  usePlaygroundDark,
+} from "../../docsTheme";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Demo, H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
   FlowSection,
+  Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -54,6 +62,8 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
+const tocDark = tocForDarkDocs(toc, true);
+
 const allItems: BreadcrumbItem[] = [
   {
     label: "Home",
@@ -68,10 +78,12 @@ const allItems: BreadcrumbItem[] = [
 ];
 
 export function BreadcrumbPage() {
+  const docsDark = useDocsDark();
+  const dm = useDarkModeSnippet();
   const [size, setSize] = useState<BreadcrumbSize>("base");
   const [background, setBackground] = useState<BackgroundOption>("without");
   const [menuCount, setMenuCount] = useState("3");
-  const [theme, setTheme] = useState("light");
+  const [dark, setDark] = usePlaygroundDark();
 
   const items = allItems.slice(0, Number(menuCount));
 
@@ -80,24 +92,24 @@ export function BreadcrumbPage() {
       eyebrow="Components · Breadcrumb"
       title="Breadcrumb"
       description="Menampilkan posisi halaman saat ini dalam struktur navigasi dan membantu pengguna berpindah ke halaman sebelumnya. Tersedia juga dalam tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="sizes" title="Sizes">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Breadcrumb tersedia dalam dua ukuran untuk menyesuaikan kebutuhan hierarki dan kepadatan
           informasi pada layout. Ukuran <Hl>base</Hl> adalah ukuran default. Ukuran <Hl>sm</Hl>{" "}
           digunakan ketika Breadcrumb diimplementasikan pada mobile.
-        </p>
+        </Lead>
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">
           <Demo label="sm">
             <div>
-              <Breadcrumb items={allItems.slice(0, 3)} size="sm" background="none" />
+              <Breadcrumb darkMode={docsDark} items={allItems.slice(0, 3)} size="sm" background="none" />
             </div>
           </Demo>
 
           <Demo label="base - 14 px">
-            <Breadcrumb items={allItems.slice(0, 3)} size="base" background="none" />
+            <Breadcrumb darkMode={docsDark} items={allItems.slice(0, 3)} size="base" background="none" />
           </Demo>
         </div>
 
@@ -112,23 +124,24 @@ export function BreadcrumbPage() {
           {"    "}
           <H>size</H>
           {'="base"\n'}
+          {dm.line}
           {"/>"}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="variants" title="Variants">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Breadcrumb dapat digunakan dengan atau tanpa background. Background digunakan ketika
           Breadcrumb perlu memiliki area visual tersendiri dari konten halaman.
-        </p>
+        </Lead>
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">
           <Demo label="Tanpa Backgorund">
-            <Breadcrumb items={allItems.slice(0, 3)} size="base" background="none" />
+            <Breadcrumb darkMode={docsDark} items={allItems.slice(0, 3)} size="base" background="none" />
           </Demo>
 
           <Demo label="Dengan Background">
-            <Breadcrumb items={allItems.slice(0, 3)} size="base" background="bg" />
+            <Breadcrumb darkMode={docsDark} items={allItems.slice(0, 3)} size="base" background="bg" />
           </Demo>
         </div>
 
@@ -144,6 +157,7 @@ export function BreadcrumbPage() {
           {"    "}
           <H>background</H>
           {'="none"\n'}
+          {dm.line}
           {"/>"}
           {"\n\n"}
           {"/*Dengan background*/\n"}
@@ -152,14 +166,20 @@ export function BreadcrumbPage() {
           {"    "}
           <H>background</H>
           {'="bg"\n'}
+          {dm.line}
           {"/>"}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <p className="mb-6 text-body-sm text-gray-500">
-          Breadcrumb mengadopsi sistem token warna semantik dan token komponen (<H>--color-breadcrumb-surface</H>, <H>--color-breadcrumb-active</H>, dan <H>--color-breadcrumb-link-hover</H>). Mode gelap dapat diaktifkan lewat prop <H>darkMode</H> maupun pewarisan otomatis atribut <H>data-theme="dark"</H> dari kontainer pembungkusnya. Latar belakang (pada varian <H>bg</H>) menjadi <H>gray-700</H>, item aktif <H>gray-300</H>, serta item tidak aktif dan ikon pemisah (chevron) menggunakan <H>gray-400</H>.
-        </p>
+      <ModeSection
+        name="Breadcrumb"
+        stayDark
+        lead={
+          <>
+            Breadcrumb mengadopsi sistem token warna semantik dan token komponen (<H>--color-breadcrumb-surface</H>, <H>--color-breadcrumb-active</H>, dan <H>--color-breadcrumb-link-hover</H>). Mode gelap dapat diaktifkan lewat prop <H>darkMode</H> maupun pewarisan otomatis atribut <H>data-theme="dark"</H> dari kontainer pembungkusnya. Latar belakang (pada varian <H>bg</H>) menjadi <H>gray-700</H>, item aktif <H>gray-300</H>, serta item tidak aktif dan ikon pemisah (chevron) menggunakan <H>gray-400</H>.
+          </>
+        }
+      >
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">
           <Demo label="Tanpa Background" dark>
@@ -179,34 +199,30 @@ export function BreadcrumbPage() {
           {"]\n\n"}
           {"/*Tanpa background*/\n"}
           {"<Breadcrumb\n"}
-          {"    "}
-          <H>darkMode</H>
-          {"\n"}
+          {"    "}<H>darkMode</H>{"\n"}
           {"    items={items}\n"}
           {'    background="none"\n'}
           {"/>"}
           {"\n\n"}
           {"/*Dengan background*/\n"}
           {"<Breadcrumb\n"}
-          {"    "}
-          <H>darkMode</H>
-          {"\n"}
+          {"    "}<H>darkMode</H>{"\n"}
           {"    items={items}\n"}
           {'    background="bg"\n'}
           {"/>"}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Coba konfigurasi Breadcrumb secara langsung melalui kontrol di bawah ini. Anda dapat
           mengubah ukuran, background, dan jumlah menu.
-        </p>
+        </Lead>
 
-        <Stage maxWidth="max-w-[700px]" dark={theme === "dark"}>
+        <Stage maxWidth="max-w-[700px]" dark={dark}>
           <div className="flex min-h-[160px] items-center justify-center">
             <Breadcrumb
-              darkMode={theme === "dark"}
+              darkMode={dark}
               items={items}
               size={size}
               background={background === "with" ? "bg" : "none"}
@@ -217,12 +233,12 @@ export function BreadcrumbPage() {
         <Controls>
           <Control label="Tampilan">
             <Segmented
-              label="Pilih mode"
-              value={theme}
-              onChange={(v) => setTheme(String(v))}
+              label="Pilih tampilan"
+              value={dark}
+              onChange={(value) => setDark(Boolean(value))}
               options={[
-                { value: "light", label: "Light" },
-                { value: "dark", label: "Dark" },
+                { value: false, label: "Light" },
+                { value: true, label: "Dark" },
               ]}
             />
           </Control>
@@ -265,10 +281,10 @@ export function BreadcrumbPage() {
       </FlowSection>
 
       <FlowSection id="penggunaan" title="Penggunaan">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Bagian ini menampilkan contoh kode penggunaan Breadcrumb berdasarkan konfigurasi yang
           dipilih pada Playground.
-        </p>
+        </Lead>
 
         <SectionCode flush>
           {"import { Breadcrumb } from '@ceplok-ui/design-kit-react'\n"}
@@ -285,7 +301,7 @@ export function BreadcrumbPage() {
           {"\n"}
           {"<Breadcrumb\n"}
 
-          {theme === "dark" && (
+          {dark && (
             <>
               {"    "}
               <H>darkMode</H>
@@ -316,9 +332,9 @@ export function BreadcrumbPage() {
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Referensi semua prop yang tersedia pada komponen Breadcrumb.
-        </p>
+        </Lead>
 
         <PropsTable rows={breadcrumbProps} minWidth="46rem" />
       </FlowSection>

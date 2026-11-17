@@ -619,17 +619,23 @@
 /* Search */
 @theme static {
     --color-search-category-surface: var(--color-gray-100);
+    --color-search-category-border: var(--color-gray-300);
+    --color-search-category-field-surface: var(--color-gray-50);
     --color-search-field-surface: var(--color-gray-50);
 }
 
 [data-theme='dark'] {
     --color-search-category-surface: var(--color-gray-700);
-    --color-search-field-surface: var(--color-gray-600);
+    --color-search-category-border: var(--color-gray-700);
+    --color-search-category-field-surface: var(--color-gray-600);
+    --color-search-field-surface: var(--color-gray-700);
 }
 
 [data-theme='light'],
 .ds-theme-light {
     --color-search-category-surface: var(--color-gray-100);
+    --color-search-category-border: var(--color-gray-300);
+    --color-search-category-field-surface: var(--color-gray-50);
     --color-search-field-surface: var(--color-gray-50);
 }
 

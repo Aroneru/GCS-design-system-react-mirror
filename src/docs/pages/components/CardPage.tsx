@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Button, Card } from "../../../lib";
-import { useDarkModeSnippet, useDocsDark, usePlaygroundDark } from "../../docsTheme";
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from "../../docsTheme";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Demo, Hl, Mark, Segmented } from "../../pageKit";
 import {
@@ -8,6 +8,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -86,12 +87,7 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
-/**
- * Tombol outline di kartu gelap. Outline bawaan Button memakai primary-700 yang
- * nyaris hilang di atas gray-700, jadi warnanya ditimpa ke primary-400 seperti
- * desain. Pakai `!` karena `cn` tidak menggabungkan kelas yang bentrok.
- */
-const darkOutlineClass = "border-primary-400! text-primary-400! hover:bg-primary-400/10!";
+const tocDark = tocForDarkDocs(toc, true);
 
 const SampleButton = ({
   variant,
@@ -102,7 +98,7 @@ const SampleButton = ({
 }) => {
   if (variant === "primary") {
     return (
-      <Button variant="filled" theme="primary" tone="light" size="s">
+      <Button variant="filled" theme="primary" size="s" darkMode={dark}>
         Button text
       </Button>
     );
@@ -110,14 +106,14 @@ const SampleButton = ({
 
   if (dark) {
     return (
-      <Button variant="outline" theme="primary" tone="light" size="s" className={darkOutlineClass}>
+      <Button variant="outline" theme="primary" size="s" darkMode>
         Button text
       </Button>
     );
   }
 
   return (
-    <Button variant="filled" theme="primary" tone="light" size="s">
+    <Button variant="filled" theme="primary" size="s">
       Button text
     </Button>
   );
@@ -128,10 +124,10 @@ function cardActions(action: CardAction, dark = false): ReactNode {
     return (
       <>
         <SampleButton variant="secondary" dark={dark} />
-        <SampleButton variant="primary" />
+        <SampleButton variant="primary" dark={dark} />
       </>
     );
-  if (action === "one") return <SampleButton variant="primary" />;
+  if (action === "one") return <SampleButton variant="primary" dark={dark} />;
   return undefined;
 }
 
@@ -164,7 +160,7 @@ export function CardPage() {
       eyebrow="Components"
       title="Card"
       description="Wadah ringkas untuk menampilkan satu unit informasi: gambar, judul, deskripsi, dan aksi. Setiap bagian bersifat opsional, sehingga seluruh varian pada desain terbentuk dari komponen yang sama."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="varian" title="Varian">
         <Lead>
@@ -183,7 +179,7 @@ export function CardPage() {
               imageAlt=""
               title={cardTitle}
               description={cardDesc}
-              actions={<SampleButton variant="primary" />}
+              actions={<SampleButton variant="primary" dark={docsDark} />}
             />
           </Demo>
 
@@ -192,7 +188,7 @@ export function CardPage() {
               darkMode={docsDark}
               title={cardTitle}
               description={cardDesc}
-              actions={<SampleButton variant="primary" />}
+              actions={<SampleButton variant="primary" dark={docsDark} />}
             />
           </Demo>
 
@@ -342,7 +338,7 @@ export function CardPage() {
               imageAlt=""
               title={cardTitle}
               description={cardDesc}
-              actions={<SampleButton variant="primary" />}
+              actions={<SampleButton variant="primary" dark={docsDark} />}
             />
           </Demo>
           <Demo label="Dua tombol">
@@ -364,29 +360,32 @@ export function CardPage() {
           <Mark>actions</Mark>
           {"={\n"}
           {"        <>\n"}
-          {/* Di kartu gelap tombol pertama jadi outline primary-400, sama seperti pratinjaunya. */}
+          {/* Di kartu gelap tombol pertama jadi outline, dan keduanya memakai darkMode, sama seperti pratinjaunya. */}
           {docsDark
-            ? '            <Button variant="outline" size="s"\n' +
-              '                className="border-primary-400! text-primary-400! hover:bg-primary-400/10!">\n' +
-              "                Button text\n" +
-              "            </Button>\n"
+            ? '            <Button variant="outline" size="s" darkMode>Button text</Button>\n'
             : '            <Button variant="filled" size="s">Button text</Button>\n'}
-          {'            <Button variant="filled" size="s">Button text</Button>\n'}
+          {`            <Button variant="filled" size="s"${dm.inline}>Button text</Button>\n`}
           {"        </>\n"}
           {"    }\n"}
           {"/>"}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Isi <Hl>darkMode</Hl> untuk halaman berlatar gelap. Kartu berubah ke
-          gray-700, judul jadi putih, deskripsi gray-300, dan tautan primary-400
-          supaya tetap terbaca. Gambar sedikit diredupkan. Semua varian di atas
-          tetap berlaku, termasuk ukuran mobile. Tombol di <Hl>actions</Hl> tidak
-          ikut diubah. Tombol outline perlu diberi warna primary-400 sendiri,
-          karena primary-700 bawaannya hampir tidak terlihat di kartu gelap.
-        </Lead>
+      {/* stayDark: bagian ini selalu memperagakan darkMode, di mode docs apa pun. */}
+      <ModeSection
+        name="Card"
+        stayDark
+        lead={
+          <>
+            Isi <Hl>darkMode</Hl> untuk halaman berlatar gelap. Warnanya dari token{" "}
+            <Hl>--color-card-*</Hl>: kartu gray-700, judul putih, deskripsi gray-300, dan
+            tautan primary-400 supaya tetap terbaca. Gambar sedikit diredupkan. Semua
+            varian di atas tetap berlaku, termasuk ukuran mobile. Tombol di{" "}
+            <Hl>actions</Hl> tidak ikut diubah, jadi beri <Hl>darkMode</Hl> juga pada
+            tiap <Hl>Button</Hl> di dalamnya.
+          </>
+        }
+      >
 
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Dua tombol" dark>
@@ -477,11 +476,8 @@ export function CardPage() {
           {'    description="…"\n'}
           {"    actions={\n"}
           {"        <>\n"}
-          {'            <Button variant="outline" size="s"\n'}
-          {'                className="border-primary-400! text-primary-400! hover:bg-primary-400/10!">\n'}
-          {"                Button text\n"}
-          {"            </Button>\n"}
-          {'            <Button variant="filled" size="s">Button text</Button>\n'}
+          {'            <Button variant="outline" size="s" darkMode>Button text</Button>\n'}
+          {'            <Button variant="filled" size="s" darkMode>Button text</Button>\n'}
           {"        </>\n"}
           {"    }\n"}
           {"/>"}
@@ -517,7 +513,7 @@ export function CardPage() {
           {"    </div>\n"}
           {"</section>"}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="lebar" title="Lebar kartu">
         <Lead>
@@ -542,7 +538,7 @@ export function CardPage() {
                   imageAlt=""
                   title={cardTitle}
                   description={cardDesc}
-                  actions={<SampleButton variant="primary" />}
+                  actions={<SampleButton variant="primary" dark={docsDark} />}
                 />
               </div>
             ))}
@@ -680,17 +676,10 @@ export function CardPage() {
               <Mark>actions</Mark>
               {"={\n"}
               {"            <>\n"}
-              {darkMode ? (
-                <>
-                  {'                <Button variant="outline" size="s"\n'}
-                  {'                    className="border-primary-400! text-primary-400! hover:bg-primary-400/10!">\n'}
-                  {"                    Button text\n"}
-                  {"                </Button>\n"}
-                </>
-              ) : (
-                '                <Button variant="filled" size="s">Button text</Button>\n'
-              )}
-              {'                <Button variant="filled" size="s">Button text</Button>\n'}
+              {darkMode
+                ? '                <Button variant="outline" size="s" darkMode>Button text</Button>\n'
+                : '                <Button variant="filled" size="s">Button text</Button>\n'}
+              {`                <Button variant="filled" size="s"${darkMode ? " darkMode" : ""}>Button text</Button>\n`}
               {"            </>\n"}
               {"        }\n"}
             </>
@@ -699,7 +688,7 @@ export function CardPage() {
             <>
               {"        "}
               <Mark>actions</Mark>
-              {'={<Button variant="filled" size="s">Button text</Button>}\n'}
+              {`={<Button variant="filled" size="s"${darkMode ? " darkMode" : ""}>Button text</Button>}\n`}
             </>
           )}
           {"    />\n"}
