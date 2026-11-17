@@ -602,7 +602,7 @@ export function DrawerPage() {
                 </PlaygroundFontScope>
 
                 <Controls>
-                    <Control label="Mode">
+                    <Control label="Tampilan">
                         <Segmented
                             label="Pilih mode"
                             value={playgroundDarkMode ? 'dark' : 'light'}

@@ -28,6 +28,7 @@ const darkPages = new Set([
   '/',
   '/components',
   '/components/alert',
+  '/components/container',
   '/components/toast',
   '/components/timeline',
   '/form',

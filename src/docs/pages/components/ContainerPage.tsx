@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Container, type ContainerSize } from "../../../lib";
+import { useDarkModeSnippet, useDocsDark, usePlaygroundDark } from "../../docsTheme";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { H, Hl, Mark, Segmented } from "../../pageKit";
 import {
@@ -225,9 +226,11 @@ function Isi({ label, dark = false }: { label: string; dark?: boolean }) {
  * Container (bukan `className` Container, yang jatuh ke elemen luar), jadi
  * latar Container membungkus label dan isi di keempat sisi.
  */
-function ContainerLabel({ note }: { note: string }) {
+function ContainerLabel({ note, dark = false }: { note: string; dark?: boolean }) {
   return (
-    <p className="pt-4 pb-3 text-[11px] font-bold tracking-[0.12em] text-gray-400 uppercase">
+    <p
+      className={`pt-4 pb-3 text-[11px] font-bold tracking-[0.12em] uppercase ${dark ? "text-gray-400" : "text-gray-500"}`}
+    >
       Container <span className="font-medium tracking-normal normal-case">· {note}</span>
     </p>
   );
@@ -244,10 +247,13 @@ function Ruang({ children, dark = false }: { children: ReactNode; dark?: boolean
 }
 
 export function ContainerPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark();
+  const dm = useDarkModeSnippet();
   const [view, setView] = useState<View>("desktop");
   const [size, setSize] = useState<ContainerSize>("default");
   const [customWidth, setCustomWidth] = useState(900);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = usePlaygroundDark();
   const tone = darkMode ? tones.dark : tones.light;
 
   const width = view === "custom" ? customWidth : presetWidth[view];
@@ -315,49 +321,49 @@ export function ContainerPage() {
           persis sama di keempatnya. Bilah di bawah digambar dengan skala yang
           sama, 1440px sebagai patokan penuh.
         </Lead>
-        <ul className="ds-card divide-y divide-border">
+        <ul className="ds-card divide-y divide-border dark:divide-gray-700">
           {containerSizes.map(({ value, max, ratio, headline, use }) => (
             <li
               key={value}
               className="grid gap-3 p-5 sm:grid-cols-[11rem_1fr] sm:gap-6"
             >
               <div>
-                <p className="text-sm font-black text-gray-900">
+                <p className="text-sm font-black text-gray-900 dark:text-white">
                   size=&quot;{value}&quot;
                   {value === "default" && (
-                    <span className="ml-2 align-middle text-[10px] font-bold tracking-wide text-gray-500 uppercase">
+                    <span className="ml-2 align-middle text-[10px] font-bold tracking-wide text-gray-500 uppercase dark:text-gray-400">
                       bawaan
                     </span>
                   )}
                 </p>
-                <p className="mt-0.5 text-xs font-bold text-primary-700">
+                <p className="mt-0.5 text-xs font-bold text-primary-700 dark:text-primary-400">
                   {max}
                 </p>
-                <p className="mt-0.5 text-body-sm text-gray-500">{headline}</p>
+                <p className="mt-0.5 text-body-sm text-gray-500 dark:text-gray-400">{headline}</p>
               </div>
               <div>
                 {/* Bilah perbandingan: dekoratif, angkanya sudah ditulis di kiri. */}
                 <div
                   aria-hidden="true"
-                  className="h-8 w-full overflow-hidden rounded-lg bg-surface-subtle ring-1 ring-border"
+                  className="h-8 w-full overflow-hidden rounded-lg bg-surface-subtle ring-1 ring-border dark:bg-gray-900 dark:ring-gray-700"
                 >
                   <div
                     className={
                       value === "full"
-                        ? "h-full rounded-lg bg-primary-100 ring-1 ring-primary-300"
-                        : "h-full rounded-lg bg-primary-50 ring-1 ring-primary-300"
+                        ? "h-full rounded-lg bg-primary-100 ring-1 ring-primary-300 dark:bg-primary-800 dark:ring-primary-600"
+                        : "h-full rounded-lg bg-primary-50 ring-1 ring-primary-300 dark:bg-primary-900 dark:ring-primary-700"
                     }
                     style={{ width: `${ratio * 100}%` }}
                   />
                 </div>
-                <p className="mt-2 text-body-sm leading-6 text-gray-500">
+                <p className="mt-2 text-body-sm leading-6 text-gray-500 dark:text-gray-400">
                   {use}
                 </p>
               </div>
             </li>
           ))}
         </ul>
-        <p className="mt-3 max-w-2xl text-body-sm leading-6 text-gray-500">
+        <p className="mt-3 max-w-2xl text-body-sm leading-6 text-gray-500 dark:text-gray-400">
           <Hl>wide</Hl> dan <Hl>full</Hl> menggambar bilah yang sama panjang karena
           patokannya 1440px — bedanya baru terasa di ruang yang lebih lebar dari
           itu: <Hl>wide</Hl> berhenti, <Hl>full</Hl> terus mengikuti induknya.
@@ -365,11 +371,11 @@ export function ContainerPage() {
         </p>
         <SectionCode>
           {'{/* Bawaan — size="default" tidak perlu ditulis */}\n'}
-          {"<Container>\n    ...\n</Container>\n\n"}
+          {`<Container${dm.inline}>\n    ...\n</Container>\n\n`}
           {"{/* Teks panjang & formulir — berhenti di 720px */}\n"}
           {"<Container "}
           <Mark>size=&quot;prose&quot;</Mark>
-          {">\n    ...\n</Container>"}
+          {`${dm.inline}>\n    ...\n</Container>`}
         </SectionCode>
       </FlowSection>
 
@@ -383,11 +389,11 @@ export function ContainerPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           {howItWorks.map(([title, classes, detail]) => (
             <article key={title} className="ds-card p-5">
-              <h3 className="text-sm font-black text-gray-900">{title}</h3>
-              <p className="mt-1 text-xs font-bold text-primary-700">
+              <h3 className="text-sm font-black text-gray-900 dark:text-white">{title}</h3>
+              <p className="mt-1 text-xs font-bold text-primary-700 dark:text-primary-400">
                 {classes}
               </p>
-              <p className="mt-1.5 text-body-sm leading-6 text-gray-500">
+              <p className="mt-1.5 text-body-sm leading-6 text-gray-500 dark:text-gray-400">
                 {detail}
               </p>
             </article>
@@ -402,14 +408,14 @@ export function ContainerPage() {
           tetap memegang susunannya sendiri; yang berubah cuma di mana ia
           berhenti.
         </Lead>
-        <Ruang>
-          <Container className="py-6">
-            <Isi label="children" />
+        <Ruang dark={docsDark}>
+          <Container darkMode={docsDark} className="py-6">
+            <Isi label="children" dark={docsDark} />
           </Container>
         </Ruang>
         <SectionCode>
           {"import { Container } from '@ceplok-ui/design-kit-react'\n\n"}
-          {"<Container>\n"}
+          {`<Container${dm.inline}>\n`}
           {"    <h1>Pendaftaran Penyelenggara Sistem Elektronik</h1>\n"}
           {"    <p>Lengkapi data pemohon dan sistem elektronik yang didaftarkan.</p>\n"}
           {"</Container>"}
@@ -423,15 +429,15 @@ export function ContainerPage() {
           atau <Hl>footer</Hl> supaya struktur halaman tetap terbaca oleh pembaca
           layar dan mesin pencari — bukan tumpukan div tanpa makna.
         </Lead>
-        <Ruang>
-          <Container as="section" className="py-6">
-            <Isi label='as="section"' />
+        <Ruang dark={docsDark}>
+          <Container as="section" darkMode={docsDark} className="py-6">
+            <Isi label='as="section"' dark={docsDark} />
           </Container>
         </Ruang>
         <SectionCode>
           {"<Container "}
           <Mark>as</Mark>
-          {'="section">\n    ...\n</Container>'}
+          {`="section"${dm.inline}>\n    ...\n</Container>`}
         </SectionCode>
       </FlowSection>
 
@@ -444,21 +450,21 @@ export function ContainerPage() {
           yang menerima <Hl>className</Hl>.
         </Lead>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Ruang>
-            <Container className="py-6">
-              <Isi label="padded (bawaan)" />
+          <Ruang dark={docsDark}>
+            <Container darkMode={docsDark} className="py-6">
+              <Isi label="padded (bawaan)" dark={docsDark} />
             </Container>
           </Ruang>
-          <Ruang>
-            <Container padded={false} className="py-6">
-              <Isi label="padded={false}" />
+          <Ruang dark={docsDark}>
+            <Container padded={false} darkMode={docsDark} className="py-6">
+              <Isi label="padded={false}" dark={docsDark} />
             </Container>
           </Ruang>
         </div>
         <SectionCode>
           {'<Container as="section" '}
           <Mark>padded={"{false}"}</Mark>
-          {">\n    ...\n</Container>"}
+          {`${dm.inline}>\n    ...\n</Container>`}
         </SectionCode>
       </FlowSection>
 
@@ -470,23 +476,24 @@ export function ContainerPage() {
           melebar penuh; dan <Hl>max-w-*</Hl> bila batasnya perlu lebih sempit dari
           bawaan.
         </Lead>
-        <Ruang>
-          <Container className="max-w-180 py-10">
-            <Isi label='className="max-w-[720px] py-10"' />
+        <Ruang dark={docsDark}>
+          <Container darkMode={docsDark} className="max-w-180 py-10">
+            <Isi label='className="max-w-[720px] py-10"' dark={docsDark} />
           </Container>
         </Ruang>
         <SectionCode>
           {"{/* Jarak vertikal — Container tidak punya bawaannya */}\n"}
           {'<Container className="'}
           <H>py-12 lg:py-16</H>
-          {'">\n    ...\n</Container>\n\n'}
+          {`"${dm.inline}>\n    ...\n</Container>\n\n`}
           {"{/* Batas lebih sempit dari bawaan */}\n"}
           {'<Container className="'}
           <Mark>max-w-[720px]</Mark>
-          {'">\n    ...\n</Container>'}
+          {`"${dm.inline}>\n    ...\n</Container>`}
         </SectionCode>
       </FlowSection>
 
+      {/* Bagian ini selalu memperagakan darkMode, di mode docs apa pun. */}
       <FlowSection id="dark-mode" title="Dark mode">
         <Lead>
           Prop <Hl>darkMode</Hl> memberi elemen dalam latar dari token{" "}
@@ -497,7 +504,7 @@ export function ContainerPage() {
         </Lead>
 
         {/* Keterangan tiga lapis di contoh, supaya jelas bidang mana Container-nya. */}
-        <ul className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-500 mb-2">
+        <ul className="mb-2 flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-gray-400">
           <li className="inline-flex items-center gap-2">
             <span className="size-3.5 rounded-sm bg-gray-900 ring-1 ring-gray-700" />
             Halaman (panggung)
@@ -516,22 +523,22 @@ export function ContainerPage() {
             jadi keduanya jatuh ke mode sempit (< 640px) dan terlihat sama. */}
         <div className="grid gap-4">
           <div>
-            <p className="mb-2 text-xs font-bold text-gray-500">Ruang lapang (≥ 640px)</p>
+            <p className="mb-2 text-xs font-bold text-gray-500 dark:text-gray-400">Ruang lapang (≥ 640px)</p>
             <Ruang dark>
               <div className="py-6">
                 <Container darkMode>
-                  <ContainerLabel note="sudut lurus, padding 32–56px, maks. 1126px" />
+                  <ContainerLabel note="sudut lurus, padding 32–56px, maks. 1126px" dark />
                   <div className="pb-4"><Isi label="Konten" dark /></div>
                 </Container>
               </div>
             </Ruang>
           </div>
           <div>
-            <p className="mb-2 text-xs font-bold text-gray-500">Ruang sempit (&lt; 640px)</p>
+            <p className="mb-2 text-xs font-bold text-gray-500 dark:text-gray-400">Ruang sempit (&lt; 640px)</p>
             <Ruang dark>
               <div className="mx-auto max-w-[380px] py-6">
                 <Container darkMode>
-                  <ContainerLabel note="rounded-xl, padding 20px, maks. 380px" />
+                  <ContainerLabel note="rounded-xl, padding 20px, maks. 380px" dark />
                   <div className="pb-4"><Isi label="Konten" dark /></div>
                 </Container>
               </div>
@@ -556,9 +563,9 @@ export function ContainerPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           {containerSpecs.map(([title, range, detail]) => (
             <article key={title} className="ds-card p-5">
-              <h3 className="text-sm font-black text-gray-900">{title}</h3>
-              <p className="mt-1 text-xs font-bold text-primary-700">{range}</p>
-              <p className="mt-1.5 text-body-sm leading-6 text-gray-500">
+              <h3 className="text-sm font-black text-gray-900 dark:text-white">{title}</h3>
+              <p className="mt-1 text-xs font-bold text-primary-700 dark:text-primary-400">{range}</p>
+              <p className="mt-1.5 text-body-sm leading-6 text-gray-500 dark:text-gray-400">
                 {detail}
               </p>
             </article>
@@ -570,7 +577,7 @@ export function ContainerPage() {
         <Lead>
           Kotak biru muda adalah ruang yang tersedia; garis putus-putus adalah
           tempat konten berhenti. Selisih keduanya itulah padding. Ganti{" "}
-          <strong className="text-gray-900">Varian</strong> untuk melihat batas
+          <strong className="text-gray-900 dark:text-white">Varian</strong> untuk melihat batas
           lebarnya, lalu <Hl>Mobile</Hl>/<Hl>Desktop</Hl> untuk melihat ambang
           bawaannya — atau <Hl>Custom</Hl> untuk mengetik lebar sendiri. Yang
           berganti di atas benar-benar komponen <Hl>Container</Hl>, bukan kotak
@@ -601,7 +608,7 @@ export function ContainerPage() {
         </PlaygroundFontScope>
 
         <Controls>
-          <Control label="Mode">
+          <Control label="Tampilan"> 
             <Segmented
               label="Pilih mode"
               value={darkMode}
@@ -649,9 +656,9 @@ export function ContainerPage() {
                   value={customWidth}
                   onChange={(e) => setCustomWidth(clamp(Number(e.target.value)))}
                   aria-label="Geser lebar container"
-                  className="h-1.5 w-40 cursor-pointer appearance-none rounded-full bg-border accent-primary-600"
+                  className="h-1.5 w-40 cursor-pointer appearance-none rounded-full bg-border accent-primary-600 dark:bg-gray-700"
                 />
-                <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5">
+                <label className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 dark:border-gray-700 dark:bg-gray-800">
                   <input
                     type="number"
                     min={MIN_WIDTH}
@@ -661,11 +668,11 @@ export function ContainerPage() {
                       setCustomWidth(clamp(Number(e.target.value) || MIN_WIDTH))
                     }
                     aria-label="Lebar container dalam piksel"
-                    className="w-16 bg-transparent text-sm font-bold text-gray-900 outline-none"
+                    className="w-16 bg-transparent text-sm font-bold text-gray-900 outline-none dark:text-white"
                   />
-                  <span className="text-xs font-bold text-gray-500">px</span>
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400">px</span>
                 </label>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   {MIN_WIDTH}–{MAX_WIDTH}px
                 </span>
               </div>

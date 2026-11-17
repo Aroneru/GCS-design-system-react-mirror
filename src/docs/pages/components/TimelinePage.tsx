@@ -693,7 +693,7 @@ export function TimelinePage() {
               options={sizeOptions}
             />
           </Control>
-          <Control label="Mode">
+          <Control label="Tampilan">
             <Segmented
               label="Pilih mode"
               value={dark}

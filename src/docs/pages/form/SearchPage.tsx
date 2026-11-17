@@ -282,7 +282,7 @@ export function SearchPage() {
         </Stage>
 
         <Controls>
-          <Control label="Mode">
+          <Control label="Tampilan">
             <Segmented
               label="Pilih mode"
               value={dark}
