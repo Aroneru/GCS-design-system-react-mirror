@@ -1,11 +1,19 @@
 import { useState } from "react";
 import { Pagination, type PaginationTheme } from "../../../lib";
+import {
+  tocForDarkDocs,
+  useDarkModeSnippet,
+  useDocsDark,
+  usePlaygroundDark,
+} from "../../docsTheme";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Demo, H, Hl, Segmented } from "../../pageKit";
 import {
   Control,
   Controls,
   FlowSection,
+  Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -47,31 +55,35 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
+const tocDark = tocForDarkDocs(toc, true);
+
 export function PaginationPage() {
+  const docsDark = useDocsDark();
+  const dm = useDarkModeSnippet();
   const [currentPage, setCurrentPage] = useState(1);
   const [theme, setTheme] = useState<PaginationTheme>("primary");
   const [totalPages, setTotalPages] = useState(100);
-  const [mode, setMode] = useState("light");
+  const [dark, setDark] = usePlaygroundDark();
   return (
     <UsulanPage
       eyebrow="Components · Pagination"
       title="Pagination"
       description="Navigasi untuk berpindah antar halaman pada data atau konten yang terbagi ke dalam beberapa halaman."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="states" title="States">
-        <p className="mb-4 text-body-sm text-gray-500">
+        <Lead>
           Pagination memiliki state aktif untuk menunjukkan halaman yang sedang dipilih. Tombol
           halaman lainnya dapat digunakan untuk berpindah ke halaman yang berbeda.
-        </p>
+        </Lead>
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">
           <Demo label="First Page">
-            <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} theme="primary" />
+            <Pagination darkMode={docsDark} currentPage={1} totalPages={100} onPageChange={() => {}} theme="primary" />
           </Demo>
 
           <Demo label="Active Page">
-            <Pagination currentPage={2} totalPages={100} onPageChange={() => {}} theme="primary" />
+            <Pagination darkMode={docsDark} currentPage={2} totalPages={100} onPageChange={() => {}} theme="primary" />
           </Demo>
         </div>
 
@@ -84,15 +96,16 @@ export function PaginationPage() {
           {"={currentPage}\n"}
           {"    totalPages={100}\n"}
           {"    onPageChange={setCurrentPage}\n"}
+          {dm.line}
           {"/>"}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="themes" title="Themes">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Theme digunakan untuk menyesuaikan warna halaman aktif pada Pagination sesuai dengan
           konteks visual aplikasi.
-        </p>
+        </Lead>
 
         <div className="mb-4 flex flex-col gap-6">
           <Demo>
@@ -102,9 +115,10 @@ export function PaginationPage() {
                 totalPages={100}
                 onPageChange={() => {}}
                 theme="default"
+                darkMode={docsDark}
               />
 
-              <p className="mt-2 mb-5 text-sm text-gray-600">
+              <p className="mt-2 mb-5 text-sm text-gray-600 dark:text-gray-300">
                 <Hl>Default</Hl> menggunakan gray sebagai warna utama pagination.
               </p>
             </div>
@@ -114,17 +128,18 @@ export function PaginationPage() {
                 totalPages={100}
                 onPageChange={() => {}}
                 theme="primary"
+                darkMode={docsDark}
               />
 
-              <p className="mt-2 mb-5 text-sm text-gray-600">
+              <p className="mt-2 mb-5 text-sm text-gray-600 dark:text-gray-300">
                 <Hl>Primary</Hl> digunakan sebagai warna utama lain pagination.
               </p>
             </div>
 
             <div>
-              <Pagination currentPage={1} totalPages={100} onPageChange={() => {}} theme="purple" />
+              <Pagination darkMode={docsDark} currentPage={1} totalPages={100} onPageChange={() => {}} theme="purple" />
 
-              <p className="mt-2 mb-5 text-sm text-gray-600">
+              <p className="mt-2 mb-5 text-sm text-gray-600 dark:text-gray-300">
                 <Hl>Purple</Hl> digunakan ketika pagination membutuhkan aksen ungu.
               </p>
             </div>
@@ -141,14 +156,20 @@ export function PaginationPage() {
           {"    "}
           <H>theme</H>
           {'="primary"\n'}
+          {dm.line}
           {"/>"}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <p className="mb-6 text-body-sm text-gray-500">
-          Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Pagination. Komponen secara otomatis menyesuaikan warna latar, teks, batas, dan tema yang aktif.
-        </p>
+      <ModeSection
+        name="Pagination"
+        stayDark
+        lead={
+          <>
+            Prop <H>darkMode</H> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Pagination. Komponen secara otomatis menyesuaikan warna latar, teks, batas, dan tema yang aktif.
+          </>
+        }
+      >
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">
           <Demo label="Default" dark>
@@ -170,39 +191,38 @@ export function PaginationPage() {
           {'    totalPages={100}\n'}
           {'    onPageChange={setCurrentPage}\n'}
           {'    theme="primary"\n'}
-          {'    '}
-          <H>darkMode</H>
-          {'\n/>'}
+          {'    '}<H>darkMode</H>{'\n'}
+          {'/>'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Coba konfigurasi Pagination secara langsung melalui kontrol di bawah ini untuk melihat
           perubahan halaman dan theme.
-        </p>
+        </Lead>
 
-        <Stage maxWidth="max-w-[700px]" dark={mode === "dark"}>
+        <Stage maxWidth="max-w-[700px]" dark={dark}>
           <div className="flex min-h-[160px] items-center justify-center">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
               theme={theme}
-              darkMode={mode === "dark"}
+              darkMode={dark}
             />
           </div>
         </Stage>
 
         <Controls>
-          <Control label="Mode">
+          <Control label="Tampilan">
             <Segmented
               label="Pilih mode"
-              value={mode}
-              onChange={(value) => setMode(value as string)}
+              value={dark}
+              onChange={(value) => setDark(Boolean(value))}
               options={[
-                { value: "light", label: "Light" },
-                { value: "dark", label: "Dark" },
+                { value: false, label: "Light" },
+                { value: true, label: "Dark" },
               ]}
             />
           </Control>
@@ -229,10 +249,10 @@ export function PaginationPage() {
       </FlowSection>
 
       <FlowSection id="penggunaan" title="Penggunaan">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Bagian ini menampilkan contoh kode penggunaan Pagination berdasarkan konfigurasi yang
           dipilih pada Playground.
-        </p>
+        </Lead>
 
         <SectionCode flush>
           {"import { Pagination } from '@ceplok-ui/design-kit-react'\n"}
@@ -260,7 +280,7 @@ export function PaginationPage() {
             <H>theme</H>
             {`="${theme}"\n`}
           </>
-          {mode === "dark" && (
+          {dark && (
             <>
               {"    "}
               <H>darkMode</H>
@@ -272,9 +292,9 @@ export function PaginationPage() {
       </FlowSection>
 
       <FlowSection id="properties" title="Properties">
-        <p className="mb-6 text-body-sm text-gray-500">
+        <Lead>
           Referensi semua prop yang tersedia pada komponen Pagination.
-        </p>
+        </Lead>
 
         <PropsTable rows={paginationProps} minWidth="46rem" />
       </FlowSection>
