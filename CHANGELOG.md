@@ -11,17 +11,38 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+### Ditambahkan
+
+- **Portal Dashboard lebih lengkap.** Di bawah Rencana Kegiatan kini ada kartu
+  Aplikasi Intranet, Forum Terbaru, Sticky Post, dan kartu unduhan KOSMO.
+  - Aplikasi Intranet menampilkan 12 ubin. Tombol panah di tepi bawah kartunya
+    membuka 6 ubin lagi dan menutupnya kembali.
+  - Forum Terbaru memakai `ListView` varian `article`, Sticky Post memakai
+    varian `simple`.
+  - Presensi Harian kini punya baris Check-Out dan Detail Kehadiran.
+  - Logo aplikasi, kode QR, dan lencana toko di desain belum ada di repo, jadi
+    sementara dirakit dari ikon dan token warna kit. Nama dan judul di forum
+    serta Sticky Post adalah contoh rekaan.
+
 ### Diubah
+
+- **Tombol "Pengaturan Layout" di Portal Dashboard kini primary.** Sebelumnya
+  outline. Tombol "Buat Forum" yang baru memakai outline sebagai tombol
+  sekunder.
 - **Mode gelap situs dokumentasi meluas.** Selain halaman di 0.6.0, mode gelap
   kini berlaku di semua halaman Form, Components Overview, Alert, Toast,
   Timeline View, Foundations Overview, Spacing, Border, Elevation, dan Icons.
   Aturannya sama: komponen di pratinjau dan kartu Overview memakai `darkMode`
-  selama docs gelap, cuplikan kodenya ikut menuliskannya, mode Playground
-  mengikuti mode docs, dan bagian Dark mode bertukar menjadi Light mode.
-  Perubahan ini hanya di situs dokumentasi: komponen library dan `styles.css`
-  paket tidak berubah.
+  selama docs gelap, cuplikan kodenya ikut menuliskannya, dan mode Playground
+  mengikuti mode docs. Perubahan ini hanya di situs dokumentasi: komponen
+  library dan `styles.css` paket tidak berubah.
+- **Bagian Dark mode di docs tetap gelap.** Selama docs gelap, bagian itu tidak
+  lagi bertukar menjadi Light mode. Judul, daftar isi, pratinjau, dan
+  cuplikannya tetap memperagakan `darkMode` di kedua mode docs. Ini berlaku di
+  semua halaman yang punya bagian Dark mode, termasuk Search Form dari 0.6.0.
 
 ### Diperbaiki
+
 - **Jarak kartu versi di panel samping docs.** Kartu "Foundation v1.0" di
   ujung bawah panel tidak lagi menempel ke menu terakhir saat daftar menunya
   memenuhi panel, mis. di area Components.

@@ -84,7 +84,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function DatepickerPage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -339,6 +339,7 @@ export function DatepickerPage() {
 
       <ModeSection
         name="Datepicker"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengganti seluruh warnanya ke tampilan gelap: kotak dan panel gray-700,
@@ -347,20 +348,20 @@ export function DatepickerPage() {
         }
       >
         <div className="grid gap-5 sm:grid-cols-2">
-          <Demo label="Single" dark={!docsDark} light={docsDark}>
-            <Datepicker darkMode={!docsDark} label="Nama Tanggal" defaultValue={TANGGAL} />
+          <Demo label="Single" dark>
+            <Datepicker darkMode label="Nama Tanggal" defaultValue={TANGGAL} />
           </Demo>
-          <Demo label="Period" dark={!docsDark} light={docsDark}>
-            <Datepicker darkMode={!docsDark} type="period" label="Nama Tanggal" />
+          <Demo label="Period" dark>
+            <Datepicker darkMode type="period" label="Nama Tanggal" />
           </Demo>
           <div className="sm:col-span-2">
-            <Demo label="Multiple" dark={!docsDark} light={docsDark}>
-              <Datepicker darkMode={!docsDark} type="multiple" label="Nama Tanggal" defaultValue={RENTANG} />
+            <Demo label="Multiple" dark>
+              <Datepicker darkMode type="multiple" label="Nama Tanggal" defaultValue={RENTANG} />
             </Demo>
           </div>
-          <Demo label="Multiple · Mobile dengan shortcuts" dark={!docsDark} light={docsDark}>
+          <Demo label="Multiple · Mobile dengan shortcuts" dark>
             <Datepicker
-              darkMode={!docsDark}
+              darkMode
               type="multiple"
               platform="mobile"
               shortcuts
@@ -371,11 +372,7 @@ export function DatepickerPage() {
         </div>
         <SectionCode>
           {'<Datepicker '}
-          {!docsDark && (
-            <>
-              <H>darkMode</H>{' '}
-            </>
-          )}
+          <H>darkMode</H>{' '}
           {'label="Nama Tanggal" />'}
         </SectionCode>
       </ModeSection>

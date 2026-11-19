@@ -161,13 +161,18 @@ export function Lead({ children }: { children: ReactNode }) {
 }
 
 /**
- * Bagian "Dark mode" di halaman komponen, yang selalu menunjukkan mode yang
- * sedang tidak dipakai docs. Di mode terang ia memperagakan `darkMode` dengan
- * `lead` milik halaman. Di mode gelap, ketika semua contoh lain sudah gelap, ia
- * bertukar menjadi Light mode. Isinya ditulis halaman: komponen dengan
+ * Bagian "Dark mode" di halaman komponen, yang memperagakan `darkMode` dengan
+ * `lead` milik halaman. Pasangannya di daftar isi: `tocForDarkDocs` di
+ * docsTheme.ts.
+ *
+ * Dengan `stayDark`, bagian ini tetap Dark mode di kedua mode docs. Isinya
+ * ditulis halaman: komponen dengan `darkMode` di dalam <Demo dark>, dan
+ * cuplikan yang selalu menulis `darkMode`.
+ *
+ * Tanpa `stayDark`, bagian ini bertukar menjadi Light mode selama docs gelap,
+ * ketika semua contoh lain sudah gelap. Isinya komponen dengan
  * `darkMode={!docsDark}` di dalam <Demo dark={!docsDark} light={docsDark}>,
- * dan cuplikan yang menulis `darkMode` hanya di mode terang. Pasangannya di
- * daftar isi: `tocForDarkDocs` di docsTheme.ts.
+ * dan cuplikan yang menulis `darkMode` hanya di mode terang.
  */
 export function ModeSection({
   name,

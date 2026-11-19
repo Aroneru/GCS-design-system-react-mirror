@@ -88,7 +88,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function InputFieldPage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -268,6 +268,7 @@ export function InputFieldPage() {
 
       <ModeSection
         name="Input Field"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengganti field ke gray-700 dengan label putih. Garisnya menyatu dengan latar
@@ -279,9 +280,9 @@ export function InputFieldPage() {
       >
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
-            <Demo key={s.value} label={s.label} dark={!docsDark} light={docsDark}>
+            <Demo key={s.value} label={s.label} dark>
               <InputField
-                darkMode={!docsDark}
+                darkMode
                 state={s.value}
                 label="Nama lengkap"
                 placeholder="Masukkan nama lengkap"
@@ -294,20 +295,16 @@ export function InputFieldPage() {
           {passwordDemos
             .filter((d) => d.platform !== 'mobile')
             .map((d) => (
-              <Demo key={`password-${d.label}`} label={`Password · ${d.label}`} dark={!docsDark} light={docsDark}>
-                <PasswordDemoField platform={d.platform} state={d.state} dark={!docsDark} />
+              <Demo key={`password-${d.label}`} label={`Password · ${d.label}`} dark>
+                <PasswordDemoField platform={d.platform} state={d.state} dark />
               </Demo>
             ))}
         </div>
         <SectionCode>
           {'<InputField\n'}
-          {!docsDark && (
-            <>
-              {'    '}
-              <H>darkMode</H>
-              {'\n'}
-            </>
-          )}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
           {'    label="Nama lengkap"\n'}
           {'    placeholder="Masukkan nama lengkap"\n'}
           {'/>'}

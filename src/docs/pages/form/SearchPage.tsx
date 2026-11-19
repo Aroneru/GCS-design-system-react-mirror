@@ -65,7 +65,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function SearchPage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -216,6 +216,7 @@ export function SearchPage() {
 
       <ModeSection
         name="Search Form"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, dan batas.
@@ -223,26 +224,22 @@ export function SearchPage() {
         }
       >
         <div className="grid gap-5">
-          <Demo label="Default" dark={!docsDark} light={docsDark}>
-            <Search placeholder={PLACEHOLDER} darkMode={!docsDark} />
+          <Demo label="Default" dark>
+            <Search placeholder={PLACEHOLDER} darkMode />
           </Demo>
-          <Demo label="Dengan Kategori" dark={!docsDark} light={docsDark}>
+          <Demo label="Dengan Kategori" dark>
             <div className="max-w-[882px]">
               <Search
                 categories={kategori}
                 placeholder={PLACEHOLDER}
-                darkMode={!docsDark}
+                darkMode
               />
             </div>
           </Demo>
         </div>
         <SectionCode>
           {'<Search '}
-          {!docsDark && (
-            <>
-              <H>darkMode</H>{' '}
-            </>
-          )}
+          <H>darkMode</H>{' '}
           {'placeholder="Search Civitas, Organisasi…" />'}
         </SectionCode>
       </ModeSection>

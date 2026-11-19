@@ -47,7 +47,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function UploadPage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -214,6 +214,7 @@ export function UploadPage() {
 
       <ModeSection
         name="Upload"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual. Komponen secara otomatis menyesuaikan warna latar, batas, dan teks.
@@ -221,12 +222,12 @@ export function UploadPage() {
         }
       >
         <div className="grid gap-5">
-          <Demo label="Upload" dark={!docsDark} light={docsDark}>
-            <Upload label="Upload File" helperText="PDF atau JPG, maksimal 2 MB." darkMode={!docsDark} />
+          <Demo label="Upload" dark>
+            <Upload label="Upload File" helperText="PDF atau JPG, maksimal 2 MB." darkMode />
           </Demo>
-          <Demo label="Attach — 538px" dark={!docsDark} light={docsDark}>
+          <Demo label="Attach — 538px" dark>
             <div className="max-w-[538px]">
-              <Upload type="attach" darkMode={!docsDark} />
+              <Upload type="attach" darkMode />
             </div>
           </Demo>
         </div>
@@ -238,20 +239,12 @@ export function UploadPage() {
           {'    '}
           <H>helperText</H>
           {'="PDF atau JPG, maksimal 2 MB."\n'}
-          {!docsDark && (
-            <>
-              {'    '}
-              <H>darkMode</H>
-              {'\n'}
-            </>
-          )}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
           {'/>\n\n<Upload type="attach"'}
-          {!docsDark && (
-            <>
-              {' '}
-              <H>darkMode</H>
-            </>
-          )}
+          {' '}
+          <H>darkMode</H>
           {' />'}
         </SectionCode>
       </ModeSection>
