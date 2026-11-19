@@ -353,7 +353,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function TimelinePage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -627,6 +627,7 @@ export function TimelinePage() {
 
       <ModeSection
         name="Timeline"
+        stayDark
         lead={
           <>
             Garis, tepi kartu, dan latar avatar memakai token semantik <Hl>border</Hl>, serta nama dan
@@ -642,17 +643,13 @@ export function TimelinePage() {
           </>
         }
       >
-        <Demo label={docsDark ? 'tanpa darkMode' : 'darkMode'} dark={!docsDark} light={docsDark} minWidth={desktopMinWidth}>
-          <Timeline items={designItems.slice(0, 2)} darkMode={!docsDark} />
+        <Demo label="darkMode" dark minWidth={desktopMinWidth}>
+          <Timeline items={designItems.slice(0, 2)} darkMode />
         </Demo>
 
         <SectionCode>
           {'<Timeline '}
-          {!docsDark && (
-            <>
-              <H>darkMode</H>{' '}
-            </>
-          )}
+          <H>darkMode</H>{' '}
           {'items={items} />'}
         </SectionCode>
       </ModeSection>

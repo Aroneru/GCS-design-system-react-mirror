@@ -59,7 +59,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 /**
  * Tombol contoh untuk slot `actions`. Ukuran xs (tinggi 34px, teks 12px,
@@ -164,6 +164,7 @@ export function ToastPage() {
 
       <ModeSection
         name="Toast"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengganti kartunya ke gray-700, heading dan pesan singkat ke gray-300, dan teks
@@ -174,18 +175,18 @@ export function ToastPage() {
         }
       >
         <div className="grid gap-5 lg:grid-cols-2">
-          <Demo label="Pesan singkat" dark={!docsDark} light={docsDark}>
+          <Demo label="Pesan singkat" dark>
             <div className="space-y-3">
               {variants.map((v) => (
-                <Toast key={v.value} darkMode={!docsDark} variant={v.value} dismissible={false}>
+                <Toast key={v.value} darkMode variant={v.value} dismissible={false}>
                   {v.pesan}
                 </Toast>
               ))}
             </div>
           </Demo>
-          <Demo label="Dengan heading & aksi" dark={!docsDark} light={docsDark}>
+          <Demo label="Dengan heading & aksi" dark>
             <Toast
-              darkMode={!docsDark}
+              darkMode
               variant="info"
               icon={<Refresh />}
               heading="Update 2FA sudah tersedia!"
@@ -197,11 +198,7 @@ export function ToastPage() {
         </div>
         <SectionCode>
           {'<Toast '}
-          {!docsDark && (
-            <>
-              <H>darkMode</H>{' '}
-            </>
-          )}
+          <H>darkMode</H>{' '}
           {'variant="success">Sukses Membuat Data!</Toast>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">

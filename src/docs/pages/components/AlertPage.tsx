@@ -76,7 +76,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function AlertPage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -181,6 +181,7 @@ export function AlertPage() {
 
       <ModeSection
         name="Alert"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengganti latarnya ke warna -900 dari variant itu sendiri. Ikonnya -500,
@@ -188,15 +189,15 @@ export function AlertPage() {
           </>
         }
       >
-        <Demo dark={!docsDark} light={docsDark}>
+        <Demo dark>
           <div className="space-y-4">
             {variants.map((v) => (
               <Alert
                 key={v.value}
-                darkMode={!docsDark}
+                darkMode
                 variant={v.value}
                 heading="Ini adalah Alert"
-                actions={<AksiButton variant={v.value} dark={!docsDark} />}
+                actions={<AksiButton variant={v.value} dark />}
               >
                 {isiAlert}
               </Alert>
@@ -205,26 +206,12 @@ export function AlertPage() {
         </Demo>
         <SectionCode>
           {'<Alert '}
-          {!docsDark && (
-            <>
-              <H>darkMode</H>{' '}
-            </>
-          )}
+          <H>darkMode</H>{' '}
           {'variant="success" heading="Ini adalah Alert">…</Alert>'}
         </SectionCode>
         <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
-          {docsDark ? (
-            <>
-              Isi <Hl>actions</Hl> tetap milik Anda, jadi warnanya tidak ikut diganti. Tombol contoh di atas
-              memakai desain terangnya, sedangkan contoh lain di halaman ini mengikuti desain gelapnya: -600,
-              kecuali success dan warning yang -500.
-            </>
-          ) : (
-            <>
-              Isi <Hl>actions</Hl> tetap milik Anda, jadi warnanya tidak ikut diganti. Tombol contoh di atas mengikuti
-              desain gelapnya: -600, kecuali success dan warning yang -500.
-            </>
-          )}
+          Isi <Hl>actions</Hl> tetap milik Anda, jadi warnanya tidak ikut diganti. Tombol contoh di atas mengikuti
+          desain gelapnya: -600, kecuali success dan warning yang -500.
         </p>
       </ModeSection>
 

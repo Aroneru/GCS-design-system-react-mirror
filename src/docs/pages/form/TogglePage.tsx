@@ -42,7 +42,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function TogglePage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -56,13 +56,13 @@ export function TogglePage() {
   const [aktif, setAktif] = useState(true)
 
   // Potongan `darkMode` di cuplikan bagian Dark mode, sebagai atribut sebaris
-  // dan sebagai baris sendiri. Hilang selama bagian itu menjadi Light mode.
-  const atributDarkMode = !docsDark && (
+  // dan sebagai baris sendiri.
+  const atributDarkMode = (
     <>
       <H>darkMode</H>{' '}
     </>
   )
-  const barisDarkMode = !docsDark && (
+  const barisDarkMode = (
     <>
       {'    '}
       <H>darkMode</H>
@@ -239,6 +239,7 @@ export function TogglePage() {
 
       <ModeSection
         name="Toggle"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengganti jalur yang mati ke gray-600 dengan bulatan gray-400, label putih, dan
@@ -248,13 +249,13 @@ export function TogglePage() {
           </>
         }
       >
-        <Demo dark={!docsDark} light={docsDark}>
+        <Demo dark>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <Toggle darkMode={!docsDark} label="Mati" helperText="Keterangan singkat." />
-            <Toggle darkMode={!docsDark} label="Menyala" helperText="Keterangan singkat." defaultChecked />
-            <Toggle darkMode={!docsDark} state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />
+            <Toggle darkMode label="Mati" helperText="Keterangan singkat." />
+            <Toggle darkMode label="Menyala" helperText="Keterangan singkat." defaultChecked />
+            <Toggle darkMode state="inactive" label="Tidak aktif" helperText="Keterangan singkat." />
             <Toggle
-              darkMode={!docsDark}
+              darkMode
               state="inactive"
               label="Tidak aktif, menyala"
               helperText="Keterangan singkat."
