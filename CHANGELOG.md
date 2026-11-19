@@ -12,9 +12,19 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 ## [Belum dirilis]
 
 ### Diubah
+- **`Modal`: aksi standar dan ikon Popup.** Prop `actions` menyediakan tombol
+  `secondary`, `primary`, dan `danger` dengan urutan serta tampilan baku;
+  `footer` tetap tersedia untuk override kustom dan tidak dapat dipakai
+  bersamaan dengan `actions`. Ikon Popup kini dapat diganti melalui `icon`
+  atau disembunyikan dengan `icon={null}`. Prop `darkMode` mengatur tema Modal
+  dan mewariskannya ke Button di dalam dialog.
+- **`Navbar`: dukungan `darkMode`.** Navbar kini menerima tema gelap lokal dan
+  mewariskan konteks tema ke komponen di dalamnya; tanpa prop, tema mengikuti
+  konteks pembungkus.
 - **Mode gelap situs dokumentasi meluas.** Selain halaman di 0.6.0, mode gelap
   kini berlaku di semua halaman Form, Components Overview, Alert, Toast,
-  Timeline View, Foundations Overview, Spacing, Border, Elevation, dan Icons.
+  Timeline View, Foundations Overview, Spacing, Border, Elevation, Icons, dan
+  Navbar.
   Aturannya sama: komponen di pratinjau dan kartu Overview memakai `darkMode`
   selama docs gelap, cuplikan kodenya ikut menuliskannya, mode Playground
   mengikuti mode docs, dan bagian Dark mode bertukar menjadi Light mode.

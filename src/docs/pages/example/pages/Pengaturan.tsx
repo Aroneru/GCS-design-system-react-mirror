@@ -170,23 +170,17 @@ export function Pengaturan() {
           <Modal
             trigger={<Button type="button">Simpan perubahan</Button>}
             title="Simpan perubahan?"
-            footer={({ close }) => (
-              <>
-                <Button type="button" variant="outline" theme="gray" size="xs" onClick={close}>
-                  Batal
-                </Button>
-                <Button
-                  type="submit"
-                  size="xs"
-                  onClick={() => {
-                    setTersimpan(true)
-                    close()
-                  }}
-                >
-                  Ya, simpan
-                </Button>
-              </>
-            )}
+            actions={{
+              secondary: { label: 'Batal', onClick: ({ close }) => close() },
+              primary: {
+                label: 'Ya, simpan',
+                buttonProps: { type: 'submit' },
+                onClick: ({ close }) => {
+                  setTersimpan(true)
+                  close()
+                },
+              },
+            }}
           >
             <div className="flex gap-3">
               <Icon className="mt-0.5 shrink-0 text-primary-700">

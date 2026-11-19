@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState, type Key, type ReactNode } from "react";
 import { Plus } from "flowbite-react-icons/outline";
 import { Download, Edit, Eye, Printer, TrashBin } from "flowbite-react-icons/solid";
-import { ExclamationCircle } from "../../../lib/icons/solid";
 import {
   Badge,
   Button,
-  Icon,
   Modal,
   Table,
   type BadgeVariant,
@@ -712,31 +710,19 @@ function ConfirmDeleteModal(props: ConfirmDeleteModalProps) {
       {...visibilityProps}
       variant="popup"
       aria-label="Konfirmasi hapus data"
-      footer={({ close }) => (
-        <div className="flex w-full justify-center gap-4">
-          <Button variant="outline" theme="gray" size="xs" onClick={close}>
-            Tidak, Batalkan
-          </Button>
-          <Button
-            theme="orange"
-            size="xs"
-            onClick={() => {
-              onConfirm();
-              close();
-            }}
-          >
-            {confirmLabel}
-          </Button>
-        </div>
-      )}
+      actions={{
+        secondary: { label: 'Tidak, Batalkan', onClick: ({ close }) => close() },
+        danger: {
+          label: confirmLabel,
+          onClick: ({ close }) => {
+            onConfirm();
+            close();
+          },
+        },
+      }}
     >
       <div className="text-center">
-        <div className="flex justify-center">
-          <Icon className="size-12 text-orange-600">
-            <ExclamationCircle />
-          </Icon>
-        </div>
-        <p className="mx-auto mt-4 max-w-xs text-body font-medium text-gray-500">{message}</p>
+        <p className="mx-auto max-w-xs text-body font-medium text-gray-500">{message}</p>
       </div>
     </Modal>
   );

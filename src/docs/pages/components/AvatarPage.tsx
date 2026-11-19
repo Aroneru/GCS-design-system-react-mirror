@@ -3,7 +3,8 @@ import { Avatar, type AvatarFallback, type AvatarSize } from '../../../lib'
 import { asset } from '../../asset'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
-import { Control, Controls, FlowSection, Lead, SectionCode, Stage, UsulanPage, type TocEntry } from '../../usulanKit'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
+import { Control, Controls, FlowSection, Lead, ModeSection, SectionCode, Stage, UsulanPage, type TocEntry } from '../../usulanKit'
 
 const FOTO = asset('/images/avatar-sample.svg')
 
@@ -20,7 +21,7 @@ const avatarProps: PropRow[] = [
   ['initials', 'ReactNode', 'undefined', 'Override isi inisial ketika foto tidak tersedia.'],
   ['fallback', "'initials' | 'female' | 'male'", 'initials', 'Memilih fallback secara eksplisit; initials memerlukan name atau initials.'],
   ['size', "'small' | 'default' | 'large'", 'default (M)', 'Diameter lingkaran: 24px, 32px, atau 80px.'],
-  ['darkMode', 'boolean', 'false', 'Deprecated. Gunakan scope ambient data-theme="dark".'],
+  ['darkMode', 'boolean', 'false', 'Mengaktifkan tampilan gelap. Tanpa prop ini, Avatar mengikuti tema pembungkusnya.'],
   ['ref', 'Ref<HTMLDivElement>', '—', 'Diteruskan ke elemen <div> root.'],
   ['…props', 'HTMLAttributes<HTMLDivElement>', '—', 'Atribut root diteruskan; role, aria-label, dan data-theme dapat meng-override nilai terhitung. className digabungkan.'],
 ]
@@ -36,30 +37,35 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc)
+
 export function AvatarPage() {
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [size, setSize] = useState<AvatarSize>('default')
   const [content, setContent] = useState<'photo' | 'auto' | 'override' | 'profile'>('auto')
   const [profileFallback, setProfileFallback] = useState<Exclude<AvatarFallback, 'initials'>>('female')
   const [name, setName] = useState('Putri Handayani')
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = usePlaygroundDark()
   const nama = name.trim()
   const initialsPlayground = content === 'override' || (content !== 'profile' && !nama) ? 'UI' : undefined
 
   const previewAvatar = content === 'profile' ? (
-    <Avatar size={size} name={nama || undefined} alt="" fallback={profileFallback} />
+    <Avatar size={size} name={nama || undefined} alt="" fallback={profileFallback} darkMode={dark} />
   ) : nama ? (
-    <Avatar size={size} src={content === 'photo' ? FOTO : undefined} name={nama} alt="" initials={initialsPlayground} />
+    <Avatar size={size} src={content === 'photo' ? FOTO : undefined} name={nama} alt="" initials={initialsPlayground} darkMode={dark} />
   ) : (
-    <Avatar size={size} src={content === 'photo' ? FOTO : undefined} alt="" initials="UI" />
+    <Avatar size={size} src={content === 'photo' ? FOTO : undefined} alt="" initials="UI" darkMode={dark} />
   )
 
   return (
-    <UsulanPage
-      eyebrow="Components"
-      title="Avatar"
-      description="Lingkaran identitas berisi foto, inisial otomatis, atau ilustrasi profil."
-      toc={toc}
-    >
+    <div data-theme={docsDark ? 'dark' : undefined}>
+      <UsulanPage
+        eyebrow="Components"
+        title="Avatar"
+        description="Lingkaran identitas berisi foto, inisial otomatis, atau ilustrasi profil."
+        toc={docsDark ? tocDark : toc}
+      >
       <FlowSection id="avatar" title="Avatar">
         <Lead>
           Foto dari <Hl>src</Hl> selalu menjadi pilihan pertama. Jika kosong atau gagal dimuat,
@@ -68,9 +74,9 @@ export function AvatarPage() {
         </Lead>
         <Demo label="Default Avatar / foto">
           <div className="flex items-center gap-4">
-            <Avatar src={FOTO} name="Putri Handayani" size="large" />
-            <Avatar src={FOTO} name="Putri Handayani" />
-            <Avatar src={FOTO} name="Putri Handayani" size="small" />
+            <Avatar src={FOTO} name="Putri Handayani" size="large" darkMode={docsDark} />
+            <Avatar src={FOTO} name="Putri Handayani" darkMode={docsDark} />
+            <Avatar src={FOTO} name="Putri Handayani" size="small" darkMode={docsDark} />
           </div>
         </Demo>
         <SectionCode>
@@ -78,15 +84,17 @@ export function AvatarPage() {
           <H>src</H>
           {'={user.avatarUrl} '}
           <H>name</H>
-          {'={user.name} />'}
+          {'={user.name}'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Bila nama sudah ditampilkan sebagai teks di dekat Avatar, gunakan <Hl>alt=&quot;&quot;</Hl>{' '}
           agar tidak dibacakan dua kali.
         </p>
         <Demo>
           <div className="flex items-center gap-3">
-            <Avatar name="Putri Handayani" alt="" />
+            <Avatar name="Putri Handayani" alt="" darkMode={docsDark} />
             <span className="text-sm text-content">Putri Handayani</span>
           </div>
         </Demo>
@@ -95,7 +103,9 @@ export function AvatarPage() {
           <H>name</H>
           {'="Putri Handayani" '}
           <H>alt</H>
-          {'="" />\n  <span>Putri Handayani</span>\n</div>'}
+          {'=""'}
+          {dm.inline}
+          {' />\n  <span>Putri Handayani</span>\n</div>'}
         </SectionCode>
       </FlowSection>
 
@@ -106,22 +116,24 @@ export function AvatarPage() {
         </Lead>
         <Demo label="Otomatis dari name">
           <div className="flex items-center gap-4">
-            <Avatar name="Putri Handayani" size="large" />
-            <Avatar name="Putri Handayani" />
-            <Avatar name="Putri Handayani" size="small" />
+            <Avatar name="Putri Handayani" size="large" darkMode={docsDark} />
+            <Avatar name="Putri Handayani" darkMode={docsDark} />
+            <Avatar name="Putri Handayani" size="small" darkMode={docsDark} />
           </div>
         </Demo>
         <SectionCode>
           {'<Avatar '}
           <H>name</H>
-          {'="Putri Handayani" />'}
+          {'="Putri Handayani"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
         <div className="mt-5">
           <Demo label="Override initials">
             <div className="flex items-center gap-4">
-              <Avatar name="Putri Handayani" initials="UI" size="large" />
-              <Avatar name="Putri Handayani" initials="UI" />
-              <Avatar name="Putri Handayani" initials="UI" size="small" />
+              <Avatar name="Putri Handayani" initials="UI" size="large" darkMode={docsDark} />
+              <Avatar name="Putri Handayani" initials="UI" darkMode={docsDark} />
+              <Avatar name="Putri Handayani" initials="UI" size="small" darkMode={docsDark} />
             </div>
           </Demo>
         </div>
@@ -130,7 +142,9 @@ export function AvatarPage() {
           <H>name</H>
           {'="Putri Handayani" '}
           <H>initials</H>
-          {'="UI" />'}
+          {'="UI"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -142,13 +156,13 @@ export function AvatarPage() {
         </Lead>
         <div className="grid gap-5 sm:grid-cols-3">
           <Demo label="Female">
-            <Avatar name="Putri Handayani" fallback="female" size="large" />
+            <Avatar name="Putri Handayani" fallback="female" size="large" darkMode={docsDark} />
           </Demo>
           <Demo label="Male">
-            <Avatar name="Rafli Arandhana" fallback="male" size="large" />
+            <Avatar name="Rafli Arandhana" fallback="male" size="large" darkMode={docsDark} />
           </Demo>
           <Demo label="Default → initials">
-            <Avatar name="Pengguna" size="large" />
+            <Avatar name="Pengguna" size="large" darkMode={docsDark} />
           </Demo>
         </div>
         <SectionCode>
@@ -156,7 +170,9 @@ export function AvatarPage() {
           <H>name</H>
           {'="Putri Handayani" '}
           <H>fallback</H>
-          {'="female" />'}
+          {'="female"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -169,50 +185,53 @@ export function AvatarPage() {
           {ukuran.map((u) => (
             <Demo key={u.value} label={u.label + ' — ' + u.diameter}>
               <div className="flex items-center gap-3">
-                <Avatar name="Putri Handayani" size={u.value} />
-                <Avatar name="Putri Handayani" fallback="female" size={u.value} />
+                <Avatar name="Putri Handayani" size={u.value} darkMode={docsDark} />
+                <Avatar name="Putri Handayani" fallback="female" size={u.value} darkMode={docsDark} />
               </div>
             </Demo>
           ))}
         </div>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Ukuran teks inisial S, M, dan L berturut-turut {ukuran.map((u) => u.teks).join(', ')}.
         </p>
         <SectionCode>
           {'<Avatar '}
           <H>size</H>
-          {'="small" name="Putri Handayani" />'}
+          {'="small" name="Putri Handayani"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Avatar mengikuti scope ambient <Hl>data-theme</Hl>. Inisial dan ilustrasi profile berpindah
-          otomatis, termasuk dalam nested theme scope; foto pengguna tidak diberi tint.
-        </Lead>
-        <Stage maxWidth="max-w-full" dark>
-          <div data-theme="dark" className="flex flex-wrap items-center gap-4">
-            <Avatar name="Putri Handayani" size="large" />
-            <Avatar name="Putri Handayani" fallback="female" size="large" />
-            <Avatar name="Rafli Arandhana" fallback="male" size="large" />
+      <ModeSection
+        name="Avatar"
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengubah warna inisial dan ilustrasi profile. Tanpa prop tersebut,
+            Avatar mengikuti scope ambient <Hl>data-theme</Hl>; foto pengguna tidak diberi tint.
+          </>
+        }
+      >
+        <Demo dark={!docsDark} light={docsDark}>
+          <div className="flex flex-wrap items-center gap-4">
+            <Avatar name="Putri Handayani" size="large" darkMode={!docsDark} />
+            <Avatar name="Putri Handayani" fallback="female" size="large" darkMode={!docsDark} />
+            <Avatar name="Rafli Arandhana" fallback="male" size="large" darkMode={!docsDark} />
           </div>
-        </Stage>
+        </Demo>
         <SectionCode>
-          {'<section '}
-          <H>data-theme</H>
-          {'="dark">\n  <Avatar name="Putri Handayani" />\n</section>'}
+          {'<Avatar '}
+          {!docsDark && <><H>darkMode</H>{' '}</>}
+          {'name="Putri Handayani" />'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>Ubah tema, ukuran, isi, fallback profil, dan nama. Preview memakai komponen production yang sama.</Lead>
         <Stage maxWidth="max-w-[360px]" dark={dark}>
-          <div
-            data-theme={dark ? 'dark' : 'light'}
-            className="flex min-h-30 items-center justify-center gap-3"
-          >
+          <div className="flex min-h-30 items-center justify-center gap-3">
             {previewAvatar}
-            <span className="text-sm text-content">{nama || 'Tanpa nama'}</span>
+            <span className={`text-sm ${dark ? 'text-gray-300' : 'text-content'}`}>{nama || 'Tanpa nama'}</span>
           </div>
         </Stage>
 
@@ -287,7 +306,6 @@ export function AvatarPage() {
         </Lead>
         <SectionCode flush>
           {"import { Avatar } from '@ceplok-ui/design-kit-react'\n\n"}
-          {dark && '<section data-theme="dark">\n'}
           {'<div className="flex items-center gap-3">\n  <Avatar\n'}
           {size !== 'default' && (
             <>
@@ -324,10 +342,16 @@ export function AvatarPage() {
               {'="' + profileFallback + '"\n'}
             </>
           )}
+          {dark && (
+            <>
+              {'    '}
+              <H>darkMode</H>
+              {'\n'}
+            </>
+          )}
           {'    '}
           <H>alt</H>
           {'=""\n  />\n  <span>' + (nama || 'Tanpa nama') + '</span>\n</div>'}
-          {dark && '\n</section>'}
         </SectionCode>
       </FlowSection>
 
@@ -339,6 +363,7 @@ export function AvatarPage() {
         </Lead>
         <PropsTable rows={avatarProps} minWidth="52rem" />
       </FlowSection>
-    </UsulanPage>
+      </UsulanPage>
+    </div>
   )
 }

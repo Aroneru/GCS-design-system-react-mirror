@@ -29,6 +29,7 @@ import {
   DropdownDismissalContext,
   type DropdownDismissalScopeValue,
 } from './dropdown/DropdownDismissalContext'
+import { DarkModeContext, useInheritedDarkMode } from '../utils/darkModeContext'
 import { Sidebar, type SidebarItem, type SidebarUser } from './sidebar/Sidebar'
 import { BarsFromLeft } from '../icons/outline'
 
@@ -122,6 +123,8 @@ interface NavbarBaseProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> 
   brand: NavbarBrand
   items?: NavbarPrimaryItem[]
   search?: ReactNode
+  /** Tema gelap untuk Navbar dan komponen di dalamnya. */
+  darkMode?: boolean
   mobileNavigationOpen?: boolean
   onMobileNavigationOpenChange?: (open: boolean) => void
 }
@@ -1579,6 +1582,7 @@ export function Navbar(props: NavbarProps) {
     brand,
     items = [],
     search,
+    darkMode,
     mobileNavigationOpen,
     onMobileNavigationOpenChange,
     className,
@@ -1592,6 +1596,8 @@ export function Navbar(props: NavbarProps) {
     tableOfContents,
     ...headerProps
   } = props
+  const inheritedDarkMode = useInheritedDarkMode()
+  const navbarDarkMode = darkMode ?? inheritedDarkMode
   const navbarAccount = platform === 'front-office' ? account : undefined
   const dialogId = useId()
   const internalDrawerId = useId()
@@ -1701,12 +1707,14 @@ export function Navbar(props: NavbarProps) {
   }
 
   return (
-    <DropdownDismissalContext.Provider value={dropdownDismissalScope}>
-    <header
-      className={cn('border-b border-border bg-surface text-content', className)}
-      style={platform === 'back-office' ? { ...style, containerType: 'inline-size' } : style}
-      {...headerProps}
-    >
+    <DarkModeContext.Provider value={navbarDarkMode}>
+      <DropdownDismissalContext.Provider value={dropdownDismissalScope}>
+      <header
+        className={cn('border-b border-border bg-surface text-content', className)}
+        style={platform === 'back-office' ? { ...style, containerType: 'inline-size' } : style}
+        data-theme={navbarDarkMode ? 'dark' : undefined}
+        {...headerProps}
+      >
       <div
         ref={desktopRowRef}
         className={cn(
@@ -1908,7 +1916,8 @@ export function Navbar(props: NavbarProps) {
           className="lg:hidden"
         />
       )}
-    </header>
-    </DropdownDismissalContext.Provider>
+      </header>
+      </DropdownDismissalContext.Provider>
+    </DarkModeContext.Provider>
   )
 }

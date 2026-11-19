@@ -15,16 +15,44 @@ import {
   type SyntheticEvent,
 } from 'react'
 import { Close } from 'flowbite-react-icons/outline'
+import { ExclamationCircle } from 'flowbite-react-icons/solid'
 import { cn } from '../utils/cn'
+import { DarkModeContext, useInheritedDarkMode } from '../utils/darkModeContext'
+import { Button, type ButtonSize, type ButtonTheme, type ButtonTone, type ButtonVariant } from './Button'
+import { Icon } from './Icon'
 
 export type ModalSize = 's' | 'm'
 export type ModalVariant = 'default' | 'popup'
 
-interface ModalCommonProps
-  extends Omit<
-    DialogHTMLAttributes<HTMLDialogElement>,
-    'open' | 'onClose' | 'onCancel' | 'title'
-  > {
+export interface ModalActionButtonProps {
+  size?: ButtonSize
+  variant?: ButtonVariant
+  theme?: ButtonTheme
+  tone?: ButtonTone
+  darkMode?: boolean
+  className?: string
+  disabled?: boolean
+  type?: 'button' | 'submit' | 'reset'
+}
+
+export interface ModalAction {
+  label: ReactNode
+  onClick: (actions: { close: () => void }) => void
+  buttonProps?: ModalActionButtonProps
+}
+
+export interface ModalActions {
+  secondary?: ModalAction
+  primary?: ModalAction
+  danger?: ModalAction
+}
+
+type ModalCommonProps = Omit<
+  DialogHTMLAttributes<HTMLDialogElement>,
+  'open' | 'onClose' | 'onCancel' | 'title'
+> & {
+  /** Tema gelap untuk dialog dan pewarisan tema pada Button di dalamnya. */
+  darkMode?: boolean
   /** Nama aksesibel tombol tutup. */
   closeLabel?: string
   /** Tutup saat klik backdrop. Bawaan: true. */
@@ -35,9 +63,20 @@ interface ModalCommonProps
   showCloseButton?: boolean
   /** Isi modal. */
   children?: ReactNode
-  /** Area aksi, atau render function yang menerima fungsi penutup Modal. */
-  footer?: ReactNode | ((actions: { close: () => void }) => ReactNode)
-}
+  /** Ikon Popup. Bawaan: tanda seru; gunakan null untuk menyembunyikannya. */
+  icon?: ReactElement | null
+} & (
+  | {
+      /** Aksi standar. Consumer mengisi label dan handler; Modal mengatur tampilannya. */
+      actions: ModalActions
+      footer?: never
+    }
+  | {
+      actions?: never
+      /** Area aksi kustom atau render function yang menerima fungsi penutup Modal. */
+      footer?: ReactNode | ((actions: { close: () => void }) => ReactNode)
+    }
+)
 
 type ModalTrigger = ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>
 
@@ -55,9 +94,10 @@ type ModalVisibilityProps =
       onOpenChange?: (open: boolean) => void
     }
 
-interface ModalDefaultProps extends ModalCommonProps {
+type ModalDefaultProps = ModalCommonProps & {
   variant?: 'default'
   size?: ModalSize
+  icon?: never
   /**
    * Judul di header. Sekaligus jadi nama aksesibilitas dialognya, kecuali
    * `aria-label` atau `aria-labelledby` diisi sendiri.
@@ -65,7 +105,7 @@ interface ModalDefaultProps extends ModalCommonProps {
   title?: ReactNode
 }
 
-interface ModalPopupProps extends ModalCommonProps {
+type ModalPopupProps = ModalCommonProps & {
   variant: 'popup'
   size?: never
   title?: never
@@ -78,12 +118,35 @@ const sizes: Record<ModalSize, string> = {
   m: 'max-w-[640px]',
 }
 
+const defaultPopupIcon = (
+  <Icon className="size-12 shrink-0 text-feedback-error">
+    <ExclamationCircle viewBox="2 2 20 20" />
+  </Icon>
+)
+
+const dangerActionClasses: Record<ButtonVariant, string> = {
+  filled:
+    'bg-[light-dark(var(--color-orange-600),var(--color-red-700))]! text-white! font-sans font-semibold! leading-[1.5] enabled:hover:bg-[light-dark(var(--color-orange-700),var(--color-red-800))]! focus:ring-[light-dark(var(--color-red-700),var(--color-red-300))]! focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+  outline:
+    'border-[light-dark(var(--color-orange-600),var(--color-red-300))]! text-[light-dark(var(--color-orange-600),var(--color-red-300))]! bg-transparent! hover:bg-[light-dark(var(--color-orange-50),var(--color-red-900))]!',
+}
+
+const actionDefaults: Record<
+  keyof ModalActions,
+  Pick<ModalActionButtonProps, 'size' | 'variant' | 'theme'>
+> = {
+  secondary: { size: 'xs', variant: 'outline', theme: 'gray' },
+  primary: { size: 'xs', variant: 'filled', theme: 'primary' },
+  danger: { size: 'xs', variant: 'filled', theme: 'orange' },
+}
+
 /**
  * Modal — dialog di atas halaman, berbasis elemen `<dialog>` bawaan.
  *
  * Pada variant default, `title` mengisi header, `children` mengisi badan, dan
- * `footer` mengisi kakinya. Variant popup memakai `children` untuk konten
- * ringkas dan menampilkan footer tanpa divider.
+ * `actions` mengisi footer dengan tombol standar. Gunakan `footer` sebagai
+ * override penuh untuk konten footer khusus. Variant popup memakai `children`
+ * untuk konten ringkas dan menampilkan footer tanpa divider.
  *
  * Tanpa `open`, Modal mengurus visibilitas internal dan `trigger` membukanya.
  * Jika `open` diberikan, consumer menjadi sumber kebenaran dan `trigger` boleh
@@ -99,11 +162,14 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
     onOpenChange,
     variant = 'default',
     size,
+    icon,
     title,
+    darkMode,
     closeLabel = 'Tutup modal',
     closeOnBackdrop = true,
     closeOnEscape = true,
     showCloseButton = true,
+    actions,
     footer,
     className,
     children,
@@ -117,6 +183,9 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   const internalRef = useRef<HTMLDialogElement | null>(null)
   const titleId = useId()
   const isPopup = variant === 'popup'
+  const popupIcon = isPopup ? (icon === undefined ? defaultPopupIcon : icon) : null
+  const inheritedDarkMode = useInheritedDarkMode()
+  const modalDarkMode = darkMode ?? inheritedDarkMode
   const controlled = open !== undefined
   const [internalOpen, setInternalOpen] = useState(false)
   const [nativeSyncRevision, setNativeSyncRevision] = useState(0)
@@ -181,6 +250,8 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   const adaJudul = !isPopup && title !== undefined && title !== null && title !== false
   const namaOtomatis = adaJudul && !labelSendiri ? titleId : undefined
 
+  const hasCustomFooter = footer != null
+
   useEffect(() => {
     const dialog = internalRef.current
     if (!dialog) return
@@ -215,6 +286,9 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   ) {
     throw new Error('Modal memerlukan satu elemen <button> yang valid pada prop `trigger`.')
   }
+  if (hasCustomFooter && actions !== undefined) {
+    throw new Error('Gunakan salah satu prop `actions` atau `footer`, bukan keduanya.')
+  }
 
   const renderedTrigger = isValidElement<ButtonHTMLAttributes<HTMLButtonElement>>(trigger)
     ? cloneElement(trigger, {
@@ -227,14 +301,49 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
         },
       })
     : null
+  const close = () => requestOpenChange(false)
+  const renderAction = (role: keyof ModalActions, action: ModalAction) => {
+    const buttonProps = action.buttonProps
+    const variant = buttonProps?.variant ?? actionDefaults[role].variant ?? 'filled'
+    const dangerClassName =
+      role === 'danger' && buttonProps?.theme === undefined
+        ? dangerActionClasses[variant]
+        : undefined
+
+    return (
+      <Button
+        key={role}
+        {...actionDefaults[role]}
+        {...buttonProps}
+        className={cn(dangerClassName, buttonProps?.className)}
+        onClick={() => action.onClick({ close })}
+      >
+        {action.label}
+      </Button>
+    )
+  }
+  const actionButtons = actions
+    ? [
+        actions.secondary && renderAction('secondary', actions.secondary),
+        actions.primary && renderAction('primary', actions.primary),
+        actions.danger && renderAction('danger', actions.danger),
+      ].filter(Boolean)
+    : []
   const renderedFooter =
-    typeof footer === 'function' ? footer({ close: () => requestOpenChange(false) }) : footer
+    hasCustomFooter
+      ? typeof footer === 'function'
+        ? footer({ close })
+        : footer
+      : actionButtons.length > 0
+        ? actionButtons
+        : null
 
   return (
     <>
       {renderedTrigger}
       <dialog
         ref={setRef}
+        data-theme={modalDarkMode ? 'dark' : undefined}
         aria-label={labelSendiri}
         aria-labelledby={labelledBySendiri ?? namaOtomatis}
         onCancel={handleCancel}
@@ -250,54 +359,66 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
         )}
         {...props}
       >
-        <div
-          className={cn(
-            'flex shrink-0 items-start justify-between gap-4',
-            isPopup
-              ? 'relative h-7 px-5'
-              : cn('px-6', adaJudul ? 'border-b border-[light-dark(var(--color-border),var(--color-border-strong))] py-5' : 'pt-4'),
-          )}
-        >
-          {adaJudul && (
-            <h2 id={titleId} className="min-w-0 flex-1 font-alt text-lg leading-[1.5] font-semibold text-content">
-              {title}
-            </h2>
-          )}
-
-          {showCloseButton && (
-            <button
-              type="button"
-              onClick={() => requestOpenChange(false)}
-              aria-label={closeLabel}
-              className={cn(
-                'ml-auto inline-flex shrink-0 items-center justify-center rounded-lg text-[light-dark(var(--color-gray-400),var(--color-content-muted))] transition-colors hover:bg-[light-dark(var(--color-gray-100),var(--color-surface-subtle))] hover:text-[light-dark(var(--color-gray-600),var(--color-content))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-                isPopup ? 'absolute right-0.5 top-0.5 size-10' : '-my-2 -mr-2 size-10',
-              )}
-            >
-              <Close className="size-4" aria-hidden="true" />
-            </button>
-          )}
-        </div>
-
-        <div
-          className={cn(
-            'min-h-0 flex-1 overflow-y-auto overscroll-y-contain font-sans text-body font-medium text-content-muted',
-            isPopup ? 'px-5 pb-4 pt-5' : 'px-5 py-6',
-          )}
-        >
-          {children}
-        </div>
-
-        {renderedFooter && (
+        <DarkModeContext.Provider value={modalDarkMode}>
           <div
             className={cn(
-              'flex shrink-0 flex-wrap items-center gap-3',
-              isPopup ? 'px-5 pb-5' : 'border-t border-[light-dark(var(--color-border),var(--color-border-strong))] px-6 py-4',
+              'flex shrink-0 items-start justify-between gap-4',
+              isPopup
+                ? 'relative h-7 px-5'
+                : cn('px-6', adaJudul ? 'border-b border-[light-dark(var(--color-border),var(--color-border-strong))] py-5' : 'pt-4'),
             )}
           >
-            {renderedFooter}
+            {adaJudul && (
+              <h2 id={titleId} className="min-w-0 flex-1 font-alt text-lg leading-[1.5] font-semibold text-content">
+                {title}
+              </h2>
+            )}
+
+            {showCloseButton && (
+              <button
+                type="button"
+                onClick={close}
+                aria-label={closeLabel}
+                className={cn(
+                  'ml-auto inline-flex shrink-0 items-center justify-center rounded-lg text-[light-dark(var(--color-gray-400),var(--color-content-muted))] transition-colors hover:bg-[light-dark(var(--color-gray-100),var(--color-surface-subtle))] hover:text-[light-dark(var(--color-gray-600),var(--color-content))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+                  isPopup ? 'absolute right-0.5 top-0.5 size-10' : '-my-2 -mr-2 size-10',
+                )}
+              >
+                <Close className="size-4" aria-hidden="true" />
+              </button>
+            )}
           </div>
-        )}
+
+          <div
+            className={cn(
+              'min-h-0 flex-1 overflow-y-auto overscroll-y-contain font-sans text-body font-medium text-content-muted',
+              isPopup ? 'px-5 pb-4 pt-5' : 'px-5 py-6',
+            )}
+          >
+            {popupIcon && (
+              <div className="mb-4 flex shrink-0 justify-center">
+                {popupIcon}
+              </div>
+            )}
+            {children}
+          </div>
+
+          {renderedFooter && (
+            <div
+              className={cn(
+                'flex shrink-0 flex-wrap items-center gap-3',
+                isPopup
+                  ? cn('px-5 pb-5', actions !== undefined && 'justify-center gap-4')
+                  : cn(
+                      'border-t border-[light-dark(var(--color-border),var(--color-border-strong))] px-6 py-4',
+                      actions !== undefined && 'justify-end',
+                    ),
+              )}
+            >
+              {renderedFooter}
+            </div>
+          )}
+        </DarkModeContext.Provider>
       </dialog>
     </>
   )

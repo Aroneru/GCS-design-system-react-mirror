@@ -40,7 +40,7 @@ interface AvatarBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children
   initials?: ReactNode
   /** Diameter Avatar: `small` 24px, `default` 32px, atau `large` 80px. */
   size?: AvatarSize
-  /** @deprecated Gunakan scope ambient `data-theme="dark"`. */
+  /** Memaksa Avatar bertema gelap. Tanpa prop ini, Avatar mengikuti tema pembungkusnya. */
   darkMode?: boolean
 }
 

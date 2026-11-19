@@ -428,39 +428,57 @@ export function PortalDashboard({
             gray-600 di mode gelap; yang ditimpa variabel palet gelapnya, karena
             Search ber-`darkMode` memasang `data-theme` sendiri dan akan menimpa
             token biasa. Tanpa itu ruas kategorinya lebur dengan header gray-700. */}
-        <Navbar
-          platform="back-office"
-          className="[--color-field-border-dark:var(--color-gray-600)]"
-          brand={{
-            content: <img src={asset('/images/ceplok.svg')} alt="" className="size-8" />,
-            href: '#/portal-dashboard/app',
-            ariaLabel: 'CEPLOK — Dashboard',
-          }}
-          items={navbarItems}
-          sidebarItems={menuSidebar}
-          sidebarUser={sidebarUser}
-          search={
-            <Search
-              categories={KATEGORI}
-              categoryPlaceholder="Pilih"
-              category={kategori}
-              onCategoryChange={setKategori}
-              placeholder="Pencarian"
-              aria-label="Pencarian"
-              buttonLabel="Cari"
-              trigger="enter"
-              value={kata}
-              onChange={(e) => setKata(e.target.value)}
-              onSearch={cari}
+        <div className="relative">
+          <Navbar
+            platform="back-office"
+            className="[--color-field-border-dark:var(--color-gray-600)]"
+            brand={{
+              content: <img src={asset('/images/ceplok.svg')} alt="" className="size-8" />,
+              href: '#/portal-dashboard/app',
+              ariaLabel: 'CEPLOK — Dashboard',
+            }}
+            items={navbarItems}
+            sidebarItems={menuSidebar}
+            sidebarUser={sidebarUser}
+            search={
+              <Search
+                categories={KATEGORI}
+                categoryPlaceholder="Pilih"
+                category={kategori}
+                onCategoryChange={setKategori}
+                placeholder="Pencarian"
+                aria-label="Pencarian"
+                buttonLabel="Cari"
+                trigger="enter"
+                value={kata}
+                onChange={(e) => setKata(e.target.value)}
+                onSearch={cari}
+                darkMode={darkMode}
+              />
+            }
+            notificationTrigger={{
+              ariaLabel: 'Notifikasi',
+              badge: 5,
+              className: 'lg:ml-12',
+              onClick: () => kabari('Ada 5 notifikasi baru.'),
+            }}
+          />
+          {onDarkModeChange && (
+            <Button
+              iconOnly
+              variant="outline"
+              size="s"
+              aria-label="Mode gelap"
+              aria-pressed={darkMode}
+              title={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
+              className="absolute top-[18px] right-[116px] z-10 sm:right-[120px] lg:top-[28px] lg:right-[84px]"
+              onClick={() => onDarkModeChange(!darkMode)}
               darkMode={darkMode}
-            />
-          }
-          notificationTrigger={{
-            ariaLabel: 'Notifikasi',
-            badge: 5,
-            onClick: () => kabari('Ada 5 notifikasi baru.'),
-          }}
-        />
+            >
+              {darkMode ? <Sun /> : <Moon />}
+            </Button>
+          )}
+        </div>
 
         {/* Toast di kanan atas, tepat di bawah header. */}
         <div className="fixed top-22 right-4 z-30 w-80 max-w-[calc(100vw-2rem)] sm:right-6">
@@ -480,23 +498,6 @@ export function PortalDashboard({
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <h1 className="text-heading-3 font-bold text-content">Dashboard</h1>
                 <div className="flex items-center gap-2">
-                  {/* Tombol tema. Navbar belum punya slot aksi tambahan, jadi
-                      tombolnya di sini. Ikonnya menunjukkan hasil bila ditekan:
-                      bulan saat terang, matahari saat gelap. */}
-                  {onDarkModeChange && (
-                    <Button
-                      iconOnly
-                      variant="outline"
-                      size="s"
-                      aria-label="Mode gelap"
-                      aria-pressed={darkMode}
-                      title={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
-                      onClick={() => onDarkModeChange(!darkMode)}
-                      darkMode={darkMode}
-                    >
-                      {darkMode ? <Sun /> : <Moon />}
-                    </Button>
-                  )}
                   <Button
                     variant="outline"
                     size="s"

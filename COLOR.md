@@ -153,6 +153,15 @@ Analogi: `data-theme="dark"` adalah saklar lampu ruangan. Semua komponen di dala
 
 Prop `darkMode` hanya memasang `data-theme="dark"` di komponen itu.
 
+Pada `Modal`, boundary tema hanya dipasang pada elemen `<dialog>`. Trigger
+merupakan elemen milik consumer, jadi atur temanya secara terpisah:
+
+```tsx
+<Modal darkMode trigger={<Button darkMode>Buka modal</Button>} title="Konfirmasi">
+  Isi dialog
+</Modal>
+```
+
 ### Satu bagian halaman gelap
 
 ```tsx
@@ -257,7 +266,10 @@ Atau lewat class:
 - Jangan menulis warna langsung di komponen. Pakai token semantik.
 - Pilih token berdasarkan fungsi. Latar kartu pakai `bg-surface`, bukan `bg-white`.
 - Jangan membuat dua set class untuk terang dan gelap. Cukup satu set token, lalu tema diatur oleh `data-theme`.
-- Prop `darkMode` cukup memasang `data-theme={darkMode ? 'dark' : undefined}` di elemen terluar.
+- Prop `darkMode` memasang `data-theme={darkMode ? 'dark' : undefined}` pada
+  elemen boundary tema, biasanya elemen terluar. Jika komponen merender elemen
+  terpisah seperti trigger dan dialog pada `Modal`, tema hanya diterapkan pada
+  elemen yang perlu dimodekan; trigger diatur consumer.
 - Untuk efek khusus di tema gelap (misalnya meredupkan gambar), pakai variant `in-data-[theme=dark]:`, contoh `in-data-[theme=dark]:brightness-90`.
 - Butuh warna baru yang dipakai dua komponen atau lebih? Tambahkan token semantik baru di `tokens.css`, beserta nilai gelapnya di blok `[data-theme='dark']` dan nilai terangnya di blok `[data-theme='light']`.
 - Warna yang hanya dipakai satu komponen boleh jadi token komponen, misalnya `--color-hero-overlay`. Nilai bawaannya sebaiknya menunjuk ke token semantik.
@@ -266,6 +278,8 @@ Atau lewat class:
 
 ## Status saat ini
 
-- **Sudah memakai cara ini:** Card, Container, Hero, Toggle, Checkbox, Radio, Select, InputField, FloatingLabel, TextArea, Toast, Alert, Sidebar, Search, Breadcrumb, dan Timeline.
+- **Sudah memakai cara ini:** Card, Container, Hero, Toggle, Checkbox, Radio,
+  Select, InputField, FloatingLabel, TextArea, Toast, Alert, Modal, Sidebar,
+  Search, Breadcrumb, dan Timeline.
 - **Belum:** komponen lain yang punya `darkMode` (Popover, Drawer, Datepicker, dan lainnya) masih menulis warna gelapnya sendiri. Komponen ini akan dipindah bertahap.
 - Selama belum dipindah, `data-theme="dark"` di pembungkus belum membuat komponen tersebut gelap. Pakai prop `darkMode` di komponennya.
