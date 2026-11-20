@@ -623,6 +623,7 @@ export function PortalDashboard({
             token biasa. Tanpa itu ruas kategorinya lebur dengan header gray-700. */}
         <Navbar
           platform="back-office"
+          darkMode={darkMode}
           className="[--color-field-border-dark:var(--color-gray-600)]"
           brand={{
             content: <img src={asset('/images/ceplok.svg')} alt="" className="size-8" />,
@@ -634,6 +635,7 @@ export function PortalDashboard({
           sidebarUser={sidebarUser}
           search={
             <Search
+              platform="compact"
               categories={KATEGORI}
               categoryPlaceholder="Pilih"
               category={kategori}
