@@ -37,6 +37,7 @@ const darkPages = new Set([
   '/components/pagination',
   '/components/sidebar',
   '/components/list-view',
+  '/components/table-of-contents',
   '/components/toast',
   '/components/timeline',
   '/form',
