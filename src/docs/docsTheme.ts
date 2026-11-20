@@ -29,11 +29,17 @@ const darkPages = new Set([
   '/components',
   '/components/alert',
   '/components/avatar',
+  '/components/breadcrumb',
+  '/components/button',
   '/components/clipboard',
+  '/components/drawer',
   '/components/dropdown',
+  '/components/list-view',
   '/components/modal',
   '/components/navbar',
+  '/components/pagination',
   '/components/popover',
+  '/components/sidebar',
   '/components/spinner',
   '/components/toast',
   '/components/timeline',
@@ -163,5 +169,5 @@ export function useDarkModeSnippet() {
  * putus. Panggil di level modul halaman, sama seperti `toc`-nya: observer
  * daftar isi dipasang ulang setiap kali daftarnya berganti.
  */
-export const tocForDarkDocs = (toc: TocEntry[]): TocEntry[] =>
-  toc.map((t) => (t.id === 'dark-mode' ? { ...t, label: 'Light mode' } : t))
+export const tocForDarkDocs = (toc: TocEntry[], stayDark = false): TocEntry[] =>
+  stayDark ? toc : toc.map((t) => (t.id === 'dark-mode' ? { ...t, label: 'Light mode' } : t))

@@ -8,6 +8,7 @@ export type ButtonSize = "xs" | "s" | "base" | "l" | "xl";
 
 export type ButtonTheme = "primary" | "green" | "gray" | "purple" | "orange" | "yellow";
 
+/** @deprecated Gunakan `darkMode` untuk memilih palet pada permukaan gelap. */
 export type ButtonTone = "light" | "dark";
 
 interface CommonProps {
@@ -19,12 +20,16 @@ interface CommonProps {
   rightIcon?: ReactNode;
   className?: string;
   theme?: ButtonTheme;
+  /**
+   * @deprecated Gunakan `darkMode`. Selama masa transisi, `tone="dark"`
+   * diperlakukan sama dengan `darkMode={true}`.
+   */
   tone?: ButtonTone;
   /**
-   * Menyesuaikan warna Button untuk permukaan bertema gelap. Bila tidak diisi,
-   * Button di dalam Table ber-`darkMode` ikut gelap otomatis — tetapi hanya
-   * theme `gray`; theme berwarna (mis. primary, orange) tetap berwarna supaya
-   * tombol utama seperti "Tambah Data" tetap menonjol.
+   * Menyesuaikan Button untuk permukaan gelap. Filled memakai versi gelap dari
+   * enam theme bawaan, outline menjadi putih, dan filled tanpa palet khusus
+   * memakai tombol putih sebagai fallback. Jika tidak diisi, mode diwarisi
+   * dari konteks tema terdekat.
    */
   darkMode?: boolean;
 }
@@ -78,102 +83,71 @@ const sizeClasses: Record<
   },
 };
 
-const colorClasses: Record<ButtonTheme, Record<ButtonTone, Record<ButtonVariant, string>>> = {
+const lightClasses: Record<ButtonTheme, Record<ButtonVariant, string>> = {
   primary: {
-    light: {
-      filled: "bg-primary-700 text-white hover:bg-primary-800",
-      outline: "border border-primary-700 text-primary-700 hover:bg-primary-50",
-    },
-    dark: {
-      filled: "bg-primary-800 text-white hover:bg-primary-700",
-      outline: "border border-primary-800 text-primary-800 hover:bg-primary-50",
-    },
+    filled: "bg-primary-700 text-white hover:bg-primary-800",
+    outline: "border border-primary-700 text-primary-700 hover:bg-primary-50",
   },
 
   green: {
-    light: {
-      filled: "bg-green-700 text-white hover:bg-green-800",
-      outline: "border border-green-700 text-green-700 hover:bg-green-50",
-    },
-    dark: {
-      filled: "bg-green-800 text-white hover:bg-green-700",
-      outline: "border border-green-800 text-green-800 hover:bg-green-50",
-    },
+    filled: "bg-green-700 text-white hover:bg-green-800",
+    outline: "border border-green-700 text-green-700 hover:bg-green-50",
   },
 
   gray: {
-    // Gray light menggunakan 500
-    light: {
-      filled: "bg-gray-500 text-white hover:bg-gray-700",
-      outline: "border border-gray-500 text-gray-500 hover:bg-gray-100 hover:text-gray-700 hover:border-gray-700",
-    },
-
-    // Gray dark menggunakan 700
-    dark: {
-      filled: "bg-gray-700 text-white hover:bg-gray-500",
-      outline: "border border-gray-700 text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:border-gray-900",
-    },
+    filled: "bg-gray-500 text-white hover:bg-gray-700",
+    outline: "border border-gray-500 text-gray-500 hover:border-gray-700 hover:bg-gray-100 hover:text-gray-700",
   },
 
   purple: {
-    light: {
-      filled: "bg-purple-700 text-white hover:bg-purple-800",
-      outline: "border border-purple-700 text-purple-700 hover:bg-purple-50",
-    },
-    dark: {
-      filled: "bg-purple-800 text-white hover:bg-purple-700",
-      outline: "border border-purple-800 text-purple-800 hover:bg-purple-50",
-    },
+    filled: "bg-purple-700 text-white hover:bg-purple-800",
+    outline: "border border-purple-700 text-purple-700 hover:bg-purple-50",
   },
 
   orange: {
-    // Orange light menggunakan 600
-    light: {
-      filled: "bg-orange-600 text-white hover:bg-orange-700",
-      outline: "border border-orange-600 text-orange-600 hover:bg-orange-50",
-    },
-    // Orange dark menggunakan 700
-    dark: {
-      filled: "bg-orange-700 text-white hover:bg-orange-700",
-      outline: "border border-orange-700 text-orange-700 hover:bg-orange-50",
-    },
+    filled: "bg-orange-600 text-white hover:bg-orange-700",
+    outline: "border border-orange-600 text-orange-600 hover:bg-orange-50",
   },
 
   yellow: {
-    light: {
-      filled: "bg-yellow-700 text-white hover:bg-yellow-800",
-      outline: "border border-yellow-700 text-yellow-700 hover:bg-yellow-50",
-    },
-    dark: {
-      filled: "bg-yellow-800 text-white hover:bg-yellow-700",
-      outline: "border border-yellow-800 text-yellow-800 hover:bg-yellow-50",
-    },
+    filled: "bg-yellow-700 text-white hover:bg-yellow-800",
+    outline: "border border-yellow-700 text-yellow-700 hover:bg-yellow-50",
   },
 };
 
-// Warna dari spesifikasi dark mode: outline light memakai gray-50, sedangkan
-// outline dark memakai gray-500. Keduanya menjadi white/gray-700 saat hover.
-// `disabled:opacity-50` menghasilkan gray-400 pada gray-700, sesuai desain.
-const darkModeClasses: Record<ButtonTone, Record<ButtonVariant, string>> = {
-  light: {
-    filled: "bg-gray-50 text-gray-700 hover:bg-white hover:text-gray-700",
-    outline:
-      "border border-gray-50 text-gray-50 hover:border-gray-50 hover:bg-white hover:text-gray-700",
-  },
-  dark: {
-    filled: "bg-gray-50 text-gray-700 hover:bg-white hover:text-gray-700",
-    outline:
-      "border border-gray-500 text-gray-500 hover:border-gray-50 hover:bg-white hover:text-gray-700",
-  },
+/**
+ * `Partial` disengaja: theme baru yang belum mempunyai palet gelap akan jatuh
+ * ke tombol putih, bukan tanpa sengaja memakai warna light mode.
+ */
+const darkFilledClasses: Partial<Record<ButtonTheme, string>> = {
+  primary: "bg-primary-800 text-white hover:bg-primary-700",
+  green: "bg-green-800 text-white hover:bg-green-700",
+  gray: "bg-gray-700 text-white hover:bg-gray-500",
+  purple: "bg-purple-800 text-white hover:bg-purple-700",
+  orange: "bg-orange-700 text-white hover:bg-orange-700",
+  yellow: "bg-yellow-800 text-white hover:bg-yellow-700",
 };
+
+const darkFilledFallback = "bg-gray-50 text-gray-700 hover:bg-white hover:text-gray-700";
+const darkOutlineClass =
+  "border border-gray-50 text-gray-50 hover:border-gray-50 hover:bg-white hover:text-gray-700";
+
+function resolveColorClasses(theme: ButtonTheme | undefined, variant: ButtonVariant, darkMode: boolean) {
+  const resolvedTheme = theme ?? "primary";
+
+  if (!darkMode) return lightClasses[resolvedTheme][variant];
+  if (variant === "outline") return darkOutlineClass;
+  if (!theme) return darkFilledFallback;
+  return darkFilledClasses[theme] ?? darkFilledFallback;
+}
 
 export function Button({
   children,
   iconOnly = false,
   variant = "filled",
   size = "base",
-  theme = "primary",
-  tone = "light",
+  theme,
+  tone,
   darkMode: darkModeProp,
   leftIcon,
   rightIcon,
@@ -182,7 +156,7 @@ export function Button({
 }: ButtonProps) {
   const currentSize = sizeClasses[size];
   const inheritedDark = useInheritedDarkMode();
-  const darkMode = darkModeProp ?? (inheritedDark && theme === "gray");
+  const darkMode = darkModeProp ?? (tone === "dark" || inheritedDark);
 
   const classes = cn(
     "inline-flex items-center justify-center",
@@ -191,7 +165,7 @@ export function Button({
     "focus:outline-none",
     "focus:ring-2 focus:ring-primary-400",
     "disabled:pointer-events-none disabled:opacity-50",
-    darkMode ? darkModeClasses[tone][variant] : colorClasses[theme][tone][variant],
+    resolveColorClasses(theme, variant, darkMode),
     iconOnly ? currentSize.iconOnly : currentSize.button,
     className,
   );

@@ -111,7 +111,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 const dropdownProps: PropRow[] = [
   ['trigger', 'ReactElement<ButtonHTMLAttributes<HTMLButtonElement>>', 'required', 'Satu native <button>, Button dalam mode button, atau komponen tombol yang meneruskan atribut native ke <button> root-nya.'],
@@ -1253,6 +1253,7 @@ export function DropdownPage() {
 
       <ModeSection
         name="Dropdown"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengaktifkan tema gelap lokal pada Dropdown. Tanpa prop tersebut,
@@ -1261,10 +1262,10 @@ export function DropdownPage() {
           </>
         }
       >
-        <Stage maxWidth="max-w-xl" dark={!docsDark}>
+        <Stage maxWidth="max-w-xl" dark>
           <div className="flex min-h-72 items-start justify-center pt-3">
             <Dropdown
-              darkMode={!docsDark}
+              darkMode
               trigger={trigger()}
               items={[
                 { label: 'Profil', icon: <User /> },
@@ -1281,7 +1282,7 @@ export function DropdownPage() {
           {"import { Dropdown } from '@ceplok-ui/design-kit-react'\n"}
           {"import { ArrowRightToBracket, User } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
           {'<Dropdown\n'}
-          {!docsDark && '  darkMode\n'}
+          {'  '}<H>darkMode</H>{'\n'}
           {'  '}<H>trigger</H>{'={trigger}\n  '}<H>items</H>{"={[\n    { label: 'Profil', icon: <User /> },\n    { label: 'Keluar', icon: <ArrowRightToBracket />, tone: 'danger' },\n  ]}\n/>"}
         </SectionCode>
       </ModeSection>

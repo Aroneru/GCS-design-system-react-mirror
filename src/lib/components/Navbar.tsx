@@ -1788,7 +1788,11 @@ export function Navbar(props: NavbarProps) {
                 )}
               </div>
             </div>
-            {search && <div className="mt-3 min-w-0">{search}</div>}
+            {search && (
+              <div className="mt-3 min-w-0">
+                {search}
+              </div>
+            )}
           </>
         ) : (
           <div

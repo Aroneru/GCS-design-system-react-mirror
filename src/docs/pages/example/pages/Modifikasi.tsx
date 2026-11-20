@@ -217,7 +217,7 @@ export function Modifikasi() {
                   gelap ? 'bg-primary-700 text-white' : 'bg-white text-gray-600'
                 }`}
               >
-                tone dark
+                dark mode
               </button>
             </div>
           </div>
@@ -228,7 +228,7 @@ export function Modifikasi() {
                 theme={tema}
                 size={ukuran}
                 variant={outline ? 'outline' : 'filled'}
-                tone={gelap ? 'dark' : 'light'}
+                darkMode={gelap}
                 leftIcon={<Plus />}
               >
                 Tambah data
@@ -238,7 +238,7 @@ export function Modifikasi() {
                 theme={tema}
                 size={ukuran}
                 variant={outline ? 'outline' : 'filled'}
-                tone={gelap ? 'dark' : 'light'}
+                darkMode={gelap}
                 aria-label="Ubah data"
               >
                 <Edit />
@@ -264,7 +264,7 @@ import { Edit, Plus } from '@ceplok-ui/design-kit-react/icons/outline'
 
 <Button
   theme="${tema}"
-  size="${ukuran}"${outline ? '\n  variant="outline"' : ''}${gelap ? '\n  tone="dark"' : ''}
+  size="${ukuran}"${outline ? '\n  variant="outline"' : ''}${gelap ? '\n  darkMode' : ''}
   leftIcon={<Plus />}
 >
   Tambah data
@@ -273,7 +273,7 @@ import { Edit, Plus } from '@ceplok-ui/design-kit-react/icons/outline'
 <Button
   iconOnly
   theme="${tema}"
-  size="${ukuran}"${outline ? '\n  variant="outline"' : ''}${gelap ? '\n  tone="dark"' : ''}
+  size="${ukuran}"${outline ? '\n  variant="outline"' : ''}${gelap ? '\n  darkMode' : ''}
   aria-label="Ubah data"
 >
   <Edit />

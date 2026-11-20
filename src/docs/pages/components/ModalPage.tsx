@@ -8,6 +8,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -300,7 +301,7 @@ const toc: TocEntry[] = [
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
 ]
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 function ModalThemeFrame({ label, theme, children }: {
   label: string
@@ -702,48 +703,43 @@ export function ModalPage() {
         </p>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title={docsDark ? 'Light mode' : 'Dark mode'}>
-        <Lead>
-          {docsDark ? (
-            <>
-              Dokumentasi sedang dalam mode gelap, jadi contoh lain di halaman ini menggunakan
-              <Hl>darkMode</Hl>. Tanpa prop itu, dialog tampil terang seperti di bawah. Tombol aksi
-              di dalam Modal mengikuti tema dialog; trigger milik consumer mengatur temanya terpisah.
-            </>
-          ) : (
-            <>
-              Gunakan <Hl>darkMode</Hl> untuk menerapkan token gelap pada dialog dan Button di
-              dalamnya. Trigger milik consumer, misalnya Button, mengatur temanya sendiri. Default memakai surface gray-700,
-              sedangkan Popup memakai gray-600 dengan teks gray-300 dan warna action sesuai desain.
-            </>
-          )}
-        </Lead>
+      <ModeSection
+        name="Modal"
+        stayDark
+        lead={
+          <>
+            Gunakan <Hl>darkMode</Hl> untuk menerapkan token gelap pada dialog dan Button di
+            dalamnya. Trigger milik consumer, misalnya Button, mengatur temanya sendiri. Default memakai surface gray-700,
+            sedangkan Popup memakai gray-600 dengan teks gray-300 dan warna action sesuai desain.
+          </>
+        }
+      >
         <div className="mt-5 grid gap-5 lg:grid-cols-2">
           <ModalThemeFrame
-            label={`Default ${docsDark ? 'Light' : 'Dark'}`}
-            theme={docsDark ? 'light' : 'dark'}
+            label="Default Dark"
+            theme="dark"
           >
-            <ModalThemeExample variant="default" theme={docsDark ? 'light' : 'dark'} />
+            <ModalThemeExample variant="default" theme="dark" />
           </ModalThemeFrame>
           <ModalThemeFrame
-            label={`Popup ${docsDark ? 'Light' : 'Dark'}`}
-            theme={docsDark ? 'light' : 'dark'}
+            label="Popup Dark"
+            theme="dark"
           >
-            <ModalThemeExample variant="popup" theme={docsDark ? 'light' : 'dark'} />
+            <ModalThemeExample variant="popup" theme="dark" />
           </ModalThemeFrame>
         </div>
         <SectionCode>
           {renderModalExampleCode({
-            theme: docsDark ? 'light' : 'dark',
+            theme: 'dark',
             variant: 'default',
             example: 'basic',
             size: 's',
             dismissal: { closeOnBackdrop: true, closeOnEscape: true, showCloseButton: true },
-            highlightDarkMode: !docsDark,
+            highlightDarkMode: true,
             highlightTitle: false,
           })}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>

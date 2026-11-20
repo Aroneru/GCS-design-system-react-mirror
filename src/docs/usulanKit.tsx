@@ -173,18 +173,22 @@ export function ModeSection({
   name,
   lead,
   children,
+  stayDark = false,
 }: {
   /** Nama komponen di kalimat Light mode, mis. "Input Field". */
   name: string
   /** Pengantar bagian Dark mode, di mode terang docs. */
   lead: ReactNode
   children: ReactNode
+  /** Menjaga judul dan isi section sebagai Dark mode saat tema docs berubah. */
+  stayDark?: boolean
 }) {
   const docsDark = useDocsDark()
+  const showLightMode = docsDark && !stayDark
   return (
-    <FlowSection id="dark-mode" title={docsDark ? 'Light mode' : 'Dark mode'}>
+    <FlowSection id="dark-mode" title={showLightMode ? 'Light mode' : 'Dark mode'}>
       <Lead>
-        {docsDark ? (
+        {showLightMode ? (
           <>
             Dokumentasi sedang dalam mode gelap, jadi contoh lain di halaman ini memakai <Hl>darkMode</Hl>,
             begitu pula cuplikan kodenya. Tanpa prop itu {name} tampil terang, seperti di bawah ini.

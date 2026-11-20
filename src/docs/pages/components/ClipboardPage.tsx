@@ -18,7 +18,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 const variants: { value: ClipboardVariant; label: string }[] = [
   { value: 'default', label: 'Default' },
@@ -116,14 +116,15 @@ export function ClipboardPage() {
 
       <ModeSection
         name="Clipboard"
+        stayDark
         lead={<>Prop <H>darkMode</H> mengaktifkan palet gelap pada field, teks, prefix, dan tooltip. Tanpa prop tersebut, Clipboard mengikuti scope ambient <H>data-theme</H>.</>}
       >
-        <Demo dark={!docsDark} light={docsDark}>
+        <Demo dark>
           <div className={`mx-auto w-full ${previewWidths.segmented.default}`}>
-            <Clipboard value="https://komdigi.go.id/" label="Alamat situs" helperText="Gunakan alamat ini untuk mengunjungi situs." variant="segmented" prefix="URL" darkMode={!docsDark} />
+            <Clipboard value="https://komdigi.go.id/" label="Alamat situs" helperText="Gunakan alamat ini untuk mengunjungi situs." variant="segmented" prefix="URL" darkMode />
           </div>
         </Demo>
-        <SectionCode>{'<Clipboard\n'}{!docsDark && <>  <H>darkMode</H>{'\n'}</>}{'  value="https://komdigi.go.id/"\n  '}<H>aria-label</H>{'="Alamat situs"\n  variant="segmented"\n  prefix="URL"\n/>'}</SectionCode>
+        <SectionCode>{'<Clipboard\n  '}<H>darkMode</H>{'\n  value="https://komdigi.go.id/"\n  '}<H>aria-label</H>{'="Alamat situs"\n  variant="segmented"\n  prefix="URL"\n/>'}</SectionCode>
       </ModeSection>
 
       <FlowSection id="playground" title="Playground">

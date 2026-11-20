@@ -37,7 +37,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function AvatarPage() {
   const docsDark = useDocsDark()
@@ -205,6 +205,7 @@ export function AvatarPage() {
 
       <ModeSection
         name="Avatar"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengubah warna inisial dan ilustrasi profile. Tanpa prop tersebut,
@@ -212,16 +213,16 @@ export function AvatarPage() {
           </>
         }
       >
-        <Demo dark={!docsDark} light={docsDark}>
+        <Demo dark>
           <div className="flex flex-wrap items-center gap-4">
-            <Avatar name="Putri Handayani" size="large" darkMode={!docsDark} />
-            <Avatar name="Putri Handayani" fallback="female" size="large" darkMode={!docsDark} />
-            <Avatar name="Rafli Arandhana" fallback="male" size="large" darkMode={!docsDark} />
+            <Avatar name="Putri Handayani" size="large" darkMode />
+            <Avatar name="Putri Handayani" fallback="female" size="large" darkMode />
+            <Avatar name="Rafli Arandhana" fallback="male" size="large" darkMode />
           </div>
         </Demo>
         <SectionCode>
           {'<Avatar '}
-          {!docsDark && <><H>darkMode</H>{' '}</>}
+          <H>darkMode</H>{' '}
           {'name="Putri Handayani" />'}
         </SectionCode>
       </ModeSection>

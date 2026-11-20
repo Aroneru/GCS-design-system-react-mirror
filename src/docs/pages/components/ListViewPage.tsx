@@ -7,6 +7,12 @@ import {
   type ListViewSize,
 } from "../../../lib";
 import { Clock } from "../../../lib/icons/solid";
+import {
+  tocForDarkDocs,
+  useDarkModeSnippet,
+  useDocsDark,
+  usePlaygroundDark,
+} from "../../docsTheme";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Demo, H, Hl, Segmented } from "../../pageKit";
 import {
@@ -14,6 +20,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -269,19 +276,23 @@ const toc: TocEntry[] = [
   { id: "article", label: "List View Article" },
   { id: "decoration", label: "Decoration" },
   { id: "badge", label: "Badge" },
-  { id: "darkmode", label: "Darkmode" },
+  { id: "dark-mode", label: "Dark mode" },
   { id: "playground", label: "Playground" },
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
 ];
 
+const tocDark = tocForDarkDocs(toc, true);
+
 export function ListViewPage() {
+  const docsDark = useDocsDark();
+  const dm = useDarkModeSnippet();
   const [variant, setVariant] = useState<ListViewItemVariant>("simple");
   const [platform, setPlatform] = useState<ListViewPlatform>("desktop");
   const [size, setSize] = useState<ListViewSize>("m");
   const [decoration, setDecoration] = useState(false);
   const [hasBadge, setHasBadge] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = usePlaygroundDark();
   const canvasWidth =
     variant === "article"
       ? size === "s"
@@ -304,7 +315,7 @@ export function ListViewPage() {
       eyebrow="Components · List View"
       title="List View"
       description="Komponen kartu daftar vertikal untuk menampilkan ringkasan berkas, lampiran, dokumen, atau item data lengkap dengan ikon, judul, metadata, dan aksi cepat."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       {/* 1. Variant Section (Desktop | Mobile) */}
       <FlowSection id="variant" title="Variant">
@@ -317,21 +328,22 @@ export function ListViewPage() {
           {/* Sub-bagian 1: Desktop (S, M, L) */}
           <div className="space-y-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-gray-900">1. Desktop</h3>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white">1. Desktop</h3>
             </div>
 
 
             {/* S */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">Small (S)</h4>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">Small (S)</h4>
               </div>
-              <p className="mb-3 text-body-sm text-gray-500">
+              <p className="mb-3 text-body-sm text-gray-500 dark:text-gray-400">
                 Ukuran ringkas (410 px) dengan wadah ikon 32×32 px dan tombol aksi ukuran XS.
               </p>
               <Demo minWidth="410px">
                 <div className="w-[410px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     size="s"
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
@@ -344,16 +356,17 @@ export function ListViewPage() {
             {/* M */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                   Medium (M) · Default
                 </h4>
               </div>
-              <p className="mb-3 text-body-sm text-gray-500">
+              <p className="mb-3 text-body-sm text-gray-500 dark:text-gray-400">
                 Ukuran standar bawaan (514 px) dengan wadah ikon 40×40 px dan tombol aksi ukuran S.
               </p>
               <Demo minWidth="514px">
                 <div className="w-[514px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
                     actionLabel="Open"
@@ -365,14 +378,15 @@ export function ListViewPage() {
             {/* L */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">Large (L)</h4>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">Large (L)</h4>
               </div>
-              <p className="mb-3 text-body-sm text-gray-500">
+              <p className="mb-3 text-body-sm text-gray-500 dark:text-gray-400">
                 Ukuran lapang (600 px) dengan wadah ikon 48×48 px dan tombol aksi ukuran Base.
               </p>
               <Demo minWidth="600px">
                 <div className="w-[600px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     size="l"
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
@@ -386,7 +400,7 @@ export function ListViewPage() {
           {/* Sub-bagian 2: Mobile (1 Ukuran + Notes) */}
           <div className="space-y-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-gray-900">2. Mobile</h3>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white">2. Mobile</h3>
             </div>
             <p className="mt-1 text-body-sm text-gray-500">
               Platform mobile hanya memiliki 1 ukuran standar (lebar 348 px, tinggi 58 px). Wadah ikon 40×40 px dengan layout satu baris ringkas.
@@ -397,6 +411,7 @@ export function ListViewPage() {
               <Demo minWidth="348px">
                 <div className="w-[348px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     platform="mobile"
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
@@ -410,7 +425,8 @@ export function ListViewPage() {
         <SectionCode>
           {"import { ListViewItem } from '@ceplok-ui/design-kit-react'\n\n"}
           {"{/* 1. Desktop — Small (size=\"s\") */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {"  "}
           <H>size</H>
           {'="s"\n'}
@@ -419,13 +435,15 @@ export function ListViewPage() {
           {'  actionLabel="Open"\n'}
           {"/>\n\n"}
           {"{/* 2. Desktop — Medium (Default, prop size tidak perlu ditulis) */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {'  actionLabel="Open"\n'}
           {"/>\n\n"}
           {"{/* 3. Desktop — Large (size=\"l\") */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {"  "}
           <H>size</H>
           {'="l"\n'}
@@ -434,7 +452,8 @@ export function ListViewPage() {
           {'  actionLabel="Open"\n'}
           {"/>\n\n"}
           {"{/* 4. Mobile — 1 Ukuran Standar (348 px) */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {"  "}
           <H>platform</H>
           {'="mobile"\n'}
@@ -455,14 +474,15 @@ export function ListViewPage() {
             {/* Small (S) */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">Small (S)</h4>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">Small (S)</h4>
               </div>
-              <p className="mb-3 text-body-sm text-gray-500">
+              <p className="mb-3 text-body-sm text-gray-500 dark:text-gray-400">
                 Ukuran ringkas (410 px) dengan judul semibold 14px dan metrik interaksi 12px.
               </p>
               <Demo minWidth="410px">
                 <div className="w-[410px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     variant="article"
                     size="s"
                     subject="subject Name"
@@ -480,16 +500,17 @@ export function ListViewPage() {
             {/* Medium (M) */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                   Medium (M) · Default
                 </h4>
               </div>
-              <p className="mb-3 text-body-sm text-gray-500">
+              <p className="mb-3 text-body-sm text-gray-500 dark:text-gray-400">
                 Ukuran standar bawaan (514 px) dengan judul semibold 16px dan proporsi yang seimbang.
               </p>
               <Demo minWidth="514px">
                 <div className="w-[514px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     variant="article"
                     size="m"
                     subject="subject Name"
@@ -507,14 +528,15 @@ export function ListViewPage() {
             {/* Large (L) */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">Large (L)</h4>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">Large (L)</h4>
               </div>
-              <p className="mb-3 text-body-sm text-gray-500">
+              <p className="mb-3 text-body-sm text-gray-500 dark:text-gray-400">
                 Ukuran lapang (728 px) dengan judul semibold 18px untuk keterbacaan yang lebih tinggi.
               </p>
               <Demo minWidth="728px">
                 <div className="w-[728px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     variant="article"
                     size="l"
                     subject="subject Name"
@@ -532,16 +554,17 @@ export function ListViewPage() {
             {/* Extra Large (XL) */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                   Extra Large (XL)
                 </h4>
               </div>
-              <p className="mb-3 text-body-sm text-gray-500">
+              <p className="mb-3 text-body-sm text-gray-500 dark:text-gray-400">
                 Ukuran ekstra besar (1028 px) dengan judul semibold 20px dan bantalan lebih luas, ideal untuk judul panjang atau artikel sorotan utama.
               </p>
               <Demo minWidth="1028px">
                 <div className="w-[1028px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     variant="article"
                     size="xl"
                     subject="subject Name"
@@ -561,7 +584,8 @@ export function ListViewPage() {
         <SectionCode>
           {"import { ListViewItem } from '@ceplok-ui/design-kit-react'\n\n"}
           {"{/* 1. Small (size=\"s\" · 410 px) */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {"  "}
           <H>variant</H>
           {'="article"\n'}
@@ -577,7 +601,8 @@ export function ListViewPage() {
           {"  likes={16}\n"}
           {"/>\n\n"}
           {"{/* 2. Medium (size=\"m\" · 514 px · Default) */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {"  "}
           <H>variant</H>
           {'="article"\n'}
@@ -590,7 +615,8 @@ export function ListViewPage() {
           {"  likes={16}\n"}
           {"/>\n\n"}
           {"{/* 3. Large (size=\"l\" · 728 px) */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {"  "}
           <H>variant</H>
           {'="article"\n'}
@@ -606,7 +632,8 @@ export function ListViewPage() {
           {"  likes={16}\n"}
           {"/>\n\n"}
           {"{/* 4. Extra Large (size=\"xl\" · 1028 px) */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {"  "}
           <H>variant</H>
           {'="article"\n'}
@@ -638,7 +665,7 @@ export function ListViewPage() {
             {/* Desktop M mewakili */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                   Desktop (Medium)
                 </h4>
 
@@ -646,6 +673,7 @@ export function ListViewPage() {
               <Demo minWidth="514px">
                 <div className="w-[514px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     decoration
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
@@ -658,13 +686,14 @@ export function ListViewPage() {
             {/* Mobile mewakili */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                   Mobile
                 </h4>
               </div>
               <Demo minWidth="348px">
                 <div className="w-[348px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     platform="mobile"
                     decoration
                     title="Project brief"
@@ -679,13 +708,15 @@ export function ListViewPage() {
         <SectionCode>
           {"import { ListViewItem } from '@ceplok-ui/design-kit-react'\n\n"}
           {"{/* 1. Tanpa Dekorasi (Default) */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {'  actionLabel="Open"\n'}
           {"/>\n\n"}
           {"{/* 2. Dengan Dekorasi (Garis aksen vertikal di sisi kiri) */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {"  "}
           <H>decoration</H>
           {"\n"}
@@ -710,13 +741,14 @@ export function ListViewPage() {
             {/* Desktop M mewakili */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                   Desktop (Medium)
                 </h4>
               </div>
               <Demo minWidth="514px">
                 <div className="w-[514px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
                     badge={
@@ -737,13 +769,14 @@ export function ListViewPage() {
             {/* Mobile mewakili */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                   Mobile
                 </h4>
               </div>
               <Demo minWidth="348px">
                 <div className="w-[348px]">
                   <ListViewItem
+                    darkMode={docsDark}
                     platform="mobile"
                     title="Project brief"
                     metadata={["PDF", "2.4 MB", "Updated Oct 10, 2026"]}
@@ -767,13 +800,15 @@ export function ListViewPage() {
           {"import { Badge, ListViewItem } from '@ceplok-ui/design-kit-react'\n"}
           {"import { Clock } from '@ceplok-ui/design-kit-react/icons/solid'\n\n"}
           {"{/* 1. Tanpa Badge */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {'  actionLabel="Open"\n'}
           {"/>\n\n"}
           {"{/* 2. Dengan Badge */}\n"}
-          {"<ListViewItem\n"}
+          {'<ListViewItem\n'}
+          {dm.line}
           {'  title="Project brief"\n'}
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {"  "}
@@ -784,18 +819,23 @@ export function ListViewPage() {
         </SectionCode>
       </FlowSection>
 
-      {/* 4. Darkmode Section */}
-      <FlowSection id="darkmode" title="Darkmode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> mengaktifkan tema gelap. Article memakai surface <Hl>gray-700</Hl>, teks bertingkat <Hl>gray-100</Hl> hingga <Hl>gray-300</Hl>, serta pin transparan beraksen primary.
-        </Lead>
+      {/* 4. Dark mode Section */}
+      <ModeSection
+        name="List View"
+        stayDark
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengaktifkan tema gelap. Article memakai surface <Hl>gray-700</Hl>, teks bertingkat <Hl>gray-100</Hl> hingga <Hl>gray-300</Hl>, serta pin transparan beraksen primary.
+          </>
+        }
+      >
 
         <div className="space-y-8">
           <div className="space-y-5">
             {/* Desktop mewakili */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                   Desktop
                 </h4>
               </div>
@@ -825,7 +865,7 @@ export function ListViewPage() {
             {/* Mobile mewakili */}
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">
                   Mobile
                 </h4>
               </div>
@@ -859,9 +899,7 @@ export function ListViewPage() {
           {"import { Clock } from '@ceplok-ui/design-kit-react/icons/solid'\n\n"}
           {"{/* 1. Desktop — Dark Mode dengan Badge + Dekorasi */}\n"}
           {"<ListViewItem\n"}
-          {"  "}
-          <H>darkMode</H>
-          {"\n"}
+          {"  "}<H>darkMode</H>{"\n"}
           {"  "}
           <H>decoration</H>
           {"\n"}
@@ -869,7 +907,7 @@ export function ListViewPage() {
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {"  "}
           <H>badge</H>
-          {'={<Badge variant="success" size="sm" darkMode icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
+          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
           {'  actionLabel="Open"\n'}
           {"/>\n\n"}
           {"{/* 2. Mobile — Dark Mode dengan Badge + Dekorasi */}\n"}
@@ -877,9 +915,7 @@ export function ListViewPage() {
           {"  "}
           <H>platform</H>
           {'="mobile"\n'}
-          {"  "}
-          <H>darkMode</H>
-          {"\n"}
+          {"  "}<H>darkMode</H>{"\n"}
           {"  "}
           <H>decoration</H>
           {"\n"}
@@ -887,10 +923,10 @@ export function ListViewPage() {
           {"  metadata={['PDF', '2.4 MB', 'Updated Oct 10, 2026']}\n"}
           {"  "}
           <H>badge</H>
-          {'={<Badge variant="success" size="sm" darkMode icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
+          {'={<Badge variant="success" size="sm" icon={<Clock className="size-3.5" />}>Badge</Badge>}\n'}
           {"/>"}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       {/* 5. Playground Section */}
       <FlowSection id="playground" title="Playground">

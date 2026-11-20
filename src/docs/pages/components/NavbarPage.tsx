@@ -16,7 +16,7 @@ interface Config { platform: 'front-office' | 'back-office'; identity: Identity;
 const toc: TocEntry[] = [
   { id: 'navbar', label: 'Navbar' }, { id: 'front-office', label: 'Platform' }, { id: 'back-office', label: 'Identity & Account' }, { id: 'navigation', label: 'Navigation & Disclosure' }, { id: 'slots', label: 'Search & consumer slots' }, { id: 'responsive', label: 'Responsive behavior' }, { id: 'dark-mode', label: 'Dark mode' }, { id: 'playground', label: 'Playground' }, { id: 'penggunaan', label: 'Penggunaan' }, { id: 'properties', label: 'Properties' },
 ]
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 const bool = [{ value: true, label: 'Ada' }, { value: false, label: 'Tidak Ada' }]
 const widths = [375, 412, 440, 768, 1024, 1280, 1440] as const
 const navbarCodeHighlights = [
@@ -342,49 +342,50 @@ export function NavbarPage() {
     <FlowSection id="responsive" title="Responsive behavior"><Lead>Viewport berasal dari environment consumer, bukan prop Navbar. Pada BO desktop, consumer merender Sidebar aplikasi dan TOC halaman di layout konten. Pada mobile, Navbar merender sidebarItems dan sidebarUser di dialog Sidebar, menyajikan items melalui Drawer navigasi, lalu menaruh tableOfContents sebagai disclosure terakhir yang tertutup secara default. Search kategori BO tetap di baris kedua di bawah 576px; mulai 576px Search kembali ke baris utama agar ruang horizontal dipakai lebih efisien.</Lead><div className="grid gap-5 lg:grid-cols-2"><StaticExample title="FO mobile · 412px" config={base('front-office', 'authenticated', 4)} width={412} height={140} stageHeight={140}>{'<Navbar\n  '}<H>platform</H>{'="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  account={account}\n/>'}</StaticExample><StaticExample title="BO mobile · 458px" config={base('back-office', 'authenticated', 4)} width={458} height={140} stageHeight={140}>{'<Navbar\n  '}<H>platform</H>{'="back-office"\n  brand={brand}\n  items={navbarItems}\n  sidebarItems={sidebarItems}\n  sidebarUser={sidebarUser}\n  tableOfContents={tableOfContents}\n  search={searchWithSidebarCategories}\n/>'}</StaticExample></div></FlowSection>
     <ModeSection
       name="Navbar"
+      stayDark
       lead={<>Gunakan prop <H>darkMode</H> untuk menggelapkan Navbar beserta komponen di dalamnya. Tema ambient <H>data-theme</H>{'="dark"'} juga tetap didukung.</>}
     >
       <div className="space-y-8">
         <div className="space-y-8 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0">
           <StaticExample
-            title={`FO desktop ${docsDark ? 'Light' : 'Dark'}`}
-            config={{ ...base('front-office', 'guest', 4), theme: docsDark ? 'light' : 'dark' }}
+            title="FO desktop Dark"
+            config={{ ...base('front-office', 'guest', 4), theme: 'dark' }}
             width={1440}
             height={94}
             followDocsTheme={false}
           >
-            {`<Navbar platform="front-office" brand={brand} items={items} guestActions={guestActions}${docsDark ? '' : ' darkMode'} />`}
+            {'<Navbar platform="front-office" brand={brand} items={items} guestActions={guestActions} darkMode />'}
           </StaticExample>
           <StaticExample
-            title={`BO desktop ${docsDark ? 'Light' : 'Dark'}`}
-            config={{ ...base('back-office', 'authenticated', 4), theme: docsDark ? 'light' : 'dark' }}
+            title="BO desktop Dark"
+            config={{ ...base('back-office', 'authenticated', 4), theme: 'dark' }}
             width={1184}
             height={94}
             followDocsTheme={false}
           >
-            {`<Navbar platform="back-office" brand={brand} items={items} notificationTrigger={notificationTrigger}${docsDark ? '' : ' darkMode'} />`}
+            {'<Navbar platform="back-office" brand={brand} items={items} notificationTrigger={notificationTrigger} darkMode />'}
           </StaticExample>
         </div>
         <div className="grid gap-5 lg:grid-cols-2">
           <StaticExample
-            title={`FO mobile ${docsDark ? 'Light' : 'Dark'}`}
-            config={{ ...base('front-office', 'authenticated', 4), theme: docsDark ? 'light' : 'dark' }}
+            title="FO mobile Dark"
+            config={{ ...base('front-office', 'authenticated', 4), theme: 'dark' }}
             width={412}
             height={140}
             stageHeight={140}
             followDocsTheme={false}
           >
-            {`<Navbar platform="front-office" brand={brand} items={items} account={account}${docsDark ? '' : ' darkMode'} />`}
+            {'<Navbar platform="front-office" brand={brand} items={items} account={account} darkMode />'}
           </StaticExample>
           <StaticExample
-            title={`BO mobile ${docsDark ? 'Light' : 'Dark'}`}
-            config={{ ...base('back-office', 'authenticated', 4), theme: docsDark ? 'light' : 'dark' }}
+            title="BO mobile Dark"
+            config={{ ...base('back-office', 'authenticated', 4), theme: 'dark' }}
             width={458}
             height={140}
             stageHeight={140}
             followDocsTheme={false}
           >
-            {`<Navbar platform="back-office" brand={brand} items={items} notificationTrigger={notificationTrigger}${docsDark ? '' : ' darkMode'} />`}
+            {'<Navbar platform="back-office" brand={brand} items={items} notificationTrigger={notificationTrigger} darkMode />'}
           </StaticExample>
         </div>
       </div>

@@ -148,7 +148,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 function infoTrigger(label: string, darkMode = false, className = '') {
   return (
@@ -220,6 +220,7 @@ export function PopoverPage() {
 
       <ModeSection
         name="Popover"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengubah tema panel Popover. Tanpa prop tersebut, panel mengikuti
@@ -228,13 +229,13 @@ export function PopoverPage() {
           </>
         }
       >
-        <Stage maxWidth="max-w-[640px]" dark={!docsDark}>
+        <Stage maxWidth="max-w-[640px]" dark>
           <div className="flex min-h-32 items-center justify-center p-6">
             <Popover
-              trigger={infoTrigger(docsDark ? 'Buka Popover light mode' : 'Buka Popover dark mode', !docsDark)}
+              trigger={infoTrigger('Buka Popover dark mode', true)}
               title="Popover"
               side="top"
-              darkMode={!docsDark}
+              darkMode
             >
               {body}
             </Popover>
@@ -244,10 +245,10 @@ export function PopoverPage() {
           {"import { Icon, Popover } from '@ceplok-ui/design-kit-react'\n"}
           {"import { InfoCircle } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
           {'<Popover\n    '}
-          {!docsDark && <><H>darkMode</H>{'\n    '}</>}
+          <H>darkMode</H>{'\n    '}
           <H>trigger</H>
           {'={\n      <button\n        type="button"\n        aria-label="Buka informasi"\n        className="inline-flex size-9 items-center justify-center '}
-          {docsDark ? 'text-gray-500' : 'text-gray-400'}
+          {'text-gray-400'}
           {' focus-visible:outline-2"\n      >\n        <Icon><InfoCircle /></Icon>\n      </button>\n    }\n    '}
           <H>title</H>
           {'="Popover"\n    '}
