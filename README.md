@@ -586,7 +586,6 @@ navigasi mobile sendiri yang bersumber dari `items`.
 ```tsx
 import {
   Navbar,
-  Search,
   type NavbarAccount,
   type NavbarPrimaryItem,
 } from '@ceplok-ui/design-kit-react'
@@ -635,7 +634,6 @@ const items = [
 
 const account = {
   name: 'Siti Rahma',
-  initials: 'SR',
   items: [
     { id: 'profil', type: 'destination', label: 'Profil', href: '/profil' },
     {
@@ -654,14 +652,9 @@ export function FrontOfficeNavbar() {
       platform="front-office"
       brand={brand}
       items={items}
-      search={(
-        <Search
-          platform="compact"
-          showButton={false}
-          trigger="enter"
-          aria-label="Cari layanan"
-        />
-      )}
+      search={{
+        'aria-label': 'Cari layanan',
+      }}
       account={account}
     />
   )
@@ -700,7 +693,6 @@ tampilan current dari kontrak komponennya masing-masing.
 ```tsx
 import {
   Navbar,
-  Search,
   Sidebar,
   type NavbarPrimaryItem,
   type SidebarItem,
@@ -768,15 +760,11 @@ export function BackOfficeNavbar() {
           sidebarUser={sidebarUser}
           tableOfContents={{ items: tableOfContentsItems }}
           notificationTrigger={notificationTrigger}
-          search={
-            <Search
-              platform="compact"
-              showButton
-              categories={searchCategories}
-              categoryPlaceholder="Kategori"
-              onSearch={(query, category) => searchBackOffice(query, category)}
-            />
-          }
+          search={{
+            categories: searchCategories,
+            categoryPlaceholder: 'Kategori',
+            onSearch: (query, category) => searchBackOffice(query, category),
+          }}
         />
       </div>
     </div>
@@ -843,14 +831,20 @@ export function ReportsPage() {
 `brand` wajib pada kedua platform. Isi visualnya tetap dimiliki consumer
 melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
 
-- `search` menerima `ReactNode`. Gunakan `Search` dengan `platform="compact"`
-  dan `trigger="enter"`. FO umumnya memakai `showButton={false}`; Search BO
-  berkategori memakai `showButton` agar tombol ikon pada ruas kanan tersedia.
+- `search` menerima `NavbarSearchConfig` pada FO dan
+  `NavbarBackOfficeSearchConfig` pada BO; Navbar merender komponen `Search`
+  internal. Default FO adalah compact tanpa kategori dan tombol, sedangkan
+  default BO adalah compact, berkategori, dan bertombol. `categories` wajib
+  pada konfigurasi BO. Consumer tetap dapat mengubah `platform`, `showButton`,
+  `darkMode`, atau properti Search lainnya bila memang berbeda dari default.
 - Pada BO, `Search.categories` boleh diturunkan dari `sidebarItems` ketika
   domain pencarian sama. Jika domainnya berbeda, consumer boleh memberikan
   kategori custom dari satu sumber data pencarian yang terpisah.
-- `account` hanya untuk FO authenticated. Identitas dan aksi akun BO berada
-  pada `Sidebar.user`, lalu diteruskan sebagai `sidebarUser` untuk mobile.
+- `account` hanya untuk FO authenticated. `account.items` bersifat opsional:
+  tanpa item, Navbar menampilkan identitas tanpa trigger dropdown. Pada mobile,
+  identitas dan item akun FO digunakan kembali oleh area profil Sidebar.
+  Identitas dan aksi akun BO berada pada `Sidebar.user`, lalu diteruskan sebagai
+  `sidebarUser` untuk mobile.
 - `sidebarItems` hanya berlaku pada BO. Navbar tidak merender Sidebar desktop;
   consumer merender komponen tersebut di layout aplikasi dan memberikan data
   yang sama kepada Navbar untuk komposisi mobile.
@@ -864,12 +858,31 @@ melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
 - Drawer navigasi BO tidak memerlukan prop tersendiri: trigger dan isinya muncul
   otomatis pada mobile saat `items` tidak kosong.
 
-Tema Navbar mengikuti boundary ambient `data-theme` milik consumer. Gunakan
-`darkMode` untuk mengaktifkan tema gelap langsung pada Navbar; prop ini juga
-mewariskan mode ke komponen di dalamnya. Jika prop tidak diberikan, Navbar
-mewarisi `DarkModeContext` dari komponen pembungkus. Pada Navbar dengan Drawer
-atau Sidebar mobile, teruskan state tema yang sama melalui `darkMode` agar
-panel top-level tersebut ikut berganti ketika toggle tema berubah.
+Gunakan override hanya untuk kebutuhan yang berbeda dari default Navbar. Contoh
+berikut menampilkan tombol pada Search FO; tanpa `showButton`, nilainya kembali
+ke default FO yaitu `false`:
+
+```tsx
+<Navbar
+  platform="front-office"
+  brand={brand}
+  items={items}
+  search={{
+    'aria-label': 'Cari layanan',
+    showButton: true,
+  }}
+  account={account}
+/>
+```
+
+Mengubah `search.platform` dari `compact` juga mengubah tinggi Search dari
+37px mengikuti ukuran platform Search yang dipilih.
+
+Tema header Navbar mengikuti boundary ambient `data-theme` milik consumer.
+Prop `darkMode` mengatur tema Navbar beserta Drawer dan Sidebar mobile. Jika
+prop tidak diberikan, header mewarisi `DarkModeContext` dari komponen pembungkus.
+Search internal mengikuti tema efektif Navbar. Consumer hanya perlu memberi
+`search.darkMode` bila tema Search memang perlu berbeda dari Navbar.
 
 Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
 bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.

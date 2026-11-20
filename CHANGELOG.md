@@ -28,6 +28,25 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
     serta Sticky Post adalah contoh rekaan.
 
 ### Diubah
+- **Trigger contoh Dropdown mengikuti tema docs.** Tombol trigger pada preview
+  kini memakai komponen `Button` dengan `darkMode` saat docs atau Playground
+  gelap, sehingga menggunakan fallback filled putih milik Button, bukan palet
+  primary biru yang hanya digelapkan. Snippet Playground dan bagian Dark mode
+  ikut mengimpor Button serta menerapkan tema pada trigger milik consumer.
+- **Preview Navbar tidak berkedip terang saat mode gelap.** Tema kanvas iframe
+  kini diterapkan sebelum React dimuat dan tetap disinkronkan ketika kontrol
+  tema Playground berubah.
+- **Akun Navbar FO konsisten dengan Sidebar mobile.** `NavbarAccount.items`
+  kini opsional; tanpa item, identitas tampil tanpa dropdown. Pada mobile,
+  Navbar mengadaptasi satu sumber `account` ke area profil `Sidebar.user`.
+  Sidebar juga memakai komponen `Avatar`, termasuk inisial otomatis dari nama.
+  Contoh dasar tidak lagi mengisi `initials`; prop tersebut tetap tersedia
+  sebagai override, dan highlight Playground menandai field API yang relevan.
+- **`Navbar`: konfigurasi Search internal.** Prop `search` kini menerima opsi
+  Search, bukan `ReactNode`. Navbar memakai default compact tanpa kategori dan
+  tombol pada FO, serta compact berkategori dan bertombol pada BO. Default
+  `platform`, `showButton`, dan `darkMode` tetap dapat dioverride consumer.
+  Dokumentasi membedakan tipe FO/BO, kategori wajib BO, dan contoh override.
 - **`Modal`: aksi standar dan ikon Popup.** Prop `actions` menyediakan tombol
   `secondary`, `primary`, dan `danger` dengan urutan serta tampilan baku;
   `footer` tetap tersedia untuk override kustom dan tidak dapat dipakai

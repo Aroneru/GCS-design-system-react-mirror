@@ -7,9 +7,9 @@ import {
   User,
 } from '../../../lib/icons/outline'
 import {
+  Button,
   Checkbox,
   Dropdown,
-  Icon,
   Radio,
   type DropdownHandle,
   type DropdownGroup,
@@ -71,15 +71,6 @@ const variationMinHeights: Record<DropdownExample, string> = {
   checkbox: 'min-h-56',
   scroll: 'min-h-72',
 }
-
-const triggerClassName = [
-  'inline-flex h-10 items-center justify-center gap-2',
-  'rounded-lg bg-primary-700 px-4',
-  'text-base font-medium text-white',
-  'transition-colors duration-200 hover:bg-primary-800',
-  'focus:outline-none focus:ring-2 focus:ring-primary-400',
-  'disabled:pointer-events-none disabled:opacity-50',
-].join(' ')
 
 const selectionRowClassName = 'w-full rounded-md px-2 hover:bg-gray-100'
 const disabledSelectionRowClassName = 'w-full rounded-md px-2'
@@ -150,14 +141,11 @@ const groupProps: PropRow[] = [
   ['items', 'DropdownItem[]', 'required', 'Daftar item yang ditampilkan di dalam kelompok.'],
 ]
 
-function trigger(label = 'Dropdown button') {
+function trigger(label = 'Dropdown button', darkMode = false) {
   return (
-    <button type="button" className={triggerClassName}>
+    <Button darkMode={darkMode} rightIcon={<ChevronDown />}>
       {label}
-      <Icon className="!size-3.5">
-        <ChevronDown />
-      </Icon>
-    </button>
+    </Button>
   )
 }
 
@@ -263,15 +251,15 @@ function ContohDropdown({
   if (example === 'actions' || example === 'icons') {
     const withIcons = example === 'icons'
     return withSeparator ? (
-      <Dropdown darkMode={darkMode} align={align} closeOnSelect={closeOnSelect} trigger={trigger()} groups={kelompokAksi(opsi, withIcons)} aria-label="Daftar aksi" />
+      <Dropdown darkMode={darkMode} align={align} closeOnSelect={closeOnSelect} trigger={trigger('Dropdown button', darkMode)} groups={kelompokAksi(opsi, withIcons)} aria-label="Daftar aksi" />
     ) : (
-      <Dropdown darkMode={darkMode} align={align} closeOnSelect={closeOnSelect} trigger={trigger()} items={aksi(opsi, withIcons)} aria-label="Daftar aksi" />
+      <Dropdown darkMode={darkMode} align={align} closeOnSelect={closeOnSelect} trigger={trigger('Dropdown button', darkMode)} items={aksi(opsi, withIcons)} aria-label="Daftar aksi" />
     )
   }
 
   if (example === 'scroll') {
     return (
-      <Dropdown darkMode={darkMode} align={align} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
+      <Dropdown darkMode={darkMode} align={align} trigger={trigger('Dropdown button', darkMode)} contentClassName="p-4" aria-label="Pilih notifikasi dengan scroll">
         <div className={`flex max-h-48 flex-col gap-4 overflow-y-auto overscroll-y-contain ${darkMode ? darkScrollClassName : ''}`}>
           <ScrollContentItems {...opsi} darkMode={darkMode} />
         </div>
@@ -281,7 +269,7 @@ function ContohDropdown({
 
   if (example === 'radio') {
     return (
-      <Dropdown darkMode={darkMode} align={align} trigger={trigger()} contentClassName="p-4" aria-label="Pilih akses">
+      <Dropdown darkMode={darkMode} align={align} trigger={trigger('Dropdown button', darkMode)} contentClassName="p-4" aria-label="Pilih akses">
         <div className="flex flex-col gap-4">
           <Radio darkMode={darkMode} className={rowClassName} name={groupName} value="viewer" label="Viewer" />
           <Radio darkMode={darkMode} className={rowClassName} name={groupName} value="editor" label="Editor" helperText={withDescription ? 'Dapat mengubah konten.' : undefined} defaultChecked />
@@ -300,7 +288,7 @@ function ContohDropdown({
   }
 
   return (
-    <Dropdown darkMode={darkMode} align={align} trigger={trigger()} contentClassName="p-4" aria-label="Pilih notifikasi">
+    <Dropdown darkMode={darkMode} align={align} trigger={trigger('Dropdown button', darkMode)} contentClassName="p-4" aria-label="Pilih notifikasi">
       <div className="flex flex-col gap-4">
         <Checkbox darkMode={darkMode} className={rowClassName} label="Email" helperText={withDescription ? 'Kirim pembaruan melalui email.' : undefined} />
         <Checkbox darkMode={darkMode} className={rowClassName} label="Push notification" helperText={withDescription ? 'Tampilkan pada perangkat.' : undefined} defaultChecked />
@@ -349,7 +337,7 @@ function SelectionDemo({ darkMode = false }: { darkMode?: boolean }) {
     <Dropdown
       darkMode={darkMode}
       contentLabel="Urutan hasil"
-      trigger={trigger(`Urutkan: ${selected}`)}
+      trigger={trigger(`Urutkan: ${selected}`, darkMode)}
       items={options.map((label) => ({
         id: label,
         label,
@@ -367,7 +355,7 @@ function NavigationDemo({ darkMode = false }: { darkMode?: boolean }) {
     <div className="space-y-3 text-center">
       <Dropdown
         darkMode={darkMode}
-        trigger={trigger('Buka navigasi')}
+        trigger={trigger('Buka navigasi', darkMode)}
         items={[
           { id: 'overview', label: 'Ringkasan', href: '#navigation', current: true },
           {
@@ -403,7 +391,7 @@ function ManualCloseDemo({ darkMode = false }: { darkMode?: boolean }) {
 
   return (
     <div className="space-y-3 text-center">
-      <Dropdown darkMode={darkMode} trigger={trigger('Atur tampilan')} contentClassName="p-4">
+      <Dropdown darkMode={darkMode} trigger={trigger('Atur tampilan', darkMode)} contentClassName="p-4">
         {({ close }) => (
           <div className="w-56 space-y-3">
             <p className="text-sm text-content">
@@ -435,7 +423,7 @@ function ExternalCloseTypeExample({ darkMode = false }: { darkMode?: boolean }) 
       <Dropdown
         darkMode={darkMode}
         actionsRef={actionsRef}
-        trigger={trigger('Buka aksi')}
+        trigger={trigger('Buka aksi', darkMode)}
         items={[{ label: 'Simpan draf' }, { label: 'Publikasikan' }]}
       />
       <button
@@ -495,7 +483,7 @@ function SelectionPlayground({
       align={align}
       closeOnSelect={closeOnSelect}
       contentLabel="Urutan hasil"
-      trigger={trigger(`Urutkan: ${selected}`)}
+      trigger={trigger(`Urutkan: ${selected}`, darkMode)}
       {...(withSeparator
         ? {
             groups: [
@@ -553,7 +541,7 @@ function NavigationPlayground({
       darkMode={darkMode}
       align={align}
       closeOnSelect={closeOnSelect}
-      trigger={trigger('Buka navigasi')}
+      trigger={trigger('Buka navigasi', darkMode)}
       items={items}
     />
   )
@@ -622,12 +610,13 @@ function NavigationExampleCode({
 }) {
   return (
     <>
-      {"import { Dropdown } from '@ceplok-ui/design-kit-react'\n\n"}
+      {"import { Button, Dropdown } from '@ceplok-ui/design-kit-react'\n"}
+      {"import { ChevronDown } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
       {'<Dropdown\n'}
       {darkMode && <>{'  '}<H>darkMode</H>{'\n'}</>}
       {'  '}<H>align</H>{`="${align}"\n`}
       {'  '}<H>closeOnSelect</H>{`={${closeOnSelect}}\n`}
-      {'  trigger={<button type="button">Buka navigasi</button>}\n'}
+      {'  trigger={\n    <Button'}{darkMode && ' darkMode'}{' rightIcon={<ChevronDown />}>\n      Buka navigasi\n    </Button>\n  }\n'}
       {'  '}<H>items</H>{'={[\n'}
       {"    {\n      id: 'overview',\n      label: 'Ringkasan',\n"}
       {withDescription && "      description: 'Bagian navigasi pada halaman ini.',\n"}
@@ -696,10 +685,10 @@ function SelectionExampleCode({
       {' } from '}
       {"'react'"}
       {'\nimport { '}
-      {'Dropdown'}
+      {'Button, Dropdown'}
       {' } from '}
       {"'@ceplok-ui/design-kit-react'"}
-      {'\n\nfunction SortDropdown() {\n  const ['}
+      {'\nimport { ChevronDown } from \'@ceplok-ui/design-kit-react/icons/outline\'\n\nfunction SortDropdown() {\n  const ['}
       {'selected'}
       {', setSelected] = '}
       {'useState'}
@@ -718,7 +707,7 @@ function SelectionExampleCode({
       {'"Urutan hasil"'}
       {'\n      '}
       <H>trigger</H>
-      {'={<button type="button">Urutkan: {selected}</button>}\n'}
+      {'={\n        <Button'}{darkMode && ' darkMode'}{' rightIcon={<ChevronDown />}>\n          Urutkan: {selected}\n        </Button>\n      }\n'}
       {withSeparator ? (
         <>
           {'      '}<H>groups</H>{"={[\n        {\n          id: 'waktu',\n          label: 'Waktu',\n          items: [\n"}
@@ -786,7 +775,7 @@ function ExampleCode({
     )
   }
 
-  const imports = new Set(['Dropdown'])
+  const imports = new Set(['Button', 'Dropdown'])
   if (example === 'checkbox' || example === 'scroll') imports.add('Checkbox')
   if (example === 'radio') imports.add('Radio')
   const daftarImport = [...imports].sort((a, b) => a.localeCompare(b))
@@ -794,8 +783,8 @@ function ExampleCode({
   const withIcons = example === 'icons'
   const daftarAksi = example === 'actions' || example === 'icons'
 
-  const triggerCode =
-    '\nconst trigger = (\n  <button type="button" className="...">\n    Dropdown button\n  </button>\n)\n'
+  const iconImports = ['ChevronDown', ...(withIcons ? ['ArrowRightToBracket', 'Cog', 'QuestionCircle', 'User'] : [])]
+  const triggerCode = `\nimport { ${iconImports.join(', ')} } from '@ceplok-ui/design-kit-react/icons/outline'\n\nconst trigger = (\n  <Button${darkMode ? ' darkMode' : ''} rightIcon={<ChevronDown />}>\n    Dropdown button\n  </Button>\n)\n`
   return (
     <>
       {'import { '}
@@ -803,15 +792,6 @@ function ExampleCode({
       {' } from '}
       {"'@ceplok-ui/design-kit-react'"}
       {'\n'}
-      {withIcons && (
-        <>
-          {'import { '}
-          {'ArrowRightToBracket, Cog, QuestionCircle, User'}
-          {' } from '}
-          {"'@ceplok-ui/design-kit-react/icons/outline'"}
-          {'\n'}
-        </>
-      )}
       {triggerCode}
 
       {daftarAksi ? (
@@ -1007,9 +987,11 @@ export function DropdownPage() {
           </div>
         </Stage>
         <SectionCode>
+          {"import { Button, Dropdown } from '@ceplok-ui/design-kit-react'\n"}
+          {"import { ChevronDown } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
           {'<Dropdown\n'}
           {docsDark && '  darkMode\n'}
-          {'  trigger={<button type="button">Dropdown button</button>}\n  '}
+          {'  trigger={\n    <Button'}{docsDark && ' darkMode'}{' rightIcon={<ChevronDown />}>\n      Dropdown button\n    </Button>\n  }\n  '}
           <H>closeOnSelect</H>
           {'\n  '}
           <H>items</H>
@@ -1258,7 +1240,8 @@ export function DropdownPage() {
           <>
             Prop <Hl>darkMode</Hl> mengaktifkan tema gelap lokal pada Dropdown. Tanpa prop tersebut,
             Dropdown mewarisi tema dari boundary pembungkus. Untuk <Hl>children</Hl> kustom, styling
-            konten tetap menjadi tanggung jawab consumer.
+            konten tetap menjadi tanggung jawab consumer. Trigger juga milik consumer dan tidak
+            diubah oleh Dropdown; bila memakai Button, berikan <Hl>darkMode</Hl> yang sama.
           </>
         }
       >
@@ -1266,7 +1249,7 @@ export function DropdownPage() {
           <div className="flex min-h-72 items-start justify-center pt-3">
             <Dropdown
               darkMode
-              trigger={trigger()}
+              trigger={trigger('Dropdown button', true)}
               items={[
                 { label: 'Profil', icon: <User /> },
                 {
@@ -1279,8 +1262,9 @@ export function DropdownPage() {
           </div>
         </Stage>
         <SectionCode>
-          {"import { Dropdown } from '@ceplok-ui/design-kit-react'\n"}
-          {"import { ArrowRightToBracket, User } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
+          {"import { Button, Dropdown } from '@ceplok-ui/design-kit-react'\n"}
+          {"import { ArrowRightToBracket, ChevronDown, User } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
+          {'const trigger = (\n  <Button '}<H>darkMode</H>{' rightIcon={<ChevronDown />}>\n    Dropdown button\n  </Button>\n)\n\n'}
           {'<Dropdown\n'}
           {'  '}<H>darkMode</H>{'\n'}
           {'  '}<H>trigger</H>{'={trigger}\n  '}<H>items</H>{"={[\n    { label: 'Profil', icon: <User /> },\n    { label: 'Keluar', icon: <ArrowRightToBracket />, tone: 'danger' },\n  ]}\n/>"}

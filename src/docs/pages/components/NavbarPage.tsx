@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import { Home, InfoCircle } from 'flowbite-react-icons/outline'
-import { Navbar, Search, type NavbarAccountItem, type NavbarPrimaryItem, type NavbarProps, type SidebarItem } from '../../../lib'
+import { Navbar, type NavbarAccountItem, type NavbarPrimaryItem, type NavbarProps, type SidebarItem } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { nodeText } from '../../nodeText'
 import { tocForDarkDocs, useDocsDark, usePlaygroundDark } from '../../docsTheme'
@@ -22,8 +22,8 @@ const widths = [375, 412, 440, 768, 1024, 1280, 1440] as const
 const navbarCodeHighlights = [
   'Navbar', 'Search', 'Sidebar', 'NavbarAccount', 'NavbarPrimaryItem', 'NavbarNotificationTrigger', 'NavbarTableOfContents', 'SidebarItem', 'SidebarUser',
   'platform', 'brand', 'items', 'navbarItems', 'sidebarItems', 'sidebarUser', 'tableOfContents', 'search', 'searchCategories', 'guestActions', 'account', 'notificationTrigger',
-  'type', 'children', 'id', 'label', 'href', 'current', 'disabled', 'icon', 'tone',
-  'data-theme', 'darkMode', 'open', 'onOpenChange', 'controls', 'ariaLabel', 'trigger', 'showButton', 'categories', 'categoryPlaceholder', 'onClose', 'position', 'size',
+  'type', 'children', 'id', 'label', 'name', 'description', 'href', 'current', 'disabled', 'icon', 'tone', 'onClick',
+  'data-theme', 'darkMode', 'open', 'onOpenChange', 'controls', 'ariaLabel', 'aria-label', 'trigger', 'showButton', 'categories', 'categoryPlaceholder', 'onClose', 'position', 'size',
 ]
 
 function highlightNavbarCode(code: ReactNode, highlights: readonly string[] = navbarCodeHighlights): ReactNode {
@@ -49,12 +49,11 @@ const navbarProps: PropRow[] = [
   ['sidebarItems', 'SidebarItem[]', 'undefined', 'Khusus BO: navigasi Sidebar aplikasi yang dipakai Navbar pada mobile. Sidebar desktop tetap dirender consumer.'],
   ['sidebarUser', 'SidebarUser', 'undefined', 'Khusus BO: identitas dan aksi akun Sidebar yang digunakan kembali oleh Sidebar mobile.'],
   ['tableOfContents', 'NavbarTableOfContents', 'undefined', 'Khusus BO: section TableOfContents collapsible berjudul On this page setelah separator di bagian terbawah Drawer mobile. TOC desktop tetap dirender consumer.'],
-  ['search', 'ReactNode', 'undefined', 'Slot Search milik consumer. Pada BO gunakan varian kategori dengan pilihan yang diturunkan dari sidebarItems.'],
-  ['darkMode', 'boolean', 'undefined', 'Aktifkan tema gelap lokal dan teruskan mode ke komponen di dalam Navbar; jika tidak diisi, mewarisi DarkModeContext.'],
+  ['search', 'NavbarSearchConfig | NavbarBackOfficeSearchConfig', 'undefined', 'Konfigurasi Search internal. Default FO: compact tanpa kategori/tombol; default BO: compact berkategori dan bertombol, dengan categories wajib.'],
+  ['darkMode', 'boolean', 'undefined', 'Menggelapkan Navbar dan komponen internalnya, termasuk Search. Jika tidak diisi, Navbar mewarisi DarkModeContext.'],
   ['guestActions', 'NavbarGuestActions', 'undefined', 'Hanya FO guest; tidak dapat dikombinasikan dengan account atau notificationTrigger.'],
-  ['account', 'NavbarAccount', 'undefined', 'Hanya FO authenticated; tidak dapat dikombinasikan dengan guestActions.'],
+  ['account', 'NavbarAccount', 'undefined', 'Hanya FO authenticated; identitas tetap tampil tanpa menu ketika account.items tidak diisi, dan digunakan kembali oleh Sidebar mobile.'],
   ['notificationTrigger', 'NavbarNotificationTrigger', 'undefined', 'Konfigurasi tombol notifikasi bawaan. Pada BO independen dari identitas Sidebar.'],
-  ['darkMode', 'boolean', 'false', 'Mengaktifkan tema gelap Navbar sekaligus Drawer dan Sidebar mobile.'],
   ['mobileNavigationOpen', 'boolean', 'undefined', 'State terkontrol navigasi mobile. Jika tidak diisi, Navbar mengelola state internal.'],
   ['onMobileNavigationOpenChange', '(open: boolean) => void', 'undefined', 'Callback perubahan navigasi mobile.'],
   ['className / HTML attributes', 'HTMLAttributes<HTMLElement>', 'undefined', 'Atribut header standar, selain children.'],
@@ -63,11 +62,13 @@ const supportingTypes: PropRow[] = [
   ['NavbarBrand', '{ content; href; ariaLabel }', '—', 'Brand wajib: ReactNode, tujuan link, dan nama aksesibel.'],
   ['NavbarDestination', "{ type: 'destination'; id; label; href; … }", '—', 'Item anchor; mendukung icon, current untuk aria-current, disabled, target, rel, dan onClick.'],
   ['NavbarDisclosure', "{ type: 'disclosure'; id; label; children; … }", '—', 'Grup satu tingkat dengan children: NavbarDestination[].'],
-  ['NavbarAccount', '{ name; items; description?; avatarSrc?; initials? }', '—', 'Identitas dan menu account.'],
+  ['NavbarAccount', '{ name; items?; description?; avatarSrc?; initials? }', '—', 'Identitas akun FO; items opsional mengaktifkan menu. Avatar membuat inisial dari name, sedangkan initials hanya untuk override.'],
   ['NavbarAccountItem', "NavbarAccountDestination | NavbarAccountAction", '—', 'Destination atau action; keduanya mendukung tone default atau danger.'],
   ['NavbarGuestActions', '{ signIn; signUp? }', '—', 'Aksi guest; setiap link berisi label, href, dan onClick opsional.'],
   ['NavbarNotificationTrigger', '{ ariaLabel; onClick?; badge?; …buttonProps }', '—', 'Konfigurasi tombol Bell bawaan; consumer mengelola interaksi dan state panel.'],
   ['NavbarTableOfContents', '{ label?; items: TableOfContentsItem[] }', '—', 'Data untuk TableOfContents di disclosure mobile; label bawaan On this page. Gunakan items dan href yang sama dengan TOC desktop.'],
+  ['NavbarSearchConfig', 'SearchProps', '—', 'Konfigurasi Search FO. Navbar memberi default platform compact, showButton false, dan tema efektif Navbar.'],
+  ['NavbarBackOfficeSearchConfig', 'SearchProps & { categories: SearchCategory[] }', '—', 'Konfigurasi Search BO dengan categories wajib. Defaultnya compact, showButton true, dan tema efektif Navbar.'],
   ['SidebarItem', '{ id?; label; href?; children?; active?; disabled?; … }', '—', 'Data navigasi Sidebar BO yang dimiliki layout consumer dan dipakai Navbar pada mobile.'],
 ]
 
@@ -145,12 +146,13 @@ function Preview({ config }: { config: Config }) {
   ], [config.fixture])
   const brand = { content: <Brand compact={config.platform === 'back-office'} />, href: '/', ariaLabel: 'CEPLOK — Beranda' }
   const searchCategories = backOfficeSidebarItems.map(({ id, label }) => ({ value: id ?? label, label }))
-  const search = config.search ? <Search platform="compact" showButton={config.platform === 'back-office'} trigger="enter" aria-label="Cari dokumentasi" placeholder="Cari dokumentasi ..." categories={config.platform === 'back-office' ? searchCategories : undefined} categoryPlaceholder="Kategori" onSearch={(value, category) => setFeedback(`Pencarian demo: ${value}${category ? ` (${category})` : ''}`)} /> : undefined
-  const common = { brand, items: navItems, search, darkMode: config.theme === 'dark' }
+  const frontOfficeSearch = config.search ? { 'aria-label': 'Cari dokumentasi', placeholder: 'Cari dokumentasi ...', onSearch: (value: string, category: string) => setFeedback(`Pencarian demo: ${value}${category ? ` (${category})` : ''}`) } : undefined
+  const backOfficeSearch = config.search ? { ...frontOfficeSearch!, categories: searchCategories, categoryPlaceholder: 'Kategori' } : undefined
+  const common = { brand, items: navItems, darkMode: config.theme === 'dark' }
   const sidebarUser = { name: 'Admin CEPLOK', profileLabel: 'Administrator' }
   const intercept = (e: MouseEvent<HTMLDivElement>) => { const a = e.target instanceof Element ? e.target.closest('a') : null; if (!a || a.getAttribute('aria-disabled') === 'true') return; e.preventDefault(); setFeedback(`Navigasi demo: ${a.getAttribute('aria-label') || a.textContent?.trim() || 'Tautan'}`) }
   return <div data-theme={config.theme} data-navbar-platform={config.platform} className="overflow-hidden bg-surface text-content" onClick={intercept}>
-    {config.platform === 'front-office' ? (config.identity === 'authenticated' ? <Navbar platform="front-office" {...common} darkMode={config.theme === 'dark' || undefined} notificationTrigger={config.notification ? { ariaLabel: 'Buka pengaturan notifikasi', onClick: () => setFeedback('Aksi demo: Notifikasi') } : undefined} account={{ name: 'User CEPLOK', initials: 'US', items: accountItems }} /> : <Navbar platform="front-office" {...common} darkMode={config.theme === 'dark' || undefined} guestActions={config.identity === 'guest' ? { signIn: { label: 'Masuk', href: '/masuk' }, signUp: { label: 'Daftar', href: '/daftar' } } : undefined} />) : <Navbar platform="back-office" {...common} darkMode={config.theme === 'dark' || undefined} sidebarItems={backOfficeSidebarItems} sidebarUser={sidebarUser} notificationTrigger={config.notification ? { ariaLabel: 'Buka pengaturan notifikasi', onClick: () => setFeedback('Aksi demo: Notifikasi') } : undefined} />}
+    {config.platform === 'front-office' ? (config.identity === 'authenticated' ? <Navbar platform="front-office" {...common} search={frontOfficeSearch} notificationTrigger={config.notification ? { ariaLabel: 'Buka pengaturan notifikasi', onClick: () => setFeedback('Aksi demo: Notifikasi') } : undefined} account={{ name: 'User CEPLOK', items: accountItems }} /> : <Navbar platform="front-office" {...common} search={frontOfficeSearch} guestActions={config.identity === 'guest' ? { signIn: { label: 'Masuk', href: '/masuk' }, signUp: { label: 'Daftar', href: '/daftar' } } : undefined} />) : <Navbar platform="back-office" {...common} search={backOfficeSearch} sidebarItems={backOfficeSidebarItems} sidebarUser={sidebarUser} notificationTrigger={config.notification ? { ariaLabel: 'Buka pengaturan notifikasi', onClick: () => setFeedback('Aksi demo: Notifikasi') } : undefined} />}
     {feedback && <p role="status" aria-live="polite" className="border-t border-border bg-surface-subtle px-4 py-2 text-body-sm text-content-subtle">{feedback}</p>}
   </div>
 }
@@ -188,7 +190,8 @@ function PreviewFrame({ title, src, width, height = 220, stageHeight, showTitle 
   const usesSharedStage = stageHeight !== undefined
   const font = usePlaygroundFont()
   const frameSrc = font ? `${src}&font=${font}` : src
-  return <div className="space-y-2">{showTitle && <p className="text-sm font-semibold text-content">{title}</p>}<div className={`max-w-full overflow-hidden rounded-xl border p-3 ${dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'}`}><div ref={contentRef}><div className={usesSharedStage ? 'relative' : centered ? 'flex justify-center' : undefined} style={{ height: usesSharedStage ? stageHeight : height * scale }}><iframe title={title} src={frameSrc} loading={loading} tabIndex={interactive ? 0 : -1} className={interactive ? 'block shrink-0 border-0 bg-transparent' : 'pointer-events-none block shrink-0 border-0 bg-transparent'} style={usesSharedStage ? { position: 'absolute', top: '50%', left: 0, width, height, transform: `translateY(-50%) scale(${scale})`, transformOrigin: 'left center' } : { width, height, transform: `scale(${scale})`, transformOrigin: centered ? 'top center' : 'top left' }} /></div></div></div></div>
+  const frameBackground = dark ? 'var(--color-gray-900)' : 'var(--color-gray-50)'
+  return <div className="space-y-2">{showTitle && <p className="text-sm font-semibold text-content">{title}</p>}<div className={`max-w-full overflow-hidden rounded-xl border p-3 ${dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'}`}><div ref={contentRef}><div className={usesSharedStage ? 'relative' : centered ? 'flex justify-center' : undefined} style={{ height: usesSharedStage ? stageHeight : height * scale }}><iframe title={title} src={frameSrc} loading={loading} tabIndex={interactive ? 0 : -1} className={interactive ? 'block shrink-0 border-0' : 'pointer-events-none block shrink-0 border-0'} style={usesSharedStage ? { position: 'absolute', top: '50%', left: 0, width, height, backgroundColor: frameBackground, transform: `translateY(-50%) scale(${scale})`, transformOrigin: 'left center' } : { width, height, backgroundColor: frameBackground, transform: `scale(${scale})`, transformOrigin: centered ? 'top center' : 'top left' }} /></div></div></div></div>
 }
 function usageItemsCode(config: Config) {
   const disabledIndex = disabledNavigationIndex(config.menuCount, config.disclosure)
@@ -211,7 +214,6 @@ function usageAccountCode(config: Config) {
       : ''
   return `const account = {
   name: '${config.platform === 'back-office' ? 'Admin CEPLOK' : 'User CEPLOK'}',
-  initials: '${config.platform === 'back-office' ? 'AC' : 'US'}',
   items: [
     { id: 'profile', type: 'destination', label: 'Profil', href: '/profil'${profileState} },
     { id: 'settings', type: 'destination', label: 'Pengaturan akun', href: '/pengaturan-akun' },
@@ -224,7 +226,7 @@ function usageAccountCode(config: Config) {
 
 function PlaygroundUsageCode({ config }: { config: Config }) {
   if (config.platform === 'back-office') {
-    const imports = ['Navbar', ...(config.search ? ['Search'] : []), 'type NavbarPrimaryItem', 'type SidebarItem', 'type SidebarUser'].join(', ')
+    const imports = ['Navbar', 'type NavbarPrimaryItem', 'type SidebarItem', 'type SidebarUser'].join(', ')
     const searchCode = config.search
       ? 'const searchCategories = sidebarItems.map(({ id, label }) => ({ value: id ?? label, label }))\n\n'
       : ''
@@ -264,7 +266,7 @@ export function BackOfficeNavbar() {
       items={navbarItems}
       sidebarItems={sidebarItems}
       sidebarUser={sidebarUser}
-${config.search ? '      search={<Search platform="compact" showButton categories={searchCategories} categoryPlaceholder="Kategori" />}\n' : ''}${config.notification ? '      notificationTrigger={notificationTrigger}\n' : ''}    />
+${config.search ? '      search={{ categories: searchCategories, categoryPlaceholder: \'Kategori\' }}\n' : ''}${config.notification ? '      notificationTrigger={notificationTrigger}\n' : ''}    />
   )
 }`
     return <SectionCode flush>{highlightNavbarCode(code)}</SectionCode>
@@ -277,8 +279,8 @@ ${config.search ? '      search={<Search platform="compact" showButton categorie
   const hasIcons = config.icons
   const darkMode = config.theme === 'dark'
   const itemCode = usageItemsCode(config)
-  const imports = ['Navbar', ...(hasSearch ? ['Search'] : []), ...(hasAccount ? ['type NavbarAccount'] : []), 'type NavbarPrimaryItem'].join(', ')
-  const searchCode = hasSearch ? 'const search = (\n  <Search platform="compact" showButton={false} trigger="enter" aria-label="Cari dokumentasi" />\n)\n\n' : ''
+  const imports = ['Navbar', ...(hasAccount ? ['type NavbarAccount'] : []), 'type NavbarPrimaryItem'].join(', ')
+  const searchCode = hasSearch ? "const search = {\n  'aria-label': 'Cari dokumentasi',\n}\n\n" : ''
   const guestCode = hasGuestActions ? "const guestActions = {\n  signIn: { label: 'Masuk', href: '/masuk' },\n  signUp: { label: 'Daftar', href: '/daftar' },\n}\n\n" : ''
   const accountCode = hasAccount ? usageAccountCode(config) : ''
   const notificationCode = hasNotification ? "const notificationTrigger = { ariaLabel: 'Buka notifikasi', onClick: () => {} }\n\n" : ''
@@ -308,7 +310,7 @@ const staticExampleHighlights: Record<string, readonly string[]> = {
   Disclosure: ['type', 'children'],
   Disabled: ['disabled'],
   'Front Office Search & notification': ['search', 'notificationTrigger'],
-  'Back Office categorized Search & automatic navigation Drawer': ['Search', 'categories', 'categoryPlaceholder', 'sidebarItems', 'search'],
+  'Back Office categorized Search & automatic navigation Drawer': ['categories', 'categoryPlaceholder', 'sidebarItems', 'search'],
   'FO desktop Dark': ['darkMode'],
   'BO desktop Dark': ['darkMode'],
 }
@@ -339,12 +341,12 @@ export function NavbarPage() {
     <FlowSection id="front-office" title="Platform"><Lead>Front Office dan Back Office memiliki kontrak komposisi berbeda. Pada BO, items adalah navigasi Navbar desktop sekaligus Drawer navigasi mobile, sedangkan sidebarItems dan sidebarUser berasal dari Sidebar aplikasi yang dirender consumer pada desktop dan dipakai Navbar pada mobile.</Lead><div className="space-y-8"><StaticExample title="Front Office" config={base('front-office', 'guest', 4)} width={1440} height={94}>{'<Navbar\n  '}<H>platform</H>{'="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  guestActions={guestActions}\n/>'}</StaticExample><StaticExample title="Back Office" config={base('back-office', 'authenticated', 4)} width={1184} height={94}>{'<Navbar\n  '}<H>platform</H>{'="back-office"\n  brand={brand}\n  items={navbarItems}\n  sidebarItems={sidebarItems}\n  sidebarUser={sidebarUser}\n  search={search}\n  notificationTrigger={notificationTrigger}\n/>'}</StaticExample></div></FlowSection>
     <FlowSection id="back-office" title="Identity & Account"><Lead>FO guest memakai guestActions dan FO authenticated memakai account. Pada BO, identitas beserta aksi akun dimiliki Sidebar; Navbar hanya memakai sidebarUser kembali saat merender Sidebar mobile.</Lead><div className="space-y-8"><StaticExample title="FO guest" config={base('front-office', 'guest', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  '}<H>guestActions</H>{'={guestActions}\n/>'}</StaticExample><StaticExample title="FO authenticated" config={base('front-office', 'authenticated', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  '}<H>account</H>{'={account}\n/>'}</StaticExample><StaticExample title="Back Office identity in Sidebar" config={normalized({ ...base('back-office', 'authenticated', 4), notification: false })} width={1184} height={94}>{'<Sidebar user={sidebarUser} />\n<Navbar platform="back-office" sidebarUser={sidebarUser} />'}</StaticExample></div></FlowSection>
     <FlowSection id="navigation" title="Navigation & Disclosure"><Lead>Destination memakai anchor native; Disclosure, Lainnya, dan trigger mobile memakai button native. Pada destination utama, current diteruskan sebagai aria-current; Breadcrumb menyediakan konteks halaman secara visual. Dropdown tetap menangani tampilan current untuk baris menu sesuai kontraknya. Item yang tidak muat berpindah ke Lainnya tanpa dibuang. Disclosure dan panel yang dibuka dari trigger mendukung Escape serta mengembalikan fokus ke trigger yang masih terlihat; consumer tetap menangani route transition dan current state.</Lead><div className="space-y-8"><StaticExample title="Destination" config={normalized({ ...base('front-office', 'authenticated', 4), disclosure: false })} width={1440} height={94}>{"const items = [{ id: 'home', "}<H>type</H>{": 'destination', label: 'Beranda', href: '/beranda' }]"}</StaticExample><StaticExample title="Disclosure" config={base('front-office', 'authenticated', 4)} width={1440} height={94}>{"const items = [{ id: 'digital-services', "}<H>type</H>{": 'disclosure', label: 'Layanan Digital', "}<H>children</H>{": destinations }]"}</StaticExample><StaticExample title="Disabled" config={normalized({ ...base('front-office', 'authenticated', 4), disclosure: false, disabled: true })} width={1440} height={94}>{"const items = [{ id: 'public-information', type: 'destination', label: 'Informasi Publik', href: '/informasi-publik', "}<H>disabled</H>{': true }]'} </StaticExample></div><p className="mt-4 text-body-sm text-content-muted">Pada BO, items yang sama mempertahankan href, target, rel, disabled, dan current ketika dirender melalui Drawer mobile. Jangan gunakan role menu/menuitem tanpa model keyboard menu lengkap.</p></FlowSection>
-    <FlowSection id="slots" title="Search & consumer slots"><Lead>Search adalah slot consumer, sedangkan notificationTrigger mengonfigurasi tombol Bell bawaan Navbar. Pada BO, kategori dapat diturunkan dari sidebarItems ketika domain pencariannya sama, atau disediakan khusus oleh consumer. Navbar otomatis membentuk Drawer dari items; tableOfContents opsional ditambahkan sebagai disclosure terakhir untuk viewport mobile.</Lead><div className="space-y-8"><StaticExample title="Front Office Search & notification" config={base('front-office', 'authenticated', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  '}<H>search</H>{'={search}\n  '}<H>account</H>{'={account}\n  '}<H>notificationTrigger</H>{'={notificationTrigger}\n/>'}</StaticExample><StaticExample title="Back Office categorized Search & automatic navigation Drawer" config={base('back-office', 'authenticated', 4)} width={1184} height={94}>{"const searchCategories = sidebarItems.map(({ id, label }) => ({ value: id ?? label, label }))\n\n<Search categories={searchCategories} categoryPlaceholder=\"Kategori\" />\n\n<Navbar\n  platform=\"back-office\"\n  brand={brand}\n  items={navbarItems}\n  sidebarItems={sidebarItems}\n  sidebarUser={sidebarUser}\n  tableOfContents={tableOfContents}\n  search={searchWithSidebarCategories}\n/>"}</StaticExample></div><p className="mt-4 text-body-sm text-content-muted">Consumer boleh memetakan kategori dari sidebarItems atau memakai daftar domain pencarian tersendiri. Yang penting, daftar kategori berasal dari satu sumber data consumer dan tidak diduplikasi manual. Untuk filter, detail, atau panel kontekstual lain, render Drawer di luar Navbar.</p></FlowSection>
+    <FlowSection id="slots" title="Search & consumer slots"><Lead>Navbar merender Search internal dari konfigurasi consumer, sedangkan notificationTrigger mengonfigurasi tombol Bell bawaan Navbar. Search FO secara default compact tanpa kategori dan tombol; Search BO compact, berkategori, dan bertombol. Pada BO, kategori dapat diturunkan dari sidebarItems ketika domain pencariannya sama, atau disediakan khusus oleh consumer. Navbar otomatis membentuk Drawer dari items; tableOfContents opsional ditambahkan sebagai disclosure terakhir untuk viewport mobile.</Lead><div className="space-y-8"><StaticExample title="Front Office Search & notification" config={base('front-office', 'authenticated', 4)} width={1440} height={94}>{'<Navbar\n  platform="front-office"\n  brand={brand}\n  items={items}\n  '}<H>search</H>{'={search}\n  '}<H>account</H>{'={account}\n  '}<H>notificationTrigger</H>{'={notificationTrigger}\n/>'}</StaticExample><StaticExample title="Back Office categorized Search & automatic navigation Drawer" config={base('back-office', 'authenticated', 4)} width={1184} height={94}>{"const searchCategories = sidebarItems.map(({ id, label }) => ({ value: id ?? label, label }))\n\n<Navbar\n  platform=\"back-office\"\n  brand={brand}\n  items={navbarItems}\n  sidebarItems={sidebarItems}\n  sidebarUser={sidebarUser}\n  tableOfContents={tableOfContents}\n  search={{ categories: searchCategories, categoryPlaceholder: \"Kategori\" }}\n/>"}</StaticExample></div><p className="mt-4 text-body-sm text-content-muted">Consumer boleh memetakan kategori dari sidebarItems atau memakai daftar domain pencarian tersendiri. Properti Search seperti platform, showButton, dan darkMode tetap dapat dioverride melalui konfigurasi search bila kebutuhannya berbeda. Untuk filter, detail, atau panel kontekstual lain, render Drawer di luar Navbar.</p></FlowSection>
     <FlowSection id="responsive" title="Responsive behavior"><Lead>Viewport berasal dari environment consumer, bukan prop Navbar. Pada BO desktop, consumer merender Sidebar aplikasi dan TOC halaman di layout konten. Pada mobile, Navbar merender sidebarItems dan sidebarUser di dialog Sidebar, menyajikan items melalui Drawer navigasi, lalu menaruh tableOfContents sebagai disclosure terakhir yang tertutup secara default. Search kategori BO tetap di baris kedua di bawah 576px; mulai 576px Search kembali ke baris utama agar ruang horizontal dipakai lebih efisien.</Lead><div className="grid gap-5 lg:grid-cols-2"><StaticExample title="FO mobile · 412px" config={base('front-office', 'authenticated', 4)} width={412} height={140} stageHeight={140}>{'<Navbar\n  '}<H>platform</H>{'="front-office"\n  brand={brand}\n  items={items}\n  search={search}\n  account={account}\n/>'}</StaticExample><StaticExample title="BO mobile · 458px" config={base('back-office', 'authenticated', 4)} width={458} height={140} stageHeight={140}>{'<Navbar\n  '}<H>platform</H>{'="back-office"\n  brand={brand}\n  items={navbarItems}\n  sidebarItems={sidebarItems}\n  sidebarUser={sidebarUser}\n  tableOfContents={tableOfContents}\n  search={searchWithSidebarCategories}\n/>'}</StaticExample></div></FlowSection>
     <ModeSection
       name="Navbar"
       stayDark
-      lead={<>Gunakan prop <H>darkMode</H> untuk menggelapkan Navbar beserta komponen di dalamnya. Tema ambient <H>data-theme</H>{'="dark"'} juga tetap didukung.</>}
+      lead={<>Gunakan prop <H>darkMode</H> untuk menggelapkan Navbar serta Search, Drawer, dan Sidebar mobile. Tema ambient <H>data-theme</H>{'="dark"'} juga didukung. Search internal mengikuti tema efektif Navbar secara default; gunakan <H>search.darkMode</H> hanya bila perlu dioverride.</>}
     >
       <div className="space-y-8">
         <div className="space-y-8 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0">

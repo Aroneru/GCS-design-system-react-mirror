@@ -30,6 +30,7 @@ import {
   type DropdownDismissalScopeValue,
 } from './dropdown/DropdownDismissalContext'
 import { DarkModeContext, useInheritedDarkMode } from '../utils/darkModeContext'
+import { Search, type SearchCategory, type SearchProps } from './Search'
 import { Sidebar, type SidebarItem, type SidebarUser } from './sidebar/Sidebar'
 import { BarsFromLeft } from '../icons/outline'
 
@@ -93,7 +94,8 @@ export interface NavbarAccount {
   description?: string
   avatarSrc?: string
   initials?: ReactNode
-  items: NavbarAccountItem[]
+  /** Menu akun opsional. Tanpa item, identitas ditampilkan tanpa trigger dropdown. */
+  items?: NavbarAccountItem[]
 }
 
 export interface NavbarGuestLink {
@@ -119,10 +121,17 @@ export interface NavbarTableOfContents {
   items: TableOfContentsItem[]
 }
 
+/** Konfigurasi Search bawaan Navbar. Ukuran, tombol, dan tema memiliki default per platform. */
+export type NavbarSearchConfig = SearchProps
+
+/** Search Back Office selalu membutuhkan sumber kategori. */
+export type NavbarBackOfficeSearchConfig = NavbarSearchConfig & {
+  categories: SearchCategory[]
+}
+
 interface NavbarBaseProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
   brand: NavbarBrand
   items?: NavbarPrimaryItem[]
-  search?: ReactNode
   /** Tema gelap untuk Navbar, Drawer, Sidebar mobile, dan komponen di dalamnya. */
   darkMode?: boolean
   mobileNavigationOpen?: boolean
@@ -144,6 +153,8 @@ type FrontOfficeIdentity =
 export type NavbarFrontOfficeProps = NavbarBaseProps &
   FrontOfficeIdentity & {
     platform: 'front-office'
+    /** Search FO: compact, tanpa kategori, dan tanpa tombol secara default. */
+    search?: NavbarSearchConfig
     sidebarItems?: never
     sidebarUser?: never
     tableOfContents?: never
@@ -151,6 +162,8 @@ export type NavbarFrontOfficeProps = NavbarBaseProps &
 
 export interface NavbarBackOfficeProps extends NavbarBaseProps {
   platform: 'back-office'
+  /** Search BO: compact, berkategori, dan bertombol secara default. */
+  search?: NavbarBackOfficeSearchConfig
   /** Identitas dan aksi akun BO dimiliki Sidebar, bukan Navbar. */
   account?: never
   /** Konfigurasi trigger notifikasi, independen dari account karena identitas BO dapat berada di Sidebar. */
@@ -1214,6 +1227,7 @@ function AccountIdentity({
       <Avatar
         src={account.avatarSrc}
         alt={decorative ? '' : account.name}
+        name={account.name}
         initials={account.initials}
         size="default"
       />
@@ -1247,7 +1261,7 @@ function toDropdownAccountItem(item: NavbarAccountItem): DropdownItem {
 }
 
 function AccountMenu({ account, constrainName = false }: { account: NavbarAccount; constrainName?: boolean }) {
-  if (!account.items.length) return <AccountIdentity account={account} constrainName={constrainName} />
+  if (!account.items?.length) return <AccountIdentity account={account} constrainName={constrainName} />
 
   return (
     <Dropdown
@@ -1266,6 +1280,45 @@ function AccountMenu({ account, constrainName = false }: { account: NavbarAccoun
       items={account.items.map(toDropdownAccountItem)}
     />
   )
+}
+
+function toSidebarAccountUser(account: NavbarAccount, close: () => void): SidebarUser {
+  return {
+    name: account.name,
+    profileLabel: account.description,
+    avatarSrc: account.avatarSrc,
+    avatarAlt: account.name,
+    initials: account.initials,
+    items: account.items?.map((item) =>
+      item.type === 'destination'
+        ? {
+            id: item.id,
+            label: item.label,
+            icon: item.icon,
+            href: item.href,
+            target: item.target,
+            rel: item.rel,
+            tone: item.tone,
+            disabled: item.disabled,
+            onClick: (event) => {
+              const anchorEvent = event as Parameters<NonNullable<typeof item.onClick>>[0]
+              item.onClick?.(anchorEvent)
+              if (ordinaryActivation(anchorEvent)) close()
+            },
+          }
+        : {
+            id: item.id,
+            label: item.label,
+            icon: item.icon,
+            tone: item.tone,
+            disabled: item.disabled,
+            onClick: (event) => {
+              item.onClick(event as Parameters<NavbarAccountAction['onClick']>[0])
+              close()
+            },
+          },
+    ),
+  }
 }
 
 function NotificationTrigger({ ariaLabel, badge, className, type = 'button', ...buttonProps }: NavbarNotificationTrigger) {
@@ -1406,75 +1459,11 @@ function toMobileDrawerItem(item: NavbarPrimaryItem, close: () => void): DrawerM
   }
 }
 
-function MobileIdentity({
+function MobileGuestActions({
   platform,
-  account,
   guestActions,
   close,
-}: Pick<NavbarProps, 'platform' | 'account' | 'guestActions'> & { close: () => void }) {
-  if (account) {
-    return (
-      <div className="space-y-1 p-3">
-        <div className="flex items-center gap-2 px-3 py-2">
-          <Avatar src={account.avatarSrc} alt="" initials={account.initials} size="default" />
-          <span className="min-w-0">
-            <span className="block truncate font-sans text-sm leading-[1.5] font-medium text-content">{account.name}</span>
-            {account.description && (
-              <span className="block truncate text-xs text-content-subtle">{account.description}</span>
-            )}
-          </span>
-        </div>
-        {account.items.map((item) =>
-          item.type === 'destination' ? (
-            <a
-              key={item.id}
-              href={item.disabled ? undefined : item.href}
-              target={item.disabled ? undefined : item.target}
-              rel={item.disabled ? undefined : item.target === '_blank' ? (item.rel ?? 'noopener noreferrer') : item.rel}
-              aria-current={item.current ? 'page' : undefined}
-              aria-disabled={item.disabled || undefined}
-              onClick={
-                item.disabled
-                  ? undefined
-                  : (event) => {
-                      item.onClick?.(event)
-                      if (ordinaryActivation(event)) close()
-                    }
-              }
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-content hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-brand',
-                item.tone === 'danger' &&
-                  'text-feedback-error hover:text-feedback-error focus-visible:bg-surface-subtle active:bg-surface-subtle',
-                item.disabled && 'pointer-events-none opacity-50',
-              )}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </a>
-          ) : (
-            <button
-              key={item.id}
-              type="button"
-              disabled={item.disabled}
-              onClick={(event) => {
-                item.onClick(event)
-                close()
-              }}
-              className={cn(
-                'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-content hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50',
-                item.tone === 'danger' &&
-                  'text-feedback-error hover:text-feedback-error focus-visible:bg-surface-subtle active:bg-surface-subtle',
-              )}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </button>
-          ),
-        )}
-      </div>
-    )
-  }
-
+}: Pick<NavbarProps, 'platform' | 'guestActions'> & { close: () => void }) {
   if (platform !== 'front-office' || !guestActions) return null
 
   return (
@@ -1607,6 +1596,14 @@ export function Navbar(props: NavbarProps) {
   } = props
   const inheritedDarkMode = useInheritedDarkMode()
   const navbarDarkMode = darkMode ?? inheritedDarkMode
+  const searchElement = search ? (
+    <Search
+      {...search}
+      platform={search.platform ?? 'compact'}
+      showButton={search.showButton ?? platform === 'back-office'}
+      darkMode={search.darkMode ?? navbarDarkMode}
+    />
+  ) : null
   const navbarAccount = platform === 'front-office' ? account : undefined
   const headerTheme = navbarDarkMode
     ? 'dark'
@@ -1698,6 +1695,10 @@ export function Navbar(props: NavbarProps) {
     () => requestMobileOpen(false),
     [requestMobileOpen],
   )
+  const mobileAccountUser = useMemo(
+    () => navbarAccount ? toSidebarAccountUser(navbarAccount, closeMobileNavigation) : undefined,
+    [closeMobileNavigation, navbarAccount],
+  )
   const mobileItems = useMemo(
     () =>
       platform === 'back-office'
@@ -1747,7 +1748,7 @@ export function Navbar(props: NavbarProps) {
                 : 'min-w-[180px] w-[348px] max-w-[348px] flex-[0_1_348px]',
             )}
           >
-            {search}
+            {searchElement}
           </div>
         )}
         <CapacityAwareDesktopNavigation
@@ -1781,6 +1782,7 @@ export function Navbar(props: NavbarProps) {
                   <Avatar
                     src={navbarAccount.avatarSrc}
                     alt={navbarAccount.name}
+                    name={navbarAccount.name}
                     initials={navbarAccount.initials}
                     size="small"
                   />
@@ -1802,7 +1804,7 @@ export function Navbar(props: NavbarProps) {
             </div>
             {search && (
               <div className="mt-3 min-w-0">
-                {search}
+                {searchElement}
               </div>
             )}
           </>
@@ -1831,7 +1833,7 @@ export function Navbar(props: NavbarProps) {
             </div>
             {search && (
               <div className="col-span-4 row-start-2 min-w-0 min-[576px]:col-span-1 min-[576px]:col-start-3 min-[576px]:row-start-1">
-                {search}
+                {searchElement}
               </div>
             )}
             {notificationTrigger && (
@@ -1847,7 +1849,7 @@ export function Navbar(props: NavbarProps) {
                     : 'col-start-3 min-[576px]:col-start-4',
               )}>
                 <Drawer.Trigger
-                  darkMode={darkMode}
+                  darkMode={navbarDarkMode}
                   aria-label="Buka navigasi Navbar"
                   aria-controls={drawerId}
                   aria-expanded={drawerOpen}
@@ -1890,12 +1892,11 @@ export function Navbar(props: NavbarProps) {
             className="h-full !min-h-0 shadow-soft"
             logo={<Brand brand={brand} />}
             items={mobileItems}
-            user={platform === 'back-office' ? sidebarUser : undefined}
-            darkMode={darkMode}
+            user={platform === 'back-office' ? sidebarUser : mobileAccountUser}
+            darkMode={navbarDarkMode}
             footer={
-              <MobileIdentity
+              <MobileGuestActions
                 platform={platform}
-                account={navbarAccount}
                 guestActions={guestActions}
                 close={() => closeMobileNavigation()}
               />
@@ -1920,7 +1921,7 @@ export function Navbar(props: NavbarProps) {
           onClose={() => requestDrawerOpen(false)}
           position="right"
           size="s"
-          darkMode={darkMode}
+          darkMode={navbarDarkMode}
           aria-label="Menu"
           eyebrow="Menu"
           items={mobileDrawerItems}
@@ -1930,7 +1931,7 @@ export function Navbar(props: NavbarProps) {
                 tableOfContents={tableOfContents}
                 onItemClick={() => requestDrawerOpen(false)}
                 separated={mobileDrawerItems.length > 0}
-                darkMode={darkMode}
+                darkMode={navbarDarkMode}
               />
             ) : undefined
           }

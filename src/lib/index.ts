@@ -205,6 +205,8 @@ export type {
   NavbarPrimaryItem,
   NavbarNotificationTrigger,
   NavbarTableOfContents,
+  NavbarSearchConfig,
+  NavbarBackOfficeSearchConfig,
   NavbarAccountDestination,
   NavbarAccountAction,
   NavbarAccountItem,

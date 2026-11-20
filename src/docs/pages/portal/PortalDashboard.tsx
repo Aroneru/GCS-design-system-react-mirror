@@ -7,7 +7,6 @@ import {
   Icon,
   ListView,
   Navbar,
-  Search,
   Select,
   Sidebar,
   Toast,
@@ -613,15 +612,75 @@ export function PortalDashboard({
           collapsed={ringkas}
           onCollapse={() => setRingkas((v) => !v)}
           darkMode={darkMode}
+          footer={
+            onDarkModeChange ? (
+              ringkas ? (
+                <div className="flex justify-center p-3">
+                  <Button
+                    iconOnly
+                    variant="outline"
+                    size="s"
+                    aria-label={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
+                    aria-pressed={darkMode}
+                    title={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
+                    onClick={() => onDarkModeChange(!darkMode)}
+                    darkMode={darkMode}
+                  >
+                    {darkMode ? <Sun /> : <Moon />}
+                  </Button>
+                </div>
+              ) : (
+                <div className="px-5 py-4">
+                  <div
+                    role="group"
+                    aria-label="Pilih tema"
+                    className="relative grid grid-cols-2 overflow-hidden rounded-full border border-border bg-surface-subtle p-1"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute top-1/2 left-1/2 z-10 h-7 -translate-x-1/2 -translate-y-1/2 border-l border-border"
+                    />
+                    <button
+                      type="button"
+                      aria-label="Gunakan mode terang"
+                      aria-pressed={!darkMode}
+                      onClick={() => onDarkModeChange(false)}
+                      className={cn(
+                        'flex h-9 items-center justify-center rounded-full border border-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
+                        !darkMode
+                          ? 'border-primary-700 text-primary-700 hover:bg-primary-50'
+                          : 'text-content-muted hover:text-content',
+                      )}
+                    >
+                      <Sun className="size-5" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Gunakan mode gelap"
+                      aria-pressed={darkMode}
+                      onClick={() => onDarkModeChange(true)}
+                      className={cn(
+                        'flex h-9 items-center justify-center rounded-full border border-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
+                        darkMode
+                          ? 'border-gray-50 text-gray-50 hover:bg-white hover:text-gray-700'
+                          : 'text-content-muted hover:text-content',
+                      )}
+                    >
+                      <Moon className="size-5" aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+              )
+            ) : undefined
+          }
         />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Navbar ikut gelap lewat `data-theme` di akar. Garis field Search
-            gray-600 di mode gelap; yang ditimpa variabel palet gelapnya, karena
-            Search ber-`darkMode` memasang `data-theme` sendiri dan akan menimpa
-            token biasa. Tanpa itu ruas kategorinya lebur dengan header gray-700. */}
-        <div className="relative">
+        {/* Navbar dan Search internal mengikuti tema efektif yang sama. Garis
+            field Search memakai gray-600 di mode gelap agar ruas kategorinya
+            tidak melebur dengan header gray-700. */}
+        <div className="sticky top-0 z-20">
           <Navbar
             platform="back-office"
             darkMode={darkMode}
@@ -634,23 +693,18 @@ export function PortalDashboard({
             items={navbarItems}
             sidebarItems={menuSidebar}
             sidebarUser={sidebarUser}
-            search={
-              <Search
-                platform="compact"
-                categories={KATEGORI}
-                categoryPlaceholder="Pilih"
-                category={kategori}
-                onCategoryChange={setKategori}
-                placeholder="Pencarian"
-                aria-label="Pencarian"
-                buttonLabel="Cari"
-                trigger="enter"
-                value={kata}
-                onChange={(e) => setKata(e.target.value)}
-                onSearch={cari}
-                darkMode={darkMode}
-              />
-            }
+            search={{
+              categories: KATEGORI,
+              categoryPlaceholder: 'Pilih',
+              category: kategori,
+              onCategoryChange: setKategori,
+              placeholder: 'Pencarian',
+              'aria-label': 'Pencarian',
+              buttonLabel: 'Cari',
+              value: kata,
+              onChange: (e) => setKata(e.target.value),
+              onSearch: cari,
+            }}
             notificationTrigger={{
               ariaLabel: 'Notifikasi',
               badge: 5,
@@ -658,25 +712,11 @@ export function PortalDashboard({
               onClick: () => kabari('Ada 5 notifikasi baru.'),
             }}
           />
-          {onDarkModeChange && (
-            <Button
-              iconOnly
-              variant="outline"
-              size="s"
-              aria-label="Mode gelap"
-              aria-pressed={darkMode}
-              title={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
-              className="absolute top-[18px] right-[116px] z-10 sm:right-[120px] lg:top-[28px] lg:right-[84px]"
-              onClick={() => onDarkModeChange(!darkMode)}
-              darkMode={darkMode}
-            >
-              {darkMode ? <Sun /> : <Moon />}
-            </Button>
-          )}
         </div>
 
-        {/* Toast di kanan atas, tepat di bawah header. */}
-        <div className="fixed top-22 right-4 z-30 w-80 max-w-[calc(100vw-2rem)] sm:right-6">
+        {/* Beri jarak 8px dari Navbar: tingginya 140px saat Search BO berada
+            di baris kedua, lalu 94px mulai viewport 576px. */}
+        <div className="fixed top-[148px] right-4 z-30 w-80 max-w-[calc(100vw-2rem)] min-[576px]:top-[102px] sm:right-6">
           <Toast
             open={umpan.tampil}
             onDismiss={() => setUmpan((u) => ({ ...u, tampil: false }))}
@@ -855,7 +895,7 @@ export function PortalDashboard({
                         </p>
                       </div>
                     </div>
-                    <Button theme="gray" size="s" disabled className="min-w-36" darkMode={darkMode}>
+                    <Button theme="gray" size="s" disabled className="w-40" darkMode={darkMode}>
                       SUDAH CHECK IN
                     </Button>
                   </div>
@@ -874,7 +914,7 @@ export function PortalDashboard({
                     <Button
                       theme="primary"
                       size="s"
-                      className="min-w-36"
+                      className="w-40"
                       onClick={() => kabari('Check-out belum ada di contoh ini.')}
                       darkMode={darkMode}
                     >
@@ -980,7 +1020,8 @@ export function PortalDashboard({
                       variant="outline"
                       theme="primary"
                       size="s"
-                      leftIcon={<CirclePlus className="size-4" />}
+                      leftIcon={<CirclePlus className="size-6" />}
+                      className="[&>span:first-child]:size-6"
                       onClick={() => kabari('Halaman buat forum belum ada di contoh ini.')}
                       darkMode={darkMode}
                     >

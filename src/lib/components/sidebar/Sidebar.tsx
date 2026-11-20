@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronLeft } from "flowbite-react-icons/outline";
 import { cn } from "../../utils/cn";
+import { Avatar } from "../Avatar";
 import { SidebarNavigation } from "./SidebarNavigation";
 import type {
   SidebarProps,
@@ -20,31 +21,19 @@ export type {
 } from "./SidebarTypes";
 
 function renderUserAvatar(user: SidebarUser, collapsed: boolean, darkMode?: boolean) {
-  const avatarSrc = user.avatarSrc ?? user.avatar;
-  const initial = user.initials ?? (user.name ? user.name.slice(0, 1).toUpperCase() : "?");
-
-  return avatarSrc ? (
-    <img
-      src={avatarSrc}
+  return (
+    <Avatar
+      src={user.avatarSrc ?? user.avatar}
       alt={user.avatarAlt ?? user.name}
+      name={user.name}
+      initials={user.initials}
+      size="default"
+      darkMode={darkMode}
       className={cn(
-        "size-9 shrink-0 rounded-full object-cover",
-        collapsed && "ring-2 ring-transparent transition hover:ring-primary-500",
+        "transition",
+        collapsed && "ring-2 ring-transparent hover:ring-primary-500",
       )}
     />
-  ) : (
-    <span
-      className={cn(
-        "flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition",
-        darkMode
-          ? "bg-primary-900 text-primary-300"
-          : "bg-primary-100 text-primary-700 in-data-[theme=dark]:bg-primary-900 in-data-[theme=dark]:text-primary-300",
-        collapsed && "hover:ring-2 hover:ring-primary-500",
-      )}
-      aria-hidden="true"
-    >
-      {initial}
-    </span>
   );
 }
 
@@ -326,7 +315,8 @@ export function Sidebar({
                                     item.onClick?.(e);
                                     setUserMenuOpen(false);
                                   }}
-                                  {...(item.external ? { target: "_blank", rel: "noreferrer noopener" } : {})}
+                                  target={item.external ? "_blank" : item.target}
+                                  rel={item.external ? "noreferrer noopener" : item.rel}
                                   className={itemClasses}
                                 >
                                   {content}
