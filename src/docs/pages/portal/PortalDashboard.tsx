@@ -708,7 +708,6 @@ export function PortalDashboard({
             notificationTrigger={{
               ariaLabel: 'Notifikasi',
               badge: 5,
-              className: 'lg:ml-12',
               onClick: () => kabari('Ada 5 notifikasi baru.'),
             }}
           />

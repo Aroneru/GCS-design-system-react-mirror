@@ -655,11 +655,34 @@ export function ModalPage() {
           dari generated snippet; pilihan false ditulis eksplisit. Fungsi footer close()
           tetap meminta penutupan pada semua kombinasi.
         </p>
+        <h3 className="mt-8 text-sm font-black text-gray-900 dark:text-white">State internal</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
+          Modal berikut menyimpan visibilitasnya sendiri karena tidak menerima <Hl>open</Hl>.
+          Trigger membuka dialog, sedangkan aksi eksplisit menutupnya.
+        </p>
+        <div className="mt-4">
+          <Modal
+            darkMode={docsDark}
+            trigger={<Button darkMode={docsDark}>Buka Modal</Button>}
+            title="Konfirmasi"
+            closeOnBackdrop={false}
+            closeOnEscape={false}
+            showCloseButton={false}
+            actions={{ primary: { label: 'Saya Mengerti', onClick: ({ close }) => close() } }}
+          >
+            <p>Baca informasi sebelum melanjutkan.</p>
+          </Modal>
+        </div>
         <SectionCode>
           {`<Modal${docsDarkModeProp}\n  trigger={<Button${docsDarkModeProp}>Buka Modal</Button>}\n  title="Konfirmasi"\n  `}
           <Mark>closeOnBackdrop</Mark>{'={false}\n  '}<Mark>closeOnEscape</Mark>{'={false}\n  '}
           <Mark>showCloseButton</Mark>{'={false}\n  actions={{ primary: { label: "Saya Mengerti", onClick: ({ close }) => close() } }}\n>\n  <p>Baca informasi sebelum melanjutkan.</p>\n</Modal>'}
         </SectionCode>
+        <h3 className="mt-8 text-sm font-black text-gray-900 dark:text-white">State terkontrol</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
+          Pada contoh ini, consumer menjadi sumber kebenaran melalui <Hl>open</Hl> dan{' '}
+          <Hl>onOpenChange</Hl>.
+        </p>
         <ControlledModalExample theme={docsTheme} />
         <SectionCode>
           {`import { useState } from 'react'\nimport { Button, Modal } from '@ceplok-ui/design-kit-react'\n\nexport function ControlledModalExample() {\n  const [open, setOpen] = useState(false)\n\n  return (\n    <div>\n      <Button${docsDarkModeProp} onClick={() => setOpen(true)}>Edit data</Button>\n\n      <Modal${docsDarkModeProp}\n        `}

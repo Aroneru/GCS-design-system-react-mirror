@@ -178,6 +178,7 @@ export function NavbarPlaygroundPreview() {
 function PreviewFrame({ title, src, width, height = 220, stageHeight, showTitle = true, loading = 'eager', dark = false, interactive = true, centered = false }: { title: string; src: string; width: number; height?: number; stageHeight?: number; showTitle?: boolean; loading?: 'eager' | 'lazy'; dark?: boolean; interactive?: boolean; centered?: boolean }) {
   const contentRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
+  const [shouldLoad, setShouldLoad] = useState(loading === 'eager')
   useEffect(() => {
     const content = contentRef.current
     if (!content) return
@@ -187,11 +188,57 @@ function PreviewFrame({ title, src, width, height = 220, stageHeight, showTitle 
     observer.observe(content)
     return () => observer.disconnect()
   }, [width])
+  useEffect(() => {
+    if (shouldLoad || loading === 'eager') return
+    const content = contentRef.current
+    if (!content || typeof IntersectionObserver === 'undefined') {
+      setShouldLoad(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return
+        setShouldLoad(true)
+        observer.disconnect()
+      },
+      { rootMargin: '300px 0px' },
+    )
+    observer.observe(content)
+    return () => observer.disconnect()
+  }, [loading, shouldLoad])
   const usesSharedStage = stageHeight !== undefined
   const font = usePlaygroundFont()
   const frameSrc = font ? `${src}&font=${font}` : src
   const frameBackground = dark ? 'var(--color-gray-900)' : 'var(--color-gray-50)'
-  return <div className="space-y-2">{showTitle && <p className="text-sm font-semibold text-content">{title}</p>}<div className={`max-w-full overflow-hidden rounded-xl border p-3 ${dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'}`}><div ref={contentRef}><div className={usesSharedStage ? 'relative' : centered ? 'flex justify-center' : undefined} style={{ height: usesSharedStage ? stageHeight : height * scale }}><iframe title={title} src={frameSrc} loading={loading} tabIndex={interactive ? 0 : -1} className={interactive ? 'block shrink-0 border-0' : 'pointer-events-none block shrink-0 border-0'} style={usesSharedStage ? { position: 'absolute', top: '50%', left: 0, width, height, backgroundColor: frameBackground, transform: `translateY(-50%) scale(${scale})`, transformOrigin: 'left center' } : { width, height, backgroundColor: frameBackground, transform: `scale(${scale})`, transformOrigin: centered ? 'top center' : 'top left' }} /></div></div></div></div>
+  const frameStyle = usesSharedStage
+    ? { position: 'absolute' as const, top: '50%', left: 0, width, height, backgroundColor: frameBackground, transform: `translateY(-50%) scale(${scale})`, transformOrigin: 'left center' }
+    : { width, height, backgroundColor: frameBackground, transform: `scale(${scale})`, transformOrigin: centered ? 'top center' : 'top left' }
+  return (
+    <div className="space-y-2">
+      {showTitle && <p className="text-sm font-semibold text-content">{title}</p>}
+      <div className={`max-w-full overflow-hidden rounded-xl border p-3 ${dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'}`}>
+        <div ref={contentRef}>
+          <div
+            className={usesSharedStage ? 'relative' : centered ? 'flex justify-center' : undefined}
+            style={{ height: usesSharedStage ? stageHeight : height * scale }}
+          >
+            {shouldLoad ? (
+              <iframe
+                title={title}
+                src={frameSrc}
+                loading={loading}
+                tabIndex={interactive ? 0 : -1}
+                className={interactive ? 'block shrink-0 border-0' : 'pointer-events-none block shrink-0 border-0'}
+                style={frameStyle}
+              />
+            ) : (
+              <div aria-hidden="true" className="block shrink-0" style={frameStyle} />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 function usageItemsCode(config: Config) {
   const disabledIndex = disabledNavigationIndex(config.menuCount, config.disclosure)
