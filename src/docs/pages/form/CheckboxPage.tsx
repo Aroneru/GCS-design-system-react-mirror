@@ -53,7 +53,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function CheckboxPage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -70,13 +70,13 @@ export function CheckboxPage() {
     setDipilih((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]))
 
   // Potongan `darkMode` di cuplikan bagian Dark mode, sebagai atribut sebaris
-  // dan sebagai baris sendiri. Hilang selama bagian itu menjadi Light mode.
-  const atributDarkMode = !docsDark && (
+  // dan sebagai baris sendiri.
+  const atributDarkMode = (
     <>
       <H>darkMode</H>{' '}
     </>
   )
-  const barisDarkMode = !docsDark && (
+  const barisDarkMode = (
     <>
       {'    '}
       <H>darkMode</H>
@@ -268,6 +268,7 @@ export function CheckboxPage() {
 
       <ModeSection
         name="Checkbox"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengganti kotak ke gray-700 bergaris gray-600, dengan label putih dan caption
@@ -276,18 +277,18 @@ export function CheckboxPage() {
           </>
         }
       >
-        <Demo dark={!docsDark} light={docsDark}>
+        <Demo dark>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <Checkbox darkMode={!docsDark} label="Belum dicentang" helperText="Keterangan singkat." />
-            <Checkbox darkMode={!docsDark} label="Sudah dicentang" helperText="Keterangan singkat." defaultChecked />
+            <Checkbox darkMode label="Belum dicentang" helperText="Keterangan singkat." />
+            <Checkbox darkMode label="Sudah dicentang" helperText="Keterangan singkat." defaultChecked />
             <Checkbox
-              darkMode={!docsDark}
+              darkMode
               state="inactive"
               label="Tidak aktif"
               helperText="Keterangan singkat."
             />
             <Checkbox
-              darkMode={!docsDark}
+              darkMode
               state="inactive"
               label="Tidak aktif, tercentang"
               helperText="Keterangan singkat."

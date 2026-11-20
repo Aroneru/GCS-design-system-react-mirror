@@ -50,7 +50,7 @@ const searchProps: PropRow[] = [
   ['categoryPlaceholder', 'string', 'Kategori', 'Teks dropdown saat kategori belum dipilih.'],
   ['category / defaultCategory', 'string', 'undefined', 'Kategori terpilih, terkendali maupun tidak.'],
   ['onCategoryChange', '(value: string) => void', 'undefined', 'Dipanggil saat kategori berganti.'],
-  ['darkMode', 'boolean', 'false', 'Tampilan gelap: warna abu-abu gelap dengan teks terang.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: warna abu-abu gelap, teks terang, dan border tipis gray-500 seperti List View.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (value, onChange, placeholder, name, …).'],
 ]
 
@@ -65,7 +65,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function SearchPage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -216,33 +216,30 @@ export function SearchPage() {
 
       <ModeSection
         name="Search Form"
+        stayDark
         lead={
           <>
-            Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, dan batas.
+            Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, serta menambahkan border tipis gray-500 agar batas field tetap terlihat pada permukaan gelap.
           </>
         }
       >
         <div className="grid gap-5">
-          <Demo label="Default" dark={!docsDark} light={docsDark}>
-            <Search placeholder={PLACEHOLDER} darkMode={!docsDark} />
+          <Demo label="Default" dark>
+            <Search placeholder={PLACEHOLDER} darkMode />
           </Demo>
-          <Demo label="Dengan Kategori" dark={!docsDark} light={docsDark}>
+          <Demo label="Dengan Kategori" dark>
             <div className="max-w-[882px]">
               <Search
                 categories={kategori}
                 placeholder={PLACEHOLDER}
-                darkMode={!docsDark}
+                darkMode
               />
             </div>
           </Demo>
         </div>
         <SectionCode>
           {'<Search '}
-          {!docsDark && (
-            <>
-              <H>darkMode</H>{' '}
-            </>
-          )}
+          <H>darkMode</H>{' '}
           {'placeholder="Search Civitas, Organisasi…" />'}
         </SectionCode>
       </ModeSection>

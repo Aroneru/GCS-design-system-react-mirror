@@ -56,7 +56,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function FloatingLabelPage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -213,6 +213,7 @@ export function FloatingLabelPage() {
 
       <ModeSection
         name="Floating Label"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengganti kotak ke gray-700 bergaris gray-600, dengan teks, ikon, dan tombol hapus
@@ -223,9 +224,9 @@ export function FloatingLabelPage() {
       >
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
-            <Demo key={s.value} label={s.label} dark={!docsDark} light={docsDark}>
+            <Demo key={s.value} label={s.label} dark>
               <FloatingLabel
-                darkMode={!docsDark}
+                darkMode
                 state={s.value}
                 label="Placeholder Text"
                 defaultValue={s.value === 'default' ? undefined : 'Text Input'}
@@ -238,11 +239,7 @@ export function FloatingLabelPage() {
         </div>
         <SectionCode>
           {'<FloatingLabel '}
-          {!docsDark && (
-            <>
-              <H>darkMode</H>{' '}
-            </>
-          )}
+          <H>darkMode</H>{' '}
           {'label="Nama lengkap" />'}
         </SectionCode>
       </ModeSection>

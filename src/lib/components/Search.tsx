@@ -327,6 +327,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
           role="search"
           className={cn(
             'group flex items-stretch bg-search-category-surface',
+            'in-data-[theme=dark]:ring-1 in-data-[theme=dark]:ring-inset in-data-[theme=dark]:ring-gray-500',
             compactCategory ? 'h-[37px] rounded-lg' : 'h-[39px] rounded-[10px]',
           )}
         >
@@ -444,6 +445,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
           role="search"
           className={cn(
             'flex items-center gap-2 rounded-lg border px-2.5 transition-colors',
+            'in-data-[theme=dark]:ring-1 in-data-[theme=dark]:ring-inset in-data-[theme=dark]:ring-gray-500',
             disabled ? 'border-field-border bg-field-disabled' : 'border-field-border bg-search-field-surface',
             size.field,
             size.text,

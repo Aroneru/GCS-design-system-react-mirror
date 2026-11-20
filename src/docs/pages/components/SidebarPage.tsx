@@ -324,12 +324,12 @@ function VariantPreview({
   minWidth?: string;
 }) {
   return (
-    <article className={`overflow-hidden rounded-xl border ${dark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white"}`}>
+    <article className={`sidebar-component-preview overflow-hidden rounded-xl border ${dark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white"}`}>
       <div className={`border-b px-4 py-3 ${dark ? "border-gray-700" : "border-gray-200"}`}>
         <h3 className={`text-sm font-bold ${dark ? "text-white" : "text-gray-900"}`}>{title}</h3>
         <p className={`mt-1 text-xs leading-5 ${dark ? "text-gray-400" : "text-gray-500"}`}>{description}</p>
       </div>
-      <div className={`h-[440px] overflow-y-auto overscroll-contain ${minWidth ? "ds-scroll-x overflow-x-auto" : ""} ${dark ? "bg-gray-900" : "bg-gray-50"}`}>
+      <div className={`h-[440px] overflow-y-hidden ${minWidth ? "ds-scroll-x overflow-x-auto" : "overflow-x-hidden"} ${dark ? "bg-gray-900" : "bg-gray-50"}`}>
         <div className="h-full" style={{ minWidth }}>{children}</div>
       </div>
     </article>
@@ -505,7 +505,7 @@ export function SidebarPage() {
             dark={docsDark}
             minWidth="280px"
           >
-            <Sidebar items={menuOnlyItems} darkMode={docsDark} />
+            <Sidebar className="!min-h-0 h-full shrink-0" items={menuOnlyItems} darkMode={docsDark} />
           </VariantPreview>
 
           <VariantPreview

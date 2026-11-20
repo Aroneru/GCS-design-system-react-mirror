@@ -142,6 +142,11 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `striped`, `sticky`, `size`, `loading` |
 | `Timeline`   | `items` (`name`, `role`, `time` (`Date`, ditulis `01 Jan 2026 · 09:05`), `elapsed`, `description`, `details`, `attachments` (`name`, `href`, `target`, `download`), `status` (prop `Badge` + `label`), `avatar`, `initials`), `platform`: `desktop \| mobile`, `size`: `large \| small`, `labels` (`elapsed`, `details`, `attachments`, `months`), `darkMode` |
 
+Breadcrumb membatasi label hingga 12 karakter di mobile dan 17 karakter di
+desktop. Jika keseluruhan hierarki tetap tidak muat, komponen mengukur ruang
+tersedia lalu meringkas level tengah menjadi `…`; item pertama dan halaman aktif
+tetap ditampilkan. Arahkan pointer ke `…` untuk melihat label yang disembunyikan.
+
 Warna Button diatur `theme` (`primary | green | gray | purple | orange |
 yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya
 memilih terisi atau bergaris. Ukuran: `xs | s | base | l | xl`. Ikon di kiri
@@ -363,7 +368,7 @@ Semua komponen form meneruskan atribut elemen aslinya (`value`, `onChange`,
 | `FloatingLabel` | `label`, `helperText`, `icon`, `onClear`, `darkMode`, `state`: `default \| active \| error`                                     | 58 / 50 px                |
 | `TextArea`      | `label`, `hint`, `helperText`, `type`: `default \| editor`, `toolbar`, `onToolbarAction`, `submitLabel`, `onSubmit`, `darkMode` | 162 / 120 px              |
 | `Select`        | `label`, `info`, `helperText`, `placeholder`, `options`, `darkMode`                                                             | 37 px                     |
-| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `trigger`: `enter \| change \| auto`, `debounce`, `showButton`, `categories`, `onCategoryChange`, `darkMode` | 54 / 50 / 37 px           |
+| `Search`        | `label`, `helperText`, `buttonLabel`, `onSearch`, `trigger`: `enter \| change \| auto`, `debounce`, `platform`, `showButton`, `categories`, `onCategoryChange`, `darkMode` | 54 / 50 / 37 px           |
 | `Datepicker`    | `label`, `type`: `single \| period \| multiple`, `shortcuts`, `min`/`max`, `darkMode`, `name` — nilai `Date` / `DateRange`      | 42 / 42 px                |
 | `Upload`        | `label`, `helperText`, `buttonLabel`, `replaceLabel`, `removeLabel`, `placeholder`, `type`: `default \| attach`, `onFilesChange`, `darkMode` | 44 / 40 px                |
 | `Radio`         | `label`, `helperText`, `darkMode`                                                                                               | 16 / 14 px                |
@@ -381,6 +386,8 @@ Prop yang dipakai bersama seluruh komponen form:
   ukuran ketiga, `compact` (37px), untuk dipasang di navbar tanpa tombol cari (`showButton=false`).
   Komponen ini juga mendukung live search via `trigger="change"` / `"auto"` dengan jeda `debounce`
   (bawaan 300ms) serta tema gelap berbasis token (`--color-search-category-surface` dan `--color-search-field-surface`).
+  Pada mode gelap, seluruh bentuk Search memakai garis luar 1px gray-500 agar
+  batasnya tetap terlihat tanpa mengubah dimensi field. Light mode tidak berubah.
 - `Upload`: dibatasi khusus berkas tunggal (atribut `multiple` dinonaktifkan).
 - `application`: `default | purple` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
@@ -759,7 +766,7 @@ export function BackOfficeNavbar() {
           items={items}
           sidebarItems={sidebarItems}
           sidebarUser={sidebarUser}
-          tableOfContents={{ label: 'Daftar isi', items: tableOfContentsItems }}
+          tableOfContents={{ items: tableOfContentsItems }}
           notificationTrigger={notificationTrigger}
           search={
             <Search
@@ -789,9 +796,10 @@ yang sama di dialog Sidebar mobile. Account BO tidak dirender pada baris Navbar.
 `tableOfContents` khusus BO menambahkan disclosure terakhir di Drawer Navbar
 mobile. Disclosure tertutup secara default dan merender komponen
 `TableOfContents` yang sama setelah dibuka, termasuk styling daftar,
-scroll-spy, dan penanda aktifnya. Toggle juga memakai visual bawaan TOC melalui
-`layout="collapsible"`, dengan separator setelah menu Navbar. Pada desktop,
-consumer tetap merender
+scroll-spy, dan penanda aktifnya. Setelah separator menu Navbar, toggle tampil
+sebagai section eyebrow `ON THIS PAGE` tanpa ikon daftar, border, atau latar
+kartu. Label dapat diganti lewat `tableOfContents.label`. Pada desktop, consumer
+tetap merender
 `<TableOfContents layout="list">` di dalam layout halaman; sembunyikan versi
 desktop itu di bawah breakpoint yang sama agar tidak ada trigger TOC ganda.
 
@@ -859,7 +867,9 @@ melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
 Tema Navbar mengikuti boundary ambient `data-theme` milik consumer. Gunakan
 `darkMode` untuk mengaktifkan tema gelap langsung pada Navbar; prop ini juga
 mewariskan mode ke komponen di dalamnya. Jika prop tidak diberikan, Navbar
-mewarisi `DarkModeContext` dari komponen pembungkus.
+mewarisi `DarkModeContext` dari komponen pembungkus. Pada Navbar dengan Drawer
+atau Sidebar mobile, teruskan state tema yang sama melalui `darkMode` agar
+panel top-level tersebut ikut berganti ketika toggle tema berubah.
 
 Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
 bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.

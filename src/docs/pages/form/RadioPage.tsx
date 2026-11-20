@@ -47,7 +47,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function RadioPage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -60,9 +60,8 @@ export function RadioPage() {
   const [dark, setDark] = usePlaygroundDark()
   const [pilihan, setPilihan] = useState('wni')
 
-  // Baris `darkMode` di cuplikan bagian Dark mode. Hilang selama bagian itu
-  // bertukar menjadi Light mode.
-  const barisDarkMode = !docsDark && (
+  // Baris `darkMode` di cuplikan bagian Dark mode.
+  const barisDarkMode = (
     <>
       {'    '}
       <H>darkMode</H>
@@ -278,6 +277,7 @@ export function RadioPage() {
 
       <ModeSection
         name="Radio"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengganti lingkaran ke gray-300 bergaris gray-400, dengan label terang dan
@@ -286,30 +286,30 @@ export function RadioPage() {
           </>
         }
       >
-        <Demo dark={!docsDark} light={docsDark}>
+        <Demo dark>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <Radio
-              darkMode={!docsDark}
+              darkMode
               name="ds-radio-gelap"
               label="Belum dipilih"
               helperText="Keterangan singkat."
             />
             <Radio
-              darkMode={!docsDark}
+              darkMode
               name="ds-radio-gelap"
               label="Sedang dipilih"
               helperText="Keterangan singkat."
               defaultChecked
             />
             <Radio
-              darkMode={!docsDark}
+              darkMode
               name="ds-radio-gelap-nonaktif"
               state="inactive"
               label="Tidak aktif"
               helperText="Keterangan singkat."
             />
             <Radio
-              darkMode={!docsDark}
+              darkMode
               name="ds-radio-gelap-nonaktif-terpilih"
               state="inactive"
               label="Tidak aktif, terpilih"
@@ -320,11 +320,7 @@ export function RadioPage() {
         </Demo>
         <SectionCode>
           {'<Radio '}
-          {!docsDark && (
-            <>
-              <H>darkMode</H>{' '}
-            </>
-          )}
+          <H>darkMode</H>{' '}
           {'name="pilihan-gelap" label="Belum dipilih" helperText="Keterangan singkat." />\n'}
           {'<Radio\n'}
           {barisDarkMode}

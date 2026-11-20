@@ -41,7 +41,7 @@ const menuOptions = [
 ];
 
 const breadcrumbProps: PropRow[] = [
-  ["items", "BreadcrumbItem[]", "—", "Daftar item yang ditampilkan pada Breadcrumb."],
+  ["items", "BreadcrumbItem[]", "—", "Daftar item Breadcrumb. Label dibatasi 12 karakter di mobile dan 17 di desktop; level tengah otomatis diringkas menjadi … saat ruang tidak cukup."],
   [
     "size",
     '"sm" | "base"',
@@ -98,7 +98,8 @@ export function BreadcrumbPage() {
         <Lead>
           Breadcrumb tersedia dalam dua ukuran untuk menyesuaikan kebutuhan hierarki dan kepadatan
           informasi pada layout. Ukuran <Hl>base</Hl> adalah ukuran default. Ukuran <Hl>sm</Hl>{" "}
-          digunakan ketika Breadcrumb diimplementasikan pada mobile.
+          digunakan ketika Breadcrumb diimplementasikan pada mobile. Jika seluruh level tidak muat,
+          komponen mempertahankan item pertama dan halaman aktif, lalu meringkas level tengah menjadi <H>…</H>.
         </Lead>
 
         <div className="mb-4 grid gap-5 sm:grid-cols-2">
