@@ -46,11 +46,12 @@ const navbarProps: PropRow[] = [
   ['items', 'NavbarPrimaryItem[]', '[]', 'Navigasi Navbar desktop. Pada BO, Navbar otomatis menyajikannya di Drawer mobile.'],
   ['sidebarItems', 'SidebarItem[]', 'undefined', 'Khusus BO: navigasi Sidebar aplikasi yang dipakai Navbar pada mobile. Sidebar desktop tetap dirender consumer.'],
   ['sidebarUser', 'SidebarUser', 'undefined', 'Khusus BO: identitas dan aksi akun Sidebar yang digunakan kembali oleh Sidebar mobile.'],
-  ['tableOfContents', 'NavbarTableOfContents', 'undefined', 'Khusus BO: TableOfContents collapsible setelah separator di bagian terbawah Drawer mobile. TOC desktop tetap dirender consumer.'],
+  ['tableOfContents', 'NavbarTableOfContents', 'undefined', 'Khusus BO: section TableOfContents collapsible berjudul On this page setelah separator di bagian terbawah Drawer mobile. TOC desktop tetap dirender consumer.'],
   ['search', 'ReactNode', 'undefined', 'Slot Search milik consumer. Pada BO gunakan varian kategori dengan pilihan yang diturunkan dari sidebarItems.'],
   ['guestActions', 'NavbarGuestActions', 'undefined', 'Hanya FO guest; tidak dapat dikombinasikan dengan account atau notificationTrigger.'],
   ['account', 'NavbarAccount', 'undefined', 'Hanya FO authenticated; tidak dapat dikombinasikan dengan guestActions.'],
   ['notificationTrigger', 'NavbarNotificationTrigger', 'undefined', 'Konfigurasi tombol notifikasi bawaan. Pada BO independen dari identitas Sidebar.'],
+  ['darkMode', 'boolean', 'false', 'Mengaktifkan tema gelap Navbar sekaligus Drawer dan Sidebar mobile.'],
   ['mobileNavigationOpen', 'boolean', 'undefined', 'State terkontrol navigasi mobile. Jika tidak diisi, Navbar mengelola state internal.'],
   ['onMobileNavigationOpenChange', '(open: boolean) => void', 'undefined', 'Callback perubahan navigasi mobile.'],
   ['className / HTML attributes', 'HTMLAttributes<HTMLElement>', 'undefined', 'Atribut header standar, selain children.'],
@@ -63,7 +64,7 @@ const supportingTypes: PropRow[] = [
   ['NavbarAccountItem', "NavbarAccountDestination | NavbarAccountAction", '—', 'Destination atau action; keduanya mendukung tone default atau danger.'],
   ['NavbarGuestActions', '{ signIn; signUp? }', '—', 'Aksi guest; setiap link berisi label, href, dan onClick opsional.'],
   ['NavbarNotificationTrigger', '{ ariaLabel; onClick?; badge?; …buttonProps }', '—', 'Konfigurasi tombol Bell bawaan; consumer mengelola interaksi dan state panel.'],
-  ['NavbarTableOfContents', '{ label?; items: TableOfContentsItem[] }', '—', 'Data untuk TableOfContents di disclosure mobile; gunakan items dan href yang sama dengan TOC desktop.'],
+  ['NavbarTableOfContents', '{ label?; items: TableOfContentsItem[] }', '—', 'Data untuk TableOfContents di disclosure mobile; label bawaan On this page. Gunakan items dan href yang sama dengan TOC desktop.'],
   ['SidebarItem', '{ id?; label; href?; children?; active?; disabled?; … }', '—', 'Data navigasi Sidebar BO yang dimiliki layout consumer dan dipakai Navbar pada mobile.'],
 ]
 
@@ -142,7 +143,7 @@ function Preview({ config }: { config: Config }) {
   const brand = { content: <Brand compact={config.platform === 'back-office'} />, href: '/', ariaLabel: 'CEPLOK — Beranda' }
   const searchCategories = backOfficeSidebarItems.map(({ id, label }) => ({ value: id ?? label, label }))
   const search = config.search ? <Search platform="compact" showButton={config.platform === 'back-office'} trigger="enter" aria-label="Cari dokumentasi" placeholder="Cari dokumentasi ..." categories={config.platform === 'back-office' ? searchCategories : undefined} categoryPlaceholder="Kategori" onSearch={(value, category) => setFeedback(`Pencarian demo: ${value}${category ? ` (${category})` : ''}`)} /> : undefined
-  const common = { brand, items: navItems, search }
+  const common = { brand, items: navItems, search, darkMode: config.theme === 'dark' }
   const sidebarUser = { name: 'Admin CEPLOK', profileLabel: 'Administrator' }
   const intercept = (e: MouseEvent<HTMLDivElement>) => { const a = e.target instanceof Element ? e.target.closest('a') : null; if (!a || a.getAttribute('aria-disabled') === 'true') return; e.preventDefault(); setFeedback(`Navigasi demo: ${a.getAttribute('aria-label') || a.textContent?.trim() || 'Tautan'}`) }
   return <div data-theme={config.theme} data-navbar-platform={config.platform} className="overflow-hidden bg-surface text-content" onClick={intercept}>

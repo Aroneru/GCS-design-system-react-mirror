@@ -50,7 +50,7 @@ const searchProps: PropRow[] = [
   ['categoryPlaceholder', 'string', 'Kategori', 'Teks dropdown saat kategori belum dipilih.'],
   ['category / defaultCategory', 'string', 'undefined', 'Kategori terpilih, terkendali maupun tidak.'],
   ['onCategoryChange', '(value: string) => void', 'undefined', 'Dipanggil saat kategori berganti.'],
-  ['darkMode', 'boolean', 'false', 'Tampilan gelap: warna abu-abu gelap dengan teks terang.'],
+  ['darkMode', 'boolean', 'false', 'Tampilan gelap: warna abu-abu gelap, teks terang, dan border tipis gray-500 seperti List View.'],
   ['…props', 'InputHTMLAttributes', '—', 'Seluruh atribut <input> standar diteruskan (value, onChange, placeholder, name, …).'],
 ]
 
@@ -219,7 +219,7 @@ export function SearchPage() {
         stayDark
         lead={
           <>
-            Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, dan batas.
+            Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual pada Search Form. Komponen secara otomatis menyesuaikan warna latar, teks, placeholder, serta menambahkan border tipis gray-500 agar batas field tetap terlihat pada permukaan gelap.
           </>
         }
       >

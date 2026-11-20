@@ -112,7 +112,7 @@ export interface NavbarNotificationTrigger extends Omit<ButtonHTMLAttributes<HTM
 }
 
 export interface NavbarTableOfContents {
-  /** Label disclosure TOC di bagian paling bawah Drawer. Bawaan: "Daftar isi". */
+  /** Label disclosure TOC di bagian paling bawah Drawer. Bawaan: "On this page". */
   label?: ReactNode
   /** Entri anchor yang sama dengan TableOfContents desktop. */
   items: TableOfContentsItem[]
@@ -122,6 +122,8 @@ interface NavbarBaseProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> 
   brand: NavbarBrand
   items?: NavbarPrimaryItem[]
   search?: ReactNode
+  /** Menyamakan tema Navbar beserta Drawer dan Sidebar mobile dengan permukaan gelap. */
+  darkMode?: boolean
   mobileNavigationOpen?: boolean
   onMobileNavigationOpenChange?: (open: boolean) => void
 }
@@ -1510,20 +1512,29 @@ function NavbarDrawerTableOfContents({
   tableOfContents,
   onItemClick,
   separated,
+  darkMode,
 }: {
   tableOfContents: NavbarTableOfContents
   onItemClick: () => void
   separated: boolean
+  darkMode: boolean
 }) {
   if (!tableOfContents.items.length) return null
 
   return (
-    <div className={cn(separated && 'mt-3 border-t border-border pt-3')}>
+    <div
+      className={cn(
+        separated && 'mt-3 border-t pt-3',
+        separated && (darkMode ? 'border-gray-700' : 'border-border'),
+      )}
+    >
       <TableOfContents
         items={tableOfContents.items}
         layout="collapsible"
-        title={tableOfContents.label ?? 'Daftar isi'}
+        title={tableOfContents.label ?? 'On this page'}
         onItemClick={onItemClick}
+        darkMode={darkMode}
+        className="bg-transparent [&>button]:rounded-none [&>button]:border-0 [&>button]:bg-transparent [&>button]:text-xs [&>button]:font-bold [&>button]:tracking-[0.14em] [&>button]:uppercase [&>button]:text-content-muted [&>button:hover]:bg-transparent [&>button>svg:first-child]:hidden"
       />
     </div>
   )
@@ -1579,6 +1590,7 @@ export function Navbar(props: NavbarProps) {
     brand,
     items = [],
     search,
+    darkMode = false,
     mobileNavigationOpen,
     onMobileNavigationOpenChange,
     className,
@@ -1593,6 +1605,9 @@ export function Navbar(props: NavbarProps) {
     ...headerProps
   } = props
   const navbarAccount = platform === 'front-office' ? account : undefined
+  const headerTheme = darkMode
+    ? 'dark'
+    : (headerProps as HTMLAttributes<HTMLElement> & { 'data-theme'?: string })['data-theme']
   const dialogId = useId()
   const internalDrawerId = useId()
   const [desktopRow, setDesktopRow] = useState<HTMLDivElement | null>(null)
@@ -1703,9 +1718,10 @@ export function Navbar(props: NavbarProps) {
   return (
     <DropdownDismissalContext.Provider value={dropdownDismissalScope}>
     <header
+      {...headerProps}
+      data-theme={headerTheme}
       className={cn('border-b border-border bg-surface text-content', className)}
       style={platform === 'back-office' ? { ...style, containerType: 'inline-size' } : style}
-      {...headerProps}
     >
       <div
         ref={desktopRowRef}
@@ -1823,6 +1839,7 @@ export function Navbar(props: NavbarProps) {
                     : 'col-start-3 min-[576px]:col-start-4',
               )}>
                 <Drawer.Trigger
+                  darkMode={darkMode}
                   aria-label="Buka navigasi Navbar"
                   aria-controls={drawerId}
                   aria-expanded={drawerOpen}
@@ -1866,6 +1883,7 @@ export function Navbar(props: NavbarProps) {
             logo={<Brand brand={brand} />}
             items={mobileItems}
             user={platform === 'back-office' ? sidebarUser : undefined}
+            darkMode={darkMode}
             footer={
               <MobileIdentity
                 platform={platform}
@@ -1894,7 +1912,9 @@ export function Navbar(props: NavbarProps) {
           onClose={() => requestDrawerOpen(false)}
           position="right"
           size="s"
-          header={<Drawer.Title>Menu Navbar</Drawer.Title>}
+          darkMode={darkMode}
+          aria-label="Menu"
+          eyebrow="Menu"
           items={mobileDrawerItems}
           afterItems={
             tableOfContents ? (
@@ -1902,6 +1922,7 @@ export function Navbar(props: NavbarProps) {
                 tableOfContents={tableOfContents}
                 onItemClick={() => requestDrawerOpen(false)}
                 separated={mobileDrawerItems.length > 0}
+                darkMode={darkMode}
               />
             ) : undefined
           }

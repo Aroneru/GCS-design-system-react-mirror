@@ -13,6 +13,9 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ### Ditambahkan
 
+- **`Navbar`: prop `darkMode`.** Tema gelap Navbar kini diteruskan ke header,
+  tombol Drawer, Drawer navigasi kanan, dan Sidebar mobile. Drawer Portal
+  Dashboard karena itu langsung mengikuti toggle tema halaman yang sama.
 - **Portal Dashboard lebih lengkap.** Di bawah Rencana Kegiatan kini ada kartu
   Aplikasi Intranet, Forum Terbaru, Sticky Post, dan kartu unduhan KOSMO.
   - Aplikasi Intranet menampilkan 12 ubin. Tombol panah di tepi bawah kartunya
@@ -26,6 +29,17 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ### Diubah
 
+- **TOC Drawer Navbar mengikuti struktur section.** Header Drawer mobile kini
+  memakai eyebrow `MENU`. Setelah separator, disclosure TOC tampil sebagai
+  `ON THIS PAGE` tanpa ikon daftar, border, atau latar kartu; chevron, daftar,
+  scroll-spy, dan indikator aktif tetap berasal dari komponen `TableOfContents`.
+  TOC juga mengikuti prop `darkMode` Navbar.
+- **Border `Search` lebih terbaca di mode gelap.** Varian polos maupun kategori,
+  pada platform default, mobile, dan compact, kini memiliki garis luar 1px
+  gray-500. Garis memakai inset ring sehingga tidak mengubah ukuran komponen;
+  light mode tetap memakai border sebelumnya.
+- **Search Navbar Portal memakai platform compact.** Tinggi field menjadi 37px
+  dan tetap menampilkan kategori serta tombol cari sesuai komposisi Back Office.
 - **Tombol "Pengaturan Layout" di Portal Dashboard kini primary.** Sebelumnya
   outline. Tombol "Buat Forum" yang baru memakai outline sebagai tombol
   sekunder.
@@ -43,6 +57,11 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ### Diperbaiki
 
+- **Breadcrumb responsif untuk hierarki panjang.** Label dibatasi 12 karakter
+  di mobile dan 17 karakter di desktop. Komponen mengukur ruang yang tersedia;
+  ketika seluruh level tetap tidak muat, level tengah otomatis diringkas
+  menjadi `…` sementara item pertama dan halaman aktif dipertahankan. Tooltip
+  pada `…` menampilkan label yang disembunyikan.
 - **Jarak kartu versi di panel samping docs.** Kartu "Foundation v1.0" di
   ujung bawah panel tidak lagi menempel ke menu terakhir saat daftar menunya
   memenuhi panel, mis. di area Components.

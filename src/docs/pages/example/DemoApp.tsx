@@ -214,7 +214,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             sidebarItems={menu}
             sidebarUser={sidebarUser}
             tableOfContents={halaman === "simaya2" ? {
-              label: "Daftar isi",
+              label: "On this page",
               items: BERITA_LAYANAN_DIGITAL_TOC,
             } : undefined}
             search={

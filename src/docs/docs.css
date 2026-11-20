@@ -53,6 +53,17 @@
         scrollbar-color: var(--color-gray-600) transparent;
     }
 
+    /* Preview Sidebar memakai scrollbar standar agar Edge tidak menampilkan
+       tombol panah native pada ujung track. */
+    .sidebar-component-preview .ds-scroll-y {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-gray-300) transparent;
+    }
+
+    [data-docs-theme='dark'] .sidebar-component-preview .ds-scroll-y {
+        scrollbar-color: var(--color-gray-600) transparent;
+    }
+
     [data-docs-theme='dark'] .ds-scroll-x::-webkit-scrollbar-thumb,
     [data-docs-theme='dark'] .ds-scroll-y::-webkit-scrollbar-thumb {
         background-color: var(--color-gray-600);
