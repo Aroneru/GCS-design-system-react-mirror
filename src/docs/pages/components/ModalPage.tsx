@@ -272,7 +272,8 @@ const modalProps: PropRow[] = [
   ['variant', "'default' | 'popup'", "'default'", 'Menentukan struktur Modal. Popup digunakan untuk dialog konfirmasi ringkas.'],
   ['icon', 'ReactElement | null', 'tanda seru (Popup)', 'Ganti ikon bawaan Popup dengan ReactElement lain, atau gunakan null untuk menyembunyikannya. Hanya tersedia untuk Popup.'],
   ['size', "'s' | 'm'", "'s'", 'Ukuran Default Modal. Tidak tersedia untuk Popup.'],
-  ['darkMode', 'boolean', 'undefined', 'Terapkan tema gelap lokal pada dialog dan diwariskan ke Button di dalamnya. Trigger milik consumer mengatur temanya sendiri.'],
+  ['data-theme', "'light' | 'dark'", 'undefined', 'Boundary tema eksplisit pada dialog. Meng-override darkMode dan tema pembungkus, serta diteruskan sebagai tema efektif komponen internal.'],
+  ['darkMode', 'boolean', 'undefined', 'Terapkan tema gelap lokal pada dialog dan diwariskan ke Button di dalamnya. data-theme eksplisit menjadi override; trigger milik consumer mengatur temanya sendiri.'],
   ['title', 'ReactNode', 'undefined', 'Judul Default Modal sekaligus nama aksesibel. Tidak tersedia untuk Popup.'],
   ['closeOnBackdrop', 'boolean', 'true', 'Tutup Modal saat klik backdrop. Tidak memengaruhi klik di dalam dialog.'],
   ['closeOnEscape', 'boolean', 'true', 'Tutup Modal saat menekan Escape. Jika false, cancel native dicegah.'],
@@ -732,7 +733,8 @@ export function ModalPage() {
         lead={
           <>
             Gunakan <Hl>darkMode</Hl> untuk menerapkan token gelap pada dialog dan Button di
-            dalamnya. Trigger milik consumer, misalnya Button, mengatur temanya sendiri. Default memakai surface gray-700,
+            dalamnya. Atribut <Hl>data-theme</Hl> eksplisit menjadi override dan memakai tema efektif
+            yang sama untuk keduanya. Trigger milik consumer, misalnya Button, mengatur temanya sendiri. Default memakai surface gray-700,
             sedangkan Popup memakai gray-600 dengan teks gray-300 dan warna action sesuai desain.
           </>
         }

@@ -323,7 +323,9 @@ sediakan aksi footer yang memanggil `close()`. `closeLabel` memberi nama
 aksesibel pada tombol X. Prop `darkMode` mengatur tema dialog; `trigger` adalah
 elemen milik consumer dan mengatur temanya sendiri, misalnya dengan
 `<Button darkMode>`. Tanpa prop, tema dialog mengikuti wrapper ambient
-`data-theme`. Nested Modal adalah komposisi dua Modal
+`data-theme`. Atribut `data-theme="light"` atau `data-theme="dark"` yang
+diberikan langsung pada Modal menjadi override paling eksplisit; nilai efektif
+yang sama diteruskan ke Button internal. Nested Modal adalah komposisi dua Modal
 controlled dengan state terpisah: Default membuka Popup, penutupan Popup tidak
 menutup Default, dan fokus kembali ke kontrol pembukanya.
 
@@ -881,7 +883,9 @@ Mengubah `search.platform` dari `compact` juga mengubah tinggi Search dari
 Tema header Navbar mengikuti boundary ambient `data-theme` milik consumer.
 Prop `darkMode` mengatur tema Navbar beserta Drawer dan Sidebar mobile. Jika
 prop tidak diberikan, header mewarisi `DarkModeContext` dari komponen pembungkus.
-Search internal mengikuti tema efektif Navbar. Consumer hanya perlu memberi
+`data-theme="light"` atau `data-theme="dark"` yang diberikan langsung pada
+Navbar menjadi override paling eksplisit. Tema efektif yang sama diteruskan ke
+Search, Drawer, Sidebar mobile, dan Table of Contents. Consumer hanya perlu memberi
 `search.darkMode` bila tema Search memang perlu berbeda dari Navbar.
 
 Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada

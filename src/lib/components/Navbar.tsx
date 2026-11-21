@@ -132,7 +132,9 @@ export type NavbarBackOfficeSearchConfig = NavbarSearchConfig & {
 interface NavbarBaseProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
   brand: NavbarBrand
   items?: NavbarPrimaryItem[]
-  /** Tema gelap untuk Navbar, Drawer, Sidebar mobile, dan komponen di dalamnya. */
+  /** Boundary tema eksplisit; meng-override `darkMode` dan tema pembungkus. */
+  'data-theme'?: 'light' | 'dark'
+  /** Tema gelap untuk Navbar, Drawer, Sidebar mobile, dan komponen di dalamnya. `data-theme` eksplisit menang. */
   darkMode?: boolean
   mobileNavigationOpen?: boolean
   onMobileNavigationOpenChange?: (open: boolean) => void
@@ -1592,10 +1594,22 @@ export function Navbar(props: NavbarProps) {
     sidebarItems,
     sidebarUser,
     tableOfContents,
+    'data-theme': dataTheme,
     ...headerProps
   } = props
   const inheritedDarkMode = useInheritedDarkMode()
-  const navbarDarkMode = darkMode ?? inheritedDarkMode
+  // Boundary native consumer menjadi override paling eksplisit. Satu hasil
+  // yang sama dipakai header, context, dan seluruh komponen internal agar
+  // Search/Drawer/Sidebar/TOC tidak berbeda tema dari permukaan Navbar.
+  const explicitTheme = dataTheme === 'dark' || dataTheme === 'light' ? dataTheme : undefined
+  const navbarDarkMode = explicitTheme ? explicitTheme === 'dark' : darkMode ?? inheritedDarkMode
+  const navbarTheme =
+    dataTheme ??
+    (darkMode !== undefined || inheritedDarkMode
+      ? navbarDarkMode
+        ? 'dark'
+        : 'light'
+      : undefined)
   const searchElement = search ? (
     <Search
       {...search}
@@ -1605,9 +1619,6 @@ export function Navbar(props: NavbarProps) {
     />
   ) : null
   const navbarAccount = platform === 'front-office' ? account : undefined
-  const headerTheme = navbarDarkMode
-    ? 'dark'
-    : (headerProps as HTMLAttributes<HTMLElement> & { 'data-theme'?: string })['data-theme']
   const dialogId = useId()
   const internalDrawerId = useId()
   const [desktopRow, setDesktopRow] = useState<HTMLDivElement | null>(null)
@@ -1724,7 +1735,7 @@ export function Navbar(props: NavbarProps) {
       <DropdownDismissalContext.Provider value={dropdownDismissalScope}>
         <header
           {...headerProps}
-          data-theme={headerTheme}
+          data-theme={navbarTheme}
           className={cn('border-b border-border bg-surface text-content', className)}
           style={platform === 'back-office' ? { ...style, containerType: 'inline-size' } : style}
         >

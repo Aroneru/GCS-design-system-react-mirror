@@ -11,6 +11,38 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+### Diubah
+
+- **Kontrak tema `Avatar` diperjelas.** Prop `darkMode` tetap menjadi API resmi,
+  sama seperti komponen lain: prop tersebut memasang tema gelap secara lokal,
+  sedangkan Avatar tanpa prop mengikuti scope ambient `data-theme`, termasuk
+  nested scope. Dokumentasi sebelumnya yang menyebut prop ini deprecated telah
+  dikoreksi.
+- **Kontrak tema `Clipboard` diperjelas.** Prop `darkMode` tetap menjadi API
+  resmi untuk mengaktifkan palet gelap secara lokal. Tanpa prop tersebut,
+  Clipboard mengikuti scope ambient `data-theme`, termasuk nested scope.
+  Dokumentasi sebelumnya yang menyebut prop ini deprecated telah dikoreksi.
+- **Kontrak tema `Popover` diperjelas.** Prop `darkMode` tetap menjadi API resmi
+  untuk mengaktifkan tema gelap pada panel secara lokal. Tanpa prop tersebut,
+  Popover mengikuti scope ambient `data-theme`, dan atribut `data-theme` yang
+  diteruskan consumer dapat menjadi boundary tema eksplisit.
+- **Kontrak tema `Dropdown` diperjelas.** Prop `darkMode` merupakan API resmi
+  untuk mengaktifkan tema gelap secara lokal. Tanpa prop tersebut, Dropdown
+  mewarisi tema ambient dari boundary `data-theme`, termasuk pada scope tema
+  bertingkat. Warna panel dan item bawaan tetap berasal dari token semantik
+  `--color-dropdown-*`; trigger serta `children` kustom tetap dikelola consumer.
+- **Kontrak tema `Modal` diperjelas.** Prop `darkMode` merupakan API resmi untuk
+  mengaktifkan tema gelap secara lokal pada elemen dialog dan komponen internal.
+  Tanpa prop tersebut, Modal mewarisi tema ambient dari boundary `data-theme`.
+  Atribut `data-theme` eksplisit menjadi override dan kini menghasilkan tema
+  efektif yang sama pada dialog serta context Button internal.
+  Trigger berada di luar dialog dan tetap dikelola consumer, misalnya dengan
+  memberikan `darkMode` tersendiri pada `Button` yang digunakan sebagai trigger.
+- **Kontrak tema `Navbar` diperjelas.** Prop `darkMode` merupakan API resmi untuk
+  tema gelap lokal; tanpa prop, Navbar mengikuti tema pembungkus. Atribut
+  `data-theme` eksplisit menjadi override dan kini menghasilkan satu tema
+  efektif yang sama untuk header, Search, Drawer, Sidebar mobile, serta TOC.
+
 ### Ditambahkan
 
 - **`Navbar`: prop `darkMode`.** Tema gelap Navbar kini diteruskan ke header,
@@ -301,7 +333,7 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
 - **`Popover`.** Contoh Penggunaan merapatkan ikon informasi ke teks. Tampilan
   gelap kini mengikuti `data-theme` ambient dan memakai token lokal
   `--color-popover-*` untuk surface, border, header, serta teks; `darkMode`
-  tetap menjadi override kompatibilitas.
+  tetap menjadi prop resmi untuk mengaktifkan tema gelap secara lokal.
 - **`Spinner`.** README kini mendokumentasikan ukuran 50px/100px, atribut SVG
   yang diteruskan, reduced motion, serta pola aksesibel standalone dan bersama
   teks loading.
@@ -326,7 +358,8 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   eksplisit untuk ilustrasi profil dan tidak pernah diturunkan dari nama;
   `fallback="initials"` memakai inisial manual atau nama. Empat SVG Male/Female Light/Dark ikut dibundle sebagai
   asset package-local. Avatar kini mengikuti scope ambient `data-theme`,
-  termasuk nested scope; `darkMode` tetap didukung sebagai prop deprecated.
+  termasuk nested scope; `darkMode` tetap didukung sebagai prop resmi untuk
+  mengaktifkan tema gelap secara lokal.
   `alt` mengatur nama aksesibel (`alt=""` menjadikan Avatar dekoratif), dan
   foto gagal kembali ke representasi yang sesuai. Ukuran API tetap `small`, `default`,
   dan `large` (S/M/L: 24/32/80px, dengan M sebagai bawaan).
@@ -418,7 +451,8 @@ tampilannya masih bisa berubah sebelum rilis, jadi jangan dijadikan pegangan.
   Desktop diselaraskan ke desain, sedangkan preset Mobile tetap mempertahankan
   ukurannya sendiri. Clipboard mengikuti `data-theme="light"`/`"dark"` secara
   ambient, termasuk nested scope, melalui token `--color-clipboard-*`;
-  `darkMode` tetap menjadi override kompatibilitas yang deprecated. Saat
+  `darkMode` tetap menjadi prop resmi untuk mengaktifkan palet gelap secara
+  lokal. Saat
   `disabled`, aksi salin, tooltip, dan pemilihan/copy/cut melalui UI tidak aktif;
   hasil async lama juga tidak dapat lagi memicu callback atau feedback. Ikon
   Clipboard dan Check pada aksi bersegmen kini 20px dalam tombol 42px. Tooltip

@@ -51,7 +51,9 @@ type ModalCommonProps = Omit<
   DialogHTMLAttributes<HTMLDialogElement>,
   'open' | 'onClose' | 'onCancel' | 'title'
 > & {
-  /** Tema gelap untuk dialog dan pewarisan tema pada Button di dalamnya. */
+  /** Boundary tema eksplisit; meng-override `darkMode` dan tema pembungkus. */
+  'data-theme'?: 'light' | 'dark'
+  /** Tema gelap untuk dialog dan pewarisan tema pada Button di dalamnya. `data-theme` eksplisit menang. */
   darkMode?: boolean
   /** Nama aksesibel tombol tutup. */
   closeLabel?: string
@@ -175,6 +177,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
     children,
     'aria-label': ariaLabel,
     'aria-labelledby': ariaLabelledBy,
+    'data-theme': dataTheme,
     onClick,
     ...props
   },
@@ -185,7 +188,18 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   const isPopup = variant === 'popup'
   const popupIcon = isPopup ? (icon === undefined ? defaultPopupIcon : icon) : null
   const inheritedDarkMode = useInheritedDarkMode()
-  const modalDarkMode = darkMode ?? inheritedDarkMode
+  // `data-theme` adalah boundary native milik consumer dan karena itu menjadi
+  // override paling eksplisit. Satu hasil yang sama dipakai oleh CSS dialog
+  // dan context komponen internal agar keduanya tidak pernah berbeda tema.
+  const explicitTheme = dataTheme === 'dark' || dataTheme === 'light' ? dataTheme : undefined
+  const modalDarkMode = explicitTheme ? explicitTheme === 'dark' : darkMode ?? inheritedDarkMode
+  const modalTheme =
+    dataTheme ??
+    (darkMode !== undefined || inheritedDarkMode
+      ? modalDarkMode
+        ? 'dark'
+        : 'light'
+      : undefined)
   const controlled = open !== undefined
   const [internalOpen, setInternalOpen] = useState(false)
   const [nativeSyncRevision, setNativeSyncRevision] = useState(0)
@@ -343,7 +357,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
       {renderedTrigger}
       <dialog
         ref={setRef}
-        data-theme={modalDarkMode ? 'dark' : undefined}
+        data-theme={modalTheme}
         aria-label={labelSendiri}
         aria-labelledby={labelledBySendiri ?? namaOtomatis}
         onCancel={handleCancel}

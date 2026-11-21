@@ -50,7 +50,8 @@ const navbarProps: PropRow[] = [
   ['sidebarUser', 'SidebarUser', 'undefined', 'Khusus BO: identitas dan aksi akun Sidebar yang digunakan kembali oleh Sidebar mobile.'],
   ['tableOfContents', 'NavbarTableOfContents', 'undefined', 'Khusus BO: section TableOfContents collapsible berjudul On this page setelah separator di bagian terbawah Drawer mobile. TOC desktop tetap dirender consumer.'],
   ['search', 'NavbarSearchConfig | NavbarBackOfficeSearchConfig', 'undefined', 'Konfigurasi Search internal. Default FO: compact tanpa kategori/tombol; default BO: compact berkategori dan bertombol, dengan categories wajib.'],
-  ['darkMode', 'boolean', 'undefined', 'Menggelapkan Navbar dan komponen internalnya, termasuk Search. Jika tidak diisi, Navbar mewarisi DarkModeContext.'],
+  ['data-theme', "'light' | 'dark'", 'undefined', 'Boundary tema eksplisit pada header. Meng-override darkMode dan tema pembungkus, lalu menjadi tema efektif seluruh komponen internal.'],
+  ['darkMode', 'boolean', 'undefined', 'Menggelapkan Navbar dan komponen internalnya, termasuk Search, Drawer, Sidebar mobile, dan TOC. Tanpa prop, Navbar mengikuti tema pembungkus.'],
   ['guestActions', 'NavbarGuestActions', 'undefined', 'Hanya FO guest; tidak dapat dikombinasikan dengan account atau notificationTrigger.'],
   ['account', 'NavbarAccount', 'undefined', 'Hanya FO authenticated; identitas tetap tampil tanpa menu ketika account.items tidak diisi, dan digunakan kembali oleh Sidebar mobile.'],
   ['notificationTrigger', 'NavbarNotificationTrigger', 'undefined', 'Konfigurasi tombol notifikasi bawaan. Pada BO independen dari identitas Sidebar.'],
@@ -393,7 +394,7 @@ export function NavbarPage() {
     <ModeSection
       name="Navbar"
       stayDark
-      lead={<>Gunakan prop <H>darkMode</H> untuk menggelapkan Navbar serta Search, Drawer, dan Sidebar mobile. Tema ambient <H>data-theme</H>{'="dark"'} juga didukung. Search internal mengikuti tema efektif Navbar secara default; gunakan <H>search.darkMode</H> hanya bila perlu dioverride.</>}
+      lead={<>Gunakan prop <H>darkMode</H> untuk menggelapkan Navbar serta Search, Drawer, Sidebar mobile, dan TOC. Tema ambient <H>data-theme</H>{'="dark"'} juga didukung; atribut <H>data-theme</H> langsung pada Navbar menjadi override paling eksplisit. Search internal mengikuti tema efektif Navbar secara default; gunakan <H>search.darkMode</H> hanya bila perlu dioverride.</>}
     >
       <div className="space-y-8">
         <div className="space-y-8 lg:grid lg:grid-cols-2 lg:gap-5 lg:space-y-0">
