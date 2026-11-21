@@ -13,6 +13,10 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ### Diubah
 
+- **Preview dark docs Popover dan Modal diselaraskan.** Panggung contoh
+  Positions Popover dan kartu Sizes Modal kini memakai permukaan gelap yang
+  sama dengan contoh Dark mode saat dokumentasi berada pada tema gelap. Warna
+  teks, border, badge ukuran, dan kontrol tetap mengikuti token temanya.
 - **Kontrak tema `Avatar` diperjelas.** Prop `darkMode` tetap menjadi API resmi,
   sama seperti komponen lain: prop tersebut memasang tema gelap secara lokal,
   sedangkan Avatar tanpa prop mengikuti scope ambient `data-theme`, termasuk

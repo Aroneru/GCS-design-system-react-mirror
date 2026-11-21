@@ -52,7 +52,9 @@ function StaticPositionPreview({ side, darkMode }: { side: PopoverSide; darkMode
   return (
     <div
       data-theme={darkMode ? 'dark' : undefined}
-      className="overflow-x-auto rounded-xl border border-border bg-surface-subtle"
+      className={`overflow-x-auto rounded-xl border ${
+        darkMode ? 'border-gray-800 bg-gray-900 dark:border-gray-700' : 'border-border bg-surface-subtle'
+      }`}
     >
       <div className="relative h-80 min-w-[600px]">
         <span

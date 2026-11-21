@@ -547,14 +547,16 @@ export function ModalPage() {
             <article
               key={item.value}
               data-theme={docsDark ? 'dark' : undefined}
-              className="rounded-xl border border-border bg-surface p-5"
+              className={`rounded-xl border p-5 ${
+                docsDark ? 'border-gray-800 bg-gray-900 dark:border-gray-700' : 'border-border bg-surface'
+              }`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-sm font-black text-gray-900 dark:text-white">Size {item.label}</h3>
-                  <p className="mt-1 text-body-sm text-gray-500 dark:text-gray-400">{item.description}</p>
+                  <h3 className="text-sm font-black text-content">Size {item.label}</h3>
+                  <p className="mt-1 text-body-sm text-content-muted">{item.description}</p>
                 </div>
-                <span className="shrink-0 rounded-md bg-primary-50 px-2 py-1 text-xs font-bold text-primary-700">
+                <span className="shrink-0 rounded-md bg-[light-dark(var(--color-primary-50),var(--color-primary-900))] px-2 py-1 text-xs font-bold text-[light-dark(var(--color-primary-700),var(--color-primary-200))]">
                   {item.value === 's' ? '416px' : '640px'} max
                 </span>
               </div>
