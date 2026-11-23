@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Hero, type HeroImageOrientation, type HeroType } from "../../../lib";
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from "../../docsTheme";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Hl, Mark, Segmented } from "../../pageKit";
 import {
@@ -7,6 +8,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -208,6 +210,9 @@ const toc: TocEntry[] = [
   { id: "properties", label: "Properties" },
 ];
 
+/** stayDark: bagian Dark mode selalu memperagakan `darkMode`, jadi labelnya tidak bertukar. */
+const tocDark = tocForDarkDocs(toc, true);
+
 /**
  * Bingkai pratinjau: Hero selalu selebar wadahnya, jadi sudutnya dirapikan.
  * `label` dipakai di bagian Variasi supaya tiap frame Figma punya namanya.
@@ -225,11 +230,14 @@ function Preview({
   return (
     <div>
       {label && (
-        <p className="mb-2 text-sm font-black text-gray-900">{label}</p>
+        <p className="mb-2 text-sm font-black text-gray-900 dark:text-white">{label}</p>
       )}
+      {/* Tepi di mode gelap docs mengikuti <Demo>: gray-700, supaya bingkai tetap terlihat di atas latar halaman. */}
       <div
         className={`rounded-2xl border p-4 sm:p-5 ${
-          dark ? "border-gray-800 bg-gray-950" : "border-border bg-surface-subtle"
+          dark
+            ? "border-gray-800 bg-gray-950 dark:border-gray-700"
+            : "border-border bg-surface-subtle dark:border-gray-700 dark:bg-gray-900"
         }`}
       >
         <div className={heroFrame(dark)}>{children}</div>
@@ -298,8 +306,8 @@ function PageMockup({ dark, children }: { dark?: boolean; children: ReactNode })
 /** Catatan kontras untuk centered versi gambar. */
 const ContrastNote = () => (
   <div className="ds-card mt-4 p-5">
-    <h3 className="text-sm font-black text-gray-900">Catatan: gambar harus terlihat jelas di atas latar</h3>
-    <ul className="mt-1.5 list-disc space-y-1 pl-5 text-body-sm leading-6 text-gray-500">
+    <h3 className="text-sm font-black text-gray-900 dark:text-white">Catatan: gambar harus terlihat jelas di atas latar</h3>
+    <ul className="mt-1.5 list-disc space-y-1 pl-5 text-body-sm leading-6 text-gray-500 dark:text-gray-400">
       <li>Gambar tampil memenuhi hero. Tinggi hero mengikuti ukuran gambar.</li>
       <li>
         Bagian gambar yang transparan akan menampilkan warna latar: biru muda
@@ -320,8 +328,8 @@ const ContrastNote = () => (
 
 /** Ilustrasi inline untuk bagian imageContent — bukan berkas gambar. */
 const InlineIllustration = () => (
-  <div className="flex aspect-[3/4] w-full items-center justify-center rounded-xl border-2 border-dashed border-primary-300 bg-primary-50">
-    <span className="text-sm font-black text-primary-700">Ilustrasi inline</span>
+  <div className="flex aspect-[3/4] w-full items-center justify-center rounded-xl border-2 border-dashed border-primary-300 bg-primary-50 dark:border-primary-700 dark:bg-primary-900">
+    <span className="text-sm font-black text-primary-700 dark:text-primary-300">Ilustrasi inline</span>
   </div>
 );
 
@@ -332,7 +340,10 @@ export function HeroPage() {
     useState<HeroImageOrientation>("portrait");
   const [withSubHeading, setWithSubHeading] = useState(true);
   const [withButton, setWithButton] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark();
+  const dm = useDarkModeSnippet();
+  const [darkMode, setDarkMode] = usePlaygroundDark();
 
   // Turunan untuk cuplikan kode di bagian Penggunaan — satu sumber dengan Playground.
   const ind = view === "mobile" ? "    " : "";
@@ -350,7 +361,7 @@ export function HeroPage() {
       eyebrow="Components"
       title="Hero"
       description="Blok pembuka halaman: judul, sub heading, deskripsi, satu tombol, dan gambar pendamping. Susunannya mengikuti lebar hero itu sendiri, bukan lebar layar."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="dasar" title="Tampilan dasar">
         <Lead>
@@ -361,8 +372,9 @@ export function HeroPage() {
           tidak diisi tidak dirender, bukan disembunyikan lewat CSS.
         </Lead>
 
-        <Preview>
+        <Preview dark={docsDark}>
           <Hero
+            darkMode={docsDark}
             type="horizontal-image-left"
             heading={heroText}
             subHeading={heroSubHeading}
@@ -377,6 +389,7 @@ export function HeroPage() {
           {"import { Hero } from '@ceplok-ui/design-kit-react'\n\n"}
           {"<Hero\n"}
           {'    type="horizontal-image-left"\n'}
+          {dm.line}
           {'    heading="Hero Design system Ceplok"\n'}
           {'    subHeading="Hero Design system Ceplok"\n'}
           {`    description="${heroDesc}"\n`}
@@ -399,8 +412,9 @@ export function HeroPage() {
         </Lead>
 
         <div className="space-y-6">
-          <Preview label="Hero Horizontal Image Left — bawaan">
+          <Preview label="Hero Horizontal Image Left — bawaan" dark={docsDark}>
             <Hero
+              darkMode={docsDark}
               type="horizontal-image-left"
               heading={heroText}
               subHeading={heroSubHeading}
@@ -410,8 +424,9 @@ export function HeroPage() {
             />
           </Preview>
 
-          <Preview label="Hero Horizontal Image Right">
+          <Preview label="Hero Horizontal Image Right" dark={docsDark}>
             <Hero
+              darkMode={docsDark}
               type="horizontal-image-right"
               heading={heroText}
               subHeading={heroSubHeading}
@@ -421,8 +436,9 @@ export function HeroPage() {
             />
           </Preview>
 
-          <Preview label="Hero Horizontal Image Left — gambar lanskap">
+          <Preview label="Hero Horizontal Image Left — gambar lanskap" dark={docsDark}>
             <Hero
+              darkMode={docsDark}
               type="horizontal-image-left"
               imageOrientation="landscape"
               heading={heroText}
@@ -433,8 +449,9 @@ export function HeroPage() {
             />
           </Preview>
 
-          <Preview label="Hero Horizontal Image Right — gambar lanskap">
+          <Preview label="Hero Horizontal Image Right — gambar lanskap" dark={docsDark}>
             <Hero
+              darkMode={docsDark}
               type="horizontal-image-right"
               imageOrientation="landscape"
               heading={heroText}
@@ -445,8 +462,9 @@ export function HeroPage() {
             />
           </Preview>
 
-          <Preview label="Hero Centered — tanpa gambar, tanpa sub heading">
+          <Preview label="Hero Centered — tanpa gambar, tanpa sub heading" dark={docsDark}>
             <Hero
+              darkMode={docsDark}
               type="centered"
               heading={heroText}
               showHeading={false}
@@ -456,9 +474,10 @@ export function HeroPage() {
           </Preview>
 
           <div>
-            <Preview label="Hero Centered — image saja, di dalam mockup halaman">
-              <PageMockup>
+            <Preview label="Hero Centered — image saja, di dalam mockup halaman" dark={docsDark}>
+              <PageMockup dark={docsDark}>
                 <Hero
+                  darkMode={docsDark}
                   type="centered"
                   centeredContent="image"
                   heading={heroText}
@@ -475,15 +494,23 @@ export function HeroPage() {
           {"{/* Gambar di kiri teks — nilai bawaan type */}\n"}
           {"<Hero "}
           <Mark>type</Mark>
-          {'="horizontal-image-left"  image="/images/hero-sample.svg" … />\n\n'}
+          {'="horizontal-image-left"  image="/images/hero-sample.svg"'}
+          {dm.inline}
+          {" … />\n\n"}
           {"{/* Gambar di kanan teks */}\n"}
           {"<Hero "}
           <Mark>type</Mark>
-          {'="horizontal-image-right" image="/images/hero-sample.svg" … />\n\n'}
-          {"{/* Tanpa gambar, teks terpusat, latar primary-50 */}\n"}
+          {'="horizontal-image-right" image="/images/hero-sample.svg"'}
+          {dm.inline}
+          {" … />\n\n"}
+          {docsDark
+            ? "{/* Tanpa gambar, teks terpusat, latar gray-800 */}\n"
+            : "{/* Tanpa gambar, teks terpusat, latar primary-50 */}\n"}
           {"<Hero "}
           <Mark>type</Mark>
-          {'="centered"               showHeading={false} … />\n\n'}
+          {'="centered"               showHeading={false}'}
+          {dm.inline}
+          {" … />\n\n"}
           {"{/* Centered, isinya satu gambar saja */}\n"}
           {"<Hero\n"}
           {"    "}
@@ -492,6 +519,7 @@ export function HeroPage() {
           {"    "}
           <Mark>centeredContent</Mark>
           {'="image"\n'}
+          {dm.line}
           {'    heading="Hero Design system Ceplok"   {/* jadi <h1> tersembunyi */}\n'}
           {'    image="/images/banner.svg"\n'}
           {'    imageAlt="Hero Design system Ceplok"\n'}
@@ -513,9 +541,10 @@ export function HeroPage() {
 
         {/* Dibingkai 390px — lebar ponsel — karena hero mobile yang dipratinjau
             selebar kotak dokumentasi terbaca melar, bukan seperti pemakaiannya. */}
-        <Stage maxWidth="max-w-[390px]">
-          <div className="overflow-hidden rounded-xl shadow-soft">
+        <Stage maxWidth="max-w-[390px]" dark={docsDark}>
+          <div className={heroFrame(docsDark)}>
             <Hero
+              darkMode={docsDark}
               type="horizontal-image-left"
               platform="mobile"
               heading={heroText}
@@ -530,7 +559,9 @@ export function HeroPage() {
         <SectionCode>
           {"<Hero "}
           <Mark>platform</Mark>
-          {'="mobile" … />'}
+          {'="mobile"'}
+          {dm.inline}
+          {" … />"}
         </SectionCode>
       </FlowSection>
 
@@ -554,12 +585,13 @@ export function HeroPage() {
           lain atau disisipi tautan.
         </Lead>
 
-        <Preview>
+        <Preview dark={docsDark}>
           <Hero
+            darkMode={docsDark}
             type="horizontal-image-right"
             heading={
               <>
-                Hero <span className="text-primary-700">Design system</span>{" "}
+                Hero <span className="text-primary-700 dark:text-primary-400">Design system</span>{" "}
                 Ceplok
               </>
             }
@@ -570,7 +602,7 @@ export function HeroPage() {
                 {heroDesc}. Rinciannya ada di{" "}
                 <a
                   href="#/foundations"
-                  className="font-bold text-primary-700 underline"
+                  className="font-bold text-primary-700 underline dark:text-primary-400"
                 >
                   halaman Foundations
                 </a>
@@ -584,6 +616,7 @@ export function HeroPage() {
 
         <SectionCode>
           {"<Hero\n"}
+          {dm.line}
           {"    "}
           <Mark>heading</Mark>
           {"={\n"}
@@ -618,8 +651,9 @@ export function HeroPage() {
         </Lead>
 
         <div className="space-y-6">
-          <Preview label="buttonLabel diganti">
+          <Preview label="buttonLabel diganti" dark={docsDark}>
             <Hero
+              darkMode={docsDark}
               type="horizontal-image-left"
               heading={heroText}
               subHeading={heroSubHeading}
@@ -630,8 +664,9 @@ export function HeroPage() {
             />
           </Preview>
 
-          <Preview label="Tanpa tombol">
+          <Preview label="Tanpa tombol" dark={docsDark}>
             <Hero
+              darkMode={docsDark}
               type="horizontal-image-left"
               heading={heroText}
               subHeading={heroSubHeading}
@@ -650,17 +685,20 @@ export function HeroPage() {
           {"    "}
           <Mark>buttonHref</Mark>
           {'="/components"\n'}
+          {dm.line}
           {"/>\n\n"}
           {"<Hero "}
           <Mark>showButton</Mark>
-          {"={false} … />"}
+          {"={false}"}
+          {dm.inline}
+          {" … />"}
         </SectionCode>
       </FlowSection>
 
       <FlowSection id="gambar" title="image · imageOrientation · imageContent">
         <Lead>
           <Hl>image</Hl> menerima URL berkas dan dirender{" "}
-          <strong className="text-gray-900">tanpa kunci rasio</strong>:
+          <strong className="text-gray-900 dark:text-white">tanpa kunci rasio</strong>:
           tingginya mengikuti rasio asli berkasnya. Ini disengaja — mengunci{" "}
           <Hl>aspect-ratio</Hl> di sini membuat ilustrasi potret ikut dipipihkan
           dan teks di dalamnya jadi gepeng. Karena itu{" "}
@@ -680,8 +718,9 @@ export function HeroPage() {
           <Hl>centeredContent="image"</Hl>.
         </Lead>
 
-        <Preview label="imageContent — ilustrasi inline, bukan berkas">
+        <Preview label="imageContent — ilustrasi inline, bukan berkas" dark={docsDark}>
           <Hero
+            darkMode={docsDark}
             type="horizontal-image-left"
             heading={heroText}
             subHeading={heroSubHeading}
@@ -702,23 +741,32 @@ export function HeroPage() {
           {"    "}
           <Mark>imageAlt</Mark>
           {'="Sampul panduan Designing Interfaces"\n'}
+          {dm.line}
           {"/>\n\n"}
           {"{/* Pendamping berupa elemen — hanya dipakai bila image kosong */}\n"}
           {"<Hero "}
           <Mark>imageContent</Mark>
-          {'={<Ilustrasi className="w-full" />} … />'}
+          {'={<Ilustrasi className="w-full" />}'}
+          {dm.inline}
+          {" … />"}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Isi <Hl>darkMode</Hl> untuk halaman berlatar gelap. Ketiga tipe memakai
-          latar <Hl>gray-800</Hl> (token surface-subtle, sama dengan Container), termasuk <Hl>centered</Hl> yang di tampilan
-          terang berlatar <Hl>primary-50</Hl>. Judul jadi putih, sub heading{" "}
-          <Hl>primary-400</Hl>, dan deskripsi <Hl>gray-300</Hl>. Tombolnya tetap{" "}
-          <Hl>primary-700</Hl>. Susunan, ukuran, dan perilaku responsifnya sama
-          persis dengan tampilan terang, termasuk gambar di kiri atau kanan.
-        </Lead>
+      {/* stayDark: bagian ini selalu memperagakan darkMode, di mode docs apa pun. */}
+      <ModeSection
+        name="Hero"
+        stayDark
+        lead={
+          <>
+            Isi <Hl>darkMode</Hl> untuk halaman berlatar gelap. Ketiga tipe memakai
+            latar <Hl>gray-800</Hl> (token surface-subtle, sama dengan Container), termasuk{" "}
+            <Hl>centered</Hl> yang di tampilan terang berlatar <Hl>primary-50</Hl>. Judul jadi
+            putih, sub heading <Hl>primary-400</Hl>, dan deskripsi <Hl>gray-300</Hl>. Tombolnya
+            tetap <Hl>primary-700</Hl>. Susunan, ukuran, dan perilaku responsifnya sama persis
+            dengan tampilan terang, termasuk gambar di kiri atau kanan.
+          </>
+        }
+      >
 
         <div className="space-y-6">
           <Preview label="Image Left — gelap" dark>
@@ -836,7 +884,7 @@ export function HeroPage() {
           {"    …\n"}
           {"/>"}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="ukuran" title="Ukuran & jarak">
         <Lead>
@@ -849,14 +897,14 @@ export function HeroPage() {
         </Lead>
 
         <div className="ds-card overflow-hidden">
-          <dl className="divide-y divide-border">
+          <dl className="divide-y divide-border dark:divide-gray-700">
             {spacingSpec.map(([term, value]) => (
               <div
                 key={term}
                 className="grid gap-1 px-5 py-3 sm:grid-cols-[13rem_1fr] sm:gap-4"
               >
-                <dt className="text-sm font-black text-gray-900">{term}</dt>
-                <dd className="text-body-sm leading-6 text-gray-600">
+                <dt className="text-sm font-black text-gray-900 dark:text-white">{term}</dt>
+                <dd className="text-body-sm leading-6 text-gray-600 dark:text-gray-300">
                   {value}
                 </dd>
               </div>
@@ -868,7 +916,7 @@ export function HeroPage() {
       <FlowSection id="responsif" title="Perilaku responsif">
         <Lead>
           Ambang di bawah ini diukur dari{" "}
-          <strong className="text-gray-900">lebar hero itu sendiri</strong>,
+          <strong className="text-gray-900 dark:text-white">lebar hero itu sendiri</strong>,
           bukan lebar layar — elemen <Hl>{"<section>"}</Hl> dipasangi{" "}
           <Hl>@container</Hl>. Jadi hero yang ditaruh di kolom sempit pada layar
           desktop tetap tampil bertumpuk seperti di ponsel. Prop{" "}
@@ -879,15 +927,15 @@ export function HeroPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           {responsiveBehaviour.map(([title, desc]) => (
             <article key={title} className="ds-card p-5">
-              <h3 className="text-sm font-black text-gray-900">{title}</h3>
-              <p className="mt-1.5 text-body-sm leading-6 text-gray-500">
+              <h3 className="text-sm font-black text-gray-900 dark:text-white">{title}</h3>
+              <p className="mt-1.5 text-body-sm leading-6 text-gray-500 dark:text-gray-400">
                 {desc}
               </p>
             </article>
           ))}
         </div>
 
-        <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500">
+        <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500 dark:text-gray-400">
           Yang tidak berubah di ukuran mana pun: jarak atas-bawah 24px, judul{" "}
           <Hl>font-black</Hl>, sub heading <Hl>primary-600</Hl>, deskripsi ditahan{" "}
           <Hl>max-w-2xl</Hl>, dan teks selalu ditulis lebih dulu di DOM — letak

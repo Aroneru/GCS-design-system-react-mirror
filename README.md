@@ -107,14 +107,30 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   nilai awal saat pengguna berpindah halaman demo.
 - **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`, `Dropdown`, `Popover`,
   `Modal`, `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
-  `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, `Navbar`, dan
-  `Timeline`, serta `Avatar` dan `Clipboard`.
-- **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
-  dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
-  `--color-search-category-surface` dan `--color-search-field-surface` (Search),
-  `--color-breadcrumb-*` (Breadcrumb), `--color-card-*` (Card), `--color-clipboard-*` (Clipboard), `--color-footer-*` (Footer),
-  `--color-dropdown-*` (Dropdown), `--color-popover-*` (Popover), serta `--color-timeline-*` (Timeline). Panduan
-  lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
+  `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, `Navbar`,
+  `ListView`, `Table`, `TableOfContents`, dan `Timeline`, serta `Avatar` dan
+  `Clipboard`.
+- **Badge, Button, dan Pagination memakai prop `darkMode`**: ketiganya belum
+  berbasis token, jadi tidak ikut gelap lewat `data-theme="dark"` pembungkus.
+  Badge dan Button juga ikut gelap otomatis di dalam `Table`, `Modal`, atau
+  `Navbar` ber-`darkMode`.
+- **Table butuh prop `darkMode`**: di dalam pembungkus `data-theme="dark"`, warna
+  tabel ikut gelap, tetapi Pagination, Button, dan Badge di dalamnya tetap
+  terang. Pasang `darkMode` pada `Table` supaya semuanya ikut gelap.
+- **Footer selalu gelap**: Footer tidak punya tema terang, jadi tidak membaca
+  `data-theme`. Warnanya tetap bisa ditimpa lewat token `--color-footer-*`.
+- **Token komponen**: warna khusus tiap komponen bisa ditimpa di CSS aplikasi
+  consumer tanpa mengubah komponen lain.
+  - Umum: `--color-alert-*`, `--color-toast-*`, `--color-avatar-*`,
+    `--color-breadcrumb-*`, `--color-card-*`, `--color-clipboard-*`,
+    `--color-hero-*`, `--color-footer-*`.
+  - Overlay dan navigasi: `--color-dropdown-*`, `--color-popover-*`,
+    `--color-sidebar-*`, `--color-toc-*`.
+  - Data: `--color-table-*`, `--color-timeline-*`.
+  - Form: `--color-input-*`, `--color-floating-*`, `--color-select-*`,
+    `--color-search-*`, `--color-radio-*`, `--color-toggle-*`.
+
+  Panduan lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
 
 ## Komponen & props
 
@@ -196,6 +212,34 @@ import { InfoCircle } from '@ceplok-ui/design-kit-react/icons/outline'
   <p>Dialog ini tidak menampilkan ikon.</p>
 </Modal>
 ```
+
+#### Badge
+
+Badge adalah label status ringkas dengan lima `variant`: `gray`, `brand`,
+`danger`, `warning`, dan `success`. Ikon kiri (`icon`) dan tombol tutup
+(`dismissible`) sama-sama opsional. Ikon mengikuti warna teks, jadi pakai SVG
+dengan `currentColor`.
+
+```tsx
+import { Clock } from '@ceplok-ui/design-kit-react/icons/solid'
+
+<Badge variant="success">Aktif</Badge>
+<Badge variant="warning" icon={<Clock />} dismissible onDismiss={tutup}>
+  Menunggu
+</Badge>
+```
+
+Tanpa `open`, Badge mengurus sendiri tampil dan sembunyinya setelah tombol tutup
+diklik. Isi `open` untuk mengendalikannya dari luar.
+
+Tema gelap:
+
+- `darkMode` memakai latar -900 dan teks -300, atau latar gray-700 untuk
+  variant `gray`. Kontrasnya tetap di atas 4,5:1.
+- Badge di dalam `Table`, `Modal`, atau `Navbar` ber-`darkMode` ikut gelap tanpa
+  prop sendiri. `darkMode={false}` pada Badge tetap menang.
+- Badge **tidak** ikut gelap lewat `data-theme="dark"` pembungkus. Di luar tiga
+  komponen tadi, pasang `darkMode` langsung.
 
 #### Avatar
 
@@ -1012,6 +1056,21 @@ memberi baris zebra. Kolom berkas memakai `file`, mis.
 `file: { name: (r) => r.berkas, href: (r) => r.url }`: gambar dan PDF dibuka di
 pratinjau, berkas lain diunduh. Bentuk yang sama tersedia sebagai komponen
 `TableFile` untuk dipakai di `cell` sendiri.
+
+`darkMode` memasang `data-theme="dark"` di tabel: toolbar gray-800, header
+gray-600, dan footer gray-700. Baris gray-700, atau bergantian gray-700 dan
+gray-800 bila `striped`. Pagination, tombol Filter, dan Dropdown ikut gelap,
+begitu juga Button dan Badge di toolbar maupun di sel. `darkMode={false}` pada
+Button atau Badge tetap menang. Semua warnanya dari token `--color-table-*`:
+
+```css
+[data-theme='dark'] {
+  --color-table-toolbar: #1f2a37;
+}
+```
+
+Table otomatis memakai `size="compact"` bila lebar tabel di bawah 640px. Yang
+diukur lebar tabel, bukan lebar layar.
 
 ## Ikon
 
