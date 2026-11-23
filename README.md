@@ -109,6 +109,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
   `--color-search-category-surface` dan `--color-search-field-surface` (Search),
   `--color-breadcrumb-*` (Breadcrumb), `--color-clipboard-*` (Clipboard),
+  `--color-upload-empty-surface` (Upload),
   `--color-dropdown-*` (Dropdown), `--color-popover-*` (Popover), serta `--color-timeline-*` (Timeline). Panduan
   lengkap token dan cara kerjanya ada di [COLOR.md](COLOR.md).
 
@@ -394,6 +395,10 @@ Prop yang dipakai bersama seluruh komponen form:
   Pada mode gelap, seluruh bentuk Search memakai garis luar 1px gray-500 agar
   batasnya tetap terlihat tanpa mengubah dimensi field. Light mode tidak berubah.
 - `Upload`: dibatasi khusus berkas tunggal (atribut `multiple` dinonaktifkan).
+  Saat `darkMode` aktif dan belum ada berkas yang dipilih, background kolom
+  nama berkas beserta border pembungkus memakai token khusus
+  `--color-upload-empty-surface` (bawaan `#1F2A37`). Timpa token tersebut di
+  CSS aplikasi bila warna khusus Upload perlu disesuaikan.
 - `application`: `default | purple` — warna aksen per aplikasi.
 - `state`: `default | inactive` (`InputField` dan `FloatingLabel` punya state
   tambahan, lihat tabel). `inactive` sekaligus menonaktifkan kontrolnya.
