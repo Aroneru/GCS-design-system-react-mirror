@@ -27,8 +27,6 @@ export interface PopoverProps
   side?: PopoverSide
   /** Menggunakan tampilan gelap pada panel Popover. */
   darkMode?: boolean
-  /** Boundary tema eksplisit. Tanpa prop ini Popover mengikuti data-theme ancestor. */
-  'data-theme'?: 'light' | 'dark'
   /** Visibilitas terkontrol. */
   open?: boolean
   /** Visibilitas awal saat tidak dikontrol. */
@@ -104,7 +102,6 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
     className,
     children,
     id,
-    'data-theme': dataTheme,
     ...props
   },
   forwardedRef,
@@ -406,7 +403,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(function Popover
       <div
         ref={setPanelRef}
         id={panelId}
-        data-theme={darkMode ? 'dark' : dataTheme}
+        data-theme={darkMode ? 'dark' : undefined}
         className={cn(
           'fixed inset-auto m-0 w-[255px] shrink-0 overflow-visible border-0 bg-transparent p-0 [filter:drop-shadow(0_1px_2px_rgb(0_0_0/0.08))]',
           positionReady ? 'visible' : 'invisible',

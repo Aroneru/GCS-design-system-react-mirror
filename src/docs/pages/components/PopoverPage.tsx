@@ -3,11 +3,13 @@ import { InfoCircle } from 'flowbite-react-icons/outline'
 import { Icon, Popover, type PopoverSide } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { H, Hl, Segmented } from '../../pageKit'
+import { tocForDarkDocs, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import {
   Control,
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -44,15 +46,20 @@ const staticArrowClasses: Record<PopoverSide, string> = {
   left: 'top-1/2 right-[-8px] -translate-y-1/2 rotate-90',
 }
 
-function StaticPositionPreview({ side }: { side: PopoverSide }) {
+function StaticPositionPreview({ side, darkMode }: { side: PopoverSide; darkMode: boolean }) {
   const arrowUsesHeader = side === 'bottom'
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border bg-surface-subtle">
+    <div
+      data-theme={darkMode ? 'dark' : undefined}
+      className={`overflow-x-auto rounded-xl border ${
+        darkMode ? 'border-gray-800 bg-gray-900 dark:border-gray-700' : 'border-border bg-surface-subtle'
+      }`}
+    >
       <div className="relative h-80 min-w-[600px]">
         <span
           aria-hidden="true"
-          className="absolute top-1/2 left-1/2 inline-flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md text-gray-500"
+          className="absolute top-1/2 left-1/2 inline-flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md text-gray-500 dark:text-gray-400"
         >
           <Icon>
             <InfoCircle />
@@ -88,12 +95,14 @@ function StaticPositionPreview({ side }: { side: PopoverSide }) {
   )
 }
 
-function PositionCode() {
+function PositionCode({ darkMode }: { darkMode: boolean }) {
   return (
     <SectionCode flush>
       {"import { Icon, Popover } from '@ceplok-ui/design-kit-react'\n"}
       {"import { InfoCircle } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
-      {'<Popover\n  trigger={\n    <button type="button" aria-label="Buka informasi">\n      <Icon><InfoCircle /></Icon>\n    </button>\n  }\n  title="Popover"\n  '}
+      {'<Popover\n  '}
+      {darkMode && <><H>darkMode</H>{'\n  '}</>}
+      {'trigger={\n    <button type="button" aria-label="Buka informasi">\n      <Icon><InfoCircle /></Icon>\n    </button>\n  }\n  title="Popover"\n  '}
       <H>{'side="top"'}</H>
       {'\n>\n  Popover Body Text\n</Popover>'}
     </SectionCode>
@@ -115,8 +124,7 @@ const popoverProps: PropRow[] = [
     "'right'",
     'Preferensi posisi panel terhadap trigger; posisi dapat berbalik agar aman di viewport.',
   ],
-  ['data-theme', "'light' | 'dark'", 'inherit', 'Boundary tema eksplisit. Tanpa prop ini Popover mengikuti data-theme ancestor; darkMode={true} tetap memaksa dark.'],
-  ['darkMode', 'boolean', 'false', 'Menggunakan tampilan gelap pada panel Popover.'],
+  ['darkMode', 'boolean', 'false', 'Memaksa panel Popover bertema gelap. Tanpa prop ini, Popover mengikuti tema pembungkusnya.'],
   ['open', 'boolean', '—', 'Mengontrol visibilitas Popover dari luar.'],
   ['defaultOpen', 'boolean', 'false', 'Menentukan visibilitas awal saat Popover tidak dikontrol.'],
   [
@@ -142,6 +150,8 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc, true)
+
 function infoTrigger(label: string, darkMode = false, className = '') {
   return (
     <button
@@ -161,15 +171,16 @@ function infoTrigger(label: string, darkMode = false, className = '') {
 }
 
 export function PopoverPage() {
+  const docsDark = useDocsDark()
   const [side, setSide] = useState<PopoverSide>('right')
-  const [darkMode, setDarkMode] = useState(false)
+  const [darkMode, setDarkMode] = usePlaygroundDark()
 
   return (
     <UsulanPage
       eyebrow="Components"
       title="Popover"
       description="Panel informasi non-modal yang dibuka dari trigger dan ditempatkan secara aman di sekitar trigger."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="popover" title="Popover">
         <Lead>
@@ -177,12 +188,13 @@ export function PopoverPage() {
           <Hl>&lt;button&gt;</Hl>. Ikon informasi di bawah hanya contoh; trigger dapat berupa tombol
           native lain yang sesuai konteks.
         </Lead>
-        <Stage maxWidth="max-w-[640px]">
+        <Stage maxWidth="max-w-[640px]" dark={docsDark}>
           <div className="flex min-h-32 items-center justify-center gap-0 p-6">
-            <span className="text-sm font-medium text-gray-900">Nomor referensi</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white">Nomor referensi</span>
             <Popover
-              trigger={infoTrigger('Informasi nomor referensi', false, '-ml-1')}
+              trigger={infoTrigger('Informasi nomor referensi', docsDark, '-ml-1')}
               title="Nomor referensi"
+              darkMode={docsDark}
             >
               Nomor referensi digunakan untuk melacak status pengajuan.
             </Popover>
@@ -198,28 +210,34 @@ export function PopoverPage() {
         <div className="grid gap-8">
           {positionSides.map((item) => (
             <article key={item.value}>
-              <h3 className="mb-3 text-sm font-black text-gray-900">{item.label}</h3>
-              <StaticPositionPreview side={item.value} />
+              <h3 className="mb-3 text-sm font-black text-gray-900 dark:text-white">{item.label}</h3>
+              <StaticPositionPreview side={item.value} darkMode={docsDark} />
             </article>
           ))}
         </div>
         <div className="mt-8">
-          <PositionCode />
+          <PositionCode darkMode={docsDark} />
         </div>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Popover mewarisi <Hl>data-theme</Hl> dari consumer boundary. Pada Dark, header memakai
-          gray-700, body gray-800, judul gray-50, dan teks body gray-400. Prop <Hl>darkMode</Hl> tetap
-          tersedia sebagai override kompatibilitas. Arrow mengikuti surface yang bersentuhan dengannya.
-        </Lead>
+      <ModeSection
+        name="Popover"
+        stayDark
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengubah tema panel Popover. Tanpa prop tersebut, panel mengikuti
+            <Hl> data-theme</Hl>{' '}dari elemen pembungkus. Header memakai gray-700, body gray-800, judul
+            gray-50, dan teks body gray-400. Arrow mengikuti surface yang bersentuhan dengannya.
+          </>
+        }
+      >
         <Stage maxWidth="max-w-[640px]" dark>
-          <div data-theme="dark" className="flex min-h-32 items-center justify-center p-6">
+          <div className="flex min-h-32 items-center justify-center p-6">
             <Popover
               trigger={infoTrigger('Buka Popover dark mode', true)}
               title="Popover"
               side="top"
+              darkMode
             >
               {body}
             </Popover>
@@ -228,15 +246,18 @@ export function PopoverPage() {
         <SectionCode>
           {"import { Icon, Popover } from '@ceplok-ui/design-kit-react'\n"}
           {"import { InfoCircle } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
-          {'<div '}<H>data-theme</H>{'="dark">\n  <Popover\n    '}
+          {'<Popover\n    '}
+          <H>darkMode</H>{'\n    '}
           <H>trigger</H>
-          {'={\n      <button\n        type="button"\n        aria-label="Buka informasi"\n        className="inline-flex size-9 items-center justify-center text-gray-400 focus-visible:outline-2"\n      >\n        <Icon><InfoCircle /></Icon>\n      </button>\n    }\n    '}
+          {'={\n      <button\n        type="button"\n        aria-label="Buka informasi"\n        className="inline-flex size-9 items-center justify-center '}
+          {'text-gray-400'}
+          {' focus-visible:outline-2"\n      >\n        <Icon><InfoCircle /></Icon>\n      </button>\n    }\n    '}
           <H>title</H>
           {'="Popover"\n    '}
           <H>side</H>
-          {'="top"\n  >\n    Popover Body Text\n  </Popover>\n</div>'}
+          {'="top"\n  >\n    Popover Body Text\n</Popover>'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -244,11 +265,12 @@ export function PopoverPage() {
           lifecycle komponen yang sebenarnya.
         </Lead>
         <Stage maxWidth="max-w-[640px]" dark={darkMode}>
-          <div data-theme={darkMode ? 'dark' : 'light'} className="flex min-h-32 items-center justify-center p-6">
+          <div className="flex min-h-32 items-center justify-center p-6">
             <Popover
               trigger={infoTrigger('Buka Popover Playground', darkMode)}
               title="Popover"
               side={side}
+              darkMode={darkMode}
             >
               {body}
             </Popover>
@@ -287,8 +309,8 @@ export function PopoverPage() {
         <SectionCode flush>
           {"import { Icon, Popover } from '@ceplok-ui/design-kit-react'\n"}
           {"import { InfoCircle } from '@ceplok-ui/design-kit-react/icons/outline'\n\n"}
-          {darkMode && <>{'<div '}<H>data-theme</H>{'="dark">\n  '}</>}
           {'<Popover\n  '}
+          {darkMode && <><H>darkMode</H>{'\n  '}</>}
           <H>trigger</H>
           {'={\n    <button\n      type="button"\n      aria-label="Buka informasi"\n      className="inline-flex size-9 items-center justify-center rounded-md '}
           {darkMode ? 'text-gray-400' : 'text-gray-500'}
@@ -303,11 +325,10 @@ export function PopoverPage() {
             </>
           )}
           {'\n>\n  Popover Body Text, Popover Body Text, Popover Body Text\n</Popover>'}
-          {darkMode && '\n</div>'}
         </SectionCode>
 
-        <h3 className="mt-8 text-sm font-black text-gray-900">Accessibility</h3>
-        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
+        <h3 className="mt-8 text-sm font-black text-gray-900 dark:text-white">Accessibility</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Popover menambahkan <Hl>aria-expanded</Hl> dan <Hl>aria-controls</Hl> pada trigger, sedangkan
           trigger tetap harus memiliki nama aksesibel. Panel bersifat non-modal dan tidak memindahkan
           atau mengunci fokus. Elemen non-interaktif, Fragment, button yang dibungkus elemen lain,

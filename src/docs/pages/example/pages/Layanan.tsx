@@ -131,22 +131,16 @@ export function Layanan() {
                     <Modal
                       trigger={<Button size="xs">Ajukan</Button>}
                       title={l.judul}
-                      footer={({ close }) => (
-                        <>
-                          <Button variant="outline" theme="gray" size="xs" onClick={close}>
-                            Batal
-                          </Button>
-                          <Button
-                            size="xs"
-                            onClick={() => {
-                              setTerkirim(true)
-                              close()
-                            }}
-                          >
-                            Lanjutkan
-                          </Button>
-                        </>
-                      )}
+                      actions={{
+                        secondary: { label: 'Batal', onClick: ({ close }) => close() },
+                        primary: {
+                          label: 'Lanjutkan',
+                          onClick: ({ close }) => {
+                            setTerkirim(true)
+                            close()
+                          },
+                        },
+                      }}
                     >
                       <p>{l.deskripsi}</p>
                       <dl className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-surface-subtle p-4">

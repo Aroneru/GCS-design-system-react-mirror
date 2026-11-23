@@ -1,4 +1,4 @@
-import type { HTMLAttributes, MouseEvent, ReactNode } from "react";
+import type { HTMLAttributeAnchorTarget, HTMLAttributes, MouseEvent, ReactNode } from "react";
 
 /** Tautan pada submenu Sidebar. */
 export interface SidebarSubItem {
@@ -47,6 +47,8 @@ export interface SidebarUserItem {
   description?: ReactNode;
   icon?: ReactNode;
   href?: string;
+  target?: HTMLAttributeAnchorTarget;
+  rel?: string;
   external?: boolean;
   tone?: SidebarUserItemTone;
   disabled?: boolean;
@@ -68,7 +70,7 @@ export interface SidebarUser {
   avatar?: string;
   avatarSrc?: string;
   avatarAlt?: string;
-  initials?: string;
+  initials?: ReactNode;
   href?: string;
   external?: boolean;
   onClick?: (e: MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLElement>) => void;

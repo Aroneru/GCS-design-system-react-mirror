@@ -92,7 +92,9 @@ yang didefinisikan di `tokens.css`. Tema gelap diatur secara deklaratif lewat
 atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 
 - **Prop `darkMode`**: Memasang `darkMode={true}` pada komponen akan menyetel
-  atribut `data-theme="dark"` pada elemen terluarnya.
+  atribut `data-theme="dark"` pada boundary tema komponen. Pada `Modal`, tema
+  hanya diterapkan ke elemen `<dialog>`; trigger milik consumer mengatur temanya
+  sendiri, misalnya dengan `<Button darkMode>`.
 - **Pewarisan tema otomatis**: Jika sebuah elemen pembungkus memiliki atribut
   `data-theme="dark"` (misalnya `<div data-theme="dark">`), semua komponen di
   dalamnya otomatis beradaptasi ke tema gelap tanpa perlu memberikan prop
@@ -100,8 +102,8 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 - **Kembali ke tema terang**: Bagian di dalam area gelap dapat dikembalikan ke
   tema terang dengan `data-theme="light"` atau kelas `.ds-theme-light`.
 - **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`, `Dropdown`, `Popover`,
-  `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
-  `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, dan
+  `Modal`, `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
+  `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, `Navbar`, dan
   `Timeline`, serta `Avatar` dan `Clipboard`.
 - **Token komponen**: Warna latar dan elemen khusus komponen disediakan melalui token yang
   dapat ditimpa di CSS aplikasi consumer, seperti `--color-sidebar-surface` (Sidebar),
@@ -118,18 +120,18 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | ------------ | -------------------------------------------------------------------------------------------------------------------- |
 | `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| submit \| reset`, `iconOnly`, `as`: `button \| anchor`, `darkMode` |
 | `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
-| `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| female \| male`, `size`: `small \| default \| large`, `darkMode` (deprecated) |
+| `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| female \| male`, `size`: `small \| default \| large`, `darkMode` |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
-| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label` / `aria-label` / `aria-labelledby` (salah satu wajib), `helperText`, `platform`, `disabled`, `onCopySuccess`, `onCopyError`, `darkMode` (deprecated) |
+| `Clipboard`  | `value`, `variant`: `default \| segmented`, `prefix`, `label` / `aria-label` / `aria-labelledby` (salah satu wajib), `helperText`, `platform`, `disabled`, `onCopySuccess`, `onCopyError`, `darkMode` |
 | `Alert`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Toast`      | `variant`, `heading`, `icon`, `dismissible`, `actions`, `darkMode`                                                   |
 | `Card`       | `image`, `title`, `description`, `href`, `linkLabel`, `actions`, `darkMode`                                          |
 | `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `actionLabel`, `actionDisabled`, `interactiveFeedback`, `darkMode` |
 | `Container`  | `as` (default `div`), `padded` (default `true`), `darkMode`                                                          |
 | `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
-| `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, ambient `data-theme`, `darkMode` (override kompatibilitas) |
-| `Dropdown`   | `trigger`, `items`/`groups` atau `children`, `align`, `closeOnSelect`, `actionsRef`, `contentLabel`, `contentClassName`, `data-theme`, `darkMode` |
-| `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `closeOnBackdrop`, `closeOnEscape`, `showCloseButton`, `closeLabel` |
+| `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode` |
+| `Dropdown`   | `trigger`, `items`/`groups` atau `children`, `align`, `closeOnSelect`, `actionsRef`, `contentLabel`, `contentClassName`, `darkMode` |
+| `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `icon` (Popup), `actions`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `darkMode`, `closeOnBackdrop`, `closeOnEscape`, `showCloseButton`, `closeLabel` |
 | `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `afterItems`, `theme`, `darkMode`   |
 | `Breadcrumb` | `items`, `separator`, `size`, `background`, `darkMode`                                                               |
 | `Pagination` | `currentPage`, `totalPages`, `onPageChange`, `theme`, `size`, `darkMode`                                             |
@@ -154,6 +156,43 @@ meneruskan atribut HTML native ke elemen `<button>`, memungkinkan tombol dipakai
 untuk submit form. Untuk tautan pakai `as="anchor"` bersama `href`, maka
 Button dirender sebagai `<a>`.
 
+Modal menerima `actions` untuk tombol standar: `secondary`, `primary`, dan
+`danger`. Gunakan `primary` untuk aksi utama seperti Simpan/Lanjutkan,
+`secondary` untuk alternatif seperti Batal/Kembali, dan `danger` untuk aksi
+destruktif seperti Hapus. Peran menentukan tampilan dan urutan standar, bukan
+proses bisnisnya: consumer menentukan label, handler, dan respons. Handler
+menerima `{ close }`; Modal tidak menutup otomatis, jadi panggil `close()` setelah
+aksi berhasil.
+
+`buttonProps` dapat mengubah tampilan per tombol. Pada aksi `danger`, mengisi
+`buttonProps.theme` mengganti preset destruktif Modal dengan theme Button
+tersebut. `buttonProps.className` ditambahkan ke preset; jangan mengandalkannya
+untuk mengganti warna destruktif. Gunakan `footer` sebagai override penuh untuk konten kustom;
+`actions` dan `footer` tidak dapat digunakan bersamaan. `darkMode` pada Modal
+juga diwariskan ke Button di dalam dialog, kecuali Button diberi override eksplisit.
+
+Popup menampilkan ikon tanda seru secara bawaan. Ganti dengan elemen ikon lain
+melalui `icon`, atau sembunyikan dengan `icon={null}`. Consumer dapat memilih
+jenis ikon pengganti sekaligus mengatur ukuran dan warnanya; Modal mengatur
+posisi ikon.
+
+```tsx
+import { Icon, Modal } from '@ceplok-ui/design-kit-react'
+import { InfoCircle } from '@ceplok-ui/design-kit-react/icons/outline'
+
+<Modal
+  variant="popup"
+  icon={<Icon className="size-8 text-primary-700"><InfoCircle /></Icon>}
+  aria-label="Informasi layanan"
+>
+  <p>Periksa kembali informasi layanan sebelum melanjutkan.</p>
+</Modal>
+
+<Modal variant="popup" icon={null} aria-label="Konfirmasi">
+  <p>Dialog ini tidak menampilkan ikon.</p>
+</Modal>
+```
+
 #### Avatar
 
 Avatar memprioritaskan foto dari `src`. Foto mempertahankan rasio melalui
@@ -176,10 +215,11 @@ tersedia asset Female/Male untuk tema terang dan gelap:
 ```
 
 Avatar mengikuti `data-theme` dari pembungkusnya, termasuk scope bertingkat.
-Prop `darkMode` masih didukung untuk kompatibilitas tetapi deprecated. Pakai
-`alt=""` bila nama pemilik sudah tertulis di dekat Avatar agar pembaca layar
-tidak mengumumkannya dua kali. Ukuran API tetap `small` (S, 24px), `default`
-(M, 32px), dan `large` (L, 80px); M adalah bawaan.
+Prop `darkMode` mengaktifkan tampilan gelap secara lokal; tanpa prop tersebut,
+Avatar mewarisi tema pembungkus. Pakai `alt=""` bila nama pemilik sudah tertulis
+di dekat Avatar agar pembaca layar tidak mengumumkannya dua kali. Ukuran API
+tetap `small` (S, 24px), `default` (M, 32px), dan `large` (L, 80px); M adalah
+bawaan.
 
 #### Clipboard
 
@@ -191,6 +231,9 @@ menampilkan `prefix` kontekstual yang **tidak** ikut disalin. `platform` bernila
 Desktop memakai teks 14px; Mobile mempertahankan ukuran ringkasnya. Ukuran,
 weight, dan line-height mengikuti preset tersebut, sedangkan keluarga font tetap
 mewarisi pilihan consumer: Lato, Inter, atau Arial.
+
+Setiap pemakaian harus memberi nama aksesibel melalui `label`, `aria-label`,
+atau `aria-labelledby`; `value` tidak digunakan sebagai fallback nama.
 
 ```tsx
 import { Clipboard } from '@ceplok-ui/design-kit-react'
@@ -224,8 +267,9 @@ scope bertingkat:
 </section>
 ```
 
-`darkMode` masih tersedia sebagai override kompatibilitas, tetapi deprecated;
-gunakan `data-theme="dark"` untuk kode baru.
+Prop `darkMode` mengaktifkan palet gelap secara lokal. Tanpa prop tersebut,
+Clipboard mewarisi tema pembungkus; gunakan scope `data-theme` untuk menerapkan
+tema ke beberapa komponen sekaligus.
 
 #### Spinner
 
@@ -276,8 +320,12 @@ ukuran ringkas bawaannya dan tidak menerima `title` atau `size`; berikan
 `closeOnBackdrop`, `closeOnEscape`, dan `showCloseButton` bernilai `true` secara
 bawaan dan dapat dimatikan secara independen. Jika semuanya dimatikan,
 sediakan aksi footer yang memanggil `close()`. `closeLabel` memberi nama
-aksesibel pada tombol X. Tema mengikuti wrapper ambient `data-theme="dark"`;
-Modal tidak memiliki prop `darkMode`. Nested Modal adalah komposisi dua Modal
+aksesibel pada tombol X. Prop `darkMode` mengatur tema dialog; `trigger` adalah
+elemen milik consumer dan mengatur temanya sendiri, misalnya dengan
+`<Button darkMode>`. Tanpa prop, tema dialog mengikuti wrapper ambient
+`data-theme`. Atribut `data-theme="light"` atau `data-theme="dark"` yang
+diberikan langsung pada Modal menjadi override paling eksplisit; nilai efektif
+yang sama diteruskan ke Button internal. Nested Modal adalah komposisi dua Modal
 controlled dengan state terpisah: Default membuka Popup, penutupan Popup tidak
 menutup Default, dan fokus kembali ke kontrol pembukanya.
 
@@ -488,19 +536,18 @@ export function FilterDropdown() {
 }
 ```
 
-Dropdown mengikuti boundary ambient `data-theme="light" | "dark"`. Warna
-surface, content, icon, description, current, hover, disabled, dan danger
-berasal dari semantic component tokens `--color-dropdown-*`. Prop
-`darkMode={true}` tetap tersedia sebagai compatibility override dan belum
-deprecated; untuk kode baru, utamakan boundary ambient:
+Dropdown mewarisi tema ambient `data-theme` dari pembungkus. Prop `darkMode`
+mengaktifkan tema gelap lokal. Warna surface, content, icon, description,
+current, hover, disabled, dan danger berasal dari semantic component tokens
+`--color-dropdown-*`. Pada `children` kustom, styling konten tetap menjadi
+tanggung jawab consumer.
 
 ```tsx
-<div data-theme="dark">
-  <Dropdown
-    trigger={<button type="button">Menu</button>}
-    items={[{ id: 'profile', label: 'Profil', href: '/profil' }]}
-  />
-</div>
+<Dropdown
+  darkMode
+  trigger={<button type="button">Menu</button>}
+  items={[{ id: 'profile', label: 'Profil', href: '/profil' }]}
+/>
 ```
 
 ### Popover
@@ -512,21 +559,19 @@ preferensi `top | right | bottom | left` (default `right`); panel dapat berbalik
 agar tetap berada di viewport. Visibility dapat dikontrol melalui
 `open`/`onOpenChange`, atau diawali dengan `defaultOpen`.
 
-Popover mengikuti boundary ambient `data-theme="light" | "dark"`. Token lokal
-`--color-popover-*` mengatur surface, border, header, dan teks. `darkMode`
-tetap tersedia sebagai compatibility override; untuk kode baru, gunakan boundary
-ambient:
+Popover mewarisi tema ambient `data-theme` dari elemen pembungkus. Prop
+`darkMode` mengaktifkan tema gelap lokal pada panel. Token `--color-popover-*`
+mengatur surface, border, header, dan teks:
 
 ```tsx
-<div data-theme="dark">
-  <Popover
-    trigger={<button type="button" aria-label="Buka informasi">i</button>}
-    title="Informasi"
-    side="top"
-  >
-    Penjelasan singkat.
-  </Popover>
-</div>
+<Popover
+  darkMode
+  trigger={<button type="button" aria-label="Buka informasi">i</button>}
+  title="Informasi"
+  side="top"
+>
+  Penjelasan singkat.
+</Popover>
 ```
 
 ### Navbar
@@ -543,7 +588,6 @@ navigasi mobile sendiri yang bersumber dari `items`.
 ```tsx
 import {
   Navbar,
-  Search,
   type NavbarAccount,
   type NavbarPrimaryItem,
 } from '@ceplok-ui/design-kit-react'
@@ -592,7 +636,6 @@ const items = [
 
 const account = {
   name: 'Siti Rahma',
-  initials: 'SR',
   items: [
     { id: 'profil', type: 'destination', label: 'Profil', href: '/profil' },
     {
@@ -611,14 +654,9 @@ export function FrontOfficeNavbar() {
       platform="front-office"
       brand={brand}
       items={items}
-      search={(
-        <Search
-          platform="compact"
-          showButton={false}
-          trigger="enter"
-          aria-label="Cari layanan"
-        />
-      )}
+      search={{
+        'aria-label': 'Cari layanan',
+      }}
       account={account}
     />
   )
@@ -657,7 +695,6 @@ tampilan current dari kontrak komponennya masing-masing.
 ```tsx
 import {
   Navbar,
-  Search,
   Sidebar,
   type NavbarPrimaryItem,
   type SidebarItem,
@@ -725,15 +762,11 @@ export function BackOfficeNavbar() {
           sidebarUser={sidebarUser}
           tableOfContents={{ items: tableOfContentsItems }}
           notificationTrigger={notificationTrigger}
-          search={
-            <Search
-              platform="compact"
-              showButton
-              categories={searchCategories}
-              categoryPlaceholder="Kategori"
-              onSearch={(query, category) => searchBackOffice(query, category)}
-            />
-          }
+          search={{
+            categories: searchCategories,
+            categoryPlaceholder: 'Kategori',
+            onSearch: (query, category) => searchBackOffice(query, category),
+          }}
         />
       </div>
     </div>
@@ -800,14 +833,20 @@ export function ReportsPage() {
 `brand` wajib pada kedua platform. Isi visualnya tetap dimiliki consumer
 melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
 
-- `search` menerima `ReactNode`. Gunakan `Search` dengan `platform="compact"`
-  dan `trigger="enter"`. FO umumnya memakai `showButton={false}`; Search BO
-  berkategori memakai `showButton` agar tombol ikon pada ruas kanan tersedia.
+- `search` menerima `NavbarSearchConfig` pada FO dan
+  `NavbarBackOfficeSearchConfig` pada BO; Navbar merender komponen `Search`
+  internal. Default FO adalah compact tanpa kategori dan tombol, sedangkan
+  default BO adalah compact, berkategori, dan bertombol. `categories` wajib
+  pada konfigurasi BO. Consumer tetap dapat mengubah `platform`, `showButton`,
+  `darkMode`, atau properti Search lainnya bila memang berbeda dari default.
 - Pada BO, `Search.categories` boleh diturunkan dari `sidebarItems` ketika
   domain pencarian sama. Jika domainnya berbeda, consumer boleh memberikan
   kategori custom dari satu sumber data pencarian yang terpisah.
-- `account` hanya untuk FO authenticated. Identitas dan aksi akun BO berada
-  pada `Sidebar.user`, lalu diteruskan sebagai `sidebarUser` untuk mobile.
+- `account` hanya untuk FO authenticated. `account.items` bersifat opsional:
+  tanpa item, Navbar menampilkan identitas tanpa trigger dropdown. Pada mobile,
+  identitas dan item akun FO digunakan kembali oleh area profil Sidebar.
+  Identitas dan aksi akun BO berada pada `Sidebar.user`, lalu diteruskan sebagai
+  `sidebarUser` untuk mobile.
 - `sidebarItems` hanya berlaku pada BO. Navbar tidak merender Sidebar desktop;
   consumer merender komponen tersebut di layout aplikasi dan memberikan data
   yang sama kepada Navbar untuk komposisi mobile.
@@ -821,10 +860,33 @@ melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
 - Drawer navigasi BO tidak memerlukan prop tersendiri: trigger dan isinya muncul
   otomatis pada mobile saat `items` tidak kosong.
 
-Tema visual Navbar dapat mengikuti boundary ambient `data-theme` milik
-consumer. Untuk Navbar yang memiliki Drawer atau Sidebar mobile, teruskan state
-tema yang sama melalui `darkMode` agar panel top-level tersebut ikut berganti
-ketika toggle tema berubah.
+Gunakan override hanya untuk kebutuhan yang berbeda dari default Navbar. Contoh
+berikut menampilkan tombol pada Search FO; tanpa `showButton`, nilainya kembali
+ke default FO yaitu `false`:
+
+```tsx
+<Navbar
+  platform="front-office"
+  brand={brand}
+  items={items}
+  search={{
+    'aria-label': 'Cari layanan',
+    showButton: true,
+  }}
+  account={account}
+/>
+```
+
+Mengubah `search.platform` dari `compact` juga mengubah tinggi Search dari
+37px mengikuti ukuran platform Search yang dipilih.
+
+Tema header Navbar mengikuti boundary ambient `data-theme` milik consumer.
+Prop `darkMode` mengatur tema Navbar beserta Drawer dan Sidebar mobile. Jika
+prop tidak diberikan, header mewarisi `DarkModeContext` dari komponen pembungkus.
+`data-theme="light"` atau `data-theme="dark"` yang diberikan langsung pada
+Navbar menjadi override paling eksplisit. Tema efektif yang sama diteruskan ke
+Search, Drawer, Sidebar mobile, dan Table of Contents. Consumer hanya perlu memberi
+`search.darkMode` bila tema Search memang perlu berbeda dari Navbar.
 
 Consumer tetap wajib menambahkan `@source` package seperti dijelaskan pada
 bagian instalasi di atas agar utility Navbar ikut dihasilkan oleh Tailwind v4.

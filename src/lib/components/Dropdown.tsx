@@ -86,8 +86,6 @@ export interface DropdownHandle {
 }
 
 export interface DropdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  /** Batas tema eksplisit; `darkMode` bernilai true selalu lebih diutamakan. */
-  'data-theme'?: 'light' | 'dark'
   /**
    * Elemen yang membuka panel — satu `<button>` milik Anda, biasanya `Button`.
    * Komponen ini menyalinnya untuk memasang atribut Popover. Komponen tombol
@@ -197,7 +195,6 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
     className,
     contentLabel,
     contentClassName,
-    'data-theme': dataTheme,
     ...props
   },
   ref,
@@ -706,7 +703,7 @@ export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropd
   return (
     <div
       ref={pasangWrap}
-      data-theme={darkMode ? 'dark' : dataTheme}
+      data-theme={darkMode ? 'dark' : undefined}
       className={cn('inline-block', className)}
       {...props}
     >

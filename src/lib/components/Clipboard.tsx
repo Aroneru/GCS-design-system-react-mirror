@@ -22,7 +22,7 @@ interface ClipboardCommonProps {
   value: string
   /** Preset eksplisit; tidak mengikuti lebar viewport. */
   platform?: ClipboardPlatform
-  /** @deprecated Gunakan scope ambient `data-theme="dark"`. */
+  /** Memaksa Clipboard bertema gelap. Tanpa prop ini, Clipboard mengikuti tema pembungkusnya. */
   darkMode?: boolean
   helperText?: ReactNode
   disabled?: boolean
