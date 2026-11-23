@@ -848,7 +848,7 @@ export function ModalPage() {
         </Stage>
 
         <Controls>
-          <Control label="Mode">
+          <Control label="Tampilan">
             <Segmented
               label="Pilih mode warna Modal"
               value={theme}

@@ -71,7 +71,7 @@ export function ColorsPage() {
 
         {/* Lencana jumlah token — dulu menempel di hero, sekarang ikut bagiannya
             karena UsulanPage memegang sendiri kepala halamannya. */}
-        <span className="mb-6 inline-block w-fit rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-bold text-primary-700">
+        <span className="mb-6 inline-block w-fit rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-bold text-primary-700 dark:border-primary-800 dark:bg-primary-900 dark:text-primary-300">
           8 palette · 80 tokens
         </span>
 
@@ -80,12 +80,13 @@ export function ColorsPage() {
             <article key={palette.key}>
               {/* h3, bukan h2: judul bagian sudah dipegang <FlowSection> sebagai
                   h2, jadi nama palet adalah tingkat di bawahnya. */}
-              <h3 className="text-heading-4 font-black text-gray-900">{palette.name}</h3>
+              <h3 className="text-heading-4 font-black text-gray-900 dark:text-white">{palette.name}</h3>
               <code className="mt-0.5 block text-sm text-gray-400">colors.{palette.key}</code>
 
               <div className="ds-scroll-x mt-4 overflow-x-auto pb-1">
                 <div className="min-w-184">
-                  <div className="grid grid-cols-10 overflow-hidden rounded-xl">
+                  {/* Di mode gelap docs, garis tipis menjaga langkah tergelap (900) tidak lebur dengan latar halaman. */}
+                  <div className="grid grid-cols-10 overflow-hidden rounded-xl dark:ring-1 dark:ring-gray-700">
                     {palette.colors.map(([shade, hex]) => {
                       const id = `${palette.key}-${shade}`
                       return (
@@ -134,8 +135,8 @@ export function ColorsPage() {
               <div className={`${cls} ${textClass} grid size-11 place-items-center rounded-xl`}>
                 <span className="size-3 rounded-full border-2 border-current" />
               </div>
-              <h3 className="mt-4 text-sm font-black text-gray-900">{name}</h3>
-              <p className="mt-1 text-xs leading-5 text-gray-500">{description}</p>
+              <h3 className="mt-4 text-sm font-black text-gray-900 dark:text-white">{name}</h3>
+              <p className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-400">{description}</p>
               <code className="mt-3 block text-[11px] font-bold text-gray-400">
                 → colors.{source}
               </code>

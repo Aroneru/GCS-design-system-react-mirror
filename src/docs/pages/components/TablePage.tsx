@@ -16,6 +16,7 @@ import {
   type TableSort,
 } from "../../../lib";
 import { asset } from "../../asset";
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from "../../docsTheme";
 import { adaTidakAda } from "../../usulanOptions";
 import { PropsTable, type PropRow } from "../../PropsTable";
 import { Demo, H, Hl, Segmented } from "../../pageKit";
@@ -24,6 +25,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -476,7 +478,7 @@ const paginationProps: PropRow[] = [
 
 /** Daftar poin pendek di bawah Lead — lebih mudah dipindai daripada paragraf panjang. */
 const Points = ({ items }: { items: ReactNode[] }) => (
-  <ul className="mb-4 list-disc space-y-1 pl-5 text-body-sm text-gray-500">
+  <ul className="mb-4 list-disc space-y-1 pl-5 text-body-sm text-gray-500 dark:text-gray-400">
     {items.map((item, i) => (
       <li key={i}>{item}</li>
     ))}
@@ -485,8 +487,8 @@ const Points = ({ items }: { items: ReactNode[] }) => (
 
 /** Kotak berjudul untuk "kapan dipakai" dan sejenisnya. */
 const Box = ({ title, items }: { title: string; items: ReactNode[] }) => (
-  <div className="rounded-lg border border-gray-200 bg-white p-4 text-body-sm text-gray-500">
-    <p className="mb-2 font-semibold text-gray-900">{title}</p>
+  <div className="rounded-lg border border-gray-200 bg-white p-4 text-body-sm text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
+    <p className="mb-2 font-semibold text-gray-900 dark:text-white">{title}</p>
     <ul className="list-disc space-y-1 pl-5">
       {items.map((item, i) => (
         <li key={i}>{item}</li>
@@ -500,7 +502,7 @@ const toc: TocEntry[] = [
   { id: "states", label: "States" },
   { id: "size", label: "Size" },
   { id: "zebra", label: "Baris zebra" },
-  { id: "mode-gelap", label: "Mode gelap" },
+  { id: "dark-mode", label: "Dark mode" },
   { id: "aksi", label: "Tombol aksi" },
   { id: "posisi", label: "Posisi judul" },
   { id: "gambar", label: "Gambar" },
@@ -515,6 +517,9 @@ const toc: TocEntry[] = [
   { id: "penggunaan", label: "Penggunaan" },
   { id: "properties", label: "Properties" },
 ];
+
+/** stayDark: bagian Dark mode selalu memperagakan `darkMode`, jadi labelnya tidak bertukar. */
+const tocDark = tocForDarkDocs(toc, true);
 
 /** Kolom demo Data server. Sort `field1`/`field2` memakai id supaya "Record 10" jatuh setelah "Record 9". */
 const serverColumns: TableColumn<Row>[] = [
@@ -559,7 +564,7 @@ const requestUrl = ({ page, pageSize, sort, q }: ServerQuery) =>
  * 300ms setelah user berhenti mengetik (debounce). Penghitung request
  * memperlihatkan bedanya.
  */
-function ServerTable() {
+function ServerTable({ darkMode = false }: { darkMode?: boolean }) {
   const pageSize = 10;
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<TableSort | null>(null);
@@ -619,6 +624,7 @@ function ServerTable() {
         rowKey="id"
         manual
         loading={loading}
+        darkMode={darkMode}
         search={{
           value: input,
           onChange: (e) => {
@@ -644,7 +650,7 @@ function ServerTable() {
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-body-sm font-semibold text-gray-900">Tunda pencarian 300ms</span>
+        <span className="text-body-sm font-semibold text-gray-900 dark:text-white">Tunda pencarian 300ms</span>
         <Segmented
           label="Tunda pencarian"
           value={debounce}
@@ -657,7 +663,8 @@ function ServerTable() {
         />
       </div>
 
-      <div className="space-y-1 rounded-lg bg-gray-900 px-4 py-2.5 font-mono text-xs text-gray-300">
+      {/* Kotak log sudah gelap; di mode gelap docs diberi garis supaya tidak lebur dengan latar halaman. */}
+      <div className="space-y-1 rounded-lg border border-transparent bg-gray-900 px-4 py-2.5 font-mono text-xs text-gray-300 dark:border-gray-700">
         <p>
           <span className="text-gray-500">Request terkirim: </span>
           <span className="font-bold text-white">{sent}</span>
@@ -684,6 +691,11 @@ function ServerTable() {
  */
 type ConfirmDeleteModalProps = {
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Hanya untuk Modal di luar Table (hapus dari kolom aksi). Modal dari tombol
+   * toolbar sudah ikut `darkMode` milik Table lewat context.
+   */
+  darkMode?: boolean;
   message: ReactNode;
   confirmLabel: string;
   onConfirm: () => void;
@@ -699,7 +711,7 @@ type ConfirmDeleteModalProps = {
 );
 
 function ConfirmDeleteModal(props: ConfirmDeleteModalProps) {
-  const { message, confirmLabel, onConfirm } = props;
+  const { message, confirmLabel, onConfirm, darkMode } = props;
   const visibilityProps =
     props.open === undefined
       ? { trigger: props.trigger, onOpenChange: props.onOpenChange }
@@ -708,6 +720,7 @@ function ConfirmDeleteModal(props: ConfirmDeleteModalProps) {
   return (
     <Modal
       {...visibilityProps}
+      darkMode={darkMode}
       variant="popup"
       aria-label="Konfirmasi hapus data"
       actions={{
@@ -722,7 +735,8 @@ function ConfirmDeleteModal(props: ConfirmDeleteModalProps) {
       }}
     >
       <div className="text-center">
-        <p className="mx-auto max-w-xs text-body font-medium text-gray-500">{message}</p>
+        {/* Token, bukan `dark:`: warnanya mengikuti tema Modal, yang bisa berbeda dari mode docs (Playground). */}
+        <p className="mx-auto max-w-xs text-body font-medium text-content-subtle">{message}</p>
       </div>
     </Modal>
   );
@@ -744,7 +758,7 @@ function DeleteSelectedButton({ count, onConfirm }: { count: number; onConfirm: 
   );
 }
 
-function DataTable({ cols = columns }: { cols?: TableColumn<Row>[] }) {
+function DataTable({ cols = columns, darkMode = false }: { cols?: TableColumn<Row>[]; darkMode?: boolean }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Key[]>([1]);
   // Data disimpan di state supaya baris yang dihapus benar-benar hilang.
@@ -765,6 +779,7 @@ function DataTable({ cols = columns }: { cols?: TableColumn<Row>[] }) {
       columns={cols}
       data={rows}
       rowKey="id"
+      darkMode={darkMode}
       selectable
       selectedKeys={selected}
       onSelectionChange={setSelected}
@@ -952,6 +967,7 @@ function PlaygroundTable({
     <>
     <ConfirmDeleteModal
       open={pendingDelete !== null}
+      darkMode={darkMode}
       onOpenChange={(open) => !open && setPendingDelete(null)}
       message={`Apakah anda yakin ingin menghapus data ${pendingDelete?.nama ?? ""}?`}
       confirmLabel="Ya, hapus data ini"
@@ -987,7 +1003,7 @@ function PlaygroundTable({
 }
 
 /** Tabel pesanan size `compact`, lengkap dengan toolbar dan pagination seperti di Figma. */
-function OrderTable({ hiddenColumns = [] }: { hiddenColumns?: string[] }) {
+function OrderTable({ hiddenColumns = [], darkMode = false }: { hiddenColumns?: string[]; darkMode?: boolean }) {
   const [query, setQuery] = useState("");
   const rows = useMemo(
     () => orderRows.filter((r) => r.kode.includes(query) || r.customer.toLowerCase().includes(query.toLowerCase())),
@@ -1000,6 +1016,7 @@ function OrderTable({ hiddenColumns = [] }: { hiddenColumns?: string[] }) {
       data={rows}
       rowKey="id"
       size="compact"
+      darkMode={darkMode}
       search={{ value: query, onChange: (e) => setQuery(e.target.value) }}
       filter={{ defaultHiddenColumns: hiddenColumns }}
       actions={
@@ -1018,6 +1035,9 @@ function OrderTable({ hiddenColumns = [] }: { hiddenColumns?: string[] }) {
 }
 
 export function TablePage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark();
+  const dm = useDarkModeSnippet();
   // Playground mulai dari tabel dasar: hanya data, zebra, dan pagination.
   // Fitur lain dinyalakan sendiri lewat pengaturan di bawah tabel.
   const [selectable, setSelectable] = useState(false);
@@ -1025,7 +1045,7 @@ export function TablePage() {
   const [withFilter, setWithFilter] = useState(false);
   const [withToolbarActions, setWithToolbarActions] = useState(false);
   const [striped, setStriped] = useState(true);
-  const [mode, setMode] = useState<"light" | "dark">("light");
+  const [dark, setDark] = usePlaygroundDark();
   // Table tidak punya prop platform: rupa mobile muncul sendiri saat tabel
   // lebih sempit dari 640px, jadi pratinjaunya cukup menyempitkan panggung.
   const [view, setView] = useState<"desktop" | "mobile">("desktop");
@@ -1051,7 +1071,7 @@ export function TablePage() {
       eyebrow="Components · Table"
       title="Table"
       description="Tabel data dengan toolbar pencarian, filter, aksi, pengurutan kolom, seleksi baris, dan pagination."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="table" title="Table">
         <Lead>
@@ -1077,7 +1097,7 @@ export function TablePage() {
           <Hl><a href="#/components/pagination">Pagination</a></Hl>.
         </Lead>
 
-        <DataTable />
+        <DataTable darkMode={docsDark} />
 
         <SectionCode>
           {"import { Table, type TableColumn } from '@ceplok-ui/design-kit-react'\n\n"}
@@ -1108,6 +1128,8 @@ export function TablePage() {
           {"  "}
           <H>pagination</H>
           {"={{ pageSizeOptions: [5, 10, 25, 50, 100] }}\n"}
+          {/* Cuplikan ini berindentasi dua spasi, jadi barisnya tidak memakai dm.line. */}
+          {docsDark && "  darkMode\n"}
           {"/>"}
         </SectionCode>
       </FlowSection>
@@ -1122,20 +1144,23 @@ export function TablePage() {
 
         <div className="mb-4 grid gap-5 lg:grid-cols-2">
           <Demo label="Loading">
-            <Table columns={columns.slice(0, 3)} data={[]} rowKey="id" loading />
+            <Table columns={columns.slice(0, 3)} data={[]} rowKey="id" loading darkMode={docsDark} />
           </Demo>
           <Demo label="Empty">
-            <Table columns={columns.slice(0, 3)} data={[]} rowKey="id" />
+            <Table columns={columns.slice(0, 3)} data={[]} rowKey="id" darkMode={docsDark} />
           </Demo>
         </div>
 
         <SectionCode>
           {"<Table columns={columns} data={rows} rowKey=\"id\" "}
           <H>loading</H>
+          {dm.inline}
           {" />\n"}
           {"<Table columns={columns} data={[]} rowKey=\"id\" "}
           <H>emptyText</H>
-          {'="Belum ada pengajuan" />'}
+          {'="Belum ada pengajuan"'}
+          {dm.inline}
+          {" />"}
         </SectionCode>
       </FlowSection>
 
@@ -1149,17 +1174,19 @@ export function TablePage() {
 
         <div className="mb-4 grid gap-5">
           <Demo label="Normal">
-            <Table columns={columns} data={allRows.slice(0, 3)} rowKey="id" selectable />
+            <Table columns={columns} data={allRows.slice(0, 3)} rowKey="id" selectable darkMode={docsDark} />
           </Demo>
           <Demo label="Compact">
-            <OrderTable />
+            <OrderTable darkMode={docsDark} />
           </Demo>
         </div>
 
         <SectionCode>
           {"<Table columns={columns} data={rows} rowKey=\"id\" "}
           <H>size</H>
-          {'="compact" />\n\n'}
+          {'="compact"'}
+          {dm.inline}
+          {" />\n\n"}
           {"// Gambar di compact otomatis kotak 32px, caption hanya tampil di pratinjau\n"}
           {"{ key: 'gambar', header: 'Gambar', image: { src: (row) => row.fotoUrl } }"}
         </SectionCode>
@@ -1173,24 +1200,33 @@ export function TablePage() {
         </Lead>
 
         <Demo label="Normal">
-          <Table columns={columns} data={allRows.slice(0, 6)} rowKey="id" selectable striped />
+          <Table columns={columns} data={allRows.slice(0, 6)} rowKey="id" selectable striped darkMode={docsDark} />
         </Demo>
 
         <SectionCode>
           {"<Table columns={columns} data={rows} rowKey=\"id\" "}
           <H>striped</H>
+          {dm.inline}
           {" />"}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="mode-gelap" title="Mode gelap">
-        <Lead>
-          Isi <Hl>darkMode</Hl> untuk tampilan gelap. Toolbar berlatar gray-800, header gray-600,
-          dan footer gray-700. Bila digabung dengan <Hl>striped</Hl>, baris mulai dari gray-700 lalu
-          gray-800. Pagination, tombol Filter, dan Dropdown ikut gelap.
-        </Lead>
-
-        <Demo label="Gelap">
+      {/* stayDark: bagian ini selalu memperagakan darkMode, di mode docs apa pun. */}
+      <ModeSection
+        name="Table"
+        stayDark
+        lead={
+          <>
+            Isi <Hl>darkMode</Hl> untuk tampilan gelap. Toolbar berlatar gray-800, header gray-600,
+            dan footer gray-700. Bila digabung dengan <Hl>striped</Hl>, baris mulai dari gray-700
+            lalu gray-800. Pagination, tombol Filter, dan Dropdown ikut gelap. Badge dan Button
+            theme <Hl>gray</Hl> di toolbar maupun di sel ikut gelap tanpa perlu diberi{" "}
+            <Hl>darkMode</Hl> satu per satu. Warnanya dari token komponen{" "}
+            <Hl>--color-table-*</Hl>.
+          </>
+        }
+      >
+        <Demo label="darkMode" dark>
           <Table
             columns={columns}
             data={allRows.slice(0, 12)}
@@ -1210,7 +1246,7 @@ export function TablePage() {
           {"// Warna bisa ditimpa lewat token, mis. di CSS project:\n"}
           {"[data-theme='dark'] { --color-table-toolbar: #1f2a37; }"}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="aksi" title="Tombol aksi">
         <Lead>
@@ -1238,7 +1274,7 @@ export function TablePage() {
           berbeda per baris. Di contoh ini tombol Hapus di baris pertama dinonaktifkan.
         </Lead>
 
-        <Table columns={actionColumns} data={pendudukRows} rowKey="id" />
+        <Table columns={actionColumns} data={pendudukRows} rowKey="id" darkMode={docsDark} />
 
         <SectionCode>
           {"{\n"}
@@ -1276,7 +1312,7 @@ export function TablePage() {
           ]}
         />
 
-        <Table columns={alignColumns} data={pendudukRows.slice(0, 3)} rowKey="id" />
+        <Table columns={alignColumns} data={pendudukRows.slice(0, 3)} rowKey="id" darkMode={docsDark} />
 
         <SectionCode>
           {"{ key: 'nama', header: 'Kiri (bawaan)', align: 'left' },\n"}
@@ -1305,7 +1341,7 @@ export function TablePage() {
         />
         <Lead>Klik gambar di kolom "Dengan pratinjau" untuk mencobanya.</Lead>
 
-        <Table columns={imageColumns} data={allRows.slice(0, 3)} rowKey="id" />
+        <Table columns={imageColumns} data={allRows.slice(0, 3)} rowKey="id" darkMode={docsDark} />
 
         <SectionCode>
           {"{\n"}
@@ -1356,7 +1392,7 @@ export function TablePage() {
         />
 
         <Demo label="Kolom file">
-          <Table columns={berkasColumns} data={berkasRows} rowKey="id" />
+          <Table columns={berkasColumns} data={berkasRows} rowKey="id" darkMode={docsDark} />
         </Demo>
 
         <SectionCode>
@@ -1385,7 +1421,7 @@ export function TablePage() {
           ]}
         />
 
-        <Table columns={groupColumns} data={pendudukRows} rowKey="id" selectable />
+        <Table columns={groupColumns} data={pendudukRows} rowKey="id" selectable darkMode={docsDark} />
 
         <SectionCode>
           {"const columns: TableColumn<Penduduk>[] = [\n"}
@@ -1444,7 +1480,7 @@ export function TablePage() {
           diurutkan.
         </Lead>
 
-        <Table columns={sortColumns} data={pendudukRows} rowKey="id" />
+        <Table columns={sortColumns} data={pendudukRows} rowKey="id" darkMode={docsDark} />
 
         <SectionCode>
           {"// Bawaan\n"}
@@ -1486,7 +1522,7 @@ export function TablePage() {
           dimatikan. Klik Filter Data untuk mencobanya.
         </Lead>
 
-        <OrderTable hiddenColumns={["pembayaran"]} />
+        <OrderTable hiddenColumns={["pembayaran"]} darkMode={docsDark} />
 
         <SectionCode>
           {"const columns: TableColumn<Order>[] = [\n"}
@@ -1504,6 +1540,7 @@ export function TablePage() {
           {"={{ "}
           <H>defaultHiddenColumns</H>
           {": ['pembayaran'] }}\n"}
+          {docsDark && "  darkMode\n"}
           {"/>"}
         </SectionCode>
       </FlowSection>
@@ -1526,6 +1563,7 @@ export function TablePage() {
           data={pendudukRows}
           rowKey="id"
           selectable
+          darkMode={docsDark}
         />
 
         <SectionCode>
@@ -1534,6 +1572,7 @@ export function TablePage() {
           {"  data={rows}\n"}
           {'  rowKey="id"\n'}
           {"  selectable\n"}
+          {docsDark && "  darkMode\n"}
           {"/>"}
         </SectionCode>
       </FlowSection>
@@ -1564,7 +1603,7 @@ export function TablePage() {
           />
         </div>
 
-        <Table data={autoRows} rowKey="id" size="compact" />
+        <Table data={autoRows} rowKey="id" size="compact" darkMode={docsDark} />
 
         <SectionCode>
           {"const data = [\n"}
@@ -1573,7 +1612,9 @@ export function TablePage() {
           {"// Tanpa columns — tabel di atas jadi dari sini saja\n"}
           {"<Table "}
           <H>data</H>
-          {'={data} rowKey="id" />'}
+          {'={data} rowKey="id" size="compact"'}
+          {dm.inline}
+          {" />"}
         </SectionCode>
 
         <div className="mt-6 mb-4 grid gap-4 md:grid-cols-2">
@@ -1648,7 +1689,7 @@ export function TablePage() {
           />
         </div>
 
-        <p className="mb-2 text-body-sm font-semibold text-gray-900">Yang harus diisi saat memakai manual</p>
+        <p className="mb-2 text-body-sm font-semibold text-gray-900 dark:text-white">Yang harus diisi saat memakai manual</p>
         <Points
           items={[
             <>Pasang <Hl>manual</Hl>.</>,
@@ -1664,9 +1705,9 @@ export function TablePage() {
         />
 
         <Demo label="Coba sendiri: 1000 baris di server palsu, jawaban ditunda 0,6 detik">
-          <ServerTable />
+          <ServerTable darkMode={docsDark} />
         </Demo>
-        <div className="mt-2 mb-6 text-body-sm text-gray-500">
+        <div className="mt-2 mb-6 text-body-sm text-gray-500 dark:text-gray-400">
           <p>Klik halaman, judul kolom, atau ketik di pencarian, lalu lihat kotak hitam di bawah tabel.</p>
           <Points
             items={[
@@ -1715,6 +1756,7 @@ export function TablePage() {
           {"      "}
           <H>loading</H>
           {"={loading}\n"}
+          {docsDark && "      darkMode\n"}
           {"      search={{ value: input, onChange: (e) => setInput(e.target.value) }}\n"}
           {"      sort={sort}\n"}
           {"      "}
@@ -1743,8 +1785,8 @@ export function TablePage() {
           />
         </div>
 
-        <h3 className="mt-10 mb-2 text-base font-bold text-gray-900">Kalau datanya sangat banyak</h3>
-        <p className="mb-4 text-body-sm text-gray-500">
+        <h3 className="mt-10 mb-2 text-base font-bold text-gray-900 dark:text-white">Kalau datanya sangat banyak</h3>
+        <p className="mb-4 text-body-sm text-gray-500 dark:text-gray-400">
           Dengan <Hl>manual</Hl>, browser selalu menerima 10 baris, sebanyak apa pun datanya. Mau
           1.000 atau 10 juta baris, frontend tidak jadi lebih berat. Bebannya pindah ke backend, jadi
           yang perlu dijaga ada di sana.
@@ -1770,25 +1812,25 @@ export function TablePage() {
           />
         </div>
 
-        <div className="mb-4 overflow-x-auto rounded-lg border border-gray-200">
+        <div className="mb-4 overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
           <table className="w-full text-left text-body-sm">
-            <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
+            <thead className="bg-gray-50 text-xs text-gray-500 uppercase dark:bg-gray-700 dark:text-gray-300">
               <tr>
                 <th className="px-4 py-3 font-semibold">Jumlah data</th>
                 <th className="px-4 py-3 font-semibold">Yang disarankan</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white text-gray-600">
+            <tbody className="divide-y divide-gray-200 bg-white text-gray-600 dark:divide-gray-700 dark:bg-gray-800 dark:text-gray-300">
               <tr>
-                <td className="px-4 py-3 font-semibold whitespace-nowrap text-gray-900">Kurang dari 1.000</td>
+                <td className="px-4 py-3 font-semibold whitespace-nowrap text-gray-900 dark:text-white">Kurang dari 1.000</td>
                 <td className="px-4 py-3">Mode bawaan. Kirim semua data ke Table.</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 font-semibold whitespace-nowrap text-gray-900">Ribuan sampai ratusan ribu</td>
+                <td className="px-4 py-3 font-semibold whitespace-nowrap text-gray-900 dark:text-white">Ribuan sampai ratusan ribu</td>
                 <td className="px-4 py-3"><Hl>manual</Hl>, index di backend, dan pencarian ditunda.</td>
               </tr>
               <tr>
-                <td className="px-4 py-3 font-semibold whitespace-nowrap text-gray-900">Jutaan</td>
+                <td className="px-4 py-3 font-semibold whitespace-nowrap text-gray-900 dark:text-white">Jutaan</td>
                 <td className="px-4 py-3">
                   <Hl>manual</Hl> dengan <i>cursor pagination</i> di backend: "ambil 10 baris setelah id
                   terakhir", bukan "lewati sekian baris". Lihat catatan di bawah.
@@ -1797,8 +1839,8 @@ export function TablePage() {
             </tbody>
           </table>
         </div>
-        <p className="text-body-sm text-gray-500">
-          <b className="text-gray-900">Catatan:</b> cursor pagination biasanya tidak mengirim{" "}
+        <p className="text-body-sm text-gray-500 dark:text-gray-400">
+          <b className="text-gray-900 dark:text-white">Catatan:</b> cursor pagination biasanya tidak mengirim{" "}
           <Hl>total</Hl> dan tidak bisa loncat ke halaman tertentu. Pagination Table butuh{" "}
           <Hl>total</Hl> untuk menggambar nomor halaman, jadi untuk saat ini Table belum cocok dengan
           cursor pagination.
@@ -1811,7 +1853,7 @@ export function TablePage() {
           terlihat di sini, dan bagian Penggunaan menuliskan kodenya.
         </Lead>
 
-        <Stage maxWidth={view === "mobile" ? "max-w-[390px]" : "max-w-[1024px]"} dark={mode === "dark"}>
+        <Stage maxWidth={view === "mobile" ? "max-w-[390px]" : "max-w-[1024px]"} dark={dark}>
           <PlaygroundTable
             key={count}
             count={count}
@@ -1827,20 +1869,20 @@ export function TablePage() {
             grouped={grouped}
             headerAlign={headerAlign}
             striped={striped}
-            darkMode={mode === "dark"}
+            darkMode={dark}
             withToolbarActions={withToolbarActions}
           />
         </Stage>
 
         <Controls>
-          <Control label="Mode">
+          <Control label="Tampilan">
             <Segmented
               label="Pilih mode"
-              value={mode}
-              onChange={(v) => setMode(v as "light" | "dark")}
+              value={dark}
+              onChange={setDark}
               options={[
-                { value: "light", label: "Light" },
-                { value: "dark", label: "Dark" },
+                { value: false, label: "Light" },
+                { value: true, label: "Dark" },
               ]}
             />
           </Control>
@@ -2018,7 +2060,7 @@ export function TablePage() {
               {"\n"}
             </>
           )}
-          {mode === "dark" && (
+          {dark && (
             <>
               {"    "}
               <H>darkMode</H>
@@ -2055,34 +2097,34 @@ export function TablePage() {
         </Lead>
         <PropsTable rows={tableProps} minWidth="52rem" />
 
-        <p className="mt-10 mb-6 text-body-sm text-gray-500">
+        <p className="mt-10 mb-6 text-body-sm text-gray-500 dark:text-gray-400">
           Pengaturan tiap kolom, di dalam array <Hl>columns</Hl>.
         </p>
         <PropsTable rows={columnProps} minWidth="46rem" />
 
-        <p className="mt-10 mb-6 text-body-sm text-gray-500">
+        <p className="mt-10 mb-6 text-body-sm text-gray-500 dark:text-gray-400">
           Pengaturan tiap tombol, di dalam array <Hl>actions</Hl> milik kolom.
         </p>
         <PropsTable rows={actionProps} minWidth="46rem" />
 
-        <p className="mt-10 mb-6 text-body-sm text-gray-500">
+        <p className="mt-10 mb-6 text-body-sm text-gray-500 dark:text-gray-400">
           Pengaturan di dalam <Hl>image</Hl> milik kolom. Untuk komponen <Hl>TableImage</Hl>,
           isiannya sama tapi berupa nilai langsung, bukan fungsi.
         </p>
         <PropsTable rows={imageProps} minWidth="46rem" />
 
-        <p className="mt-10 mb-6 text-body-sm text-gray-500">
+        <p className="mt-10 mb-6 text-body-sm text-gray-500 dark:text-gray-400">
           Pengaturan di dalam <Hl>file</Hl> milik kolom. Untuk komponen <Hl>TableFile</Hl>,
           isiannya sama tapi berupa nilai langsung, bukan fungsi.
         </p>
         <PropsTable rows={fileProps} minWidth="46rem" />
 
-        <p className="mt-10 mb-6 text-body-sm text-gray-500">
+        <p className="mt-10 mb-6 text-body-sm text-gray-500 dark:text-gray-400">
           Pengaturan di dalam <Hl>filter</Hl>.
         </p>
         <PropsTable rows={filterProps} minWidth="46rem" />
 
-        <p className="mt-10 mb-6 text-body-sm text-gray-500">
+        <p className="mt-10 mb-6 text-body-sm text-gray-500 dark:text-gray-400">
           Pengaturan di dalam <Hl>pagination</Hl>.
         </p>
         <PropsTable rows={paginationProps} minWidth="46rem" />

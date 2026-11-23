@@ -22,7 +22,7 @@ export interface CardProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
  * bagian yang sama; cukup hilangkan bagian yang tidak dipakai.
  * @container: ukuran teks & jarak mengikuti lebar kartu, bukan lebar layar.
  *
- * Warnanya hanya dari token semantik (`surface`, `content`, `brand`), jadi
+ * Warnanya hanya dari token komponen `--color-card-*` (lihat tokens.css), jadi
  * tema gelap cukup mengganti nilai token lewat `data-theme`, bukan class.
  * `darkMode` sekadar memasang `data-theme="dark"` di kartu ini. Tombol di
  * `actions` tidak ikut diubah — warnanya tetap urusan halaman pemakai.
@@ -44,7 +44,7 @@ export function Card({
     <article
       data-theme={darkMode ? 'dark' : undefined}
       className={cn(
-        '@container flex flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-soft',
+        '@container flex flex-col overflow-hidden rounded-lg border border-card-border bg-card-surface shadow-soft',
         className,
       )}
       {...props}
@@ -60,15 +60,15 @@ export function Card({
 
       <div className="flex flex-1 flex-col gap-3 p-4 @xs:p-6">
         {title && (
-          <h3 className="text-base leading-snug font-bold text-content @xs:text-xl">{title}</h3>
+          <h3 className="text-base leading-snug font-bold text-card-title @xs:text-xl">{title}</h3>
         )}
 
-        {description && <p className="text-sm leading-6 text-content-subtle">{description}</p>}
+        {description && <p className="text-sm leading-6 text-card-description">{description}</p>}
 
         {href && (
           <a
             href={href}
-            className="inline-flex w-fit items-center gap-1.5 rounded text-sm font-bold text-brand transition-colors hover:text-brand-hover hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            className="inline-flex w-fit items-center gap-1.5 rounded text-sm font-bold text-card-link transition-colors hover:text-card-link-hover hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card-link"
           >
             {linkLabel ?? 'Selengkapnya'}
             <svg
