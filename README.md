@@ -118,7 +118,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 
 | Komponen     | Props utama                                                                                                          |
 | ------------ | -------------------------------------------------------------------------------------------------------------------- |
-| `Button`     | `variant`: `filled \| outline`, `theme`, `tone`, `size`, `type`: `button \| submit \| reset`, `iconOnly`, `as`: `button \| anchor`, `darkMode` |
+| `Button`     | `variant`: `filled \| outline`, `theme`, `size`, `type`: `button \| submit \| reset`, `iconOnly`, `as`: `button \| anchor`, `darkMode`, `tone` (deprecated) |
 | `Badge`      | `variant`: `gray \| brand \| danger \| warning \| success`, `size`: `sm \| lg`, `icon`, `dismissible`, `onDismiss`, `open`, `darkMode` |
 | `Avatar`     | `src`, `name`, `alt`, `initials`, `fallback`: `initials \| female \| male`, `size`: `small \| default \| large`, `darkMode` |
 | `Spinner`    | `size`: `default \| large`                                                                                           |
@@ -129,7 +129,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `ListView`   | `items` atau `children`, `variant`: `simple \| article`, `size`, `platform`: `desktop \| mobile`, `decoration`, `actionLabel`, `actionDisabled`, `interactiveFeedback`, `darkMode` |
 | `Container`  | `as` (default `div`), `padded` (default `true`), `darkMode`                                                          |
 | `Icon`       | `children` (SVG dengan `currentColor`)                                                                               |
-| `Popover`    | `trigger`, `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode` |
+| `Popover`    | `trigger` (satu `<button>` native), `title`, `side`, `open`/`defaultOpen`/`onOpenChange`, `darkMode` |
 | `Dropdown`   | `trigger`, `items`/`groups` atau `children`, `align`, `closeOnSelect`, `actionsRef`, `contentLabel`, `contentClassName`, `darkMode` |
 | `Modal`      | `trigger` atau `open`/`onOpenChange`, `title`, `icon` (Popup), `actions`, `footer`, `variant`: `default \| popup`, `size`: `s \| m`, `darkMode`, `closeOnBackdrop`, `closeOnEscape`, `showCloseButton`, `closeLabel` |
 | `Drawer`     | `open`, `onClose`, `position`, `size`, `closeOnOverlayClick`, `closeOnEsc`, `header`, `items`, `afterItems`, `theme`, `darkMode`   |
@@ -139,7 +139,7 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
 | `Hero`       | `type`, `centeredContent`, `platform`, `heading`, `description`, `image`, `showButton`, `buttonLabel`, `darkMode`    |
 | `Sidebar`    | `items`, `groups`, `logo`, `collapsedLogo`, `user` (profil + menu dropdown), `collapsed`, `onCollapse`, `showCollapseButton`, `sticky`, `footer`, `darkMode` |
 | `Footer`     | `logo`/`logoContent`, `menus`, `copyright`, `socials`                                                                |
-| `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `striped`, `sticky`, `size`, `loading` |
+| `Table`      | `columns`, `data`, `rowKey`, `search`, `filter`, `selectable`, `sort`, `headerAlign`, `pagination`, `striped`, `sticky`, `size`, `loading`, `darkMode` |
 | `Timeline`   | `items` (`name`, `role`, `time` (`Date`, ditulis `01 Jan 2026 · 09:05`), `elapsed`, `description`, `details`, `attachments` (`name`, `href`, `target`, `download`), `status` (prop `Badge` + `label`), `avatar`, `initials`), `platform`: `desktop \| mobile`, `size`: `large \| small`, `labels` (`elapsed`, `details`, `attachments`, `months`), `darkMode` |
 
 Breadcrumb membatasi label hingga 12 karakter di mobile dan 17 karakter di
@@ -148,9 +148,9 @@ tersedia lalu meringkas level tengah menjadi `…`; item pertama dan halaman akt
 tetap ditampilkan. Arahkan pointer ke `…` untuk melihat label yang disembunyikan.
 
 Warna Button diatur `theme` (`primary | green | gray | purple | orange |
-yellow`) dan `tone` (`light | dark`), bukan lewat `variant` — `variant` hanya
-memilih terisi atau bergaris. Ukuran: `xs | s | base | l | xl`. Ikon di kiri
-atau kanan teks lewat `leftIcon`/`rightIcon`; `iconOnly` membuat tombol
+yellow`), bukan lewat `variant` — `variant` hanya memilih terisi atau bergaris.
+Prop `tone` deprecated; pakai `darkMode` untuk permukaan gelap. Ukuran:
+`xs | s | base | l | xl`. Ikon di kiri atau kanan teks lewat `leftIcon`/`rightIcon`; `iconOnly` membuat tombol
 persegi berisi ikon saja. Prop `type` (`button | submit | reset`, bawaan `button`)
 meneruskan atribut HTML native ke elemen `<button>`, memungkinkan tombol dipakai
 untuk submit form. Untuk tautan pakai `as="anchor"` bersama `href`, maka
@@ -329,10 +329,13 @@ yang sama diteruskan ke Button internal. Nested Modal adalah komposisi dua Modal
 controlled dengan state terpisah: Default membuka Popup, penutupan Popup tidak
 menutup Default, dan fokus kembali ke kontrol pembukanya.
 
-`darkMode` pada Button menyesuaikan warna untuk permukaan gelap. Pada `tone="light"`,
-filled memakai gray-50 dan outline memakai gray-50; pada `tone="dark"`, filled
-tetap memakai gray-50 sedangkan outline memakai gray-500. Saat hover, seluruh
-varian berubah menjadi latar putih dengan teks gray-700.
+`darkMode` pada Button menyesuaikan warna untuk permukaan gelap. Filled memakai
+versi gelap theme-nya, mis. primary-800 atau gray-700; filled tanpa `theme`
+menjadi tombol putih (gray-50 dengan teks gray-700). Outline menjadi putih
+(gray-50) di semua theme. Saat hover, outline dan tombol putih berubah menjadi
+latar putih dengan teks gray-700. Tanpa prop, Button mengikuti `darkMode` Table,
+Modal, atau Navbar yang membungkusnya; `darkMode={false}` tetap menang.
+`tone="dark"` deprecated dan diperlakukan sama dengan `darkMode`.
 
 `ListView` menyediakan daftar item berukuran `S`, `M`, atau `L` untuk desktop
 dan mobile. Varian `simple` dapat memakai ikon, badge, dekorasi aksen, dan aksi;
@@ -553,8 +556,9 @@ tanggung jawab consumer.
 ### Popover
 
 `Popover` adalah panel informasi non-modal yang ditambatkan pada satu trigger.
-`trigger` harus berupa satu elemen button-like yang meneruskan atribut native
-dan ARIA yang disuntikkan Popover ke elemen DOM fokusabel. `side` memilih
+`trigger` harus berupa satu elemen native `<button>`. Elemen non-interaktif,
+wrapper, Fragment, dan custom component, termasuk `Button` milik kit, membuat
+Popover melempar error. `side` memilih
 preferensi `top | right | bottom | left` (default `right`); panel dapat berbalik
 agar tetap berada di viewport. Visibility dapat dikontrol melalui
 `open`/`onOpenChange`, atau diawali dengan `defaultOpen`.
