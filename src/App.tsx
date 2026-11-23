@@ -153,6 +153,8 @@ function renderNavbarPreview(path: string) {
 
 function App() {
   const [path] = useHashRoute();
+  const navbarPreview = path.startsWith("/preview/navbar/");
+  const navbarPreviewDark = navbarPreview && new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("theme") === "dark";
 
   // Mode gelap docs berlaku per halaman (lihat docs/docsTheme.ts). Dipasang di
   // sini, bukan di DocsLayout, supaya ikut berlaku di Portal Dashboard yang
@@ -164,7 +166,23 @@ function App() {
     applyDocsTheme(dark);
   }, [dark]);
 
-  if (path.startsWith("/preview/navbar/")) {
+  // Sinkronkan kanvas iframe preview pada perubahan kontrol tema. Atribut dan
+  // inline style awalnya sudah dipasang oleh index.html sebelum React dimuat.
+  useLayoutEffect(() => {
+    const html = document.documentElement;
+    if (navbarPreviewDark) {
+      html.dataset.previewTheme = "dark";
+      html.style.backgroundColor = "#111827";
+      html.style.colorScheme = "dark";
+      return;
+    }
+
+    delete html.dataset.previewTheme;
+    html.style.removeProperty("background-color");
+    html.style.removeProperty("color-scheme");
+  }, [navbarPreviewDark]);
+
+  if (navbarPreview) {
     return renderNavbarPreview(path);
   }
 

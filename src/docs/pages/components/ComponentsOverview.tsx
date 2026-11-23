@@ -32,8 +32,8 @@ const tanpaAksi = () => undefined;
 export function ComponentsOverview() {
   // Di mode gelap docs pratinjaunya ikut gelap: komponen dengan prop `darkMode`
   // menerimanya, sedangkan tiruan statis dan komponen yang mengikuti tema
-  // pembungkus (Avatar, Navbar) memakai `data-theme` di kotaknya. Modal belum
-  // punya desain gelap, jadi kerangkanya tetap terang.
+  // pembungkus (Avatar, Navbar) memakai `data-theme`; tiruan statis memakai
+  // pasangan utilitas `dark:`.
   const docsDark = useDocsDark();
   const tema = docsDark ? "dark" : undefined;
   const konteksDrawer: DrawerContextValue = {
@@ -213,18 +213,18 @@ export function ComponentsOverview() {
         name="Modal"
         desc="Dialog terkontrol untuk informasi atau tindakan yang harus diselesaikan sebelum kembali ke halaman utama."
       >
-        <div className="rounded-xl bg-gray-900/40 p-5">
-          <div className="mx-auto max-w-[240px] overflow-hidden rounded-lg border border-border bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-border px-4 py-3">
-              <div className="h-2.5 w-24 rounded bg-gray-300" />
-              <div className="size-3 rounded bg-gray-200" />
+        <div className="rounded-xl bg-surface-subtle p-5 dark:bg-gray-900">
+          <div className="mx-auto max-w-[240px] overflow-hidden rounded-lg border border-border bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3 dark:border-gray-700">
+              <div className="h-2.5 w-24 rounded bg-gray-300 dark:bg-gray-600" />
+              <div className="size-3 rounded bg-gray-200 dark:bg-gray-700" />
             </div>
             <div className="space-y-2 px-4 py-5">
-              <div className="h-1.5 w-full rounded bg-gray-200" />
-              <div className="h-1.5 w-2/3 rounded bg-gray-200" />
+              <div className="h-1.5 w-full rounded bg-gray-200 dark:bg-gray-700" />
+              <div className="h-1.5 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
             </div>
-            <div className="border-t border-border px-4 py-3">
-              <div className="h-6 w-20 rounded-lg bg-primary-700" />
+            <div className="border-t border-border px-4 py-3 dark:border-gray-700">
+              <div className="h-6 w-20 rounded-lg bg-primary-700 dark:bg-primary-600" />
             </div>
           </div>
         </div>

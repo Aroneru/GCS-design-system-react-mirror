@@ -7,7 +7,6 @@ import {
   Icon,
   ListView,
   Navbar,
-  Search,
   Select,
   Sidebar,
   Toast,
@@ -16,25 +15,51 @@ import {
   type NavbarPrimaryItem,
 } from '../../../lib'
 import {
+  Archive,
+  ArrowLeftToBracket,
   ArrowRightToBracket,
+  Award,
   BookOpen,
+  BookOpenReader,
   Bullhorn,
   CalendarMonth,
+  CalendarPlus,
   Cash,
+  ChartMixed,
+  ChartPie,
+  ChevronDown,
+  CirclePlus,
   ClipboardList,
-  Clock,
+  CloudArrowUp,
   CodeBranch,
+  Envelope,
   ExclamationCircle,
   FileLines,
+  Fingerprint,
+  Grid,
   Home,
+  InboxFull,
   Lightbulb,
+  MapPin,
   Messages,
   Moon,
   Newspaper,
+  PaperPlane,
+  Play,
+  QrCode,
   QuestionCircle,
+  Rocket,
+  ScaleBalanced,
+  Store,
   Sun,
+  Thumbtack,
+  Ticket,
+  Truck,
   User,
+  UserHeadset,
+  UsersGroup,
 } from '../../../lib/icons/outline'
+import { Apple } from '../../../lib/icons/solid'
 import { asset } from '../../asset'
 
 /**
@@ -48,7 +73,7 @@ import { asset } from '../../asset'
  *
  * Bagian yang belum punya komponen di kit dirakit dari token warnanya:
  * kalender bulanan (Datepicker hanya punya bentuk field + panel), kartu
- * sapaan, dan hiasannya.
+ * sapaan dan hiasannya, ubin Aplikasi Intranet, serta kartu unduhan KOSMO.
  *
  * Mode gelapnya dipasang seperti di aplikasi consumer: `data-theme="dark"` di
  * akar, `darkMode` di setiap komponen kit, dan varian `in-data-[theme=dark]:`
@@ -127,6 +152,118 @@ const ANGGARAN: Record<string, { label: string; pagu: string; realisasi: string;
     persentase: '60.89%',
   },
 }
+
+/**
+ * Ubin Aplikasi Intranet. Logo aplikasinya di desain berupa gambar yang belum
+ * ada di repo; sementara ini diganti ikon kit berwarna token, naik ke tangga
+ * 400 di mode gelap. Ganti dengan <img> begitu berkas logonya tersedia.
+ *
+ * Mula-mula hanya APLIKASI_RINGKAS ubin pertama yang tampil, dua baris di xl
+ * seperti desainnya. Tombol panah membuka sisanya; enam ubin terakhir rekaan,
+ * untuk memperagakan daftar yang terbuka.
+ */
+const APLIKASI = [
+  { nama: 'Kinerja Harian', Ikon: ChartMixed, warna: 'text-primary-700 in-data-[theme=dark]:text-primary-400' },
+  { nama: 'e-Mail', Ikon: Envelope, warna: 'text-orange-600 in-data-[theme=dark]:text-orange-400' },
+  { nama: 'Satu Data Komdigi', Ikon: ChartPie, warna: 'text-primary-700 in-data-[theme=dark]:text-primary-400' },
+  { nama: 'E-Presensi', Ikon: Fingerprint, warna: 'text-gray-700 in-data-[theme=dark]:text-gray-300' },
+  { nama: 'sidara', Ikon: PaperPlane, warna: 'text-primary-700 in-data-[theme=dark]:text-primary-400' },
+  { nama: 'LPSE', Ikon: Store, warna: 'text-gray-700 in-data-[theme=dark]:text-gray-300' },
+  { nama: 'Simaya+', Ikon: InboxFull, warna: 'text-purple-700 in-data-[theme=dark]:text-purple-400' },
+  { nama: 'KCloud', Ikon: CloudArrowUp, warna: 'text-gray-700 in-data-[theme=dark]:text-gray-300' },
+  { nama: 'E-Arsip', Ikon: Archive, warna: 'text-primary-700 in-data-[theme=dark]:text-primary-400' },
+  { nama: 'Pinjam Ruangan', Ikon: CalendarPlus, warna: 'text-red-600 in-data-[theme=dark]:text-red-400' },
+  { nama: 'Simpatik', Ikon: UsersGroup, warna: 'text-primary-700 in-data-[theme=dark]:text-primary-400' },
+  { nama: 'JDIH', Ikon: ScaleBalanced, warna: 'text-green-700 in-data-[theme=dark]:text-green-400' },
+  { nama: 'Helpdesk TI', Ikon: UserHeadset, warna: 'text-primary-700 in-data-[theme=dark]:text-primary-400' },
+  { nama: 'Perpustakaan Digital', Ikon: BookOpenReader, warna: 'text-orange-600 in-data-[theme=dark]:text-orange-400' },
+  { nama: 'Kendaraan Dinas', Ikon: Truck, warna: 'text-gray-700 in-data-[theme=dark]:text-gray-300' },
+  { nama: 'Peta Kantor', Ikon: MapPin, warna: 'text-red-600 in-data-[theme=dark]:text-red-400' },
+  { nama: 'Penghargaan', Ikon: Award, warna: 'text-yellow-700 in-data-[theme=dark]:text-yellow-400' },
+  { nama: 'Tiket Layanan', Ikon: Ticket, warna: 'text-purple-700 in-data-[theme=dark]:text-purple-400' },
+]
+
+/** Jumlah ubin sebelum daftarnya dibuka: dua baris di xl. */
+const APLIKASI_RINGKAS = 12
+
+/**
+ * Isi Forum Terbaru dan Sticky Post. Nama dan judulnya contoh rekaan, dengan
+ * tanggal sebelum "hari ini".
+ */
+const FORUM = [
+  {
+    penulis: 'Ayu Lestari',
+    kategori: 'Diskusi Bebas',
+    waktu: '12 Okt 2026 13:08 WIB',
+    judul: 'Sorotan Kegiatan Pegawai | September 2026',
+    dilihat: 353,
+    komentar: 0,
+    suka: 10,
+  },
+  {
+    penulis: 'Bima Pratama',
+    kategori: 'Kearsipan',
+    waktu: '09 Okt 2026 08:04 WIB',
+    judul: 'Tata cara penyerahan arsip inaktif ke unit kearsipan',
+    dilihat: 1689,
+    komentar: 1,
+    suka: 2,
+  },
+  {
+    penulis: 'Citra Maharani',
+    kategori: 'Bantuan Teknis',
+    waktu: '07 Okt 2026 13:04 WIB',
+    judul: 'Jadwal pemeliharaan jaringan kantor akhir pekan ini',
+    dilihat: 838,
+    komentar: 2,
+    suka: 3,
+  },
+  {
+    penulis: 'Dimas Saputra',
+    kategori: 'Bantuan Teknis',
+    waktu: '06 Okt 2026 10:55 WIB',
+    judul: 'Pendingin ruangan di Lantai 6 Gedung B kurang dingin',
+    dilihat: 430,
+    komentar: 1,
+    suka: 5,
+  },
+  {
+    penulis: 'Eka Wulandari',
+    kategori: 'Kepegawaian',
+    waktu: '02 Okt 2026 09:59 WIB',
+    judul: 'Tindak lanjut webinar penguatan budaya organisasi',
+    dilihat: 774,
+    komentar: 3,
+    suka: 15,
+  },
+]
+
+const STICKY = [
+  { judul: 'Panduan Akses Wi-Fi Kantor', tanggal: '01 Sep 2026 10:45 WIB', penulis: 'Fajar Nugroho' },
+  { judul: 'Panduan Akses Jaringan Internal', tanggal: '05 Mar 2026 10:19 WIB', penulis: 'Ayu Lestari' },
+  { judul: 'Pedoman Desain Flyer Portal', tanggal: '15 Jan 2026 17:45 WIB', penulis: 'Gita Permata' },
+  { judul: 'Langkah Mengubah Kata Sandi Portal Intranet', tanggal: '02 Jul 2025 22:45 WIB', penulis: 'Gita Permata' },
+]
+
+/** Toko aplikasi untuk kartu unduhan KOSMO. */
+const TOKO = [
+  {
+    id: 'android',
+    sistem: 'Android',
+    toko: 'Google Play',
+    ajakan: 'Tersedia di',
+    tautan: 's.komdigi.go.id/kosmo-android',
+    Ikon: Play,
+  },
+  {
+    id: 'ios',
+    sistem: 'iOS',
+    toko: 'App Store',
+    ajakan: 'Unduh di',
+    tautan: 's.komdigi.go.id/kosmo-ios',
+    Ikon: Apple,
+  },
+]
 
 /**
  * Padding isi mengikuti rasio desain: kolom konten 1350px berisi isi 1080px
@@ -329,6 +466,60 @@ function Kalender({ className, darkMode }: { className?: string; darkMode?: bool
   )
 }
 
+/**
+ * Kartu unduhan aplikasi KOSMO untuk satu toko. Di desain kartu ini gambar
+ * (logo, kode QR, dan lencana toko) yang belum ada di repo, jadi sementara
+ * dirakit dari token warna dan ikon kit, termasuk kotak QR-nya. Ganti dengan
+ * <img> begitu berkasnya tersedia. Warnanya tetap sama di mode gelap, seperti
+ * kartu sapaan.
+ */
+function KartuKosmo({
+  sistem,
+  toko,
+  ajakan,
+  tautan,
+  Ikon,
+  onUnduh,
+}: Omit<(typeof TOKO)[number], 'id'> & { onUnduh: () => void }) {
+  return (
+    <div className="relative isolate flex flex-col items-center gap-3 overflow-hidden rounded-lg bg-primary-800 px-3 pt-12 pb-4 text-white shadow-soft">
+      <span
+        aria-hidden="true"
+        className="absolute top-3 left-3 grid size-8 place-items-center rounded-lg bg-white text-primary-800"
+      >
+        <Ikon className="size-5" />
+      </span>
+      <div aria-hidden="true" className="absolute -top-12 -right-14 -z-10 size-40 rounded-full bg-primary-700" />
+      <div aria-hidden="true" className="absolute -bottom-20 -left-12 -z-10 size-44 rounded-full bg-primary-900" />
+      <p className="flex items-center gap-1.5 text-heading-4 font-black tracking-wide">
+        <Rocket className="size-6 shrink-0" aria-hidden="true" />
+        KOSMO
+      </p>
+      <div
+        role="img"
+        aria-label={`Kode QR unduhan KOSMO untuk ${sistem}`}
+        className="grid aspect-square w-full max-w-36 place-items-center rounded-lg bg-white text-gray-900"
+      >
+        <QrCode className="size-3/4" aria-hidden="true" />
+      </div>
+      <p className="w-full truncate rounded bg-white px-1.5 py-0.5 text-center text-caption text-primary-800">
+        {tautan}
+      </p>
+      <button
+        type="button"
+        onClick={onUnduh}
+        className="flex items-center gap-2 rounded-lg bg-gray-900 px-3 py-1.5 text-left ring-1 ring-white/50 transition-colors hover:bg-gray-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+      >
+        <Ikon className="size-5 shrink-0" aria-hidden="true" />
+        <span className="leading-tight">
+          <span className="block text-caption">{ajakan}</span>
+          <span className="block text-body-sm font-semibold">{toko}</span>
+        </span>
+      </button>
+    </div>
+  )
+}
+
 export function PortalDashboard({
   darkMode = false,
   onDarkModeChange,
@@ -347,6 +538,7 @@ export function PortalDashboard({
   const [kategori, setKategori] = useState('')
   const [sumber, setSumber] = useState('monsakti')
   const anggaran = ANGGARAN[sumber]
+  const [semuaAplikasi, setSemuaAplikasi] = useState(false)
 
   useEffect(() => {
     if (!umpan.tampil) return
@@ -420,50 +612,110 @@ export function PortalDashboard({
           collapsed={ringkas}
           onCollapse={() => setRingkas((v) => !v)}
           darkMode={darkMode}
+          footer={
+            onDarkModeChange ? (
+              ringkas ? (
+                <div className="flex justify-center p-3">
+                  <Button
+                    iconOnly
+                    variant="outline"
+                    size="s"
+                    aria-label={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
+                    aria-pressed={darkMode}
+                    title={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
+                    onClick={() => onDarkModeChange(!darkMode)}
+                    darkMode={darkMode}
+                  >
+                    {darkMode ? <Sun /> : <Moon />}
+                  </Button>
+                </div>
+              ) : (
+                <div className="px-5 py-4">
+                  <div
+                    role="group"
+                    aria-label="Pilih tema"
+                    className="relative grid grid-cols-2 overflow-hidden rounded-full border border-border bg-surface-subtle p-1"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute top-1/2 left-1/2 z-10 h-7 -translate-x-1/2 -translate-y-1/2 border-l border-border"
+                    />
+                    <button
+                      type="button"
+                      aria-label="Gunakan mode terang"
+                      aria-pressed={!darkMode}
+                      onClick={() => onDarkModeChange(false)}
+                      className={cn(
+                        'flex h-9 items-center justify-center rounded-full border border-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
+                        !darkMode
+                          ? 'border-primary-700 text-primary-700 hover:bg-primary-50'
+                          : 'text-content-muted hover:text-content',
+                      )}
+                    >
+                      <Sun className="size-5" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Gunakan mode gelap"
+                      aria-pressed={darkMode}
+                      onClick={() => onDarkModeChange(true)}
+                      className={cn(
+                        'flex h-9 items-center justify-center rounded-full border border-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
+                        darkMode
+                          ? 'border-gray-50 text-gray-50 hover:bg-white hover:text-gray-700'
+                          : 'text-content-muted hover:text-content',
+                      )}
+                    >
+                      <Moon className="size-5" aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+              )
+            ) : undefined
+          }
         />
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Navbar ikut gelap lewat `data-theme` di akar. Garis field Search
-            gray-600 di mode gelap; yang ditimpa variabel palet gelapnya, karena
-            Search ber-`darkMode` memasang `data-theme` sendiri dan akan menimpa
-            token biasa. Tanpa itu ruas kategorinya lebur dengan header gray-700. */}
-        <Navbar
-          platform="back-office"
-          className="[--color-field-border-dark:var(--color-gray-600)]"
-          brand={{
-            content: <img src={asset('/images/ceplok.svg')} alt="" className="size-8" />,
-            href: '#/portal-dashboard/app',
-            ariaLabel: 'CEPLOK — Dashboard',
-          }}
-          items={navbarItems}
-          sidebarItems={menuSidebar}
-          sidebarUser={sidebarUser}
-          search={
-            <Search
-              categories={KATEGORI}
-              categoryPlaceholder="Pilih"
-              category={kategori}
-              onCategoryChange={setKategori}
-              placeholder="Pencarian"
-              aria-label="Pencarian"
-              buttonLabel="Cari"
-              trigger="enter"
-              value={kata}
-              onChange={(e) => setKata(e.target.value)}
-              onSearch={cari}
-              darkMode={darkMode}
-            />
-          }
-          notificationTrigger={{
-            ariaLabel: 'Notifikasi',
-            badge: 5,
-            onClick: () => kabari('Ada 5 notifikasi baru.'),
-          }}
-        />
+        {/* Navbar dan Search internal mengikuti tema efektif yang sama. Garis
+            field Search memakai gray-600 di mode gelap agar ruas kategorinya
+            tidak melebur dengan header gray-700. */}
+        <div className="sticky top-0 z-20">
+          <Navbar
+            platform="back-office"
+            darkMode={darkMode}
+            className="[--color-field-border-dark:var(--color-gray-600)]"
+            brand={{
+              content: <img src={asset('/images/ceplok.svg')} alt="" className="size-8" />,
+              href: '#/portal-dashboard/app',
+              ariaLabel: 'CEPLOK — Dashboard',
+            }}
+            items={navbarItems}
+            sidebarItems={menuSidebar}
+            sidebarUser={sidebarUser}
+            search={{
+              categories: KATEGORI,
+              categoryPlaceholder: 'Pilih',
+              category: kategori,
+              onCategoryChange: setKategori,
+              placeholder: 'Pencarian',
+              'aria-label': 'Pencarian',
+              buttonLabel: 'Cari',
+              value: kata,
+              onChange: (e) => setKata(e.target.value),
+              onSearch: cari,
+            }}
+            notificationTrigger={{
+              ariaLabel: 'Notifikasi',
+              badge: 5,
+              onClick: () => kabari('Ada 5 notifikasi baru.'),
+            }}
+          />
+        </div>
 
-        {/* Toast di kanan atas, tepat di bawah header. */}
-        <div className="fixed top-22 right-4 z-30 w-80 max-w-[calc(100vw-2rem)] sm:right-6">
+        {/* Beri jarak 8px dari Navbar: tingginya 140px saat Search BO berada
+            di baris kedua, lalu 94px mulai viewport 576px. */}
+        <div className="fixed top-[148px] right-4 z-30 w-80 max-w-[calc(100vw-2rem)] min-[576px]:top-[102px] sm:right-6">
           <Toast
             open={umpan.tampil}
             onDismiss={() => setUmpan((u) => ({ ...u, tampil: false }))}
@@ -480,25 +732,8 @@ export function PortalDashboard({
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <h1 className="text-heading-3 font-bold text-content">Dashboard</h1>
                 <div className="flex items-center gap-2">
-                  {/* Tombol tema. Navbar belum punya slot aksi tambahan, jadi
-                      tombolnya di sini. Ikonnya menunjukkan hasil bila ditekan:
-                      bulan saat terang, matahari saat gelap. */}
-                  {onDarkModeChange && (
-                    <Button
-                      iconOnly
-                      variant="outline"
-                      size="s"
-                      aria-label="Mode gelap"
-                      aria-pressed={darkMode}
-                      title={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
-                      onClick={() => onDarkModeChange(!darkMode)}
-                      darkMode={darkMode}
-                    >
-                      {darkMode ? <Sun /> : <Moon />}
-                    </Button>
-                  )}
                   <Button
-                    variant="outline"
+                    theme="primary"
                     size="s"
                     onClick={() => kabari('Pengaturan layout belum ada di contoh ini.')}
                     darkMode={darkMode}
@@ -509,9 +744,9 @@ export function PortalDashboard({
               </div>
 
               {/* Satu kolom di layar sempit, dua kolom di md, lalu grid 12 kolom di xl
-                  dengan pembagian seperti desainnya: 8/4, 5/7, 5/7. Jarak antarkartu
-                  14px; di desain, baris ketiga berjarak 20px, jadi kartunya diberi
-                  tambahan 6px di xl. */}
+                  dengan pembagian seperti desainnya: 8/4, 5/7, 5/7, 12, lalu 7/5.
+                  Jarak antarkartu 14px; di desain, baris ketiga dan sesudahnya
+                  berjarak 20px, jadi kartunya diberi tambahan 6px di xl. */}
               <div className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-12">
                 <section
                   aria-labelledby="portal-sapaan"
@@ -644,19 +879,57 @@ export function PortalDashboard({
                     Rekomendasi waktu Check-In Anda adalah pukul 05.00 - Batas waktu Check-Out Anda adalah
                     pukul 22.00
                   </Alert>
+                  {/* Jam presensi seperti desainnya: check-in hijau, check-out biru.
+                      Kedua tombolnya selebar, dan warnanya naik ke tangga 400 di
+                      mode gelap. */}
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <span className="grid size-10 place-items-center rounded-lg bg-green-100 text-green-700 in-data-[theme=dark]:bg-green-900 in-data-[theme=dark]:text-green-400">
-                        <Clock className="size-5" aria-hidden="true" />
+                        <ArrowLeftToBracket className="size-5" aria-hidden="true" />
                       </span>
                       <div>
                         <p className="text-caption text-content-muted">Jam Check-In Anda</p>
-                        <p className="text-body-sm font-bold text-content">07:12:45 WIB</p>
+                        <p className="text-body-sm font-bold text-green-700 in-data-[theme=dark]:text-green-400">
+                          07:12:45 WIB
+                        </p>
                       </div>
                     </div>
-                    <Button theme="gray" size="s" disabled darkMode={darkMode}>
+                    <Button theme="gray" size="s" disabled className="w-40" darkMode={darkMode}>
                       SUDAH CHECK IN
                     </Button>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-10 place-items-center rounded-lg bg-primary-100 text-primary-700 in-data-[theme=dark]:bg-primary-900 in-data-[theme=dark]:text-primary-400">
+                        <ArrowRightToBracket className="size-5" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <p className="text-caption text-content-muted">Jam Check-Out Anda</p>
+                        <p className="text-body-sm font-bold text-primary-700 in-data-[theme=dark]:text-primary-400">
+                          15:30:00 WIB
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      theme="primary"
+                      size="s"
+                      className="w-40"
+                      onClick={() => kabari('Check-out belum ada di contoh ini.')}
+                      darkMode={darkMode}
+                    >
+                      CHECK OUT
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-3 border-t border-border pt-3 in-data-[theme=dark]:border-gray-600">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-gray-800 text-white in-data-[theme=dark]:bg-gray-900">
+                      <Fingerprint className="size-6" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <p className="text-body-sm font-bold text-content">Detail Kehadiran</p>
+                      <p className="text-caption text-content-muted">
+                        Untuk detail data kehadiran, silakan cek di aplikasi Apik.
+                      </p>
+                    </div>
                   </div>
                 </Card>
 
@@ -674,6 +947,149 @@ export function PortalDashboard({
                     Pengisian Rencana dan Realisasi Kegiatan tidak diaktifkan untuk hari ini.
                   </Alert>
                 </Card>
+
+                {/* Tombol panah di tepi bawah kartu menonjol separuh ke luar, jadi
+                    ia dipasang di pembungkus: Card memotong isinya dengan
+                    overflow-hidden. Jarak bawah 20px di pembungkus memberi ruang
+                    di bawah tombol itu, supaya tidak menempel ke kartu sesudahnya. */}
+                <div className="relative mb-5 md:col-span-2 xl:col-span-12 xl:mt-1.5">
+                  <Card className="h-full" darkMode={darkMode}>
+                    <JudulKartu
+                      ikon={
+                        <Icon className="mt-0.5 text-purple-700 in-data-[theme=dark]:text-purple-400">
+                          <Grid />
+                        </Icon>
+                      }
+                      judul="Aplikasi Intranet"
+                    >
+                      {/* Oranye seperti desainnya, bukan brand seperti tautan kartu lain. */}
+                      <a
+                        href="#/portal-dashboard/app"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          kabari('Pengaturan urutan aplikasi belum ada di contoh ini.')
+                        }}
+                        className="text-body-sm font-medium text-orange-600 underline underline-offset-2 hover:text-orange-700 in-data-[theme=dark]:text-orange-400 in-data-[theme=dark]:hover:text-orange-300"
+                      >
+                        Atur Urutan
+                      </a>
+                    </JudulKartu>
+                    {/* Hover dan garis gelapnya mengikuti kartu ListView yang bisa diklik. */}
+                    <ul id="portal-aplikasi" className="grid grid-cols-3 gap-3 pb-2 sm:grid-cols-4 lg:grid-cols-6">
+                      {APLIKASI.slice(0, semuaAplikasi ? undefined : APLIKASI_RINGKAS).map(({ nama, Ikon, warna }) => (
+                        <li key={nama}>
+                          <button
+                            type="button"
+                            onClick={() => kabari(`Aplikasi ${nama} belum ada di contoh ini.`)}
+                            className="flex size-full min-h-24 flex-col items-center justify-center gap-2 rounded-lg border border-border bg-surface px-2 py-3 text-center text-caption text-content transition-all hover:border-primary-400/80 hover:shadow-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand in-data-[theme=dark]:border-gray-600"
+                          >
+                            <Ikon className={cn('size-8 shrink-0', warna)} aria-hidden="true" />
+                            {nama}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+                  {/* Membuka dan menutup sisa ubin. Panahnya berbalik saat terbuka. */}
+                  <Button
+                    iconOnly
+                    size="xs"
+                    theme="primary"
+                    aria-label="Tampilkan semua aplikasi"
+                    aria-controls="portal-aplikasi"
+                    aria-expanded={semuaAplikasi}
+                    onClick={() => setSemuaAplikasi((v) => !v)}
+                    className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-1/2 shadow-soft"
+                    darkMode={darkMode}
+                  >
+                    <ChevronDown className={cn('size-4 transition-transform', semuaAplikasi && 'rotate-180')} />
+                  </Button>
+                </div>
+
+                <Card className="md:col-span-2 xl:col-span-7" darkMode={darkMode}>
+                  <JudulKartu
+                    ikon={
+                      <Icon className="mt-0.5 text-orange-600 in-data-[theme=dark]:text-orange-400">
+                        <Messages />
+                      </Icon>
+                    }
+                    judul="Forum Terbaru"
+                  >
+                    <Button
+                      variant="outline"
+                      theme="primary"
+                      size="s"
+                      leftIcon={<CirclePlus className="size-6" />}
+                      className="[&>span:first-child]:size-6"
+                      onClick={() => kabari('Halaman buat forum belum ada di contoh ini.')}
+                      darkMode={darkMode}
+                    >
+                      Buat Forum
+                    </Button>
+                  </JudulKartu>
+                  {/* Ukuran lg (paling lebar 728px) supaya kartunya memenuhi kolom. */}
+                  <ListView
+                    size="lg"
+                    gap="md"
+                    darkMode={darkMode}
+                    items={FORUM.map(({ penulis, kategori, waktu, judul, dilihat, komentar, suka }) => ({
+                      variant: 'article' as const,
+                      subject: penulis,
+                      category: kategori,
+                      timestamp: waktu,
+                      title: judul,
+                      views: dilihat,
+                      comments: komentar,
+                      likes: suka,
+                      href: '#/portal-dashboard/app',
+                      onClick: (e: MouseEvent<HTMLElement>) => {
+                        e.preventDefault()
+                        kabari(`Detail forum "${judul}" belum ada di contoh ini.`)
+                      },
+                    }))}
+                  />
+                </Card>
+
+                {/* Sticky Post lalu kartu unduhan KOSMO: bertumpuk di samping forum
+                    di xl, bersebelahan di md. `content-start` menjaga barisnya
+                    tidak ikut memanjang setinggi forum. */}
+                <div className="grid content-start gap-3.5 md:col-span-2 md:grid-cols-2 xl:col-span-5 xl:grid-cols-1">
+                  <Card darkMode={darkMode}>
+                    <JudulKartu
+                      ikon={
+                        <Icon className="mt-0.5 text-red-600 in-data-[theme=dark]:text-red-400">
+                          <Thumbtack />
+                        </Icon>
+                      }
+                      judul="Sticky Post"
+                    />
+                    <ListView
+                      size="sm"
+                      decoration
+                      gap="md"
+                      darkMode={darkMode}
+                      items={STICKY.map(({ judul, tanggal, penulis }) => ({
+                        title: judul,
+                        description: tanggal,
+                        metadata: [penulis],
+                        icon: null,
+                        actionDisabled: true,
+                        onAction: () => kabari(`Detail "${judul}" belum ada di contoh ini.`),
+                        interactiveFeedback: false,
+                      }))}
+                    />
+                  </Card>
+
+                  <section aria-label="Unduh aplikasi KOSMO" className="grid grid-cols-2 gap-3.5">
+                    {TOKO.map(({ id, ...toko }) => (
+                      <KartuKosmo
+                        key={id}
+                        {...toko}
+                        onUnduh={() => kabari(`Tautan KOSMO di ${toko.toko} belum ada di contoh ini.`)}
+                      />
+                    ))}
+                  </section>
+                </div>
               </div>
             </div>
           </div>

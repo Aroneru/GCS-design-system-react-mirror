@@ -38,7 +38,14 @@ export type {
 } from "./components/Dropdown";
 
 export { Modal } from "./components/Modal";
-export type { ModalProps, ModalSize, ModalVariant } from "./components/Modal";
+export type {
+  ModalProps,
+  ModalSize,
+  ModalVariant,
+  ModalAction,
+  ModalActions,
+  ModalActionButtonProps,
+} from "./components/Modal";
 
 export {
   Drawer,
@@ -198,6 +205,8 @@ export type {
   NavbarPrimaryItem,
   NavbarNotificationTrigger,
   NavbarTableOfContents,
+  NavbarSearchConfig,
+  NavbarBackOfficeSearchConfig,
   NavbarAccountDestination,
   NavbarAccountAction,
   NavbarAccountItem,

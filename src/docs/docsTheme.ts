@@ -31,13 +31,21 @@ const darkPages = new Set([
   '/components/container',
   '/components/card',
   '/components/footer',
+  '/components/avatar',
   '/components/breadcrumb',
   '/components/button',
+  '/components/clipboard',
   '/components/drawer',
-  '/components/pagination',
-  '/components/sidebar',
+  '/components/dropdown',
   '/components/list-view',
+  '/components/table',
   '/components/table-of-contents',
+  '/components/modal',
+  '/components/navbar',
+  '/components/pagination',
+  '/components/popover',
+  '/components/sidebar',
+  '/components/spinner',
   '/components/toast',
   '/components/timeline',
   '/form',
@@ -53,6 +61,8 @@ const darkPages = new Set([
   '/form/toggle',
   '/form/checkbox',
   '/foundations',
+  '/foundations/colors',
+  '/foundations/typography',
   '/foundations/spacing',
   '/foundations/border',
   '/foundations/elevation',
@@ -126,9 +136,9 @@ export const useDocsDark = () => useContext(DocsDarkContext)
 
 /*
  * Pembantu halaman komponen. Aturannya: di mode gelap docs, komponen di setiap
- * pratinjau memakai `darkMode`, cuplikan kodenya ikut menuliskannya, mode
- * Playground mengikuti mode docs, dan bagian Dark mode bertukar menjadi Light
- * mode (<ModeSection> di usulanKit).
+ * pratinjau memakai `darkMode`, cuplikan kodenya ikut menuliskannya, dan mode
+ * Playground mengikuti mode docs. Bagian Dark mode tetap memperagakan
+ * `darkMode` di kedua mode docs (<ModeSection stayDark> di usulanKit).
  */
 
 /**
@@ -161,10 +171,11 @@ export function useDarkModeSnippet() {
 }
 
 /**
- * Daftar isi untuk mode gelap docs: entri `dark-mode` berlabel Light mode,
- * karena bagiannya bertukar. Id-nya tetap supaya tautan ke bagian itu tidak
- * putus. Panggil di level modul halaman, sama seperti `toc`-nya: observer
- * daftar isi dipasang ulang setiap kali daftarnya berganti.
+ * Daftar isi untuk mode gelap docs. Dengan `stayDark`, pasangan
+ * <ModeSection stayDark>, daftarnya tidak berubah. Tanpa itu entri `dark-mode`
+ * berlabel Light mode, karena bagiannya bertukar; id-nya tetap supaya tautan
+ * ke bagian itu tidak putus. Panggil di level modul halaman, sama seperti
+ * `toc`-nya: observer daftar isi dipasang ulang setiap kali daftarnya berganti.
  */
 export const tocForDarkDocs = (toc: TocEntry[], stayDark = false): TocEntry[] =>
   stayDark ? toc : toc.map((t) => (t.id === 'dark-mode' ? { ...t, label: 'Light mode' } : t))

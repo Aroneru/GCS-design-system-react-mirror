@@ -100,7 +100,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 export function SelectPage() {
   // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
@@ -340,6 +340,7 @@ export function SelectPage() {
 
       <ModeSection
         name="Select"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengganti field ke gray-700 dengan label terang. Pada state default garisnya
@@ -349,9 +350,9 @@ export function SelectPage() {
         }
       >
         <div className="grid gap-5 sm:grid-cols-2">
-          <Demo label="Default" dark={!docsDark} light={docsDark}>
+          <Demo label="Default" dark>
             <Select
-              darkMode={!docsDark}
+              darkMode
               label="Label"
               info="Keterangan singkat."
               placeholder="Pilih Apapun Itu"
@@ -359,9 +360,9 @@ export function SelectPage() {
               helperText="Wajib diisi."
             />
           </Demo>
-          <Demo label="Inactive" dark={!docsDark} light={docsDark}>
+          <Demo label="Inactive" dark>
             <Select
-              darkMode={!docsDark}
+              darkMode
               state="inactive"
               label="Label"
               info="Keterangan singkat."
@@ -370,9 +371,9 @@ export function SelectPage() {
               helperText="Wajib diisi."
             />
           </Demo>
-          <Demo label="Sudah dipilih" dark={!docsDark} light={docsDark}>
+          <Demo label="Sudah dipilih" dark>
             <Select
-              darkMode={!docsDark}
+              darkMode
               label="Label"
               info="Keterangan singkat."
               placeholder="Pilih Apapun Itu"
@@ -381,9 +382,9 @@ export function SelectPage() {
               helperText="Wajib diisi."
             />
           </Demo>
-          <Demo label="Purple" dark={!docsDark} light={docsDark}>
+          <Demo label="Purple" dark>
             <Select
-              darkMode={!docsDark}
+              darkMode
               application="purple"
               label="Label"
               info="Keterangan singkat."
@@ -395,13 +396,9 @@ export function SelectPage() {
         </div>
         <SectionCode>
           {'<Select\n'}
-          {!docsDark && (
-            <>
-              {'    '}
-              <H>darkMode</H>
-              {'\n'}
-            </>
-          )}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
           {'    label="Label"\n'}
           {'    placeholder="Pilih Apapun Itu"\n'}
           {'    options={provinsi}\n'}

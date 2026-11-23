@@ -4,7 +4,6 @@ import {
   Container,
   Hero,
   Navbar,
-  Search,
   Sidebar,
   type SidebarItem,
 } from "../../../lib";
@@ -214,19 +213,16 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
             sidebarItems={menu}
             sidebarUser={sidebarUser}
             tableOfContents={halaman === "simaya2" ? {
-              label: "Daftar isi",
+              label: "On this page",
               items: BERITA_LAYANAN_DIGITAL_TOC,
             } : undefined}
-            search={
-              <Search
-                trigger="enter"
-                aria-label="Cari pengajuan atau pemohon"
-                placeholder="Cari pengajuan, pemohon ..."
-                categories={searchCategories}
-                categoryPlaceholder="Kategori"
-                onSearch={(value, category) => setSearchFeedback(`Pencarian demo: ${value}${category ? ` (${category})` : ""}`)}
-              />
-            }
+            search={{
+              "aria-label": "Cari pengajuan atau pemohon",
+              placeholder: "Cari pengajuan, pemohon ...",
+              categories: searchCategories,
+              categoryPlaceholder: "Kategori",
+              onSearch: (value, category) => setSearchFeedback(`Pencarian demo: ${value}${category ? ` (${category})` : ""}`),
+            }}
             notificationTrigger={{
               ariaLabel: "Buka notifikasi",
               onClick: () => setSearchFeedback("Aksi demo: Buka notifikasi"),

@@ -51,7 +51,7 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
-const tocDark = tocForDarkDocs(toc)
+const tocDark = tocForDarkDocs(toc, true)
 
 /** Isi `hint` yang dicontohkan di Playground — hint tak harus penghitung karakter. */
 type HintKind = 'counter' | 'opsional' | 'none'
@@ -196,6 +196,7 @@ export function TextAreaPage() {
 
       <ModeSection
         name="Text Area"
+        stayDark
         lead={
           <>
             Prop <Hl>darkMode</Hl> mengganti kotak, toolbar, dan area isian ke gray-700, dengan label dan teks
@@ -206,17 +207,17 @@ export function TextAreaPage() {
         }
       >
         <div className="grid gap-5 sm:grid-cols-2">
-          <Demo label="Default" dark={!docsDark} light={docsDark}>
+          <Demo label="Default" dark>
             <TextArea
-              darkMode={!docsDark}
+              darkMode
               label="Keterangan"
               placeholder="Tulis keterangan tambahan…"
               helperText="Maksimal 500 karakter."
             />
           </Demo>
-          <Demo label="Editor" dark={!docsDark} light={docsDark}>
+          <Demo label="Editor" dark>
             <TextArea
-              darkMode={!docsDark}
+              darkMode
               type="editor"
               label="Isi pesan"
               hint="Opsional"
@@ -227,13 +228,9 @@ export function TextAreaPage() {
         </div>
         <SectionCode>
           {'<TextArea\n'}
-          {!docsDark && (
-            <>
-              {'    '}
-              <H>darkMode</H>
-              {'\n'}
-            </>
-          )}
+          {'    '}
+          <H>darkMode</H>
+          {'\n'}
           {'    type="editor"\n'}
           {'    label="Isi pesan"\n'}
           {'    submitLabel="Submit Text"\n'}

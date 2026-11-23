@@ -22,6 +22,18 @@
         if (localStorage.getItem('ceplok-docs-theme') === 'dark') {
           document.documentElement.dataset.docsTheme = 'dark'
         }
+
+        // Preview Navbar hidup di dokumen iframe sendiri. Terapkan warna kanvas
+        // dari parameter hash sebelum bundle React dimuat agar preview dark tidak
+        // sempat dicat putih pada frame pertamanya.
+        const hashQuery = location.hash.split('?')[1] || ''
+        const previewDark = location.hash.startsWith('#/preview/navbar/') &&
+          new URLSearchParams(hashQuery).get('theme') === 'dark'
+        if (previewDark) {
+          document.documentElement.dataset.previewTheme = 'dark'
+          document.documentElement.style.backgroundColor = '#111827'
+          document.documentElement.style.colorScheme = 'dark'
+        }
       } catch {}
     </script>
   </head>
