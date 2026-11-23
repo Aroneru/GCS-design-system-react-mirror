@@ -1330,7 +1330,7 @@ export function DropdownPage() {
               ]}
             />
           </Control>
-          <Control label="Mode">
+          <Control label="Tampilan">
             <Segmented
               label="Pilih mode Dropdown"
               value={mode}

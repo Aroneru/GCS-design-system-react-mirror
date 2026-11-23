@@ -216,7 +216,7 @@ export function TypographyPage() {
           </Lead>
 
           <article className="ds-card overflow-hidden">
-            <div className="grid gap-8 border-b border-border bg-primary-900 p-6 text-white sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="grid gap-8 border-b border-border bg-primary-900 p-6 text-white sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end dark:border-gray-700">
               <div>
                 <p className="text-xs font-bold tracking-[0.14em] text-primary-300 uppercase">{font.role}</p>
                 <p className="mt-3 text-[clamp(4.5rem,15vw,9rem)] leading-none font-black tracking-tight">{font.name}</p>
@@ -233,14 +233,14 @@ export function TypographyPage() {
               </div>
             </div>
 
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-border dark:divide-gray-700">
               {typeScale.map((t) => (
                 <div key={t.name} className="grid gap-4 p-5 sm:p-7 lg:grid-cols-[180px_1fr] lg:items-baseline">
                   <div>
-                    <p className="text-sm font-black text-gray-900">{t.name}</p>
+                    <p className="text-sm font-black text-gray-900 dark:text-white">{t.name}</p>
                     <p className="mt-1 text-xs text-gray-400">{t.spec}</p>
                   </div>
-                  <p className={`${t.cls} text-gray-900`}>{t.sample}</p>
+                  <p className={`${t.cls} text-gray-900 dark:text-white`}>{t.sample}</p>
                 </div>
               ))}
             </div>
@@ -251,20 +251,20 @@ export function TypographyPage() {
 
         <FlowSection id="skala" title="Skala ukuran Tailwind">
           <Lead>
-            Skala <code className="text-xs font-bold text-gray-700">text-xs</code> hingga{' '}
-            <code className="text-xs font-bold text-gray-700">text-9xl</code> untuk kebutuhan di luar
+            Skala <code className="text-xs font-bold text-gray-700 dark:text-gray-300">text-xs</code> hingga{' '}
+            <code className="text-xs font-bold text-gray-700 dark:text-gray-300">text-9xl</code> untuk kebutuhan di luar
             token semantik.
           </Lead>
 
-          <article className="ds-card divide-y divide-border overflow-hidden">
+          <article className="ds-card divide-y divide-border overflow-hidden dark:divide-gray-700">
             {tailwindScale.map(([cls, label]) => (
               <div key={cls} className="p-5 sm:p-6">
                 <div className="flex items-baseline gap-2">
-                  <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                  <code className="text-sm font-bold text-primary-700 dark:text-primary-400">.{cls}</code>
                   <span className="text-xs text-gray-400">{label}</span>
                 </div>
                 <div className="ds-scroll-x mt-3 overflow-x-auto">
-                  <p className={`${cls} font-normal whitespace-nowrap text-gray-900`}>
+                  <p className={`${cls} font-normal whitespace-nowrap text-gray-900 dark:text-white`}>
                     The quick brown fox jumps over the lazy dog.
                   </p>
                 </div>
@@ -277,27 +277,28 @@ export function TypographyPage() {
 
         <FlowSection id="weight" title="Sembilan tingkat ketebalan">
           <Lead>
-            Dari <code className="text-xs font-bold text-gray-700">.font-thin</code> (100) hingga{' '}
-            <code className="text-xs font-bold text-gray-700">.font-black</code> (900). Nilainya
-            berasal dari token <code className="text-xs font-bold text-gray-700">--font-weight-*</code>{' '}
+            Dari <code className="text-xs font-bold text-gray-700 dark:text-gray-300">.font-thin</code> (100) hingga{' '}
+            <code className="text-xs font-bold text-gray-700 dark:text-gray-300">.font-black</code> (900). Nilainya
+            berasal dari token <code className="text-xs font-bold text-gray-700 dark:text-gray-300">--font-weight-*</code>{' '}
             di tokens.css. Tingkat yang tidak dimiliki {font.name} ditandai beserta ketebalan yang
             tampil sebagai gantinya.
           </Lead>
 
-          <article className="ds-card divide-y divide-border overflow-hidden">
+          <article className="ds-card divide-y divide-border overflow-hidden dark:divide-gray-700">
             {fontWeights.map(([cls, value]) => {
               const shown = renderedWeight(value, availableWeights[fontKey])
               return (
                 <div key={cls} className="grid gap-2 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6">
-                  <p className={`${cls} text-4xl text-gray-900`}>Ceplok Design System</p>
+                  <p className={`${cls} text-4xl text-gray-900 dark:text-white`}>Ceplok Design System</p>
+                  {/* Badge peringatan: warna gelapnya sama dengan Badge warning milik kit, karena orange-900 sama dengan red-900. */}
                   {/* Label ditumpuk di bawah kode, bukan di sampingnya, supaya kolom ini tidak melebar dan memotong teks contoh. */}
                   <div className="flex flex-col gap-1.5 sm:items-end">
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:justify-end">
-                      <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                      <code className="text-sm font-bold text-primary-700 dark:text-primary-400">.{cls}</code>
                       <code className="text-xs text-gray-400">--font-weight-{cls.slice(5)}: {value}</code>
                     </div>
                     {shown !== value && (
-                      <span className="w-fit rounded-full bg-orange-50 px-2 py-0.5 text-xs font-bold text-orange-700">
+                      <span className="w-fit rounded-full bg-orange-50 px-2 py-0.5 text-xs font-bold text-orange-700 dark:bg-yellow-900 dark:text-yellow-300">
                         Tidak ada di {font.name}, tampil {shown}
                       </span>
                     )}
@@ -317,10 +318,10 @@ export function TypographyPage() {
             {lineHeights.map(([cls, value]) => (
               <article key={cls} className="ds-card p-5">
                 <div className="flex items-center justify-between gap-2">
-                  <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                  <code className="text-sm font-bold text-primary-700 dark:text-primary-400">.{cls}</code>
                   <code className="text-xs text-gray-400">{value}</code>
                 </div>
-                <p className={`${cls} mt-3 text-sm text-gray-900`}>
+                <p className={`${cls} mt-3 text-sm text-gray-900 dark:text-white`}>
                   Layanan digital untuk semua masyarakat Indonesia yang inklusif dan mudah diakses.
                 </p>
               </article>
@@ -336,12 +337,12 @@ export function TypographyPage() {
           <article className="ds-card p-6">
             <div className="space-y-5">
               {textTransforms.map(([cls, desc]) => (
-                <div key={cls} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                <div key={cls} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0 dark:border-gray-700">
                   <div className="flex items-center justify-between gap-3">
-                    <code className="text-sm font-bold text-primary-700">.{cls}</code>
+                    <code className="text-sm font-bold text-primary-700 dark:text-primary-400">.{cls}</code>
                     <code className="text-[11px] text-gray-400">{desc}</code>
                   </div>
-                  <p className={`${cls} mt-2 text-lg text-gray-900`}>
+                  <p className={`${cls} mt-2 text-lg text-gray-900 dark:text-white`}>
                     The quick brown fox jumps over the lazy dog.
                   </p>
                 </div>
@@ -354,12 +355,12 @@ export function TypographyPage() {
 
         <FlowSection id="font-alt" title="Mengganti font">
           <Lead>
-            Lato dipakai lewat <code className="text-xs font-bold text-gray-700">font-sans</code>,
-            Inter lewat <code className="text-xs font-bold text-gray-700">font-alt</code>, dan Arial
-            lewat <code className="text-xs font-bold text-gray-700">font-alt-2</code>. Untuk memakai
+            Lato dipakai lewat <code className="text-xs font-bold text-gray-700 dark:text-gray-300">font-sans</code>,
+            Inter lewat <code className="text-xs font-bold text-gray-700 dark:text-gray-300">font-alt</code>, dan Arial
+            lewat <code className="text-xs font-bold text-gray-700 dark:text-gray-300">font-alt-2</code>. Untuk memakai
             font lain, timpa variabel{' '}
-            <code className="text-xs font-bold text-gray-700">--font-alt</code> atau{' '}
-            <code className="text-xs font-bold text-gray-700">--font-alt-2</code> di CSS project.
+            <code className="text-xs font-bold text-gray-700 dark:text-gray-300">--font-alt</code> atau{' '}
+            <code className="text-xs font-bold text-gray-700 dark:text-gray-300">--font-alt-2</code> di CSS project.
           </Lead>
 
           <SectionCode>{usage.alt}</SectionCode>
@@ -369,17 +370,17 @@ export function TypographyPage() {
           <PrincipleList
             items={[
               <>
-                Gunakan <strong className="text-gray-900">Bold atau Black</strong> untuk heading dan
+                Gunakan <strong className="text-gray-900 dark:text-white">Bold atau Black</strong> untuk heading dan
                 angka penting.
               </>,
               <>
-                Pertahankan body minimal <strong className="text-gray-900">16px</strong> untuk konten
+                Pertahankan body minimal <strong className="text-gray-900 dark:text-white">16px</strong> untuk konten
                 utama.
               </>,
               <>Hindari paragraf panjang dengan huruf kapital karena menurunkan keterbacaan.</>,
               <>
                 Batasi panjang baris ideal antara{' '}
-                <strong className="text-gray-900">45–75 karakter</strong>.
+                <strong className="text-gray-900 dark:text-white">45–75 karakter</strong>.
               </>,
             ]}
           />

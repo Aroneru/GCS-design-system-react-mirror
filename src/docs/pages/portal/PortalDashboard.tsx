@@ -123,6 +123,12 @@ const KATEGORI = MENU.filter(({ id }) => id !== 'dashboard').map(({ id, label })
   label,
 }))
 
+/** Pilihan toggle tema di kaki Sidebar. */
+const TEMA = [
+  { gelap: false, label: 'Terang', Ikon: Sun },
+  { gelap: true, label: 'Gelap', Ikon: Moon },
+]
+
 const WIKI = [
   {
     judul: 'Integrasi dan Template Standar',
@@ -631,43 +637,49 @@ export function PortalDashboard({
                 </div>
               ) : (
                 <div className="px-5 py-4">
+                  {/* Sorotan pilihan aktif bergeser di belakang tombol. Warnanya
+                      sama dengan item aktif Sidebar: putih di mode terang,
+                      gray-600 di mode gelap. Ikon aktif memakai warna brand.
+                      Warna wadahnya memudar 200ms, seirama dengan Sidebar. */}
                   <div
                     role="group"
                     aria-label="Pilih tema"
-                    className="relative grid grid-cols-2 overflow-hidden rounded-full border border-border bg-surface-subtle p-1"
+                    className="relative grid grid-cols-2 rounded-full border border-border bg-surface-subtle p-1 transition-colors duration-200"
                   >
                     <span
                       aria-hidden="true"
-                      className="pointer-events-none absolute top-1/2 left-1/2 z-10 h-7 -translate-x-1/2 -translate-y-1/2 border-l border-border"
+                      className={cn(
+                        'pointer-events-none absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-white shadow-sm ring-1 ring-border',
+                        'transition-[translate,background-color,box-shadow] duration-300 ease-out motion-reduce:transition-none',
+                        'in-data-[theme=dark]:bg-gray-600',
+                        darkMode && 'translate-x-full',
+                      )}
                     />
-                    <button
-                      type="button"
-                      aria-label="Gunakan mode terang"
-                      aria-pressed={!darkMode}
-                      onClick={() => onDarkModeChange(false)}
-                      className={cn(
-                        'flex h-9 items-center justify-center rounded-full border border-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
-                        !darkMode
-                          ? 'border-primary-700 text-primary-700 hover:bg-primary-50'
-                          : 'text-content-muted hover:text-content',
-                      )}
-                    >
-                      <Sun className="size-5" aria-hidden="true" />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Gunakan mode gelap"
-                      aria-pressed={darkMode}
-                      onClick={() => onDarkModeChange(true)}
-                      className={cn(
-                        'flex h-9 items-center justify-center rounded-full border border-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand',
-                        darkMode
-                          ? 'border-gray-50 text-gray-50 hover:bg-white hover:text-gray-700'
-                          : 'text-content-muted hover:text-content',
-                      )}
-                    >
-                      <Moon className="size-5" aria-hidden="true" />
-                    </button>
+                    {TEMA.map(({ gelap, label, Ikon }) => {
+                      const aktif = darkMode === gelap
+                      return (
+                        <button
+                          key={label}
+                          type="button"
+                          aria-pressed={aktif}
+                          onClick={() => onDarkModeChange(gelap)}
+                          className={cn(
+                            'relative flex h-9 items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors duration-300',
+                            'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+                            aktif ? 'text-content' : 'text-content-muted hover:text-content',
+                          )}
+                        >
+                          <Ikon
+                            aria-hidden="true"
+                            className={cn(
+                              'size-5 transition-[color,rotate,scale] duration-300 ease-out motion-reduce:transition-none',
+                              aktif ? 'text-brand' : gelap ? '-rotate-12 scale-90' : 'rotate-90 scale-90',
+                            )}
+                          />
+                          {label}
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
               )
@@ -711,6 +723,39 @@ export function PortalDashboard({
               onClick: () => kabari('Ada 5 notifikasi baru.'),
             }}
           />
+          {/* Navbar belum punya slot tombol tambahan, jadi toggle tema mobile
+              ditempel di baris atas header, tepat di kiri lonceng: 116px dari
+              kanan = padding 16px + tombol Drawer 36px + lonceng 40px + dua
+              jarak 12px. Gayanya sama dengan tombol menu Navbar. Mulai 576px
+              Search naik ke baris yang sama, jadi tombol ini disembunyikan;
+              di desktop toggle-nya ada di kaki Sidebar. */}
+          {onDarkModeChange && (
+            <button
+              type="button"
+              aria-label="Mode gelap"
+              aria-pressed={darkMode}
+              title={darkMode ? 'Matikan mode gelap' : 'Nyalakan mode gelap'}
+              onClick={() => onDarkModeChange(!darkMode)}
+              className="absolute top-4.5 right-29 grid size-9 place-items-center rounded-lg text-content-subtle transition-colors hover:bg-surface-subtle hover:text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand min-[576px]:hidden in-data-[theme=dark]:text-gray-400"
+            >
+              <Sun
+                strokeWidth={1.8}
+                aria-hidden="true"
+                className={cn(
+                  'col-start-1 row-start-1 size-5 transition-[opacity,rotate,scale] duration-300 ease-out motion-reduce:transition-none',
+                  darkMode ? 'opacity-100' : '-rotate-90 scale-50 opacity-0',
+                )}
+              />
+              <Moon
+                strokeWidth={1.8}
+                aria-hidden="true"
+                className={cn(
+                  'col-start-1 row-start-1 size-5 transition-[opacity,rotate,scale] duration-300 ease-out motion-reduce:transition-none',
+                  darkMode ? 'rotate-90 scale-50 opacity-0' : 'opacity-100',
+                )}
+              />
+            </button>
+          )}
         </div>
 
         {/* Beri jarak 8px dari Navbar: tingginya 140px saat Search BO berada

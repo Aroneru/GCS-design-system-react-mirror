@@ -102,6 +102,8 @@ Warna yang hanya dipakai satu komponen dan tidak cocok dengan token semantik man
 | Alert | `--color-alert-{variant}-surface`, `-icon`, `-heading`, `-body`, `-close` |
 | Hero | `--color-hero`, `-centered`, `-dark` |
 | Container | `--color-container` |
+| Card | `--color-card-surface`, `-border`, `-title`, `-description`, `-link`, `-link-hover` |
+| Footer | `--color-footer-surface`, `-content`, `-content-hover`, `-social`, `-divider` (sama di tema terang dan gelap, karena Footer selalu gelap) |
 | Sidebar | `--color-sidebar-surface` |
 | Search | `--color-search-category-surface`, `--color-search-field-surface` |
 | Breadcrumb | `--color-breadcrumb-surface`, `--color-breadcrumb-active`, `--color-breadcrumb-link-hover` |

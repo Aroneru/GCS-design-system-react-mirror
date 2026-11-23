@@ -11,52 +11,144 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+### Ditambahkan
+
+- **Token komponen `--color-card-*` di `tokens.css`.** Card kini memakai
+  `--color-card-surface`, `-border`, `-title`, `-description`, `-link`, dan
+  `-link-hover`, bukan token semantik umum. Nilainya sama dengan sebelumnya,
+  jadi tampilan Card tidak berubah. Warna kartu kini bisa ditimpa di CSS
+  aplikasi tanpa ikut mengubah komponen lain. Daftarnya ada di `COLOR.md`.
+- **Token komponen `--color-footer-*` di `tokens.css`.** Footer kini memakai
+  `--color-footer-surface`, `-content`, `-content-hover`, `-social`, dan
+  `-divider`, bukan kelas warna langsung (`bg-gray-800`, `text-white`, dan
+  lainnya). Nilainya sama dengan sebelumnya dan sama di kedua tema, karena
+  Footer selalu gelap.
+
 ### Diubah
 
-- **Warna field kosong `Upload` mode gelap ditokenisasi.** Background kolom
-  nama berkas dan border pembungkus tetap memakai `#1F2A37`, tetapi sekarang
-  berasal dari token komponen `--color-upload-empty-surface`, bukan arbitrary
-  value yang ditulis langsung di komponen. Consumer dapat menimpa token ini
-  tanpa mengubah komponen.
-- **Preview dark docs Popover dan Modal diselaraskan.** Panggung contoh
-  Positions Popover dan kartu Sizes Modal kini memakai permukaan gelap yang
-  sama dengan contoh Dark mode saat dokumentasi berada pada tema gelap. Warna
-  teks, border, badge ukuran, dan kontrol tetap mengikuti token temanya.
-- **Kontrak tema `Avatar` diperjelas.** Prop `darkMode` tetap menjadi API resmi,
-  sama seperti komponen lain: prop tersebut memasang tema gelap secara lokal,
-  sedangkan Avatar tanpa prop mengikuti scope ambient `data-theme`, termasuk
-  nested scope. Dokumentasi sebelumnya yang menyebut prop ini deprecated telah
-  dikoreksi.
-- **Kontrak tema `Clipboard` diperjelas.** Prop `darkMode` tetap menjadi API
-  resmi untuk mengaktifkan palet gelap secara lokal. Tanpa prop tersebut,
-  Clipboard mengikuti scope ambient `data-theme`, termasuk nested scope.
-  Dokumentasi sebelumnya yang menyebut prop ini deprecated telah dikoreksi.
-- **Kontrak tema `Popover` diperjelas.** Prop `darkMode` tetap menjadi API resmi
-  untuk mengaktifkan tema gelap pada panel secara lokal. Tanpa prop tersebut,
-  Popover mengikuti scope ambient `data-theme`, dan atribut `data-theme` yang
-  diteruskan consumer dapat menjadi boundary tema eksplisit.
-- **Kontrak tema `Dropdown` diperjelas.** Prop `darkMode` merupakan API resmi
-  untuk mengaktifkan tema gelap secara lokal. Tanpa prop tersebut, Dropdown
-  mewarisi tema ambient dari boundary `data-theme`, termasuk pada scope tema
-  bertingkat. Warna panel dan item bawaan tetap berasal dari token semantik
-  `--color-dropdown-*`; trigger serta `children` kustom tetap dikelola consumer.
-- **Kontrak tema `Modal` diperjelas.** Prop `darkMode` merupakan API resmi untuk
-  mengaktifkan tema gelap secara lokal pada elemen dialog dan komponen internal.
-  Tanpa prop tersebut, Modal mewarisi tema ambient dari boundary `data-theme`.
-  Atribut `data-theme` eksplisit menjadi override dan kini menghasilkan tema
-  efektif yang sama pada dialog serta context Button internal.
-  Trigger berada di luar dialog dan tetap dikelola consumer, misalnya dengan
-  memberikan `darkMode` tersendiri pada `Button` yang digunakan sebagai trigger.
-- **Kontrak tema `Navbar` diperjelas.** Prop `darkMode` merupakan API resmi untuk
-  tema gelap lokal; tanpa prop, Navbar mengikuti tema pembungkus. Atribut
-  `data-theme` eksplisit menjadi override dan kini menghasilkan satu tema
-  efektif yang sama untuk header, Search, Drawer, Sidebar mobile, serta TOC.
+- **Mode gelap situs dokumentasi meluas.** Selain halaman di 0.6.0, mode gelap
+  kini juga berlaku di halaman berikut. Aturannya sama dengan bagian
+  "Pratinjau di docs gelap" di 0.6.0.
+  - Components: Card, Container, Footer, Table, dan Table of Contents.
+  - Foundations: Colors dan Typography.
+- **Id bagian Dark mode di halaman Table berganti.** Bagian "Mode gelap" kini
+  bernama Dark mode, sama seperti halaman lain. Tautan
+  `#/components/table#mode-gelap` berganti menjadi `#/components/table#dark-mode`.
+
+## [0.6.0] - 2026-11-23
+
+Rilis npm pertama sejak 0.5.0; versi 0.5.1 hanya mengubah situs dokumentasi
+dan tidak terbit di npm. Ada perubahan API yang memutus, ditandai **Memutus**
+di bagian **Diubah**:
+
+- `Avatar`: prop `gender`, tipe `AvatarGender`, dan nilai `fallback="profile"`
+  dihapus.
+- `Clipboard` wajib punya nama aksesibel: `label`, `aria-label`, atau
+  `aria-labelledby`.
+- `Popover`: `trigger` wajib satu elemen native `<button>`. Trigger lain
+  membuat Popover melempar error.
+- `Navbar`: `search` dan `notificationTrigger` kini objek konfigurasi, bukan
+  `ReactNode`. Navbar Back Office tidak lagi menerima `account` dan
+  `mobileDrawer`.
+
+Tampilan gelap `Button` juga berubah, dan prop `tone` kini deprecated. Button
+di dalam Table, Modal, atau Navbar ber-`darkMode` ikut gelap. Yang baru antara
+lain `darkMode` untuk Table, Modal, dan Navbar, aksi standar Modal, daftar isi
+di Drawer Navbar, dan Search berkategori di platform `compact`. Situs
+dokumentasi kini punya mode gelap (uji coba).
 
 ### Ditambahkan
 
-- **`Navbar`: prop `darkMode`.** Tema gelap Navbar kini diteruskan ke header,
-  tombol Drawer, Drawer navigasi kanan, dan Sidebar mobile. Drawer Portal
-  Dashboard karena itu langsung mengikuti toggle tema halaman yang sama.
+- **`Table` punya prop `darkMode`.** Prop ini memasang `data-theme="dark"` di
+  tabel.
+  - Toolbar berlatar gray-800, header gray-600, footer gray-700.
+  - Baris gray-700. Dengan `striped`, baris mulai dari gray-700 lalu gray-800.
+  - Pagination, tombol Filter, dan Dropdown ikut gelap.
+- **Token baru `--color-table-*`.** Semua warna Table kini dari token ini,
+  dengan nilai terang dan gelap. Timpa di CSS project bila perlu, mis.
+  `[data-theme='dark'] { --color-table-toolbar: #1f2a37; }`.
+- **`Table` otomatis `compact` di mobile.** Bila lebar tabel di bawah 640px,
+  tabel memakai `compact` apa pun nilai `size`. Yang diukur lebar tabel, bukan
+  lebar layar.
+- **Button dan Badge mewarisi `darkMode` pembungkusnya.** Table, Modal, dan
+  Navbar ber-`darkMode` meneruskan mode gelapnya, jadi Button dan Badge di
+  toolbar, sel, dialog, maupun header tidak perlu diberi `darkMode` satu per
+  satu.
+  - Badge: semua varian ikut gelap.
+  - Button: memakai palet gelap yang dijelaskan di entri `Button` pada bagian
+    **Diubah**.
+  - Prop `darkMode` yang diisi langsung tetap menang, termasuk `false`.
+- **`Modal`: prop `darkMode`, aksi standar, dan ikon Popup.**
+  - `darkMode` memasang tema gelap pada dialog dan meneruskannya ke Button di
+    dalamnya. Tanpa prop ini, Modal mengikuti tema pembungkusnya. Atribut
+    `data-theme` yang diisi langsung menang atas keduanya dan menghasilkan
+    tema yang sama untuk dialog serta Button di dalamnya.
+  - Prop `actions` menyediakan tombol `secondary`, `primary`, dan `danger`
+    dengan urutan serta tampilan baku. `footer` tetap tersedia untuk isi
+    kustom dan tidak dapat dipakai bersamaan dengan `actions`.
+  - Ikon Popup dapat diganti lewat `icon` atau disembunyikan dengan
+    `icon={null}`.
+  - Trigger berada di luar dialog dan tetap dikelola consumer, mis. dengan
+    memberi `darkMode` sendiri pada `Button` yang menjadi trigger.
+- **`Navbar`: prop `darkMode`.** Tema gelap diteruskan ke header, Search,
+  tombol Drawer, Drawer navigasi kanan, Sidebar mobile, dan TOC di Drawer.
+  Tanpa prop, Navbar mengikuti tema pembungkusnya. Atribut `data-theme` yang
+  diisi langsung menang dan menghasilkan satu tema yang sama untuk semua bagian
+  itu. Karena itu Drawer Portal Dashboard langsung mengikuti toggle tema
+  halaman.
+- **Navbar Back Office: TOC responsif di Drawer.** Prop `tableOfContents`
+  menambahkan disclosure daftar isi sebagai item terakhir Drawer Navbar mobile.
+  Header Drawer memakai eyebrow `MENU`. Setelah garis pemisah, disclosure TOC
+  tampil sebagai `ON THIS PAGE` tanpa ikon daftar, border, atau latar kartu.
+  Daftar tetap tertutup sampai dipilih, lalu merender komponen
+  `TableOfContents` yang sama dengan tampilan desktop sehingga styling,
+  scroll-spy, dan penanda aktifnya konsisten. TOC desktop tetap dirender oleh
+  consumer pada konten halaman.
+- **`TableOfContents`: layout `collapsible`.** Daftar isi tampil sebagai
+  disclosure yang membuka daftarnya di tempat, bukan di dialog. TOC di Drawer
+  Navbar memakai mode ini.
+- **`Search`: kategori di platform `compact`.** Tingginya 37px, ruas
+  kategorinya 128px, dan label kategori dipotong sesudah 12 karakter. Bila ada
+  kategori, tombol cari tampil secara bawaan, juga di `compact`. Nama aksesibel
+  trigger kategori kini menyebut kategori yang terpilih.
+- **`ListViewItem`: prop `actionDisabled` dan `interactiveFeedback`.** Tombol
+  aksi bawaan pada varian `simple` kini dapat disembunyikan di seluruh ukuran
+  dan platform. Saat `actionHref`/`onAction` tersedia tanpa `href`/`onClick`
+  item, aksinya dialihkan ke seluruh item sebagai anchor/button. Aksi item yang
+  eksplisit tetap diprioritaskan, sedangkan feedback hover/active dapat
+  dimatikan secara terpisah tanpa menonaktifkan klik.
+- **Drawer: slot `afterItems`.** Konten kustom kini dapat ditambahkan setelah
+  menu `items` tanpa mengganti `DrawerBody` data-driven bawaan.
+- **Mode gelap situs dokumentasi (uji coba).** Tombol bulan/matahari ada di
+  ujung bawah rail dan di top bar mobile, dan pilihannya disimpan di browser.
+  Rail, panel samping, dan jendela pencarian halaman ikut gelap. Mode gelap
+  berlaku di halaman berikut; di halaman lain situs tetap terang dan tombolnya
+  diredupkan.
+  - Home dan Portal Dashboard.
+  - Components: Overview, Alert, Avatar, Breadcrumb, Button, Clipboard, Drawer,
+    Dropdown, List View, Modal, Navbar, Pagination, Popover, Sidebar, Spinner,
+    Toast, dan Timeline View.
+  - Form: Overview, Input Field Form, dan semua halaman Form.
+  - Foundations: Overview, Spacing, Border, Elevation, dan Icons.
+- **Pratinjau di docs gelap.** Komponen di pratinjau dan kartu Overview memakai
+  `darkMode` selama docs gelap, cuplikan kodenya ikut menuliskannya, dan mode
+  Playground mengikuti mode docs. Perubahan ini hanya di situs dokumentasi:
+  komponen library dan `styles.css` paket tidak berubah.
+  - Bagian Dark mode tetap gelap di kedua mode docs, termasuk judul, daftar
+    isi, pratinjau, dan cuplikannya.
+  - Trigger contoh Dropdown memakai `Button` ber-`darkMode` saat docs atau
+    Playground gelap, jadi tampil sebagai tombol putih milik Button, bukan
+    palet primary biru yang hanya digelapkan. Snippet Playground dan bagian
+    Dark mode ikut mengimpor Button serta menerapkan tema pada trigger milik
+    consumer.
+  - Panggung contoh Positions Popover dan kartu Sizes Modal memakai permukaan
+    gelap yang sama dengan contoh Dark mode. Warna teks, border, badge ukuran,
+    dan kontrol tetap mengikuti token temanya.
+  - Pratinjau Navbar tidak berkedip terang: tema kanvas iframe diterapkan
+    sebelum React dimuat dan tetap disinkronkan ketika kontrol tema Playground
+    berubah.
+  - Aplikasi Portal Dashboard memasang `data-theme="dark"` di akarnya dan
+    punya tombol tema sendiri di header.
 - **Portal Dashboard lebih lengkap.** Di bawah Rencana Kegiatan kini ada kartu
   Aplikasi Intranet, Forum Terbaru, Sticky Post, dan kartu unduhan KOSMO.
   - Aplikasi Intranet menampilkan 12 ubin. Tombol panah di tepi bawah kartunya
@@ -69,158 +161,81 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
     serta Sticky Post adalah contoh rekaan.
 
 ### Diubah
-- **Trigger contoh Dropdown mengikuti tema docs.** Tombol trigger pada preview
-  kini memakai komponen `Button` dengan `darkMode` saat docs atau Playground
-  gelap, sehingga menggunakan fallback filled putih milik Button, bukan palet
-  primary biru yang hanya digelapkan. Snippet Playground dan bagian Dark mode
-  ikut mengimpor Button serta menerapkan tema pada trigger milik consumer.
-- **Preview Navbar tidak berkedip terang saat mode gelap.** Tema kanvas iframe
-  kini diterapkan sebelum React dimuat dan tetap disinkronkan ketika kontrol
-  tema Playground berubah.
-- **Akun Navbar FO konsisten dengan Sidebar mobile.** `NavbarAccount.items`
-  kini opsional; tanpa item, identitas tampil tanpa dropdown. Pada mobile,
-  Navbar mengadaptasi satu sumber `account` ke area profil `Sidebar.user`.
-  Sidebar juga memakai komponen `Avatar`, termasuk inisial otomatis dari nama.
-  Contoh dasar tidak lagi mengisi `initials`; prop tersebut tetap tersedia
-  sebagai override, dan highlight Playground menandai field API yang relevan.
-- **`Navbar`: konfigurasi Search internal.** Prop `search` kini menerima opsi
-  Search, bukan `ReactNode`. Navbar memakai default compact tanpa kategori dan
-  tombol pada FO, serta compact berkategori dan bertombol pada BO. Default
-  `platform`, `showButton`, dan `darkMode` tetap dapat dioverride consumer.
-  Dokumentasi membedakan tipe FO/BO, kategori wajib BO, dan contoh override.
-- **`Modal`: aksi standar dan ikon Popup.** Prop `actions` menyediakan tombol
-  `secondary`, `primary`, dan `danger` dengan urutan serta tampilan baku;
-  `footer` tetap tersedia untuk override kustom dan tidak dapat dipakai
-  bersamaan dengan `actions`. Ikon Popup kini dapat diganti melalui `icon`
-  atau disembunyikan dengan `icon={null}`. Prop `darkMode` mengatur tema Modal
-  dan mewariskannya ke Button di dalam dialog.
-- **`Navbar`: dukungan `darkMode`.** Navbar kini menerima tema gelap lokal dan
-  mewariskan konteks tema ke komponen di dalamnya; tanpa prop, tema mengikuti
-  konteks pembungkus.
 
-- **TOC Drawer Navbar mengikuti struktur section.** Header Drawer mobile kini
-  memakai eyebrow `MENU`. Setelah separator, disclosure TOC tampil sebagai
-  `ON THIS PAGE` tanpa ikon daftar, border, atau latar kartu; chevron, daftar,
-  scroll-spy, dan indikator aktif tetap berasal dari komponen `TableOfContents`.
-  TOC juga mengikuti prop `darkMode` Navbar.
-- **Border `Search` lebih terbaca di mode gelap.** Varian polos maupun kategori,
-  pada platform default, mobile, dan compact, kini memiliki garis luar 1px
-  gray-500. Garis memakai inset ring sehingga tidak mengubah ukuran komponen;
-  light mode tetap memakai border sebelumnya.
-- **Search Navbar Portal memakai platform compact.** Tinggi field menjadi 37px
-  dan tetap menampilkan kategori serta tombol cari sesuai komposisi Back Office.
-- **Tombol "Pengaturan Layout" di Portal Dashboard kini primary.** Sebelumnya
-  outline. Tombol "Buat Forum" yang baru memakai outline sebagai tombol
-  sekunder.
-- **Mode gelap situs dokumentasi meluas.** Selain halaman di 0.6.0, mode gelap
-  kini berlaku di semua halaman Form, Components Overview, Alert, Toast,
-  Timeline View, Foundations Overview, Spacing, Border, Elevation, Icons, dan
-  Navbar.
-  Aturannya sama: komponen di pratinjau dan kartu Overview memakai `darkMode`
-  selama docs gelap, cuplikan kodenya ikut menuliskannya, dan mode Playground
-  mengikuti mode docs. Perubahan ini hanya di situs dokumentasi: komponen
-  library dan `styles.css` paket tidak berubah.
-- **Bagian Dark mode di docs tetap gelap.** Selama docs gelap, bagian itu tidak
-  lagi bertukar menjadi Light mode. Judul, daftar isi, pratinjau, dan
-  cuplikannya tetap memperagakan `darkMode` di kedua mode docs. Ini berlaku di
-  semua halaman yang punya bagian Dark mode, termasuk Search Form dari 0.6.0.
-
-### Diperbaiki
-
-- **Breadcrumb responsif untuk hierarki panjang.** Label dibatasi 12 karakter
-  di mobile dan 17 karakter di desktop. Komponen mengukur ruang yang tersedia;
-  ketika seluruh level tetap tidak muat, level tengah otomatis diringkas
-  menjadi `…` sementara item pertama dan halaman aktif dipertahankan. Tooltip
-  pada `…` menampilkan label yang disembunyikan.
-- **Jarak kartu versi di panel samping docs.** Kartu "Foundation v1.0" di
-  ujung bawah panel tidak lagi menempel ke menu terakhir saat daftar menunya
-  memenuhi panel, mis. di area Components.
-
-## [0.6.0] - 2026-11-16
-
-### Ditambahkan
-- **`Table` punya prop `darkMode`.** Prop ini memasang `data-theme="dark"` di
-  tabel.
-  - Toolbar berlatar gray-800, header gray-600, footer gray-700.
-  - Baris gray-700. Dengan `striped`, baris mulai dari gray-700 lalu gray-800.
-  - Pagination, tombol Filter, dan Dropdown ikut gelap.
-- **Token baru `--color-table-*`.** Semua warna Table kini dari token ini,
-  dengan nilai terang dan gelap. Timpa di CSS project bila perlu, mis.
-  `[data-theme='dark'] { --color-table-toolbar: #1f2a37; }`.
-- **`Table` otomatis `compact` di mobile.** Bila lebar tabel di bawah 640px,
-  tabel memakai `compact` apa pun nilai `size`. Yang diukur lebar tabel, bukan
-  lebar layar.
-- **Button dan Badge ikut `darkMode` milik `Table`.** Tidak perlu lagi memberi
-  `darkMode` ke tiap Button atau Badge di toolbar maupun di sel.
-  - Badge: semua varian ikut gelap.
-  - Button: hanya theme `gray` yang ikut gelap. Theme berwarna, mis. tombol
-    "Tambah Data" (primary), tetap berwarna.
-  - Prop `darkMode` yang diisi langsung tetap menang, termasuk `false`.
-
-- **`ListViewItem`: prop `actionDisabled` dan `interactiveFeedback`.** Tombol
-  aksi bawaan pada varian `simple` kini dapat disembunyikan di seluruh ukuran
-  dan platform. Saat `actionHref`/`onAction` tersedia tanpa `href`/`onClick`
-  item, aksinya dialihkan ke seluruh item sebagai anchor/button. Aksi item yang
-  eksplisit tetap diprioritaskan, sedangkan feedback hover/active dapat
-  dimatikan secara terpisah tanpa menonaktifkan klik.
-- **Navbar Back Office: TOC responsif di Drawer.** Prop `tableOfContents`
-  menambahkan disclosure daftar isi sebagai item terakhir Drawer Navbar mobile.
-  Daftar tetap tertutup sampai dipilih, lalu merender komponen
-  `TableOfContents` yang sama dengan tampilan desktop sehingga styling,
-  scroll-spy, dan penanda aktifnya konsisten. Toggle memakai mode
-  `layout="collapsible"` bawaan TOC dan dipisahkan dari menu Navbar oleh garis.
-  TOC desktop tetap dirender oleh consumer pada konten halaman.
-- **Drawer: slot `afterItems`.** Konten kustom kini dapat ditambahkan setelah
-  menu `items` tanpa mengganti `DrawerBody` data-driven bawaan.
-- **Mode gelap situs dokumentasi (uji coba).** Tombol bulan/matahari ada di
-  ujung bawah rail dan di top bar mobile, dan pilihannya disimpan di browser.
-  Baru berlaku di Home, Form Overview, Input Field Form, Search Form, dan
-  Portal Dashboard, termasuk rail, panel samping, dan jendela pencarian
-  halaman. Di halaman lain situs tetap terang dan tombolnya diredupkan.
-  Komponen di pratinjau ikut gelap lewat `darkMode` miliknya dan kembali
-  terang di mode terang. Cuplikan kode di Search Form ikut menulis `darkMode`,
-  mode Playground-nya mengikuti mode docs, dan bagian Dark mode-nya bertukar
-  menjadi Light mode selama docs gelap. Aplikasi Portal Dashboard
-  memasang `data-theme="dark"` di akarnya dan punya tombol tema sendiri di
-  header. Perubahan ini hanya di situs dokumentasi: komponen library dan
-  `styles.css` paket tidak berubah.
-
-### Diubah
-
+- **Memutus — Fallback `Avatar` disederhanakan.** Prop `gender`, tipe
+  `AvatarGender`, dan nilai ambigu `fallback="profile"` dihapus. Satu prop
+  `fallback="initials" | "female" | "male"` kini memilih representasi ketika
+  foto kosong atau gagal dimuat. `initials` menjadi bawaan dan secara tipe
+  memerlukan `name` atau `initials`; tidak ada fallback netral. Foto tetap
+  memakai `object-cover` dengan crop tengah.
+- **Kontrak tema `Avatar` diperjelas.** Prop `darkMode` tetap menjadi API resmi,
+  sama seperti komponen lain: prop tersebut memasang tema gelap secara lokal,
+  sedangkan Avatar tanpa prop mengikuti scope ambient `data-theme`, termasuk
+  nested scope. Dokumentasi 0.5.0 yang menyebut prop ini deprecated telah
+  dikoreksi.
+- **Memutus — `Clipboard`: kontrak nama aksesibel.** Consumer kini wajib memberi
+  salah satu `label`, `aria-label`, atau `aria-labelledby`; tidak ada fallback
+  nama dari `value`. Ini perubahan tipe yang dapat memerlukan penambahan nama
+  pada pemakaian lama tanpa label.
 - **`Clipboard`: runtime callback dan feedback.** Hasil Clipboard API kini
   terpisah dari callback consumer: error sinkron maupun Promise rejection dari
   `onCopySuccess`/`onCopyError` diabaikan, tidak mengubah feedback operasi, dan
   tidak menghasilkan unhandled rejection. Reset feedback tidak lagi memanggil
   state setter saat render; hasil write lama tetap ditolak saat `value` berubah
   atau Clipboard dinonaktifkan.
-- **`Clipboard`: kontrak nama aksesibel.** Consumer kini wajib memberi salah
-  satu `label`, `aria-label`, atau `aria-labelledby`; tidak ada fallback nama
-  dari `value`. Ini perubahan tipe yang dapat memerlukan penambahan nama pada
-  pemakaian lama tanpa label.
+- **Kontrak tema `Clipboard` diperjelas.** Prop `darkMode` tetap menjadi API
+  resmi untuk mengaktifkan palet gelap secara lokal. Tanpa prop tersebut,
+  Clipboard mengikuti scope ambient `data-theme`, termasuk nested scope.
+  Dokumentasi 0.5.0 yang menyebut prop ini deprecated telah dikoreksi.
 - **Dokumentasi dan test runtime `Clipboard`.** Playground, Penggunaan, dan
   Properties menjelaskan kontrak nama aksesibel serta isolasi error callback;
   harness runtime mencakup lifecycle copy, feedback, disabled, tema ambient,
   dan preset platform.
-
-- **Fallback Avatar disederhanakan.** Prop `gender` dan nilai ambigu
-  `fallback="profile"` dihapus. Satu prop `fallback="initials" | "female" |
-  "male"` kini memilih representasi ketika foto kosong atau gagal dimuat.
-  `initials` menjadi bawaan dan secara tipe memerlukan `name` atau `initials`;
-  tidak ada fallback netral. Foto tetap memakai `object-cover` dengan crop
-  tengah. Perubahan ini memutus consumer API Avatar V2 sebelumnya.
-
-- **Sumber navigasi Back Office dipisahkan.** `items` mengisi navigasi Navbar
-  desktop dan otomatis menjadi isi Drawer navigasi mobile milik Navbar.
+- **Memutus — `Popover`: `trigger` wajib native `<button>`.** Tipe `trigger`
+  kini `ReactElement<ButtonHTMLAttributes<HTMLButtonElement>, 'button'>`.
+  Elemen non-interaktif, wrapper, Fragment, dan custom component, termasuk
+  `Button` milik kit, membuat Popover melempar error. Pakai `<button>` native
+  dengan class sendiri, seperti contoh di halaman Popover.
+- **Kontrak tema `Popover` diperjelas.** Prop `darkMode` tetap menjadi API resmi
+  untuk mengaktifkan tema gelap pada panel secara lokal. Tanpa prop tersebut,
+  Popover mengikuti scope ambient `data-theme`, dan atribut `data-theme` yang
+  diteruskan consumer dapat menjadi boundary tema eksplisit.
+- **Kontrak tema `Dropdown` diperjelas.** Prop `darkMode` merupakan API resmi
+  untuk mengaktifkan tema gelap secara lokal. Tanpa prop tersebut, Dropdown
+  mewarisi tema ambient dari boundary `data-theme`, termasuk pada scope tema
+  bertingkat. Warna panel dan item bawaan tetap berasal dari token semantik
+  `--color-dropdown-*`; trigger serta `children` kustom tetap dikelola consumer.
+- **Memutus — Sumber navigasi Back Office dipisahkan.** `items` mengisi navigasi
+  Navbar desktop dan otomatis menjadi isi Drawer navigasi mobile milik Navbar.
   Prop BO baru `sidebarItems` membawa data Sidebar aplikasi ke dialog Sidebar
   mobile, sedangkan `sidebarUser` membawa identitas dan aksi akun Sidebar yang
   sama. Sidebar desktop tetap dirender dan dimiliki layout consumer. `account`
   kini khusus Front Office; Back Office menempatkan akun hanya di Sidebar. Kontrak
-  lama `mobileDrawer` dihapus karena trigger, state, lifecycle, dan isi Drawer
-  navigasi sekarang sepenuhnya dimiliki Navbar. Drawer custom tetap digunakan
-  consumer sebagai komponen terpisah.
-- **Tautan Drawer mempertahankan konteks navigasi.** Item dan subitem Drawer
-  data-driven kini meneruskan `target` serta `rel`, sehingga destination Navbar
-  yang berpindah ke Drawer mobile tidak kehilangan perilaku tautannya.
+  lama `mobileDrawer` dan tipe `NavbarMobileDrawer` dihapus karena trigger,
+  state, lifecycle, dan isi Drawer navigasi sekarang sepenuhnya dimiliki
+  Navbar. Drawer custom tetap digunakan consumer sebagai komponen terpisah.
+- **Memutus — `Navbar`: konfigurasi Search internal.** Prop `search` kini
+  menerima opsi Search, bukan `ReactNode`. Navbar memakai default compact tanpa
+  kategori dan tombol pada FO, serta compact berkategori dan bertombol pada BO.
+  Default `platform`, `showButton`, dan `darkMode` tetap dapat dioverride
+  consumer. Dokumentasi membedakan tipe FO/BO, kategori wajib BO, dan contoh
+  override.
+- **Memutus — Notification Back Office independen dari Account.**
+  `notificationTrigger` kini menerima `NavbarNotificationTrigger`, bukan
+  `ReactNode`, dan tersedia pada BO tanpa bergantung pada identitas Sidebar.
+  Navbar merender ikon Bell 24px berwarna gray-800 pada light dan gray-400 pada
+  dark; consumer tetap mengatur aksi, state panel, badge, dan atribut tombolnya.
+- **Akun Navbar FO konsisten dengan Sidebar mobile.** `NavbarAccount.items`
+  kini opsional; tanpa item, identitas tampil tanpa dropdown. Pada mobile,
+  Navbar mengadaptasi satu sumber `account` ke area profil `Sidebar.user`.
+  Sidebar juga memakai komponen `Avatar`, termasuk inisial otomatis dari nama,
+  dan `SidebarUser.initials` kini menerima `ReactNode`. Contoh dasar tidak lagi
+  mengisi `initials`; prop tersebut tetap tersedia sebagai override, dan
+  highlight Playground menandai field API yang relevan.
+- **Tautan Drawer dan Sidebar mempertahankan konteks navigasi.** Item dan
+  subitem Drawer data-driven serta item Sidebar kini meneruskan `target` serta
+  `rel`, sehingga destination Navbar yang berpindah ke Drawer mobile tidak
+  kehilangan perilaku tautannya.
 - **Search Back Office memakai kategori Sidebar.** Contoh consumer menurunkan
   `Search.categories` dari `sidebarItems`, sementara ruang Search desktop BO
   diperlebar agar dropdown kategori dan field tetap nyaman dibaca. Pada mobile,
@@ -231,11 +246,16 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   `Lainnya`, yang tetap mendukung label dua baris. Allocator juga memakai lebar
   Search aktual agar Search BO berkategori tidak membuat navigasi atau action
   di sisi kanan terpotong.
-- **Notification Back Office independen dari Account.** `notificationTrigger`
-  kini menerima `NavbarNotificationTrigger`, bukan `ReactNode`, dan tersedia
-  pada BO tanpa bergantung pada identitas Sidebar. Navbar merender ikon Bell 24px berwarna
-  gray-800 pada light dan gray-400 pada dark; consumer tetap mengatur aksi,
-  state panel, badge, dan atribut tombolnya.
+- **Palet gelap `Button` berubah, dan prop `tone` deprecated.** Tampilan Button
+  gelap yang sudah ada ikut berubah.
+  - Filled ber-`darkMode` memakai versi gelap theme-nya, mis. primary-800 atau
+    orange-700. Sebelumnya semua theme menjadi tombol putih. Filled tanpa
+    `theme` tetap tombol putih.
+  - Outline ber-`darkMode` menjadi putih (gray-50) di semua theme.
+  - Prop `tone` dan tipe `ButtonTone` deprecated; pakai `darkMode`.
+    `tone="dark"` kini diperlakukan sama dengan `darkMode`, jadi outline
+    `tone="dark"` menjadi putih, dan filled `tone="dark"` tanpa `theme` menjadi
+    tombol putih, sebelumnya primary-800.
 - **Footer `Table` disusun ulang.**
   - Pemilih jumlah baris di kiri, Pagination di kanan.
   - Labelnya kini "Menampilkan [n] Data", sebelumnya "Baris per halaman".
@@ -255,6 +275,16 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
     kiri.
   - Mode gelap di bawah 640px: toolbar, baris, dan footer gray-800, header
     tetap gray-600. Dengan `striped`, baris berganti gray-800 lalu gray-700.
+- **`Search` lebih terbaca di mode gelap.** Varian polos maupun kategori, pada
+  platform default, mobile, dan compact, kini memiliki garis luar 1px gray-500.
+  Garis memakai inset ring sehingga tidak mengubah ukuran komponen. Field
+  Search polos kini gray-700, sebelumnya gray-600; field di samping kategori
+  tetap gray-600. Light mode tetap memakai border sebelumnya.
+- **Warna gelap `Upload` tipe `default`.** Setelah file dipilih, kotak nama
+  file dan garis luarnya gray-700, sebelumnya kotak gray-800. Selama kosong,
+  garis luarnya kini sewarna kotaknya (`#1F2A37`, hampir sama dengan gray-800).
+  Garis kanan tombol pilih file mengikuti warna aplikasi, primary-700 atau
+  purple-500, dan teks tombol hapus kini gray-400.
 - **Situs dokumentasi.** Halaman Table punya bagian baru "Mode gelap", dan
   Playground-nya punya kontrol Mode (Light/Dark) setelah Typography, serta
   kontrol Tampilan (Desktop/Mobile) untuk melihat tabel selebar 390px.
@@ -264,6 +294,17 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
   mobile buatan contoh dihapus; Search kategori serta notifikasi memakai slot
   Navbar. Item wiki tetap memakai aksi pada seluruh baris tanpa tombol dan
   tanpa feedback hover/active.
+- **Search Navbar Portal memakai platform compact.** Tinggi field menjadi 37px
+  dan tetap menampilkan kategori serta tombol cari sesuai komposisi Back Office.
+- **Tombol "Pengaturan Layout" di Portal Dashboard kini primary.** Sebelumnya
+  outline. Tombol "Buat Forum" yang baru memakai outline sebagai tombol
+  sekunder.
+- **Toggle tema Portal Dashboard diperbarui.** Di kaki Sidebar, sorotan pilihan
+  aktif kini bergeser halus di antara Terang dan Gelap dengan warna item aktif
+  Sidebar: putih di mode terang, gray-600 di mode gelap. Ikon pilihan aktif
+  berwarna brand, tiap pilihan kini berlabel teks, dan warna toggle memudar
+  bersama Sidebar saat tema berganti. Di layar di bawah 576px, tombol tema kini
+  ada di header, di kiri lonceng notifikasi.
 - **Kalender Portal Dashboard memenuhi kartunya.** Kisi tanggalnya kini selebar
   kartu, bukan 240px di tengah, dan barisnya ikut memanjang bila kartunya lebih
   tinggi dari isinya.
@@ -275,13 +316,20 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 - **Dokumentasi `Avatar`.** Demo, Playground, dan generated snippet kini sama
   dalam penggunaan initials override `UI`, fallback valid saat nama kosong, dan
   pola aksesibilitas Avatar dekoratif beserta teks nama pendampingnya.
-
 - **Lebar `ListViewItem` interaktif.** Item `simple` yang aksinya dialihkan ke
   elemen button kini tetap memenuhi lebar `ListView` dan mempertahankan teks
   rata kiri, sehingga panjang konten tidak mengubah lebar setiap baris.
 - **Lebar kategori pada `Search`.** Ruas kategori kini tetap 113px sesuai
   desain SVG. Option panjang tidak lagi memperlebar kategori sampai field query
   menghilang; label trigger dipotong dan input tetap mengisi sisa ruang.
+- **Breadcrumb responsif untuk hierarki panjang.** Label dibatasi 12 karakter
+  di mobile dan 17 karakter di desktop. Komponen mengukur ruang yang tersedia;
+  ketika seluruh level tetap tidak muat, level tengah otomatis diringkas
+  menjadi `…` sementara item pertama dan halaman aktif dipertahankan. Tooltip
+  pada `…` menampilkan label yang disembunyikan.
+- **Jarak kartu versi di panel samping docs.** Kartu "Foundation v1.0" di
+  ujung bawah panel tidak lagi menempel ke menu terakhir saat daftar menunya
+  memenuhi panel, mis. di area Components.
 
 ## [0.5.1] - 2026-11-03
 
