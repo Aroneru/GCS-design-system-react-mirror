@@ -29,7 +29,8 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 - **Mode gelap situs dokumentasi meluas.** Selain halaman di 0.6.0, mode gelap
   kini juga berlaku di halaman berikut. Aturannya sama dengan bagian
   "Pratinjau di docs gelap" di 0.6.0.
-  - Components: Card, Container, Footer, Table, dan Table of Contents.
+  - Components: Badge, Card, Container, Footer, Hero, Table, dan Table of
+    Contents.
   - Foundations: Colors dan Typography.
 - **Id bagian Dark mode di halaman Table berganti.** Bagian "Mode gelap" kini
   bernama Dark mode, sama seperti halaman lain. Tautan
