@@ -275,6 +275,12 @@ dokumentasi kini punya mode gelap (uji coba).
 - **Tombol "Pengaturan Layout" di Portal Dashboard kini primary.** Sebelumnya
   outline. Tombol "Buat Forum" yang baru memakai outline sebagai tombol
   sekunder.
+- **Toggle tema Portal Dashboard diperbarui.** Di kaki Sidebar, sorotan pilihan
+  aktif kini bergeser halus di antara Terang dan Gelap dengan warna item aktif
+  Sidebar: putih di mode terang, gray-600 di mode gelap. Ikon pilihan aktif
+  berwarna brand, tiap pilihan kini berlabel teks, dan warna toggle memudar
+  bersama Sidebar saat tema berganti. Di layar di bawah 576px, tombol tema kini
+  ada di header, di kiri lonceng notifikasi.
 - **Kalender Portal Dashboard memenuhi kartunya.** Kisi tanggalnya kini selebar
   kartu, bukan 240px di tengah, dan barisnya ikut memanjang bila kartunya lebih
   tinggi dari isinya.
