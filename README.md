@@ -101,6 +101,10 @@ atribut `data-theme="dark"` alih-alih class `dark:` per elemen:
   `darkMode` satu per satu.
 - **Kembali ke tema terang**: Bagian di dalam area gelap dapat dikembalikan ke
   tema terang dengan `data-theme="light"` atau kelas `.ds-theme-light`.
+- **Demo aplikasi**: Portal Dashboard dan Example App masing-masing menyediakan
+  kontrol tema. Keduanya menggunakan preferensi yang sama; seluruh route di
+  `/example/app/*` mengikuti pilihan tersebut, sehingga tema tidak kembali ke
+  nilai awal saat pengguna berpindah halaman demo.
 - **Komponen yang mendukung `data-theme`**: `Card`, `Hero`, `Container`, `Dropdown`, `Popover`,
   `Modal`, `Sidebar`, `Search`, `Alert`, `Toast`, `InputField`, `FloatingLabel`,
   `TextArea`, `Select`, `Toggle`, `Radio`, `Checkbox`, `Breadcrumb`, `Navbar`, dan
@@ -337,6 +341,15 @@ latar putih dengan teks gray-700. Tanpa prop, Button mengikuti `darkMode` Table,
 Modal, atau Navbar yang membungkusnya; `darkMode={false}` tetap menang.
 `tone="dark"` deprecated dan diperlakukan sama dengan `darkMode`.
 
+#### Drawer
+
+Saat `darkMode` aktif, panel `Drawer` memakai background `gray-800`
+(`#1F2937`) dan border `gray-700` (`#374151`) dengan teks dasar `gray-300`
+(`#D1D5DB`). Judul memakai putih, sedangkan deskripsi dan isi sekunder memakai
+`gray-400` (`#9CA3AF`). Backdrop tetap `gray-900/50`—warna `#111827` dengan
+opacity 50%. Aturan ini berlaku untuk semua posisi Drawer (`left`, `right`,
+`top`, dan `bottom`).
+
 `ListView` menyediakan daftar item berukuran `S`, `M`, atau `L` untuk desktop
 dan mobile. Varian `simple` dapat memakai ikon, badge, dekorasi aksen, dan aksi;
 varian `article` tersedia hingga `XL`, selalu memakai garis aksen vertikal, dan
@@ -391,6 +404,9 @@ Prop yang dipakai bersama seluruh komponen form:
   ukuran ketiga, `compact` (37px), untuk dipasang di navbar tanpa tombol cari (`showButton=false`).
   Komponen ini juga mendukung live search via `trigger="change"` / `"auto"` dengan jeda `debounce`
   (bawaan 300ms) serta tema gelap berbasis token (`--color-search-category-surface` dan `--color-search-field-surface`).
+  Bila `compact` memakai `categories`, ruas kategorinya selebar 128px dengan
+  padding kiri/kanan 10px dan jarak label ke chevron 10px. Label ditampilkan
+  maksimal 10 karakter sebelum elipsis; misalnya `Pengumuman` tetap utuh.
   Pada mode gelap, seluruh bentuk Search memakai garis luar 1px gray-500 agar
   batasnya tetap terlihat tanpa mengubah dimensi field. Light mode tidak berubah.
 - `Upload`: dibatasi khusus berkas tunggal (atribut `multiple` dinonaktifkan).
@@ -841,8 +857,11 @@ melalui `brand.content`. Integrasi tambahan mengikuti batas berikut:
   `NavbarBackOfficeSearchConfig` pada BO; Navbar merender komponen `Search`
   internal. Default FO adalah compact tanpa kategori dan tombol, sedangkan
   default BO adalah compact, berkategori, dan bertombol. `categories` wajib
-  pada konfigurasi BO. Consumer tetap dapat mengubah `platform`, `showButton`,
-  `darkMode`, atau properti Search lainnya bila memang berbeda dari default.
+  pada konfigurasi BO. Pada Search BO compact, ruas kategori 128px memakai
+  jarak seimbang 10px dan label maksimum 10 karakter sebelum elipsis; aturan
+  yang sama otomatis berlaku pada Navbar Portal, Example App, dan preview
+  Navbar. Consumer tetap dapat mengubah `platform`, `showButton`, `darkMode`,
+  atau properti Search lainnya bila memang berbeda dari default.
 - Pada BO, `Search.categories` boleh diturunkan dari `sidebarItems` ketika
   domain pencarian sama. Jika domainnya berbeda, consumer boleh memberikan
   kategori custom dari satu sumber data pencarian yang terpisah.

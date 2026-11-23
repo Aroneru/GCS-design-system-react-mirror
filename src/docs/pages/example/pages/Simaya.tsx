@@ -33,7 +33,7 @@ const KLASIFIKASI = [
   { value: "rahasia", label: "Rahasia" },
 ];
 
-export function Simaya() {
+export function Simaya({ darkMode = false }: { darkMode?: boolean }) {
   const [perihal, setPerihal] = useState("");
   const [tujuan, setTujuan] = useState("");
   const [klasifikasi, setKlasifikasi] = useState("biasa");
@@ -45,7 +45,7 @@ export function Simaya() {
 
   return (
     <div className="space-y-8">
-      <Alert variant="purple" heading="Mode Simaya aktif" dismissible={false}>
+      <Alert variant="purple" heading="Mode Simaya aktif" dismissible={false} darkMode={darkMode}>
         Seluruh kontrol di halaman ini memakai{" "}
         <code className="font-mono text-xs">application="purple"</code>.
         Bandingkan dengan halaman Pengaturan yang memakai nilai bawaan —
@@ -63,7 +63,7 @@ export function Simaya() {
               Formulir persuratan internal dengan aksen ungu khas Simaya.
             </p>
           </div>
-          <Badge variant="gray" className="bg-purple-100 text-purple-700">
+          <Badge variant="gray" className="bg-purple-100 text-purple-700" darkMode={darkMode}>
             Simaya
           </Badge>
         </div>
@@ -73,6 +73,7 @@ export function Simaya() {
             (37px) dipasangkan dengan grup radio. */}
         <div className="mt-7 grid gap-5 sm:grid-cols-2">
           <FloatingLabel
+            darkMode={darkMode}
             application="purple"
             label="Unit tujuan"
             icon={<User className="size-4" />}
@@ -81,6 +82,7 @@ export function Simaya() {
             className="sm:col-span-2"
           />
           <InputField
+            darkMode={darkMode}
             application="purple"
             label="Perihal"
             placeholder="Ringkasan isi naskah…"
@@ -89,12 +91,14 @@ export function Simaya() {
             onChange={(e) => setPerihal(e.target.value)}
           />
           <InputField
+            darkMode={darkMode}
             application="purple"
             label="Nomor agenda"
             placeholder="Otomatis bila dikosongkan"
             helperText="Diisi sistem saat naskah disetujui."
           />
           <Select
+            darkMode={darkMode}
             application="purple"
             label="Klasifikasi"
             options={KLASIFIKASI}
@@ -107,6 +111,7 @@ export function Simaya() {
             </legend>
             <div className="flex min-h-9.25 flex-wrap items-center gap-x-6 gap-y-2">
               <Radio
+                darkMode={darkMode}
                 application="purple"
                 name="sifat"
                 label="Biasa"
@@ -114,6 +119,7 @@ export function Simaya() {
                 onChange={() => setSifat("biasa")}
               />
               <Radio
+                darkMode={darkMode}
                 application="purple"
                 name="sifat"
                 label="Segera"
@@ -121,6 +127,7 @@ export function Simaya() {
                 onChange={() => setSifat("segera")}
               />
               <Radio
+                darkMode={darkMode}
                 application="purple"
                 name="sifat"
                 label="Sangat segera"
@@ -133,6 +140,7 @@ export function Simaya() {
 
         <div className="mt-6">
           <TextArea
+            darkMode={darkMode}
             application="purple"
             type="editor"
             label="Isi naskah"
@@ -148,6 +156,7 @@ export function Simaya() {
 
         <div className="mt-6 space-y-4">
           <Toggle
+            darkMode={darkMode}
             application="purple"
             label="Bubuhkan tanda tangan elektronik"
             helperText="Memakai sertifikat elektronik yang terdaftar pada akun Anda."
@@ -155,6 +164,7 @@ export function Simaya() {
             onChange={(e) => setTtd(e.target.checked)}
           />
           <Checkbox
+            darkMode={darkMode}
             application="purple"
             label="Kirim tembusan ke unit terkait"
             helperText="Tembusan tidak memerlukan persetujuan tambahan."
@@ -164,10 +174,11 @@ export function Simaya() {
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Button variant="outline" theme="purple">
+          <Button variant="outline" theme="purple" darkMode={darkMode}>
             Simpan konsep
           </Button>
           <Button
+            darkMode={darkMode}
             type="submit"
             theme="purple"
             onClick={() => setTerkirim(true)}
@@ -199,11 +210,12 @@ export function Simaya() {
               default
             </p>
             <InputField
+              darkMode={darkMode}
               label="Perihal"
               placeholder="Klik untuk melihat garis fokus"
             />
-            <Toggle label="Tanda tangan elektronik" defaultChecked />
-            <Checkbox label="Kirim tembusan" defaultChecked />
+            <Toggle label="Tanda tangan elektronik" defaultChecked darkMode={darkMode} />
+            <Checkbox label="Kirim tembusan" defaultChecked darkMode={darkMode} />
           </div>
 
           <div className="space-y-4 rounded-xl bg-surface-subtle p-5">
@@ -211,16 +223,19 @@ export function Simaya() {
               simaya
             </p>
             <InputField
+              darkMode={darkMode}
               application="purple"
               label="Perihal"
               placeholder="Klik untuk melihat garis fokus"
             />
             <Toggle
+              darkMode={darkMode}
               application="purple"
               label="Tanda tangan elektronik"
               defaultChecked
             />
             <Checkbox
+              darkMode={darkMode}
               application="purple"
               label="Kirim tembusan"
               defaultChecked
@@ -232,6 +247,7 @@ export function Simaya() {
       {terkirim && (
         <div className="fixed bottom-4 left-4 z-50">
           <Toast
+            darkMode={darkMode}
             variant="purple"
             heading="Naskah terkirim"
             onDismiss={() => setTerkirim(false)}

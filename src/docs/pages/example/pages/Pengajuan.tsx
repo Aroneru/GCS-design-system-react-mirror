@@ -65,7 +65,7 @@ const KOLOM: TableColumn<DataPengajuan>[] = [
   },
 ]
 
-export function Pengajuan() {
+export function Pengajuan({ darkMode = false }: { darkMode?: boolean }) {
   const [halaman, setHalaman] = useState(1)
   const [status, setStatus] = useState('semua')
   const [cari, setCari] = useState('')
@@ -98,10 +98,10 @@ export function Pengajuan() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-heading-4 font-black text-gray-900">Semua pengajuan</h2>
         <div className="flex flex-wrap items-center gap-2">
-          <Button size="xs" variant="outline" theme="gray" leftIcon={<Download />}>
+          <Button size="xs" variant="outline" theme="gray" leftIcon={<Download />} darkMode={darkMode}>
             Unduh
           </Button>
-          <Button size="xs" leftIcon={<Plus />}>
+          <Button size="xs" theme="primary" leftIcon={<Plus />} darkMode={darkMode}>
             Pengajuan baru
           </Button>
         </div>
@@ -113,6 +113,7 @@ export function Pengajuan() {
         kata kunci dan status, lalu menyerahkan hasilnya ke Table.
       */}
       <Table
+        darkMode={darkMode}
         columns={KOLOM}
         data={tersaring}
         rowKey="id"

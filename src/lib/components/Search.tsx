@@ -26,7 +26,7 @@ export interface SearchCategory {
   disabled?: boolean
 }
 
-const CATEGORY_LABEL_MAX_LENGTH = 12
+const CATEGORY_LABEL_MAX_LENGTH = 10
 
 /**
  * Tinggi kotak, ukuran ikon, ukuran teks, dan ukuran tombol per platform.
@@ -326,8 +326,20 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
         <div
           role="search"
           className={cn(
-            'group flex items-stretch bg-search-category-surface',
-            'in-data-[theme=dark]:ring-1 in-data-[theme=dark]:ring-inset in-data-[theme=dark]:ring-gray-500',
+            'group relative flex items-stretch bg-search-category-surface',
+            // Garis tipis tema gelap. Ring inset di pembungkus ini sendiri
+            // tertutup latar anak-anaknya (kategori, field, tombol), jadi yang
+            // terlihat hanya sudut rounded-nya. Karena itu ring dilukis di
+            // lapisan ::after di atas anak-anak, sebatas kategori + field
+            // (tombol kanan tetap tanpa garis, sama seperti di mode terang),
+            // dan disembunyikan saat fokus supaya garis aksen fokus terlihat.
+            "in-data-[theme=dark]:after:pointer-events-none in-data-[theme=dark]:after:absolute in-data-[theme=dark]:after:inset-y-0 in-data-[theme=dark]:after:left-0 in-data-[theme=dark]:after:content-['']",
+            'in-data-[theme=dark]:after:ring-1 in-data-[theme=dark]:after:ring-inset in-data-[theme=dark]:after:ring-gray-500 in-data-[theme=dark]:focus-within:after:ring-transparent',
+            !hasButton
+              ? 'in-data-[theme=dark]:after:right-0 in-data-[theme=dark]:after:rounded-lg'
+              : compactCategory
+                ? 'in-data-[theme=dark]:after:right-[37px] in-data-[theme=dark]:after:rounded-l-lg'
+                : 'in-data-[theme=dark]:after:right-[42px] in-data-[theme=dark]:after:rounded-l-lg',
             compactCategory ? 'h-[37px] rounded-lg' : 'h-[39px] rounded-[10px]',
           )}
         >
@@ -373,39 +385,26 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
                   aria-label={`${categoryPlaceholder}: ${labelKategori}`}
                   title={labelKategori}
                   className={cn(
-                    'absolute inset-0 flex items-center justify-center text-sm outline-none',
-                    compactCategory && 'px-[5px] py-[2px]',
+                    'absolute inset-0 flex items-center px-2.5 text-sm outline-none',
+                    compactCategory && 'py-[2px]',
                     'disabled:cursor-not-allowed',
                     'text-content disabled:text-content-disabled',
                   )}
                 >
-                  {compactCategory ? (
-                    <>
-                      <span className="block max-w-[12ch] truncate text-center">{labelKategoriCompact}</span>
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          'absolute right-[5px] flex shrink-0 items-center',
-                          disabled ? 'text-content-disabled' : 'text-content',
-                        )}
-                      >
-                        <ChevronIcon />
-                      </span>
-                    </>
-                  ) : (
-                    <span className="flex min-w-0 max-w-[106px] items-center gap-[10px]">
-                      <span className="min-w-0 truncate">{labelKategori}</span>
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          'flex shrink-0 items-center',
-                          disabled ? 'text-content-disabled' : 'text-content',
-                        )}
-                      >
-                        <ChevronIcon />
-                      </span>
+                  <span className="flex w-full min-w-0 items-center gap-2.5">
+                    <span className="min-w-0 flex-1 truncate text-center">
+                      {compactCategory ? labelKategoriCompact : labelKategori}
                     </span>
-                  )}
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'flex shrink-0 items-center',
+                        disabled ? 'text-content-disabled' : 'text-content',
+                      )}
+                    >
+                      <ChevronIcon />
+                    </span>
+                  </span>
                 </button>
               }
             />

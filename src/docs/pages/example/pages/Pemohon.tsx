@@ -4,7 +4,7 @@ import { Avatar, Badge, Button, Icon, Popover, Toggle } from '../../../../lib'
 import { Envelope } from '../../../../lib/icons/outline'
 import { inisial, PEMOHON } from '../data'
 
-export function Pemohon() {
+export function Pemohon({ darkMode = false }: { darkMode?: boolean }) {
   // Status aktif dipegang di sini — Toggle-nya benar-benar mengubah data,
   // bukan sekadar bergerak.
   const [aktif, setAktif] = useState(() =>
@@ -23,6 +23,7 @@ export function Pemohon() {
           </p>
         </div>
         <Popover
+          darkMode={darkMode}
           trigger={
             <button
               type="button"
@@ -51,7 +52,7 @@ export function Pemohon() {
                 begini avatarnya baru berguna kalau tiap kartu bisa dibedakan.
                 Namanya sudah tertulis di sebelahnya, jadi alt sengaja kosong.
               */}
-              <Avatar initials={inisial(p.nama)} alt="" />
+              <Avatar initials={inisial(p.nama)} alt="" darkMode={darkMode} />
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -59,6 +60,7 @@ export function Pemohon() {
                   <Badge
                     variant={aktif[p.surel] ? 'success' : 'gray'}
                     icon={aktif[p.surel] ? <CheckCircle /> : <CloseCircle />}
+                    darkMode={darkMode}
                   >
                     {aktif[p.surel] ? 'Aktif' : 'Nonaktif'}
                   </Badge>
@@ -76,6 +78,7 @@ export function Pemohon() {
                 {p.jumlah} pengajuan
               </span>
               <Toggle
+                darkMode={darkMode}
                 label="Akun aktif"
                 checked={aktif[p.surel]}
                 onChange={(e) => setAktif((s) => ({ ...s, [p.surel]: e.target.checked }))}
@@ -83,7 +86,7 @@ export function Pemohon() {
             </div>
 
             <div className="mt-4">
-              <Button size="xs" variant="outline" theme="gray" className="w-full">
+              <Button size="xs" variant="outline" theme="gray" className="w-full" darkMode={darkMode}>
                 Lihat riwayat
               </Button>
             </div>
