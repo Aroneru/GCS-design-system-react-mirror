@@ -22,7 +22,7 @@ import {
 } from "flowbite-react-icons/outline";
 import { File as FileIcon, FilePdf, Image as ImageIcon } from "flowbite-react-icons/solid";
 import { cn } from "../utils/cn";
-import { DarkModeContext } from "../utils/darkModeContext";
+import { DarkModeContext, KeepFilledColorContext } from "../utils/darkModeContext";
 import { Button } from "./Button";
 import { Checkbox } from "./Checkbox";
 import { Dropdown } from "./Dropdown";
@@ -1280,6 +1280,7 @@ export function Table<T>({
     // Button dan Badge di dalam tabel — toolbar maupun sel — ikut `darkMode`
     // tanpa perlu diberi prop sendiri.
     <DarkModeContext.Provider value={darkMode}>
+    <KeepFilledColorContext.Provider value={darkMode}>
     <div
       // `@container`: toolbar, footer, dan Pagination menyesuaikan lebar tabel ini,
       // bukan lebar layar — tetap benar di kolom sempit maupun pratinjau mobile.
@@ -1603,6 +1604,7 @@ export function Table<T>({
         </div>
       )}
     </div>
+    </KeepFilledColorContext.Provider>
     </DarkModeContext.Provider>
   );
 }

@@ -11,6 +11,16 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
+### Diperbaiki
+
+- **Button berwarna di Table gelap kembali berwarna.** Sejak refactor warna
+  gelap Button, tombol filled tanpa `theme` di toolbar Table ber-`darkMode`
+  (mis. "Tambah Data") tampil putih, dan tombol berwarna memakai versi gelapnya.
+  Kini Button filled berwarna di dalam Table tetap memakai warna terangnya,
+  sesuai desain, mis. primary-700. Button theme `gray` dan varian outline
+  tetap ikut gelap. Tombol di dalam Modal tidak terpengaruh, dan `darkMode`
+  yang diisi langsung pada Button tetap menang.
+
 ## [0.6.0] - 2026-11-24
 
 Rilis npm pertama sejak 0.5.0; versi 0.5.1 hanya mengubah situs dokumentasi

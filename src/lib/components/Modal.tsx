@@ -2,7 +2,6 @@ import {
   cloneElement,
   forwardRef,
   isValidElement,
-  useCallback,
   useEffect,
   useId,
   useRef,
@@ -17,7 +16,7 @@ import {
 import { Close } from 'flowbite-react-icons/outline'
 import { ExclamationCircle } from 'flowbite-react-icons/solid'
 import { cn } from '../utils/cn'
-import { DarkModeContext, useInheritedDarkMode } from '../utils/darkModeContext'
+import { DarkModeContext, KeepFilledColorContext, useInheritedDarkMode } from '../utils/darkModeContext'
 import { Button, type ButtonSize, type ButtonTheme, type ButtonTone, type ButtonVariant } from './Button'
 import { Icon } from './Icon'
 
@@ -374,6 +373,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
         {...props}
       >
         <DarkModeContext.Provider value={modalDarkMode}>
+        <KeepFilledColorContext.Provider value={false}>
           <div
             className={cn(
               'flex shrink-0 items-start justify-between gap-4',
@@ -432,6 +432,7 @@ export const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
               {renderedFooter}
             </div>
           )}
+        </KeepFilledColorContext.Provider>
         </DarkModeContext.Provider>
       </dialog>
     </>

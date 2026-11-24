@@ -1,6 +1,6 @@
 import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "../utils/cn";
-import { useInheritedDarkMode } from "../utils/darkModeContext";
+import { useInheritedDarkMode, useKeepFilledColor } from "../utils/darkModeContext";
 
 export type ButtonVariant = "filled" | "outline";
 
@@ -156,7 +156,11 @@ export function Button({
 }: ButtonProps) {
   const currentSize = sizeClasses[size];
   const inheritedDark = useInheritedDarkMode();
-  const darkMode = darkModeProp ?? (tone === "dark" || inheritedDark);
+  const keepFilledColor = useKeepFilledColor();
+  // Di Table gelap, Button filled berwarna tetap memakai warna terangnya
+  // (mis. "Tambah Data" primary-700). Tanpa `theme`, Button dihitung primary.
+  const keepsColor = keepFilledColor && variant === "filled" && (theme ?? "primary") !== "gray";
+  const darkMode = darkModeProp ?? (tone === "dark" || (inheritedDark && !keepsColor));
 
   const classes = cn(
     "inline-flex items-center justify-center",

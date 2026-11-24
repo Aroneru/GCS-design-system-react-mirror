@@ -383,6 +383,9 @@ menjadi tombol putih (gray-50 dengan teks gray-700). Outline menjadi putih
 (gray-50) di semua theme. Saat hover, outline dan tombol putih berubah menjadi
 latar putih dengan teks gray-700. Tanpa prop, Button mengikuti `darkMode` Table,
 Modal, atau Navbar yang membungkusnya; `darkMode={false}` tetap menang.
+Pengecualiannya di dalam Table: Button filled berwarna, termasuk yang tanpa
+`theme`, tetap memakai warna terangnya (mis. primary-700). Hanya theme `gray`
+dan varian outline yang ikut gelap.
 `tone="dark"` deprecated dan diperlakukan sama dengan `darkMode`.
 
 #### Drawer
@@ -1060,8 +1063,10 @@ pratinjau, berkas lain diunduh. Bentuk yang sama tersedia sebagai komponen
 `darkMode` memasang `data-theme="dark"` di tabel: toolbar gray-800, header
 gray-600, dan footer gray-700. Baris gray-700, atau bergantian gray-700 dan
 gray-800 bila `striped`. Pagination, tombol Filter, dan Dropdown ikut gelap,
-begitu juga Button dan Badge di toolbar maupun di sel. `darkMode={false}` pada
-Button atau Badge tetap menang. Semua warnanya dari token `--color-table-*`:
+begitu juga Badge di toolbar maupun di sel. Button filled berwarna, mis.
+"Tambah Data", tetap memakai warna terangnya; hanya Button theme `gray` dan
+outline yang ikut gelap. `darkMode` yang diisi langsung pada Button atau Badge
+tetap menang. Semua warnanya dari token `--color-table-*`:
 
 ```css
 [data-theme='dark'] {

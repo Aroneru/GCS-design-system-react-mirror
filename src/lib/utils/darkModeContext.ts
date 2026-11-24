@@ -13,3 +13,15 @@ export const DarkModeContext = createContext(false);
 export function useInheritedDarkMode() {
   return useContext(DarkModeContext);
 }
+
+/**
+ * Diisi Table ber-`darkMode`: Button filled berwarna (primary, orange, …) di
+ * dalamnya tetap memakai warna mode terang, sesuai desain tabel gelap. Hanya
+ * theme `gray` dan varian outline yang ikut palet gelap. Modal mengisinya
+ * `false` lagi, supaya tombol di dalam dialog tetap memakai palet gelap Modal.
+ */
+export const KeepFilledColorContext = createContext(false);
+
+export function useKeepFilledColor() {
+  return useContext(KeepFilledColorContext);
+}
