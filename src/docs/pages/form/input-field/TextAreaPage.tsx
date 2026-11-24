@@ -5,6 +5,7 @@ import {
   type TextAreaPlatform,
   type TextAreaType,
 } from '../../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../../docsTheme'
 import { PropsTable, type PropRow } from '../../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../../pageKit'
 import {
@@ -12,6 +13,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -49,6 +51,8 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc, true)
+
 /** Isi `hint` yang dicontohkan di Playground — hint tak harus penghitung karakter. */
 type HintKind = 'counter' | 'opsional' | 'none'
 
@@ -59,6 +63,9 @@ const hintOptions: { value: HintKind; label: string }[] = [
 ]
 
 export function TextAreaPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [type, setType] = useState<TextAreaType>('editor')
   const [platform, setPlatform] = useState<TextAreaPlatform>('default')
   const [application, setApplication] = useState<TextAreaApplication>('default')
@@ -66,7 +73,7 @@ export function TextAreaPage() {
   const [withHelper, setWithHelper] = useState(true)
   const [withSubmit, setWithSubmit] = useState(true)
   const [value, setValue] = useState('')
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = usePlaygroundDark()
 
   const isEditor = type === 'editor'
   const hint =
@@ -77,7 +84,7 @@ export function TextAreaPage() {
       eyebrow="Form · Input Field Form"
       title="Text Area"
       description="Isian teks banyak baris. Tersedia sebagai kotak polos atau sebagai editor dengan toolbar dan tombol kirim, memakai token warna, radius, dan jarak yang sama dengan Foundations. Tersedia juga dalam tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="text-area" title="Text Area">
         <Lead>
@@ -90,6 +97,7 @@ export function TextAreaPage() {
               label="Keterangan"
               placeholder="Tulis keterangan tambahan…"
               helperText="Maksimal 500 karakter."
+              darkMode={docsDark}
             />
           </Demo>
           <Demo label="Mobile · 120px">
@@ -98,6 +106,7 @@ export function TextAreaPage() {
               label="Keterangan"
               placeholder="Tulis keterangan tambahan…"
               helperText="Maksimal 500 karakter."
+              darkMode={docsDark}
             />
           </Demo>
         </div>
@@ -107,11 +116,14 @@ export function TextAreaPage() {
           {'    label="Keterangan"\n'}
           {'    placeholder="Tulis keterangan tambahan…"\n'}
           {'    helperText="Maksimal 500 karakter."\n'}
+          {dm.line}
           {'/>\n\n'}
           {'{/* Mobile — kotak 120px */}\n'}
           {'<TextArea '}
           <H>platform</H>
-          {'="mobile" label="Keterangan" />'}
+          {'="mobile" label="Keterangan"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -128,6 +140,7 @@ export function TextAreaPage() {
             hint="0/500"
             placeholder="Tulis pesan Anda…"
             submitLabel="Submit Text"
+            darkMode={docsDark}
           />
         </Demo>
         <SectionCode>
@@ -143,6 +156,7 @@ export function TextAreaPage() {
           {'="Submit Text"\n'}
           {'    onSubmit={kirim}\n'}
           {'    onToolbarAction={(action) => console.log(action)}\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
@@ -162,6 +176,7 @@ export function TextAreaPage() {
                 placeholder="Tulis pesan Anda…"
                 helperText={`bg-${a.token}`}
                 submitLabel="Submit Text"
+                darkMode={docsDark}
               />
             </Demo>
           ))}
@@ -174,17 +189,23 @@ export function TextAreaPage() {
           {'="purple"\n'}
           {'    label="Isi pesan"\n'}
           {'    submitLabel="Submit Text"\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> mengganti kotak, toolbar, dan area isian ke gray-700, dengan label dan teks
-          yang diketik putih. Kotak polos tidak lagi bergaris, sedangkan bingkai editor dan garis pemisah
-          toolbarnya menjadi gray-600. Tombol kirim memakai -600 (hover -700), satu tingkat lebih terang dari
-          tampilan terang.
-        </Lead>
+      <ModeSection
+        name="Text Area"
+        stayDark
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengganti kotak, toolbar, dan area isian ke gray-700, dengan label dan teks
+            yang diketik putih. Kotak polos tidak lagi bergaris, sedangkan bingkai editor dan garis pemisah
+            toolbarnya menjadi gray-600. Tombol kirim memakai -600 (hover -700), satu tingkat lebih terang dari
+            tampilan terang.
+          </>
+        }
+      >
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Default" dark>
             <TextArea
@@ -215,7 +236,7 @@ export function TextAreaPage() {
           {'    submitLabel="Submit Text"\n'}
           {'/>'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -318,7 +339,7 @@ export function TextAreaPage() {
           </Control>
         </Controls>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Tombol kirim hanya dirender pada type <em>editor</em>, jadi kontrolnya ikut mati saat type{' '}
           <em>default</em>. Hint dan helper text berlaku di kedua type; platform hanya mengubah tinggi kotak
           pada type <em>default</em>. Isi <Hl>hint</Hl> bebas — penghitung karakter perlu diikat ke nilai

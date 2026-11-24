@@ -8,6 +8,7 @@ import {
   type TimelineStatus,
 } from '../../../lib'
 import { asset } from '../../asset'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -15,6 +16,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -351,14 +353,18 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc, true)
+
 export function TimelinePage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [platform, setPlatform] = useState<TimelinePlatform>('desktop')
   const [size, setSize] = useState<TimelineSize>('large')
-  const [theme, setTheme] = useState('light')
+  const [dark, setDark] = usePlaygroundDark()
   const [count, setCount] = useState('4')
   const [lampiran, setLampiran] = useState<AttachmentMode>('tab-baru')
 
-  const dark = theme === 'dark'
   const playgroundItems = linkAttachments(designItems.slice(0, Number(count)), lampiran)
 
   return (
@@ -366,7 +372,7 @@ export function TimelinePage() {
       eyebrow="Components · Timeline View"
       title="Timeline View"
       description="Riwayat kejadian berurutan: siapa, kapan, dan apa yang terjadi di tiap langkah, dengan avatar di sepanjang satu garis."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="platform" title="Platform">
         <Lead>
@@ -379,19 +385,22 @@ export function TimelinePage() {
 
         <div className="space-y-5">
           <Demo label="desktop" minWidth={desktopMinWidth}>
-            <Timeline items={designItems.slice(0, 3)} />
+            <Timeline items={designItems.slice(0, 3)} darkMode={docsDark} />
           </Demo>
           <Demo label="mobile">
             <div className="max-w-102">
-              <Timeline items={designItems.slice(0, 2)} platform="mobile" />
+              <Timeline items={designItems.slice(0, 2)} platform="mobile" darkMode={docsDark} />
             </div>
           </Demo>
         </div>
 
         <SectionCode>
           {"import { Timeline } from '@ceplok-ui/design-kit-react'\n\n"}
-          {'<Timeline items={items} />\n\n<Timeline items={items} '}
+          {'<Timeline items={items}'}
+          {dm.inline}
+          {' />\n\n<Timeline items={items} '}
           <H>platform=&quot;mobile&quot;</H>
+          {dm.inline}
           {' />'}
         </SectionCode>
       </FlowSection>
@@ -405,16 +414,19 @@ export function TimelinePage() {
 
         <div className="grid gap-5 lg:grid-cols-2">
           <Demo label="large">
-            <Timeline items={designItems.slice(0, 2)} platform="mobile" />
+            <Timeline items={designItems.slice(0, 2)} platform="mobile" darkMode={docsDark} />
           </Demo>
           <Demo label="small">
-            <Timeline items={designItems.slice(0, 2)} platform="mobile" size="small" />
+            <Timeline items={designItems.slice(0, 2)} platform="mobile" size="small" darkMode={docsDark} />
           </Demo>
         </div>
 
         <SectionCode>
-          {'<Timeline items={items} />\n\n<Timeline items={items} '}
+          {'<Timeline items={items}'}
+          {dm.inline}
+          {' />\n\n<Timeline items={items} '}
           <H>size=&quot;small&quot;</H>
+          {dm.inline}
           {' />'}
         </SectionCode>
       </FlowSection>
@@ -428,7 +440,7 @@ export function TimelinePage() {
         </Lead>
 
         <Demo label="ringkas dan lengkap" minWidth={desktopMinWidth}>
-          <Timeline items={designItems.slice(0, 2)} />
+          <Timeline items={designItems.slice(0, 2)} darkMode={docsDark} />
         </Demo>
 
         <SectionCode>
@@ -463,7 +475,9 @@ export function TimelinePage() {
           {": { label: 'Badge', icon: <Clock />, dismissible: true },\n"}
           {'  },\n'}
           {']\n\n'}
-          {'<Timeline items={items} />'}
+          {'<Timeline items={items}'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -479,7 +493,7 @@ export function TimelinePage() {
 
         <Demo label="tanggal dan jam dua digit, jam 24 jam">
           <div className="max-w-102">
-            <Timeline items={waktuItems} platform="mobile" />
+            <Timeline items={waktuItems} platform="mobile" darkMode={docsDark} />
           </div>
         </Demo>
 
@@ -508,7 +522,7 @@ export function TimelinePage() {
 
         <Demo label="warning, success, dan Badge seperti di desain">
           <div className="max-w-102">
-            <Timeline items={statusItems} platform="mobile" />
+            <Timeline items={statusItems} platform="mobile" darkMode={docsDark} />
           </div>
         </Demo>
 
@@ -539,7 +553,7 @@ export function TimelinePage() {
 
         <Demo label="teks biasa, tab baru, dan unduhan">
           <div className="max-w-102">
-            <Timeline items={lampiranItems} platform="mobile" />
+            <Timeline items={lampiranItems} platform="mobile" darkMode={docsDark} />
           </div>
         </Demo>
 
@@ -579,7 +593,7 @@ export function TimelinePage() {
 
         <Demo label="labels bahasa Indonesia">
           <div className="max-w-102">
-            <Timeline items={contohIndonesia} platform="mobile" labels={labelIndonesia} />
+            <Timeline items={contohIndonesia} platform="mobile" labels={labelIndonesia} darkMode={docsDark} />
           </div>
         </Demo>
 
@@ -605,34 +619,40 @@ export function TimelinePage() {
           <H>months</H>
           {": ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],\n"}
           {'  }}\n'}
+          {/* Cuplikan ini berindentasi dua spasi, jadi barisnya tidak memakai dm.line. */}
+          {docsDark && '  darkMode\n'}
           {'/>'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Garis, tepi kartu, dan latar avatar memakai token semantik <Hl>border</Hl>, serta nama dan
-          jabatan memakai <Hl>brand</Hl>. Warna lainnya dari token komponen{' '}
-          <Hl>--color-timeline-surface</Hl>, <Hl>-content</Hl>, dan <Hl>-avatar</Hl>. Aktifkan
-          lewat prop <Hl>darkMode</Hl>, atau biarkan Timeline ikut{' '}
-          <Hl>data-theme=&quot;dark&quot;</Hl> dari pembungkusnya. Kartu menjadi gray-800, garis
-          dan tepinya gray-700, nama dan jabatan primary-400, serta teks isi dan siluet avatar
-          gray-100. Badge status memakai tampilan gelapnya sendiri (green-900 dengan teks
-          green-300) lewat <Hl>darkMode</Hl>. Badge belum berbasis token, jadi ia tidak ikut gelap
-          lewat <Hl>data-theme</Hl> pembungkus; pakai prop <Hl>darkMode</Hl> bila kartunya memuat
-          status.
-        </Lead>
-
+      <ModeSection
+        name="Timeline"
+        stayDark
+        lead={
+          <>
+            Garis, tepi kartu, dan latar avatar memakai token semantik <Hl>border</Hl>, serta nama dan
+            jabatan memakai <Hl>brand</Hl>. Warna lainnya dari token komponen{' '}
+            <Hl>--color-timeline-surface</Hl>, <Hl>-content</Hl>, dan <Hl>-avatar</Hl>. Aktifkan
+            lewat prop <Hl>darkMode</Hl>, atau biarkan Timeline ikut{' '}
+            <Hl>data-theme=&quot;dark&quot;</Hl> dari pembungkusnya. Kartu menjadi gray-800, garis
+            dan tepinya gray-700, nama dan jabatan primary-400, serta teks isi dan siluet avatar
+            gray-100. Badge status memakai tampilan gelapnya sendiri (green-900 dengan teks
+            green-300) lewat <Hl>darkMode</Hl>. Badge belum berbasis token, jadi ia tidak ikut gelap
+            lewat <Hl>data-theme</Hl> pembungkus; pakai prop <Hl>darkMode</Hl> bila kartunya memuat
+            status.
+          </>
+        }
+      >
         <Demo label="darkMode" dark minWidth={desktopMinWidth}>
           <Timeline items={designItems.slice(0, 2)} darkMode />
         </Demo>
 
         <SectionCode>
           {'<Timeline '}
-          <H>darkMode</H>
-          {' items={items} />'}
+          <H>darkMode</H>{' '}
+          {'items={items} />'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -670,14 +690,14 @@ export function TimelinePage() {
               options={sizeOptions}
             />
           </Control>
-          <Control label="Mode">
+          <Control label="Tampilan">
             <Segmented
               label="Pilih mode"
-              value={theme}
-              onChange={(v) => setTheme(String(v))}
+              value={dark}
+              onChange={setDark}
               options={[
-                { value: 'light', label: 'Light' },
-                { value: 'dark', label: 'Dark' },
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
               ]}
             />
           </Control>
@@ -747,17 +767,17 @@ export function TimelinePage() {
           <PropsTable rows={timelineProps} minWidth="46rem" />
 
           <div>
-            <h3 className="mb-3 text-sm font-black text-gray-900">TimelineItem</h3>
+            <h3 className="mb-3 text-sm font-black text-gray-900 dark:text-white">TimelineItem</h3>
             <PropsTable rows={itemProps} minWidth="46rem" />
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-black text-gray-900">TimelineStatus</h3>
+            <h3 className="mb-3 text-sm font-black text-gray-900 dark:text-white">TimelineStatus</h3>
             <PropsTable rows={statusProps} minWidth="46rem" />
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-black text-gray-900">TimelineAttachment</h3>
+            <h3 className="mb-3 text-sm font-black text-gray-900 dark:text-white">TimelineAttachment</h3>
             <PropsTable rows={attachmentProps} minWidth="46rem" />
           </div>
         </div>

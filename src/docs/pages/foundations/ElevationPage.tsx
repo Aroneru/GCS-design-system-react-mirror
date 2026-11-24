@@ -38,11 +38,15 @@ export function ElevationPage() {
           untuk elemen melayang standar.
         </Lead>
 
+        {/* Di mode gelap docs petaknya gray-700: bayangannya tetap, hanya permukaannya yang ikut gelap. */}
         <article className="ds-card p-5 sm:p-7">
           <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
             {shadowScale.map((cls) => (
-              <div key={cls} className={`${cls} flex aspect-6/7 items-center justify-center rounded-lg bg-white text-center`}>
-                <code className="text-sm font-bold text-primary-700">.{cls}</code>
+              <div
+                key={cls}
+                className={`${cls} flex aspect-6/7 items-center justify-center rounded-lg bg-white text-center dark:bg-gray-700`}
+              >
+                <code className="text-sm font-bold text-primary-700 dark:text-primary-300">.{cls}</code>
               </div>
             ))}
           </div>
@@ -86,7 +90,7 @@ export function ElevationPage() {
         <PrincipleList
           items={[
             <>Kartu memakai <C>shadow-sm</C>/<C>shadow</C>, dropdown/popover <C>shadow-lg</C>, modal <C>shadow-xl</C> ke atas.</>,
-            <>Batasi maksimal <strong className="text-gray-900">dua tingkat elevation</strong> dalam satu tampilan agar hierarki jelas.</>,
+            <>Batasi maksimal <strong className="text-gray-900 dark:text-white">dua tingkat elevation</strong> dalam satu tampilan agar hierarki jelas.</>,
             <>Bayangan berwarna hanya untuk penekanan khusus (CTA, kartu promosi) — bukan konten reguler.</>,
             <>Bayangan bukan pengganti kontras — elemen interaktif tetap butuh batas/warna yang aksesibel.</>,
           ]}

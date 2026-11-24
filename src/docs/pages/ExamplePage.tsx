@@ -102,7 +102,8 @@ export function ExamplePage({
         ref={scope}
         className="relative isolate flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6"
       >
-        <Aurora />
+        {/* Di mode gelap docs yang menyambung di bawahnya latar halaman gray-900. */}
+        <Aurora darkFade="dark:to-gray-900" />
 
         <div ref={konten} className="relative z-10 max-w-2xl text-center">
           <p data-intro className="ds-eyebrow">
@@ -112,11 +113,11 @@ export function ExamplePage({
           <SplitWords
             as="h1"
             text={judul}
-            className="mt-4 text-heading-1 font-black text-gray-900"
+            className="mt-4 text-heading-1 font-black text-gray-900 dark:text-white"
             delay={0.25}
           />
 
-          <p data-intro className="mx-auto mt-5 max-w-xl text-body text-gray-600">
+          <p data-intro className="mx-auto mt-5 max-w-xl text-body text-gray-600 dark:text-gray-300">
             {deskripsi}
           </p>
 

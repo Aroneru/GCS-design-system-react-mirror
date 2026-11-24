@@ -169,6 +169,18 @@ export interface ListViewItemProps
   onAction?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
   /** Tautan untuk tombol aksi bawaan. */
   actionHref?: string;
+  /**
+   * Menyembunyikan tombol aksi bawaan. Jika `actionHref` atau `onAction`
+   * tersedia dan item belum memiliki `href`/`onClick`, aksi dialihkan ke
+   * seluruh item.
+   */
+  actionDisabled?: boolean;
+  /**
+   * Menampilkan feedback visual hover dan active pada item `simple` yang
+   * interaktif. Prop ini tidak mengubah kemampuan item untuk diklik.
+   * Bawaannya `true`.
+   */
+  interactiveFeedback?: boolean;
   /** Ukuran tombol aksi bawaan. Mengikuti `size` item bila tidak diisi. */
   actionButtonSize?: ButtonSize;
   /** Tautan jika seluruh item bertindak sebagai tautan. */
@@ -236,6 +248,8 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
       actionLabel,
       onAction,
       actionHref,
+      actionDisabled = false,
+      interactiveFeedback = true,
       actionButtonSize,
       href,
       target,
@@ -301,8 +315,18 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
     }
 
     const isDecoration = decoration ?? false;
-    const isInteractive = Boolean(href || onClick);
-    const Component = as ?? (href ? "a" : "article");
+    const shouldDelegateAction = actionDisabled && !href && !onClick;
+    const resolvedHref = href ?? (shouldDelegateAction ? actionHref : undefined);
+    const resolvedOnClick = onClick ?? (
+      shouldDelegateAction && onAction
+        ? (event: React.MouseEvent<HTMLElement>) => {
+          onAction(event as React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>);
+        }
+        : undefined
+    );
+    const isInteractive = Boolean(resolvedHref || resolvedOnClick);
+    const rendersDelegatedButton = !as && !resolvedHref && Boolean(resolvedOnClick);
+    const Component = as ?? (resolvedHref ? "a" : rendersDelegatedButton ? "button" : "article");
     const isMobile = platform === "mobile";
     const hasBadge = Boolean(badge);
     const normalizedSize = normalizeListViewSize(size);
@@ -317,7 +341,7 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
     const renderedIcon =
       icon ?? <FileLines className={cn(currentSize.iconSize, "shrink-0")} aria-hidden="true" />;
 
-    const renderedAction = actionLabel ? (
+    const renderedAction = actionLabel && !actionDisabled ? (
       actionHref ? (
         <Button
           as="anchor"
@@ -350,18 +374,20 @@ export const ListViewItem = forwardRef<HTMLElement, ListViewItemProps>(
     return (
       <Component
         ref={ref as React.Ref<never>}
-        href={href}
+        href={resolvedHref}
         target={target}
         rel={target === "_blank" ? (rel ?? "noreferrer noopener") : rel}
-        onClick={onClick}
+        onClick={resolvedOnClick}
+        type={rendersDelegatedButton ? "button" : undefined}
         data-theme={darkMode ? "dark" : undefined}
         className={cn(
-          "group relative flex items-center justify-between overflow-hidden rounded-lg border border-border bg-surface text-content transition-all",
+          "group relative flex w-full items-center justify-between overflow-hidden rounded-lg border border-border bg-surface text-left text-content transition-all",
           "data-[theme=dark]:border-gray-500 in-data-[theme=dark]:border-gray-500 data-[theme=dark]:bg-gray-700 in-data-[theme=dark]:bg-gray-700",
           currentSize.container,
           isDecoration && currentSize.decorationPadding,
-          isInteractive &&
-          "cursor-pointer hover:border-primary-400/80 hover:shadow-soft active:scale-[0.998]",
+          isInteractive && "cursor-pointer",
+          isInteractive && interactiveFeedback &&
+          "hover:border-primary-400/80 hover:shadow-soft active:scale-[0.998]",
           className,
         )}
         {...props}

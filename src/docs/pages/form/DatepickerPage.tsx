@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Datepicker, type DateRange, type DatepickerPlatform, type DatepickerType } from '../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -7,6 +8,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -82,10 +84,15 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc, true)
+
 export function DatepickerPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [type, setType] = useState<DatepickerType>('single')
   const [platform, setPlatform] = useState<DatepickerPlatform>('default')
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = usePlaygroundDark()
   const [withLabel, setWithLabel] = useState(true)
   const [disabled, setDisabled] = useState(false)
   const [shortcuts, setShortcuts] = useState(false)
@@ -111,7 +118,7 @@ export function DatepickerPage() {
       eyebrow="Form"
       title="Datepicker"
       description="Pemilih tanggal dengan kalender di panel melayang — satu tanggal, satu kalender dengan pintasan periode, atau rentang dengan dua kalender. Tersedia juga tata letak mobile dan tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="single" title="Single">
         <Lead>
@@ -120,10 +127,10 @@ export function DatepickerPage() {
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Belum dipilih">
-            <Datepicker label="Nama Tanggal" />
+            <Datepicker label="Nama Tanggal" darkMode={docsDark} />
           </Demo>
           <Demo label="Sudah dipilih">
-            <Datepicker label="Nama Tanggal" defaultValue={TANGGAL} />
+            <Datepicker label="Nama Tanggal" defaultValue={TANGGAL} darkMode={docsDark} />
           </Demo>
         </div>
         <SectionCode>
@@ -137,9 +144,10 @@ export function DatepickerPage() {
           {'    '}
           <H>onChange</H>
           {'={setTanggal}\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Kotak single selebar 325px, sama dengan di mobile, sedangkan panelnya 284px — seperti desainnya.
           Bentuk lain selebar panelnya, 325px untuk period dan 600px untuk multiple (325px di mobile), supaya
           tepi kotak dan kalendernya segaris. Di wadah yang lebih sempit ia ikut menyusut;{' '}
@@ -157,10 +165,10 @@ export function DatepickerPage() {
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Satu minggu">
-            <Datepicker type="period" label="Nama Tanggal" defaultValue={SEPEKAN} />
+            <Datepicker type="period" label="Nama Tanggal" defaultValue={SEPEKAN} darkMode={docsDark} />
           </Demo>
           <Demo label="Semua Waktu">
-            <Datepicker type="period" label="Nama Tanggal" defaultValue={SEMUA_WAKTU} />
+            <Datepicker type="period" label="Nama Tanggal" defaultValue={SEMUA_WAKTU} darkMode={docsDark} />
           </Demo>
         </div>
         <SectionCode>
@@ -173,6 +181,7 @@ export function DatepickerPage() {
           {'    label="Nama Tanggal"\n'}
           {'    value={periode}\n'}
           {'    onChange={setPeriode}\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
@@ -187,10 +196,10 @@ export function DatepickerPage() {
         </Lead>
         <div className="grid gap-5">
           <Demo label="Rentang terpilih">
-            <Datepicker type="multiple" label="Nama Tanggal" defaultValue={RENTANG} />
+            <Datepicker type="multiple" label="Nama Tanggal" defaultValue={RENTANG} darkMode={docsDark} />
           </Demo>
           <Demo label="Dengan shortcuts">
-            <Datepicker type="multiple" shortcuts label="Nama Tanggal" />
+            <Datepicker type="multiple" shortcuts label="Nama Tanggal" darkMode={docsDark} />
           </Demo>
         </div>
         <SectionCode>
@@ -201,13 +210,16 @@ export function DatepickerPage() {
           {'    label="Nama Tanggal"\n'}
           {'    value={rentang}\n'}
           {'    onChange={setRentang}\n'}
+          {dm.line}
           {'/>\n\n'}
           {'// Dengan Minggu ini, Bulan ini, dan Semua Waktu\n'}
           {'<Datepicker type="multiple" '}
           <H>shortcuts</H>
-          {' label="Nama Tanggal" />'}
+          {' label="Nama Tanggal"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Kedua kalender bisa digeser sendiri-sendiri, jadi rentang yang panjang tidak perlu melewati setiap
           bulan di antaranya. Kotak mana pun yang ditekan, pilihan selalu dimulai dari tanggal mulai; tanggal
           selesai yang jatuh sebelum tanggal mulai dianggap memulai rentang baru. Tanggal bulan sebelah yang
@@ -228,13 +240,25 @@ export function DatepickerPage() {
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Single">
-            <Datepicker platform="mobile" label="Nama Tanggal" defaultValue={TANGGAL} />
+            <Datepicker platform="mobile" label="Nama Tanggal" defaultValue={TANGGAL} darkMode={docsDark} />
           </Demo>
           <Demo label="Period">
-            <Datepicker type="period" platform="mobile" label="Nama Tanggal" defaultValue={SEPEKAN} />
+            <Datepicker
+              type="period"
+              platform="mobile"
+              label="Nama Tanggal"
+              defaultValue={SEPEKAN}
+              darkMode={docsDark}
+            />
           </Demo>
           <Demo label="Multiple">
-            <Datepicker type="multiple" platform="mobile" label="Nama Tanggal" defaultValue={RENTANG} />
+            <Datepicker
+              type="multiple"
+              platform="mobile"
+              label="Nama Tanggal"
+              defaultValue={RENTANG}
+              darkMode={docsDark}
+            />
           </Demo>
         </div>
         <SectionCode>
@@ -246,9 +270,10 @@ export function DatepickerPage() {
           {'    label="Nama Tanggal"\n'}
           {'    value={rentang}\n'}
           {'    onChange={setRentang}\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Dengan <Hl>className="max-w-none"</Hl> ia memenuhi wadahnya dan panelnya ikut melebar. Panel
           multiple setinggi ini jarang muat di layar ponsel, jadi bila tidak muat di bawah maupun di atas
           kotak, tingginya dibatasi ruang yang tersedia dan isinya digulir di dalam panel. Selebihnya sama
@@ -266,7 +291,13 @@ export function DatepickerPage() {
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Period">
-            <Datepicker type="period" label="Tanggal penerbangan" min={HARI_INI} max={SETAHUN_LAGI} />
+            <Datepicker
+              type="period"
+              label="Tanggal penerbangan"
+              min={HARI_INI}
+              max={SETAHUN_LAGI}
+              darkMode={docsDark}
+            />
           </Demo>
           <div className="sm:col-span-2">
             <Demo label="Multiple dengan shortcuts">
@@ -276,6 +307,7 @@ export function DatepickerPage() {
                 label="Tanggal penerbangan"
                 min={HARI_INI}
                 max={SETAHUN_LAGI}
+                darkMode={docsDark}
               />
             </Demo>
           </div>
@@ -292,10 +324,11 @@ export function DatepickerPage() {
           {'    '}
           <H>max</H>
           {'={setahunLagi}\n'}
+          {dm.line}
           {'/>\n'}
           {'// Semua Waktu → { start: hariIni, end: setahunLagi }'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Pintasan lain ikut dipotong ke batas itu: Minggu ini yang dimulai sebelum <Hl>min</Hl> hanya diambil
           mulai <Hl>min</Hl>, sedangkan pintasan yang seluruh rentangnya di luar batas — misalnya Hari ini saat
           datanya baru mulai minggu depan — dimatikan. Panah bulan berhenti di bulan pertama dan terakhir yang
@@ -304,11 +337,16 @@ export function DatepickerPage() {
         </p>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> mengganti seluruh warnanya ke tampilan gelap: kotak dan panel gray-700,
-          tanggal terpilih primary-600, dan tombol pintasan berisi. Tata letak mobile memakai warna yang sama.
-        </Lead>
+      <ModeSection
+        name="Datepicker"
+        stayDark
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengganti seluruh warnanya ke tampilan gelap: kotak dan panel gray-700,
+            tanggal terpilih primary-600, dan tombol pintasan berisi. Tata letak mobile memakai warna yang sama.
+          </>
+        }
+      >
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Single" dark>
             <Datepicker darkMode label="Nama Tanggal" defaultValue={TANGGAL} />
@@ -334,17 +372,17 @@ export function DatepickerPage() {
         </div>
         <SectionCode>
           {'<Datepicker '}
-          <H>darkMode</H>
-          {' label="Nama Tanggal" />'}
+          <H>darkMode</H>{' '}
+          {'label="Nama Tanggal" />'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="nilai" title="Nilai & formulir">
         <Lead>
           Single bernilai <Hl>Date</Hl>, sedangkan period dan multiple bernilai <Hl>DateRange</Hl> —{' '}
           <Hl>{'{ start, end }'}</Hl>. Jamnya selalu dibuang, jadi dua tanggal cukup dibandingkan harinya.
         </Lead>
-        <ul className="max-w-2xl space-y-2 text-body-sm text-gray-600">
+        <ul className="max-w-2xl space-y-2 text-body-sm text-gray-600 dark:text-gray-300">
           <li>
             <Hl>null</Hl> — belum diisi, atau setelah <Hl>Hapus</Hl>.
           </li>
@@ -365,14 +403,18 @@ export function DatepickerPage() {
         <SectionCode>
           {'<Datepicker '}
           <H>name</H>
-          {'="tanggal_lahir" />\n'}
+          {'="tanggal_lahir"'}
+          {dm.inline}
+          {' />\n'}
           {'// terkirim: tanggal_lahir=2021-06-25\n\n'}
           {'<Datepicker type="multiple" '}
           <H>name</H>
-          {'="periode" />\n'}
+          {'="periode"'}
+          {dm.inline}
+          {' />\n'}
           {'// terkirim: periode[start]=2021-06-25 & periode[end]=2021-07-12'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Dengan <Hl>name</Hl>, tanggalnya ikut terkirim bersama formulir dalam format <Hl>YYYY-MM-DD</Hl>. Semua
           Waktu terkirim sebagai <Hl>min</Hl> dan <Hl>max</Hl>-nya; sisi yang tidak berbatas terkirim kosong.
         </p>
@@ -383,7 +425,7 @@ export function DatepickerPage() {
           Begitu panel terbuka, fokus langsung berada di tanggal terpilih — atau hari ini — sehingga kalender
           bisa ditelusuri tanpa tetikus.
         </Lead>
-        <ul className="max-w-2xl space-y-2 text-body-sm text-gray-600">
+        <ul className="max-w-2xl space-y-2 text-body-sm text-gray-600 dark:text-gray-300">
           <li>
             <Hl>←</Hl> <Hl>→</Hl> hari sebelumnya dan berikutnya; <Hl>↑</Hl> <Hl>↓</Hl> minggu sebelumnya dan
             berikutnya.
@@ -408,7 +450,7 @@ export function DatepickerPage() {
           </li>
         </ul>
         <Demo label="Coba: buka, lalu ketik 17 agustus 1945 dan tekan Enter">
-          <Datepicker label="Tanggal lahir" placeholder="Pilih tanggal lahir" max={HARI_INI} />
+          <Datepicker label="Tanggal lahir" placeholder="Pilih tanggal lahir" max={HARI_INI} darkMode={docsDark} />
         </Demo>
       </FlowSection>
 
@@ -444,7 +486,7 @@ export function DatepickerPage() {
           )}
         </Stage>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Nilai terakhir dari <Hl>onChange</Hl>: <Hl>{nilaiTerakhir}</Hl>
         </p>
 

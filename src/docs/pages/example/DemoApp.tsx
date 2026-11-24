@@ -1,13 +1,13 @@
-import { useId, useState, type MouseEvent } from "react";
+import { useState, type CSSProperties } from "react";
 import {
   Breadcrumb,
+  Button,
   Container,
-  Drawer,
   Hero,
   Navbar,
-  Search,
   Sidebar,
-  type DrawerMenuItem,
+  cn,
+  type SidebarItem,
 } from "../../../lib";
 import {
   ChartMixed,
@@ -16,7 +16,10 @@ import {
   FileLines,
   GridPlus,
   Home,
+  Moon,
+  Newspaper,
   Palette,
+  Sun,
   UsersGroup,
 } from "../../../lib/icons/outline";
 import { asset } from "../../asset";
@@ -29,7 +32,8 @@ import { Pemohon } from "./pages/Pemohon";
 import { Pengajuan } from "./pages/Pengajuan";
 import { Pengaturan } from "./pages/Pengaturan";
 import { Simaya } from "./pages/Simaya";
-import { Simaya2 } from "./pages/Simaya2";
+import { BeritaLayananDigital } from "./pages/BeritaLayananDigital";
+import { BERITA_LAYANAN_DIGITAL_TOC } from "./pages/BeritaLayananDigitalToc";
 
 /**
  * Kerangka aplikasi demo.
@@ -54,7 +58,7 @@ const RUTE: { halaman: HalamanDemo; ikon: React.ReactNode; badge?: string }[] = 
   { halaman: "simaya", ikon: <Envelope className="size-5" /> },
   { halaman: "modifikasi", ikon: <Palette className="size-5" /> },
   { halaman: "pengaturan", ikon: <Cog className="size-5" /> },
-  { halaman: "simaya2", ikon: <Cog className="size-5" />, },
+  { halaman: "simaya2", ikon: <Newspaper className="size-5" /> },
 ];
 
 /** Sub-rute nyata, bukan state palsu — jadi Sidebar dan Navbar bekerja sebagai tautan. */
@@ -68,70 +72,110 @@ const DESKRIPSI: Record<HalamanDemo, string> = {
   simaya: "Persuratan internal dengan aksen Simaya — prop application pada tujuh komponen form.",
   modifikasi: "Tiga tingkat penyesuaian komponen: varian bawaan, slot, lalu className.",
   pengaturan: "Data profil dan preferensi pemberitahuan akun Anda.",
-  simaya2: "Simaya-simayaan.",
+  simaya2: "Berita dan pembaruan terbaru seputar Portal Layanan Terpadu.",
 };
 
-const RUTE_KONTEKSTUAL: Record<HalamanDemo, HalamanDemo[]> = {
-  dasbor: ["pengajuan", "layanan"],
-  pengajuan: ["pemohon", "layanan"],
-  pemohon: ["pengajuan", "layanan"],
-  layanan: ["pengajuan", "pengaturan"],
-  simaya: ["pengajuan", "pengaturan"],
-  modifikasi: ["layanan", "pengaturan"],
-  pengaturan: ["pemohon", "modifikasi"],
-  simaya2: ["simaya", "pengaturan"],
-};
+const RUTE_SIDEBAR = ["dasbor", "pengajuan", "pemohon", "modifikasi", "pengaturan"] as const;
+const RUTE_LAYANAN = ["layanan", "simaya"] as const;
 
-const RUTE_LAYANAN = ["pengajuan", "pemohon", "layanan"] as const;
+const TEMA = [
+  { gelap: false, label: "Terang", Ikon: Sun },
+  { gelap: true, label: "Gelap", Ikon: Moon },
+];
 
-function isAcceptedNavigation(event: MouseEvent<HTMLElement>) {
+function ThemeIconToggle({
+  darkMode,
+  onChange,
+  className,
+}: {
+  darkMode: boolean;
+  onChange: (darkMode: boolean) => void;
+  className?: string;
+}) {
   return (
-    !event.defaultPrevented &&
-    event.button === 0 &&
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.metaKey &&
-    !event.shiftKey
+    <button
+      type="button"
+      aria-label="Mode gelap"
+      aria-pressed={darkMode}
+      title={darkMode ? "Matikan mode gelap" : "Nyalakan mode gelap"}
+      onClick={() => onChange(!darkMode)}
+      className={cn(
+        "grid size-9 place-items-center rounded-lg text-content-subtle transition-colors hover:bg-surface-subtle hover:text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand in-data-[theme=dark]:text-gray-400",
+        className,
+      )}
+    >
+      <Sun
+        strokeWidth={1.8}
+        aria-hidden="true"
+        className={cn(
+          "col-start-1 row-start-1 size-5 transition-[opacity,rotate,scale] duration-300 ease-out motion-reduce:transition-none",
+          darkMode ? "opacity-100" : "-rotate-90 scale-50 opacity-0",
+        )}
+      />
+      <Moon
+        strokeWidth={1.8}
+        aria-hidden="true"
+        className={cn(
+          "col-start-1 row-start-1 size-5 transition-[opacity,rotate,scale] duration-300 ease-out motion-reduce:transition-none",
+          darkMode ? "rotate-90 scale-50 opacity-0" : "opacity-100",
+        )}
+      />
+    </button>
   );
 }
 
-function Isi({ halaman }: { halaman: HalamanDemo }) {
+function Isi({ halaman, darkMode }: { halaman: HalamanDemo; darkMode: boolean }) {
   switch (halaman) {
     case "pengajuan":
-      return <Pengajuan />;
+      return <Pengajuan darkMode={darkMode} />;
     case "pemohon":
-      return <Pemohon />;
+      return <Pemohon darkMode={darkMode} />;
     case "layanan":
-      return <Layanan />;
+      return <Layanan darkMode={darkMode} />;
     case "simaya":
-      return <Simaya />;
+      return <Simaya darkMode={darkMode} />;
     case "simaya2":
-      return <Simaya2 />;
+      return <BeritaLayananDigital darkMode={darkMode} />;
     case "modifikasi":
-      return <Modifikasi />;
+      return <Modifikasi darkMode={darkMode} />;
     case "pengaturan":
-      return <Pengaturan />;
+      return <Pengaturan darkMode={darkMode} />;
     default:
-      return <Dasbor />;
+      return <Dasbor darkMode={darkMode} />;
   }
 }
 
-export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
+export function DemoApp({
+  halaman,
+  darkMode = false,
+  onDarkModeChange,
+}: {
+  halaman: HalamanDemo;
+  darkMode?: boolean;
+  onDarkModeChange?: (darkMode: boolean) => void;
+}) {
   const [ringkas, setRingkas] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [contextualDrawerPage, setContextualDrawerPage] = useState<HalamanDemo | null>(null);
   const [searchFeedback, setSearchFeedback] = useState("");
-  const contextualDrawerOpen = contextualDrawerPage === halaman;
-  const contextualDrawerId = useId();
+  // Separator struktural aplikasi portal perlu tetap terbaca di atas surface
+  // gray-700. Cukup satu tingkat lebih terang (gray-600): gray-400 terlalu
+  // tegas dibanding gray-200 di mode terang. Dibuat lokal agar token border
+  // seluruh design system tidak ikut berubah pada mode gelap.
+  const separatorStyle = darkMode
+    ? { borderColor: "var(--color-gray-600)" }
+    : undefined;
 
-  const menu = RUTE.map(({ halaman: h, ikon, badge }) => ({
-    id: h,
-    label: JUDUL_HALAMAN[h],
-    href: href(h),
-    icon: ikon,
-    badge,
-    active: h === halaman,
-  }));
+  const menu: SidebarItem[] = RUTE_SIDEBAR.map((h) => {
+    const route = RUTE.find(({ halaman: routePage }) => routePage === h);
+    return {
+      id: h,
+      label: JUDUL_HALAMAN[h],
+      href: href(h),
+      icon: route?.ikon,
+      badge: route?.badge,
+      active: h === halaman,
+    };
+  });
   const navbarDestination = (h: HalamanDemo) => {
     const route = RUTE.find(({ halaman: routePage }) => routePage === h);
 
@@ -145,7 +189,6 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
     };
   };
   const navbarItems = [
-    navbarDestination("dasbor"),
     {
       id: "layanan-digital",
       type: "disclosure" as const,
@@ -153,31 +196,48 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
       icon: <GridPlus className="size-5" />,
       children: RUTE_LAYANAN.map(navbarDestination),
     },
-    ...(["simaya", "modifikasi", "pengaturan", "simaya2"] as const).map(navbarDestination),
+    {
+      ...navbarDestination("simaya2"),
+      label: "Berita & Pembaruan",
+    },
   ];
-  const contextualMenu: DrawerMenuItem[] = [halaman, ...RUTE_KONTEKSTUAL[halaman]].map((h) => {
-    const route = RUTE.find(({ halaman: routePage }) => routePage === h);
-
-    return {
-      id: h,
-      label: JUDUL_HALAMAN[h],
-      href: href(h),
-      icon: route?.ikon,
-      active: h === halaman,
-      onClick: (event) => {
-        if (isAcceptedNavigation(event)) setContextualDrawerPage(null);
+  const searchCategories = menu.map(({ id, label }) => ({ value: id ?? label, label }));
+  const sidebarUser = {
+    name: "Rafli Arandhana",
+    profileLabel: "Administrator",
+    items: [
+      {
+        id: "account-settings",
+        label: "Pengaturan akun",
+        href: href("pengaturan"),
       },
-    };
-  });
+      {
+        id: "logout",
+        label: "Keluar",
+        tone: "danger" as const,
+        onClick: () => setSearchFeedback("Aksi demo: Keluar"),
+      },
+    ],
+  };
 
   return (
     // Kolom, bukan baris: Sidebar dan konten berdampingan di dalam satu baris,
     // lalu footer jadi saudara baris itu — supaya latarnya melebar penuh
     // selebar layar, ikut menutupi kolom di bawah Sidebar.
-    <div className="flex min-h-screen flex-col bg-surface-subtle">
+    <div
+      data-theme={darkMode ? "dark" : "light"}
+      className={cn(
+        "flex min-h-screen flex-col text-content",
+        // Latar halaman satu tingkat di bawah surface-subtle saat gelap, supaya
+        // kartu dan tabel (gray-800/700, warna asli komponennya) tampak naik
+        // dari alasnya, sama seperti kartu putih di atas gray-50 di mode terang.
+        darkMode ? "bg-gray-900" : "bg-surface-subtle",
+        darkMode &&
+          "[&_.bg-white]:bg-surface [&_.border-gray-200]:border-border [&_.border-gray-300]:border-border-strong [&_.text-gray-900]:text-content [&_.text-gray-800]:text-content [&_.text-gray-700]:text-content-subtle [&_.text-gray-600]:text-content-subtle [&_.text-gray-500]:text-content-muted [&_.bg-primary-50]:bg-primary-900 [&_.border-primary-100]:border-primary-800 [&_.text-primary-900]:text-primary-100 [&_.text-primary-800]:text-primary-100 [&_.text-primary-700]:text-primary-400 [&_.bg-yellow-50]:bg-yellow-900 [&_.text-yellow-800]:text-yellow-100 [&_.bg-purple-100]:bg-purple-900 [&_.text-purple-700]:text-purple-300 [&_.text-green-700]:text-green-400 [&_.text-red-700]:text-red-400",
+      )}
+    >
       <div className="flex flex-1">
-        {/* Disembunyikan di bawah lg: di layar sempit Navbar sudah menyediakan
-            panel navigasinya sendiri, jadi dua navigasi akan bertumpuk. */}
+        {/* Pada mobile, menu Sidebar ini dipindahkan ke hamburger kiri Navbar. */}
         <div className="hidden lg:block">
           <Sidebar
             logo={
@@ -194,10 +254,75 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
              */
             collapsedLogo={<img src={asset("/images/ceplok.svg")} alt="CEPLOK" className="size-8" />}
             items={menu}
-            user={{ name: "Rafli Arandhana", profileLabel: "Administrator" }}
+            user={sidebarUser}
             sticky
             collapsed={ringkas}
             onCollapse={() => setRingkas((v) => !v)}
+            darkMode={darkMode}
+            style={separatorStyle}
+            footer={
+              onDarkModeChange ? (
+                ringkas ? (
+                  <div className="flex justify-center p-3">
+                    <Button
+                      iconOnly
+                      variant="outline"
+                      size="s"
+                      aria-label={darkMode ? "Matikan mode gelap" : "Nyalakan mode gelap"}
+                      aria-pressed={darkMode}
+                      title={darkMode ? "Matikan mode gelap" : "Nyalakan mode gelap"}
+                      onClick={() => onDarkModeChange(!darkMode)}
+                      darkMode={darkMode}
+                    >
+                      {darkMode ? <Sun /> : <Moon />}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="px-5 py-4">
+                    <div
+                      role="group"
+                      aria-label="Pilih tema"
+                      className="relative grid grid-cols-2 rounded-full border border-border bg-surface-subtle p-1 transition-colors duration-200"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "pointer-events-none absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-white shadow-sm ring-1 ring-border",
+                          "transition-[translate,background-color,box-shadow] duration-300 ease-out motion-reduce:transition-none",
+                          "in-data-[theme=dark]:bg-gray-600",
+                          darkMode && "translate-x-full",
+                        )}
+                      />
+                      {TEMA.map(({ gelap, label, Ikon }) => {
+                        const aktif = darkMode === gelap;
+                        return (
+                          <button
+                            key={label}
+                            type="button"
+                            aria-pressed={aktif}
+                            onClick={() => onDarkModeChange(gelap)}
+                            className={cn(
+                              "relative flex h-9 items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors duration-300",
+                              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+                              aktif ? "text-content" : "text-content-muted hover:text-content",
+                            )}
+                          >
+                            <Ikon
+                              aria-hidden="true"
+                              className={cn(
+                                "size-5 transition-[color,rotate,scale] duration-300 ease-out motion-reduce:transition-none",
+                                aktif ? "text-brand" : gelap ? "-rotate-12 scale-90" : "rotate-90 scale-90",
+                              )}
+                            />
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )
+              ) : undefined
+            }
             /*
              * Catatan status di kaki Sidebar. Ditaruh di dalam navigasinya, bukan
              * di halaman pintu masuk, supaya ia terbaca justru saat orang sedang
@@ -212,8 +337,11 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <Navbar
+          <div className="relative">
+            <Navbar
             platform="back-office"
+            darkMode={darkMode}
+            style={separatorStyle}
             brand={{
               content: (
                 <img
@@ -226,48 +354,45 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
               ariaLabel: "CEPLOK — Dasbor",
             }}
             items={navbarItems}
-            search={
-              <Search
-                platform="compact"
-                showButton={false}
-                trigger="enter"
-                aria-label="Cari pengajuan atau pemohon"
-                placeholder="Cari pengajuan, pemohon ..."
-                onSearch={(value) => setSearchFeedback(`Pencarian demo: ${value}`)}
-              />
-            }
-            account={{
-              name: "Rafli Arandhana",
-              initials: "RA",
-              items: [
-                {
-                  id: "account-settings",
-                  type: "destination",
-                  label: "Pengaturan akun",
-                  href: href("pengaturan"),
-                  current: halaman === "pengaturan",
-                },
-                {
-                  id: "logout",
-                  type: "action",
-                  label: "Keluar",
-                  tone: "danger",
-                  onClick: () => setSearchFeedback("Aksi demo: Keluar"),
-                },
-              ],
+            sidebarItems={menu}
+            sidebarUser={sidebarUser}
+            tableOfContents={halaman === "simaya2" ? {
+              label: "On this page",
+              items: BERITA_LAYANAN_DIGITAL_TOC,
+            } : undefined}
+            search={{
+              "aria-label": "Cari pengajuan atau pemohon",
+              placeholder: "Cari pengajuan, pemohon ...",
+              categories: searchCategories,
+              categoryPlaceholder: "Kategori",
+              onSearch: (value, category) => setSearchFeedback(`Pencarian demo: ${value}${category ? ` (${category})` : ""}`),
+            }}
+            notificationTrigger={{
+              ariaLabel: "Buka notifikasi",
+              onClick: () => setSearchFeedback("Aksi demo: Buka notifikasi"),
             }}
             mobileNavigationOpen={mobileSidebarOpen}
             onMobileNavigationOpenChange={setMobileSidebarOpen}
-            mobileDrawer={{
-              open: contextualDrawerOpen,
-              onOpenChange: (open) => setContextualDrawerPage(open ? halaman : null),
-              controls: contextualDrawerId,
-              ariaLabel: `Buka navigasi kontekstual ${JUDUL_HALAMAN[halaman]}`,
-            }}
-          />
+            />
+            {onDarkModeChange && (
+              <ThemeIconToggle
+                darkMode={darkMode}
+                onChange={onDarkModeChange}
+                className="absolute top-4.5 right-29 min-[576px]:hidden"
+              />
+            )}
+          </div>
+
+          {onDarkModeChange && (
+            <ThemeIconToggle
+              darkMode={darkMode}
+              onChange={onDarkModeChange}
+              className="fixed right-4 bottom-20 z-40 hidden shadow-lg min-[576px]:grid lg:hidden"
+            />
+          )}
 
           {searchFeedback && (
-            <div className="border-b border-border bg-surface">
+            <div className="border-b border-border bg-surface" style={separatorStyle}>
               <Container>
                 <p role="status" aria-live="polite" className="py-2 text-body-sm text-content-subtle">
                   {searchFeedback}
@@ -277,10 +402,11 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
           )}
 
           <main className="flex-1">
-            <div className="border-b border-border bg-white">
+            <div className="border-b border-border bg-surface" style={separatorStyle}>
               <Container>
                 <div className="flex items-center gap-4 py-6">
                   <Breadcrumb
+                    darkMode={darkMode}
                     items={[
                       { label: "Beranda", href: href("dasbor"), icon: <Home className="size-4" /> },
                       { label: JUDUL_HALAMAN[halaman] },
@@ -293,6 +419,7 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
                   isi yang penting ke bawah lipatan. */}
               {halaman === "dasbor" ? (
                 <Hero
+                  darkMode={darkMode}
                   heading="Portal Layanan Terpadu"
                   subHeading="Satu pintu untuk seluruh layanan"
                   description="Ajukan, pantau, dan selesaikan permohonan tanpa perlu datang ke kantor. Seluruh antarmuka di halaman ini dirakit dari komponen @ceplok-ui/design-kit-react."
@@ -304,10 +431,10 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
               ) : (
                 <Container>
                   <div className="pb-8">
-                    <h1 className="text-heading-2 font-black text-gray-900">
+                    <h1 className="text-heading-2 font-black text-content">
                       {JUDUL_HALAMAN[halaman]}
                     </h1>
-                    <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+                    <p className="mt-2 max-w-2xl text-body-sm text-content-muted">
                       {DESKRIPSI[halaman]}
                     </p>
                   </div>
@@ -315,23 +442,18 @@ export function DemoApp({ halaman }: { halaman: HalamanDemo }) {
               )}
             </div>
 
-            <Container>
+            {/* Container di tema gelap melukis latar gray-700. Di sini ia hanya
+                pembatas lebar, jadi latarnya dimatikan lokal; tanpa ini muncul
+                pita gray-700 di tengah halaman yang tidak ada di mode terang. */}
+            <Container
+              style={darkMode ? ({ "--color-container": "transparent" } as CSSProperties) : undefined}
+            >
               <div className="py-10">
-                <Isi halaman={halaman} />
+                <Isi halaman={halaman} darkMode={darkMode} />
               </div>
             </Container>
           </main>
 
-          <Drawer
-            id={contextualDrawerId}
-            open={contextualDrawerOpen}
-            onClose={() => setContextualDrawerPage(null)}
-            position="right"
-            size="s"
-            eyebrow="Navigasi kontekstual"
-            header={<Drawer.Title>{JUDUL_HALAMAN[halaman]}</Drawer.Title>}
-            items={contextualMenu}
-          />
         </div>
       </div>
 

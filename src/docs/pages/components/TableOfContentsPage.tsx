@@ -1,9 +1,11 @@
-import { useRef, useState, type MouseEvent, type RefObject } from 'react'
+import { useRef, useState, type MouseEvent, type ReactNode, type RefObject } from 'react'
 import {
   TableOfContents,
   type TableOfContentsItem,
   type TableOfContentsItemElement,
 } from '../../../lib'
+import { Bars, BarsFromLeft, ChevronDown, Close } from '../../../lib/icons/outline'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { adaTidakAda } from '../../usulanOptions'
 import { CodeBlock, H, Hl, Segmented } from '../../pageKit'
@@ -12,6 +14,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -29,7 +32,7 @@ const tocProps: PropRow[] = [
   ['onItemClick', '(item, event) => void', '—', 'Dipanggil saat entri diklik, sebelum tautan berjalan.'],
   ['darkMode', 'boolean', 'false', 'Sama dengan data-theme="dark". Latar jadi gray-800.'],
   ['maxHeight', 'number | string', '—', 'Tinggi maksimum daftar. Daftar yang lebih panjang bisa digulir dan mengikuti entri aktif.'],
-  ['layout', "'auto' | 'list' | 'drawer'", "'auto'", 'auto: daftar biasa (teks 12px) mulai 1024px, di bawahnya tombol yang membuka Drawer dari kanan (teks 14px). list dan drawer memaksa salah satunya.'],
+  ['layout', "'auto' | 'list' | 'drawer' | 'collapsible'", "'auto'", 'auto: daftar biasa mulai 1024px dan Drawer di bawahnya. list dan drawer memaksa salah satunya; collapsible memakai trigger TOC untuk membuka daftar inline.'],
   ['anchor', 'boolean', 'true', 'Entri berupa tautan <a href> yang melompat ke bagiannya, dengan scroll-spy. false menjadikan entri <button>: klik hanya memindahkan sorotan, tanpa berpindah atau menggulir.'],
   ['drawerContained', 'boolean', 'false', 'Drawer muncul di dalam pembungkus terdekat yang relative, bukan menutupi seluruh layar. Untuk pratinjau di dalam bingkai, mis. playground.'],
   ['scrollContainer', 'RefObject<HTMLElement>', '—', 'Wadah gulir isi halaman bila bukan window. Scroll-spy dan klik entri bekerja di dalam wadah ini.'],
@@ -45,6 +48,8 @@ const toc: TocEntry[] = [
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
 ]
+
+const tocDark = tocForDarkDocs(toc, true)
 
 /** Contoh isi daftar, mengikuti daftar isi halaman Hero di desain. */
 const contoh: TableOfContentsItem[] = [
@@ -83,10 +88,16 @@ const daftarPanjang: TableOfContentsItem[] = Array.from({ length: 24 }, (_, i) =
  * Di bawah 640px daftar 208px tidak muat di samping isi, jadi daftar isinya
  * berganti tombol yang membuka Drawer di dalam kartu ini, sama seperti
  * layout `auto` di layar sempit.
+ *
+ * `dark` memasang `data-theme="dark"` di bingkainya, jadi token isi tiruan dan
+ * TableOfContents di dalamnya ikut gelap bersama mode docs.
  */
-function PagePreview({ demo }: { demo: ReturnType<typeof useDemo> }) {
+function PagePreview({ demo, dark = false }: { demo: ReturnType<typeof useDemo>; dark?: boolean }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-toc-surface shadow-soft">
+    <div
+      data-theme={dark ? 'dark' : undefined}
+      className="relative overflow-hidden rounded-2xl border border-border bg-toc-surface shadow-soft"
+    >
       <div className="flex gap-8 p-5 sm:p-8">
         <div className="min-w-0 flex-1">
           <div aria-hidden="true">
@@ -112,7 +123,7 @@ function PagePreview({ demo }: { demo: ReturnType<typeof useDemo> }) {
                 <div
                   key={item.id}
                   className={`rounded-lg border-l-2 px-3 py-2.5 transition-colors duration-300 ${
-                    isActive ? 'border-brand bg-primary-50' : 'border-transparent'
+                    isActive ? `border-brand ${dark ? 'bg-primary-900/40' : 'bg-primary-50'}` : 'border-transparent'
                   }`}
                 >
                   <p
@@ -154,9 +165,12 @@ function PagePreview({ demo }: { demo: ReturnType<typeof useDemo> }) {
 function LongListPreview({
   activeId,
   onSelect,
+  dark = false,
 }: {
   activeId: string
   onSelect: (id: string) => void
+  /** Sama seperti PagePreview: memasang `data-theme="dark"` di bingkainya. */
+  dark?: boolean
 }) {
   const active = daftarPanjang.find((item) => item.id === activeId) ?? daftarPanjang[0]
   const demo = {
@@ -169,7 +183,10 @@ function LongListPreview({
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-toc-surface shadow-soft">
+    <div
+      data-theme={dark ? 'dark' : undefined}
+      className="relative overflow-hidden rounded-2xl border border-border bg-toc-surface shadow-soft"
+    >
       {/* Navbar halaman */}
       <div className="flex items-center justify-between border-b border-border px-5 py-3 sm:px-8" aria-hidden="true">
         <div className="h-3 w-24 rounded bg-border-strong" />
@@ -200,7 +217,9 @@ function LongListPreview({
 
           {/* Bagian yang sedang dibaca: judulnya mengikuti entri aktif. */}
           <div className="mt-6 space-y-4" aria-hidden="true">
-            <div className="rounded-lg border-l-2 border-brand bg-primary-50 px-3 py-2.5">
+            <div
+              className={`rounded-lg border-l-2 border-brand px-3 py-2.5 ${dark ? 'bg-primary-900/40' : 'bg-primary-50'}`}
+            >
               <p className="truncate text-sm font-bold text-brand">{active.label}</p>
               <div className="mt-2 space-y-1.5">
                 <div className="h-1.5 w-full rounded bg-border" />
@@ -239,8 +258,8 @@ function PlatformPair({ dark = false }: { dark?: boolean }) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <article>
-        <h3 className="text-sm font-black text-gray-900">Desktop · 12px</h3>
-        <p className="mt-1 mb-3 text-body-sm text-gray-500">
+        <h3 className="text-sm font-black text-gray-900 dark:text-white">Desktop · 12px</h3>
+        <p className="mt-1 mb-3 text-body-sm text-gray-500 dark:text-gray-400">
           Daftar biasa di kanan isi halaman, mulai lebar layar 1024px.
         </p>
         <div data-theme={theme} className="rounded-2xl border border-border bg-surface-subtle p-6">
@@ -249,8 +268,8 @@ function PlatformPair({ dark = false }: { dark?: boolean }) {
       </article>
 
       <article>
-        <h3 className="text-sm font-black text-gray-900">Mobile · 14px</h3>
-        <p className="mt-1 mb-3 text-body-sm text-gray-500">
+        <h3 className="text-sm font-black text-gray-900 dark:text-white">Mobile · 14px</h3>
+        <p className="mt-1 mb-3 text-body-sm text-gray-500 dark:text-gray-400">
           Tombol yang menampilkan bagian aktif. Ketuk untuk membuka Drawer berisi daftarnya.
         </p>
         {/* Bingkai `relative` supaya Drawer muncul di sini, bukan menutupi seluruh layar. */}
@@ -351,6 +370,246 @@ function layer(visible: boolean) {
   }`
 }
 
+const phoneSidebar: Record<string, string[]> = {
+  Foundations: ['Colors', 'Typography', 'Icons'],
+  Components: ['Alert', 'Badge', 'Button', 'Table of Contents', 'Timeline'],
+}
+const phoneNavbar = ['Beranda', 'Foundations', 'Components', 'Form']
+const phonePanelClass =
+  'absolute inset-y-0 flex w-64 max-w-[85%] flex-col bg-surface text-content shadow-2xl outline-none transition-transform duration-300 ease-out in-data-[theme=dark]:bg-gray-800'
+const phoneCloseClass =
+  '-mr-2 ml-auto inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle hover:text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand'
+const phoneIconButtonClass =
+  'inline-flex shrink-0 items-center justify-center rounded-lg p-1.5 text-content-muted transition-colors hover:bg-surface-subtle hover:text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand'
+const phoneItemClass =
+  'flex w-full items-center rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand'
+
+type PhonePanel = 'sidebar' | 'menu'
+
+/**
+ * Isi mockup ponsel di Playground: navbar, isi halaman, dan dua panel yang
+ * muncul di dalam bingkai ponsel, sama dengan docs Livewire.
+ * - Ikon kiri navbar membuka menu sidebar dari kiri.
+ * - Ikon kanan membuka menu navbar dari kanan: tautan navbar, lalu daftar isi
+ *   yang bisa dilipat. Daftar isinya `toc`, biasanya TableOfContents
+ *   `layout="list"` dengan `title={null}`, karena judulnya sudah menjadi tombol
+ *   lipat. Klik entri menutup panelnya.
+ *
+ * Panel menempel di pembungkus `relative` terdekat, yaitu bingkai ponselnya.
+ * Tautan sidebar dan navbar hanya tiruan: kliknya menutup panel.
+ */
+function TocPhone({
+  toc,
+  children,
+}: {
+  toc: ReactNode
+  children: ReactNode
+}) {
+  const [panel, setPanel] = useState<PhonePanel | null>(null)
+  const [daftarIsi, setDaftarIsi] = useState(true)
+  const openers = useRef<Record<PhonePanel, HTMLButtonElement | null>>({ sidebar: null, menu: null })
+  const panels = useRef<Record<PhonePanel, HTMLDivElement | null>>({ sidebar: null, menu: null })
+  const bodies = useRef<Record<PhonePanel, HTMLDivElement | null>>({ sidebar: null, menu: null })
+
+  const open = (name: PhonePanel) => {
+    setPanel(name)
+    // Dibuka lagi setelah memilih entri daftar isi: mulai dari atas.
+    bodies.current[name]?.scrollTo({ top: 0 })
+    // Panelnya baru bisa difokus setelah inert dan invisible-nya dicabut.
+    requestAnimationFrame(() => requestAnimationFrame(() => panels.current[name]?.focus()))
+  }
+  const close = () => {
+    const name = panel
+    setPanel(null)
+    if (name) openers.current[name]?.focus()
+  }
+
+  return (
+    <div className="flex h-full flex-col">
+      {/*
+        Navbar di luar area gulir, bukan sticky: elemen sticky menjadi
+        containing block, sehingga panel akan terkurung di navbar, bukan
+        memenuhi bingkai ponsel.
+      */}
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-toc-surface px-3 py-2.5 transition-colors duration-300">
+        <button
+          type="button"
+          ref={(el) => {
+            openers.current.sidebar = el
+          }}
+          onClick={() => open('sidebar')}
+          aria-label="Buka sidebar"
+          aria-haspopup="dialog"
+          aria-expanded={panel === 'sidebar'}
+          className={phoneIconButtonClass}
+        >
+          <Bars className="size-5" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          ref={(el) => {
+            openers.current.menu = el
+          }}
+          onClick={() => open('menu')}
+          aria-label="Buka menu dan daftar isi"
+          aria-haspopup="dialog"
+          aria-expanded={panel === 'menu'}
+          className={phoneIconButtonClass}
+        >
+          <BarsFromLeft className="size-5" aria-hidden="true" />
+        </button>
+      </div>
+
+      {children}
+
+      <div
+        className={`absolute inset-0 z-20 overflow-hidden rounded-[inherit] transition-[visibility] duration-300 ${
+          panel ? 'visible' : 'invisible'
+        }`}
+        inert={!panel}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            e.stopPropagation()
+            close()
+          }
+        }}
+      >
+        <div
+          aria-hidden="true"
+          onClick={close}
+          className={`absolute inset-0 bg-gray-900/50 transition-opacity duration-300 ${
+            panel ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+
+        {/* Menu sidebar dari kiri. */}
+        <div
+          role="dialog"
+          aria-label="Sidebar"
+          tabIndex={-1}
+          ref={(el) => {
+            panels.current.sidebar = el
+          }}
+          inert={panel !== 'sidebar'}
+          className={`left-0 ${phonePanelClass} ${panel === 'sidebar' ? 'translate-x-0' : '-translate-x-full'}`}
+        >
+          <div className="flex shrink-0 items-center justify-between gap-4 px-5 pt-4 pb-2">
+            <p className="text-base font-black text-content">Ceplok UI</p>
+            <button type="button" onClick={close} aria-label="Tutup sidebar" className={phoneCloseClass}>
+              <Close className="size-4.5" aria-hidden="true" />
+            </button>
+          </div>
+          <div
+            ref={(el) => {
+              bodies.current.sidebar = el
+            }}
+            className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-y-contain px-3 pt-3 pb-6"
+          >
+            {Object.entries(phoneSidebar).map(([group, links]) => (
+              <div key={group}>
+                <p className="px-3 text-[11px] leading-4 font-bold tracking-[0.14em] text-content-disabled uppercase">
+                  {group}
+                </p>
+                <ul className="mt-2 space-y-0.5">
+                  {links.map((link) => {
+                    const current = link === 'Table of Contents'
+                    return (
+                      <li key={link}>
+                        <button
+                          type="button"
+                          onClick={close}
+                          aria-current={current ? 'page' : undefined}
+                          className={`${phoneItemClass} ${
+                            current ? 'bg-surface-subtle text-brand' : 'text-content hover:bg-surface-subtle'
+                          }`}
+                        >
+                          {link}
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Menu navbar dari kanan: tautan navbar, lalu daftar isi yang bisa dilipat. */}
+        <div
+          role="dialog"
+          aria-label="Menu"
+          tabIndex={-1}
+          ref={(el) => {
+            panels.current.menu = el
+          }}
+          inert={panel !== 'menu'}
+          className={`right-0 ${phonePanelClass} ${panel === 'menu' ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+          <div className="flex shrink-0 items-center justify-between gap-4 px-5 pt-4 pb-2">
+            <p className="text-xs font-bold tracking-[0.14em] text-content-disabled uppercase">Menu</p>
+            <button type="button" onClick={close} aria-label="Tutup menu" className={phoneCloseClass}>
+              <Close className="size-4.5" aria-hidden="true" />
+            </button>
+          </div>
+          <div
+            ref={(el) => {
+              bodies.current.menu = el
+            }}
+            className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-3 pt-2 pb-6"
+          >
+            <ul className="space-y-0.5">
+              {phoneNavbar.map((link) => {
+                const current = link === 'Components'
+                return (
+                  <li key={link}>
+                    <button
+                      type="button"
+                      onClick={close}
+                      aria-current={current ? 'page' : undefined}
+                      className={`${phoneItemClass} ${current ? 'text-brand' : 'text-content hover:bg-surface-subtle'}`}
+                    >
+                      {link}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+
+            <div className="mt-3 border-t border-border pt-3">
+              <button
+                type="button"
+                onClick={() => setDaftarIsi((v) => !v)}
+                aria-expanded={daftarIsi}
+                className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-[11px] leading-4 font-bold tracking-[0.14em] text-content-disabled uppercase transition-colors hover:text-content focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
+              >
+                On this page
+                <ChevronDown
+                  className={`size-4 shrink-0 transition-transform duration-200 ${daftarIsi ? 'rotate-180' : ''}`}
+                  aria-hidden="true"
+                />
+              </button>
+              {/*
+                Entri memakai ukuran mobile (14px, baris 40px) seperti daftar di
+                Drawer kit, walau daftarnya layout list. Klik entri menutup
+                panel; gulirannya tetap diurus TableOfContents.
+              */}
+              <div
+                hidden={!daftarIsi}
+                onClick={(e) => {
+                  if ((e.target as HTMLElement).closest('li')) close()
+                }}
+                className="mt-2 px-3 [&_li>*]:py-2.5! [&_li>*]:text-sm!"
+              >
+                {toc}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /** Demo tidak boleh berpindah halaman; kliknya hanya memindahkan sorotan. */
 function useDemo() {
   const [active, setActive] = useState(contoh[0].id)
@@ -365,12 +624,18 @@ function useDemo() {
 }
 
 export function TableOfContentsPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const dasar = useDemo()
   const wadah = useRef<HTMLDivElement>(null)
   const deskScroll = useRef<HTMLDivElement>(null)
   const mobileScroll = useRef<HTMLDivElement>(null)
   const [aktifPanjang, setAktifPanjang] = useState(daftarPanjang[18].id)
-  const [tema, setTema] = useState<'light' | 'dark'>('light')
+  // Mode Playground mulai dari mode docs; kontrol Tampilan memakai 'light' | 'dark'.
+  const [pgDark, setPgDark] = usePlaygroundDark()
+  const tema = pgDark ? 'dark' : 'light'
+  const setTema = (value: 'light' | 'dark') => setPgDark(value === 'dark')
   const [judul, setJudul] = useState(true)
   const [anchor, setAnchor] = useState(true)
   const [tampilan, setTampilan] = useState<'list' | 'drawer'>('list')
@@ -381,7 +646,7 @@ export function TableOfContentsPage() {
       eyebrow="Components"
       title="Table of Contents"
       description="Daftar isi “On this page” untuk halaman panjang. Menyorot bagian yang sedang dibaca secara otomatis."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="tampilan-dasar" title="Tampilan dasar">
         <Lead>
@@ -390,11 +655,13 @@ export function TableOfContentsPage() {
           halaman ikut ditandai. Di layar di bawah 1024px daftar ini berubah jadi tombol yang membuka
           Drawer dari kanan; lihat bagian Platform.
         </Lead>
-        <PagePreview demo={dasar} />
+        <PagePreview demo={dasar} dark={docsDark} />
         <div className="mt-4">
           <CodeBlock>
             {"import { TableOfContents } from '@ceplok-ui/design-kit-react'\n\n"}
-            {"<TableOfContents\n  className=\"sticky top-10\"\n  items={[\n    { id: 'dasar', label: 'Tampilan dasar' },\n    { id: 'variasi', label: 'Variasi' },\n  ]}\n/>"}
+            {"<TableOfContents\n  className=\"sticky top-10\"\n  items={[\n    { id: 'dasar', label: 'Tampilan dasar' },\n    { id: 'variasi', label: 'Variasi' },\n  ]}\n"}
+            {docsDark && '  darkMode\n'}
+            {'/>'}
           </CodeBlock>
         </div>
       </FlowSection>
@@ -406,23 +673,30 @@ export function TableOfContentsPage() {
           supaya mudah disentuh. Dengan <Hl>layout</Hl> bawaan (<Hl>auto</Hl>) peralihannya terjadi
           sendiri di 1024px.
         </Lead>
-        <PlatformPair />
+        <PlatformPair dark={docsDark} />
         <SectionCode>
-          {'<TableOfContents items={items} />                 // auto: 12px di desktop, Drawer 14px di mobile\n'}
-          {'<TableOfContents items={items} '}
+          {`<TableOfContents items={items}${dm.inline} />                 // auto: 12px di desktop, Drawer 14px di mobile\n`}
+          {`<TableOfContents items={items}${dm.inline} `}
           <H>layout</H>
           {'="list" />   // selalu daftar\n'}
-          {'<TableOfContents items={items} '}
+          {`<TableOfContents items={items}${dm.inline} `}
           <H>layout</H>
           {'="drawer" /> // selalu Drawer'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Hanya palet warnanya yang berubah: latar jadi gray-800, teks dan garis ikut token semantik.
-          Pakai <Hl>darkMode</Hl>, atau letakkan di dalam pembungkus <Hl>data-theme=&quot;dark&quot;</Hl>.
-        </Lead>
+      {/* stayDark: bagian ini selalu memperagakan darkMode, di mode docs apa pun. */}
+      <ModeSection
+        name="Table of Contents"
+        stayDark
+        lead={
+          <>
+            Hanya palet warnanya yang berubah: latar jadi gray-800 lewat token{' '}
+            <Hl>--color-toc-surface</Hl>, teks dan garis ikut token semantik. Pakai <Hl>darkMode</Hl>,
+            atau letakkan di dalam pembungkus <Hl>data-theme=&quot;dark&quot;</Hl>.
+          </>
+        }
+      >
         <PlatformPair dark />
         <div className="mt-4">
           <CodeBlock>
@@ -431,7 +705,7 @@ export function TableOfContentsPage() {
             {' items={items} />'}
           </CodeBlock>
         </div>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="scrollable" title="Scrollable">
         <Lead>
@@ -439,7 +713,11 @@ export function TableOfContentsPage() {
           <Hl>scrollContainer</Hl>. Gulir panel di bawah: sorotan ikut berpindah, dan klik entri
           menggulir panelnya.
         </Lead>
-        <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-border bg-surface-subtle p-4 sm:flex-row sm:gap-6 sm:p-6">
+        {/* Isi panel memakai token semantik, jadi `data-theme` cukup untuk menggelapkannya. */}
+        <div
+          data-theme={docsDark ? 'dark' : undefined}
+          className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-border bg-surface-subtle p-4 sm:flex-row sm:gap-6 sm:p-6"
+        >
           {/* Di layar sempit daftarnya berupa tombol Drawer di atas panel. */}
           <TableOfContents
             className="bg-transparent sm:hidden"
@@ -451,17 +729,17 @@ export function TableOfContentsPage() {
           />
           <div
             ref={wadah}
-            className="h-80 min-w-0 flex-1 space-y-8 overflow-y-auto rounded-xl border border-border bg-white p-6"
+            className="h-80 min-w-0 flex-1 space-y-8 overflow-y-auto rounded-xl border border-border bg-surface p-6"
           >
             {bagianGulir.map((b) => (
               <section key={b.id} id={b.id}>
-                <h3 className="text-heading-4 font-black text-gray-900">{b.label}</h3>
-                <p className="mt-2 text-body-sm leading-6 text-gray-500">
+                <h3 className="text-heading-4 font-black text-content">{b.label}</h3>
+                <p className="mt-2 text-body-sm leading-6 text-content-subtle">
                   Contoh isi bagian {b.label}. Paragraf ini sengaja dibuat cukup panjang supaya
                   panelnya bisa digulir dan perpindahan sorotan di daftar isi terlihat jelas saat
                   menggulir ke bawah maupun ke atas.
                 </p>
-                <div className="mt-3 h-24 rounded-lg bg-gray-50" />
+                <div className="mt-3 h-24 rounded-lg bg-surface-subtle" />
               </section>
             ))}
           </div>
@@ -473,24 +751,24 @@ export function TableOfContentsPage() {
           />
         </div>
 
-        <h3 className="mt-8 text-sm font-black text-gray-900">Daftar panjang</h3>
-        <p className="mt-1 mb-3 max-w-2xl text-body-sm text-gray-500">
+        <h3 className="mt-8 text-sm font-black text-gray-900 dark:text-white">Daftar panjang</h3>
+        <p className="mt-1 mb-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Dengan <Hl>maxHeight</Hl>, daftar yang panjang bisa digulir sendiri dan entri aktif tetap
           terlihat. Contoh ini menyorot Bagian 19; klik entri lain dan judul isi halaman ikut
           berganti. Di layar sempit daftarnya menjadi tombol yang membuka Drawer.
         </p>
-        <LongListPreview activeId={aktifPanjang} onSelect={setAktifPanjang} />
+        <LongListPreview activeId={aktifPanjang} onSelect={setAktifPanjang} dark={docsDark} />
 
         <div className="mt-4">
           <CodeBlock>
             {'const panel = useRef<HTMLDivElement>(null)\n\n'}
             {'<div ref={panel} className="h-80 overflow-y-auto">…</div>\n'}
-            {'<TableOfContents items={items} '}
+            {`<TableOfContents items={items}${dm.inline} `}
             <H>scrollContainer</H>
             {'={panel} '}
             <H>offset</H>
             {'={24} />\n\n'}
-            {'<TableOfContents items={items} '}
+            {`<TableOfContents items={items}${dm.inline} `}
             <H>maxHeight</H>
             {"=\"calc(100vh - 8rem)\" />"}
           </CodeBlock>
@@ -501,15 +779,16 @@ export function TableOfContentsPage() {
         <Lead>
           Satu daftar isi yang bisa Anda utak-atik lewat kontrol di bawahnya; bagian Penggunaan
           menuliskan kodenya. Isi bingkai berupa bagian yang bisa digulir: klik entri untuk melompat,
-          atau gulir isinya dan lihat sorotan ikut berpindah. Di platform Mobile, ketuk tombolnya
-          untuk membuka Drawer.
+          atau gulir isinya dan lihat sorotan ikut berpindah. Di platform Mobile, ikon kiri navbar
+          membuka menu sidebar, dan ikon kanan membuka menu navbar dengan daftar isi yang bisa dilipat
+          di bawahnya.
         </Lead>
 
         {/*
           Stage yang menganimasikan lebar (desktop ke ponsel), sama seperti
           playground lain. Bingkai di dalamnya diberi data-theme supaya token
-          isinya ikut Tampilan, dan `relative` supaya Drawer muncul di sini
-          berkat drawerContained.
+          isinya ikut Tampilan, dan `relative` supaya panel menu ponsel muncul
+          di sini.
         */}
         <Stage maxWidth={mobile ? 'max-w-[360px]' : 'max-w-full'} dark={tema === 'dark'}>
           <div
@@ -522,13 +801,18 @@ export function TableOfContentsPage() {
               Dua lapis bertumpuk yang saling memudar; lapis yang tersembunyi
               diberi `inert` supaya tidak bisa difokus.
             */}
-            <div className={layer(!mobile)} inert={mobile}>
-              <div className="flex h-full gap-8 pl-6">
+            {/*
+              Platform Desktop tetap selebar desktop (min 640px) walau layarnya
+              sempit: bingkai bisa digeser ke kanan untuk melihat daftar isinya,
+              jadi terbayang rupanya di desktop.
+            */}
+            <div className={`${layer(!mobile)} overflow-x-auto overscroll-x-contain`} inert={mobile}>
+              <div className="flex h-full min-w-[640px] gap-8 pl-6">
                 <div ref={deskScroll} className="min-w-0 flex-1 overflow-y-auto py-6 pr-2">
                   <AnchoredSections items={itemsDesktop} scrollRef={deskScroll} anchors={anchor} />
                 </div>
                 <TableOfContents
-                  className="hidden shrink-0 pt-6 pr-6 sm:block"
+                  className="shrink-0 pt-6 pr-6"
                   items={itemsDesktop}
                   layout="list"
                   title={judul ? undefined : null}
@@ -540,26 +824,27 @@ export function TableOfContentsPage() {
             </div>
             <div className={layer(mobile)} inert={!mobile}>
               {/*
-                Tombol daftar isi di luar area gulir, bukan sticky: elemen
-                sticky menjadi containing block, sehingga panel Drawer akan
-                terkurung di tombolnya, bukan memenuhi bingkai ponsel.
+                Daftar isinya layout `list` tanpa judul, karena judulnya sudah
+                menjadi tombol lipat di menu navbar.
               */}
-              <div className="flex h-full flex-col">
-                <div className="shrink-0 border-b border-border p-4">
+              <TocPhone
+                toc={
                   <TableOfContents
+                    // `!`: cn tidak menggabungkan kelas, jadi w-52 dan latar bawaan perlu dikalahkan.
+                    className="w-full! bg-transparent!"
                     items={itemsMobile}
-                    layout="drawer"
-                    drawerContained
-                    title={judul ? undefined : null}
+                    layout="list"
+                    title={null}
                     scrollContainer={mobileScroll}
                     anchor={anchor}
                     offset={16}
                   />
-                </div>
-                <div ref={mobileScroll} className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+                }
+              >
+                <div ref={mobileScroll} className="min-h-0 flex-1 overflow-y-auto p-4">
                   <AnchoredSections items={itemsMobile} scrollRef={mobileScroll} anchors={anchor} />
                 </div>
-              </div>
+              </TocPhone>
             </div>
           </div>
         </Stage>
@@ -589,7 +874,14 @@ export function TableOfContentsPage() {
           </Control>
 
           <Control label="Judul">
-            <Segmented label="Tampilkan judul" value={judul} onChange={setJudul} options={adaTidakAda} />
+            {/* Di Mobile judul daftar isi sudah menjadi tombol lipat di menu navbar. */}
+            <Segmented
+              label="Tampilkan judul"
+              value={judul}
+              onChange={setJudul}
+              options={adaTidakAda}
+              disabled={mobile}
+            />
           </Control>
 
           <Control label="Anchor">
@@ -607,18 +899,41 @@ export function TableOfContentsPage() {
         <Lead>
           Blok ini mengikuti kontrol di Playground. Prop yang nilainya masih bawaan sengaja tidak
           ditulis. Di aplikasi, <Hl>layout</Hl> cukup dibiarkan <Hl>auto</Hl>: daftar di layar 1024px
-          ke atas, Drawer di bawahnya.
+          ke atas, Drawer di bawahnya. Untuk pola Mobile di Playground, daftar isinya diletakkan
+          sendiri di menu navbar.
         </Lead>
+        {mobile ? (
+          <SectionCode flush>
+            {"import { TableOfContents } from '@ceplok-ui/design-kit-react'\n\n"}
+            {'<Drawer open={menu} onClose={() => setMenu(false)} position="right" size="s">\n'}
+            {'  <nav>…tautan navbar…</nav>\n'}
+            {'  <button type="button" onClick={() => setBuka(!buka)}>On this page</button>\n'}
+            {'  {buka && (\n    <TableOfContents\n      '}
+            <H>items</H>
+            {'={items}\n      '}
+            <H>layout</H>
+            {'="list"\n      '}
+            <H>title</H>
+            {'={null}'}
+            {tema === 'dark' && (
+              <>
+                {'\n      '}
+                <H>darkMode</H>
+              </>
+            )}
+            {!anchor && (
+              <>
+                {'\n      '}
+                <H>anchor</H>
+                {'={false}'}
+              </>
+            )}
+            {'\n      onItemClick={() => setMenu(false)}\n    />\n  )}\n</Drawer>'}
+          </SectionCode>
+        ) : (
         <SectionCode flush>
           {"import { TableOfContents } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<TableOfContents\n  items={items}\n  className="sticky top-10"'}
-          {mobile && (
-            <>
-              {'\n  '}
-              <H>layout</H>
-              {'="drawer"'}
-            </>
-          )}
           {tema === 'dark' && (
             <>
               {'\n  '}
@@ -641,15 +956,16 @@ export function TableOfContentsPage() {
           )}
           {'\n/>'}
         </SectionCode>
+        )}
 
-        <h3 className="mt-8 text-sm font-black text-gray-900">Menempel dan offset</h3>
-        <p className="mt-1 mb-3 max-w-2xl text-body-sm text-gray-500">
+        <h3 className="mt-8 text-sm font-black text-gray-900 dark:text-white">Menempel dan offset</h3>
+        <p className="mt-1 mb-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Komponen ini tidak menempel sendiri; beri <Hl>sticky top-*</Hl> lewat className. Beri
           bagian yang dituju <Hl>scroll-mt-*</Hl> supaya judulnya tidak tertutup navbar. Untuk router
           hash, bentuk alamatnya lewat <Hl>getHref</Hl>.
         </p>
         <SectionCode flush>
-          {'<TableOfContents\n  items={items}\n  className="sticky top-10"\n  '}
+          {`<TableOfContents\n  items={items}\n  className="sticky top-10"\n${docsDark ? '  darkMode\n' : ''}  `}
           <H>offset</H>
           {'={80} // tinggi navbar\n  '}
           <H>getHref</H>

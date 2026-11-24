@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Upload, type UploadApplication, type UploadPlatform, type UploadType } from '../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -7,6 +8,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -45,20 +47,25 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc, true)
+
 export function UploadPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [application, setApplication] = useState<UploadApplication>('default')
   const [platform, setPlatform] = useState<UploadPlatform>('default')
   const [type, setType] = useState<UploadType>('default')
   const [withLabel, setWithLabel] = useState(true)
   const [withHelper, setWithHelper] = useState(true)
-  const [theme, setTheme] = useState('light')
+  const [dark, setDark] = usePlaygroundDark()
 
   return (
     <UsulanPage
       eyebrow="Form"
       title="Upload Form"
       description="Pemilih berkas dalam dua bentuk: satu baris tombol dengan nama berkas di sampingnya, atau area seret-lepas yang mengambil ruang lebih besar. Keduanya membungkus input berkas bawaan, jadi dialog, penyaringan accept, dan pengiriman formulir bekerja apa adanya."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="upload-form" title="Upload Form">
         <Lead>
@@ -67,7 +74,7 @@ export function UploadPage() {
           salah satu isian di antara isian lain dan tidak perlu menonjol.
         </Lead>
         <Demo label="Default">
-          <Upload label="Unggah dokumen" helperText="PDF atau JPG, maksimal 2 MB." />
+          <Upload label="Unggah dokumen" helperText="PDF atau JPG, maksimal 2 MB." darkMode={docsDark} />
         </Demo>
         <SectionCode>
           {"import { Upload } from '@ceplok-ui/design-kit-react'\n\n"}
@@ -76,9 +83,10 @@ export function UploadPage() {
           {'    helperText="PDF atau JPG, maksimal 2 MB."\n'}
           {'    name="dokumen"\n'}
           {'    accept="application/pdf,image/jpeg"\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Yang dibungkus komponen ini <Hl>&lt;input type="file"&gt;</Hl> sungguhan — ia hanya
           disembunyikan secara visual, bukan diganti tombol tiruan. Cukup beri <Hl>name</Hl> seperti
           isian lain lalu kirim formulirnya seperti biasa; <Hl>onFilesChange</Hl> baru diperlukan kalau
@@ -94,7 +102,7 @@ export function UploadPage() {
         </Lead>
         <div className="grid gap-5">
           <Demo label="Default — 44px">
-            <Upload label="Unggah dokumen" helperText="PDF atau JPG, maksimal 2 MB." />
+            <Upload label="Unggah dokumen" helperText="PDF atau JPG, maksimal 2 MB." darkMode={docsDark} />
           </Demo>
           <Demo label="Mobile — 40px">
             <div className="max-w-[382px]">
@@ -102,6 +110,7 @@ export function UploadPage() {
                 platform="mobile"
                 label="Unggah dokumen"
                 helperText="PDF atau JPG, maksimal 2 MB."
+                darkMode={docsDark}
               />
             </div>
           </Demo>
@@ -109,7 +118,9 @@ export function UploadPage() {
         <SectionCode>
           {'<Upload '}
           <H>platform</H>
-          {'="mobile" label="Unggah dokumen" />'}
+          {'="mobile" label="Unggah dokumen"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -123,12 +134,12 @@ export function UploadPage() {
         <div className="grid gap-5">
           <Demo label="Default — 538px">
             <div className="max-w-[538px]">
-              <Upload type="attach" />
+              <Upload type="attach" darkMode={docsDark} />
             </div>
           </Demo>
           <Demo label="Mobile — 382px">
             <div className="max-w-[382px]">
-              <Upload type="attach" platform="mobile" />
+              <Upload type="attach" platform="mobile" darkMode={docsDark} />
             </div>
           </Demo>
         </div>
@@ -140,15 +151,16 @@ export function UploadPage() {
           {'    accept="image/png,image/jpeg"\n'}
           {'    attachLabel="Klik untuk memilih atau seret berkas ke sini"\n'}
           {'    attachHint="PNG atau JPG, maksimal 2 MB"\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Isi kotaknya sama persis di kedua platform — ikon 20px, ajakan 14px, keterangan format 12px.
           Yang berbeda hanya lebarnya, dan lebar itu datang dari wadahnya: komponen ini selebar ruang
           yang Anda beri, sama seperti isian form lain. Kedua demo di atas hanya membatasi wadahnya di
           538px dan 382px.
         </p>
-        <p className="mt-3 text-body-sm text-gray-500">
+        <p className="mt-3 text-body-sm text-gray-500 dark:text-gray-400">
           Berkas yang dijatuhkan dititipkan ke input aslinya, bukan sekadar disimpan di state, jadi ia
           ikut terkirim saat formulirnya di-submit. Begitu ada berkas terpilih, namanya menggantikan
           baris ajakan supaya jelas bahwa areanya sudah terpakai. Dua baris teks di dalamnya bisa
@@ -177,9 +189,10 @@ export function UploadPage() {
                     application={a.value}
                     label="Unggah dokumen"
                     helperText={`bg-${a.token}`}
+                    darkMode={docsDark}
                   />
                 </div>
-                <Upload type="attach" application={a.value} />
+                <Upload type="attach" application={a.value} darkMode={docsDark} />
               </div>
             </Demo>
           ))}
@@ -187,9 +200,11 @@ export function UploadPage() {
         <SectionCode>
           {'<Upload '}
           <H>application</H>
-          {'="purple" label="Unggah dokumen" />'}
+          {'="purple" label="Unggah dokumen"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Kedua kotak attach di atas memang terlihat sama persis, dan itu bukan kekeliruan: dalam
           keadaan diam bentuk ini tidak punya satu pun elemen berwarna aksen. Warnanya baru muncul
           saat berkas ditahan di atas areanya — garis dan latarnya menyala mengikuti aplikasi yang
@@ -197,10 +212,15 @@ export function UploadPage() {
         </p>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual. Komponen secara otomatis menyesuaikan warna latar, batas, dan teks.
-        </Lead>
+      <ModeSection
+        name="Upload"
+        stayDark
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> dapat digunakan untuk mengaktifkan warna gelap secara manual. Komponen secara otomatis menyesuaikan warna latar, batas, dan teks.
+          </>
+        }
+      >
         <div className="grid gap-5">
           <Demo label="Upload" dark>
             <Upload label="Upload File" helperText="PDF atau JPG, maksimal 2 MB." darkMode />
@@ -221,11 +241,13 @@ export function UploadPage() {
           {'="PDF atau JPG, maksimal 2 MB."\n'}
           {'    '}
           <H>darkMode</H>
-          {'\n/>\n\n<Upload type="attach" '}
+          {'\n'}
+          {'/>\n\n<Upload type="attach"'}
+          {' '}
           <H>darkMode</H>
           {' />'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -233,26 +255,26 @@ export function UploadPage() {
           satu ke area attach, untuk melihat namanya muncul.
         </Lead>
 
-        <Stage dark={theme === 'dark'} maxWidth={platform === 'mobile' ? 'max-w-[382px]' : 'max-w-[538px]'}>
+        <Stage dark={dark} maxWidth={platform === 'mobile' ? 'max-w-[382px]' : 'max-w-[538px]'}>
           <Upload
             type={type}
             platform={platform}
             application={application}
             label={withLabel ? 'Unggah dokumen' : undefined}
             helperText={withHelper ? 'PDF atau JPG, maksimal 2 MB.' : undefined}
-            darkMode={theme === 'dark'}
+            darkMode={dark}
           />
         </Stage>
 
         <Controls>
-          <Control label="Mode">
+          <Control label="Tampilan">
             <Segmented
               label="Pilih mode"
-              value={theme}
-              onChange={(v) => setTheme(v as string)}
+              value={dark}
+              onChange={setDark}
               options={[
-                { value: 'light', label: 'Light' },
-                { value: 'dark', label: 'Dark' },
+                { value: false, label: 'Light' },
+                { value: true, label: 'Dark' },
               ]}
             />
           </Control>
@@ -312,7 +334,7 @@ export function UploadPage() {
           </Control>
         </Controls>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Pada bentuk Attach, <em>Platform</em> hanya menyempitkan wadah pratinjaunya dan{' '}
           <em>Application</em> baru terlihat saat berkas diseret ke atas kotak — isi kotaknya sendiri
           tidak berubah.
@@ -363,7 +385,7 @@ export function UploadPage() {
               {'="PDF atau JPG, maksimal 2 MB."\n'}
             </>
           )}
-          {theme === 'dark' && (
+          {dark && (
             <>
               {'    '}
               <H>darkMode</H>

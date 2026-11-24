@@ -1,14 +1,14 @@
 import { Fragment, useState, type ReactNode } from 'react'
-import { Close } from 'flowbite-react-icons/outline'
-import { ExclamationCircle } from '../../../lib/icons/solid'
-import { Button, Icon, Modal, type ModalSize, type ModalVariant } from '../../../lib'
+import { Button, Modal, type ModalSize, type ModalVariant } from '../../../lib'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { H, Hl, Mark, Segmented } from '../../pageKit'
+import { tocForDarkDocs, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import {
   Control,
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -34,13 +34,6 @@ type ModalDismissal = {
   closeOnEscape: boolean
   showCloseButton: boolean
 }
-
-// Consumer-owned Popup content follows the ambient theme; danger colors follow the reference.
-const popupCancelClass = 'border-[light-dark(var(--color-gray-500),var(--color-gray-50))]! text-[light-dark(var(--color-gray-500),var(--color-gray-50))]! bg-transparent hover:bg-[light-dark(var(--color-gray-100),var(--color-surface-subtle))]! hover:text-[light-dark(var(--color-gray-700),var(--color-content))]!'
-// Button has no danger theme. Explicit utility overrides are local to this action;
-// darker red steps keep white text readable, including in the ambient Dark theme.
-const popupDangerClass = 'bg-[light-dark(var(--color-orange-600),var(--color-red-700))]! text-white! font-sans font-semibold! leading-[1.5] enabled:hover:bg-red-800! enabled:active:bg-red-900! focus:ring-[light-dark(var(--color-red-700),var(--color-red-300))]! focus-visible:ring-offset-2 focus-visible:ring-offset-surface'
-const popupIconClass = 'size-12! shrink-0 text-feedback-error'
 
 const examples: { value: ModalExample; label: string }[] = [
   { value: 'basic', label: 'Dasar' },
@@ -92,36 +85,55 @@ function renderModalExampleCode({
   size,
   dismissal,
   theme,
+  highlightDarkMode = false,
+  highlightTitle = true,
+  highlightPlayground = false,
 }: {
   theme: 'light' | 'dark'
   variant: ModalVariant
   example: ModalExample
   size: ModalSize
   dismissal: ModalDismissal
+  highlightDarkMode?: boolean
+  highlightTitle?: boolean
+  highlightPlayground?: boolean
 }) {
+  const Highlight = highlightPlayground ? Mark : H
   const dismissalCode = Object.entries(dismissal)
     .filter(([, enabled]) => !enabled)
     .map(([prop]) => (
       <Fragment key={prop}>
         {'\n  '}
-        <H>{prop}</H>
+        <Highlight>{prop}</Highlight>
         {'={false}'}
       </Fragment>
     ))
   const judul = example === 'long' ? 'Ketentuan Layanan' : 'Terms of Service'
+  const buttonDarkModeProp = theme === 'dark' ? <> <Highlight>darkMode</Highlight></> : null
+  const modalDarkModeProp =
+    theme === 'dark' && (highlightDarkMode || highlightPlayground)
+      ? <> <Highlight>darkMode</Highlight></>
+      : theme === 'dark'
+        ? ' darkMode'
+        : null
 
   if (variant === 'popup') {
     return (
       <>
-        {"import { Button, Icon, Modal } from '@ceplok-ui/design-kit-react'\n"}
-        {"import { ExclamationCircle } from '@ceplok-ui/design-kit-react/icons/solid'\n"}
-        {'\n<div '}<Mark>data-theme</Mark>{`="${theme}">\n<Modal\n  trigger={<Button>Buka Modal</Button>}`}
+        {"import { Button, Modal } from '@ceplok-ui/design-kit-react'\n"}
+        {'\n<Modal'}
+        {modalDarkModeProp}
+        {'\n  trigger={<Button'}
+        {buttonDarkModeProp}
+        {'>Buka Modal</Button>}'}
         {dismissalCode}
         {'\n  '}
-        <H>variant</H>
+        <Highlight>variant</Highlight>
         {'="popup"\n  '}
         <H>aria-label</H>
-        {`="Konfirmasi hapus konten"\n  footer={({ close }) => (\n    <div className="flex w-full flex-wrap justify-center gap-4">\n      <Button variant="outline" theme="gray" size="xs" className="${popupCancelClass}" onClick={close}>\n        Tidak, Batalkan\n      </Button>\n      <Button size="xs" className="${popupDangerClass}" onClick={close}>\n        Ya, hapus konten ini\n      </Button>\n    </div>\n  )}\n>\n  <div className="text-center">\n    <div className="flex justify-center">\n      <Icon className="${popupIconClass}"><ExclamationCircle viewBox="2 2 20 20" /></Icon>\n    </div>\n    <p className="mx-auto mt-4 max-w-xs text-body font-medium text-content-subtle">\n      Apakah anda yakin ingin menghapus konten ini?\n    </p>\n  </div>\n</Modal>\n</div>`}
+        {'="Konfirmasi hapus konten"\n  '}
+        <Highlight>actions</Highlight>
+        {`={{\n    secondary: { label: 'Tidak, Batalkan', onClick: ({ close }) => close() },\n    danger: { label: 'Ya, hapus konten ini', onClick: ({ close }) => close() },\n  }}\n>\n  <p className="mx-auto max-w-xs text-center text-body font-medium text-content-subtle">\n    Apakah anda yakin ingin menghapus konten ini?\n  </p>\n        </Modal>`}
       </>
     )
   }
@@ -129,31 +141,56 @@ function renderModalExampleCode({
   return (
     <>
       {"import { Button, Modal } from '@ceplok-ui/design-kit-react'\n"}
-      {'\n<div '}<Mark>data-theme</Mark>{`="${theme}">\n<Modal\n  trigger={<Button>Buka Modal</Button>}`}
+      {'\n<Modal'}
+      {modalDarkModeProp}
+      {'\n  trigger={<Button'}
+      {buttonDarkModeProp}
+      {'>Buka Modal</Button>}'}
       {dismissalCode}
-      {size === 'm' && (
+      {highlightPlayground && (
         <>
           {'\n  '}
-          <H>size</H>
-          {'="m"'}
+          <Highlight>variant</Highlight>
+          {'="default"'}
         </>
       )}
-      {'\n  '}<Mark>title</Mark>{`="${judul}"\n  footer={({ close }) => <Button size="xs" className="ml-auto" onClick={close}>${
-        example === 'long' ? 'Saya mengerti' : 'Ya, saya setuju'
-      }</Button>}\n>\n`}
+      {(size === 'm' || highlightPlayground) && (
+        <>
+          {'\n  '}
+          <Highlight>size</Highlight>
+          {`="${size}"`}
+        </>
+      )}
+      {'\n  '}{highlightTitle ? <Mark>title</Mark> : 'title'}{`="${judul}"\n  `}
+      <Highlight>actions</Highlight>
+      {`={{\n    primary: { label: '${example === 'long' ? 'Saya mengerti' : 'Ya, saya setuju'}', onClick: ({ close }) => close() },\n  }}\n>\n`}
       {example === 'image' ? (
         <>
           {'  <'}
           <H>img</H>
-          {'\n    src="/images/ceplok.svg"\n    alt="Ilustrasi motif Ceplok"\n    className="aspect-[600/437] w-full rounded-lg object-cover"\n  />'}
-          {`\n  <div className="mt-5 space-y-4">\n    <p>${ceplokCopy[0]}</p>\n    <p>${ceplokCopy[1]}</p>\n  </div>\n</Modal>`}
+          {'\n    '}
+          <H>src</H>
+          {'="/images/ceplok.svg"\n    '}
+          <H>alt</H>
+          {'="Ilustrasi motif Ceplok"\n    '}
+          <H>className</H>
+          {'="aspect-[600/437] w-full rounded-lg object-cover"\n  />\n  <div '}
+          <H>className</H>
+          {`="mt-5 space-y-4">\n    <p>${ceplokCopy[0]}</p>\n    <p>${ceplokCopy[1]}</p>\n  </div>\n</Modal>`}
         </>
       ) : example === 'long' ? (
-        `  <div className="space-y-5">\n${longContent.map((paragraph) => `    <p>${paragraph}</p>`).join('\n')}\n  </div>\n</Modal>`
+        <>
+          {'  <div '}
+          <H>className</H>
+          {`="space-y-5">\n${longContent.map((paragraph) => `    <p>${paragraph}</p>`).join('\n')}\n  </div>\n</Modal>`}
+        </>
       ) : (
-        `  <div className="space-y-4">\n    <p>${ceplokCopy[0]}</p>\n    <p>${ceplokCopy[1]}</p>\n  </div>\n</Modal>`
+        <>
+          {'  <div '}
+          <H>className</H>
+          {`="space-y-4">\n    <p>${ceplokCopy[0]}</p>\n    <p>${ceplokCopy[1]}</p>\n  </div>\n</Modal>`}
+        </>
       )}
-      {'\n</div>'}
     </>
   )
 }
@@ -162,18 +199,30 @@ function renderNestedModalExampleCode({
   theme,
   size,
   dismissal,
+  highlightDarkMode = false,
+  highlightPlayground = false,
 }: {
   theme: 'light' | 'dark'
   size: ModalSize
   dismissal: ModalDismissal
+  highlightDarkMode?: boolean
+  highlightPlayground?: boolean
 }) {
+  const Highlight = highlightPlayground ? Mark : H
+  const buttonDarkModeProp = theme === 'dark' ? <> <Highlight>darkMode</Highlight></> : null
+  const modalDarkModeProp =
+    theme === 'dark' && (highlightDarkMode || highlightPlayground)
+      ? <> <Highlight>darkMode</Highlight></>
+      : theme === 'dark'
+        ? ' darkMode'
+        : null
   const dismissalCode = (keyPrefix: string) =>
     Object.entries(dismissal)
       .filter(([, enabled]) => !enabled)
       .map(([prop]) => (
         <Fragment key={`${keyPrefix}-${prop}`}>
           {'\n  '}
-          <H>{prop}</H>
+          <Highlight>{prop}</Highlight>
           {'={false}'}
         </Fragment>
       ))
@@ -182,32 +231,36 @@ function renderNestedModalExampleCode({
     <>
       {"import { useState } from 'react'\n"}
       {"import { Button, Modal } from '@ceplok-ui/design-kit-react'\n\n"}
-      {'export function NestedModalExample() {\n  const [defaultOpen, setDefaultOpen] = useState(false)\n  const [popupOpen, setPopupOpen] = useState(false)\n\n  return (\n    <div '}
-      <Mark>data-theme</Mark>
-      {`="${theme}">\n      <Button onClick={() => setDefaultOpen(true)}>Buka Modal Bertingkat</Button>\n\n      <Modal\n  `}
-      <H>open</H>
+      {'export function NestedModalExample() {\n  const [defaultOpen, setDefaultOpen] = useState(false)\n  const [popupOpen, setPopupOpen] = useState(false)\n\n  return (\n'}
+      {'    <div>\n      <Button'}
+      {buttonDarkModeProp}
+      {' onClick={() => setDefaultOpen(true)}>Buka Modal Bertingkat</Button>\n\n      <Modal'}
+      {modalDarkModeProp}
+      {'\n  '}
+      <Highlight>open</Highlight>
       {'={defaultOpen}\n  '}
-      <H>onOpenChange</H>
+      <Highlight>onOpenChange</Highlight>
       {'={(nextOpen) => {\n    setDefaultOpen(nextOpen)\n    if (!nextOpen) setPopupOpen(false)\n  }}'}
       {dismissalCode('default')}
-      {size === 'm' && (
-        <>
-          {'\n  '}
-          <H>size</H>
-          {'="m"'}
-        </>
-      )}
-      {'\n  title="Kelola konten"\n  footer={({ close }) => <Button size="xs" className="ml-auto" onClick={close}>Selesai</Button>}\n>\n  <Button size="xs" onClick={() => setPopupOpen(true)}>Hapus konten</Button>\n</Modal>\n\n<Modal\n  '}
-      <H>open</H>
+      {'\n  '}
+      <Highlight>size</Highlight>
+      {`="${size}"\n  title="Kelola konten"\n  `}
+      <Highlight>actions</Highlight>
+      {'={{ primary: { label: "Selesai", onClick: ({ close }) => close() } }}\n>\n  <div className="space-y-4">\n    <p>Buka konfirmasi untuk menghapus konten tanpa menutup Modal ini.</p>\n    <Button size="xs" onClick={() => setPopupOpen(true)}>Hapus konten</Button>\n  </div>\n</Modal>\n\n<Modal'}
+      {modalDarkModeProp}
+      {'\n  '}
+      <Highlight>open</Highlight>
       {'={popupOpen}\n  '}
-      <H>onOpenChange</H>
+      <Highlight>onOpenChange</Highlight>
       {'={setPopupOpen}'}
       {dismissalCode('popup')}
       {'\n  '}
-      <H>variant</H>
+      <Highlight>variant</Highlight>
       {'="popup"\n  '}
       <H>aria-label</H>
-      {`="Konfirmasi hapus konten"\n  footer={({ close }) => (\n    <div className="flex w-full flex-wrap justify-center gap-4">\n      <Button variant="outline" theme="gray" size="xs" className="${popupCancelClass}" onClick={close}>\n        Tidak, Batalkan\n      </Button>\n      <Button size="xs" className="${popupDangerClass}" onClick={close}>\n        Ya, hapus konten ini\n      </Button>\n    </div>\n  )}\n>\n  <p>Apakah anda yakin ingin menghapus konten ini?</p>\n</Modal>\n    </div>\n  )\n}`}
+      {'="Konfirmasi hapus konten"\n  '}
+      <Highlight>actions</Highlight>
+      {`={{\n    secondary: { label: 'Tidak, Batalkan', onClick: ({ close }) => close() },\n    danger: { label: 'Ya, hapus konten ini', onClick: ({ close }) => close() },\n  }}\n>\n  <p>Apakah anda yakin ingin menghapus konten ini?</p>\n</Modal>\n    </div>\n  )\n}`}
     </>
   )
 }
@@ -217,14 +270,18 @@ const modalProps: PropRow[] = [
   ['open', 'boolean', 'undefined', 'Visibilitas terkontrol. Jika diberikan, nilai ini menjadi sumber kebenaran dan trigger bersifat opsional.'],
   ['onOpenChange', '(open: boolean) => void', 'undefined', 'Dipanggil saat Modal minta dibuka atau ditutup (tombol tutup, Escape, backdrop, atau close di footer).'],
   ['variant', "'default' | 'popup'", "'default'", 'Menentukan struktur Modal. Popup digunakan untuk dialog konfirmasi ringkas.'],
+  ['icon', 'ReactElement | null', 'tanda seru (Popup)', 'Ganti ikon bawaan Popup dengan ReactElement lain, atau gunakan null untuk menyembunyikannya. Hanya tersedia untuk Popup.'],
   ['size', "'s' | 'm'", "'s'", 'Ukuran Default Modal. Tidak tersedia untuk Popup.'],
+  ['data-theme', "'light' | 'dark'", 'undefined', 'Boundary tema eksplisit pada dialog. Meng-override darkMode dan tema pembungkus, serta diteruskan sebagai tema efektif komponen internal.'],
+  ['darkMode', 'boolean', 'undefined', 'Terapkan tema gelap lokal pada dialog dan diwariskan ke Button di dalamnya. data-theme eksplisit menjadi override; trigger milik consumer mengatur temanya sendiri.'],
   ['title', 'ReactNode', 'undefined', 'Judul Default Modal sekaligus nama aksesibel. Tidak tersedia untuk Popup.'],
   ['closeOnBackdrop', 'boolean', 'true', 'Tutup Modal saat klik backdrop. Tidak memengaruhi klik di dalam dialog.'],
   ['closeOnEscape', 'boolean', 'true', 'Tutup Modal saat menekan Escape. Jika false, cancel native dicegah.'],
   ['showCloseButton', 'boolean', 'true', 'Tampilkan tombol X. Jika false, tombol dihapus sepenuhnya.'],
   ['closeLabel', 'string', "'Tutup modal'", 'Nama aksesibel tombol tutup.'],
-  ['footer', 'ReactNode | ({ close }) => ReactNode', 'undefined', 'Area aksi Default dan Popup. Render function menyediakan close untuk penutupan eksplisit; footer Popup tidak memakai divider.'],
-  ['children', 'ReactNode', 'undefined', 'Isi Modal. Pada Popup, icon dan pesan disusun di sini.'],
+  ['actions', 'ModalActions', 'undefined', 'Aksi berperan secondary, primary, atau danger. Modal mengatur tampilan dan urutan; label, handler, dan proses ditentukan consumer.'],
+  ['footer', 'ReactNode | ({ close }) => ReactNode', 'undefined', 'Override penuh untuk footer kustom. Tidak dapat digunakan bersamaan dengan actions; footer Popup tidak memakai divider.'],
+  ['children', 'ReactNode', 'undefined', 'Isi Modal. Untuk Popup, susun pesan di sini; ikon diatur melalui prop icon.'],
   ['className', 'string', 'undefined', 'Class tambahan pada elemen <dialog>.'],
   [
     '…props',
@@ -245,92 +302,74 @@ const toc: TocEntry[] = [
   { id: 'penggunaan', label: 'Penggunaan' },
   { id: 'properties', label: 'Properties' },
 ]
+const tocDark = tocForDarkDocs(toc, true)
 
-function ModalThemeFrame({ label, children }: {
+function ModalThemeFrame({ label, theme, children }: {
   label: string
+  theme: 'light' | 'dark'
   children: ReactNode
 }) {
+  const isDark = theme === 'dark'
   return (
     <div>
-      <p className="mb-2 text-sm font-black text-gray-900">{label}</p>
-      <div data-theme="dark" className="grid min-h-[440px] place-items-center overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 p-4">
+      <p className="mb-2 text-sm font-black text-gray-900 dark:text-white">{label}</p>
+      <div
+        data-theme={theme}
+        className={`grid min-h-[440px] place-items-center overflow-hidden rounded-2xl border p-4 ${
+          isDark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
+        }`}
+      >
         {children}
       </div>
     </div>
   )
 }
 
-function StaticModalCloseButton() {
-  return (
-    <button
-      type="button"
-      onClick={(event) => event.preventDefault()}
-      aria-label="Tutup modal"
-      className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-content-muted transition-colors hover:bg-surface-subtle hover:text-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-    >
-      <Close className="size-4" aria-hidden="true" />
-    </button>
-  )
-}
+function ModalThemeExample({ variant, theme }: { variant: ModalVariant; theme: 'light' | 'dark' }) {
+  const darkMode = theme === 'dark'
 
-function StaticDefaultDarkModal() {
   return (
-    <div className="flex w-full max-w-[416px] flex-col overflow-hidden rounded-lg border border-border-strong bg-surface text-left text-content shadow-xl">
-      <div className="flex shrink-0 items-start justify-between gap-4 border-b border-border-strong px-6 py-5">
-        <h3 className="min-w-0 flex-1 font-alt text-lg leading-[1.5] font-semibold text-content">Terms of Service</h3>
-        <div className="-my-2 -mr-2"><StaticModalCloseButton /></div>
-      </div>
-      <div className="min-h-0 flex-1 px-5 py-6 font-sans text-body font-medium text-content-muted">
+    variant === 'popup' ? (
+      <Modal
+        darkMode={darkMode}
+        trigger={<Button darkMode={darkMode}>Buka Popup</Button>}
+        variant="popup"
+        aria-label="Konfirmasi hapus konten"
+        actions={{
+          secondary: { label: 'Tidak, Batalkan', onClick: ({ close }) => close() },
+          danger: { label: 'Ya, hapus konten ini', onClick: ({ close }) => close() },
+        }}
+      >
+        <p className="mx-auto max-w-xs text-center text-body font-medium text-content-subtle">
+          Apakah anda yakin ingin menghapus konten ini?
+        </p>
+      </Modal>
+    ) : (
+      <Modal
+        darkMode={darkMode}
+        trigger={<Button darkMode={darkMode}>Buka Default</Button>}
+        title="Terms of Service"
+        actions={{ primary: { label: 'Saya Setuju', onClick: ({ close }) => close() } }}
+      >
         <p>{ceplokCopy[0]}</p>
-      </div>
-      <div className="flex shrink-0 flex-wrap items-center gap-3 border-t border-border-strong px-6 py-4">
-        <Button size="xs" className="ml-auto">Saya Setuju</Button>
-      </div>
-    </div>
-  )
-}
-
-function StaticPopupDarkModal() {
-  return (
-    <div className="flex w-full max-w-[416px] flex-col overflow-hidden rounded-lg border border-border-strong bg-gray-600 text-left text-content shadow-xl">
-      <div className="relative h-7 shrink-0 px-5">
-        <div className="absolute right-0.5 top-0.5"><StaticModalCloseButton /></div>
-      </div>
-      <div className="min-h-0 flex-1 px-5 pb-4 pt-5 font-sans text-body font-medium text-content-muted">
-        <div className="text-center">
-          <div className="flex justify-center">
-            <Icon className={popupIconClass}>
-              <ExclamationCircle viewBox="2 2 20 20" />
-            </Icon>
-          </div>
-          <p className="mx-auto mt-4 max-w-xs text-body font-medium text-content-subtle">
-            Apakah anda yakin ingin menghapus konten ini?
-          </p>
-        </div>
-      </div>
-      <div className="flex shrink-0 flex-wrap items-center justify-center gap-4 px-5 pb-5">
-        <Button variant="outline" theme="gray" size="xs" className={popupCancelClass}>Tidak, Batalkan</Button>
-        <Button size="xs" className={popupDangerClass}>Ya, hapus konten ini</Button>
-      </div>
-    </div>
+      </Modal>
+    )
   )
 }
 
 function ControlledModalExample({ theme }: { theme: 'light' | 'dark' }) {
   const [open, setOpen] = useState(false)
+  const darkMode = theme === 'dark'
 
   return (
-    <div data-theme={theme} className="mt-4">
-      <Button onClick={() => setOpen(true)}>Edit data</Button>
+    <div className="mt-4">
+      <Button darkMode={darkMode} onClick={() => setOpen(true)}>Edit data</Button>
       <Modal
+        darkMode={darkMode}
         open={open}
         onOpenChange={setOpen}
         title="Edit data"
-        footer={({ close }) => (
-          <Button size="xs" className="ml-auto" onClick={close}>
-            Simpan
-          </Button>
-        )}
+        actions={{ primary: { label: 'Simpan', onClick: ({ close }) => close() } }}
       >
         <p>Form dan proses penyimpanan tetap dimiliki consumer.</p>
       </Modal>
@@ -351,11 +390,13 @@ function NestedModalExample({
 }) {
   const [defaultOpen, setDefaultOpen] = useState(false)
   const [popupOpen, setPopupOpen] = useState(false)
+  const darkMode = theme === 'dark'
 
   return (
-    <div data-theme={theme} className="mt-4">
-      <Button onClick={() => setDefaultOpen(true)}>{triggerLabel}</Button>
+    <div className="mt-4">
+      <Button darkMode={darkMode} onClick={() => setDefaultOpen(true)}>{triggerLabel}</Button>
       <Modal
+        darkMode={darkMode}
         {...dismissal}
         open={defaultOpen}
         onOpenChange={(nextOpen) => {
@@ -364,7 +405,7 @@ function NestedModalExample({
         }}
         size={size}
         title="Kelola konten"
-        footer={({ close }) => <Button size="xs" className="ml-auto" onClick={close}>Selesai</Button>}
+        actions={{ primary: { label: 'Selesai', onClick: ({ close }) => close() } }}
       >
         <div className="space-y-4">
           <p>Buka konfirmasi untuk menghapus konten tanpa menutup Modal ini.</p>
@@ -374,39 +415,32 @@ function NestedModalExample({
         </div>
       </Modal>
       <Modal
+        darkMode={darkMode}
         {...dismissal}
         open={popupOpen}
         onOpenChange={setPopupOpen}
         variant="popup"
         aria-label="Konfirmasi hapus konten"
-        footer={({ close }) => (
-          <div className="flex w-full flex-wrap justify-center gap-4">
-            <Button variant="outline" theme="gray" size="xs" className={popupCancelClass} onClick={close}>
-              Tidak, Batalkan
-            </Button>
-            <Button size="xs" className={popupDangerClass} onClick={close}>
-              Ya, hapus konten ini
-            </Button>
-          </div>
-        )}
+        actions={{
+          secondary: { label: 'Tidak, Batalkan', onClick: ({ close }) => close() },
+          danger: { label: 'Ya, hapus konten ini', onClick: ({ close }) => close() },
+        }}
       >
-        <div className="text-center">
-          <div className="flex justify-center">
-            <Icon className={popupIconClass}>
-              <ExclamationCircle viewBox="2 2 20 20" />
-            </Icon>
-          </div>
-          <p className="mx-auto mt-4 max-w-xs text-body font-medium text-content-subtle">
-            Apakah anda yakin ingin menghapus konten ini?
-          </p>
-        </div>
+        <p className="mx-auto max-w-xs text-center text-body font-medium text-content-subtle">
+          Apakah anda yakin ingin menghapus konten ini?
+        </p>
       </Modal>
     </div>
   )
 }
 
 export function ModalPage() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const docsDark = useDocsDark()
+  const docsTheme = docsDark ? 'dark' : 'light'
+  const docsDarkModeProp = docsDark ? ' darkMode' : ''
+  const [playgroundDark, setPlaygroundDark] = usePlaygroundDark()
+  const theme = playgroundDark ? 'dark' : 'light'
+  const setTheme = (nextTheme: 'light' | 'dark') => setPlaygroundDark(nextTheme === 'dark')
   const [playgroundVariant, setPlaygroundVariant] = useState<ModalVariant>('default')
   const [playgroundExample, setPlaygroundExample] = useState<ModalExample>('basic')
   const [playgroundSize, setPlaygroundSize] = useState<ModalSize>('s')
@@ -422,7 +456,7 @@ export function ModalPage() {
       eyebrow="Components"
       title="Modal"
       description="Dialog untuk informasi atau tindakan yang perlu diselesaikan sebelum kembali ke halaman utama. Gunakan Default untuk konten umum dan Popup untuk konfirmasi ringkas."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="modal" title="Modal">
         <Lead>
@@ -432,32 +466,29 @@ export function ModalPage() {
 
         <div className="mt-4">
           <Modal
-            trigger={<Button>Buka Default</Button>}
+            darkMode={docsDark}
+            trigger={<Button darkMode={docsDark}>Buka Default</Button>}
             title="Terms of Service"
-            footer={({ close }) => (
-              <div className="flex w-full flex-wrap justify-end gap-3">
-                <Button variant="outline" theme="gray" size="xs" onClick={close}>
-                  Batal
-                </Button>
-                <Button size="xs" onClick={close}>
-                  Saya Setuju
-                </Button>
-              </div>
-            )}
+            actions={{
+              secondary: { label: 'Batal', onClick: ({ close }) => close() },
+              primary: { label: 'Saya Setuju', onClick: ({ close }) => close() },
+            }}
           >
             <p>{ceplokCopy[0]}</p>
           </Modal>
         </div>
 
         <SectionCode>
-          {'<Modal\n  trigger={<Button>Buka Modal</Button>}\n  title="Terms of Service"\n  footer={({ close }) => (\n    <div className="flex w-full flex-wrap justify-end gap-3">\n      <Button variant="outline" theme="gray" size="xs" onClick={close}>Batal</Button>\n      <Button size="xs" onClick={close}>Saya Setuju</Button>\n    </div>\n  )}\n>\n  ...\n</Modal>'}
+          {`<Modal${docsDarkModeProp}\n  trigger={<Button${docsDarkModeProp}>Buka Modal</Button>}\n  `}
+          <H>title</H>
+          {`="Terms of Service"\n  actions={{\n    secondary: { label: 'Batal', onClick: ({ close }) => close() },\n    primary: { label: 'Saya Setuju', onClick: ({ close }) => close() },\n  }}\n>\n  ...\n</Modal>`}
         </SectionCode>
-        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           <Hl>title</Hl> pada Default menjadi judul visual sekaligus nama aksesibel. Untuk Popup
           atau Modal tanpa judul visual yang sesuai, berikan <Hl>aria-label</Hl> atau arahkan{' '}
           <Hl>aria-labelledby</Hl> ke elemen yang memuat namanya.
         </p>
-        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Title Default sudah dirender sebagai <Hl>&lt;h2&gt;</Hl>; jangan membungkus isinya
           dengan heading tambahan hanya untuk membuat judul. Modal tidak otomatis membuat{' '}
           <Hl>aria-describedby</Hl>; berikan atribut tersebut bila diperlukan.
@@ -466,44 +497,42 @@ export function ModalPage() {
 
       <FlowSection id="popup" title="Popup">
         <Lead>
-          Gunakan Popup untuk konfirmasi atau keputusan ringkas. Susun icon dan pesan di dalam
-          children, lalu tempatkan tombol aksi di footer tanpa divider.
+          Gunakan Popup untuk konfirmasi atau keputusan ringkas. Tanda seru tampil secara bawaan;
+          ganti dengan prop <Hl>icon</Hl> atau hilangkan dengan <Hl>icon={'{null}'}</Hl>. Modal
+          mengatur posisi dan jarak ikon; consumer dapat mengganti jenis ikon sekaligus menentukan
+          ukuran dan warnanya. Susun pesan di dalam children dan gunakan <Hl>actions</Hl> untuk
+          tombol standar. Footer Popup tidak memakai divider.
         </Lead>
 
-        <div data-theme="light" className="mt-4">
+        <div className="mt-4">
           <Modal
-            trigger={<Button>Buka Popup</Button>}
+            darkMode={docsDark}
+            trigger={<Button darkMode={docsDark}>Buka Popup</Button>}
             variant="popup"
             aria-label="Konfirmasi hapus konten"
-            footer={({ close }) => (
-              <div className="flex w-full flex-wrap justify-center gap-4">
-                <Button variant="outline" theme="gray" size="xs" className={popupCancelClass} onClick={close}>
-                  Tidak, Batalkan
-                </Button>
-                <Button size="xs" className={popupDangerClass} onClick={close}>
-                  Ya, hapus konten ini
-                </Button>
-              </div>
-            )}
+            actions={{
+              secondary: { label: 'Tidak, Batalkan', onClick: ({ close }) => close() },
+              danger: { label: 'Ya, hapus konten ini', onClick: ({ close }) => close() },
+            }}
           >
-            <div className="text-center">
-              <div className="flex justify-center">
-                <Icon className={popupIconClass}>
-                  <ExclamationCircle viewBox="2 2 20 20" />
-                </Icon>
-              </div>
-              <p className="mx-auto mt-4 max-w-xs text-body font-medium text-content-subtle">
-                Apakah anda yakin ingin menghapus konten ini?
-              </p>
-            </div>
+            <p className="mx-auto max-w-xs text-center text-body font-medium text-content-subtle">
+              Apakah anda yakin ingin menghapus konten ini?
+            </p>
           </Modal>
         </div>
 
         <SectionCode>
           {renderModalExampleCode({
-            theme: 'light', variant: 'popup', example: 'basic', size: 's',
+            theme: docsTheme, variant: 'popup', example: 'basic', size: 's',
             dismissal: { closeOnBackdrop: true, closeOnEscape: true, showCloseButton: true },
           })}
+        </SectionCode>
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
+          Contoh ini mengganti tanda seru dengan ikon <Hl>InfoCircle</Hl> dan mengatur ukuran serta
+          warnanya. Gunakan <Hl>icon={'{null}'}</Hl> untuk menyembunyikan ikon bawaan.
+        </p>
+        <SectionCode>
+          {`import { Icon, Modal } from '@ceplok-ui/design-kit-react'\nimport { InfoCircle } from '@ceplok-ui/design-kit-react/icons/outline'\n\n<Modal\n  variant="popup"\n  icon={<Icon className="size-8 text-primary-700"><InfoCircle /></Icon>}\n  aria-label="Informasi layanan"\n>\n  <p>Periksa kembali informasi layanan sebelum melanjutkan.</p>\n</Modal>\n\n<Modal variant="popup" icon={null} aria-label="Konfirmasi">\n  <p>Dialog ini tidak menampilkan ikon.</p>\n</Modal>`}
         </SectionCode>
       </FlowSection>
 
@@ -515,26 +544,29 @@ export function ModalPage() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           {sizes.map((item) => (
-            <article key={item.value} className="rounded-xl border border-border bg-surface p-5">
+            <article
+              key={item.value}
+              data-theme={docsDark ? 'dark' : undefined}
+              className={`rounded-xl border p-5 ${
+                docsDark ? 'border-gray-800 bg-gray-900 dark:border-gray-700' : 'border-border bg-surface'
+              }`}
+            >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-sm font-black text-gray-900">Size {item.label}</h3>
-                  <p className="mt-1 text-body-sm text-gray-500">{item.description}</p>
+                  <h3 className="text-sm font-black text-content">Size {item.label}</h3>
+                  <p className="mt-1 text-body-sm text-content-muted">{item.description}</p>
                 </div>
-                <span className="shrink-0 rounded-md bg-primary-50 px-2 py-1 text-xs font-bold text-primary-700">
+                <span className="shrink-0 rounded-md bg-[light-dark(var(--color-primary-50),var(--color-primary-900))] px-2 py-1 text-xs font-bold text-[light-dark(var(--color-primary-700),var(--color-primary-200))]">
                   {item.value === 's' ? '416px' : '640px'} max
                 </span>
               </div>
               <div className="mt-4">
                 <Modal
-                  trigger={<Button>Buka Modal {item.label}</Button>}
+                  darkMode={docsDark}
+                  trigger={<Button darkMode={docsDark}>Buka Modal {item.label}</Button>}
                   size={item.value}
                   title="Terms of Service"
-                  footer={({ close }) => (
-                    <Button size="xs" className="ml-auto" onClick={close}>
-                      Ya, saya setuju
-                    </Button>
-                  )}
+                  actions={{ primary: { label: 'Ya, saya setuju', onClick: ({ close }) => close() } }}
                 >
                   <div className="space-y-4">
                     {ceplokCopy.map((paragraph) => (
@@ -548,45 +580,76 @@ export function ModalPage() {
         </div>
 
         <SectionCode>
-          {'<Modal\n  trigger={<Button>Buka Modal</Button>}\n  '}
+          {`<Modal${docsDarkModeProp}\n  trigger={<Button${docsDarkModeProp}>Buka Modal</Button>}\n  `}
           <H>size</H>
-          {`="m"\n  title="Terms of Service"\n  footer={({ close }) => (\n    <Button size="xs" className="ml-auto" onClick={close}>Ya, saya setuju</Button>\n  )}\n>\n  <div className="space-y-4">\n    <p>${ceplokCopy[0]}</p>\n    <p>${ceplokCopy[1]}</p>\n  </div>\n</Modal>`}
+          {`="m"\n  title="Terms of Service"\n  actions={{ primary: { label: 'Ya, saya setuju', onClick: ({ close }) => close() } }}\n>\n  <div className="space-y-4">\n    <p>${ceplokCopy[0]}</p>\n    <p>${ceplokCopy[1]}</p>\n  </div>\n</Modal>`}
         </SectionCode>
 
-        <p className="mt-4 max-w-2xl text-body-sm text-gray-500">
+        <p className="mt-4 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Size S digunakan secara bawaan. Gunakan <Hl>size=&quot;m&quot;</Hl> untuk lebar M.
         </p>
       </FlowSection>
 
       <FlowSection id="aksi-footer" title="Aksi Footer">
-        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
-          Modal tidak mengatur proses bisnis seperti validasi atau submit. Gunakan{' '}
-          <Hl>close()</Hl> dari render function <Hl>footer</Hl> ketika aksi memang perlu menutup
-          Modal, misalnya setelah proses simpan berhasil.
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
+          Gunakan <Hl>actions</Hl> untuk tombol standar yang konsisten pada Default dan Popup.
+          Peran aksi menentukan makna dan tampilan tombol, bukan proses yang dijalankan:
+        </p>
+        <ul className="mt-2 max-w-2xl list-disc space-y-1 pl-5 text-body-sm text-gray-500 dark:text-gray-400">
+          <li>
+            <Hl>primary</Hl> untuk aksi utama yang menyelesaikan tujuan, misalnya Simpan atau Lanjutkan.
+          </li>
+          <li>
+            <Hl>secondary</Hl> untuk aksi alternatif atau pendukung, sering kali Batal atau Kembali.
+          </li>
+          <li>
+            <Hl>danger</Hl> untuk aksi destruktif atau sulit dibatalkan, misalnya Hapus; bukan sekadar
+            aksen merah.
+          </li>
+        </ul>
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
+          Consumer menentukan label, handler, proses, dan responsnya. Peran hanya memberi tampilan
+          serta urutan standar—<Hl>secondary</Hl>, <Hl>primary</Hl>, lalu <Hl>danger</Hl>. Modal
+          meratakan aksi ke kanan pada Default dan ke tengah pada Popup. Aksi tidak menutup Modal
+          otomatis; panggil <Hl>close()</Hl> setelah proses berhasil.
         </p>
         <SectionCode>
-          {'<Modal\n  trigger={<Button>Edit data</Button>}\n  title="Edit data"\n  '}
-          <H>footer</H>
-          {'={({ close }) => (\n    <>\n      <Button variant="outline" theme="gray" onClick={close}>\n        Batal\n      </Button>\n      <Button\n        onClick={async () => {\n          const success = await save()\n\n          if (success) {\n            close()\n          }\n        }}\n      >\n        Simpan\n      </Button>\n    </>\n  )}\n>\n  {/* Form milik consumer */}\n</Modal>'}
+          {`<Modal${docsDarkModeProp}\n  trigger={<Button${docsDarkModeProp}>Edit data</Button>}\n  title="Edit data"\n  `}
+          <H>actions</H>
+          {'={{\n    secondary: { label: "Batal", onClick: ({ close }) => close() },\n    primary: {\n      label: "Simpan",\n      onClick: async ({ close }) => {\n        const success = await save()\n\n        if (success) close()\n      },\n    },\n  }}\n>\n  {/* Form milik consumer */}\n</Modal>'}
         </SectionCode>
-        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
-          Footer opsional: tanpa isi footer, container aksi dan divider footer tidak dirender.
-          ReactNode cocok untuk konten statis; render function menyediakan <Hl>close()</Hl>.
-          Tombol footer tidak otomatis menutup Modal. Default memakai divider, Popup tidak.
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
+          Sesuaikan tombol per aksi lewat <Hl>buttonProps</Hl>, misalnya <Hl>size</Hl>,{' '}
+          <Hl>variant</Hl>, <Hl>theme</Hl>, <Hl>tone</Hl>, <Hl>darkMode</Hl>, <Hl>disabled</Hl>,{' '}
+          <Hl>type</Hl>, atau <Hl>className</Hl>. Efeknya bergantung pada peran aksi. Mengisi{' '}
+          <Hl>buttonProps.theme</Hl> pada aksi <Hl>danger</Hl> mengganti preset destruktif Modal
+          dengan theme Button yang dipilih. <Hl>className</Hl> ditambahkan ke preset dan tidak
+          dijamin dapat mengganti warna destruktifnya.
         </p>
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
+          Gunakan <Hl>footer</Hl> jika perlu mengganti seluruh area footer dengan layout atau konten
+          kustom; render function menerima{' '}
+          <Hl>close()</Hl>. Pilih salah satu: <Hl>actions</Hl> atau <Hl>footer</Hl>. Tanpa
+          keduanya, area footer tidak dirender.
+        </p>
+        <SectionCode>
+          {`<Modal${docsDarkModeProp}\n  title="Pilih jadwal"\n  `}
+          <H>footer</H>
+          {'={({ close }) => (\n    <div className="flex items-center justify-between">\n      <p>Perubahan belum disimpan</p>\n      <Button onClick={close}>Tutup</Button>\n    </div>\n  )}\n>\n  ...\n</Modal>'}
+        </SectionCode>
       </FlowSection>
 
       <FlowSection id="state-modal" title="State Modal">
-        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Tanpa <Hl>open</Hl>, Modal mengelola visibilitas secara internal dan{' '}
           <Hl>trigger</Hl> wajib tersedia.
         </p>
-        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Gunakan <Hl>open</Hl> dan <Hl>onOpenChange</Hl> ketika visibilitas perlu mengikuti state
           aplikasi. Dalam mode terkontrol, <Hl>trigger</Hl> opsional dan nilai <Hl>open</Hl> tetap
           menjadi sumber kebenaran.
         </p>
-        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           <Hl>onOpenChange(false)</Hl> adalah permintaan penutupan, bukan callback native
           <Hl> onClose</Hl>; onClose dan onCancel tidak tersedia sebagai API consumer.
           Kontrol Cara Menutup di Playground bekerja independen: false pada closeOnBackdrop
@@ -595,58 +658,115 @@ export function ModalPage() {
           dari generated snippet; pilihan false ditulis eksplisit. Fungsi footer close()
           tetap meminta penutupan pada semua kombinasi.
         </p>
+        <h3 className="mt-8 text-sm font-black text-gray-900 dark:text-white">State internal</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
+          Modal berikut menyimpan visibilitasnya sendiri karena tidak menerima <Hl>open</Hl>.
+          Trigger membuka dialog, sedangkan aksi eksplisit menutupnya.
+        </p>
+        <div className="mt-4">
+          <Modal
+            darkMode={docsDark}
+            trigger={<Button darkMode={docsDark}>Buka Modal</Button>}
+            title="Konfirmasi"
+            closeOnBackdrop={false}
+            closeOnEscape={false}
+            showCloseButton={false}
+            actions={{ primary: { label: 'Saya Mengerti', onClick: ({ close }) => close() } }}
+          >
+            <p>Baca informasi sebelum melanjutkan.</p>
+          </Modal>
+        </div>
         <SectionCode>
-          {'<Modal\n  trigger={<Button>Buka Modal</Button>}\n  title="Konfirmasi"\n  '}
+          {`<Modal${docsDarkModeProp}\n  trigger={<Button${docsDarkModeProp}>Buka Modal</Button>}\n  title="Konfirmasi"\n  `}
           <Mark>closeOnBackdrop</Mark>{'={false}\n  '}<Mark>closeOnEscape</Mark>{'={false}\n  '}
-          <Mark>showCloseButton</Mark>{'={false}\n  footer={({ close }) => <Button onClick={close}>Saya Mengerti</Button>}\n>\n  <p>Baca informasi sebelum melanjutkan.</p>\n</Modal>'}
+          <Mark>showCloseButton</Mark>{'={false}\n  actions={{ primary: { label: "Saya Mengerti", onClick: ({ close }) => close() } }}\n>\n  <p>Baca informasi sebelum melanjutkan.</p>\n</Modal>'}
         </SectionCode>
-        <ControlledModalExample theme={theme} />
+        <h3 className="mt-8 text-sm font-black text-gray-900 dark:text-white">State terkontrol</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
+          Pada contoh ini, consumer menjadi sumber kebenaran melalui <Hl>open</Hl> dan{' '}
+          <Hl>onOpenChange</Hl>.
+        </p>
+        <ControlledModalExample theme={docsTheme} />
         <SectionCode>
-          {`import { useState } from 'react'\nimport { Button, Modal } from '@ceplok-ui/design-kit-react'\n\nexport function ControlledModalExample() {\n  const [open, setOpen] = useState(false)\n\n  return (\n    <div data-theme="${theme}">\n      <Button onClick={() => setOpen(true)}>Edit data</Button>\n\n      <Modal\n        open={open}\n        onOpenChange={setOpen}\n        title="Edit data"\n        footer={({ close }) => <Button size="xs" className="ml-auto" onClick={close}>Simpan</Button>}\n      >\n        {/* Form milik consumer */}\n      </Modal>\n    </div>\n  )\n}`}
+          {`import { useState } from 'react'\nimport { Button, Modal } from '@ceplok-ui/design-kit-react'\n\nexport function ControlledModalExample() {\n  const [open, setOpen] = useState(false)\n\n  return (\n    <div>\n      <Button${docsDarkModeProp} onClick={() => setOpen(true)}>Edit data</Button>\n\n      <Modal${docsDarkModeProp}\n        `}
+          <H>open</H>
+          {'={open}\n        '}
+          <H>onOpenChange</H>
+          {`={setOpen}\n        title="Edit data"\n        actions={{ primary: { label: "Simpan", onClick: ({ close }) => close() } }}\n      >\n        {/* Form milik consumer */}\n      </Modal>\n    </div>\n  )\n}`}
         </SectionCode>
-        <h3 className="mt-8 text-sm font-black text-gray-900">Modal bertingkat</h3>
-        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
+        <h3 className="mt-8 text-sm font-black text-gray-900 dark:text-white">Modal bertingkat</h3>
+        <p className="mt-1 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Gunakan state terkontrol terpisah untuk Modal pertama dan Popup konfirmasi. Popup yang
           dibuka terakhir berada di top layer; menutupnya tidak menutup Modal pertama dan fokus
           kembali ke tombol pembukanya.
         </p>
-        <NestedModalExample theme={theme} />
+        <NestedModalExample theme={docsTheme} />
         <SectionCode>
-          {`const [defaultOpen, setDefaultOpen] = useState(false)\nconst [popupOpen, setPopupOpen] = useState(false)\n\n<Modal\n  open={defaultOpen}\n  onOpenChange={(nextOpen) => {\n    setDefaultOpen(nextOpen)\n    if (!nextOpen) setPopupOpen(false)\n  }}\n  title="Kelola konten"\n>\n  <Button size="xs" onClick={() => setPopupOpen(true)}>Hapus konten</Button>\n</Modal>\n\n<Modal\n  open={popupOpen}\n  onOpenChange={setPopupOpen}\n  variant="popup"\n  aria-label="Konfirmasi hapus konten"\n>\n  {/* Konten dan aksi Popup */}\n</Modal>`}
+          {`const [defaultOpen, setDefaultOpen] = useState(false)\nconst [popupOpen, setPopupOpen] = useState(false)\n\n<Modal${docsDarkModeProp}\n  `}
+          <H>open</H>
+          {'={defaultOpen}\n  '}
+          <H>onOpenChange</H>
+          {`={(nextOpen) => {\n    setDefaultOpen(nextOpen)\n    if (!nextOpen) setPopupOpen(false)\n  }}\n  title="Kelola konten"\n>\n  <Button size="xs" onClick={() => setPopupOpen(true)}>Hapus konten</Button>\n</Modal>\n\n<Modal${docsDarkModeProp}\n  `}
+          <H>open</H>
+          {'={popupOpen}\n  '}
+          <H>onOpenChange</H>
+          {'={setPopupOpen}\n  '}
+          <H>variant</H>
+          {'="popup"\n  '}
+          <H>aria-label</H>
+          {`="Konfirmasi hapus konten"\n>\n  {/* Konten dan aksi Popup */}\n</Modal>`}
         </SectionCode>
-        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Secara bawaan, backdrop, Escape, dan tombol X meminta penutupan. Atur masing-masing
           melalui <Hl>closeOnBackdrop</Hl>, <Hl>closeOnEscape</Hl>, dan <Hl>showCloseButton</Hl>.
           Jika ketiganya false, sediakan aksi eksplisit yang memanggil <Hl>close()</Hl>.
           Dalam mode terkontrol, consumer perlu memperbarui state melalui <Hl>onOpenChange</Hl>.
         </p>
-        <p className="mt-3 max-w-2xl text-body-sm text-gray-500">
+        <p className="mt-3 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Elemen native <Hl>&lt;dialog&gt;</Hl> menyediakan perilaku dialog dan top layer;
           Modal menyerahkan perilaku fokus kepada browser tanpa focus trap kustom. Susun kontrol
           awal yang aman, misalnya Batal, dan jangan arahkan fokus awal ke aksi yang merusak data.
         </p>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark Mode">
-        <p className="mt-1 max-w-2xl text-body-sm text-gray-500">
-          Modal mengikuti <Hl>data-theme=&quot;dark&quot;</Hl>. Default memakai surface gray-700,
-          sedangkan Popup memakai gray-600 dengan teks gray-300 dan warna action sesuai desain.
-        </p>
+      <ModeSection
+        name="Modal"
+        stayDark
+        lead={
+          <>
+            Gunakan <Hl>darkMode</Hl> untuk menerapkan token gelap pada dialog dan Button di
+            dalamnya. Atribut <Hl>data-theme</Hl> eksplisit menjadi override dan memakai tema efektif
+            yang sama untuk keduanya. Trigger milik consumer, misalnya Button, mengatur temanya sendiri. Default memakai surface gray-700,
+            sedangkan Popup memakai gray-600 dengan teks gray-300 dan warna action sesuai desain.
+          </>
+        }
+      >
         <div className="mt-5 grid gap-5 lg:grid-cols-2">
-          <ModalThemeFrame label="Default Dark">
-            <StaticDefaultDarkModal />
+          <ModalThemeFrame
+            label="Default Dark"
+            theme="dark"
+          >
+            <ModalThemeExample variant="default" theme="dark" />
           </ModalThemeFrame>
-          <ModalThemeFrame label="Popup Dark">
-            <StaticPopupDarkModal />
+          <ModalThemeFrame
+            label="Popup Dark"
+            theme="dark"
+          >
+            <ModalThemeExample variant="popup" theme="dark" />
           </ModalThemeFrame>
         </div>
         <SectionCode>
           {renderModalExampleCode({
-            theme: 'dark', variant: 'default', example: 'basic', size: 's',
+            theme: 'dark',
+            variant: 'default',
+            example: 'basic',
+            size: 's',
             dismissal: { closeOnBackdrop: true, closeOnEscape: true, showCloseButton: true },
+            highlightDarkMode: true,
+            highlightTitle: false,
           })}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -655,7 +775,7 @@ export function ModalPage() {
         </Lead>
 
         <Stage maxWidth="max-w-[420px]" dark={theme === 'dark'}>
-          <div data-theme={theme} className="flex min-h-40 items-center justify-center">
+          <div className="flex min-h-40 items-center justify-center">
             {isNested ? (
               <NestedModalExample
                 key={playgroundKey}
@@ -667,44 +787,34 @@ export function ModalPage() {
             ) : isPopup ? (
               <Modal
                 key={playgroundKey}
+                darkMode={theme === 'dark'}
                 {...dismissal}
-                trigger={<Button>Buka Modal</Button>}
+                trigger={<Button darkMode={theme === 'dark'}>Buka Modal</Button>}
                 variant="popup"
                 aria-label="Konfirmasi hapus konten"
-                footer={({ close }) => (
-                  <div className="flex w-full flex-wrap justify-center gap-4">
-                    <Button variant="outline" theme="gray" size="xs" className={popupCancelClass} onClick={close}>
-                      Tidak, Batalkan
-                    </Button>
-                    <Button size="xs" className={popupDangerClass} onClick={close}>
-                      Ya, hapus konten ini
-                    </Button>
-                  </div>
-                )}
+                actions={{
+                  secondary: { label: 'Tidak, Batalkan', onClick: ({ close }) => close() },
+                  danger: { label: 'Ya, hapus konten ini', onClick: ({ close }) => close() },
+                }}
               >
-                <div className="text-center">
-                  <div className="flex justify-center">
-                    <Icon className={popupIconClass}>
-                      <ExclamationCircle viewBox="2 2 20 20" />
-                    </Icon>
-                  </div>
-                  <p className="mx-auto mt-4 max-w-xs text-body font-medium text-content-subtle">
-                    Apakah anda yakin ingin menghapus konten ini?
-                  </p>
-                </div>
+                <p className="mx-auto max-w-xs text-center text-body font-medium text-content-subtle">
+                  Apakah anda yakin ingin menghapus konten ini?
+                </p>
               </Modal>
             ) : (
               <Modal
                 key={playgroundKey}
+                darkMode={theme === 'dark'}
                 {...dismissal}
-                trigger={<Button>Buka Modal</Button>}
+                trigger={<Button darkMode={theme === 'dark'}>Buka Modal</Button>}
                 size={playgroundSize}
                 title={playgroundExample === 'long' ? 'Ketentuan Layanan' : 'Terms of Service'}
-                footer={({ close }) => (
-                  <Button size="xs" className="ml-auto" onClick={close}>
-                    {playgroundExample === 'long' ? 'Saya mengerti' : 'Ya, saya setuju'}
-                  </Button>
-                )}
+                actions={{
+                  primary: {
+                    label: playgroundExample === 'long' ? 'Saya mengerti' : 'Ya, saya setuju',
+                    onClick: ({ close }) => close(),
+                  },
+                }}
               >
                 {playgroundExample === 'image' ? (
                   <>
@@ -738,7 +848,7 @@ export function ModalPage() {
         </Stage>
 
         <Controls>
-          <Control label="Mode">
+          <Control label="Tampilan">
             <Segmented
               label="Pilih mode warna Modal"
               value={theme}
@@ -801,31 +911,32 @@ export function ModalPage() {
           </Control>
         </Controls>
 
-        <p className="mt-4 max-w-2xl text-body-sm text-gray-500">
+        <p className="mt-4 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
           Variant menentukan struktur Modal. Contoh mengubah komposisi konten pada Default,
           sedangkan Size mengatur lebar maksimum Default Modal.
         </p>
         {isNested && (
-          <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+          <p className="mt-2 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
             Nested Modal selalu memakai alur Default ke Popup. Variant dikunci pada Default; Size
             dan Cara Menutup diterapkan pada kedua dialog.
           </p>
         )}
         {isPopup && (
-          <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+          <p className="mt-2 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
             Popup digunakan untuk konfirmasi ringkas. Gunakan <Hl>aria-label</Hl> atau{' '}
-            <Hl>aria-labelledby</Hl> sebagai nama aksesibel, susun icon dan pesan di dalam children,
-            lalu tempatkan tombol di footer. Contoh dan Size hanya tersedia untuk Default Modal.
+            <Hl>aria-labelledby</Hl> sebagai nama aksesibel, susun pesan di dalam children, atur ikon
+            melalui prop <Hl>icon</Hl>, lalu tentukan tombol melalui <Hl>actions</Hl>. Contoh dan Size
+            hanya tersedia untuk Default Modal.
           </p>
         )}
         {!isPopup && playgroundExample === 'image' && (
-          <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+          <p className="mt-2 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
             Gambar disusun sebagai bagian dari children; Modal tidak memiliki prop khusus untuk
             gambar.
           </p>
         )}
         {!isPopup && playgroundExample === 'long' && (
-          <p className="mt-2 max-w-2xl text-body-sm text-gray-500">
+          <p className="mt-2 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">
             Konten panjang menggunakan gulir body Modal secara otomatis tanpa prop khusus.
           </p>
         )}
@@ -835,10 +946,18 @@ export function ModalPage() {
       <FlowSection id="penggunaan" title="Penggunaan">
         <SectionCode flush>
           {isNested
-            ? renderNestedModalExampleCode({ theme, size: playgroundSize, dismissal })
+            ? renderNestedModalExampleCode({
+                theme,
+                size: playgroundSize,
+                dismissal,
+                highlightDarkMode: theme === 'dark',
+                highlightPlayground: true,
+              })
             : renderModalExampleCode({
                 theme, variant: playgroundVariant, example: playgroundExample,
                 size: playgroundSize, dismissal,
+                highlightDarkMode: theme === 'dark',
+                highlightPlayground: true,
               })}
         </SectionCode>
 

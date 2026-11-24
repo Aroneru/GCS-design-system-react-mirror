@@ -1,4 +1,5 @@
 import {
+  useContext,
   useEffect,
   useId,
   useCallback,
@@ -8,6 +9,8 @@ import {
   useState,
   type HTMLAttributeAnchorTarget,
   type HTMLAttributes,
+  type ButtonHTMLAttributes,
+  type KeyboardEvent,
   type MouseEventHandler,
   type MouseEvent,
   type ReactNode,
@@ -15,12 +18,20 @@ import {
   type SyntheticEvent,
 } from 'react'
 import { ArrowRightToBracket, Bars, Edit } from 'flowbite-react-icons/outline'
+import { Bell } from 'flowbite-react-icons/solid'
 import { cn } from '../utils/cn'
 import { Avatar } from './Avatar'
 import { Button } from './Button'
-import { Drawer } from './Drawer'
+import { Drawer, type DrawerMenuItem } from './Drawer'
 import { Dropdown, type DropdownItem } from './Dropdown'
-import { Sidebar, type SidebarItem } from './sidebar/Sidebar'
+import { TableOfContents, type TableOfContentsItem } from './TableOfContents'
+import {
+  DropdownDismissalContext,
+  type DropdownDismissalScopeValue,
+} from './dropdown/DropdownDismissalContext'
+import { DarkModeContext, useInheritedDarkMode } from '../utils/darkModeContext'
+import { Search, type SearchCategory, type SearchProps } from './Search'
+import { Sidebar, type SidebarItem, type SidebarUser } from './sidebar/Sidebar'
 import { BarsFromLeft } from '../icons/outline'
 
 export type NavbarPlatform = 'front-office' | 'back-office'
@@ -83,7 +94,8 @@ export interface NavbarAccount {
   description?: string
   avatarSrc?: string
   initials?: ReactNode
-  items: NavbarAccountItem[]
+  /** Menu akun opsional. Tanpa item, identitas ditampilkan tanpa trigger dropdown. */
+  items?: NavbarAccountItem[]
 }
 
 export interface NavbarGuestLink {
@@ -97,17 +109,33 @@ export interface NavbarGuestActions {
   signUp?: NavbarGuestLink
 }
 
-export interface NavbarMobileDrawer {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  controls: string
-  ariaLabel?: string
+export interface NavbarNotificationTrigger extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label' | 'children'> {
+  ariaLabel: string
+  badge?: ReactNode
+}
+
+export interface NavbarTableOfContents {
+  /** Label disclosure TOC di bagian paling bawah Drawer. Bawaan: "On this page". */
+  label?: ReactNode
+  /** Entri anchor yang sama dengan TableOfContents desktop. */
+  items: TableOfContentsItem[]
+}
+
+/** Konfigurasi Search bawaan Navbar. Ukuran, tombol, dan tema memiliki default per platform. */
+export type NavbarSearchConfig = SearchProps
+
+/** Search Back Office selalu membutuhkan sumber kategori. */
+export type NavbarBackOfficeSearchConfig = NavbarSearchConfig & {
+  categories: SearchCategory[]
 }
 
 interface NavbarBaseProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
   brand: NavbarBrand
   items?: NavbarPrimaryItem[]
-  search?: ReactNode
+  /** Boundary tema eksplisit; meng-override `darkMode` dan tema pembungkus. */
+  'data-theme'?: 'light' | 'dark'
+  /** Tema gelap untuk Navbar, Drawer, Sidebar mobile, dan komponen di dalamnya. `data-theme` eksplisit menang. */
+  darkMode?: boolean
   mobileNavigationOpen?: boolean
   onMobileNavigationOpenChange?: (open: boolean) => void
 }
@@ -116,7 +144,7 @@ type FrontOfficeIdentity =
   | {
       account: NavbarAccount
       guestActions?: never
-      notificationTrigger?: ReactNode
+      notificationTrigger?: NavbarNotificationTrigger
     }
   | {
       account?: undefined
@@ -127,14 +155,27 @@ type FrontOfficeIdentity =
 export type NavbarFrontOfficeProps = NavbarBaseProps &
   FrontOfficeIdentity & {
     platform: 'front-office'
-    mobileDrawer?: never
+    /** Search FO: compact, tanpa kategori, dan tanpa tombol secara default. */
+    search?: NavbarSearchConfig
+    sidebarItems?: never
+    sidebarUser?: never
+    tableOfContents?: never
   }
 
 export interface NavbarBackOfficeProps extends NavbarBaseProps {
   platform: 'back-office'
-  account?: NavbarAccount
-  notificationTrigger?: never
-  mobileDrawer?: NavbarMobileDrawer
+  /** Search BO: compact, berkategori, dan bertombol secara default. */
+  search?: NavbarBackOfficeSearchConfig
+  /** Identitas dan aksi akun BO dimiliki Sidebar, bukan Navbar. */
+  account?: never
+  /** Konfigurasi trigger notifikasi, independen dari account karena identitas BO dapat berada di Sidebar. */
+  notificationTrigger?: NavbarNotificationTrigger
+  /** Sumber navigasi Sidebar aplikasi yang digunakan Navbar pada komposisi mobile. */
+  sidebarItems?: SidebarItem[]
+  /** Identitas dan aksi akun Sidebar BO yang digunakan kembali pada komposisi mobile. */
+  sidebarUser?: SidebarUser
+  /** Daftar isi halaman yang ditambahkan sebagai disclosure terakhir di Drawer Navbar mobile. */
+  tableOfContents?: NavbarTableOfContents
   guestActions?: never
 }
 
@@ -168,7 +209,9 @@ function Brand({ brand }: { brand: NavbarBrand }) {
   )
 }
 
-const navbarLabelClass = 'min-w-0 max-w-[304px] line-clamp-2 break-words font-sans text-base leading-[1.5] font-semibold'
+const navbarLabelBaseClass = 'font-sans text-base leading-[1.5] font-semibold'
+const primaryNavbarLabelClass = cn(navbarLabelBaseClass, 'block shrink-0 whitespace-nowrap')
+const overflowNavbarLabelClass = cn(navbarLabelBaseClass, 'min-w-0 max-w-[304px] line-clamp-2 break-words')
 
 function useTruncatedNavbarLabels<T extends HTMLElement>(
   containerRef: RefObject<T | null>,
@@ -229,7 +272,7 @@ function NavbarLabel({
 }: {
   label: string
   measurementKey: string
-  scope: 'primary' | 'overflow'
+  scope: 'primary' | 'overflow' | 'menu'
   truncated: boolean
   className?: string
 }) {
@@ -237,7 +280,7 @@ function NavbarLabel({
     <span
       data-navbar-primary-label={scope === 'primary' ? measurementKey : undefined}
       data-navbar-overflow-label={scope === 'overflow' ? measurementKey : undefined}
-      className={cn(navbarLabelClass, className)}
+      className={cn(scope === 'primary' ? primaryNavbarLabelClass : overflowNavbarLabelClass, className)}
       title={truncated ? label : undefined}
     >
       {label}
@@ -284,7 +327,7 @@ function OverflowLabel({
   measurement: boolean
   truncated: boolean
 }) {
-  if (measurement) return <span className={cn(navbarLabelClass, 'flex-1')}>{label}</span>
+  if (measurement) return <span className={cn(overflowNavbarLabelClass, 'flex-1')}>{label}</span>
   return (
     <NavbarLabel
       label={label}
@@ -441,11 +484,16 @@ function OverflowPanel({
   spacingMode: DesktopSpacingMode
 }) {
   const panelId = useId()
+  const panelRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const measurementRef = useRef<HTMLDivElement>(null)
   const measurementFrameRef = useRef(0)
   const focusFrameRef = useRef(0)
+  const restoreFocusRef = useRef(false)
+  const typeaheadRef = useRef({ text: '', time: 0 })
+  const heldSpaceRef = useRef(false)
   const pendingScrollRef = useRef<{ scrollTop: number } | null>(null)
+  const dismissalScope = useContext(DropdownDismissalContext)
   const [parentOpen, setParentOpen] = useState(false)
   const [visibleItemCount, setVisibleItemCount] = useState(() => Math.min(1, items.length))
   const [capacityReady, setCapacityReady] = useState(false)
@@ -463,35 +511,98 @@ function OverflowPanel({
   const currentVisibleCount = Math.min(visibleItemCount, items.length)
   const truncatedLabels = useTruncatedNavbarLabels(contentRef, 'data-navbar-overflow-label', `${labelKey}|${expandedKey}|${currentVisibleCount}`)
 
-  const readMeasurementMetrics = useCallback(() => {
+  const positionPanel = useCallback(() => {
+    const panel = panelRef.current
+    const trigger = triggerRef.current
     const content = contentRef.current
-    const panel = content?.closest<HTMLElement>('[popover]')
-    if (!content || !panel || !panel.matches(':popover-open')) return null
+    if (!panel || !trigger?.isConnected || !content) return
+
+    const gutter = 4
+    const gap = 4
+    const triggerRect = trigger.getBoundingClientRect()
+    const safeWidth = Math.max(0, window.innerWidth - gutter * 2)
+    panel.style.maxWidth = `${safeWidth}px`
+
+    const panelWidth = panel.offsetWidth || Math.min(304, safeWidth)
+    panel.style.left = `${Math.max(gutter, Math.min(triggerRect.right - panelWidth, window.innerWidth - panelWidth - gutter))}px`
+
+    const spaceBelow = Math.max(0, window.innerHeight - gutter - (triggerRect.bottom + gap))
+    const spaceAbove = Math.max(0, triggerRect.top - gutter - gap)
+    const naturalHeight = Math.max(panel.scrollHeight, panel.offsetHeight)
+    const opensAbove = naturalHeight > spaceBelow && spaceAbove > spaceBelow
+    const selectedSpace = opensAbove ? spaceAbove : spaceBelow
+    panel.style.maxHeight = `${selectedSpace}px`
+    const panelHeight = panel.offsetHeight
+    panel.style.top = opensAbove
+      ? `${Math.max(gutter, triggerRect.top - gap - panelHeight)}px`
+      : `${triggerRect.bottom + gap}px`
 
     const panelStyle = window.getComputedStyle(panel)
-    const maxHeight = Number.parseFloat(panelStyle.maxHeight)
     const padding = Number.parseFloat(panelStyle.paddingTop) + Number.parseFloat(panelStyle.paddingBottom)
-    const availableHeight = Math.max(0, (Number.isFinite(maxHeight) ? maxHeight : panel.clientHeight) - padding)
-    return { width: content.clientWidth, availableHeight }
-  }, [])
-
-  const syncMeasurementMetrics = useCallback(() => {
-    const next = readMeasurementMetrics()
-    if (!next || next.width <= 0 || next.availableHeight <= 0) return
+    const next = {
+      width: content.clientWidth,
+      availableHeight: Math.max(0, selectedSpace - padding),
+    }
+    if (next.width <= 0 || next.availableHeight <= 0) return
     setMeasurementMetrics((current) => (
       current && Math.abs(current.width - next.width) < 0.5 && Math.abs(current.availableHeight - next.availableHeight) < 0.5
         ? current
         : next
     ))
-  }, [readMeasurementMetrics])
+  }, [triggerRef])
 
   const scheduleMeasurement = useCallback(() => {
     if (measurementFrameRef.current) return
     measurementFrameRef.current = window.requestAnimationFrame(() => {
       measurementFrameRef.current = 0
-      syncMeasurementMetrics()
+      positionPanel()
     })
-  }, [syncMeasurementMetrics])
+  }, [positionPanel])
+
+  const close = useCallback(() => {
+    const panel = panelRef.current
+    if (panel?.isConnected && panel.matches(':popover-open')) panel.hidePopover()
+  }, [])
+
+  useEffect(() => dismissalScope?.register(close), [close, dismissalScope])
+
+  const handleTypeahead = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key.length !== 1 || event.ctrlKey || event.metaKey || event.altKey) return
+    const typing = typeaheadRef.current.text !== '' && Date.now() - typeaheadRef.current.time < 1000
+    if (event.key === ' ' && !typing) return
+
+    event.preventDefault()
+    if (event.key === ' ') heldSpaceRef.current = true
+    const normalized = (typing ? typeaheadRef.current.text : '') + event.key
+    const query = normalized
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/\s+/g, ' ')
+      .toLowerCase()
+    typeaheadRef.current = { text: query, time: Date.now() }
+
+    const rows = Array.from(
+      contentRef.current?.querySelectorAll<HTMLElement>(
+        '[data-baris]:not([aria-disabled="true"]):not(:disabled)',
+      ) ?? [],
+    )
+    const current = rows.indexOf(document.activeElement as HTMLElement)
+    const repeated = [...query].every((character) => character === query[0])
+    const needle = repeated ? query[0] : query
+    const start = repeated ? current + 1 : Math.max(current, 0)
+    const ordered = [...rows.slice(start), ...rows.slice(0, start)]
+    const match = ordered.find((row) => {
+      const label = (row.textContent ?? '').replace(/\s+/g, ' ').trim().toLowerCase()
+      return label.startsWith(needle) || label.split(/[\s/(),.-]/).some((word) => word.startsWith(needle))
+    })
+    match?.focus()
+  }
+
+  const releaseHeldSpace = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== ' ' || !heldSpaceRef.current) return
+    event.preventDefault()
+    heldSpaceRef.current = false
+  }
 
   const measuredHeights = useCallback(() => {
     const measurement = measurementRef.current
@@ -551,16 +662,25 @@ function OverflowPanel({
   }, [items.length, measuredHeights])
 
   useEffect(() => {
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (!panel) return
+
+    const handleBeforeToggle = (event: Event) => {
+      const newState = (event as Event & { newState?: string }).newState
+      if (newState === 'open') {
+        panel.style.visibility = 'hidden'
+        positionPanel()
+      } else if (newState === 'closed') {
+        restoreFocusRef.current = panel.contains(document.activeElement)
+      }
+    }
 
     const handleParentToggle = (event: Event) => {
       const newState = (event as Event & { newState?: string }).newState
       if (newState === 'open') {
-        panel.style.visibility = 'hidden'
         setParentOpen(true)
         setCapacityReady(false)
-        scheduleMeasurement()
+        positionPanel()
         return
       }
       if (newState !== 'closed') return
@@ -571,6 +691,8 @@ function OverflowPanel({
       setVisibleItemCount(Math.min(1, items.length))
       setFocusTransferIndex(null)
       setExpanded((current) => current.size === 0 ? current : new Set())
+      typeaheadRef.current = { text: '', time: 0 }
+      heldSpaceRef.current = false
       pendingScrollRef.current = null
       if (measurementFrameRef.current) {
         window.cancelAnimationFrame(measurementFrameRef.current)
@@ -580,10 +702,21 @@ function OverflowPanel({
         window.cancelAnimationFrame(focusFrameRef.current)
         focusFrameRef.current = 0
       }
+      if (
+        restoreFocusRef.current &&
+        triggerRef.current?.isConnected &&
+        triggerRef.current.getClientRects().length > 0
+      ) {
+        restoreFocusRef.current = false
+        triggerRef.current.focus({ preventScroll: true })
+      }
+      restoreFocusRef.current = false
     }
 
+    panel.addEventListener('beforetoggle', handleBeforeToggle)
     panel.addEventListener('toggle', handleParentToggle)
     return () => {
+      panel.removeEventListener('beforetoggle', handleBeforeToggle)
       panel.removeEventListener('toggle', handleParentToggle)
       if (measurementFrameRef.current) {
         window.cancelAnimationFrame(measurementFrameRef.current)
@@ -594,17 +727,20 @@ function OverflowPanel({
         focusFrameRef.current = 0
       }
     }
-  }, [items.length, scheduleMeasurement])
+  }, [items.length, positionPanel, triggerRef])
 
   useEffect(() => {
     if (!parentOpen) return
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (!panel) return
 
     const observer = new ResizeObserver(scheduleMeasurement)
     observer.observe(panel)
+    if (triggerRef.current) observer.observe(triggerRef.current)
     if (contentRef.current) observer.observe(contentRef.current)
+    const handleScroll = () => positionPanel()
     window.addEventListener('resize', scheduleMeasurement)
+    window.addEventListener('scroll', handleScroll, true)
     let active = true
     void document.fonts.ready.then(() => {
       if (!active) return
@@ -616,8 +752,9 @@ function OverflowPanel({
       active = false
       observer.disconnect()
       window.removeEventListener('resize', scheduleMeasurement)
+      window.removeEventListener('scroll', handleScroll, true)
     }
-  }, [parentOpen, scheduleMeasurement])
+  }, [parentOpen, positionPanel, scheduleMeasurement, triggerRef])
 
   useEffect(() => {
     if (!parentOpen || !measurementMetrics) return
@@ -631,7 +768,7 @@ function OverflowPanel({
 
   useLayoutEffect(() => {
     if (!parentOpen || !capacityReady) return
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (panel) panel.style.visibility = 'visible'
   }, [capacityReady, parentOpen])
 
@@ -639,14 +776,14 @@ function OverflowPanel({
     const pending = pendingScrollRef.current
     if (!pending) return
     pendingScrollRef.current = null
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (!panel) return
     panel.scrollTop = pending.scrollTop
   }, [visibleItemCount])
 
   useEffect(() => {
     if (focusTransferIndex === null || visibleItemCount < items.length) return
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (!panel) return
     const scrollTop = panel.scrollTop
     focusFrameRef.current = window.requestAnimationFrame(() => {
@@ -678,7 +815,7 @@ function OverflowPanel({
   }
 
   const loadMore = (event: MouseEvent<HTMLButtonElement>) => {
-    const panel = contentRef.current?.closest<HTMLElement>('[popover]')
+    const panel = panelRef.current
     if (!panel) return
     const currentVisibleCount = Math.min(visibleItemCount, items.length)
     const next = Math.min(items.length, nextVisibleCount(currentVisibleCount))
@@ -698,58 +835,64 @@ function OverflowPanel({
 
   return (
     <>
-      <Dropdown
-        align="end"
-        trigger={
-          <button
-            ref={triggerRef}
-            type="button"
-            aria-controls={panelId}
-            className={cn(
-              'inline-flex items-center gap-1 whitespace-nowrap rounded py-1.5 font-sans text-base leading-[1.5] font-semibold text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
-              desktopItemPadding[spacingMode],
-            )}
-          >
-            Lainnya
-            <ChevronDownIcon />
-          </button>
-        }
-        contentClassName="w-[min(clamp(240px,21vw,304px),calc(100vw-48px))] p-2"
-      >
-        {({ close }) => (
-          <div
-            ref={contentRef}
-            id={panelId}
-            role="region"
-            aria-label="Navigasi lainnya"
-            className={cn('w-full min-w-0', !capacityReady && 'invisible')}
-          >
-            {visibleItems.map((item, index) => (
-              <OverflowItemBlock
-                key={item.id}
-                item={item}
-                index={index}
-                panelId={panelId}
-                expanded={item.type === 'disclosure' && expanded.has(item.id)}
-                measurement={false}
-                truncatedLabels={truncatedLabels}
-                close={close}
-                onToggle={toggleDisclosure}
-              />
-            ))}
-            {(hasMoreItems || focusTransferIndex !== null) && (
-              <button
-                type="button"
-                className={loadMoreClass}
-                disabled={!hasMoreItems}
-                onClick={loadMore}
-              >
-                <span className={navbarLabelClass}>Muat lebih banyak</span>
-              </button>
-            )}
-          </div>
+      <button
+        ref={triggerRef}
+        type="button"
+        popoverTarget={panelId}
+        popoverTargetAction="toggle"
+        aria-controls={panelId}
+        aria-expanded={parentOpen}
+        onKeyDown={(event) => {
+          if (parentOpen) handleTypeahead(event)
+        }}
+        onKeyUp={releaseHeldSpace}
+        className={cn(
+          'inline-flex items-center gap-1 whitespace-nowrap rounded py-1.5 font-sans text-base leading-[1.5] font-semibold text-content transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+          desktopItemPadding[spacingMode],
         )}
-      </Dropdown>
+      >
+        Lainnya
+        <ChevronDownIcon />
+      </button>
+      <div
+        ref={panelRef}
+        id={panelId}
+        popover="auto"
+        aria-label="Navigasi lainnya"
+        onKeyDown={handleTypeahead}
+        onKeyUp={releaseHeldSpace}
+        className="fixed inset-auto m-0 w-[min(clamp(240px,21vw,304px),calc(100vw-48px))] overflow-x-hidden overflow-y-auto overscroll-contain rounded-lg bg-dropdown-surface p-2 text-dropdown-content shadow-dropdown [overflow-wrap:anywhere]"
+      >
+        <div
+          ref={contentRef}
+          role="region"
+          className={cn('w-full min-w-0', !capacityReady && 'invisible')}
+        >
+          {visibleItems.map((item, index) => (
+            <OverflowItemBlock
+              key={item.id}
+              item={item}
+              index={index}
+              panelId={panelId}
+              expanded={item.type === 'disclosure' && expanded.has(item.id)}
+              measurement={false}
+              truncatedLabels={truncatedLabels}
+              close={close}
+              onToggle={toggleDisclosure}
+            />
+          ))}
+          {(hasMoreItems || focusTransferIndex !== null) && (
+            <button
+              type="button"
+              className={loadMoreClass}
+              disabled={!hasMoreItems}
+              onClick={loadMore}
+            >
+              <span className={overflowNavbarLabelClass}>Muat lebih banyak</span>
+            </button>
+          )}
+        </div>
+      </div>
       {measurementMetrics && (
         <div
           ref={measurementRef}
@@ -770,7 +913,7 @@ function OverflowPanel({
             </div>
           ))}
           <div data-navbar-overflow-measure-more="" className={loadMoreClass}>
-            <span className={navbarLabelClass}>Muat lebih banyak</span>
+            <span className={overflowNavbarLabelClass}>Muat lebih banyak</span>
           </div>
         </div>
       )}
@@ -790,14 +933,14 @@ function MeasurementItem({
   if (item.type === 'destination') {
     return (
       <span className={cn('inline-flex items-center py-1.5', padding)}>
-        <span className={navbarLabelClass}>{item.label}</span>
+        <span className={primaryNavbarLabelClass}>{item.label}</span>
       </span>
     )
   }
 
   return (
     <span className={cn('inline-flex items-center gap-1 py-1.5', padding)}>
-      <span className={navbarLabelClass}>{item.label}</span>
+      <span className={primaryNavbarLabelClass}>{item.label}</span>
       <ChevronDownIcon />
     </span>
   )
@@ -892,7 +1035,7 @@ function CapacityAwareDesktopNavigation({
       const navigationGap = Number.parseFloat(computedList.columnGap) || 0
       const fixedGroupCount = 1 + (brand ? 1 : 0) + (search ? 1 : 0) + (identity ? 1 : 0)
       const fixedWidth = (brand?.getBoundingClientRect().width ?? 0)
-        + (search ? 180 : 0)
+        + (search?.getBoundingClientRect().width ?? 0)
         + (identity?.getBoundingClientRect().width ?? 0)
         + majorGap * Math.max(0, fixedGroupCount - 1)
       const navigationBudget = Math.max(0, maximumRowWidth - fixedWidth)
@@ -1019,7 +1162,7 @@ function CapacityAwareDesktopNavigation({
                   }
                   items={item.children.map((child) => {
                     const measurementKey = `primary:child:${item.id}:${child.id}`
-                    return toDropdownDestination(child, <NavbarLabel label={child.label} measurementKey={measurementKey} scope="primary" truncated={truncatedLabels.has(measurementKey)} />)
+                    return toDropdownDestination(child, <NavbarLabel label={child.label} measurementKey={measurementKey} scope="menu" truncated={truncatedLabels.has(measurementKey)} />)
                   })}
                 />
               )}
@@ -1086,6 +1229,7 @@ function AccountIdentity({
       <Avatar
         src={account.avatarSrc}
         alt={decorative ? '' : account.name}
+        name={account.name}
         initials={account.initials}
         size="default"
       />
@@ -1119,7 +1263,7 @@ function toDropdownAccountItem(item: NavbarAccountItem): DropdownItem {
 }
 
 function AccountMenu({ account, constrainName = false }: { account: NavbarAccount; constrainName?: boolean }) {
-  if (!account.items.length) return <AccountIdentity account={account} constrainName={constrainName} />
+  if (!account.items?.length) return <AccountIdentity account={account} constrainName={constrainName} />
 
   return (
     <Dropdown
@@ -1137,6 +1281,66 @@ function AccountMenu({ account, constrainName = false }: { account: NavbarAccoun
       }
       items={account.items.map(toDropdownAccountItem)}
     />
+  )
+}
+
+function toSidebarAccountUser(account: NavbarAccount, close: () => void): SidebarUser {
+  return {
+    name: account.name,
+    profileLabel: account.description,
+    avatarSrc: account.avatarSrc,
+    avatarAlt: account.name,
+    initials: account.initials,
+    items: account.items?.map((item) =>
+      item.type === 'destination'
+        ? {
+            id: item.id,
+            label: item.label,
+            icon: item.icon,
+            href: item.href,
+            target: item.target,
+            rel: item.rel,
+            tone: item.tone,
+            disabled: item.disabled,
+            onClick: (event) => {
+              const anchorEvent = event as Parameters<NonNullable<typeof item.onClick>>[0]
+              item.onClick?.(anchorEvent)
+              if (ordinaryActivation(anchorEvent)) close()
+            },
+          }
+        : {
+            id: item.id,
+            label: item.label,
+            icon: item.icon,
+            tone: item.tone,
+            disabled: item.disabled,
+            onClick: (event) => {
+              item.onClick(event as Parameters<NavbarAccountAction['onClick']>[0])
+              close()
+            },
+          },
+    ),
+  }
+}
+
+function NotificationTrigger({ ariaLabel, badge, className, type = 'button', ...buttonProps }: NavbarNotificationTrigger) {
+  return (
+    <button
+      {...buttonProps}
+      type={type}
+      aria-label={ariaLabel}
+      className={cn(
+        'relative grid size-10 shrink-0 place-items-center rounded-lg text-gray-800 transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand in-data-[theme=dark]:text-gray-400',
+        className,
+      )}
+    >
+      <Bell className="size-6" aria-hidden="true" />
+      {badge != null && (
+        <span className="absolute right-0.5 top-0.5 min-w-4 rounded-full bg-feedback-error px-1 text-center text-[10px] leading-4 text-white">
+          {badge}
+        </span>
+      )}
+    </button>
   )
 }
 
@@ -1191,75 +1395,77 @@ function toSidebarItem(item: NavbarPrimaryItem, close: () => void): SidebarItem 
   }
 }
 
-function MobileIdentity({
-  platform,
-  account,
-  guestActions,
-  close,
-}: Pick<NavbarProps, 'platform' | 'account' | 'guestActions'> & { close: () => void }) {
-  if (account) {
-    return (
-      <div className="space-y-1 p-3">
-        <div className="flex items-center gap-2 px-3 py-2">
-          <Avatar src={account.avatarSrc} alt="" initials={account.initials} size="default" />
-          <span className="min-w-0">
-            <span className="block truncate font-sans text-sm leading-[1.5] font-medium text-content">{account.name}</span>
-            {account.description && (
-              <span className="block truncate text-xs text-content-subtle">{account.description}</span>
-            )}
-          </span>
-        </div>
-        {account.items.map((item) =>
-          item.type === 'destination' ? (
-            <a
-              key={item.id}
-              href={item.disabled ? undefined : item.href}
-              target={item.disabled ? undefined : item.target}
-              rel={item.disabled ? undefined : item.target === '_blank' ? (item.rel ?? 'noopener noreferrer') : item.rel}
-              aria-current={item.current ? 'page' : undefined}
-              aria-disabled={item.disabled || undefined}
-              onClick={
-                item.disabled
-                  ? undefined
-                  : (event) => {
-                      item.onClick?.(event)
-                      if (ordinaryActivation(event)) close()
-                    }
-              }
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-content hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-brand',
-                item.tone === 'danger' &&
-                  'text-feedback-error hover:text-feedback-error focus-visible:bg-surface-subtle active:bg-surface-subtle',
-                item.disabled && 'pointer-events-none opacity-50',
-              )}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </a>
-          ) : (
-            <button
-              key={item.id}
-              type="button"
-              disabled={item.disabled}
-              onClick={(event) => {
-                item.onClick(event)
-                close()
-              }}
-              className={cn(
-                'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-content hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50',
-                item.tone === 'danger' &&
-                  'text-feedback-error hover:text-feedback-error focus-visible:bg-surface-subtle active:bg-surface-subtle',
-              )}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </button>
-          ),
-        )}
-      </div>
-    )
+function toMobileSidebarItem(item: SidebarItem, close: () => void): SidebarItem {
+  return {
+    ...item,
+    onClick: (event) => {
+      item.onClick?.(event)
+      if (ordinaryActivation(event)) close()
+    },
+    children: item.children?.map((child) => ({
+      ...child,
+      onClick: (event) => {
+        child.onClick?.(event)
+        if (ordinaryActivation(event)) close()
+      },
+    })),
+  }
+}
+
+function callAnchorClick(
+  handler: MouseEventHandler<HTMLAnchorElement> | undefined,
+  event: MouseEvent<HTMLElement>,
+) {
+  if (!(event.currentTarget instanceof HTMLAnchorElement)) return
+  handler?.(event as MouseEvent<HTMLAnchorElement>)
+}
+
+function toMobileDrawerItem(item: NavbarPrimaryItem, close: () => void): DrawerMenuItem {
+  if (item.type === 'destination') {
+    return {
+      id: item.id,
+      label: item.label,
+      icon: item.icon,
+      href: item.disabled ? undefined : item.href,
+      target: item.disabled ? undefined : item.target,
+      rel: item.disabled ? undefined : (item.target === '_blank' ? (item.rel ?? 'noopener noreferrer') : item.rel),
+      active: item.current,
+      disabled: item.disabled,
+      onClick: (event) => {
+        callAnchorClick(item.onClick, event)
+        if (ordinaryActivation(event)) close()
+      },
+    }
   }
 
+  return {
+    id: item.id,
+    label: item.label,
+    icon: item.icon,
+    active: item.children.some((child) => child.current),
+    disabled: item.disabled,
+    defaultExpanded: item.children.some((child) => child.current),
+    children: item.children.map((child) => ({
+      id: child.id,
+      label: child.label,
+      href: child.disabled ? undefined : child.href,
+      target: child.disabled ? undefined : child.target,
+      rel: child.disabled ? undefined : (child.target === '_blank' ? (child.rel ?? 'noopener noreferrer') : child.rel),
+      active: child.current,
+      disabled: child.disabled,
+      onClick: (event) => {
+        callAnchorClick(child.onClick, event)
+        if (ordinaryActivation(event)) close()
+      },
+    })),
+  }
+}
+
+function MobileGuestActions({
+  platform,
+  guestActions,
+  close,
+}: Pick<NavbarProps, 'platform' | 'guestActions'> & { close: () => void }) {
   if (platform !== 'front-office' || !guestActions) return null
 
   return (
@@ -1294,17 +1500,49 @@ function MobileIdentity({
   )
 }
 
+function NavbarDrawerTableOfContents({
+  tableOfContents,
+  onItemClick,
+  separated,
+  darkMode,
+}: {
+  tableOfContents: NavbarTableOfContents
+  onItemClick: () => void
+  separated: boolean
+  darkMode: boolean
+}) {
+  if (!tableOfContents.items.length) return null
+
+  return (
+    <div
+      className={cn(
+        separated && 'mt-3 border-t pt-3',
+        separated && (darkMode ? 'border-gray-700' : 'border-border'),
+      )}
+    >
+      <TableOfContents
+        items={tableOfContents.items}
+        layout="collapsible"
+        title={tableOfContents.label ?? 'On this page'}
+        onItemClick={onItemClick}
+        darkMode={darkMode}
+        className="bg-transparent [&>button]:rounded-none [&>button]:border-0 [&>button]:bg-transparent [&>button]:text-xs [&>button]:font-bold [&>button]:tracking-[0.14em] [&>button]:uppercase [&>button]:text-content-muted [&>button:hover]:bg-transparent [&>button>svg:first-child]:hidden"
+      />
+    </div>
+  )
+}
+
 function DesktopIdentity({
   platform,
   account,
   notificationTrigger,
   guestActions,
 }: Pick<NavbarProps, 'platform' | 'account' | 'notificationTrigger' | 'guestActions'>) {
-  if (account) {
+  if (account || notificationTrigger) {
     return (
       <div data-navbar-identity="" className="flex shrink-0 items-center gap-3">
-        {notificationTrigger}
-        <AccountMenu account={account} constrainName />
+        {notificationTrigger && <NotificationTrigger {...notificationTrigger} />}
+        {account && <AccountMenu account={account} constrainName />}
       </div>
     )
   }
@@ -1344,6 +1582,7 @@ export function Navbar(props: NavbarProps) {
     brand,
     items = [],
     search,
+    darkMode,
     mobileNavigationOpen,
     onMobileNavigationOpenChange,
     className,
@@ -1352,21 +1591,62 @@ export function Navbar(props: NavbarProps) {
     account,
     guestActions,
     notificationTrigger,
-    mobileDrawer,
+    sidebarItems,
+    sidebarUser,
+    tableOfContents,
+    'data-theme': dataTheme,
     ...headerProps
   } = props
+  const inheritedDarkMode = useInheritedDarkMode()
+  // Boundary native consumer menjadi override paling eksplisit. Satu hasil
+  // yang sama dipakai header, context, dan seluruh komponen internal agar
+  // Search/Drawer/Sidebar/TOC tidak berbeda tema dari permukaan Navbar.
+  const explicitTheme = dataTheme === 'dark' || dataTheme === 'light' ? dataTheme : undefined
+  const navbarDarkMode = explicitTheme ? explicitTheme === 'dark' : darkMode ?? inheritedDarkMode
+  const navbarTheme =
+    dataTheme ??
+    (darkMode !== undefined || inheritedDarkMode
+      ? navbarDarkMode
+        ? 'dark'
+        : 'light'
+      : undefined)
+  const searchElement = search ? (
+    <Search
+      {...search}
+      platform={search.platform ?? 'compact'}
+      showButton={search.showButton ?? platform === 'back-office'}
+      darkMode={search.darkMode ?? navbarDarkMode}
+    />
+  ) : null
+  const navbarAccount = platform === 'front-office' ? account : undefined
   const dialogId = useId()
-  const headerRef = useRef<HTMLElement>(null)
+  const internalDrawerId = useId()
   const [desktopRow, setDesktopRow] = useState<HTMLDivElement | null>(null)
   const desktopRowRef = useCallback((node: HTMLDivElement | null) => {
     setDesktopRow(node)
   }, [])
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const dropdownClosersRef = useRef(new Set<() => void>())
   const mobileTriggerRef = useRef<HTMLButtonElement>(null)
   const mobileCloseRef = useRef<HTMLButtonElement>(null)
   const wasMobileOpenRef = useRef(false)
   const [internalMobileOpen, setInternalMobileOpen] = useState(false)
+  const [internalDrawerOpen, setInternalDrawerOpen] = useState(false)
   const mobileOpen = mobileNavigationOpen ?? internalMobileOpen
+  const drawerOpen = internalDrawerOpen
+  const drawerId = internalDrawerId
+  const dropdownDismissalScope = useMemo<DropdownDismissalScopeValue>(
+    () => ({
+      register: (close) => {
+        dropdownClosersRef.current.add(close)
+        return () => dropdownClosersRef.current.delete(close)
+      },
+    }),
+    [],
+  )
+  const closeNavbarDropdowns = useCallback(() => {
+    for (const close of dropdownClosersRef.current) close()
+  }, [])
   const requestMobileOpen = useCallback(
     (open: boolean) => {
       if (mobileNavigationOpen === undefined) setInternalMobileOpen(open)
@@ -1376,16 +1656,17 @@ export function Navbar(props: NavbarProps) {
   )
   const requestMobileNavigationOpen = useCallback(
     (open: boolean) => {
-      if (open && mobileDrawer?.open) mobileDrawer.onOpenChange(false)
+      if (open && drawerOpen) setInternalDrawerOpen(false)
       requestMobileOpen(open)
     },
-    [mobileDrawer, requestMobileOpen],
+    [drawerOpen, requestMobileOpen],
   )
-  const hasMobileNavigation = items.length > 0 || Boolean(account) || Boolean(guestActions)
-
-  useEffect(() => {
-    if (mobileOpen && mobileDrawer?.open) mobileDrawer.onOpenChange(false)
-  }, [mobileDrawer, mobileOpen])
+  const requestDrawerOpen = useCallback(
+    (open: boolean) => setInternalDrawerOpen(open),
+    [],
+  )
+  const mobileNavigationItems = platform === 'back-office' ? (sidebarItems ?? []) : items
+  const hasMobileNavigation = mobileNavigationItems.length > 0 || Boolean(navbarAccount) || Boolean(guestActions)
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -1410,27 +1691,37 @@ export function Navbar(props: NavbarProps) {
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1024px)')
     const synchronize = () => {
-      headerRef.current
-        ?.querySelectorAll<HTMLElement>('[popover]:popover-open')
-        .forEach((panel) => panel.hidePopover())
+      closeNavbarDropdowns()
       if (!desktop.matches) return
       if (mobileOpen) requestMobileOpen(false)
-      if (mobileDrawer?.open) mobileDrawer.onOpenChange(false)
+      if (drawerOpen) requestDrawerOpen(false)
     }
 
     synchronize()
     desktop.addEventListener('change', synchronize)
     return () => desktop.removeEventListener('change', synchronize)
-  }, [mobileDrawer, mobileOpen, requestMobileOpen])
+  }, [closeNavbarDropdowns, drawerOpen, mobileOpen, requestDrawerOpen, requestMobileOpen])
 
   const closeMobileNavigation = useCallback(
     () => requestMobileOpen(false),
     [requestMobileOpen],
   )
-  const mobileItems = useMemo(
-    () => items.map((item) => toSidebarItem(item, () => closeMobileNavigation())),
-    [closeMobileNavigation, items],
+  const mobileAccountUser = useMemo(
+    () => navbarAccount ? toSidebarAccountUser(navbarAccount, closeMobileNavigation) : undefined,
+    [closeMobileNavigation, navbarAccount],
   )
+  const mobileItems = useMemo(
+    () =>
+      platform === 'back-office'
+        ? (sidebarItems ?? []).map((item) => toMobileSidebarItem(item, closeMobileNavigation))
+        : items.map((item) => toSidebarItem(item, closeMobileNavigation)),
+    [closeMobileNavigation, items, platform, sidebarItems],
+  )
+  const mobileDrawerItems = useMemo<DrawerMenuItem[]>(
+    () => items.map((item) => toMobileDrawerItem(item, () => requestDrawerOpen(false))),
+    [items, requestDrawerOpen],
+  )
+  const hasMobileDrawerContent = mobileDrawerItems.length > 0 || Boolean(tableOfContents?.items.length)
   const handleDialogCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
     event.preventDefault()
     closeMobileNavigation()
@@ -1440,12 +1731,14 @@ export function Navbar(props: NavbarProps) {
   }
 
   return (
-    <header
-      ref={headerRef}
-      className={cn('border-b border-border bg-surface text-content', className)}
-      style={platform === 'back-office' ? { ...style, containerType: 'inline-size' } : style}
-      {...headerProps}
-    >
+    <DarkModeContext.Provider value={navbarDarkMode}>
+      <DropdownDismissalContext.Provider value={dropdownDismissalScope}>
+        <header
+          {...headerProps}
+          data-theme={navbarTheme}
+          className={cn('border-b border-border bg-surface text-content', className)}
+          style={platform === 'back-office' ? { ...style, containerType: 'inline-size' } : style}
+        >
       <div
         ref={desktopRowRef}
         className={cn(
@@ -1459,9 +1752,14 @@ export function Navbar(props: NavbarProps) {
         {search && (
           <div
             data-navbar-search=""
-            className="min-w-[180px] w-[348px] max-w-[348px] flex-[0_1_348px] in-data-[theme=dark]:[--color-field-border:var(--color-gray-600)]"
+            className={cn(
+              'in-data-[theme=dark]:[--color-field-border:var(--color-gray-600)]',
+              platform === 'back-office'
+                ? 'min-w-[360px] w-[420px] max-w-[480px] flex-[0_1_420px]'
+                : 'min-w-[180px] w-[348px] max-w-[348px] flex-[0_1_348px]',
+            )}
           >
-            {search}
+            {searchElement}
           </div>
         )}
         <CapacityAwareDesktopNavigation
@@ -1470,13 +1768,13 @@ export function Navbar(props: NavbarProps) {
           platform={platform}
           compositionKey={[
             search ? 'search' : 'no-search',
-            account ? 'account' : platform === 'front-office' && guestActions ? 'guest' : 'no-identity',
-            account && notificationTrigger ? 'notification' : 'no-notification',
+            navbarAccount ? 'account' : platform === 'front-office' && guestActions ? 'guest' : 'no-identity',
+            notificationTrigger ? 'notification' : 'no-notification',
           ].join('|')}
         />
         <DesktopIdentity
           platform={platform}
-          account={account}
+          account={navbarAccount}
           guestActions={guestActions}
           notificationTrigger={notificationTrigger}
         />
@@ -1490,11 +1788,13 @@ export function Navbar(props: NavbarProps) {
             <div className="flex min-h-10 items-center gap-3">
               <Brand brand={brand} />
               <div className="ml-auto flex items-center gap-3">
-                {account && (
+                {notificationTrigger && <NotificationTrigger {...notificationTrigger} />}
+                {navbarAccount && (
                   <Avatar
-                    src={account.avatarSrc}
-                    alt={account.name}
-                    initials={account.initials}
+                    src={navbarAccount.avatarSrc}
+                    alt={navbarAccount.name}
+                    name={navbarAccount.name}
+                    initials={navbarAccount.initials}
                     size="small"
                   />
                 )}
@@ -1513,13 +1813,17 @@ export function Navbar(props: NavbarProps) {
                 )}
               </div>
             </div>
-            {search && <div className="mt-3 min-w-0">{search}</div>}
+            {search && (
+              <div className="mt-3 min-w-0">
+                {searchElement}
+              </div>
+            )}
           </>
         ) : (
           <div
             className={cn(
-              'grid min-h-10 grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-3 min-[440px]:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto]',
-              search && 'grid-rows-[minmax(40px,auto)_auto] min-[440px]:grid-rows-none',
+              'grid min-h-10 grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-x-3 gap-y-3 min-[576px]:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto]',
+              search && 'grid-rows-[minmax(40px,auto)_auto] min-[576px]:grid-rows-none',
             )}
           >
             {hasMobileNavigation && (
@@ -1539,26 +1843,27 @@ export function Navbar(props: NavbarProps) {
               <Brand brand={brand} />
             </div>
             {search && (
-              <div className="col-span-4 row-start-2 min-w-0 min-[440px]:col-span-1 min-[440px]:col-start-3 min-[440px]:row-start-1">
-                {search}
+              <div className="col-span-4 row-start-2 min-w-0 min-[576px]:col-span-1 min-[576px]:col-start-3 min-[576px]:row-start-1">
+                {searchElement}
               </div>
             )}
-            {account && (
-              <div className="col-start-3 row-start-1 min-[440px]:col-start-4">
-                <Avatar
-                  src={account.avatarSrc}
-                  alt={account.name}
-                  initials={account.initials}
-                  size="small"
-                />
+            {notificationTrigger && (
+              <div className="col-start-3 row-start-1 min-[576px]:col-start-4">
+                <NotificationTrigger {...notificationTrigger} />
               </div>
             )}
-            {mobileDrawer && (
-              <div className="col-start-4 row-start-1 min-[440px]:col-start-5">
+            {hasMobileDrawerContent && (
+              <div className={cn(
+                'row-start-1',
+                notificationTrigger
+                    ? 'col-start-4 min-[576px]:col-start-5'
+                    : 'col-start-3 min-[576px]:col-start-4',
+              )}>
                 <Drawer.Trigger
-                  aria-label={mobileDrawer.ariaLabel ?? 'Buka navigasi kontekstual'}
-                  aria-controls={mobileDrawer.controls}
-                  aria-expanded={mobileDrawer.open}
+                  darkMode={navbarDarkMode}
+                  aria-label="Buka navigasi Navbar"
+                  aria-controls={drawerId}
+                  aria-expanded={drawerOpen}
                   className="size-9 in-data-[theme=dark]:text-gray-400 in-data-[theme=dark]:hover:bg-gray-700 in-data-[theme=dark]:hover:text-white"
                   icon={
                     <BarsFromLeft
@@ -1568,12 +1873,12 @@ export function Navbar(props: NavbarProps) {
                     />
                   }
                   onClick={() => {
-                    if (mobileDrawer.open) {
-                      mobileDrawer.onOpenChange(false)
+                    if (drawerOpen) {
+                      requestDrawerOpen(false)
                       return
                     }
                     if (mobileOpen) requestMobileOpen(false)
-                    mobileDrawer.onOpenChange(true)
+                    requestDrawerOpen(true)
                   }}
                 />
               </div>
@@ -1598,10 +1903,11 @@ export function Navbar(props: NavbarProps) {
             className="h-full !min-h-0 shadow-soft"
             logo={<Brand brand={brand} />}
             items={mobileItems}
+            user={platform === 'back-office' ? sidebarUser : mobileAccountUser}
+            darkMode={navbarDarkMode}
             footer={
-              <MobileIdentity
+              <MobileGuestActions
                 platform={platform}
-                account={account}
                 guestActions={guestActions}
                 close={() => closeMobileNavigation()}
               />
@@ -1618,6 +1924,33 @@ export function Navbar(props: NavbarProps) {
           </button>
         </div>
       </dialog>
-    </header>
+
+      {platform === 'back-office' && hasMobileDrawerContent && (
+        <Drawer
+          id={drawerId}
+          open={drawerOpen}
+          onClose={() => requestDrawerOpen(false)}
+          position="right"
+          size="s"
+          darkMode={navbarDarkMode}
+          aria-label="Menu"
+          eyebrow="Menu"
+          items={mobileDrawerItems}
+          afterItems={
+            tableOfContents ? (
+              <NavbarDrawerTableOfContents
+                tableOfContents={tableOfContents}
+                onItemClick={() => requestDrawerOpen(false)}
+                separated={mobileDrawerItems.length > 0}
+                darkMode={navbarDarkMode}
+              />
+            ) : undefined
+          }
+          className="lg:hidden"
+        />
+      )}
+      </header>
+      </DropdownDismissalContext.Provider>
+    </DarkModeContext.Provider>
   )
 }

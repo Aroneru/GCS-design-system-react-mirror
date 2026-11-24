@@ -26,6 +26,8 @@ export interface SearchCategory {
   disabled?: boolean
 }
 
+const CATEGORY_LABEL_MAX_LENGTH = 10
+
 /**
  * Tinggi kotak, ukuran ikon, ukuran teks, dan ukuran tombol per platform.
  *
@@ -116,13 +118,11 @@ export interface SearchProps
   debounce?: number
   /**
    * Menampilkan tombol cari di kanan.
-   * Bawaannya `false` pada platform `compact` (untuk navbar), dan `true` pada platform lainnya.
+   * Bawaannya `false` pada bentuk polos platform `compact` (untuk navbar),
+   * dan `true` pada platform lain maupun bentuk berkategori.
    */
   showButton?: boolean
-  /**
-   * Hanya berlaku pada varian polos. Varian kategori tingginya tetap 39px di
-   * lebar berapa pun — yang memanjang hanya isian di tengahnya.
-   */
+  /** Mengatur ukuran bentuk polos dan bentuk berkategori. */
   platform?: SearchPlatform
   application?: SearchApplication
   /**
@@ -197,7 +197,8 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   const size = platforms[platform]
   const accent = accents[application]
   const withCategory = Boolean(categories?.length)
-  const hasButton = showButton ?? (platform !== 'compact')
+  const compactCategory = withCategory && platform === 'compact'
+  const hasButton = showButton ?? (withCategory || platform !== 'compact')
   const isLive = trigger === 'change' || trigger === 'auto'
 
   useEffect(() => {
@@ -220,6 +221,10 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   const opsiKategori = [{ value: "", label: categoryPlaceholder }, ...(categories ?? [])]
   const labelKategori =
     opsiKategori.find((option) => option.value === kategoriKini)?.label ?? categoryPlaceholder
+  const labelKategoriCompact =
+    labelKategori.length > CATEGORY_LABEL_MAX_LENGTH
+      ? `${labelKategori.slice(0, CATEGORY_LABEL_MAX_LENGTH)}…`
+      : labelKategori
 
   // Ref internal dipakai untuk membaca isi field saat pencarian dijalankan;
   // ref dari luar tetap diteruskan supaya pemakai masih bisa memfokuskan field.
@@ -316,14 +321,35 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
       )}
 
       {withCategory ? (
-        // Tinggi 39px persis, bukan dibulatkan ke 40. Pada tiga ruas yang
-        // bersebelahan selisih 1px langsung terbaca sebagai garis yang tidak
-        // sejajar dengan isian di sekitarnya.
-        <div role="search" className="group flex h-[39px] items-stretch">
+        // Bentuk kategori reguler 39px: isi tombol kanan setinggi 37px dengan
+        // sisa 1px di atas dan bawah. Di Navbar, platform compact tetap 37px.
+        <div
+          role="search"
+          className={cn(
+            'group relative flex items-stretch bg-search-category-surface',
+            // Garis tipis tema gelap. Ring inset di pembungkus ini sendiri
+            // tertutup latar anak-anaknya (kategori, field, tombol), jadi yang
+            // terlihat hanya sudut rounded-nya. Karena itu ring dilukis di
+            // lapisan ::after di atas anak-anak, sebatas kategori + field
+            // (tombol kanan tetap tanpa garis, sama seperti di mode terang),
+            // dan disembunyikan saat fokus supaya garis aksen fokus terlihat.
+            "in-data-[theme=dark]:after:pointer-events-none in-data-[theme=dark]:after:absolute in-data-[theme=dark]:after:inset-y-0 in-data-[theme=dark]:after:left-0 in-data-[theme=dark]:after:content-['']",
+            'in-data-[theme=dark]:after:ring-1 in-data-[theme=dark]:after:ring-inset in-data-[theme=dark]:after:ring-gray-500 in-data-[theme=dark]:focus-within:after:ring-transparent',
+            !hasButton
+              ? 'in-data-[theme=dark]:after:right-0 in-data-[theme=dark]:after:rounded-lg'
+              : compactCategory
+                ? 'in-data-[theme=dark]:after:right-[37px] in-data-[theme=dark]:after:rounded-l-lg'
+                : 'in-data-[theme=dark]:after:right-[42px] in-data-[theme=dark]:after:rounded-l-lg',
+            compactCategory ? 'h-[37px] rounded-lg' : 'h-[39px] rounded-[10px]',
+          )}
+        >
           <div
             className={cn(
               'relative flex shrink-0 items-center rounded-l-lg border transition-colors',
-              'border-field-border bg-search-category-surface',
+              compactCategory
+                ? 'w-[128px] border-field-border'
+                : 'w-[113px] border-search-category-border',
+              'bg-search-category-surface',
               !disabled && accent.groupFocus,
             )}
           >
@@ -334,12 +360,10 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               aria-hidden="true"
               tabIndex={-1}
               onChange={(event) => pilihKategori(event.target.value)}
-              // Pembawa nilai saja, tapi tetap di alur: lebar ruas kategori
-              // ditentukan pilihan terpanjangnya, bukan yang sedang aktif —
-              // kalau ia dicabut, kotaknya melebar-menyempit tiap kali memilih.
-              // Karena itu kelas ukurannya dipertahankan, sementara ia sendiri
-              // tak terlihat dan tak bisa disentuh.
-              className="pointer-events-none h-full appearance-none pr-10 pl-5 text-sm opacity-0"
+              // Pembawa nilai saja. Ruas reguler mengikuti desain 113px;
+              // compact Navbar tetap 128px agar label panjang tidak langsung
+              // menghabiskan ruang field pencarian di sebelahnya.
+              className="pointer-events-none absolute inset-0 h-full w-full appearance-none opacity-0"
             >
               <option value="">{categoryPlaceholder}</option>
               {categories?.map((option) => (
@@ -358,33 +382,38 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
                 <button
                   type="button"
                   disabled={disabled}
-                  aria-label={categoryPlaceholder}
+                  aria-label={`${categoryPlaceholder}: ${labelKategori}`}
+                  title={labelKategori}
                   className={cn(
-                    'absolute inset-0 flex items-center pr-10 pl-5 text-left text-sm outline-none',
+                    'absolute inset-0 flex items-center px-2.5 text-sm outline-none',
+                    compactCategory && 'py-[2px]',
                     'disabled:cursor-not-allowed',
                     'text-content disabled:text-content-disabled',
                   )}
                 >
-                  <span className="truncate">{labelKategori}</span>
+                  <span className="flex w-full min-w-0 items-center gap-2.5">
+                    <span className="min-w-0 flex-1 truncate text-center">
+                      {compactCategory ? labelKategoriCompact : labelKategori}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'flex shrink-0 items-center',
+                        disabled ? 'text-content-disabled' : 'text-content',
+                      )}
+                    >
+                      <ChevronIcon />
+                    </span>
+                  </span>
                 </button>
               }
             />
-
-            <span
-              aria-hidden="true"
-              className={cn(
-                'pointer-events-none absolute right-5 flex items-center',
-                disabled ? 'text-content-disabled' : 'text-content',
-              )}
-            >
-              <ChevronIcon />
-            </span>
           </div>
 
           <div
             className={cn(
               'flex min-w-0 flex-1 items-center border-y px-2.5 text-sm transition-colors',
-              'border-field-border bg-search-field-surface',
+              'border-field-border bg-search-category-field-surface',
               !disabled && accent.groupFocus,
               !hasButton && 'rounded-r-lg border-r',
             )}
@@ -399,13 +428,14 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
               disabled={disabled}
               aria-label={buttonLabel}
               className={cn(
-                'flex w-11 shrink-0 items-center justify-center rounded-r-lg text-white transition-colors',
+                'flex shrink-0 items-center justify-center rounded-r-lg text-white transition-colors',
+                compactCategory ? 'w-[37px]' : 'my-px h-[37px] w-[42px]',
                 'focus-visible:outline-2 focus-visible:outline-offset-2',
                 'disabled:cursor-not-allowed disabled:opacity-50',
                 accent.solid,
               )}
             >
-              <SearchIcon className="size-4" />
+              <SearchIcon className={compactCategory ? 'size-3.5' : 'size-4'} />
             </button>
           )}
         </div>
@@ -414,6 +444,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
           role="search"
           className={cn(
             'flex items-center gap-2 rounded-lg border px-2.5 transition-colors',
+            'in-data-[theme=dark]:ring-1 in-data-[theme=dark]:ring-inset in-data-[theme=dark]:ring-gray-500',
             disabled ? 'border-field-border bg-field-disabled' : 'border-field-border bg-search-field-surface',
             size.field,
             size.text,

@@ -52,18 +52,18 @@ export function SpacingPage() {
         <article className="ds-card overflow-hidden">
           <div className="ds-scroll-x overflow-x-auto">
             <div className="min-w-[560px]">
-              <div className="grid grid-cols-[90px_110px_90px_1fr] gap-4 border-b border-border px-5 py-3.5 sm:px-7">
-                <p className="text-xs font-black text-gray-900">Name</p>
-                <p className="text-xs font-black text-gray-900">Size</p>
-                <p className="text-xs font-black text-gray-900">Pixels</p>
+              <div className="grid grid-cols-[90px_110px_90px_1fr] gap-4 border-b border-border px-5 py-3.5 sm:px-7 dark:border-gray-700">
+                <p className="text-xs font-black text-gray-900 dark:text-white">Name</p>
+                <p className="text-xs font-black text-gray-900 dark:text-white">Size</p>
+                <p className="text-xs font-black text-gray-900 dark:text-white">Pixels</p>
                 <p aria-hidden="true" />
               </div>
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 dark:divide-gray-700">
                 {spacingScale.map(([name, size, px, bar]) => (
                   <div key={name} className="grid grid-cols-[90px_110px_90px_1fr] items-center gap-4 px-5 py-3 sm:px-7">
-                    <code className="text-sm font-bold text-gray-900">{name}</code>
-                    <code className="text-sm text-gray-500">{size}</code>
-                    <code className="text-sm text-gray-500">{px}</code>
+                    <code className="text-sm font-bold text-gray-900 dark:text-white">{name}</code>
+                    <code className="text-sm text-gray-500 dark:text-gray-400">{size}</code>
+                    <code className="text-sm text-gray-500 dark:text-gray-400">{px}</code>
                     <div><div className={`${bar} h-4 rounded-xs bg-primary-600`} /></div>
                   </div>
                 ))}
@@ -88,34 +88,46 @@ export function SpacingPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {prefixes.map(([label, code, desc]) => (
             <article key={label} className="ds-card p-5">
-              <p className="text-sm font-black text-gray-900">{label}</p>
-              <code className="mt-1 block text-xs font-bold text-primary-700">{code}</code>
-              <p className="mt-3 text-sm leading-6 text-gray-600">{desc}</p>
+              <p className="text-sm font-black text-gray-900 dark:text-white">{label}</p>
+              <code className="mt-1 block text-xs font-bold text-primary-700 dark:text-primary-400">{code}</code>
+              <p className="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">{desc}</p>
             </article>
           ))}
         </div>
 
+        {/* Di mode gelap docs ilustrasinya memakai ujung gelap tangga yang sama (primary-900, gray-700). */}
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <article className="ds-card p-5">
-            <code className="text-sm font-bold text-primary-700">.p-4</code>
-            <div className="mt-3 rounded-lg bg-primary-100">
+            <code className="text-sm font-bold text-primary-700 dark:text-primary-400">.p-4</code>
+            <div className="mt-3 rounded-lg bg-primary-100 dark:bg-primary-900">
               <div className="p-4">
-                <div className="rounded-md bg-white px-3 py-2 text-xs font-bold text-gray-700 shadow-sm">Konten</div>
+                <div className="rounded-md bg-white px-3 py-2 text-xs font-bold text-gray-700 shadow-sm dark:bg-gray-700 dark:text-gray-200">
+                  Konten
+                </div>
               </div>
             </div>
           </article>
           <article className="ds-card p-5">
-            <code className="text-sm font-bold text-primary-700">.mt-4</code>
-            <div className="mt-3 rounded-lg border border-dashed border-primary-300 p-2">
-              <div className="rounded-md bg-gray-100 px-3 py-2 text-xs font-bold text-gray-500">Elemen pertama</div>
-              <div className="mt-4 rounded-md bg-primary-100 px-3 py-2 text-xs font-bold text-primary-800">Elemen kedua</div>
+            <code className="text-sm font-bold text-primary-700 dark:text-primary-400">.mt-4</code>
+            <div className="mt-3 rounded-lg border border-dashed border-primary-300 p-2 dark:border-primary-700">
+              <div className="rounded-md bg-gray-100 px-3 py-2 text-xs font-bold text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                Elemen pertama
+              </div>
+              <div className="mt-4 rounded-md bg-primary-100 px-3 py-2 text-xs font-bold text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+                Elemen kedua
+              </div>
             </div>
           </article>
           <article className="ds-card p-5">
-            <code className="text-sm font-bold text-primary-700">.gap-4</code>
-            <div className="mt-3 flex gap-4 rounded-lg border border-dashed border-primary-300 p-2">
+            <code className="text-sm font-bold text-primary-700 dark:text-primary-400">.gap-4</code>
+            <div className="mt-3 flex gap-4 rounded-lg border border-dashed border-primary-300 p-2 dark:border-primary-700">
               {[1, 2, 3].map((n) => (
-                <div key={n} className="flex-1 rounded-md bg-primary-100 px-3 py-2 text-center text-xs font-bold text-primary-800">{n}</div>
+                <div
+                  key={n}
+                  className="flex-1 rounded-md bg-primary-100 px-3 py-2 text-center text-xs font-bold text-primary-800 dark:bg-primary-900 dark:text-primary-200"
+                >
+                  {n}
+                </div>
               ))}
             </div>
           </article>
@@ -134,7 +146,7 @@ export function SpacingPage() {
         <PrincipleList
           items={[
             <>Selalu pakai langkah pada skala — hindari nilai arbitrer seperti <C>p-[13px]</C> agar ritme 4px terjaga.</>,
-            <>Langkah kecil (<strong className="text-gray-900">1–4</strong>) untuk jarak dalam komponen, sedang (<strong className="text-gray-900">5–12</strong>) antarkomponen, besar (<strong className="text-gray-900">14+</strong>) antarseksi.</>,
+            <>Langkah kecil (<strong className="text-gray-900 dark:text-white">1–4</strong>) untuk jarak dalam komponen, sedang (<strong className="text-gray-900 dark:text-white">5–12</strong>) antarkomponen, besar (<strong className="text-gray-900 dark:text-white">14+</strong>) antarseksi.</>,
             <>Pilih <C>gap-*</C> dibanding margin antaritem di flex/grid — lebih mudah dirawat dan tidak menimbulkan margin ganda.</>,
             <>Elemen dengan fungsi setara harus memakai jarak yang sama agar hierarki konsisten.</>,
           ]}

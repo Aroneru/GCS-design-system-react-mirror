@@ -125,8 +125,8 @@ const toc: TocEntry[] = [
 function Preview({ label, children }: { label?: string; children: ReactNode }) {
   return (
     <div>
-      {label && <p className="mb-2 text-sm font-black text-gray-900">{label}</p>}
-      <div className="rounded-2xl border border-border bg-surface-subtle p-4 sm:p-5">
+      {label && <p className="mb-2 text-sm font-black text-gray-900 dark:text-white">{label}</p>}
+      <div className="rounded-2xl border border-border bg-surface-subtle p-4 sm:p-5 dark:border-gray-700 dark:bg-gray-900">
         <div className="overflow-hidden rounded-xl shadow-soft">{children}</div>
       </div>
     </div>
@@ -164,7 +164,8 @@ export function FooterPage() {
         <Lead>
           Satu blok utuh berlatar <Hl>gray-800</Hl>: baris atas berisi logo dan menu, lalu garis tipis,
           lalu baris bawah berisi hak cipta dan ikon sosial. Semua bagiannya opsional — yang tidak
-          diisi tidak dirender, bukan disembunyikan lewat CSS.
+          diisi tidak dirender, bukan disembunyikan lewat CSS. Footer selalu gelap, jadi tidak punya
+          prop <Hl>darkMode</Hl>; warnanya diatur lewat token <Hl>--color-footer-*</Hl>.
         </Lead>
 
         <Preview>
@@ -355,7 +356,7 @@ export function FooterPage() {
       <FlowSection id="responsif" title="Perilaku responsif">
         <Lead>
           Ambang di bawah ini diukur dari{' '}
-          <strong className="text-gray-900">lebar footer itu sendiri</strong>, bukan lebar layar —
+          <strong className="text-gray-900 dark:text-white">lebar footer itu sendiri</strong>, bukan lebar layar —
           elemen <Hl>{'<footer>'}</Hl> dipasangi <Hl>@container</Hl>. Jadi footer yang ditaruh di kolom
           sempit pada layar desktop tetap tampil bertumpuk seperti di ponsel, dan sebaliknya. Cara
           mengeceknya: ganti kontrol <em>Tampilan</em> di Playground, atau perkecil jendela.
@@ -364,14 +365,14 @@ export function FooterPage() {
         <div className="grid gap-4 sm:grid-cols-3">
           {responsiveBehaviour.map(([title, desc]) => (
             <article key={title} className="ds-card p-5">
-              <h3 className="text-sm font-black text-gray-900">{title}</h3>
-              <p className="mt-1.5 text-body-sm leading-6 text-gray-500">{desc}</p>
+              <h3 className="text-sm font-black text-gray-900 dark:text-white">{title}</h3>
+              <p className="mt-1.5 text-body-sm leading-6 text-gray-500 dark:text-gray-400">{desc}</p>
             </article>
           ))}
         </div>
 
-        <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500">
-          Yang tidak berubah di ukuran mana pun: latar <Hl>bg-gray-800</Hl>, jarak atas-bawah 64px, lebar
+        <p className="mt-4 max-w-2xl text-body-sm leading-6 text-gray-500 dark:text-gray-400">
+          Yang tidak berubah di ukuran mana pun: latar <Hl>--color-footer-surface</Hl> (gray-800), jarak atas-bawah 64px, lebar
           isi dibatasi <Hl>max-w-7xl</Hl> lalu dipusatkan — kecuali bila <Hl>fluid</Hl> diisi — dan garis
           pemisah tipis di atas baris hak cipta.
         </p>

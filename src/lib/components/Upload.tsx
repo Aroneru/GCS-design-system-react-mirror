@@ -37,14 +37,16 @@ const platforms: Record<UploadPlatform, { field: string; text: string; button: s
  * area attach selama berkas ditahan di atasnya. Keduanya ditulis utuh karena
  * Tailwind memindai nama kelas secara harfiah.
  */
-const accents: Record<UploadApplication, { solid: string; drag: string; dragDark: string }> = {
+const accents: Record<UploadApplication, { solid: string; solidBorderDark: string; drag: string; dragDark: string }> = {
   default: {
     solid: 'bg-primary-700 hover:bg-primary-800 focus-visible:outline-primary-700',
+    solidBorderDark: 'border-primary-700',
     drag: 'border-primary-500 bg-primary-50',
     dragDark: 'border-primary-500 bg-gray-600',
   },
   purple: {
     solid: 'bg-purple-500 hover:bg-purple-600 focus-visible:outline-purple-500',
+    solidBorderDark: 'border-purple-500',
     drag: 'border-purple-500 bg-purple-50',
     dragDark: 'border-purple-500 bg-gray-600',
   },
@@ -233,7 +235,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
           <div
             className={cn(
               'flex flex-1 items-stretch overflow-hidden rounded-lg border transition-colors',
-              darkMode ? 'border-gray-700' : 'border-gray-300',
+              darkMode ? (file ? 'border-gray-700' : 'border-upload-empty-surface') : 'border-gray-300',
               size.field,
             )}
           >
@@ -245,7 +247,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
               disabled={disabled}
               className={cn(
                 'shrink-0 border-r font-medium text-white transition-colors',
-                darkMode ? 'border-gray-700' : 'border-gray-300',
+                darkMode ? accent.solidBorderDark : 'border-gray-300',
                 'focus-visible:outline-2 focus-visible:-outline-offset-2',
                 'disabled:cursor-not-allowed disabled:opacity-50',
                 size.button,
@@ -258,7 +260,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
             <p
               className={cn(
                 'flex min-w-0 flex-1 items-center px-4 transition-colors',
-                darkMode ? 'bg-gray-800' : 'bg-gray-50',
+                darkMode ? (file ? 'bg-gray-700' : 'bg-upload-empty-surface') : 'bg-gray-50',
                 size.text,
                 disabled
                   ? (darkMode ? 'text-gray-500' : 'text-gray-400')
@@ -279,7 +281,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
               disabled={disabled}
               className={cn(
                 'shrink-0 rounded-lg border px-4 font-medium transition-colors',
-                darkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white' : 'border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+                darkMode ? 'border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white' : 'border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-900',
                 size.text,
               )}
             >

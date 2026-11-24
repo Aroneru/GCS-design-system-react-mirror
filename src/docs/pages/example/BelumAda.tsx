@@ -45,7 +45,7 @@ export function BelumAda({
         } ${ringkas ? 'p-1' : 'p-4'}`}
       >
         <p
-          className={`rounded-lg border border-border bg-white/95 text-center font-black text-gray-900 shadow-soft ${
+          className={`rounded-lg border border-border bg-surface/95 text-center font-black text-content shadow-soft ${
             ringkas ? 'px-2.5 py-1 text-xs' : 'px-4 py-2.5 text-sm'
           }`}
         >

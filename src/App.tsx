@@ -1,4 +1,6 @@
+import { useLayoutEffect } from "react";
 import { DocsLayout } from "./docs/DocsLayout";
+import { applyDocsTheme, hasDarkMode, setDarkPreference, useDarkPreference } from "./docs/docsTheme";
 import { useHashRoute } from "./docs/useHashRoute";
 import { HomePage } from "./docs/pages/HomePage";
 import { ExamplePage } from "./docs/pages/ExamplePage";
@@ -151,8 +153,36 @@ function renderNavbarPreview(path: string) {
 
 function App() {
   const [path] = useHashRoute();
+  const navbarPreview = path.startsWith("/preview/navbar/");
+  const navbarPreviewDark = navbarPreview && new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("theme") === "dark";
 
-  if (path.startsWith("/preview/navbar/")) {
+  // Mode gelap docs berlaku per halaman (lihat docs/docsTheme.ts). Dipasang di
+  // sini, bukan di DocsLayout, supaya ikut berlaku di Portal Dashboard yang
+  // tampil penuh layar di luar DocsLayout. Layout effect: atributnya harus
+  // terpasang sebelum frame digambar, supaya pindah halaman tidak sempat
+  // menampilkan warna tema halaman sebelumnya.
+  const dark = useDarkPreference() && hasDarkMode(path);
+  useLayoutEffect(() => {
+    applyDocsTheme(dark);
+  }, [dark]);
+
+  // Sinkronkan kanvas iframe preview pada perubahan kontrol tema. Atribut dan
+  // inline style awalnya sudah dipasang oleh index.html sebelum React dimuat.
+  useLayoutEffect(() => {
+    const html = document.documentElement;
+    if (navbarPreviewDark) {
+      html.dataset.previewTheme = "dark";
+      html.style.backgroundColor = "#111827";
+      html.style.colorScheme = "dark";
+      return;
+    }
+
+    delete html.dataset.previewTheme;
+    html.style.removeProperty("background-color");
+    html.style.removeProperty("color-scheme");
+  }, [navbarPreviewDark]);
+
+  if (navbarPreview) {
     return renderNavbarPreview(path);
   }
 
@@ -161,15 +191,22 @@ function App() {
   // startsWith, bukan ===, karena aplikasi itu punya rute-dalam sendiri
   // (/example/app/pengajuan, .../pemohon, dst) yang dibaca ExampleAppFrame.
   if (path.startsWith("/example/app")) {
-    return <ExampleAppFrame path={path} />;
+    return (
+      <ExampleAppFrame
+        path={path}
+        darkMode={dark}
+        onDarkModeChange={setDarkPreference}
+      />
+    );
   }
 
   // Portal Dashboard memakai bingkai yang sama: penuh layar, dengan tirai
-  // transisi dan tombol pulang ke pintu masuknya.
+  // transisi dan tombol pulang ke pintu masuknya. Mode gelapnya mengikuti
+  // pilihan yang sama dengan docs, dan tombol tema di header-nya mengubahnya.
   if (path.startsWith("/portal-dashboard/app")) {
     return (
       <ExampleAppFrame path={path} kembali="/portal-dashboard">
-        <PortalDashboard />
+        <PortalDashboard darkMode={dark} onDarkModeChange={setDarkPreference} />
       </ExampleAppFrame>
     );
   }

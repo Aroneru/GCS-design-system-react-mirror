@@ -13,6 +13,29 @@
     <link rel="apple-touch-icon" href="/images/favicon-180.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ceplok Design Kit — React</title>
+    <!-- Mode gelap docs dipasang sebelum frame pertama, supaya pembaca yang
+         memilihnya tidak melihat kilatan terang selama skrip aplikasi dimuat.
+         DocsLayout menyesuaikannya lagi untuk halaman yang belum punya tampilan
+         gelap (lihat src/docs/docsTheme.ts). -->
+    <script>
+      try {
+        if (localStorage.getItem('ceplok-docs-theme') === 'dark') {
+          document.documentElement.dataset.docsTheme = 'dark'
+        }
+
+        // Preview Navbar hidup di dokumen iframe sendiri. Terapkan warna kanvas
+        // dari parameter hash sebelum bundle React dimuat agar preview dark tidak
+        // sempat dicat putih pada frame pertamanya.
+        const hashQuery = location.hash.split('?')[1] || ''
+        const previewDark = location.hash.startsWith('#/preview/navbar/') &&
+          new URLSearchParams(hashQuery).get('theme') === 'dark'
+        if (previewDark) {
+          document.documentElement.dataset.previewTheme = 'dark'
+          document.documentElement.style.backgroundColor = '#111827'
+          document.documentElement.style.colorScheme = 'dark'
+        }
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

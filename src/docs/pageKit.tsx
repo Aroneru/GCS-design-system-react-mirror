@@ -98,20 +98,35 @@ export function Demo({
   children,
   label,
   dark,
+  light,
   minWidth,
 }: {
   children: ReactNode
   label?: string
   dark?: boolean
+  /** Kebalikan `dark`: kotaknya tetap terang meski docs sedang gelap. */
+  light?: boolean
   minWidth?: string
 }) {
   return (
     <div>
-      {label && <p className="mb-2 text-sm font-black text-gray-900">{label}</p>}
-      {/* `dark` untuk komponen yang punya tampilan gelap — latarnya ikut gelap. */}
+      {label && <p className="mb-2 text-sm font-black text-gray-900 dark:text-white">{label}</p>}
+      {/*
+        `dark` untuk komponen yang punya tampilan gelap — latarnya ikut gelap.
+        `light` kebalikannya, untuk versi terang komponen di mode gelap docs:
+        `data-theme="light"` mengembalikan color-scheme terang dan
+        `dark:text-content` warna teks yang diwarisi komponen. Tanpa keduanya
+        kotak mengikuti mode docs, karena halamannya memberi `darkMode` pada
+        komponen di dalamnya (lihat docsTheme.ts).
+      */}
       <div
+        data-theme={light ? 'light' : undefined}
         className={`rounded-xl border p-5 ${minWidth ? 'ds-scroll-x overflow-x-auto' : ''} ${
-          dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
+          dark
+            ? 'border-gray-800 bg-gray-900 dark:border-gray-700'
+            : light
+              ? 'border-border bg-surface-subtle dark:text-content'
+              : 'border-border bg-surface-subtle dark:border-gray-700 dark:bg-gray-900'
         }`}
       >
         {minWidth ? <div style={{ minWidth }}>{children}</div> : children}
@@ -152,7 +167,7 @@ export function CodeBlock({ children }: { children: ReactNode }) {
 
 /** Potongan kode inline di dalam paragraf. */
 export const C = ({ children }: { children: ReactNode }) => (
-  <code className="text-xs font-bold text-gray-700">{children}</code>
+  <code className="text-xs font-bold text-gray-700 dark:text-gray-300">{children}</code>
 )
 
 /**
@@ -160,7 +175,7 @@ export const C = ({ children }: { children: ReactNode }) => (
  * yang disebut di luar blok kode. `H` yang primary-300 terlalu pucat di sini.
  */
 export const Hl = ({ children }: { children: ReactNode }) => (
-  <span className="text-primary-500">{children}</span>
+  <span className="text-primary-500 dark:text-primary-400">{children}</span>
 )
 
 /** Penyorot potongan kode, menggantikan <span class="text-primary-300"> di Blade. */
@@ -206,9 +221,9 @@ export function Segmented<T extends string | number | boolean>({
 }) {
   return (
     <div
-      className={`inline-flex rounded-lg border border-border bg-surface p-1 ${wrap ? 'flex-wrap' : ''} ${
-        disabled ? 'opacity-50' : ''
-      }`}
+      className={`inline-flex rounded-lg border border-border bg-surface p-1 dark:border-gray-700 dark:bg-gray-800 ${
+        wrap ? 'flex-wrap' : ''
+      } ${disabled ? 'opacity-50' : ''}`}
       role="group"
       aria-label={label}
     >
@@ -219,7 +234,9 @@ export function Segmented<T extends string | number | boolean>({
           onClick={() => onChange(o.value)}
           disabled={disabled || o.disabled}
           className={`inline-flex items-center gap-2 rounded-md py-1.5 text-sm font-bold transition-colors disabled:cursor-not-allowed ${itemClassName} ${
-            value === o.value ? 'bg-primary-50 text-primary-700' : 'text-gray-500 hover:text-gray-800'
+            value === o.value
+              ? 'bg-primary-50 text-primary-700 dark:bg-primary-900 dark:text-primary-300'
+              : 'text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100'
           } ${!disabled && o.disabled ? 'opacity-40' : ''}`}
           aria-pressed={value === o.value}
         >
@@ -236,7 +253,7 @@ export function Segmented<T extends string | number | boolean>({
 }
 
 export const ControlLabel = ({ children }: { children: ReactNode }) => (
-  <span className="text-xs font-black tracking-wide text-gray-500 uppercase">{children}</span>
+  <span className="text-xs font-black tracking-wide text-gray-500 uppercase dark:text-gray-400">{children}</span>
 )
 
 /* ---------- Kartu Overview ---------- */
@@ -303,7 +320,7 @@ export function OverviewCard({
       <div className="grid flex-1" inert>
         {children}
       </div>
-      <h2 className="mt-4 text-heading-4 font-black text-gray-900">
+      <h2 className="mt-4 text-heading-4 font-black text-gray-900 dark:text-white">
         <a
           href={`#${route}`}
           className="rounded-sm after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none"
@@ -311,9 +328,9 @@ export function OverviewCard({
           {name}
         </a>
       </h2>
-      <p className="mt-1.5 text-body-sm text-gray-500">{desc}</p>
+      <p className="mt-1.5 text-body-sm text-gray-500 dark:text-gray-400">{desc}</p>
       <span
-        className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary-700"
+        className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary-700 dark:text-primary-400"
         aria-hidden="true"
       >
         Lihat detail

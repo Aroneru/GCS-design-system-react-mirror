@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Clock } from '../../../lib/icons/solid'
 import { Badge, type BadgeSize, type BadgeVariant } from '../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -8,6 +9,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -50,6 +52,9 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+/** stayDark: bagian Dark mode selalu memperagakan `darkMode`, jadi labelnya tidak bertukar. */
+const tocDark = tocForDarkDocs(toc, true)
+
 /** Satu baris berisi kelima variant dengan pengaturan yang sama. */
 function Baris({ size, darkMode }: { size: BadgeSize; darkMode?: boolean }) {
   return (
@@ -68,14 +73,17 @@ export function BadgePage() {
   const [size, setSize] = useState<BadgeSize>('sm')
   const [pakaiIkon, setPakaiIkon] = useState(true)
   const [pakaiTutup, setPakaiTutup] = useState(true)
-  const [dark, setDark] = useState(false)
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
+  const [dark, setDark] = usePlaygroundDark()
 
   return (
     <UsulanPage
       eyebrow="Components"
       title="Badge"
       description="Label status ringkas untuk menandai kondisi sebuah entitas. Lima variant warna, dua ukuran, ikon dan tombol tutup opsional. Tersedia juga dalam tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="badge" title="Badge">
         <Lead>
@@ -84,18 +92,20 @@ export function BadgePage() {
         </Lead>
         <Demo>
           <div className="flex flex-wrap items-center gap-3">
-            <Badge variant="gray">Draf</Badge>
-            <Badge variant="danger">Ditolak</Badge>
-            <Badge variant="warning">Menunggu</Badge>
-            <Badge variant="success">Aktif</Badge>
-            <Badge variant="brand">Baru</Badge>
+            <Badge variant="gray" darkMode={docsDark}>Draf</Badge>
+            <Badge variant="danger" darkMode={docsDark}>Ditolak</Badge>
+            <Badge variant="warning" darkMode={docsDark}>Menunggu</Badge>
+            <Badge variant="success" darkMode={docsDark}>Aktif</Badge>
+            <Badge variant="brand" darkMode={docsDark}>Baru</Badge>
           </div>
         </Demo>
         <SectionCode>
           {"import { Badge } from '@ceplok-ui/design-kit-react'\n\n"}
           {'<Badge '}
           <H>variant</H>
-          {'="success">Aktif</Badge>'}
+          {'="success"'}
+          {dm.inline}
+          {'>Aktif</Badge>'}
         </SectionCode>
       </FlowSection>
 
@@ -106,17 +116,17 @@ export function BadgePage() {
         </Lead>
         <div className="grid gap-5 sm:grid-cols-3">
           <Demo label="Dengan ikon">
-            <Badge variant="brand" icon={<Clock />}>
+            <Badge variant="brand" icon={<Clock />} darkMode={docsDark}>
               Badge
             </Badge>
           </Demo>
           <Demo label="Dengan tombol tutup">
-            <Badge variant="brand" dismissible>
+            <Badge variant="brand" dismissible darkMode={docsDark}>
               Badge
             </Badge>
           </Demo>
           <Demo label="Keduanya">
-            <Badge variant="brand" icon={<Clock />} dismissible>
+            <Badge variant="brand" icon={<Clock />} dismissible darkMode={docsDark}>
               Badge
             </Badge>
           </Demo>
@@ -126,6 +136,7 @@ export function BadgePage() {
           <H>icon</H>
           {'={<Clock />} '}
           <H>dismissible</H>
+          {dm.inline}
           {'>Badge</Badge>'}
         </SectionCode>
       </FlowSection>
@@ -138,23 +149,35 @@ export function BadgePage() {
         <Demo>
           <div className="flex flex-col gap-4">
             {sizes.map((s) => (
-              <Baris key={s.value} size={s.value} />
+              <Baris key={s.value} size={s.value} darkMode={docsDark} />
             ))}
           </div>
         </Demo>
         <SectionCode>
           {'<Badge '}
           <H>size</H>
-          {'="lg" variant="success" icon={<Clock />} dismissible>Badge</Badge>'}
+          {'="lg" variant="success" icon={<Clock />} dismissible'}
+          {dm.inline}
+          {'>Badge</Badge>'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> membalik pasangan warnanya: latar -900 (gray-700 untuk variant gray) dan
-          teks -300, keduanya di atas 4,5:1.
-        </Lead>
-        <Demo dark>
+      {/* stayDark: bagian ini selalu memperagakan darkMode, di mode docs apa pun. */}
+      <ModeSection
+        name="Badge"
+        stayDark
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> membalik pasangan warnanya: latar -900 (gray-700 untuk variant gray)
+            dan teks -300, keduanya di atas 4,5:1. Badge di dalam <Hl>Table</Hl>, <Hl>Modal</Hl>, atau{' '}
+            <Hl>Navbar</Hl> ber-<Hl>darkMode</Hl> ikut gelap tanpa prop sendiri, dan{' '}
+            <Hl>darkMode={'{false}'}</Hl> pada Badge tetap menang. Badge belum berbasis token, jadi
+            ia tidak ikut gelap lewat <Hl>data-theme=&quot;dark&quot;</Hl> pembungkus; pakai prop{' '}
+            <Hl>darkMode</Hl>.
+          </>
+        }
+      >
+        <Demo label="darkMode" dark>
           <div className="flex flex-col gap-4">
             {sizes.map((s) => (
               <Baris key={s.value} size={s.value} darkMode />
@@ -166,7 +189,7 @@ export function BadgePage() {
           <H>darkMode</H>
           {' variant="success" icon={<Clock />} dismissible>Badge</Badge>'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>

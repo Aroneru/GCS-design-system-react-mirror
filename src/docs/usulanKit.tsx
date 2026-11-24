@@ -1,13 +1,19 @@
 import {
-  createContext,
   useContext,
   useEffect,
   useState,
   type MouseEvent,
   type ReactNode,
 } from 'react'
-import { CodeBlock, ControlLabel, Segmented } from './pageKit'
-import { fontClass, typographyOptions, type PlaygroundFont } from './usulanOptions'
+import { useDocsDark } from './docsTheme'
+import { CodeBlock, ControlLabel, Hl, Segmented } from './pageKit'
+import {
+  PlaygroundFontContext,
+  fontClass,
+  fontScopeStyle,
+  typographyOptions,
+  type PlaygroundFont,
+} from './usulanOptions'
 
 /**
  * Kerangka halaman dokumentasi: judul ber-anchor, blok kode menempel di tiap
@@ -91,11 +97,6 @@ function useActiveSection(toc: TocEntry[]) {
  * state tambahan di tiap halaman. Di luar bagian Playground konteksnya kosong,
  * sehingga contoh-contoh lain di halaman tidak ikut berubah font.
  */
-const PlaygroundFontContext = createContext<{
-  font: PlaygroundFont
-  setFont: (font: PlaygroundFont) => void
-} | null>(null)
-
 function PlaygroundFontProvider({ children }: { children: ReactNode }) {
   const [font, setFont] = useState<PlaygroundFont>('sans')
   return (
@@ -116,7 +117,11 @@ export function PlaygroundFontScope({
 }) {
   const ctx = useContext(PlaygroundFontContext)
   const cls = [className, ctx ? fontClass[ctx.font] : ''].filter(Boolean).join(' ')
-  return <div className={cls || undefined}>{children}</div>
+  return (
+    <div className={cls || undefined} style={ctx ? fontScopeStyle(ctx.font) : undefined}>
+      {children}
+    </div>
+  )
 }
 
 /** Pola satu bagian: judul ber-anchor, lalu isi. */
@@ -131,14 +136,14 @@ export function FlowSection({
 }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <h2 className="group flex items-baseline gap-2 text-heading-3 font-black text-gray-900">
+      <h2 className="group flex items-baseline gap-2 text-heading-3 font-black text-gray-900 dark:text-white">
         {title}
         <a
           href={sectionHref(id)}
           onClick={handleSectionClick(id)}
           title="Tautan ke bagian ini"
           aria-label={`Tautan ke bagian ${title}`}
-          className="rounded text-primary-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-primary-600 focus-visible:opacity-100"
+          className="rounded text-primary-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-primary-600 focus-visible:opacity-100 dark:text-primary-800 dark:hover:text-primary-400"
         >
           #
         </a>
@@ -152,7 +157,54 @@ export function FlowSection({
 
 /** Paragraf pengantar tiap bagian. */
 export function Lead({ children }: { children: ReactNode }) {
-  return <p className="mb-4 max-w-2xl text-body-sm text-gray-500">{children}</p>
+  return <p className="mb-4 max-w-2xl text-body-sm text-gray-500 dark:text-gray-400">{children}</p>
+}
+
+/**
+ * Bagian "Dark mode" di halaman komponen, yang memperagakan `darkMode` dengan
+ * `lead` milik halaman. Pasangannya di daftar isi: `tocForDarkDocs` di
+ * docsTheme.ts.
+ *
+ * Dengan `stayDark`, bagian ini tetap Dark mode di kedua mode docs. Isinya
+ * ditulis halaman: komponen dengan `darkMode` di dalam <Demo dark>, dan
+ * cuplikan yang selalu menulis `darkMode`.
+ *
+ * Tanpa `stayDark`, bagian ini bertukar menjadi Light mode selama docs gelap,
+ * ketika semua contoh lain sudah gelap. Isinya komponen dengan
+ * `darkMode={!docsDark}` di dalam <Demo dark={!docsDark} light={docsDark}>,
+ * dan cuplikan yang menulis `darkMode` hanya di mode terang.
+ */
+export function ModeSection({
+  name,
+  lead,
+  children,
+  stayDark = false,
+}: {
+  /** Nama komponen di kalimat Light mode, mis. "Input Field". */
+  name: string
+  /** Pengantar bagian Dark mode, di mode terang docs. */
+  lead: ReactNode
+  children: ReactNode
+  /** Menjaga judul dan isi section sebagai Dark mode saat tema docs berubah. */
+  stayDark?: boolean
+}) {
+  const docsDark = useDocsDark()
+  const showLightMode = docsDark && !stayDark
+  return (
+    <FlowSection id="dark-mode" title={showLightMode ? 'Light mode' : 'Dark mode'}>
+      <Lead>
+        {showLightMode ? (
+          <>
+            Dokumentasi sedang dalam mode gelap, jadi contoh lain di halaman ini memakai <Hl>darkMode</Hl>,
+            begitu pula cuplikan kodenya. Tanpa prop itu {name} tampil terang, seperti di bawah ini.
+          </>
+        ) : (
+          lead
+        )}
+      </Lead>
+      {children}
+    </FlowSection>
+  )
 }
 
 /** Blok kode di bawah pratinjau — jaraknya seragam di semua bagian. */
@@ -172,10 +224,10 @@ export function SectionCode({ children, flush }: { children: ReactNode; flush?: 
  */
 export function PrincipleList({ items }: { items: ReactNode[] }) {
   return (
-    <ul className="space-y-4 text-sm leading-6 text-gray-600">
+    <ul className="space-y-4 text-sm leading-6 text-gray-600 dark:text-gray-300">
       {items.map((item, i) => (
         <li key={i} className="flex gap-3">
-          <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-600" />
+          <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-600 dark:bg-primary-400" />
           <span>{item}</span>
         </li>
       ))}
@@ -208,17 +260,23 @@ export function Stage({
 }) {
   const ctx = useContext(PlaygroundFontContext)
   const activeFont = font ?? ctx?.font
+  const docsDark = useDocsDark()
   return (
+    // Panggung mengikuti kontrol Mode Playground, bukan mode docs. Bila
+    // pembaca memilih Light di mode gelap docs, panggungnya tetap terang:
+    // `data-theme="light"` mengembalikan color-scheme terang dan
+    // `dark:text-content` warna teks yang diwarisi komponen.
     <div
+      data-theme={docsDark && !dark ? 'light' : undefined}
       className={`rounded-2xl border p-6 transition-colors sm:p-10 ${minWidth ? 'ds-scroll-x overflow-x-auto' : ''} ${
-        dark ? 'border-gray-800 bg-gray-900' : 'border-border bg-surface-subtle'
+        dark ? 'border-gray-800 bg-gray-900 dark:border-gray-700' : 'border-border bg-surface-subtle dark:text-content'
       }`}
     >
       <div
         className={`mx-auto transition-[max-width] duration-300 ease-out ${maxWidth} ${
           activeFont ? fontClass[activeFont] : ''
         }`}
-        style={{ minWidth }}
+        style={{ minWidth, ...(activeFont ? fontScopeStyle(activeFont) : {}) }}
       >
         {children}
       </div>
@@ -298,11 +356,11 @@ export function UsulanPage({
 
   return (
     <>
-      <header className="border-b border-border bg-white px-5 py-10 sm:px-8 lg:px-12 lg:py-12 xl:px-14">
+      <header className="border-b border-border bg-white px-5 py-10 sm:px-8 lg:px-12 lg:py-12 xl:px-14 dark:border-gray-700 dark:bg-gray-800">
         <div className="mx-auto max-w-[78.5rem]">
           <p className="ds-eyebrow">{eyebrow}</p>
-          <h1 className="mt-2 text-heading-1 font-black tracking-tight text-gray-900">{title}</h1>
-          <p className="mt-3 max-w-2xl text-body text-gray-500">{description}</p>
+          <h1 className="mt-2 text-heading-1 font-black tracking-tight text-gray-900 dark:text-white">{title}</h1>
+          <p className="mt-3 max-w-2xl text-body text-gray-500 dark:text-gray-400">{description}</p>
           {actions && <div className="mt-6">{actions}</div>}
         </div>
       </header>
@@ -316,7 +374,7 @@ export function UsulanPage({
               <p className="text-[11px] font-black tracking-[0.14em] text-gray-400 uppercase">
                 On this page
               </p>
-              <nav className="mt-3 border-l border-border" aria-label="Daftar isi halaman">
+              <nav className="mt-3 border-l border-border dark:border-gray-700" aria-label="Daftar isi halaman">
                 {toc.map((t) => (
                   <a
                     key={t.id}
@@ -325,8 +383,8 @@ export function UsulanPage({
                     aria-current={active === t.id ? 'true' : undefined}
                     className={`-ml-px block w-full border-l-2 py-1.5 pl-3 text-left text-[13px] transition-colors ${
                       active === t.id
-                        ? 'border-primary-600 font-bold text-primary-700'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800'
+                        ? 'border-primary-600 font-bold text-primary-700 dark:border-primary-400 dark:text-primary-400'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:text-gray-100'
                     }`}
                   >
                     {t.label}

@@ -94,13 +94,13 @@ const ALAT = [
  * tak satu pun punya prop untuk menggantinya. Dirender dua kali di bagian 6
  * — sekali dengan token bawaan, sekali di dalam pembungkus yang menimpanya.
  */
-function ContohToken() {
+function ContohToken({ darkMode = false }: { darkMode?: boolean }) {
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-      <Button size="s">Simpan</Button>
-      <Badge variant="brand">Aktif</Badge>
-      <Toggle defaultChecked label="Notifikasi" />
-      <Checkbox defaultChecked label="Setuju" />
+      <Button size="s" darkMode={darkMode}>Simpan</Button>
+      <Badge variant="brand" darkMode={darkMode}>Aktif</Badge>
+      <Toggle defaultChecked label="Notifikasi" darkMode={darkMode} />
+      <Checkbox defaultChecked label="Setuju" darkMode={darkMode} />
     </div>
   )
 }
@@ -125,7 +125,7 @@ function Blok({
   )
 }
 
-export function Modifikasi() {
+export function Modifikasi({ darkMode = false }: { darkMode?: boolean }) {
   const [tema, setTema] = useState<(typeof TEMA)[number]>('primary')
   const [ukuran, setUkuran] = useState<(typeof UKURAN)[number]>('base')
   const [outline, setOutline] = useState(false)
@@ -134,7 +134,7 @@ export function Modifikasi() {
 
   return (
     <div className="space-y-8">
-      <Alert variant="info" heading="Enam contoh cara menyesuaikan" dismissible={false}>
+      <Alert variant="info" heading="Enam contoh cara menyesuaikan" dismissible={false} darkMode={darkMode}>
         <p>
           Tiga yang pertama satu tangga: varian bawaan, slot, lalu{' '}
           <code className="font-mono text-xs">className</code> — dalam urutan itu, karena tiap
@@ -217,7 +217,7 @@ export function Modifikasi() {
                   gelap ? 'bg-primary-700 text-white' : 'bg-white text-gray-600'
                 }`}
               >
-                tone dark
+                dark mode
               </button>
             </div>
           </div>
@@ -228,7 +228,7 @@ export function Modifikasi() {
                 theme={tema}
                 size={ukuran}
                 variant={outline ? 'outline' : 'filled'}
-                tone={gelap ? 'dark' : 'light'}
+                darkMode={darkMode || gelap}
                 leftIcon={<Plus />}
               >
                 Tambah data
@@ -238,7 +238,7 @@ export function Modifikasi() {
                 theme={tema}
                 size={ukuran}
                 variant={outline ? 'outline' : 'filled'}
-                tone={gelap ? 'dark' : 'light'}
+                darkMode={darkMode || gelap}
                 aria-label="Ubah data"
               >
                 <Edit />
@@ -251,7 +251,7 @@ export function Modifikasi() {
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {VARIAN_BADGE.map((v) => (
-                  <Badge key={v} variant={v}>
+                  <Badge key={v} variant={v} darkMode={darkMode}>
                     {v}
                   </Badge>
                 ))}
@@ -264,7 +264,7 @@ import { Edit, Plus } from '@ceplok-ui/design-kit-react/icons/outline'
 
 <Button
   theme="${tema}"
-  size="${ukuran}"${outline ? '\n  variant="outline"' : ''}${gelap ? '\n  tone="dark"' : ''}
+  size="${ukuran}"${outline ? '\n  variant="outline"' : ''}${gelap ? '\n  darkMode' : ''}
   leftIcon={<Plus />}
 >
   Tambah data
@@ -273,7 +273,7 @@ import { Edit, Plus } from '@ceplok-ui/design-kit-react/icons/outline'
 <Button
   iconOnly
   theme="${tema}"
-  size="${ukuran}"${outline ? '\n  variant="outline"' : ''}${gelap ? '\n  tone="dark"' : ''}
+  size="${ukuran}"${outline ? '\n  variant="outline"' : ''}${gelap ? '\n  darkMode' : ''}
   aria-label="Ubah data"
 >
   <Edit />
@@ -298,11 +298,13 @@ import { Edit, Plus } from '@ceplok-ui/design-kit-react/icons/outline'
           <TextArea
             type="editor"
             label="toolbar bawaan"
+            darkMode={darkMode}
             placeholder="Tulis catatan…"
           />
           <TextArea
             type="editor"
             label="toolbar diganti"
+            darkMode={darkMode}
             placeholder="Tulis catatan…"
             value={catatan}
             onChange={(e) => setCatatan(e.target.value)}
@@ -323,7 +325,7 @@ import { Edit, Plus } from '@ceplok-ui/design-kit-react/icons/outline'
                     </button>
                   ))}
                 </div>
-                <Badge variant="brand">Markdown</Badge>
+                <Badge variant="brand" darkMode={darkMode}>Markdown</Badge>
                 <span className="ml-auto font-mono text-xs text-gray-500">
                   {catatan.length}/280
                 </span>
@@ -360,21 +362,23 @@ import { Edit, Plus } from '@ceplok-ui/design-kit-react/icons/outline'
             imageAlt=""
             title="Slot actions kosong"
             description="Tanpa actions, Card berhenti di deskripsi."
+            darkMode={darkMode}
           />
           <Card
             image={asset('/images/card-sample.svg')}
             imageAlt=""
             title="Slot actions terisi"
             description="Baris aksi di bawah sepenuhnya markup Anda sendiri."
+            darkMode={darkMode}
             actions={
               <div className="flex w-full items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Badge variant="success">Aktif</Badge>
+                  <Badge variant="success" darkMode={darkMode}>Aktif</Badge>
                   <span className="text-xs text-gray-500">
                     Isi actions tidak harus tombol — badge, teks, atau apa pun boleh.
                   </span>
                 </div>
-                <Button iconOnly size="xs" theme="gray" variant="outline" aria-label="Hapus">
+                <Button iconOnly size="xs" theme="gray" variant="outline" aria-label="Hapus" darkMode={darkMode}>
                   <TrashBin />
                 </Button>
               </div>
@@ -406,9 +410,10 @@ import { TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
         </pre>
 
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
-          <InputField label="icon bawaan" placeholder="Tanpa icon" />
+          <InputField label="icon bawaan" placeholder="Tanpa icon" darkMode={darkMode} />
           <InputField
             label="icon diisi sendiri"
+            darkMode={darkMode}
             placeholder="Cari sesuatu…"
             icon={<Search className="size-4" />}
           />
@@ -426,8 +431,8 @@ import { TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
               Aman — menambah properti yang belum dipakai komponen
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
-              <Button className="w-full sm:w-56">w-full · lebar</Button>
-              <Badge variant="brand" className="tracking-widest uppercase">
+              <Button className="w-full sm:w-56" darkMode={darkMode}>w-full · lebar</Button>
+              <Badge variant="brand" className="tracking-widest uppercase" darkMode={darkMode}>
                 tracking · uppercase
               </Badge>
               <Spinner className="mx-auto" aria-label="Memuat data" />
@@ -445,8 +450,8 @@ import { TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
               Untuk kasus begini, pilih tema yang sesuai atau tambahkan variant baru di library.
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-3">
-              <Button className="bg-red-600 hover:bg-red-700">Hasilnya tak terjamin</Button>
-              <Button theme="orange">Pakai theme yang ada</Button>
+              <Button className="bg-red-600 hover:bg-red-700" darkMode={darkMode}>Hasilnya tak terjamin</Button>
+              <Button theme="orange" darkMode={darkMode}>Pakai theme yang ada</Button>
             </div>
           </div>
 
@@ -510,9 +515,10 @@ import { TrashBin } from '@ceplok-ui/design-kit-react/icons/outline'
         catatan="Komponen kit ini tidak membawa gerak apa pun. Transisi bisa ditempelkan dari luar lewat className, tanpa menyentuh kode di dalamnya."
       >
         <div className="grid gap-5 sm:grid-cols-2">
-          <Select label="panah bawaan" placeholder="Pilih layanan" options={PILIHAN} />
+          <Select label="panah bawaan" placeholder="Pilih layanan" options={PILIHAN} darkMode={darkMode} />
           <Select
             label="panah beranimasi"
+            darkMode={darkMode}
             placeholder="Pilih layanan"
             options={PILIHAN}
             className={PANAH_BERANIMASI}
@@ -551,7 +557,7 @@ const PANAH_BERANIMASI =
           <div className="rounded-xl bg-surface-subtle p-6">
             <p className="text-caption font-bold tracking-wide text-gray-500 uppercase">Token bawaan</p>
             <div className="mt-4">
-              <ContohToken />
+              <ContohToken darkMode={darkMode} />
             </div>
           </div>
 
@@ -562,7 +568,7 @@ const PANAH_BERANIMASI =
           <div style={HIJAU} className="rounded-xl bg-surface-subtle p-6">
             <p className="text-caption font-bold tracking-wide text-gray-500 uppercase">--color-primary-* ditimpa</p>
             <div className="mt-4">
-              <ContohToken />
+              <ContohToken darkMode={darkMode} />
             </div>
           </div>
         </div>

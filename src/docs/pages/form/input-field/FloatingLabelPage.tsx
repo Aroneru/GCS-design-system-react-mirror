@@ -6,6 +6,7 @@ import {
   type FloatingLabelPlatform,
   type FloatingLabelState,
 } from '../../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../../docsTheme'
 import { PropsTable, type PropRow } from '../../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../../pageKit'
 import {
@@ -13,6 +14,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -54,7 +56,12 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc, true)
+
 export function FloatingLabelPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [platform, setPlatform] = useState<FloatingLabelPlatform>('default')
   const [state, setState] = useState<FloatingLabelState>('default')
   const [application, setApplication] = useState<FloatingLabelApplication>('default')
@@ -62,7 +69,7 @@ export function FloatingLabelPage() {
   const [withHelper, setWithHelper] = useState(true)
   const [withClear, setWithClear] = useState(true)
   const [value, setValue] = useState('')
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = usePlaygroundDark()
 
   const helper = state === 'error' ? 'Isian tidak dapat diproses.' : 'Sesuai yang tertera pada KTP.'
 
@@ -71,7 +78,7 @@ export function FloatingLabelPage() {
       eyebrow="Form · Input Field Form"
       title="Floating Label"
       description="Isian teks yang labelnya naik ke garis atas begitu field difokus atau berisi — menghemat ruang tanpa menghilangkan keterangan field. Tersedia juga dalam tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="floating-label" title="Floating Label">
         <Lead>
@@ -82,13 +89,19 @@ export function FloatingLabelPage() {
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Desktop · 58px">
             <div className="space-y-5">
-              <FloatingLabel label="Placeholder Text" icon={<User className="size-4" />} onClear={() => {}} />
+              <FloatingLabel
+                label="Placeholder Text"
+                icon={<User className="size-4" />}
+                onClear={() => {}}
+                darkMode={docsDark}
+              />
               <FloatingLabel
                 label="Placeholder Text"
                 defaultValue="Text Input"
                 state="active"
                 icon={<User className="size-4" />}
                 onClear={() => {}}
+                darkMode={docsDark}
               />
             </div>
           </Demo>
@@ -99,6 +112,7 @@ export function FloatingLabelPage() {
                 label="Placeholder Text"
                 icon={<User className="size-4" />}
                 onClear={() => {}}
+                darkMode={docsDark}
               />
               <FloatingLabel
                 platform="mobile"
@@ -107,6 +121,7 @@ export function FloatingLabelPage() {
                 state="active"
                 icon={<User className="size-4" />}
                 onClear={() => {}}
+                darkMode={docsDark}
               />
             </div>
           </Demo>
@@ -118,11 +133,14 @@ export function FloatingLabelPage() {
           {'<FloatingLabel\n'}
           {'    label="Nama lengkap"\n'}
           {'    icon={<User className="size-4" />}\n'}
+          {dm.line}
           {'/>\n\n'}
           {'{/* Mobile — field 50px */}\n'}
           {'<FloatingLabel '}
           <H>platform</H>
-          {'="mobile" label="Nama lengkap" />'}
+          {'="mobile" label="Nama lengkap"'}
+          {dm.inline}
+          {' />'}
         </SectionCode>
       </FlowSection>
 
@@ -142,6 +160,7 @@ export function FloatingLabelPage() {
                 helperText={s.value === 'error' ? 'Isian tidak dapat diproses.' : s.desc}
                 icon={<User className="size-4" />}
                 onClear={() => {}}
+                darkMode={docsDark}
               />
             </Demo>
           ))}
@@ -154,6 +173,7 @@ export function FloatingLabelPage() {
           {'="error"\n'}
           {'    label="Nama lengkap"\n'}
           {'    helperText="Isian tidak dapat diproses."\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
@@ -174,6 +194,7 @@ export function FloatingLabelPage() {
                 helperText={`border-${a.token}`}
                 icon={<User className="size-4" />}
                 onClear={() => {}}
+                darkMode={docsDark}
               />
             </Demo>
           ))}
@@ -185,16 +206,22 @@ export function FloatingLabelPage() {
           {'="purple"\n'}
           {'    state="active"\n'}
           {'    label="Nama lengkap"\n'}
+          {dm.line}
           {'/>'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> mengganti kotak ke gray-700 bergaris gray-600, dengan teks, ikon, dan tombol hapus
-          gray-400. Garis aksen tetap sama, tetapi label yang naik satu tingkat lebih terang — primary-500 —
-          supaya terbaca di latar gelap. Pada <Hl>error</Hl>, hanya garis dan label yang berubah merah.
-        </Lead>
+      <ModeSection
+        name="Floating Label"
+        stayDark
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengganti kotak ke gray-700 bergaris gray-600, dengan teks, ikon, dan tombol hapus
+            gray-400. Garis aksen tetap sama, tetapi label yang naik satu tingkat lebih terang — primary-500 —
+            supaya terbaca di latar gelap. Pada <Hl>error</Hl>, hanya garis dan label yang berubah merah.
+          </>
+        }
+      >
         <div className="grid gap-5 sm:grid-cols-2">
           {states.map((s) => (
             <Demo key={s.value} label={s.label} dark>
@@ -212,10 +239,10 @@ export function FloatingLabelPage() {
         </div>
         <SectionCode>
           {'<FloatingLabel '}
-          <H>darkMode</H>
-          {' label="Nama lengkap" />'}
+          <H>darkMode</H>{' '}
+          {'label="Nama lengkap" />'}
         </SectionCode>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -311,7 +338,7 @@ export function FloatingLabelPage() {
           </Control>
         </Controls>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Klik field di atas tanpa mengubah prop apa pun: labelnya naik saat difokus dan tetap di atas
           selama masih ada isi. Perhatikan juga posisi label saat turun — ia menyesuaikan diri bila ada ikon
           kiri.

@@ -11,7 +11,7 @@ import { Clock } from '../../../../lib/icons/outline'
 import { asset } from '../../../asset'
 import { LAYANAN } from '../data'
 
-export function Layanan() {
+export function Layanan({ darkMode = false }: { darkMode?: boolean }) {
   const [terkirim, setTerkirim] = useState(false)
 
   return (
@@ -27,6 +27,7 @@ export function Layanan() {
 
           <div className="mt-5 space-y-3">
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -34,8 +35,10 @@ export function Layanan() {
               metadata={["Pengumuman", "Hari ini, 09:00 WIB"]}
               badge={<Badge variant="brand" size="sm">Terbaru</Badge>}
               actionLabel="Buka"
+              actionDisabled
             />
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -43,8 +46,10 @@ export function Layanan() {
               metadata={["Pembaruan", "Kemarin, 14:30 WIB"]}
               badge={<Badge variant="success" size="sm">Tersedia</Badge>}
               actionLabel="Buka"
+              actionDisabled
             />
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -52,6 +57,62 @@ export function Layanan() {
               metadata={["Informasi", "24 Okt 2026, 10:15 WIB"]}
               badge={<Badge variant="gray" size="sm">Bantuan</Badge>}
               actionLabel="Buka"
+              actionDisabled
+            />
+            <ListViewItem
+              darkMode={darkMode}
+              size="s"
+              platform="desktop"
+              decoration
+              title="Pendaftaran akun layanan"
+              metadata={["Panduan", "21 Okt 2026, 08:30 WIB"]}
+              badge={<Badge variant="warning" size="sm">Penting</Badge>}
+              actionLabel="Buka"
+              actionDisabled
+            />
+            <ListViewItem
+              darkMode={darkMode}
+              size="s"
+              platform="desktop"
+              decoration
+              title="Jadwal pemeliharaan portal"
+              metadata={["Pemberitahuan", "18 Okt 2026, 17:00 WIB"]}
+              badge={<Badge variant="gray" size="sm">Terjadwal</Badge>}
+              actionLabel="Buka"
+              actionDisabled
+            />
+            <ListViewItem
+              darkMode={darkMode}
+              size="s"
+              platform="desktop"
+              decoration
+              title="Panduan unggah dokumen persyaratan"
+              metadata={["Panduan", "15 Okt 2026, 13:45 WIB"]}
+              badge={<Badge variant="brand" size="sm">Terbaru</Badge>}
+              actionLabel="Buka"
+              actionDisabled
+            />
+            <ListViewItem
+              darkMode={darkMode}
+              size="s"
+              platform="desktop"
+              decoration
+              title="Perubahan estimasi waktu layanan"
+              metadata={["Pembaruan", "12 Okt 2026, 09:20 WIB"]}
+              badge={<Badge variant="warning" size="sm">Perhatian</Badge>}
+              actionLabel="Buka"
+              actionDisabled
+            />
+            <ListViewItem
+              darkMode={darkMode}
+              size="s"
+              platform="desktop"
+              decoration
+              title="Kanal bantuan layanan terpadu"
+              metadata={["Informasi", "08 Okt 2026, 16:00 WIB"]}
+              badge={<Badge variant="success" size="sm">Aktif</Badge>}
+              actionLabel="Buka"
+              actionDisabled
             />
           </div>
         </section>
@@ -63,8 +124,9 @@ export function Layanan() {
           </p>
 
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
-            {LAYANAN.slice(0, 2).map((l) => (
+            {LAYANAN.map((l) => (
               <Card
+                darkMode={darkMode}
                 key={l.slug}
                 image={asset('/images/card-sample.svg')}
                 imageAlt=""
@@ -72,28 +134,23 @@ export function Layanan() {
                 description={l.deskripsi}
                 actions={
                   <div className="flex w-full flex-wrap items-center justify-between gap-3">
-                    <Badge variant="brand" icon={<Clock />}>
+                    <Badge variant="brand" icon={<Clock />} darkMode={darkMode}>
                       {l.durasi}
                     </Badge>
                     <Modal
-                      trigger={<Button size="xs">Ajukan</Button>}
+                      darkMode={darkMode}
+                      trigger={<Button size="xs" theme="primary" darkMode={darkMode}>Ajukan</Button>}
                       title={l.judul}
-                      footer={({ close }) => (
-                        <>
-                          <Button variant="outline" theme="gray" size="xs" onClick={close}>
-                            Batal
-                          </Button>
-                          <Button
-                            size="xs"
-                            onClick={() => {
-                              setTerkirim(true)
-                              close()
-                            }}
-                          >
-                            Lanjutkan
-                          </Button>
-                        </>
-                      )}
+                      actions={{
+                        secondary: { label: 'Batal', onClick: ({ close }) => close() },
+                        primary: {
+                          label: 'Lanjutkan',
+                          onClick: ({ close }) => {
+                            setTerkirim(true)
+                            close()
+                          },
+                        },
+                      }}
                     >
                       <p>{l.deskripsi}</p>
                       <dl className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-surface-subtle p-4">
@@ -122,7 +179,7 @@ export function Layanan() {
 
       {terkirim && (
         <div className="fixed bottom-4 left-4 z-50">
-          <Toast variant="success" heading="Pengajuan dibuat" onDismiss={() => setTerkirim(false)}>
+          <Toast variant="success" heading="Pengajuan dibuat" onDismiss={() => setTerkirim(false)} darkMode={darkMode}>
             Lengkapi datanya di halaman Pengaturan sebelum dikirim ke petugas.
           </Toast>
         </div>

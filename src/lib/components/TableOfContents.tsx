@@ -80,6 +80,7 @@ export interface TableOfContentsProps extends Omit<HTMLAttributes<HTMLElement>, 
    *   membuka Drawer dari kanan dengan teks 14px; mulai `lg` daftar biasa 12px.
    * - `list`: selalu daftar biasa.
    * - `drawer`: selalu tombol + Drawer.
+   * - `collapsible`: tombol bergaya TOC yang membuka daftar secara inline.
    */
   layout?: TableOfContentsLayout
   /**
@@ -90,7 +91,7 @@ export interface TableOfContentsProps extends Omit<HTMLAttributes<HTMLElement>, 
   drawerContained?: boolean
 }
 
-export type TableOfContentsLayout = 'auto' | 'list' | 'drawer'
+export type TableOfContentsLayout = 'auto' | 'list' | 'drawer' | 'collapsible'
 
 /** Elemen entri: `<a>` saat `anchor` (bawaan), `<button>` saat `anchor={false}`. */
 export type TableOfContentsItemElement = HTMLAnchorElement | HTMLButtonElement
@@ -324,10 +325,15 @@ export function TableOfContents({
     setDrawerUsed(true)
     setDrawerOpen(true)
   }
+  const toggleCollapsible = () => {
+    setDrawerUsed(true)
+    setDrawerOpen((open) => !open)
+  }
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const drawerListRef = useRef<HTMLUListElement>(null)
   const drawerTitleId = useId()
+  const collapsibleListId = useId()
 
   const closeDrawer = () => setDrawerOpen(false)
 
@@ -427,8 +433,8 @@ export function TableOfContents({
       <ActiveIndicator
         listRef={variant === 'inline' ? listRef : drawerListRef}
         active={active}
-        // Daftar di Drawer baru punya ukuran setelah panelnya terbuka.
-        remeasureKey={variant === 'drawer' ? drawerOpen : undefined}
+        // Daftar di Drawer/collapsible baru punya ukuran setelah panelnya terbuka.
+        remeasureKey={variant === 'drawer' || layout === 'collapsible' ? drawerOpen : undefined}
       />
     </ul>
   )
@@ -441,7 +447,7 @@ export function TableOfContents({
         'bg-toc-surface transition-colors duration-300',
         layout === 'auto' && 'w-full lg:w-52',
         layout === 'list' && 'w-52',
-        layout === 'drawer' && 'w-full',
+        (layout === 'drawer' || layout === 'collapsible') && 'w-full',
         className,
       )}
       {...props}
@@ -451,9 +457,10 @@ export function TableOfContents({
           <button
             ref={triggerRef}
             type="button"
-            onClick={openDrawer}
-            aria-haspopup="dialog"
+            onClick={layout === 'collapsible' ? toggleCollapsible : openDrawer}
+            aria-haspopup={layout === 'collapsible' ? undefined : 'dialog'}
             aria-expanded={drawerOpen}
+            aria-controls={layout === 'collapsible' ? collapsibleListId : undefined}
             className={cn(
               'flex w-full items-center gap-3 rounded-lg border border-border bg-surface px-4 py-2.5 text-left text-sm text-content transition-colors hover:bg-surface-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
               layout === 'auto' && 'lg:hidden',
@@ -461,13 +468,29 @@ export function TableOfContents({
           >
             <Bars className="size-4 shrink-0 text-content-muted" aria-hidden="true" />
             <span className="min-w-0 flex-1 truncate">
-              {title !== null && <span className="sr-only">{title}: </span>}
-              {activeItem?.label ?? title}
+              {layout === 'collapsible' ? (
+                title ?? ariaLabel
+              ) : (
+                <>
+                  {title !== null && <span className="sr-only">{title}: </span>}
+                  {activeItem?.label ?? title}
+                </>
+              )}
             </span>
-            <ChevronDown className="size-4 shrink-0 text-content-muted" aria-hidden="true" />
+            <ChevronDown
+              className={cn(
+                'size-4 shrink-0 text-content-muted transition-transform',
+                layout === 'collapsible' && drawerOpen && 'rotate-180',
+              )}
+              aria-hidden="true"
+            />
           </button>
 
-          {drawerContained ? (
+          {layout === 'collapsible' ? (
+            <div id={collapsibleListId} hidden={!drawerOpen}>
+              {renderList('inline')}
+            </div>
+          ) : drawerContained ? (
             /*
               Drawer asli memakai <dialog> + showModal(), yang selalu naik ke top
               layer dan menutupi seluruh layar. Versi ini panel biasa yang
@@ -537,7 +560,7 @@ export function TableOfContents({
         </>
       )}
 
-      {layout !== 'drawer' && (
+      {layout !== 'drawer' && layout !== 'collapsible' && (
         <div className={layout === 'auto' ? 'hidden lg:block' : undefined}>
           {title !== null && (
             <p className="text-[11px] leading-4 font-bold tracking-[0.14em] text-content-disabled uppercase">

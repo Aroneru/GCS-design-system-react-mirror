@@ -15,7 +15,7 @@ export { Clipboard } from "./components/Clipboard";
 export type { ClipboardProps, ClipboardVariant, ClipboardPlatform } from "./components/Clipboard";
 
 export { Avatar } from "./components/Avatar";
-export type { AvatarFallback, AvatarGender, AvatarProps, AvatarSize } from "./components/Avatar";
+export type { AvatarFallback, AvatarProps, AvatarSize } from "./components/Avatar";
 
 export { Badge } from "./components/Badge";
 export type { BadgeProps, BadgeSize, BadgeVariant } from "./components/Badge";
@@ -38,7 +38,14 @@ export type {
 } from "./components/Dropdown";
 
 export { Modal } from "./components/Modal";
-export type { ModalProps, ModalSize, ModalVariant } from "./components/Modal";
+export type {
+  ModalProps,
+  ModalSize,
+  ModalVariant,
+  ModalAction,
+  ModalActions,
+  ModalActionButtonProps,
+} from "./components/Modal";
 
 export {
   Drawer,
@@ -196,13 +203,16 @@ export type {
   NavbarDestination,
   NavbarDisclosure,
   NavbarPrimaryItem,
+  NavbarNotificationTrigger,
+  NavbarTableOfContents,
+  NavbarSearchConfig,
+  NavbarBackOfficeSearchConfig,
   NavbarAccountDestination,
   NavbarAccountAction,
   NavbarAccountItem,
   NavbarAccount,
   NavbarGuestLink,
   NavbarGuestActions,
-  NavbarMobileDrawer,
   NavbarFrontOfficeProps,
   NavbarBackOfficeProps,
 } from "./components/Navbar";

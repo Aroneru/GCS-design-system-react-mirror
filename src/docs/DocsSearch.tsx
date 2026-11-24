@@ -158,9 +158,9 @@ export function DocsSearch({ open, onOpenChange }: { open: boolean; onOpenChange
         setAktif(0)
       }}
       onClick={klikLatar}
-      className="m-auto mt-[12vh] w-[min(36rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-border bg-white p-0 shadow-xl backdrop:bg-gray-900/40"
+      className="m-auto mt-[12vh] w-[min(36rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-border bg-white p-0 shadow-xl backdrop:bg-gray-900/40 dark:border-gray-700 dark:bg-gray-800 dark:backdrop:bg-gray-900/70"
     >
-      <div className="flex items-center gap-3 border-b border-border px-4">
+      <div className="flex items-center gap-3 border-b border-border px-4 dark:border-gray-700">
         <svg
           className="size-4.5 shrink-0 text-gray-400"
           fill="none"
@@ -188,9 +188,9 @@ export function DocsSearch({ open, onOpenChange }: { open: boolean; onOpenChange
             setAktif(0)
           }}
           onKeyDown={onKeyDown}
-          className="h-12 min-w-0 flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
+          className="h-12 min-w-0 flex-1 bg-transparent text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:text-white"
         />
-        <kbd className="shrink-0 rounded border border-border px-1.5 py-0.5 text-[10px] font-bold text-gray-500 max-sm:hidden">
+        <kbd className="shrink-0 rounded border border-border px-1.5 py-0.5 text-[10px] font-bold text-gray-500 max-sm:hidden dark:border-gray-600 dark:text-gray-400">
           Esc
         </kbd>
       </div>
@@ -208,16 +208,18 @@ export function DocsSearch({ open, onOpenChange }: { open: boolean; onOpenChange
                   if (!e.ctrlKey && !e.metaKey && !e.shiftKey) onOpenChange(false)
                 }}
                 className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 ${
-                  i === aktif ? 'bg-primary-50' : ''
+                  i === aktif ? 'bg-primary-50 dark:bg-primary-900' : ''
                 }`}
               >
                 <span className="min-w-0">
                   <span
-                    className={`block truncate text-sm font-bold ${i === aktif ? 'text-primary-700' : 'text-gray-900'}`}
+                    className={`block truncate text-sm font-bold ${
+                      i === aktif ? 'text-primary-700 dark:text-primary-300' : 'text-gray-900 dark:text-white'
+                    }`}
                   >
                     {halaman.label}
                   </span>
-                  <span className="block truncate text-xs text-gray-500">{halaman.letak}</span>
+                  <span className="block truncate text-xs text-gray-500 dark:text-gray-400">{halaman.letak}</span>
                 </span>
                 {i === aktif && (
                   <span aria-hidden="true" className="shrink-0 text-xs text-gray-400">
@@ -229,13 +231,13 @@ export function DocsSearch({ open, onOpenChange }: { open: boolean; onOpenChange
           ))}
         </ul>
       ) : (
-        <p className="px-4 py-10 text-center text-sm text-gray-500">
+        <p className="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
           Tidak ada halaman yang cocok dengan “{kueri.trim()}”.
         </p>
       )}
 
       {/* Petunjuk papan ketik — tidak berarti di layar sentuh, jadi disembunyikan di mobile. */}
-      <div className="flex gap-4 border-t border-border bg-gray-50 px-4 py-2.5 text-[11px] text-gray-500 max-sm:hidden">
+      <div className="flex gap-4 border-t border-border bg-gray-50 px-4 py-2.5 text-[11px] text-gray-500 max-sm:hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400">
         <span>↑↓ pindah</span>
         <span>↵ buka</span>
         <span>Esc tutup</span>

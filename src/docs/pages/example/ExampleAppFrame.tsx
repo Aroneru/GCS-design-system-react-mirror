@@ -32,11 +32,17 @@ function halamanDari(path: string): HalamanDemo {
 export function ExampleAppFrame({
   path,
   kembali = '/example',
+  darkMode = false,
+  onDarkModeChange,
   children,
 }: {
   path: string
   /** Pintu masuk yang dituju tombol pulang. */
   kembali?: string
+  /** Tema aplikasi demo yang diteruskan dari preferensi docs. */
+  darkMode?: boolean
+  /** Hanya dipakai DemoApp untuk mengubah preferensi tema bersama. */
+  onDarkModeChange?: (darkMode: boolean) => void
   /** Aplikasi yang dibingkai; tanpa ini yang dirender aplikasi demo Example. */
   children?: ReactNode
 }) {
@@ -76,7 +82,15 @@ export function ExampleAppFrame({
 
   return (
     <>
-      <div ref={isi}>{children ?? <DemoApp halaman={halamanDari(path)} />}</div>
+      <div ref={isi} data-theme={darkMode ? 'dark' : 'light'}>
+        {children ?? (
+          <DemoApp
+            halaman={halamanDari(path)}
+            darkMode={darkMode}
+            onDarkModeChange={onDarkModeChange}
+          />
+        )}
+      </div>
 
       <div className="fixed right-4 bottom-4 z-50">
         <Magnetic>
@@ -93,7 +107,7 @@ export function ExampleAppFrame({
               tandaiAsal('app')
               tutupKeAtas(panel.current, isi.current, () => navigate(kembali))
             }}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-lg transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:cursor-default disabled:hover:text-gray-700"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-lg transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-700 disabled:cursor-default disabled:hover:text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:text-primary-300 dark:disabled:hover:text-gray-200"
           >
             <ArrowLeft className="size-4" />
             Kembali ke dokumentasi

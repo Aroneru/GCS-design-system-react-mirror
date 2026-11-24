@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Messages } from '../../../lib/icons/outline'
 import { Alert, type AlertVariant } from '../../../lib'
+import { tocForDarkDocs, useDarkModeSnippet, useDocsDark, usePlaygroundDark } from '../../docsTheme'
 import { PropsTable, type PropRow } from '../../PropsTable'
 import { Demo, H, Hl, Segmented } from '../../pageKit'
 import {
@@ -8,6 +9,7 @@ import {
   Controls,
   FlowSection,
   Lead,
+  ModeSection,
   SectionCode,
   Stage,
   UsulanPage,
@@ -74,13 +76,18 @@ const toc: TocEntry[] = [
   { id: 'properties', label: 'Properties' },
 ]
 
+const tocDark = tocForDarkDocs(toc, true)
+
 export function AlertPage() {
+  // Contoh di halaman ini mengikuti mode docs; aturannya di docsTheme.ts.
+  const docsDark = useDocsDark()
+  const dm = useDarkModeSnippet()
   const [variant, setVariant] = useState<AlertVariant>('success')
   const [lebar, setLebar] = useState<'mobile' | 'desktop'>('desktop')
   const [pakaiIkon, setPakaiIkon] = useState(true)
   const [pakaiTutup, setPakaiTutup] = useState(true)
   const [pakaiAksi, setPakaiAksi] = useState(true)
-  const [dark, setDark] = useState(false)
+  const [dark, setDark] = usePlaygroundDark()
 
   // Alert menutup dirinya sendiri; ganti key untuk memasangnya kembali dari nol.
   const [tayangan, setTayangan] = useState(0)
@@ -90,7 +97,7 @@ export function AlertPage() {
       eyebrow="Components"
       title="Alert"
       description="Menyampaikan pesan status — sukses, error, peringatan, atau informasi — tepat di dalam alur halaman. Lima variant warna dengan elemen yang sepenuhnya opsional. Tersedia juga dalam tampilan gelap."
-      toc={toc}
+      toc={docsDark ? tocDark : toc}
     >
       <FlowSection id="alert" title="Alert">
         <Lead>
@@ -103,7 +110,8 @@ export function AlertPage() {
               key={v.value}
               variant={v.value}
               heading="Ini adalah Alert"
-              actions={<AksiButton variant={v.value} />}
+              actions={<AksiButton variant={v.value} dark={docsDark} />}
+              darkMode={docsDark}
             >
               {isiAlert}
             </Alert>
@@ -117,6 +125,7 @@ export function AlertPage() {
           {'="success"\n'}
           {'    heading="Ini adalah Alert"\n'}
           {'    actions={<button type="button" className="…">Button text</button>}\n'}
+          {dm.line}
           {'>\n'}
           {'    Ini merupakan Design system Ceplok berupa component alert.\n'}
           {'</Alert>'}
@@ -130,45 +139,56 @@ export function AlertPage() {
         </Lead>
         <div className="grid gap-5 sm:grid-cols-2">
           <Demo label="Tanpa tombol">
-            <Alert variant="warning" heading="Ini adalah Alert">
+            <Alert variant="warning" heading="Ini adalah Alert" darkMode={docsDark}>
               {isiAlert}
             </Alert>
           </Demo>
           <Demo label="Tanpa tombol tutup">
-            <Alert variant="warning" heading="Ini adalah Alert" dismissible={false}>
+            <Alert variant="warning" heading="Ini adalah Alert" dismissible={false} darkMode={docsDark}>
               {isiAlert}
             </Alert>
           </Demo>
           <Demo label="Tanpa ikon">
-            <Alert variant="warning" icon={false} heading="Ini adalah Alert" dismissible={false}>
+            <Alert variant="warning" icon={false} heading="Ini adalah Alert" dismissible={false} darkMode={docsDark}>
               {isiAlert}
             </Alert>
           </Demo>
           <Demo label="Hanya pesan">
-            <Alert variant="warning" dismissible={false}>
+            <Alert variant="warning" dismissible={false} darkMode={docsDark}>
               Ini merupakan Design system Ceplok berupa component alert.
             </Alert>
           </Demo>
         </div>
         <SectionCode>
           {'{/* Tanpa tombol: cukup hilangkan prop actions */}\n'}
-          {'<Alert variant="warning" heading="Ini adalah Alert">…</Alert>\n\n'}
+          {'<Alert variant="warning" heading="Ini adalah Alert"'}
+          {dm.inline}
+          {'>…</Alert>\n\n'}
           {'{/* Tanpa tombol tutup */}\n'}
           {'<Alert variant="warning" heading="Ini adalah Alert" '}
           <H>dismissible</H>
-          {'={false}>…</Alert>\n\n'}
+          {'={false}'}
+          {dm.inline}
+          {'>…</Alert>\n\n'}
           {'{/* Tanpa ikon kiri */}\n'}
           {'<Alert variant="warning" '}
           <H>icon</H>
-          {'={false} heading="Ini adalah Alert">…</Alert>'}
+          {'={false} heading="Ini adalah Alert"'}
+          {dm.inline}
+          {'>…</Alert>'}
         </SectionCode>
       </FlowSection>
 
-      <FlowSection id="dark-mode" title="Dark mode">
-        <Lead>
-          Prop <Hl>darkMode</Hl> mengganti latarnya ke warna -900 dari variant itu sendiri. Ikonnya -500,
-          sedangkan heading dan isi pesan sama-sama -50 sehingga tetap terang di atas latar gelap.
-        </Lead>
+      <ModeSection
+        name="Alert"
+        stayDark
+        lead={
+          <>
+            Prop <Hl>darkMode</Hl> mengganti latarnya ke warna -900 dari variant itu sendiri. Ikonnya -500,
+            sedangkan heading dan isi pesan sama-sama -50 sehingga tetap terang di atas latar gelap.
+          </>
+        }
+      >
         <Demo dark>
           <div className="space-y-4">
             {variants.map((v) => (
@@ -186,14 +206,14 @@ export function AlertPage() {
         </Demo>
         <SectionCode>
           {'<Alert '}
-          <H>darkMode</H>
-          {' variant="success" heading="Ini adalah Alert">…</Alert>'}
+          <H>darkMode</H>{' '}
+          {'variant="success" heading="Ini adalah Alert">…</Alert>'}
         </SectionCode>
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Isi <Hl>actions</Hl> tetap milik Anda, jadi warnanya tidak ikut diganti. Tombol contoh di atas mengikuti
           desain gelapnya: -600, kecuali success dan warning yang -500.
         </p>
-      </FlowSection>
+      </ModeSection>
 
       <FlowSection id="playground" title="Playground">
         <Lead>
@@ -288,7 +308,7 @@ export function AlertPage() {
           Tampilkan Alert
         </button>
 
-        <p className="mt-4 text-body-sm text-gray-500">
+        <p className="mt-4 text-body-sm text-gray-500 dark:text-gray-400">
           Tombol tutup mengurus visibilitasnya sendiri, jadi tidak ada state yang perlu Anda siapkan. Isi{' '}
           <Hl>onDismiss</Hl> bila penutupan perlu dicatat, atau <Hl>open</Hl> bila Alert dikendalikan penuh dari
           luar.
