@@ -11,53 +11,7 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 
 ## [Belum dirilis]
 
-### Ditambahkan
-
-- **Token komponen `--color-card-*` di `tokens.css`.** Card kini memakai
-  `--color-card-surface`, `-border`, `-title`, `-description`, `-link`, dan
-  `-link-hover`, bukan token semantik umum. Nilainya sama dengan sebelumnya,
-  jadi tampilan Card tidak berubah. Warna kartu kini bisa ditimpa di CSS
-  aplikasi tanpa ikut mengubah komponen lain. Daftarnya ada di `COLOR.md`.
-- **Token komponen `--color-footer-*` di `tokens.css`.** Footer kini memakai
-  `--color-footer-surface`, `-content`, `-content-hover`, `-social`, dan
-  `-divider`, bukan kelas warna langsung (`bg-gray-800`, `text-white`, dan
-  lainnya). Nilainya sama dengan sebelumnya dan sama di kedua tema, karena
-  Footer selalu gelap.
-
-### Diubah
-
-- **Mode gelap situs dokumentasi meluas.** Selain halaman di 0.6.0, mode gelap
-  kini juga berlaku di halaman berikut. Aturannya sama dengan bagian
-  "Pratinjau di docs gelap" di 0.6.0.
-  - Components: Badge, Card, Container, Footer, Hero, Table, dan Table of
-    Contents.
-  - Foundations: Colors dan Typography.
-- **Id bagian Dark mode di halaman Table berganti.** Bagian "Mode gelap" kini
-  bernama Dark mode, sama seperti halaman lain. Tautan
-  `#/components/table#mode-gelap` berganti menjadi `#/components/table#dark-mode`.
-- **Toggle tema tersedia di Portal dan Example App.** Kontrol tema Portal tetap
-  tersedia di footer Sidebar desktop dan Navbar mobile, lalu diduplikasi ke
-  Example App. Semua halaman Example kini mengikuti pilihan terang/gelap yang
-  sama, termasuk Navbar, Sidebar, breadcrumb, form, tabel, modal, dan toast;
-  preferensinya tetap konsisten saat berpindah route atau aplikasi demo.
-- **Warna `Drawer` mode gelap dikonsistenkan.** Komponen dan seluruh preview
-  dokumentasi memakai background panel `gray-800` (`#1F2937`) dengan border
-  `gray-700` (`#374151`). Teks dasar tetap `gray-300`, sementara backdrop
-  tetap `gray-900/50`.
-- **Kategori `Search` compact di Navbar diseimbangkan.** Ruas kategori tetap
-  selebar 128px, tetapi kini memakai padding kiri/kanan 10px dan jarak 10px
-  antara label dengan chevron. Label dipusatkan di ruang yang tersedia dan
-  dibatasi 10 karakter sebelum elipsis (sebelumnya 12), sehingga `Pengumuman`
-  tetap tampil utuh sementara chevron tidak lagi mepet ke tepi. Karena memakai
-  komponen `Search` bersama, perubahan ini berlaku di Navbar Portal, Example
-  App, dan preview dokumentasi Navbar.
-- **Warna field kosong `Upload` mode gelap ditokenisasi.** Background kolom
-  nama berkas dan border pembungkus tetap memakai `#1F2A37`, tetapi sekarang
-  berasal dari token komponen `--color-upload-empty-surface`, bukan arbitrary
-  value yang ditulis langsung di komponen. Consumer dapat menimpa token ini
-  tanpa mengubah komponen.
-
-## [0.6.0] - 2026-11-23
+## [0.6.0] - 2026-11-24
 
 Rilis npm pertama sejak 0.5.0; versi 0.5.1 hanya mengubah situs dokumentasi
 dan tidak terbit di npm. Ada perubahan API yang memutus, ditandai **Memutus**
@@ -129,10 +83,12 @@ dokumentasi kini punya mode gelap (uji coba).
 - **`TableOfContents`: layout `collapsible`.** Daftar isi tampil sebagai
   disclosure yang membuka daftarnya di tempat, bukan di dialog. TOC di Drawer
   Navbar memakai mode ini.
-- **`Search`: kategori di platform `compact`.** Tingginya 37px, ruas
-  kategorinya 128px, dan label kategori dipotong sesudah 12 karakter. Bila ada
-  kategori, tombol cari tampil secara bawaan, juga di `compact`. Nama aksesibel
-  trigger kategori kini menyebut kategori yang terpilih.
+- **`Search`: kategori di platform `compact`.** Tingginya 37px dan ruas
+  kategorinya 128px, dengan padding kiri-kanan 10px dan jarak 10px ke chevron.
+  Label kategori dipusatkan dan dipotong sesudah 10 karakter, jadi `Pengumuman`
+  tetap utuh. Bila ada kategori, tombol cari tampil secara bawaan, juga di
+  `compact`. Nama aksesibel trigger kategori kini menyebut kategori yang
+  terpilih.
 - **`ListViewItem`: prop `actionDisabled` dan `interactiveFeedback`.** Tombol
   aksi bawaan pada varian `simple` kini dapat disembunyikan di seluruh ukuran
   dan platform. Saat `actionHref`/`onAction` tersedia tanpa `href`/`onClick`
@@ -141,17 +97,29 @@ dokumentasi kini punya mode gelap (uji coba).
   dimatikan secara terpisah tanpa menonaktifkan klik.
 - **Drawer: slot `afterItems`.** Konten kustom kini dapat ditambahkan setelah
   menu `items` tanpa mengganti `DrawerBody` data-driven bawaan.
+- **Token komponen `--color-card-*` di `tokens.css`.** Card kini memakai
+  `--color-card-surface`, `-border`, `-title`, `-description`, `-link`, dan
+  `-link-hover`, bukan token semantik umum. Nilainya sama dengan sebelumnya,
+  jadi tampilan Card tidak berubah. Warna kartu kini bisa ditimpa di CSS
+  aplikasi tanpa ikut mengubah komponen lain. Daftarnya ada di `COLOR.md`.
+- **Token komponen `--color-footer-*` di `tokens.css`.** Footer kini memakai
+  `--color-footer-surface`, `-content`, `-content-hover`, `-social`, dan
+  `-divider`, bukan kelas warna langsung (`bg-gray-800`, `text-white`, dan
+  lainnya). Nilainya sama dengan sebelumnya dan sama di kedua tema, karena
+  Footer selalu gelap.
 - **Mode gelap situs dokumentasi (uji coba).** Tombol bulan/matahari ada di
   ujung bawah rail dan di top bar mobile, dan pilihannya disimpan di browser.
   Rail, panel samping, dan jendela pencarian halaman ikut gelap. Mode gelap
   berlaku di halaman berikut; di halaman lain situs tetap terang dan tombolnya
   diredupkan.
   - Home dan Portal Dashboard.
-  - Components: Overview, Alert, Avatar, Breadcrumb, Button, Clipboard, Drawer,
-    Dropdown, List View, Modal, Navbar, Pagination, Popover, Sidebar, Spinner,
+  - Components: Overview, Alert, Avatar, Badge, Breadcrumb, Button, Card,
+    Clipboard, Container, Drawer, Dropdown, Footer, Hero, List View, Modal,
+    Navbar, Pagination, Popover, Sidebar, Spinner, Table, Table of Contents,
     Toast, dan Timeline View.
   - Form: Overview, Input Field Form, dan semua halaman Form.
-  - Foundations: Overview, Spacing, Border, Elevation, dan Icons.
+  - Foundations: Overview, Colors, Typography, Spacing, Border, Elevation, dan
+    Icons.
 - **Pratinjau di docs gelap.** Komponen di pratinjau dan kartu Overview memakai
   `darkMode` selama docs gelap, cuplikan kodenya ikut menuliskannya, dan mode
   Playground mengikuti mode docs. Perubahan ini hanya di situs dokumentasi:
@@ -304,12 +272,17 @@ dokumentasi kini punya mode gelap (uji coba).
   tetap gray-600. Light mode tetap memakai border sebelumnya.
 - **Warna gelap `Upload` tipe `default`.** Setelah file dipilih, kotak nama
   file dan garis luarnya gray-700, sebelumnya kotak gray-800. Selama kosong,
-  garis luarnya kini sewarna kotaknya (`#1F2A37`, hampir sama dengan gray-800).
-  Garis kanan tombol pilih file mengikuti warna aplikasi, primary-700 atau
-  purple-500, dan teks tombol hapus kini gray-400.
-- **Situs dokumentasi.** Halaman Table punya bagian baru "Mode gelap", dan
-  Playground-nya punya kontrol Mode (Light/Dark) setelah Typography, serta
-  kontrol Tampilan (Desktop/Mobile) untuk melihat tabel selebar 390px.
+  kotak nama file dan garis luarnya sewarna, dari token baru
+  `--color-upload-empty-surface` (`#1F2A37`, hampir sama dengan gray-800) yang
+  bisa ditimpa di CSS aplikasi. Garis kanan tombol pilih file mengikuti warna
+  aplikasi, primary-700 atau purple-500, dan teks tombol hapus kini gray-400.
+- **Warna `Drawer` mode gelap dikonsistenkan.** Komponen dan seluruh preview
+  dokumentasi memakai background panel `gray-800` (`#1F2937`) dengan border
+  `gray-700` (`#374151`). Teks dasar tetap `gray-300`, sementara backdrop
+  tetap `gray-900/50`.
+- **Situs dokumentasi.** Halaman Table punya bagian baru Dark mode, dan
+  Playground-nya punya kontrol tema terang/gelap setelah Typography, serta
+  kontrol lebar Desktop/Mobile untuk melihat tabel selebar 390px.
 - **Portal Dashboard memakai kontrak Navbar Back Office.** Menu aplikasi dan
   identitas akun berasal dari Sidebar yang sama pada desktop/mobile, sedangkan
   navigasi global berada di Navbar desktop dan Drawer mobile. Header dan dialog
@@ -327,6 +300,11 @@ dokumentasi kini punya mode gelap (uji coba).
   berwarna brand, tiap pilihan kini berlabel teks, dan warna toggle memudar
   bersama Sidebar saat tema berganti. Di layar di bawah 576px, tombol tema kini
   ada di header, di kiri lonceng notifikasi.
+- **Toggle tema tersedia di Portal dan Example App.** Kontrol tema Portal tetap
+  tersedia di footer Sidebar desktop dan Navbar mobile, lalu diduplikasi ke
+  Example App. Semua halaman Example kini mengikuti pilihan terang/gelap yang
+  sama, termasuk Navbar, Sidebar, breadcrumb, form, tabel, modal, dan toast;
+  preferensinya tetap konsisten saat berpindah route atau aplikasi demo.
 - **Kalender Portal Dashboard memenuhi kartunya.** Kisi tanggalnya kini selebar
   kartu, bukan 240px di tengah, dan barisnya ikut memanjang bila kartunya lebih
   tinggi dari isinya.
