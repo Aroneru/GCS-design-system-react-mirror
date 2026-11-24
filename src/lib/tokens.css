@@ -141,6 +141,9 @@
     --color-clipboard-prefix: #111928;
     --color-clipboard-tooltip: var(--color-gray-900);
 
+    /* Upload kosong di mode gelap memakai warna khusus dari desain. */
+    --color-upload-empty-surface: #1f2a37;
+
     /*
      * Token semantik field dan kontrol form (Input Field, Select, Text Area,
      * Checkbox, Radio, Toggle, Floating Label).

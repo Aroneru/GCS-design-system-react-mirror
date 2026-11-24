@@ -69,11 +69,13 @@ const darkPages = new Set([
   '/foundations/border',
   '/foundations/elevation',
   '/foundations/icons',
+  '/example',
   '/portal-dashboard',
   '/portal-dashboard/app',
 ])
 
-export const hasDarkMode = (path: string) => darkPages.has(path)
+export const hasDarkMode = (path: string) =>
+  darkPages.has(path) || path.startsWith('/example/app')
 
 /** Kunci localStorage pilihan pembaca. Skrip kecil di index.html membacanya juga. */
 const STORAGE_KEY = 'ceplok-docs-theme'

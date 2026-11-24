@@ -235,7 +235,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
           <div
             className={cn(
               'flex flex-1 items-stretch overflow-hidden rounded-lg border transition-colors',
-              darkMode ? (file ? 'border-gray-700' : 'border-[#1F2A37]') : 'border-gray-300',
+              darkMode ? (file ? 'border-gray-700' : 'border-upload-empty-surface') : 'border-gray-300',
               size.field,
             )}
           >
@@ -260,7 +260,7 @@ export const Upload = forwardRef<HTMLInputElement, UploadProps>(function Upload(
             <p
               className={cn(
                 'flex min-w-0 flex-1 items-center px-4 transition-colors',
-                darkMode ? (file ? 'bg-gray-700' : 'bg-[#1F2A37]') : 'bg-gray-50',
+                darkMode ? (file ? 'bg-gray-700' : 'bg-upload-empty-surface') : 'bg-gray-50',
                 size.text,
                 disabled
                   ? (darkMode ? 'text-gray-500' : 'text-gray-400')

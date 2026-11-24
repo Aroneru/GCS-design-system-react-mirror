@@ -11,7 +11,7 @@ import { Clock } from '../../../../lib/icons/outline'
 import { asset } from '../../../asset'
 import { LAYANAN } from '../data'
 
-export function Layanan() {
+export function Layanan({ darkMode = false }: { darkMode?: boolean }) {
   const [terkirim, setTerkirim] = useState(false)
 
   return (
@@ -27,6 +27,7 @@ export function Layanan() {
 
           <div className="mt-5 space-y-3">
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -37,6 +38,7 @@ export function Layanan() {
               actionDisabled
             />
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -47,6 +49,7 @@ export function Layanan() {
               actionDisabled
             />
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -57,6 +60,7 @@ export function Layanan() {
               actionDisabled
             />
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -67,6 +71,7 @@ export function Layanan() {
               actionDisabled
             />
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -77,6 +82,7 @@ export function Layanan() {
               actionDisabled
             />
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -87,6 +93,7 @@ export function Layanan() {
               actionDisabled
             />
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -97,6 +104,7 @@ export function Layanan() {
               actionDisabled
             />
             <ListViewItem
+              darkMode={darkMode}
               size="s"
               platform="desktop"
               decoration
@@ -118,6 +126,7 @@ export function Layanan() {
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
             {LAYANAN.map((l) => (
               <Card
+                darkMode={darkMode}
                 key={l.slug}
                 image={asset('/images/card-sample.svg')}
                 imageAlt=""
@@ -125,11 +134,12 @@ export function Layanan() {
                 description={l.deskripsi}
                 actions={
                   <div className="flex w-full flex-wrap items-center justify-between gap-3">
-                    <Badge variant="brand" icon={<Clock />}>
+                    <Badge variant="brand" icon={<Clock />} darkMode={darkMode}>
                       {l.durasi}
                     </Badge>
                     <Modal
-                      trigger={<Button size="xs">Ajukan</Button>}
+                      darkMode={darkMode}
+                      trigger={<Button size="xs" theme="primary" darkMode={darkMode}>Ajukan</Button>}
                       title={l.judul}
                       actions={{
                         secondary: { label: 'Batal', onClick: ({ close }) => close() },
@@ -169,7 +179,7 @@ export function Layanan() {
 
       {terkirim && (
         <div className="fixed bottom-4 left-4 z-50">
-          <Toast variant="success" heading="Pengajuan dibuat" onDismiss={() => setTerkirim(false)}>
+          <Toast variant="success" heading="Pengajuan dibuat" onDismiss={() => setTerkirim(false)} darkMode={darkMode}>
             Lengkapi datanya di halaman Pengaturan sebelum dikirim ke petugas.
           </Toast>
         </div>

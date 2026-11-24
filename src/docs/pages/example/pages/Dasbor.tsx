@@ -27,10 +27,10 @@ const KOLOM: TableColumn<Pengajuan>[] = [
   },
 ]
 
-export function Dasbor() {
+export function Dasbor({ darkMode = false }: { darkMode?: boolean }) {
   return (
     <div className="space-y-8">
-      <Alert variant="info" heading="Pemeliharaan terjadwal">
+      <Alert variant="info" heading="Pemeliharaan terjadwal" darkMode={darkMode}>
         Layanan legalisasi dokumen tidak tersedia pada Sabtu, 06.00–09.00 WIB. Pengajuan yang sudah
         masuk tetap diproses seperti biasa.
       </Alert>
@@ -42,7 +42,7 @@ export function Dasbor() {
               <Icon className="text-primary-700">
                 <Ikon />
               </Icon>
-              <Badge variant="success" icon={<ArrowUp />}>
+              <Badge variant="success" icon={<ArrowUp />} darkMode={darkMode}>
                 {delta}
               </Badge>
             </div>
@@ -62,6 +62,7 @@ export function Dasbor() {
             variant="outline"
             theme="gray"
             rightIcon={<ChevronRight />}
+            darkMode={darkMode}
           >
             Lihat semua
           </Button>
@@ -69,7 +70,7 @@ export function Dasbor() {
 
         {/* Ringkasan saja: lima baris terbaru, tanpa toolbar dan pagination.
             Daftar lengkap dengan pencarian ada di halaman Pengajuan. */}
-        <Table columns={KOLOM} data={PENGAJUAN.slice(0, 5)} rowKey="id"  />
+        <Table columns={KOLOM} data={PENGAJUAN.slice(0, 5)} rowKey="id" darkMode={darkMode} />
       </section>
     </div>
   )

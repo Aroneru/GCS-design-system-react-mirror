@@ -191,7 +191,13 @@ function App() {
   // startsWith, bukan ===, karena aplikasi itu punya rute-dalam sendiri
   // (/example/app/pengajuan, .../pemohon, dst) yang dibaca ExampleAppFrame.
   if (path.startsWith("/example/app")) {
-    return <ExampleAppFrame path={path} />;
+    return (
+      <ExampleAppFrame
+        path={path}
+        darkMode={dark}
+        onDarkModeChange={setDarkPreference}
+      />
+    );
   }
 
   // Portal Dashboard memakai bingkai yang sama: penuh layar, dengan tirai

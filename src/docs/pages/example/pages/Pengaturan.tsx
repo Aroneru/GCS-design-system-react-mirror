@@ -17,7 +17,7 @@ import {
 import { Envelope, ExclamationCircle, InfoCircle, User } from '../../../../lib/icons/outline'
 import { inisial, JENIS_LAYANAN } from '../data'
 
-export function Pengaturan() {
+export function Pengaturan({ darkMode = false }: { darkMode?: boolean }) {
   const [nama, setNama] = useState('Rafli Arandhana')
   const [surel, setSurel] = useState('rafli@contoh.id')
   const [telepon, setTelepon] = useState('')
@@ -32,7 +32,7 @@ export function Pengaturan() {
 
   return (
     <div className="space-y-8">
-      <Alert variant="warning" heading="Profil belum lengkap" dismissible={false}>
+      <Alert variant="warning" heading="Profil belum lengkap" dismissible={false} darkMode={darkMode}>
         Nomor telepon belum diisi. Petugas memakainya untuk mengonfirmasi jadwal layanan.
       </Alert>
 
@@ -43,7 +43,7 @@ export function Pengaturan() {
             Inisialnya diturunkan dari kolom Nama lengkap di bawah, jadi
             mengetik nama baru langsung mengubah avatarnya.
           */}
-          <Avatar size="large" initials={inisial(nama)} alt="" />
+          <Avatar size="large" initials={inisial(nama)} alt="" darkMode={darkMode} />
           <div>
             <h2 className="text-heading-3 font-black text-gray-900">Profil pemohon</h2>
             <p className="mt-1 text-body-sm text-gray-500">
@@ -59,6 +59,7 @@ export function Pengaturan() {
         */}
         <div className="mt-7 grid items-start gap-5 sm:grid-cols-2">
           <InputField
+            darkMode={darkMode}
             platform="mobile"
             label="Nama lengkap"
             placeholder="Sesuai dokumen identitas"
@@ -77,6 +78,7 @@ export function Pengaturan() {
             bawahnya ikut sebaris dengan InputField di sebelahnya.
           */}
           <FloatingLabel
+            darkMode={darkMode}
             platform="mobile"
             label="Alamat surel"
             type="email"
@@ -86,6 +88,7 @@ export function Pengaturan() {
             className="sm:pt-7 [&>div>div]:h-10"
           />
           <InputField
+            darkMode={darkMode}
             platform="mobile"
             label="Nomor telepon"
             placeholder="08xx-xxxx-xxxx"
@@ -95,6 +98,7 @@ export function Pengaturan() {
             onChange={(e) => setTelepon(e.target.value)}
           />
           <Select
+            darkMode={darkMode}
             label="Layanan yang paling sering diajukan"
             options={JENIS_LAYANAN}
             value={jenis}
@@ -108,6 +112,7 @@ export function Pengaturan() {
           </legend>
           <div className="mt-3 flex flex-wrap gap-6">
             <Radio
+              darkMode={darkMode}
               name="prioritas"
               label="Normal"
               helperText="Selesai 5 hari kerja"
@@ -115,6 +120,7 @@ export function Pengaturan() {
               onChange={() => setPrioritas('normal')}
             />
             <Radio
+              darkMode={darkMode}
               name="prioritas"
               label="Dipercepat"
               helperText="Selesai 2 hari kerja"
@@ -126,6 +132,7 @@ export function Pengaturan() {
 
         <div className="mt-6">
           <TextArea
+            darkMode={darkMode}
             type="editor"
             label="Catatan tetap"
             hint={`${keterangan.length}/500`}
@@ -144,18 +151,21 @@ export function Pengaturan() {
 
         <div className="mt-6 space-y-4">
           <Toggle
+            darkMode={darkMode}
             label="Surel setiap perubahan status"
             helperText="Dikirim segera setiap pengajuan berpindah status."
             checked={surelMasuk}
             onChange={(e) => setSurelMasuk(e.target.checked)}
           />
           <Toggle
+            darkMode={darkMode}
             label="Ringkasan mingguan"
             helperText="Satu surel tiap Senin pagi berisi rekap pekan sebelumnya."
             checked={ringkasan}
             onChange={(e) => setRingkasan(e.target.checked)}
           />
           <Checkbox
+            darkMode={darkMode}
             label="Saya menyatakan seluruh data di atas benar"
             helperText="Data yang tidak sesuai dapat membatalkan pengajuan."
             checked={setuju}
@@ -164,11 +174,12 @@ export function Pengaturan() {
         </div>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <Button type="button" variant="outline" theme="gray">
+          <Button type="button" variant="outline" theme="gray" darkMode={darkMode}>
             Batalkan
           </Button>
           <Modal
-            trigger={<Button type="button">Simpan perubahan</Button>}
+            darkMode={darkMode}
+            trigger={<Button type="button" theme="primary" darkMode={darkMode}>Simpan perubahan</Button>}
             title="Simpan perubahan?"
             actions={{
               secondary: { label: 'Batal', onClick: ({ close }) => close() },
@@ -209,7 +220,7 @@ export function Pengaturan() {
 
       {tersimpan && (
         <div className="fixed bottom-4 left-4 z-50">
-          <Toast variant="success" heading="Perubahan tersimpan" onDismiss={() => setTersimpan(false)}>
+          <Toast variant="success" heading="Perubahan tersimpan" onDismiss={() => setTersimpan(false)} darkMode={darkMode}>
             Pengaturan profil dan pemberitahuan Anda sudah diperbarui.
           </Toast>
         </div>

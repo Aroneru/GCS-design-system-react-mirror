@@ -35,6 +35,27 @@ penomorannya mengikuti [Semantic Versioning](https://semver.org/lang/id/).
 - **Id bagian Dark mode di halaman Table berganti.** Bagian "Mode gelap" kini
   bernama Dark mode, sama seperti halaman lain. Tautan
   `#/components/table#mode-gelap` berganti menjadi `#/components/table#dark-mode`.
+- **Toggle tema tersedia di Portal dan Example App.** Kontrol tema Portal tetap
+  tersedia di footer Sidebar desktop dan Navbar mobile, lalu diduplikasi ke
+  Example App. Semua halaman Example kini mengikuti pilihan terang/gelap yang
+  sama, termasuk Navbar, Sidebar, breadcrumb, form, tabel, modal, dan toast;
+  preferensinya tetap konsisten saat berpindah route atau aplikasi demo.
+- **Warna `Drawer` mode gelap dikonsistenkan.** Komponen dan seluruh preview
+  dokumentasi memakai background panel `gray-800` (`#1F2937`) dengan border
+  `gray-700` (`#374151`). Teks dasar tetap `gray-300`, sementara backdrop
+  tetap `gray-900/50`.
+- **Kategori `Search` compact di Navbar diseimbangkan.** Ruas kategori tetap
+  selebar 128px, tetapi kini memakai padding kiri/kanan 10px dan jarak 10px
+  antara label dengan chevron. Label dipusatkan di ruang yang tersedia dan
+  dibatasi 10 karakter sebelum elipsis (sebelumnya 12), sehingga `Pengumuman`
+  tetap tampil utuh sementara chevron tidak lagi mepet ke tepi. Karena memakai
+  komponen `Search` bersama, perubahan ini berlaku di Navbar Portal, Example
+  App, dan preview dokumentasi Navbar.
+- **Warna field kosong `Upload` mode gelap ditokenisasi.** Background kolom
+  nama berkas dan border pembungkus tetap memakai `#1F2A37`, tetapi sekarang
+  berasal dari token komponen `--color-upload-empty-surface`, bukan arbitrary
+  value yang ditulis langsung di komponen. Consumer dapat menimpa token ini
+  tanpa mengubah komponen.
 
 ## [0.6.0] - 2026-11-23
 

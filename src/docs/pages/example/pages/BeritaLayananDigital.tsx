@@ -2,10 +2,11 @@ import { Badge, TableOfContents } from "../../../../lib";
 import { BERITA_LAYANAN_DIGITAL_TOC } from "./BeritaLayananDigitalToc";
 
 /** Artikel dummy panjang; ID bagian disiapkan sebagai target TableOfContents. */
-export function BeritaLayananDigital() {
+export function BeritaLayananDigital({ darkMode = false }: { darkMode?: boolean }) {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 lg:flex-row lg:items-start">
       <TableOfContents
+        darkMode={darkMode}
         items={BERITA_LAYANAN_DIGITAL_TOC}
         layout="list"
         className="order-first hidden shrink-0 lg:order-last lg:sticky lg:top-6 lg:block"
@@ -14,7 +15,7 @@ export function BeritaLayananDigital() {
     <article className="min-w-0 flex-1 [&_p]:text-justify">
       <header className="border-b border-border pb-8">
         <div className="flex flex-wrap items-center gap-3">
-          <Badge variant="brand">Berita layanan</Badge>
+          <Badge variant="brand" darkMode={darkMode}>Berita layanan</Badge>
           <span className="text-body-sm text-content-muted">12 November 2026</span>
           <span className="text-content-disabled" aria-hidden="true">&middot;</span>
           <span className="text-body-sm text-content-muted">6 menit baca</span>
